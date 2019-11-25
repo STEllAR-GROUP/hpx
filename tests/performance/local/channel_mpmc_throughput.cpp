@@ -16,11 +16,12 @@
 #include <cstddef>
 #include <cstdint>
 
+///////////////////////////////////////////////////////////////////////////////
 struct data
 {
     data() = default;
 
-    data(int d)
+    explicit data(int d)
     {
         data_[0] = d;
     }
@@ -30,6 +31,26 @@ struct data
 
 constexpr int NUM_TESTS = 10000000;
 
+///////////////////////////////////////////////////////////////////////////////
+inline data channel_get(hpx::lcos::local::channel_mpmc<data> const& c)
+{
+    data result;
+    while (!c.get(&result))
+    {
+        hpx::this_thread::yield();
+    }
+    return result;
+}
+
+inline void channel_set(hpx::lcos::local::channel_mpmc<data>& c, data&& val)
+{
+    while (!c.set(std::move(val)))    // NOLINT
+    {
+        hpx::this_thread::yield();
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Produce
 double thread_func_0(hpx::lcos::local::channel_mpmc<data>& c)
 {
@@ -37,11 +58,7 @@ double thread_func_0(hpx::lcos::local::channel_mpmc<data>& c)
 
     for (int i = 0; i != NUM_TESTS; ++i)
     {
-        data d{i};
-        while (!c.set(std::move(d)))
-        {
-            hpx::this_thread::yield();
-        }
+        channel_set(c, data{i});
     }
 
     std::uint64_t end = hpx::util::high_resolution_clock::now();
@@ -56,11 +73,7 @@ double thread_func_1(hpx::lcos::local::channel_mpmc<data>& c)
 
     for (int i = 0; i != NUM_TESTS; ++i)
     {
-        data d;
-        while (!c.try_get(&d))
-        {
-            hpx::this_thread::yield();
-        }
+        data d = channel_get(c);
         HPX_ASSERT(d.data_[0] == i);
     }
 
@@ -71,15 +84,18 @@ double thread_func_1(hpx::lcos::local::channel_mpmc<data>& c)
 
 int main(int argc, char* argv[])
 {
-    hpx::lcos::local::channel_mpmc<data> c(100);
+    hpx::lcos::local::channel_mpmc<data> c(10000);
 
     hpx::future<double> producer = hpx::async(thread_func_0, std::ref(c));
     hpx::future<double> consumer = hpx::async(thread_func_1, std::ref(c));
 
-    std::cout << "Producer throughput: " << (NUM_TESTS / producer.get())
-              << "\n";
-    std::cout << "Consumer throughput: " << (NUM_TESTS / consumer.get())
-              << "\n";
+    auto producer_time = producer.get();
+    std::cout << "Producer throughput: " << (NUM_TESTS / producer_time)
+              << " [op/s] (" << (producer_time / NUM_TESTS) << " [s/op])\n";
+
+    auto consumer_time = consumer.get();
+    std::cout << "Consumer throughput: " << (NUM_TESTS / consumer_time)
+              << " [op/s] (" << (consumer_time / NUM_TESTS) << " [s/op])\n";
 
     return 0;
 }

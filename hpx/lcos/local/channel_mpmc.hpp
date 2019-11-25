@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace hpx { namespace lcos { namespace local {
 
@@ -47,9 +48,19 @@ namespace hpx { namespace lcos { namespace local {
             return num_items() == size_ - 1;
         }
 
+        bool is_full_unbuffered() const noexcept
+        {
+            return head_.data_ != 0;
+        }
+
         bool is_empty() const noexcept
         {
             return head_.data_ == tail_.data_;
+        }
+
+        bool is_empty_unbuffered() const noexcept
+        {
+            return !is_full_unbuffered();
         }
 
     public:
@@ -62,6 +73,28 @@ namespace hpx { namespace lcos { namespace local {
             tail_.data_ = 0;
         }
 
+        channel_mpmc(channel_mpmc&& rhs) noexcept
+          : head_(std::move(rhs.head_))
+          , tail_(std::move(rhs.tail_))
+          , size_(rhs.size_)
+          , buffer_(std::move(rhs.buffer_))
+          , closed_(rhs.closed_)
+        {
+            rhs.size_ = 0;
+            rhs.closed_ = true;
+        }
+
+        channel_mpmc& operator=(channel_mpmc&& rhs) noexcept
+        {
+            head_ = std::move(rhs.head_);
+            tail_ = std::move(rhs.tail_);
+            size_ = rhs.size_;
+            buffer_ = std::move(rhs.buffer_);
+            closed_ = rhs.closed_;
+            rhs.closed_ = true;
+            return *this;
+        }
+
         ~channel_mpmc()
         {
             std::unique_lock<mutex_type> l(mtx_.data_);
@@ -71,62 +104,53 @@ namespace hpx { namespace lcos { namespace local {
             }
         }
 
-        T get() const
+        bool get(T* val = nullptr) const
         {
             std::unique_lock<mutex_type> l(mtx_.data_);
-            if (is_empty())
-            {
-                if (closed_)
-                {
-                    l.unlock();
-                    HPX_THROW_EXCEPTION(hpx::invalid_status,
-                        "hpx::lcos::local::channel_mpmc::get_sync",
-                        "this channel is empty and was closed");
-                }
-                else
-                {
-                    l.unlock();
-                    HPX_THROW_EXCEPTION(hpx::invalid_status,
-                        "hpx::lcos::local::channel_mpmc::get_sync",
-                        "this channel is empty");
-                }
-            }
-
-            std::size_t head = head_.data_;
-            T result = std::move(buffer_[head]);
-            if (++head < size_)
-            {
-                head_.data_ = head;
-            }
-            else
-            {
-                head_.data_ = head - size_;
-            }
-            return result;
-        }
-
-        bool try_get(T* val = nullptr) const
-        {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            if (is_empty())
+            if (closed_)
             {
                 return false;
             }
 
-            if (val == nullptr)
+            if (size_ <= 1)
             {
-                return true;
-            }
+                // unbuffered operation
+                if (is_empty_unbuffered())
+                {
+                    return false;
+                }
 
-            std::size_t head = head_.data_;
-            *val = std::move(buffer_[head]);
-            if (++head < size_)
-            {
-                head_.data_ = head;
+                if (val == nullptr)
+                {
+                    return true;
+                }
+
+                *val = std::move(buffer_[0]);
+                head_.data_ = 0;
             }
             else
             {
-                head_.data_ = head - size_;
+                // buffered operation
+                if (is_empty())
+                {
+                    return false;
+                }
+
+                if (val == nullptr)
+                {
+                    return true;
+                }
+
+                std::size_t head = head_.data_;
+                *val = std::move(buffer_[head]);
+                if (++head < size_)
+                {
+                    head_.data_ = head;
+                }
+                else
+                {
+                    head_.data_ = 0;
+                }
             }
             return true;
         }
@@ -134,20 +158,40 @@ namespace hpx { namespace lcos { namespace local {
         bool set(T&& t)
         {
             std::unique_lock<mutex_type> l(mtx_.data_);
-            if (closed_ || is_full())
+            if (closed_)
             {
                 return false;
             }
 
-            std::size_t tail = tail_.data_;
-            buffer_[tail] = std::move(t);
-            if (++tail < size_)
+            if (size_ <= 1)
             {
-                tail_.data_ = tail;
+                // unbuffered operation
+                if (is_full_unbuffered())
+                {
+                    return false;
+                }
+
+                buffer_[0] = std::move(t);
+                head_.data_ = 1;
             }
             else
             {
-                tail_.data_ = tail - size_;
+                // buffered operation
+                if (is_full())
+                {
+                    return false;
+                }
+
+                std::size_t tail = tail_.data_;
+                buffer_[tail] = std::move(t);
+                if (++tail < size_)
+                {
+                    tail_.data_ = tail;
+                }
+                else
+                {
+                    tail_.data_ = 0;
+                }
             }
             return true;
         }
@@ -183,10 +227,10 @@ namespace hpx { namespace lcos { namespace local {
         hpx::util::cache_aligned_data<std::size_t> tail_;
 
         // a channel of size n can buffer n-1 items
-        std::size_t const size_;
+        std::size_t size_;
 
         // channel buffer
-        std::unique_ptr<T[]> const buffer_;
+        std::unique_ptr<T[]> buffer_;
 
         bool closed_;
     };
