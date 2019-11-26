@@ -26,7 +26,7 @@ Using :term:`LCO`\ s
 
 :term:`Lightweight Control Object`\ s (LCOs) provide synchronization for |hpx| applications. Most
 of them are familiar from other frameworks, but a few of them work in slightly
-different ways adapted to |hpx|. The following synchronization parameters are available in |hpx|:
+different ways adapted to |hpx|. The following synchronization objects are available in |hpx|:
 
 #. ``future``
 
