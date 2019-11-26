@@ -12,13 +12,10 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/thread_support.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <memory>
-#include <mutex>
 #include <utility>
 
 namespace hpx { namespace lcos { namespace local {
@@ -75,32 +72,22 @@ namespace hpx { namespace lcos { namespace local {
         {
             head_.data_.store(rhs.head_.data_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            rhs.head_.data_.store(0, std::memory_order_release);
-
             tail_.data_.store(rhs.tail_.data_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            rhs.tail_.data_.store(0, std::memory_order_release);
 
             closed_.store(rhs.closed_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
             rhs.closed_.store(true, std::memory_order_release);
-
-            rhs.size_ = 0;
         }
 
         channel_spsc& operator=(channel_spsc&& rhs) noexcept
         {
             head_.data_.store(rhs.head_.data_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            rhs.head_.data_.store(0, std::memory_order_release);
-
             tail_.data_.store(rhs.tail_.data_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            rhs.tail_.data_.store(0, std::memory_order_release);
 
             size_ = rhs.size_;
-            rhs.size_ = 0;
-
             buffer_ = std::move(rhs.buffer_);
 
             closed_.store(rhs.closed_.load(std::memory_order_acquire),
@@ -118,7 +105,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         }
 
-        bool get(T* val = nullptr) const
+        bool get(T* val = nullptr) const noexcept
         {
             if (closed_.load(std::memory_order_relaxed))
             {
@@ -166,7 +153,7 @@ namespace hpx { namespace lcos { namespace local {
             return true;
         }
 
-        bool set(T&& t)
+        bool set(T&& t) noexcept
         {
             if (closed_.load(std::memory_order_relaxed))
             {

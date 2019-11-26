@@ -27,11 +27,11 @@ namespace hpx { namespace lcos { namespace local {
     // This channel is bounded to a size given at construction time and supports
     // multiple producers and multiple consumers. The data is stored in a
     // ring-buffer.
-    template <typename T>
-    class channel_mpmc
+    template <typename T, typename Mutex = lcos::local::spinlock>
+    class base_channel_mpmc
     {
     private:
-        using mutex_type = hpx::lcos::local::spinlock;
+        using mutex_type = Mutex;
 
         bool is_full(std::size_t tail) const noexcept
         {
@@ -59,7 +59,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     public:
-        explicit channel_mpmc(std::size_t size)
+        explicit base_channel_mpmc(std::size_t size)
           : size_(size + 1)
           , buffer_(new T[size + 1])
           , closed_(false)
@@ -68,9 +68,9 @@ namespace hpx { namespace lcos { namespace local {
             tail_.data_ = 0;
         }
 
-        channel_mpmc(channel_mpmc&& rhs) noexcept
-          : head_(std::move(rhs.head_))
-          , tail_(std::move(rhs.tail_))
+        base_channel_mpmc(base_channel_mpmc&& rhs) noexcept
+          : head_(rhs.head_)
+          , tail_(rhs.tail_)
           , size_(rhs.size_)
           , buffer_(std::move(rhs.buffer_))
           , closed_(rhs.closed_)
@@ -79,10 +79,10 @@ namespace hpx { namespace lcos { namespace local {
             rhs.closed_ = true;
         }
 
-        channel_mpmc& operator=(channel_mpmc&& rhs) noexcept
+        base_channel_mpmc& operator=(base_channel_mpmc&& rhs) noexcept
         {
-            head_ = std::move(rhs.head_);
-            tail_ = std::move(rhs.tail_);
+            head_ = rhs.head_;
+            tail_ = rhs.tail_;
             size_ = rhs.size_;
             buffer_ = std::move(rhs.buffer_);
             closed_ = rhs.closed_;
@@ -90,7 +90,7 @@ namespace hpx { namespace lcos { namespace local {
             return *this;
         }
 
-        ~channel_mpmc()
+        ~base_channel_mpmc()
         {
             std::unique_lock<mutex_type> l(mtx_.data_);
             if (!closed_)
@@ -99,7 +99,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         }
 
-        bool get(T* val = nullptr) const
+        bool get(T* val = nullptr) const noexcept
         {
             std::unique_lock<mutex_type> l(mtx_.data_);
             if (closed_)
@@ -148,7 +148,7 @@ namespace hpx { namespace lcos { namespace local {
             return true;
         }
 
-        bool set(T&& t)
+        bool set(T&& t) noexcept
         {
             std::unique_lock<mutex_type> l(mtx_.data_);
             if (closed_)
@@ -202,7 +202,7 @@ namespace hpx { namespace lcos { namespace local {
             {
                 l.unlock();
                 HPX_THROW_EXCEPTION(hpx::invalid_status,
-                    "hpx::lcos::local::channel_mpmc::close",
+                    "hpx::lcos::local::base_channel_mpmc::close",
                     "attempting to close an already closed channel");
             }
 
@@ -226,6 +226,16 @@ namespace hpx { namespace lcos { namespace local {
         // this channel was closed, i.e. no further operations are possible
         bool closed_;
     };
+
+    ////////////////////////////////////////////////////////////////////////////
+    // For use with HPX threads, the channel_mpmc defined here is the fastest
+    // (even faster than the channel_spsc). Using hpx::util::spinlock as the
+    // means of synchronization enables the use of this channel with non-HPX
+    // threads, however the performance degrades by a factor of ten compared to
+    // using hpx::lcos::local::spinlock.
+    template <typename T>
+    using channel_mpmc = base_channel_mpmc<T, hpx::lcos::local::spinlock>;
+
 }}}    // namespace hpx::lcos::local
 
 #endif

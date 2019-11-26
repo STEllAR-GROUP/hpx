@@ -28,7 +28,7 @@ struct data
     int data_[8];
 };
 
-constexpr int NUM_TESTS = 10000000;
+constexpr int NUM_TESTS = 100000000;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline data channel_get(hpx::lcos::local::channel_spsc<data> const& c)
