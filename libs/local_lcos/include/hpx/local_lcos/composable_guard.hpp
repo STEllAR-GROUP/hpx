@@ -86,7 +86,6 @@
 #include <hpx/local_lcos/packaged_task.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <atomic>
 #include <cstddef>
