@@ -230,8 +230,56 @@ Additionally, if you wish to require |hpx| for your project, replace the
 
 You can check if |hpx| was successfully found with the ``HPX_FOUND`` CMake variable.
 
-The simplest way to add the |hpx| component is to use the ``add_hpx_component``
-macro and add it to the ``CMakeLists.txt`` file:
+Using |hpx| targets
+-------------------
+
+The recommended way of setting up your targets to use |hpx| is to link to the
+``HPX::hpx`` target:
+
+.. code-block:: cmake
+
+   target_link_libraries(hello_world_component PUBLIC HPX::hpx)
+
+This requires that you have already created the target like this:
+
+.. code-block:: cmake
+
+   add_library(hello_world_component SHARED hello_world_component.cpp)
+   target_include_directories(hello_world_component PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+When you link your library to ``HPX::hpx`` you will be able use |hpx|
+functionality in your library. To create a component, however, requires setting
+two additional compile definitions:
+
+.. code-block:: cmake
+
+   target_compile_options(hello_world_component
+     HPX_COMPONENT_NAME=hello_world
+     HPX_COMPONENT_EXPORTS)
+
+Instead of setting these definitions manually you may link to the
+``HPX::component`` target, which sets ``HPX_COMPONENT_NAME`` to
+``hpx_<target_name>``, where ``<target_name>`` is the target name of your
+library. Note that these definitions should be ``PRIVATE`` to make sure these
+definitions are not propagated transitively to dependent targets.
+
+In addition to making your library a component you can make it a plugin. To do
+so link to the ``HPX::plugin`` target. Similarly to ``HPX::component`` this
+will set ``HPX_PLUGIN_NAME`` to ``hpx_<target_name>``. This definition should
+also be ``PRIVATE``. Creating an |hpx| plugin requires some additional setup.
+
+TODO: Describe the requirements of a plugin (output directory!).
+
+Using macros to create new targets
+----------------------------------
+
+In addition to the targets described above, |hpx| provides convenience macros
+to hide optional boilerplate code that may be useful for your project. The link
+to the targets described above. We recommend that you use the targets directly
+whenever possible as they tend to compose better with other targets.
+
+The macro for adding an |hpx| component is ``add_hpx_component``. It can be
+used in your ``CMakeLists.txt`` file like this:
 
 .. code-block:: cmake
 
@@ -299,8 +347,8 @@ variable to point to the installation of |hpx|.
 
 .. _cmake_integrate_hpx:
 
-CMake macros to integrate |hpx| into existing applications
-----------------------------------------------------------
+Using macros to set up existing targets to use |hpx|
+----------------------------------------------------
 
 In addition to the ``add_hpx_component`` and ``add_hpx_executable``, you can use
 the ``hpx_setup_target`` macro to have an already existing target to be used

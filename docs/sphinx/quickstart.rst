@@ -160,9 +160,8 @@ build an executable using |cmake|_ and |hpx|:
    cmake_minimum_required(VERSION 3.3.2)
    project(my_hpx_project CXX)
    find_package(HPX REQUIRED)
-   add_hpx_executable(my_hpx_program
-       SOURCES main.cpp
-       COMPONENT_DEPENDENCIES iostreams)
+   add_executable(my_hpx_program main.cpp)
+   target_link_libraries(my_hpx_program HPX::hpx HPX::iostreams_component)
 
 .. note::
 
@@ -172,9 +171,9 @@ build an executable using |cmake|_ and |hpx|:
 
 .. note::
 
-   ``COMPONENT_DEPENDENCIES iostreams`` is optional for a minimal project but
-   lets us use the |hpx| equivalent of ``std::cout``, i.e. the |hpx|
-   :ref:`iostreams` functionality in our application.
+   ``HPX::iostreams_component`` is optional for a minimal project but lets us
+   use the |hpx| equivalent of ``std::cout``, i.e. the |hpx| :ref:`iostreams`
+   functionality in our application.
 
 Create a new project directory and a ``CMakeLists.txt`` with the contents above.
 Also create a ``main.cpp`` with the contents below.
