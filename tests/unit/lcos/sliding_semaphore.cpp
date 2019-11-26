@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/apply.hpp>
-#include <hpx/include/local_lcos.hpp>
+#include <hpx/synchronization.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 
