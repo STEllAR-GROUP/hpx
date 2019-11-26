@@ -516,6 +516,45 @@ if(HPX_WITH_DEFAULT_TARGETS)
   set(_optional OPTIONAL)
 endif()
 
+set(_library_types "STATIC_LIBRARY;MODULE_LIBRARY;SHARED_LIBRARY;OBJECT_LIBRARY;INTERFACE_LIBRARY")
+set(_is_executable "$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>")
+set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
+
+# hpx_interface contains additional interface options to be passed to dependent
+# targets. We create this as a separate target to easily filter out the
+# generator expressions that can't be handled by the pkgconfig file generation.
+add_library(hpx_interface INTERFACE)
+target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>)
+target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPX::hpx_init>>)
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+  # hpx_wrap is not correctly expanded to HPX::wrap in HPXTargets.cmake when
+  # wrapped in a generator expression. We instead choose hpx_wrap or
+  # HPX::hpx_wrap depending on which one is available.
+  target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_wrap>>)
+  target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPX::hpx_wrap>>)
+endif()
+target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>")
+target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">")
+target_compile_definitions(hpx_interface INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>")
+target_link_libraries(hpx INTERFACE hpx_interface)
+
+# HPX::component is to be linked privately to all HPX components
+# NOTE: The _is_library guard only prevents simple mistakes of linking
+# HPX::component to executables. It does not prevent linking it to libraries
+# that are not components.
+add_library(component INTERFACE)
+target_compile_definitions(component INTERFACE "$<${_is_library}:HPX_COMPONENT_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>")
+target_compile_definitions(component INTERFACE "$<${_is_library}:HPX_COMPONENT_EXPORTS>")
+
+# HPX::plugin is to be linked privately to all HPX plugins
+# NOTE: The _is_library guard only prevents simple mistakes of linking
+# HPX::component to executables. It does not prevent linking it to libraries
+# that are not components.
+add_library(plugin INTERFACE)
+target_compile_definitions(plugin INTERFACE "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>")
+
+set(hpx_targets ${hpx_targets} hpx_interface plugin component)
+
 install(
   TARGETS ${hpx_targets}
   EXPORT HPXTargets

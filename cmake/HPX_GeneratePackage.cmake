@@ -45,11 +45,11 @@ install(EXPORT HPXTargets
 
 if (NOT MSVC)
   # Generate the pkconfig files for HPX_APPLICATION (both for build and install)
-  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_application hpx_application TRUE)
-  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_application hpx_application FALSE)
+  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_application hpx_application TRUE EXCLUDE hpx_interface)
+  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_application hpx_application FALSE EXCLUDE hpx_interface)
   # Generate the pkconfig files for HPX_COMPONENT (both for build and install)
-  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_component hpx_component TRUE)
-  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_component hpx_component FALSE)
+  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_component hpx_component TRUE EXCLUDE hpx_interface)
+  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_component hpx_component FALSE EXCLUDE hpx_interface)
 endif()
 
 # Install dir
