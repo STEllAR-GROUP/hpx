@@ -217,7 +217,7 @@ used by ``find_package(HPX)`` to set up all the necessary macros needed to use
 
   The difference between ``CMAKE_PREFIX_PATH`` and ``HPX_DIR`` is that CMake
   will add common postfixes, such as ``lib/cmake/<project``, to the
-  ``MAKE_PREFIX_PATH`` and search in these locations too. Note that if your
+  ``CMAKE_PREFIX_PATH`` and search in these locations too. Note that if your
   project uses |hpx| as well as other CMake-managed projects, the paths to the
   locations of these multiple projects may be concatenated in the
   ``CMAKE_PREFIX_PATH``.
