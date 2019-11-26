@@ -6,8 +6,8 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#if !defined(HPX_LCOS_LOCAL_CHANNEL_MPMC_NOV_24_2019_1141AM)
-#define HPX_LCOS_LOCAL_CHANNEL_MPMC_NOV_24_2019_1141AM
+#if !defined(HPX_LCOS_LOCAL_CHANNEL_spsc_NOV_24_2019_1141AM)
+#define HPX_LCOS_LOCAL_CHANNEL_spsc_NOV_24_2019_1141AM
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency.hpp>
@@ -15,6 +15,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/thread_support.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <mutex>
@@ -25,84 +26,101 @@ namespace hpx { namespace lcos { namespace local {
     ////////////////////////////////////////////////////////////////////////////
     // A simple but very high performance implementation of the channel concept.
     // This channel is bounded to a size given at construction time and supports
-    // multiple producers and multiple consumers. The data is stored in a
+    // a single producer and a single consumer. The data is stored in a
     // ring-buffer.
     template <typename T>
-    class channel_mpmc
+    class channel_spsc
     {
     private:
-        using mutex_type = hpx::lcos::local::spinlock;
-
         bool is_full(std::size_t tail) const noexcept
         {
-            std::size_t numitems = size_ + tail - head_.data_;
+            std::size_t numitems =
+                size_ + tail - head_.data_.load(std::memory_order_acquire);
+
             if (numitems < size_)
             {
                 return numitems == size_ - 1;
             }
-            return numitems - size_ == size_ - 1;
+            return (numitems - size_ == size_ - 1);
         }
 
         bool is_empty(std::size_t head) const noexcept
         {
-            return head == tail_.data_;
+            return head == tail_.data_.load(std::memory_order_acquire);
         }
 
         bool is_full_unbuffered() const noexcept
         {
-            return head_.data_ != 0;
+            return head_.data_.load(std::memory_order_relaxed) != 0;
         }
 
         bool is_empty_unbuffered() const noexcept
         {
-            return head_.data_ == 0;
+            return head_.data_.load(std::memory_order_acquire) == 0;
         }
 
     public:
-        explicit channel_mpmc(std::size_t size)
+        explicit channel_spsc(std::size_t size)
           : size_(size + 1)
           , buffer_(new T[size + 1])
           , closed_(false)
         {
-            head_.data_ = 0;
-            tail_.data_ = 0;
+            head_.data_.store(0, std::memory_order_relaxed);
+            tail_.data_.store(0, std::memory_order_relaxed);
         }
 
-        channel_mpmc(channel_mpmc&& rhs) noexcept
-          : head_(std::move(rhs.head_))
-          , tail_(std::move(rhs.tail_))
-          , size_(rhs.size_)
+        channel_spsc(channel_spsc&& rhs) noexcept
+          : size_(rhs.size_)
           , buffer_(std::move(rhs.buffer_))
-          , closed_(rhs.closed_)
         {
+            head_.data_.store(rhs.head_.data_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            rhs.head_.data_.store(0, std::memory_order_release);
+
+            tail_.data_.store(rhs.tail_.data_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            rhs.tail_.data_.store(0, std::memory_order_release);
+
+            closed_.store(rhs.closed_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            rhs.closed_.store(true, std::memory_order_release);
+
             rhs.size_ = 0;
-            rhs.closed_ = true;
         }
 
-        channel_mpmc& operator=(channel_mpmc&& rhs) noexcept
+        channel_spsc& operator=(channel_spsc&& rhs) noexcept
         {
-            head_ = std::move(rhs.head_);
-            tail_ = std::move(rhs.tail_);
+            head_.data_.store(rhs.head_.data_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            rhs.head_.data_.store(0, std::memory_order_release);
+
+            tail_.data_.store(rhs.tail_.data_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            rhs.tail_.data_.store(0, std::memory_order_release);
+
             size_ = rhs.size_;
+            rhs.size_ = 0;
+
             buffer_ = std::move(rhs.buffer_);
-            closed_ = rhs.closed_;
-            rhs.closed_ = true;
+
+            closed_.store(rhs.closed_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            rhs.closed_.store(true, std::memory_order_release);
+
             return *this;
         }
 
-        ~channel_mpmc()
+        ~channel_spsc()
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            if (!closed_)
+            if (!closed_.load(std::memory_order_relaxed))
             {
-                close(l);
+                close();
             }
         }
 
         bool get(T* val = nullptr) const
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            if (closed_)
+            if (closed_.load(std::memory_order_relaxed))
             {
                 return false;
             }
@@ -121,12 +139,12 @@ namespace hpx { namespace lcos { namespace local {
                 }
 
                 *val = std::move(buffer_[0]);
-                head_.data_ = 0;
+                head_.data_.store(0, std::memory_order_release);
             }
             else
             {
                 // buffered operation
-                std::size_t head = head_.data_;
+                std::size_t head = head_.data_.load(std::memory_order_relaxed);
 
                 if (is_empty(head))
                 {
@@ -143,15 +161,14 @@ namespace hpx { namespace lcos { namespace local {
                 {
                     head = 0;
                 }
-                head_.data_ = head;
+                head_.data_.store(head, std::memory_order_release);
             }
             return true;
         }
 
         bool set(T&& t)
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            if (closed_)
+            if (closed_.load(std::memory_order_relaxed))
             {
                 return false;
             }
@@ -165,12 +182,12 @@ namespace hpx { namespace lcos { namespace local {
                 }
 
                 buffer_[0] = std::move(t);
-                head_.data_ = 1;
+                head_.data_.store(1, std::memory_order_release);
             }
             else
             {
                 // buffered operation
-                std::size_t tail = tail_.data_;
+                std::size_t tail = tail_.data_.load(std::memory_order_relaxed);
 
                 if (is_full(tail))
                 {
@@ -182,40 +199,28 @@ namespace hpx { namespace lcos { namespace local {
                 {
                     tail = 0;
                 }
-                tail_.data_ = tail;
+                tail_.data_.store(tail, std::memory_order_release);
             }
             return true;
         }
 
         std::size_t close()
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            return close(l);
-        }
-
-    protected:
-        std::size_t close(std::unique_lock<mutex_type>& l)
-        {
-            HPX_ASSERT_OWNS_LOCK(l);
-
-            if (closed_)
+            bool expected = false;
+            if (!closed_.compare_exchange_strong(expected, true))
             {
-                l.unlock();
                 HPX_THROW_EXCEPTION(hpx::invalid_status,
-                    "hpx::lcos::local::channel_mpmc::close",
+                    "hpx::lcos::local::channel_spsc::close",
                     "attempting to close an already closed channel");
             }
-
-            closed_ = true;
             return 0;
         }
 
     private:
         // keep the mutex, the head, and the tail pointer in separate cache
         // lines
-        mutable hpx::util::cache_aligned_data<mutex_type> mtx_;
-        mutable hpx::util::cache_aligned_data<std::size_t> head_;
-        hpx::util::cache_aligned_data<std::size_t> tail_;
+        mutable hpx::util::cache_aligned_data<std::atomic<std::size_t>> head_;
+        hpx::util::cache_aligned_data<std::atomic<std::size_t>> tail_;
 
         // a channel of size n can buffer n-1 items
         std::size_t size_;
@@ -224,7 +229,7 @@ namespace hpx { namespace lcos { namespace local {
         std::unique_ptr<T[]> buffer_;
 
         // this channel was closed, i.e. no further operations are possible
-        bool closed_;
+        std::atomic<bool> closed_;
     };
 }}}    // namespace hpx::lcos::local
 

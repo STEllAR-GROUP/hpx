@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/local/channel_mpmc.hpp>
+#include <hpx/lcos/local/channel_spsc.hpp>
 
 #include <hpx/testing.hpp>
 
@@ -26,7 +26,7 @@ int verify_fibonacci(int n)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-inline T channel_get(hpx::lcos::local::channel_mpmc<T> const& c)
+inline T channel_get(hpx::lcos::local::channel_spsc<T> const& c)
 {
     T result;
     while (!c.get(&result))
@@ -37,7 +37,7 @@ inline T channel_get(hpx::lcos::local::channel_mpmc<T> const& c)
 }
 
 template <typename T>
-inline void channel_set(hpx::lcos::local::channel_mpmc<T>& c, T val)
+inline void channel_set(hpx::lcos::local::channel_spsc<T>& c, T val)
 {
     while (!c.set(std::move(val)))    // NOLINT
     {
@@ -46,8 +46,8 @@ inline void channel_set(hpx::lcos::local::channel_mpmc<T>& c, T val)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void produce_numbers(hpx::lcos::local::channel_mpmc<int>& c2,
-    hpx::lcos::local::channel_mpmc<int>& c3)
+void produce_numbers(hpx::lcos::local::channel_spsc<int>& c2,
+    hpx::lcos::local::channel_spsc<int>& c3)
 {
     int f1 = 1, f2 = 0;
 
@@ -69,9 +69,9 @@ void produce_numbers(hpx::lcos::local::channel_mpmc<int>& c2,
     }
 }
 
-void consume_numbers(int n, hpx::lcos::local::channel_mpmc<bool>& c1,
-    hpx::lcos::local::channel_mpmc<int>& c2,
-    hpx::lcos::local::channel_mpmc<int>& c3)
+void consume_numbers(int n, hpx::lcos::local::channel_spsc<bool>& c1,
+    hpx::lcos::local::channel_spsc<int>& c2,
+    hpx::lcos::local::channel_spsc<int>& c3)
 {
     channel_set(c2, n);
 
@@ -87,9 +87,9 @@ void consume_numbers(int n, hpx::lcos::local::channel_mpmc<bool>& c1,
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    hpx::lcos::local::channel_mpmc<bool> c1(0);
-    hpx::lcos::local::channel_mpmc<int> c2(0);
-    hpx::lcos::local::channel_mpmc<int> c3(5);
+    hpx::lcos::local::channel_spsc<bool> c1(0);
+    hpx::lcos::local::channel_spsc<int> c2(0);
+    hpx::lcos::local::channel_spsc<int> c3(5);
 
     hpx::future<void> producer =
         hpx::async(&produce_numbers, std::ref(c2), std::ref(c3));
