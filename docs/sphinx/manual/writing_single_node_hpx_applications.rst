@@ -27,7 +27,7 @@ Using :term:`LCO`\ s
 
 :term:`Lightweight Control Object`\ s (LCOs) provide synchronization for |hpx| applications. Most
 of them are familiar from other frameworks, but a few of them work in slightly
-different ways adapted to |hpx|.
+different ways adapted to |hpx|. The following synchronization objects are available in |hpx|:
 
 #. ``future``
 
@@ -125,7 +125,7 @@ If a single method needs to run with multiple guards, use a guard set::
      run_guarded(gs,task);
 
 Guards use two atomic operations (which are not called repeatedly) to manage
-what they do, so overhead should be extremely low.
+what they do, so overhead should be extremely low. The following guards are available in |hpx|:
 
 #. ``conditional_trigger``
 
@@ -647,7 +647,7 @@ Parallel algorithms
      * ``<hpx/include/parallel_is_partitioned.hpp>``
      * :cppreference-algorithm:`is_partitioned`
    * * :cpp:func:`hpx::parallel::v1::partition`
-     * Divides elements into two groups while don't preserve their relative order.
+     * Divides elements into two groups without preserving their relative order.
      * ``<hpx/include/parallel_partition.hpp>``
      * :cppreference-algorithm:`partition`
    * * :cpp:func:`hpx::parallel::v1::partition_copy`
@@ -802,8 +802,8 @@ the chunks of work executed on a single |hpx| thread (such as the number of loop
 iterations combined to run as a single task).
 
 An executor parameter object is responsible for exposing the calculation of the
-size of the chunks scheduled. It abstracts the (potential platform-specific)
-algorithms of determining those chunks sizes.
+size of the chunks scheduled. It abstracts the (potentially platform-specific)
+algorithms of determining those chunk sizes.
 
 The way executor parameters are implemented is aligned with the way executors
 are implemented. All functionalities of concrete executor parameter types are
