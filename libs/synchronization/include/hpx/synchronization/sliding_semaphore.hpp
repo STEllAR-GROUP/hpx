@@ -17,12 +17,11 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     /// A semaphore is a protected variable (an entity storing a value) or
     /// abstract data type (an entity grouping several variables that may or
     /// may not be numerical) which constitutes the classic method for
@@ -58,10 +57,11 @@ namespace hpx { namespace lcos { namespace local
         ///                 signal()) which is allowed without suspending any
         ///                 thread calling wait().
         /// \param lower_limit  [in] The initial lower limit.
-        sliding_semaphore_var(std::int64_t max_difference,
-                std::int64_t lower_limit = 0)
+        sliding_semaphore_var(
+            std::int64_t max_difference, std::int64_t lower_limit = 0)
           : sem_(max_difference, lower_limit)
-        {}
+        {
+        }
 
         /// \brief Set/Change the difference that will cause the semaphore to trigger
         ///
@@ -71,8 +71,8 @@ namespace hpx { namespace lcos { namespace local
         ///                 signal()) which is allowed without suspending any
         ///                 thread calling wait().
         /// \param lower_limit  [in] The initial lower limit.
-        void set_max_difference(std::int64_t max_difference,
-                std::int64_t lower_limit = 0)
+        void set_max_difference(
+            std::int64_t max_difference, std::int64_t lower_limit = 0)
         {
             std::unique_lock<mutex_type> l(mtx_);
             sem_.set_max_difference(l, max_difference, lower_limit);
@@ -130,11 +130,10 @@ namespace hpx { namespace lcos { namespace local
     };
 
     typedef sliding_semaphore_var<> sliding_semaphore;
-}}}
+}}}    // namespace hpx::lcos::local
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
 #endif
-

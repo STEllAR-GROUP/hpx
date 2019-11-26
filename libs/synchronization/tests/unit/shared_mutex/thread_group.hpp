@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 
 #include <boost/thread/locks.hpp>
 
@@ -25,11 +25,10 @@
 
 #ifdef HPX_MSVC
 #pragma warning(push)
-#pragma warning(disable:4251)
+#pragma warning(disable : 4251)
 #endif
 
-namespace test
-{
+namespace test {
     class thread_group
     {
     private:
@@ -43,7 +42,7 @@ namespace test
 
         ~thread_group()
         {
-            for (hpx::thread* t: threads)
+            for (hpx::thread* t : threads)
                 delete t;
         }
 
@@ -52,7 +51,7 @@ namespace test
         {
             hpx::thread::id id = hpx::this_thread::get_id();
             boost::shared_lock<mutex_type> guard(mtx_);
-            for (hpx::thread* t: threads)
+            for (hpx::thread* t : threads)
             {
                 if (t->get_id() == id)
                     return true;
@@ -67,7 +66,7 @@ namespace test
 
             hpx::thread::id id = thrd->get_id();
             boost::shared_lock<mutex_type> guard(mtx_);
-            for (hpx::thread* t: threads)
+            for (hpx::thread* t : threads)
             {
                 if (t->get_id() == id)
                     return true;
@@ -76,8 +75,8 @@ namespace test
         }
 
     public:
-        template<typename F>
-        hpx::thread* create_thread(F && f)
+        template <typename F>
+        hpx::thread* create_thread(F&& f)
         {
             std::lock_guard<mutex_type> guard(mtx_);
             std::unique_ptr<hpx::thread> new_thread(
@@ -88,14 +87,14 @@ namespace test
 
         void add_thread(hpx::thread* thrd)
         {
-            if(thrd)
+            if (thrd)
             {
-                if(is_thread_in(thrd))
+                if (is_thread_in(thrd))
                 {
-                    HPX_THROW_EXCEPTION(
-                        hpx::thread_resource_error, "thread_group::add_thread",
+                    HPX_THROW_EXCEPTION(hpx::thread_resource_error,
+                        "thread_group::add_thread",
                         "resource_deadlock_would_occur: trying to add a "
-                            "duplicated thread");
+                        "duplicated thread");
                     return;
                 };
 
@@ -110,7 +109,7 @@ namespace test
             std::list<hpx::thread*>::iterator const it =
                 std::find(threads.begin(), threads.end(), thrd);
 
-            if(it != threads.end())
+            if (it != threads.end())
                 threads.erase(it);
         }
 
@@ -118,14 +117,14 @@ namespace test
         {
             if (is_this_thread_in())
             {
-                HPX_THROW_EXCEPTION(
-                    hpx::thread_resource_error, "thread_group::join_all",
+                HPX_THROW_EXCEPTION(hpx::thread_resource_error,
+                    "thread_group::join_all",
                     "resource_deadlock_would_occur: trying joining itself");
                 return;
             }
 
             boost::shared_lock<mutex_type> guard(mtx_);
-            for (hpx::thread* t: threads)
+            for (hpx::thread* t : threads)
             {
                 if (t->joinable())
                     t->join();
@@ -135,7 +134,7 @@ namespace test
         void interrupt_all()
         {
             boost::shared_lock<mutex_type> guard(mtx_);
-            for (hpx::thread* t: threads)
+            for (hpx::thread* t : threads)
             {
                 t->interrupt();
             }
@@ -151,7 +150,7 @@ namespace test
         std::list<hpx::thread*> threads;
         mutable mutex_type mtx_;
     };
-}
+}    // namespace test
 
 #ifdef HPX_MSVC
 #pragma warning(pop)

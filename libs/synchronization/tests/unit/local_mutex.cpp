@@ -7,14 +7,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/functional/bind.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
-#include <hpx/synchronization/mutex.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/functional/bind.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/testing.hpp>
-
 
 #include <chrono>
 #include <mutex>
@@ -44,13 +43,13 @@ struct test_lock
 
         // Construct and initialize an xtime for a fast time out.
         std::chrono::system_clock::time_point xt =
-            std::chrono::system_clock::now()
-          + std::chrono::milliseconds(10);
+            std::chrono::system_clock::now() + std::chrono::milliseconds(10);
 
         // Test the lock and the mutex with condition variables.
         // No one is going to notify this condition variable.  We expect to
         // time out.
-        HPX_TEST(condition.wait_until(lock, xt) == hpx::lcos::local::cv_status::timeout);
+        HPX_TEST(condition.wait_until(lock, xt) ==
+            hpx::lcos::local::cv_status::timeout);
         HPX_TEST(lock ? true : false);
 
         // Test the lock and unlock methods.
@@ -86,13 +85,13 @@ struct test_trylock
 
         // Construct and initialize an xtime for a fast time out.
         std::chrono::system_clock::time_point xt =
-            std::chrono::system_clock::now()
-          + std::chrono::milliseconds(10);
+            std::chrono::system_clock::now() + std::chrono::milliseconds(10);
 
         // Test the lock and the mutex with condition variables.
         // No one is going to notify this condition variable.  We expect to
         // time out.
-        HPX_TEST(condition.wait_until(lock, xt) == hpx::lcos::local::cv_status::timeout);
+        HPX_TEST(condition.wait_until(lock, xt) ==
+            hpx::lcos::local::cv_status::timeout);
         HPX_TEST(lock ? true : false);
 
         // Test the lock, unlock and trylock methods.
@@ -107,7 +106,7 @@ struct test_trylock
     }
 };
 
-template<typename Mutex>
+template <typename Mutex>
 struct test_lock_times_out_if_other_thread_has_lock
 {
     typedef std::unique_lock<Mutex> Lock;
@@ -118,28 +117,30 @@ struct test_lock_times_out_if_other_thread_has_lock
     bool locked;
     hpx::lcos::local::condition_variable_any done_cond;
 
-    test_lock_times_out_if_other_thread_has_lock():
-        done(false),locked(false)
-    {}
+    test_lock_times_out_if_other_thread_has_lock()
+      : done(false)
+      , locked(false)
+    {
+    }
 
     void locking_thread()
     {
-        Lock lock(m,std::defer_lock);
+        Lock lock(m, std::defer_lock);
         lock.try_lock_for(std::chrono::milliseconds(50));
 
         std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
-        locked=lock.owns_lock();
-        done=true;
+        locked = lock.owns_lock();
+        done = true;
         done_cond.notify_one();
     }
 
     void locking_thread_through_constructor()
     {
-        Lock lock(m,std::chrono::milliseconds(50));
+        Lock lock(m, std::chrono::milliseconds(50));
 
         std::lock_guard<hpx::lcos::local::mutex> lk(done_mutex);
-        locked=lock.owns_lock();
-        done=true;
+        locked = lock.owns_lock();
+        done = true;
         done_cond.notify_one();
     }
 
@@ -154,31 +155,30 @@ struct test_lock_times_out_if_other_thread_has_lock
     {
         Lock lock(m);
 
-        locked=false;
-        done=false;
+        locked = false;
+        done = false;
 
-        hpx::thread t(test_func,this);
+        hpx::thread t(test_func, this);
 
         try
         {
             {
                 std::unique_lock<hpx::lcos::local::mutex> lk(done_mutex);
-                HPX_TEST(done_cond.wait_for(lk,std::chrono::seconds(2),
-                    hpx::util::bind(&this_type::is_done,this)));
+                HPX_TEST(done_cond.wait_for(lk, std::chrono::seconds(2),
+                    hpx::util::bind(&this_type::is_done, this)));
                 HPX_TEST(!locked);
             }
 
             lock.unlock();
             t.join();
         }
-        catch(...)
+        catch (...)
         {
             lock.unlock();
             t.join();
             throw;
         }
     }
-
 
     void operator()()
     {
@@ -209,8 +209,8 @@ struct test_timedlock
         {
             // Construct and initialize an xtime for a fast time out.
             std::chrono::system_clock::time_point xt =
-                std::chrono::system_clock::now()
-              + std::chrono::milliseconds(10);
+                std::chrono::system_clock::now() +
+                std::chrono::milliseconds(10);
 
             try_lock_for_type lock(mutex, xt);
             HPX_TEST(lock ? true : false);
@@ -224,8 +224,7 @@ struct test_timedlock
 
         // Construct and initialize an xtime for a fast time out.
         std::chrono::system_clock::time_point timeout =
-            std::chrono::system_clock::now()
-          + std::chrono::milliseconds(100);
+            std::chrono::system_clock::now() + std::chrono::milliseconds(100);
 
         // Test the lock and the mutex with condition variables.
         // No one is going to notify this condition variable.  We expect to
@@ -246,8 +245,7 @@ struct test_timedlock
         HPX_TEST(!lock);
 
         std::chrono::system_clock::time_point target =
-            std::chrono::system_clock::now()
-          + std::chrono::milliseconds(100);
+            std::chrono::system_clock::now() + std::chrono::milliseconds(100);
         HPX_TEST(lock.try_lock_until(target));
         HPX_TEST(lock ? true : false);
         lock.unlock();
@@ -306,8 +304,8 @@ void test_timed_mutex()
 //}
 
 ///////////////////////////////////////////////////////////////////////////////
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 int hpx_main(variables_map&)
 {
@@ -328,9 +326,7 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

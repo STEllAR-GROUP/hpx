@@ -24,14 +24,13 @@
 
 #include <cstddef>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
     HPX_API_EXPORT extern bool spinlock_break_on_deadlock;
     HPX_API_EXPORT extern std::size_t spinlock_deadlock_detection_limit;
 #endif
 
-    inline void yield_k(std::size_t k, const char *thread_name,
+    inline void yield_k(std::size_t k, const char* thread_name,
         hpx::threads::thread_state_enum p = hpx::threads::pending_boost)
     {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
@@ -44,6 +43,6 @@ namespace hpx { namespace util { namespace detail
 #endif
         hpx::basic_execution::this_thread::yield_k(k, thread_name);
     }
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif

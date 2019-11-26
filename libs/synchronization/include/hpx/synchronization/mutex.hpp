@@ -27,10 +27,9 @@ namespace hpx { namespace threads {
     /// specific) self reference to the current HPX thread.
     HPX_API_EXPORT thread_self* get_self_ptr();
 
-}}  // namespace hpx::threads
+}}    // namespace hpx::threads
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
     class mutex
     {
@@ -52,7 +51,8 @@ namespace hpx { namespace lcos { namespace local
             return lock("mutex::lock", ec);
         }
 
-        HPX_EXPORT bool try_lock(char const* description, error_code& ec = throws);
+        HPX_EXPORT bool try_lock(
+            char const* description, error_code& ec = throws);
 
         bool try_lock(error_code& ec = throws)
         {
@@ -85,8 +85,8 @@ namespace hpx { namespace lcos { namespace local
         HPX_EXPORT bool try_lock_until(util::steady_time_point const& abs_time,
             char const* description, error_code& ec = throws);
 
-        bool try_lock_until(util::steady_time_point const& abs_time,
-            error_code& ec = throws)
+        bool try_lock_until(
+            util::steady_time_point const& abs_time, error_code& ec = throws)
         {
             return try_lock_until(abs_time, "mutex::try_lock_until", ec);
         }
@@ -97,12 +97,12 @@ namespace hpx { namespace lcos { namespace local
             return try_lock_until(rel_time.from_now(), description, ec);
         }
 
-        bool try_lock_for(util::steady_duration const& rel_time,
-            error_code& ec = throws)
+        bool try_lock_for(
+            util::steady_duration const& rel_time, error_code& ec = throws)
         {
             return try_lock_for(rel_time, "mutex::try_lock_for", ec);
         }
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif /*HPX_LCOS_LOCAL_MUTEX_HPP*/

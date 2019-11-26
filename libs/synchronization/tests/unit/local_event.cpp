@@ -17,9 +17,9 @@
 #include <string>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::applier::register_work;
 
@@ -29,8 +29,8 @@ using hpx::this_thread::suspend;
 
 using hpx::lcos::local::event;
 
-using hpx::init;
 using hpx::finalize;
+using hpx::init;
 
 using hpx::util::report_errors;
 
@@ -61,14 +61,13 @@ int hpx_main(variables_map& vm)
 
         std::atomic<std::size_t> c(0);
 
-        std::vector<hpx::future<void> > futs;
+        std::vector<hpx::future<void>> futs;
         futs.reserve(pxthreads);
         // Create the threads which will wait on the event
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             futs.push_back(
-                hpx::async(&local_event_test, std::ref(e), std::ref(c))
-            );
+                hpx::async(&local_event_test, std::ref(e), std::ref(c)));
         }
 
         // Release all the threads.
@@ -91,24 +90,20 @@ int hpx_main(variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(64),
-            "the number of PX threads to invoke")
-        ("iterations", value<std::size_t>()->default_value(64),
-            "the number of times to repeat the test")
-        ;
+    desc_commandline.add_options()("pxthreads,T",
+        value<std::size_t>()->default_value(64),
+        "the number of PX threads to invoke")("iterations",
+        value<std::size_t>()->default_value(64),
+        "the number of times to repeat the test");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,
-      "HPX main exited with non-zero status");
+        "HPX main exited with non-zero status");
     return report_errors();
 }
-

@@ -20,12 +20,11 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local { namespace detail
-{
+namespace hpx { namespace lcos { namespace local { namespace detail {
     class sliding_semaphore
     {
     private:
@@ -33,17 +32,19 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
     public:
         sliding_semaphore(std::int64_t max_difference, std::int64_t lower_limit)
-          : max_difference_(max_difference), lower_limit_(lower_limit), cond_()
-        {}
+          : max_difference_(max_difference)
+          , lower_limit_(lower_limit)
+          , cond_()
+        {
+        }
 
-        void set_max_difference(std::unique_lock<mutex_type> &l,
-                                std::int64_t max_difference,
-                                std::int64_t lower_limit)
+        void set_max_difference(std::unique_lock<mutex_type>& l,
+            std::int64_t max_difference, std::int64_t lower_limit)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
             max_difference_ = max_difference;
-            lower_limit_    = lower_limit;
+            lower_limit_ = lower_limit;
         }
 
         void wait(std::unique_lock<mutex_type>& l, std::int64_t upper_limit)
@@ -102,11 +103,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         std::int64_t lower_limit_;
         local::detail::condition_variable cond_;
     };
-}}}}
+}}}}    // namespace hpx::lcos::local::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
 #endif
-

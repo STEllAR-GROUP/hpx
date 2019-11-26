@@ -10,12 +10,11 @@
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/lcos/local/spinlock_no_backoff.hpp is deprecated, \
     please include hpx/synchronization/spinlock_no_backoff.hpp instead")
 #else
-#warning \
-    "The header hpx/lcos/local/spinlock_no_backoff.hpp is deprecated, \
+#warning "The header hpx/lcos/local/spinlock_no_backoff.hpp is deprecated, \
     please include hpx/synchronization/spinlock_no_backoff.hpp instead"
 #endif
 #endif

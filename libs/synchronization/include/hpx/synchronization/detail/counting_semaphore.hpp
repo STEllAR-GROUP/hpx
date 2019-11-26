@@ -21,12 +21,11 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local { namespace detail
-{
+namespace hpx { namespace lcos { namespace local { namespace detail {
     class counting_semaphore
     {
     private:
@@ -34,8 +33,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
     public:
         counting_semaphore(std::int64_t value = 0)
-          : value_(value), cond_()
-        {}
+          : value_(value)
+          , cond_()
+        {
+        }
 
         void wait(std::unique_lock<mutex_type>& l, std::int64_t count)
         {
@@ -52,7 +53,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
-            if (!(value_ < count)) {
+            if (!(value_ < count))
+            {
                 // enter wait_locked only if there are sufficient credits
                 // available
                 wait(l, count);
@@ -93,11 +95,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         std::int64_t value_;
         local::detail::condition_variable cond_;
     };
-}}}}
+}}}}    // namespace hpx::lcos::local::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
 #endif
-

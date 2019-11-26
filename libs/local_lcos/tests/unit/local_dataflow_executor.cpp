@@ -7,9 +7,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/util/unwrap.hpp>
 
@@ -21,9 +21,9 @@
 #include <utility>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::dataflow;
 using hpx::util::bind;
@@ -34,8 +34,8 @@ using hpx::shared_future;
 
 using hpx::make_ready_future;
 
-using hpx::init;
 using hpx::finalize;
+using hpx::init;
 
 using hpx::util::report_errors;
 using hpx::util::unwrapping;
@@ -45,21 +45,39 @@ using hpx::util::unwrapping;
 std::atomic<std::uint32_t> void_f_count;
 std::atomic<std::uint32_t> int_f_count;
 
-void void_f() {++void_f_count;}
-int int_f() {++int_f_count; return 42; }
+void void_f()
+{
+    ++void_f_count;
+}
+int int_f()
+{
+    ++int_f_count;
+    return 42;
+}
 
 std::atomic<std::uint32_t> void_f1_count;
 std::atomic<std::uint32_t> int_f1_count;
 
-void void_f1(int) {++void_f1_count;}
-int int_f1(int i) {++int_f1_count; return i+42; }
+void void_f1(int)
+{
+    ++void_f1_count;
+}
+int int_f1(int i)
+{
+    ++int_f1_count;
+    return i + 42;
+}
 
 std::atomic<std::uint32_t> int_f2_count;
-int int_f2(int l, int r) {++int_f2_count; return l + r; }
+int int_f2(int l, int r)
+{
+    ++int_f2_count;
+    return l + r;
+}
 
 std::atomic<std::uint32_t> int_f_vector_count;
 
-int int_f_vector(std::vector<int> const & vf)
+int int_f_vector(std::vector<int> const& vf)
 {
     int sum = 0;
     for (int f : vf)
@@ -79,44 +97,24 @@ void function_pointers(Executor& exec)
     int_f2_count.store(0);
 
     future<void> f1 = dataflow(exec, unwrapping(&void_f1), async(&int_f));
-    future<int>
-        f2 = dataflow(exec,
-            unwrapping(&int_f1)
-          , dataflow(exec,
-                unwrapping(&int_f1)
-              , make_ready_future(42))
-        );
-    future<int>
-        f3 = dataflow(exec,
-            unwrapping(&int_f2)
-          , dataflow(exec,
-                unwrapping(&int_f1)
-              , make_ready_future(42)
-            )
-          , dataflow(exec,
-                unwrapping(&int_f1)
-              , make_ready_future(37)
-            )
-        );
+    future<int> f2 = dataflow(exec, unwrapping(&int_f1),
+        dataflow(exec, unwrapping(&int_f1), make_ready_future(42)));
+    future<int> f3 = dataflow(exec, unwrapping(&int_f2),
+        dataflow(exec, unwrapping(&int_f1), make_ready_future(42)),
+        dataflow(exec, unwrapping(&int_f1), make_ready_future(37)));
 
     int_f_vector_count.store(0);
-    std::vector<future<int> > vf;
-    for(std::size_t i = 0; i < 10; ++i)
+    std::vector<future<int>> vf;
+    for (std::size_t i = 0; i < 10; ++i)
     {
-        vf.push_back(dataflow(exec, unwrapping(&int_f1), make_ready_future(42)));
+        vf.push_back(
+            dataflow(exec, unwrapping(&int_f1), make_ready_future(42)));
     }
     future<int> f4 = dataflow(exec, unwrapping(&int_f_vector), std::move(vf));
 
-    future<int>
-        f5 = dataflow(exec,
-            unwrapping(&int_f1)
-          , dataflow(exec,
-                unwrapping(&int_f1)
-              , make_ready_future(42))
-          , dataflow(exec,
-                unwrapping(&void_f)
-              , make_ready_future())
-        );
+    future<int> f5 = dataflow(exec, unwrapping(&int_f1),
+        dataflow(exec, unwrapping(&int_f1), make_ready_future(42)),
+        dataflow(exec, unwrapping(&void_f), make_ready_future()));
 
     f1.wait();
     HPX_TEST_EQ(f2.get(), 126);
@@ -166,14 +164,15 @@ int future_int_f1(future<void> f1)
 
 int future_int_f2(future<int> f1, future<int> f2)
 {
-    HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
     ++future_int_f2_count;
     return f1.get() + f2.get();
 }
 
 std::atomic<std::uint32_t> future_int_f_vector_count;
 
-int future_int_f_vector(std::vector<future<int> >& vf)
+int future_int_f_vector(std::vector<future<int>>& vf)
 {
     int sum = 0;
     for (future<int>& f : vf)
@@ -193,22 +192,17 @@ void future_function_pointers(Executor& exec)
     future_int_f1_count.store(0);
     future_int_f2_count.store(0);
 
-    future<void> f1
-        = dataflow(exec,
-            &future_void_f1
-          , async(&future_void_sf1, shared_future<void>(make_ready_future()))
-        );
+    future<void> f1 = dataflow(exec, &future_void_f1,
+        async(&future_void_sf1, shared_future<void>(make_ready_future())));
 
     f1.wait();
 
     HPX_TEST_EQ(future_void_f1_count, 2u);
     future_void_f1_count.store(0);
 
-    future<void> f2 = dataflow(exec,
-        &future_void_f2
-      , async(&future_void_sf1, shared_future<void>(make_ready_future()))
-      , async(&future_void_sf1, shared_future<void>(make_ready_future()))
-    );
+    future<void> f2 = dataflow(exec, &future_void_f2,
+        async(&future_void_sf1, shared_future<void>(make_ready_future())),
+        async(&future_void_sf1, shared_future<void>(make_ready_future())));
 
     f2.wait();
     HPX_TEST_EQ(future_void_f1_count, 2u);
@@ -219,20 +213,15 @@ void future_function_pointers(Executor& exec)
     future_int_f1_count.store(0);
     future_int_f2_count.store(0);
 
-    future<int> f3 = dataflow(exec,
-        &future_int_f1
-      , make_ready_future()
-    );
+    future<int> f3 = dataflow(exec, &future_int_f1, make_ready_future());
 
     HPX_TEST_EQ(f3.get(), 1);
     HPX_TEST_EQ(future_int_f1_count, 1u);
     future_int_f1_count.store(0);
 
-    future<int> f4 = dataflow(exec,
-        &future_int_f2
-      , dataflow(exec, &future_int_f1, make_ready_future())
-      , dataflow(exec, &future_int_f1, make_ready_future())
-    );
+    future<int> f4 = dataflow(exec, &future_int_f2,
+        dataflow(exec, &future_int_f1, make_ready_future()),
+        dataflow(exec, &future_int_f1, make_ready_future()));
 
     HPX_TEST_EQ(f4.get(), 2);
     HPX_TEST_EQ(future_int_f1_count, 2u);
@@ -241,8 +230,8 @@ void future_function_pointers(Executor& exec)
     future_int_f2_count.store(0);
 
     future_int_f_vector_count.store(0);
-    std::vector<future<int> > vf;
-    for(std::size_t i = 0; i < 10; ++i)
+    std::vector<future<int>> vf;
+    for (std::size_t i = 0; i < 10; ++i)
     {
         vf.push_back(dataflow(exec, &future_int_f1, make_ready_future()));
     }
@@ -257,14 +246,28 @@ void future_function_pointers(Executor& exec)
 std::atomic<std::uint32_t> void_f4_count;
 std::atomic<std::uint32_t> int_f4_count;
 
-void void_f4(int) { ++void_f4_count; }
-int int_f4(int i) { ++int_f4_count; return i+42; }
+void void_f4(int)
+{
+    ++void_f4_count;
+}
+int int_f4(int i)
+{
+    ++int_f4_count;
+    return i + 42;
+}
 
 std::atomic<std::uint32_t> void_f5_count;
 std::atomic<std::uint32_t> int_f5_count;
 
-void void_f5(int, hpx::future<int>) { ++void_f5_count; }
-int int_f5(int i, hpx::future<int> j) { ++int_f5_count; return i+j.get()+42; }
+void void_f5(int, hpx::future<int>)
+{
+    ++void_f5_count;
+}
+int int_f5(int i, hpx::future<int> j)
+{
+    ++int_f5_count;
+    return i + j.get() + 42;
+}
 
 template <typename Executor>
 void plain_arguments(Executor& exec)
@@ -305,10 +308,10 @@ void plain_deferred_arguments(Executor& exec)
     int_f5_count.store(0);
 
     {
-        future<void> f1 = dataflow(
-            exec, &void_f5, 42, async(hpx::launch::deferred, &int_f));
-        future<int> f2 = dataflow(
-            exec, &int_f5, 42, async(hpx::launch::deferred, &int_f));
+        future<void> f1 =
+            dataflow(exec, &void_f5, 42, async(hpx::launch::deferred, &int_f));
+        future<int> f2 =
+            dataflow(exec, &int_f5, 42, async(hpx::launch::deferred, &int_f));
 
         f1.wait();
         HPX_TEST_EQ(void_f5_count, 1u);
@@ -344,16 +347,14 @@ int hpx_main(variables_map&)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,
-      "HPX main exited with non-zero status");
+        "HPX main exited with non-zero status");
     return report_errors();
 }

@@ -6,11 +6,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/functional/bind.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
-#include <hpx/functional/bind.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -19,16 +19,16 @@
 #include <string>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::applier::register_work;
 
 using hpx::lcos::local::barrier;
 
-using hpx::init;
 using hpx::finalize;
+using hpx::init;
 
 using hpx::util::report_errors;
 
@@ -69,7 +69,7 @@ int hpx_main(variables_map& vm)
                 hpx::util::bind(&local_barrier_test, std::ref(b), std::ref(c)));
         }
 
-        b.wait(); // wait for all threads to enter the barrier
+        b.wait();    // wait for all threads to enter the barrier
         HPX_TEST_EQ(pxthreads, c);
     }
 
@@ -82,24 +82,20 @@ int hpx_main(variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    options_description
-    desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-            ("pxthreads,T", value<std::size_t>()->default_value(64),
-             "the number of PX threads to invoke")
-            ("iterations", value<std::size_t>()->default_value(64),
-             "the number of times to repeat the test")
-            ;
+    desc_commandline.add_options()("pxthreads,T",
+        value<std::size_t>()->default_value(64),
+        "the number of PX threads to invoke")("iterations",
+        value<std::size_t>()->default_value(64),
+        "the number of times to repeat the test");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-            "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,
-                    "HPX main exited with non-zero status");
+        "HPX main exited with non-zero status");
     return report_errors();
 }
-

@@ -10,17 +10,16 @@
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
     mutex::mutex(char const* const description)
       : owner_id_(threads::invalid_thread_id)
@@ -42,11 +41,10 @@ namespace hpx { namespace lcos { namespace local
         std::unique_lock<mutex_type> l(mtx_);
 
         threads::thread_id_type self_id = threads::get_self_id();
-        if(owner_id_ == self_id)
+        if (owner_id_ == self_id)
         {
             HPX_ITT_SYNC_CANCEL(this);
-            HPX_THROWS_IF(ec, deadlock,
-                description,
+            HPX_THROWS_IF(ec, deadlock, description,
                 "The calling thread already owns the mutex");
             return;
         }
@@ -54,7 +52,11 @@ namespace hpx { namespace lcos { namespace local
         while (owner_id_ != threads::invalid_thread_id)
         {
             cond_.wait(l, ec);
-            if (ec) { HPX_ITT_SYNC_CANCEL(this); return; }
+            if (ec)
+            {
+                HPX_ITT_SYNC_CANCEL(this);
+                return;
+            }
         }
 
         util::register_lock(this);
@@ -93,8 +95,7 @@ namespace hpx { namespace lcos { namespace local
         if (HPX_UNLIKELY(owner_id_ != self_id))
         {
             util::unregister_lock(this);
-            HPX_THROWS_IF(ec, lock_error,
-                "mutex::unlock",
+            HPX_THROWS_IF(ec, lock_error, "mutex::unlock",
                 "The calling thread does not own the mutex");
             return;
         }
@@ -112,10 +113,10 @@ namespace hpx { namespace lcos { namespace local
     ///////////////////////////////////////////////////////////////////////////
     timed_mutex::timed_mutex(char const* const description)
       : mutex(description)
-    {}
+    {
+    }
 
-    timed_mutex::~timed_mutex()
-    {}
+    timed_mutex::~timed_mutex() {}
 
     bool timed_mutex::try_lock_until(util::steady_time_point const& abs_time,
         char const* description, error_code& ec)
@@ -130,15 +131,19 @@ namespace hpx { namespace lcos { namespace local
         {
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, abs_time, ec);
-            if (ec) { HPX_ITT_SYNC_CANCEL(this); return false; }
-
-            if (reason == threads::wait_timeout) //-V110
+            if (ec)
             {
                 HPX_ITT_SYNC_CANCEL(this);
                 return false;
             }
 
-            if (owner_id_ != threads::invalid_thread_id) //-V110
+            if (reason == threads::wait_timeout)    //-V110
+            {
+                HPX_ITT_SYNC_CANCEL(this);
+                return false;
+            }
+
+            if (owner_id_ != threads::invalid_thread_id)    //-V110
             {
                 HPX_ITT_SYNC_CANCEL(this);
                 return false;
@@ -150,4 +155,4 @@ namespace hpx { namespace lcos { namespace local
         owner_id_ = self_id;
         return true;
     }
-}}}
+}}}    // namespace hpx::lcos::local

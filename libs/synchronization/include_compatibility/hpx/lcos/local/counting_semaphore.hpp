@@ -10,12 +10,11 @@
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/lcos/local/counting_semaphore.hpp is deprecated, \
     please include hpx/synchronization/counting_semaphore.hpp instead")
 #else
-#warning \
-    "The header hpx/lcos/local/counting_semaphore.hpp is deprecated, \
+#warning "The header hpx/lcos/local/counting_semaphore.hpp is deprecated, \
     please include hpx/synchronization/counting_semaphore.hpp instead"
 #endif
 #endif

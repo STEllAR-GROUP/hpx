@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <cstdint>
 
+// clang-format off
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
 #  if !defined(BOOST_SP_HAS_SYNC)
@@ -35,10 +36,10 @@
 #    endif
 #  endif
 #endif
+// clang-format on
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     // std::mutex-compatible spinlock class
     struct spinlock
     {
@@ -82,9 +83,10 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            bool r = acquire_lock(); //-V707
+            bool r = acquire_lock();    //-V707
 
-            if (r) {
+            if (r)
+            {
                 HPX_ITT_SYNC_ACQUIRED(this);
                 util::register_lock(this);
                 return true;
@@ -127,7 +129,6 @@ namespace hpx { namespace lcos { namespace local
 #endif
         }
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
-#endif // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
-
+#endif    // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113

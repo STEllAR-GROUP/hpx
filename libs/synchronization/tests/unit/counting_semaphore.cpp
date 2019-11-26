@@ -5,8 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
@@ -23,7 +23,7 @@ std::atomic<int> count(0);
 void worker(hpx::lcos::local::counting_semaphore& sem)
 {
     ++count;
-    sem.signal();   // signal main thread
+    sem.signal();    // signal main thread
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,13 +45,11 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv, cfg), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

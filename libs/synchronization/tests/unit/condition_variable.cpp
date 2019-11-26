@@ -10,9 +10,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
-#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <hpx/testing.hpp>
@@ -24,11 +24,10 @@
 #include <string>
 #include <vector>
 
-namespace
-{
+namespace {
     hpx::lcos::local::mutex multiple_wake_mutex;
     hpx::lcos::local::condition_variable multiple_wake_cond;
-    unsigned multiple_wake_count=0;
+    unsigned multiple_wake_count = 0;
 
     void wait_for_condvar_and_increase_count()
     {
@@ -43,7 +42,7 @@ namespace
             group[i].join();
     }
 
-}
+}    // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
 struct wait_for_flag
@@ -53,17 +52,20 @@ struct wait_for_flag
     bool flag;
     unsigned woken;
 
-    wait_for_flag():
-        flag(false),woken(0)
-    {}
+    wait_for_flag()
+      : flag(false)
+      , woken(0)
+    {
+    }
 
     struct check_flag
     {
         bool const& flag;
 
-        check_flag(bool const& flag_):
-            flag(flag_)
-        {}
+        check_flag(bool const& flag_)
+          : flag(flag_)
+        {
+        }
 
         bool operator()() const
         {
@@ -71,11 +73,10 @@ struct wait_for_flag
         }
     };
 
-
     void wait_without_predicate()
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
-        while(!flag)
+        while (!flag)
         {
             cond_var.wait(lock);
         }
@@ -85,8 +86,8 @@ struct wait_for_flag
     void wait_with_predicate()
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
-        cond_var.wait(lock,check_flag(flag));
-        if(flag)
+        cond_var.wait(lock, check_flag(flag));
+        if (flag)
         {
             ++woken;
         }
@@ -98,9 +99,10 @@ struct wait_for_flag
             std::chrono::system_clock::now() + std::chrono::milliseconds(5);
 
         std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
-        while(!flag)
+        while (!flag)
         {
-            if(cond_var.wait_until(lock,timeout) == hpx::lcos::local::cv_status::timeout)
+            if (cond_var.wait_until(lock, timeout) ==
+                hpx::lcos::local::cv_status::timeout)
             {
                 return;
             }
@@ -114,7 +116,7 @@ struct wait_for_flag
             std::chrono::system_clock::now() + std::chrono::milliseconds(5);
 
         std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
-        if(cond_var.wait_until(lock,timeout,check_flag(flag)) && flag)
+        if (cond_var.wait_until(lock, timeout, check_flag(flag)) && flag)
         {
             ++woken;
         }
@@ -122,8 +124,9 @@ struct wait_for_flag
     void relative_wait_until_with_predicate()
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(mutex);
-        if(cond_var.wait_for(lock,std::chrono::milliseconds(5),
-            check_flag(flag)) && flag)
+        if (cond_var.wait_for(
+                lock, std::chrono::milliseconds(5), check_flag(flag)) &&
+            flag)
         {
             ++woken;
         }
@@ -138,7 +141,7 @@ void test_condition_notify_one_wakes_from_wait()
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-        data.flag=true;
+        data.flag = true;
     }
 
     data.cond_var.notify_one();
@@ -155,7 +158,7 @@ void test_condition_notify_one_wakes_from_wait_with_predicate()
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-        data.flag=true;
+        data.flag = true;
     }
 
     data.cond_var.notify_one();
@@ -168,11 +171,12 @@ void test_condition_notify_one_wakes_from_wait_until()
 {
     wait_for_flag data;
 
-    hpx::thread thread(&wait_for_flag::wait_until_without_predicate, std::ref(data));
+    hpx::thread thread(
+        &wait_for_flag::wait_until_without_predicate, std::ref(data));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-        data.flag=true;
+        data.flag = true;
     }
 
     data.cond_var.notify_one();
@@ -185,11 +189,12 @@ void test_condition_notify_one_wakes_from_wait_until_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(&wait_for_flag::wait_until_with_predicate, std::ref(data));
+    hpx::thread thread(
+        &wait_for_flag::wait_until_with_predicate, std::ref(data));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-        data.flag=true;
+        data.flag = true;
     }
 
     data.cond_var.notify_one();
@@ -202,12 +207,12 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
 {
     wait_for_flag data;
 
-    hpx::thread thread(&wait_for_flag::relative_wait_until_with_predicate,
-        std::ref(data));
+    hpx::thread thread(
+        &wait_for_flag::relative_wait_until_with_predicate, std::ref(data));
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-        data.flag=true;
+        data.flag = true;
     }
 
     data.cond_var.notify_one();
@@ -218,7 +223,7 @@ void test_condition_notify_one_wakes_from_relative_wait_until_with_predicate()
 
 void test_multiple_notify_one_calls_wakes_multiple_threads()
 {
-    multiple_wake_count=0;
+    multiple_wake_count = 0;
 
     hpx::thread thread1(wait_for_condvar_and_increase_count);
     hpx::thread thread2(wait_for_condvar_and_increase_count);
@@ -235,7 +240,7 @@ void test_multiple_notify_one_calls_wakes_multiple_threads()
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lk(multiple_wake_mutex);
-        HPX_TEST(multiple_wake_count==3);
+        HPX_TEST(multiple_wake_count == 3);
     }
 
     thread1.join();
@@ -253,23 +258,23 @@ void test_condition_notify_all_wakes_from_wait()
 
     try
     {
-        for(unsigned i=0;i<5;++i)
+        for (unsigned i = 0; i < 5; ++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::wait_without_predicate,
-                std::ref(data)));
+            group.push_back(hpx::thread(
+                &wait_for_flag::wait_without_predicate, std::ref(data)));
         }
 
         {
             std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-            data.flag=true;
+            data.flag = true;
         }
 
         data.cond_var.notify_all();
 
         join_all(group);
-        HPX_TEST_EQ(data.woken,5u);
+        HPX_TEST_EQ(data.woken, 5u);
     }
-    catch(...)
+    catch (...)
     {
         join_all(group);
         throw;
@@ -284,23 +289,23 @@ void test_condition_notify_all_wakes_from_wait_with_predicate()
 
     try
     {
-        for(unsigned i=0;i<5;++i)
+        for (unsigned i = 0; i < 5; ++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::wait_with_predicate,
-                std::ref(data)));
+            group.push_back(hpx::thread(
+                &wait_for_flag::wait_with_predicate, std::ref(data)));
         }
 
         {
             std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-            data.flag=true;
+            data.flag = true;
         }
 
         data.cond_var.notify_all();
 
         join_all(group);
-        HPX_TEST_EQ(data.woken,5u);
+        HPX_TEST_EQ(data.woken, 5u);
     }
-    catch(...)
+    catch (...)
     {
         join_all(group);
         throw;
@@ -315,23 +320,23 @@ void test_condition_notify_all_wakes_from_wait_until()
 
     try
     {
-        for(unsigned i=0;i<5;++i)
+        for (unsigned i = 0; i < 5; ++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::wait_until_without_predicate,
-                std::ref(data)));
+            group.push_back(hpx::thread(
+                &wait_for_flag::wait_until_without_predicate, std::ref(data)));
         }
 
         {
             std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-            data.flag=true;
+            data.flag = true;
         }
 
         data.cond_var.notify_all();
 
         join_all(group);
-        HPX_TEST_EQ(data.woken,5u);
+        HPX_TEST_EQ(data.woken, 5u);
     }
-    catch(...)
+    catch (...)
     {
         join_all(group);
         throw;
@@ -346,23 +351,23 @@ void test_condition_notify_all_wakes_from_wait_until_with_predicate()
 
     try
     {
-        for(unsigned i=0;i<5;++i)
+        for (unsigned i = 0; i < 5; ++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag::wait_until_with_predicate,
-                std::ref(data)));
+            group.push_back(hpx::thread(
+                &wait_for_flag::wait_until_with_predicate, std::ref(data)));
         }
 
         {
             std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-            data.flag=true;
+            data.flag = true;
         }
 
         data.cond_var.notify_all();
 
         join_all(group);
-        HPX_TEST_EQ(data.woken,5u);
+        HPX_TEST_EQ(data.woken, 5u);
     }
-    catch(...)
+    catch (...)
     {
         join_all(group);
         throw;
@@ -377,23 +382,24 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
 
     try
     {
-        for(unsigned i=0;i<5;++i)
+        for (unsigned i = 0; i < 5; ++i)
         {
-            group.push_back(hpx::thread(&wait_for_flag
-                ::relative_wait_until_with_predicate, std::ref(data)));
+            group.push_back(
+                hpx::thread(&wait_for_flag ::relative_wait_until_with_predicate,
+                    std::ref(data)));
         }
 
         {
             std::unique_lock<hpx::lcos::local::mutex> lock(data.mutex);
-            data.flag=true;
+            data.flag = true;
         }
 
         data.cond_var.notify_all();
 
         join_all(group);
-        HPX_TEST_EQ(data.woken,5u);
+        HPX_TEST_EQ(data.woken, 5u);
     }
-    catch(...)
+    catch (...)
     {
         join_all(group);
         throw;
@@ -402,7 +408,7 @@ void test_condition_notify_all_wakes_from_relative_wait_until_with_predicate()
 
 void test_notify_all_following_notify_one_wakes_all_threads()
 {
-    multiple_wake_count=0;
+    multiple_wake_count = 0;
 
     hpx::thread thread1(wait_for_condvar_and_increase_count);
     hpx::thread thread2(wait_for_condvar_and_increase_count);
@@ -419,7 +425,7 @@ void test_notify_all_following_notify_one_wakes_all_threads()
 
     {
         std::unique_lock<hpx::lcos::local::mutex> lk(multiple_wake_mutex);
-        HPX_TEST(multiple_wake_count==3);
+        HPX_TEST(multiple_wake_count == 3);
     }
 
     thread1.join();
@@ -430,7 +436,11 @@ void test_notify_all_following_notify_one_wakes_all_threads()
 ///////////////////////////////////////////////////////////////////////////////
 struct condition_test_data
 {
-    condition_test_data() : notified(0), awoken(0) { }
+    condition_test_data()
+      : notified(0)
+      , awoken(0)
+    {
+    }
 
     hpx::lcos::local::mutex mutex;
     hpx::lcos::local::condition_variable condition;
@@ -450,9 +460,16 @@ void condition_test_thread(condition_test_data* data)
 
 struct cond_predicate
 {
-    cond_predicate(int& var, int val) : _var(var), _val(val) { }
+    cond_predicate(int& var, int val)
+      : _var(var)
+      , _val(val)
+    {
+    }
 
-    bool operator()() { return _var == _val; }
+    bool operator()()
+    {
+        return _var == _val;
+    }
 
     int& _var;
     int _val;
@@ -480,8 +497,7 @@ void condition_test_waits(condition_test_data* data)
 
     // Test wait_until.
     std::chrono::system_clock::time_point xt =
-        std::chrono::system_clock::now()
-      + std::chrono::milliseconds(10);
+        std::chrono::system_clock::now() + std::chrono::milliseconds(10);
     while (data->notified != 3)
         data->condition.wait_until(lock, xt);
     HPX_TEST(lock ? true : false);
@@ -490,8 +506,7 @@ void condition_test_waits(condition_test_data* data)
     data->condition.notify_one();
 
     // Test predicate wait_until.
-    xt = std::chrono::system_clock::now()
-      + std::chrono::milliseconds(10);
+    xt = std::chrono::system_clock::now() + std::chrono::milliseconds(10);
     cond_predicate pred(data->notified, 4);
     HPX_TEST(data->condition.wait_until(lock, xt, pred));
     HPX_TEST(lock ? true : false);
@@ -502,7 +517,8 @@ void condition_test_waits(condition_test_data* data)
 
     // Test predicate wait_for
     cond_predicate pred_rel(data->notified, 5);
-    HPX_TEST(data->condition.wait_for(lock, std::chrono::milliseconds(10), pred_rel));
+    HPX_TEST(data->condition.wait_for(
+        lock, std::chrono::milliseconds(10), pred_rel));
     HPX_TEST(lock ? true : false);
     HPX_TEST(pred_rel());
     HPX_TEST_EQ(data->notified, 5);
@@ -570,7 +586,6 @@ void test_condition_waits()
         HPX_TEST(lock ? true : false);
         HPX_TEST_EQ(data.awoken, 4);
 
-
         {
             hpx::util::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -608,7 +623,10 @@ void test_wait_until_times_out()
         std::chrono::system_clock::now();
     std::chrono::system_clock::time_point const timeout = start + delay;
 
-    while(cond.wait_until(lock, timeout) == hpx::lcos::local::cv_status::no_timeout) {}
+    while (cond.wait_until(lock, timeout) ==
+        hpx::lcos::local::cv_status::no_timeout)
+    {
+    }
 
     std::chrono::system_clock::time_point const end =
         std::chrono::system_clock::now();
@@ -659,7 +677,10 @@ void test_wait_until_relative_times_out()
     std::chrono::system_clock::time_point const start =
         std::chrono::system_clock::now();
 
-    while(cond.wait_for(lock, delay) == hpx::lcos::local::cv_status::no_timeout) {}
+    while (
+        cond.wait_for(lock, delay) == hpx::lcos::local::cv_status::no_timeout)
+    {
+    }
 
     std::chrono::system_clock::time_point const end =
         std::chrono::system_clock::now();
@@ -667,8 +688,8 @@ void test_wait_until_relative_times_out()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 int hpx_main(variables_map&)
 {
@@ -709,9 +730,7 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

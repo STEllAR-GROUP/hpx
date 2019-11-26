@@ -10,11 +10,11 @@
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/lcos/local/detail/sliding_semaphore.hpp is deprecated, \
     please include hpx/synchronization/detail/sliding_semaphore.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/lcos/local/detail/sliding_semaphore.hpp is deprecated, \
     please include hpx/synchronization/detail/sliding_semaphore.hpp instead"
 #endif

@@ -14,10 +14,8 @@
 
 #include <mutex>
 
-namespace hpx { namespace lcos { namespace local
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos { namespace local {
+    namespace detail {
         template <typename Mutex = lcos::local::mutex>
         class shared_mutex
         {
@@ -142,8 +140,8 @@ namespace hpx { namespace lcos { namespace local
             {
                 std::unique_lock<mutex_type> lk(state_change);
 
-                while (state.exclusive || state.exclusive_waiting_blocked
-                    || state.upgrade)
+                while (state.exclusive || state.exclusive_waiting_blocked ||
+                    state.upgrade)
                 {
                     shared_cond.wait(lk);
                 }
@@ -156,7 +154,8 @@ namespace hpx { namespace lcos { namespace local
             {
                 std::unique_lock<mutex_type> lk(state_change);
 
-                if (state.exclusive || state.exclusive_waiting_blocked || state.upgrade)
+                if (state.exclusive || state.exclusive_waiting_blocked ||
+                    state.upgrade)
                     return false;
 
                 else
@@ -216,12 +215,10 @@ namespace hpx { namespace lcos { namespace local
             bool try_unlock_shared_and_lock()
             {
                 std::unique_lock<mutex_type> lk(state_change);
-                if(    !state.exclusive
-                    && !state.exclusive_waiting_blocked
-                    && !state.upgrade
-                    && state.shared_count == 1)
+                if (!state.exclusive && !state.exclusive_waiting_blocked &&
+                    !state.upgrade && state.shared_count == 1)
                 {
-                    state.shared_count=0;
+                    state.shared_count = 0;
                     state.exclusive = true;
                     return true;
                 }
@@ -236,10 +233,9 @@ namespace hpx { namespace lcos { namespace local
                 release_waiters();
             }
         };
-    }
+    }    // namespace detail
 
     typedef detail::shared_mutex<> shared_mutex;
-}}}
+}}}    // namespace hpx::lcos::local
 
-#endif // HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F
-
+#endif    // HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F

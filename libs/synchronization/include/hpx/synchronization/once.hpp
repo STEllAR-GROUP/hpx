@@ -12,14 +12,13 @@
 #define HPX_LCOS_LOCAL_ONCE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/event.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/synchronization/event.hpp>
 
 #include <atomic>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     struct once_flag
     {
     public:
@@ -28,20 +27,21 @@ namespace hpx { namespace lcos { namespace local
     public:
         once_flag() noexcept
           : status_(0)
-        {}
+        {
+        }
 
     private:
         std::atomic<long> status_;
         lcos::local::event event_;
 
-        template <typename F, typename ...Args>
+        template <typename F, typename... Args>
         friend void call_once(once_flag& flag, F&& f, Args&&... args);
     };
 
-    #define HPX_ONCE_INIT ::hpx::lcos::local::once_flag()
+#define HPX_ONCE_INIT ::hpx::lcos::local::once_flag()
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename ...Args>
+    template <typename F, typename... Args>
     void call_once(once_flag& flag, F&& f, Args&&... args)
     {
         // Try for a quick win: if the procedure has already been called
@@ -55,19 +55,22 @@ namespace hpx { namespace lcos { namespace local
             long status = 0;
             if (flag.status_.compare_exchange_strong(status, running_value))
             {
-                try {
+                try
+                {
                     // reset event to ensure its usability in case the
                     // wrapped function was throwing an exception before
                     flag.event_.reset();
 
-                    util::invoke(std::forward<F>(f), std::forward<Args>(args)...);
+                    util::invoke(
+                        std::forward<F>(f), std::forward<Args>(args)...);
 
                     // set status to done, release waiting threads
                     flag.status_.store(function_complete_flag_value);
                     flag.event_.set();
                     break;
                 }
-                catch (...) {
+                catch (...)
+                {
                     // reset status to initial, release waiting threads
                     flag.status_.store(0);
                     flag.event_.set();
@@ -84,6 +87,6 @@ namespace hpx { namespace lcos { namespace local
             flag.event_.wait();
         }
     }
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif /*HPX_LCOS_LOCAL_ONCE_HPP*/

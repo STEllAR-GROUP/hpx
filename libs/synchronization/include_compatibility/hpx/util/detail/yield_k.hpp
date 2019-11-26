@@ -10,12 +10,10 @@
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/detail/yield_k.hpp is deprecated, \
+#pragma message("The header hpx/util/detail/yield_k.hpp is deprecated, \
     please include hpx/synchronization/detail/yield_k.hpp instead")
 #else
-#warning \
-    "The header hpx/util/detail/yield_k.hpp is deprecated, \
+#warning "The header hpx/util/detail/yield_k.hpp is deprecated, \
     please include hpx/synchronization/detail/yield_k.hpp instead"
 #endif
 #endif

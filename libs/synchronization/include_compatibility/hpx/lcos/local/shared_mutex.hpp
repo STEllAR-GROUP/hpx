@@ -10,12 +10,10 @@
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/lcos/local/shared_mutex.hpp is deprecated, \
+#pragma message("The header hpx/lcos/local/shared_mutex.hpp is deprecated, \
     please include hpx/synchronization/shared_mutex.hpp instead")
 #else
-#warning \
-    "The header hpx/lcos/local/shared_mutex.hpp is deprecated, \
+#warning "The header hpx/lcos/local/shared_mutex.hpp is deprecated, \
     please include hpx/synchronization/shared_mutex.hpp instead"
 #endif
 #endif

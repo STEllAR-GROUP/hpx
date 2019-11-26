@@ -41,12 +41,13 @@ int hpx_main()
 {
     // count_down_and_wait
     {
-        hpx::lcos::local::latch l(NUM_THREADS+1);
+        hpx::lcos::local::latch l(NUM_THREADS + 1);
         HPX_TEST(!l.is_ready());
 
-        std::vector<hpx::future<void> > results;
+        std::vector<hpx::future<void>> results;
         for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i)
-            results.push_back(hpx::async(&test_count_down_and_wait, std::ref(l)));
+            results.push_back(
+                hpx::async(&test_count_down_and_wait, std::ref(l)));
 
         HPX_TEST(!l.is_ready());
 
@@ -63,7 +64,7 @@ int hpx_main()
     {
         num_threads.store(0);
 
-        hpx::lcos::local::latch l(NUM_THREADS+1);
+        hpx::lcos::local::latch l(NUM_THREADS + 1);
         HPX_TEST(!l.is_ready());
 
         hpx::future<void> f = hpx::async(&test_count_down, std::ref(l));
@@ -84,9 +85,10 @@ int hpx_main()
         hpx::lcos::local::latch l(NUM_THREADS);
         HPX_TEST(!l.is_ready());
 
-        std::vector<hpx::future<void> > results;
+        std::vector<hpx::future<void>> results;
         for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i)
-            results.push_back(hpx::async(&test_count_down_and_wait, std::ref(l)));
+            results.push_back(
+                hpx::async(&test_count_down_and_wait, std::ref(l)));
 
         hpx::wait_all(results);
 
@@ -103,10 +105,12 @@ int hpx_main()
         hpx::lcos::local::latch l(1);
         HPX_TEST(!l.is_ready());
 
-        std::vector<hpx::future<void> > results;
-        for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i){
+        std::vector<hpx::future<void>> results;
+        for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i)
+        {
             l.count_up(1);
-            results.push_back(hpx::async(&test_count_down_and_wait, std::ref(l)));
+            results.push_back(
+                hpx::async(&test_count_down_and_wait, std::ref(l)));
         }
 
         HPX_TEST(!l.is_ready());
@@ -125,12 +129,14 @@ int hpx_main()
         num_threads.store(0);
 
         hpx::lcos::local::latch l(0);
-        l.reset(NUM_THREADS+1);
+        l.reset(NUM_THREADS + 1);
         HPX_TEST(!l.is_ready());
 
-        std::vector<hpx::future<void> > results;
-        for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i){
-            results.push_back(hpx::async(&test_count_down_and_wait, std::ref(l)));
+        std::vector<hpx::future<void>> results;
+        for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i)
+        {
+            results.push_back(
+                hpx::async(&test_count_down_and_wait, std::ref(l)));
         }
 
         HPX_TEST(!l.is_ready());
@@ -151,8 +157,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

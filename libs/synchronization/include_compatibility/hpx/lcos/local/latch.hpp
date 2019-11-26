@@ -10,12 +10,10 @@
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/lcos/local/latch.hpp is deprecated, \
+#pragma message("The header hpx/lcos/local/latch.hpp is deprecated, \
     please include hpx/synchronization/latch.hpp instead")
 #else
-#warning \
-    "The header hpx/lcos/local/latch.hpp is deprecated, \
+#warning "The header hpx/lcos/local/latch.hpp is deprecated, \
     please include hpx/synchronization/latch.hpp instead"
 #endif
 #endif

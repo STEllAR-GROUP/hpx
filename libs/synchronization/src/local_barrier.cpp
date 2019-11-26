@@ -12,14 +12,14 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     barrier::barrier(std::size_t number_of_threads)
-      : number_of_threads_(number_of_threads),
-        total_(barrier_flag),
-        mtx_(),
-        cond_()
-    {}
+      : number_of_threads_(number_of_threads)
+      , total_(barrier_flag)
+      , mtx_()
+      , cond_()
+    {
+    }
 
     barrier::~barrier()
     {
@@ -43,7 +43,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Are we the first to enter?
-        if (total_ == barrier_flag) total_ = 0;
+        if (total_ == barrier_flag)
+            total_ = 0;
 
         ++total_;
 
@@ -78,7 +79,7 @@ namespace hpx { namespace lcos { namespace local
     void barrier::reset(std::size_t number_of_threads)
     {
         std::unique_lock<mutex_type> l(mtx_);
-        this->number_of_threads_=number_of_threads;
+        this->number_of_threads_ = number_of_threads;
     }
 
-}}}
+}}}    // namespace hpx::lcos::local

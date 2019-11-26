@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -24,11 +24,12 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     enum class cv_status
     {
-        no_timeout, timeout, error
+        no_timeout,
+        timeout,
+        error
     };
 
     class condition_variable
@@ -52,13 +53,13 @@ namespace hpx { namespace lcos { namespace local
         void wait(std::unique_lock<mutex>& lock, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
-            util::ignore_while_checking<std::unique_lock<mutex> > il(&lock);
+            util::ignore_while_checking<std::unique_lock<mutex>> il(&lock);
             std::unique_lock<mutex_type> l(mtx_.data_);
-            util::ignore_while_checking<std::unique_lock<mutex_type> > ill(&l);
-            util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
+            util::ignore_while_checking<std::unique_lock<mutex_type>> ill(&l);
+            util::unlock_guard<std::unique_lock<mutex>> unlock(lock);
             //The following ensures that the inner lock will be unlocked
             //before the outer to avoid deadlock (fixes issue #3608)
-            std::lock_guard<std::unique_lock<mutex_type> > unlock_next(
+            std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
             cond_.data_.wait(l, ec);
@@ -83,18 +84,17 @@ namespace hpx { namespace lcos { namespace local
         }
 
         cv_status wait_until(std::unique_lock<mutex>& lock,
-            util::steady_time_point const& abs_time,
-            error_code& ec = throws)
+            util::steady_time_point const& abs_time, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
-            util::ignore_while_checking<std::unique_lock<mutex> > il(&lock);
+            util::ignore_while_checking<std::unique_lock<mutex>> il(&lock);
             std::unique_lock<mutex_type> l(mtx_.data_);
             util::ignore_while_checking<std::unique_lock<mutex_type>> iil(&l);
-            util::unlock_guard<std::unique_lock<mutex> > unlock(lock);
+            util::unlock_guard<std::unique_lock<mutex>> unlock(lock);
             //The following ensures that the inner lock will be unlocked
             //before the outer to avoid deadlock (fixes issue #3608)
-            std::lock_guard<std::unique_lock<mutex_type> > unlock_next(
+            std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
             threads::thread_state_ex_enum const reason =
@@ -106,11 +106,13 @@ namespace hpx { namespace lcos { namespace local
             // destructed before the unlock_guard.
             hpx::util::ignore_lock(&mtx_.data_);
 
-            if (ec) return cv_status::error;
+            if (ec)
+                return cv_status::error;
 
             // if the timer has hit, the waiting period timed out
-            return (reason == threads::wait_timeout) ? //-V110
-                cv_status::timeout : cv_status::no_timeout;
+            return (reason == threads::wait_timeout) ?    //-V110
+                cv_status::timeout :
+                cv_status::no_timeout;
         }
 
         template <typename Predicate>
@@ -129,8 +131,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         cv_status wait_for(std::unique_lock<mutex>& lock,
-            util::steady_duration const& rel_time,
-            error_code& ec = throws)
+            util::steady_duration const& rel_time, error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), ec);
         }
@@ -176,7 +177,7 @@ namespace hpx { namespace lcos { namespace local
             util::unlock_guard<Lock> unlock(lock);
             //The following ensures that the inner lock will be unlocked
             //before the outer to avoid deadlock (fixes issue #3608)
-            std::lock_guard<std::unique_lock<mutex_type> > unlock_next(
+            std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
             cond_.data_.wait(l, ec);
@@ -200,9 +201,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Lock>
-        cv_status
-        wait_until(Lock& lock, util::steady_time_point const& abs_time,
-            error_code& ec = throws)
+        cv_status wait_until(Lock& lock,
+            util::steady_time_point const& abs_time, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
@@ -211,7 +211,7 @@ namespace hpx { namespace lcos { namespace local
             util::unlock_guard<Lock> unlock(lock);
             //The following ensures that the inner lock will be unlocked
             //before the outer to avoid deadlock (fixes issue #3608)
-            std::lock_guard<std::unique_lock<mutex_type> > unlock_next(
+            std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
             threads::thread_state_ex_enum const reason =
@@ -223,11 +223,13 @@ namespace hpx { namespace lcos { namespace local
             // destructed before the unlock_guard.
             hpx::util::ignore_lock(&mtx_.data_);
 
-            if (ec) return cv_status::error;
+            if (ec)
+                return cv_status::error;
 
             // if the timer has hit, the waiting period timed out
-            return (reason == threads::wait_timeout) ? //-V110
-                cv_status::timeout : cv_status::no_timeout;
+            return (reason == threads::wait_timeout) ?    //-V110
+                cv_status::timeout :
+                cv_status::no_timeout;
         }
 
         template <typename Lock, typename Predicate>
@@ -245,8 +247,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Lock>
-        cv_status
-        wait_for(Lock& lock, util::steady_duration const& rel_time,
+        cv_status wait_for(Lock& lock, util::steady_duration const& rel_time,
             error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), ec);
@@ -263,6 +264,6 @@ namespace hpx { namespace lcos { namespace local
         mutable util::cache_line_data<mutex_type> mtx_;
         util::cache_line_data<detail::condition_variable> cond_;
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif /*HPX_LCOS_LOCAL_CONDITION_VARIABLE_HPP*/

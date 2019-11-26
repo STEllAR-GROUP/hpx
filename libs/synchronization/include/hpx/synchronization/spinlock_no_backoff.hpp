@@ -15,6 +15,7 @@
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 
+// clang-format off
 #if defined(HPX_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock.hpp>
 #  if !defined( BOOST_SP_HAS_SYNC )
@@ -29,13 +30,13 @@
 #    endif
 #  endif
 #endif
+// clang-format on
 
 #include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     /// boost::mutex-compatible spinlock class
     struct spinlock_no_backoff
     {
@@ -46,9 +47,11 @@ namespace hpx { namespace lcos { namespace local
         std::uint64_t v_;
 
     public:
-        spinlock_no_backoff() : v_(0)
+        spinlock_no_backoff()
+          : v_(0)
         {
-            HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock_no_backoff", "");
+            HPX_ITT_SYNC_CREATE(
+                this, "hpx::lcos::local::spinlock_no_backoff", "");
         }
 
         ~spinlock_no_backoff()
@@ -72,14 +75,15 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if !defined( BOOST_SP_HAS_SYNC )
+#if !defined(BOOST_SP_HAS_SYNC)
             std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
             HPX_COMPILER_FENCE;
 #else
             std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
 
-            if (r == 0) {
+            if (r == 0)
+            {
                 HPX_ITT_SYNC_ACQUIRED(this);
                 util::register_lock(this);
                 return true;
@@ -93,7 +97,7 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-#if !defined( BOOST_SP_HAS_SYNC )
+#if !defined(BOOST_SP_HAS_SYNC)
             HPX_COMPILER_FENCE;
             *const_cast<std::uint64_t volatile*>(&v_) = 0;
 #else
@@ -104,6 +108,6 @@ namespace hpx { namespace lcos { namespace local
             util::unregister_lock(this);
         }
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
-#endif // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
+#endif    // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113

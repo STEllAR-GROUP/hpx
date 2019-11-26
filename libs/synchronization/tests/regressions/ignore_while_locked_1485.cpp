@@ -22,8 +22,10 @@ struct wait_for_flag
     hpx::lcos::local::condition_variable_any cond_var;
 
     wait_for_flag()
-      : flag(false), woken(0)
-    {}
+      : flag(false)
+      , woken(0)
+    {
+    }
 
     void wait(hpx::lcos::local::spinlock& local_mutex,
         hpx::lcos::local::condition_variable_any& local_cond_var, bool& running)

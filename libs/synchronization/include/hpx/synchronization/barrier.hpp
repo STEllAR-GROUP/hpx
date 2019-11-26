@@ -20,8 +20,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     /// A barrier can be used to synchronize a specific number of threads,
     /// blocking all of the entering threads until all of the threads have
     /// entered the barrier.
@@ -72,9 +71,8 @@ namespace hpx { namespace lcos { namespace local
         mutable mutex_type mtx_;
         local::detail::condition_variable cond_;
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-

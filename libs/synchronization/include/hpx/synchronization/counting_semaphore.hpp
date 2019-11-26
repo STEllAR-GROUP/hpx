@@ -18,12 +18,11 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     /// A semaphore is a protected variable (an entity storing a value) or
     /// abstract data type (an entity grouping several variables that may or
     /// may not be numerical) which constitutes the classic method for
@@ -57,7 +56,8 @@ namespace hpx { namespace lcos { namespace local
         ///                 same number of waits pre-set.
         counting_semaphore_var(std::int64_t value = N)
           : sem_(value)
-        {}
+        {
+        }
 
         /// \brief Wait for the semaphore to be signaled
         ///
@@ -107,11 +107,10 @@ namespace hpx { namespace lcos { namespace local
     };
 
     typedef counting_semaphore_var<> counting_semaphore;
-}}}
+}}}    // namespace hpx::lcos::local
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
 #endif
-

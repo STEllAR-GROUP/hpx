@@ -21,8 +21,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     /// Latches are a thread coordination mechanism that allow one or more
     /// threads to block until an operation is completed. An individual latch
     /// is a singleuse object; once the operation has been completed, the latch
@@ -57,7 +56,10 @@ namespace hpx { namespace lcos { namespace local
         /// Postconditions: counter_ == count.
         ///
         explicit latch(std::ptrdiff_t count)
-          : mtx_(), cond_(), counter_(count), notified_(count == 0)
+          : mtx_()
+          , cond_()
+          , counter_(count)
+          , notified_(count == 0)
         {
         }
 
@@ -71,7 +73,7 @@ namespace hpx { namespace lcos { namespace local
         /// \note It is the caller's responsibility to ensure that no other
         ///       thread enters wait() after one thread has called the
         ///       destructor. This may require additional coordination.
-        ~latch ()
+        ~latch()
         {
             HPX_ASSERT(counter_ == 0);
         }
@@ -194,7 +196,6 @@ namespace hpx { namespace lcos { namespace local
         std::atomic<std::ptrdiff_t> counter_;
         bool notified_;
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif
-

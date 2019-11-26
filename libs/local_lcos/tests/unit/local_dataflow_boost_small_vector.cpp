@@ -9,8 +9,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/util/unwrap.hpp>
 
@@ -26,8 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <boost/container/small_vector.hpp>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     // support unwrapping of boost::container::small_vector
     // Note: small_vector's allocator support is not 100% conforming
     template <typename NewType, typename OldType, std::size_t Size,
@@ -35,18 +34,19 @@ namespace hpx { namespace traits
     struct pack_traversal_rebind_container<NewType,
         boost::container::small_vector<OldType, Size, OldAllocator>>
     {
-        using NewAllocator = typename std::allocator_traits<OldAllocator>::
-            template rebind_alloc<NewType>;
+        using NewAllocator = typename std::allocator_traits<
+            OldAllocator>::template rebind_alloc<NewType>;
 
         static boost::container::small_vector<NewType, Size, NewAllocator> call(
             boost::container::small_vector<OldType, Size, OldAllocator> const&)
         {
             // Create a new version of the container with a new allocator
             // instance
-            return boost::container::small_vector<NewType, Size, NewAllocator>();
+            return boost::container::small_vector<NewType, Size,
+                NewAllocator>();
         }
     };
-}}
+}}    // namespace hpx::traits
 
 template <typename T>
 using small_vector =
@@ -88,7 +88,7 @@ int int_f2(int l, int r)
 
 std::atomic<std::uint32_t> int_f_vector_count;
 
-int int_f_vector(small_vector<int> const & vf)
+int int_f_vector(small_vector<int> const& vf)
 {
     int sum = 0;
     for (int f : vf)
@@ -122,10 +122,10 @@ void function_pointers(std::uint32_t num)
 
     small_vector<hpx::future<int>> vf;
     vf.resize(num);
-    for(std::uint32_t i = 0; i < num; ++i)
+    for (std::uint32_t i = 0; i < num; ++i)
     {
         vf[i] = hpx::dataflow(
-           hpx::util::unwrapping(&int_f1), hpx::make_ready_future(42));
+            hpx::util::unwrapping(&int_f1), hpx::make_ready_future(42));
     }
     hpx::future<int> f4 =
         hpx::dataflow(hpx::util::unwrapping(&int_f_vector), std::move(vf));
@@ -201,7 +201,7 @@ void future_function_pointers(std::uint32_t num)
     future_int_f_vector_count.store(0);
     small_vector<hpx::future<int>> vf;
     vf.resize(num);
-    for(std::uint32_t i = 0; i < num; ++i)
+    for (std::uint32_t i = 0; i < num; ++i)
     {
         vf[i] = hpx::dataflow(&future_int_f1, hpx::make_ready_future());
     }

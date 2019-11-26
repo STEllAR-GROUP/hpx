@@ -22,10 +22,8 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos { namespace local {
+    namespace detail {
         /// An exclusive-ownership recursive mutex which implements Boost.Thread's
         /// TimedLockable concept.
         template <typename Mutex = local::spinlock>
@@ -40,10 +38,12 @@ namespace hpx { namespace lcos { namespace local
             Mutex mtx;
 
         public:
-            recursive_mutex_impl(char const* const desc = "recursive_mutex_impl")
+            recursive_mutex_impl(
+                char const* const desc = "recursive_mutex_impl")
               : recursion_count(0)
               , mtx(desc)
-            {}
+            {
+            }
 
             /// Attempts to acquire ownership of the \a recursive_mutex.
             /// Never blocks.
@@ -91,14 +91,15 @@ namespace hpx { namespace lcos { namespace local
             ///         suspending. Throws \a hpx#yield_aborted if the mutex is
             ///         destroyed while suspended. Throws \a hpx#null_thread_id if
             ///         called outside of a HPX-thread.
-//             bool timed_lock(::boost::system_time const& wait_until);
-//             {
-//                 threads::thread_id_type const current_thread_id =
-//                     threads::get_self_id();
-//
-//                 return try_recursive_lock(current_thread_id) ||
-//                        try_timed_lock(current_thread_id, wait_until);
-//             }
+            //
+            //bool timed_lock(::boost::system_time const& wait_until);
+            //{
+            //    threads::thread_id_type const current_thread_id =
+            //        threads::get_self_id();
+            //
+            //    return try_recursive_lock(current_thread_id) ||
+            //           try_timed_lock(current_thread_id, wait_until);
+            //}
 
             /// Attempts to acquire ownership of the \a recursive_mutex.
             /// Suspends the current HPX-thread until \a timeout if ownership cannot
@@ -110,17 +111,18 @@ namespace hpx { namespace lcos { namespace local
             ///         suspending. Throws \a hpx#yield_aborted if the mutex is
             ///         destroyed while suspended. Throws \a hpx#null_thread_id if
             ///         called outside of a HPX-thread.
-//             template<typename Duration>
-//             bool timed_lock(Duration const& timeout)
-//             {
-//                 return timed_lock(boost::get_system_time() + timeout);
-//             }
-//
-//             bool timed_lock(boost::xtime const& timeout)
-//             {
-//                 return timed_lock(boost::posix_time::ptime(timeout));
-//             }
-//
+            //
+            //template<typename Duration>
+            //bool timed_lock(Duration const& timeout)
+            //{
+            //    return timed_lock(boost::get_system_time() + timeout);
+            //}
+            //
+            //bool timed_lock(boost::xtime const& timeout)
+            //{
+            //    return timed_lock(boost::posix_time::ptime(timeout));
+            //}
+            //
             /// Release ownership of the \a recursive_mutex.
             ///
             /// \throws Throws \a hpx#bad_parameter if an error occurs while
@@ -164,9 +166,9 @@ namespace hpx { namespace lcos { namespace local
                 return false;
             }
         };
-    }
+    }    // namespace detail
 
     using recursive_mutex = detail::recursive_mutex_impl<>;
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif

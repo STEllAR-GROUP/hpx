@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/agent_ref.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <boost/intrusive/slist.hpp>
@@ -22,8 +22,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local { namespace detail
-{
+namespace hpx { namespace lcos { namespace local { namespace detail {
     class condition_variable
     {
     public:
@@ -43,7 +42,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             queue_entry(hpx::basic_execution::agent_ref ctx, void* q)
               : ctx_(ctx)
               , q_(q)
-            {}
+            {
+            }
 
             hpx::basic_execution::agent_ref ctx_;
             void* q_;
@@ -60,15 +60,17 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         struct reset_queue_entry
         {
             reset_queue_entry(queue_entry& e, queue_type& q)
-              : e_(e), last_(q.last())
-            {}
+              : e_(e)
+              , last_(q.last())
+            {
+            }
 
             ~reset_queue_entry()
             {
                 if (e_.ctx_)
                 {
                     queue_type* q = static_cast<queue_type*>(e_.q_);
-                    q->erase(last_);     // remove entry from queue
+                    q->erase(last_);    // remove entry from queue
                 }
             }
 
@@ -81,8 +83,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
         HPX_EXPORT ~condition_variable();
 
-        HPX_EXPORT bool empty(
-            std::unique_lock<mutex_type> const& lock) const;
+        HPX_EXPORT bool empty(std::unique_lock<mutex_type> const& lock) const;
 
         HPX_EXPORT std::size_t size(
             std::unique_lock<mutex_type> const& lock) const;
@@ -95,63 +96,59 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         HPX_EXPORT void notify_all(std::unique_lock<mutex_type> lock,
             threads::thread_priority priority, error_code& ec = throws);
 
-        bool notify_one(std::unique_lock<mutex_type> lock,
-            error_code& ec = throws)
+        bool notify_one(
+            std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
-            return notify_one(std::move(lock),
-                threads::thread_priority_default, ec);
+            return notify_one(
+                std::move(lock), threads::thread_priority_default, ec);
         }
 
-        void notify_all(std::unique_lock<mutex_type> lock,
-            error_code& ec = throws)
+        void notify_all(
+            std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
-            return notify_all(std::move(lock),
-                threads::thread_priority_default, ec);
+            return notify_all(
+                std::move(lock), threads::thread_priority_default, ec);
         }
 
-        HPX_EXPORT void abort_all(
-            std::unique_lock<mutex_type> lock);
+        HPX_EXPORT void abort_all(std::unique_lock<mutex_type> lock);
 
         HPX_EXPORT threads::thread_state_ex_enum wait(
-            std::unique_lock<mutex_type>& lock,
-            char const* description, error_code& ec = throws);
+            std::unique_lock<mutex_type>& lock, char const* description,
+            error_code& ec = throws);
 
         threads::thread_state_ex_enum wait(
-            std::unique_lock<mutex_type>& lock,
-            error_code& ec = throws)
+            std::unique_lock<mutex_type>& lock, error_code& ec = throws)
         {
             return wait(lock, "condition_variable::wait", ec);
         }
 
         HPX_EXPORT threads::thread_state_ex_enum wait_until(
             std::unique_lock<mutex_type>& lock,
-            util::steady_time_point const& abs_time,
-            char const* description, error_code& ec = throws);
+            util::steady_time_point const& abs_time, char const* description,
+            error_code& ec = throws);
 
         threads::thread_state_ex_enum wait_until(
             std::unique_lock<mutex_type>& lock,
-            util::steady_time_point const& abs_time,
-            error_code& ec = throws)
+            util::steady_time_point const& abs_time, error_code& ec = throws)
         {
-            return wait_until(lock, abs_time,
-                "condition_variable::wait_until", ec);
+            return wait_until(
+                lock, abs_time, "condition_variable::wait_until", ec);
         }
 
         threads::thread_state_ex_enum wait_for(
             std::unique_lock<mutex_type>& lock,
-            util::steady_duration const& rel_time,
-            char const* description, error_code& ec = throws)
+            util::steady_duration const& rel_time, char const* description,
+            error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), description, ec);
         }
 
         threads::thread_state_ex_enum wait_for(
             std::unique_lock<mutex_type>& lock,
-            util::steady_duration const& rel_time,
-            error_code& ec = throws)
+            util::steady_duration const& rel_time, error_code& ec = throws)
         {
-            return wait_until(lock, rel_time.from_now(),
-                "condition_variable::wait_for", ec);
+            return wait_until(
+                lock, rel_time.from_now(), "condition_variable::wait_for", ec);
         }
 
     private:
@@ -166,6 +163,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         queue_type queue_;
     };
 
-}}}}
+}}}}    // namespace hpx::lcos::local::detail
 
 #endif /*HPX_LCOS_LOCAL_DETAIL_CONDITION_VARIABLE_HPP*/
