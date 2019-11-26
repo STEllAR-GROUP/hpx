@@ -53,7 +53,7 @@ are completed to avoid confusion.
    * Change the release branch to be the most current release tag available in
      the APEX/hpxMP ``git_external`` section in the main ``CMakeLists.txt``.
      Please contact the maintainers of the respective packages to generate a new
-     release to synchronize with the|hpx| release (`APEX
+     release to synchronize with the |hpx| release (`APEX
      <http://github.com/khuck/xpress-apex>`_, `hpxMP
      <https://github.com/STEllAR-GROUP/hpxMP>`_).
 
