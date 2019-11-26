@@ -186,7 +186,7 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     set(OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/)
   else()
     # Parent_scope to use the same variable to install
-    set(OUTPUT_DIR ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/)
+    set(OUTPUT_DIR ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/)
     set(OUTPUT_DIR_PC ${OUTPUT_DIR} PARENT_SCOPE)
   endif()
 

@@ -16,8 +16,6 @@ function(add_hpx_module name)
     EXCLUDE_FROM_GLOBAL_HEADER)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-  project(HPX.${name} CXX)
-
   include(HPX_Message)
   include(HPX_Option)
 
@@ -97,7 +95,7 @@ function(add_hpx_module name)
         set(module_headers "${module_headers}#include <${header_file}>\n")
       endif()
     endforeach(header_file)
-    configure_file("${CMAKE_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
+    configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
       "${global_header}")
     set(generated_headers ${global_header})
   endif()
@@ -105,12 +103,12 @@ function(add_hpx_module name)
   if(${name}_FORCE_LINKING_GEN)
       # Add a header to force linking of modules on Windows
       set(force_linking_header "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/force_linking.hpp")
-      configure_file("${CMAKE_SOURCE_DIR}/cmake/templates/force_linking.hpp.in"
+      configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/force_linking.hpp.in"
         "${force_linking_header}")
 
       # Add a source file implementing the above function
       set(force_linking_source "${CMAKE_CURRENT_BINARY_DIR}/src/force_linking.cpp")
-      configure_file("${CMAKE_SOURCE_DIR}/cmake/templates/force_linking.cpp.in"
+      configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/force_linking.cpp.in"
         "${force_linking_source}")
   endif()
 
@@ -124,14 +122,14 @@ function(add_hpx_module name)
     # Version file
     set(global_config_file ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/version.hpp)
     configure_file(
-        "${PROJECT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
-        "${global_config_file}"
-        @ONLY)
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/config_version.hpp.in"
+      "${global_config_file}"
+      @ONLY)
     set(generated_headers ${generated_headers} ${global_config_file})
     # Global config defines file (different from the one for each module)
     set(global_config_file ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/defines.hpp)
     write_config_defines_file(
-      TEMPLATE "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
+      TEMPLATE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
       NAMESPACE default
       FILENAME "${global_config_file}")
     set(generated_headers ${generated_headers} ${global_config_file})

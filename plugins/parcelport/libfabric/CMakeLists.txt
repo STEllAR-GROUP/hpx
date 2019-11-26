@@ -88,7 +88,7 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
     INCLUDE_DIRS
       ${_libfabric_include_dirs}
       ${PROJECT_SOURCE_DIR}
-      ${CMAKE_BINARY_DIR}
+      ${PROJECT_BINARY_DIR}
     FOLDER
       "Core/Plugins/Parcelport/libfabric")
 

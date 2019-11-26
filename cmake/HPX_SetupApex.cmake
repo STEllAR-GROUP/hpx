@@ -40,7 +40,7 @@ if(HPX_WITH_APEX)
   endif(NOT APEX_ROOT)
 
   LIST(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")
-  add_subdirectory(${APEX_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
+  add_subdirectory(${APEX_ROOT}/src/apex ${PROJECT_BINARY_DIR}/apex/src/apex)
   if(AMPLIFIER_FOUND)
     hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the \
     Intel Amplifier (WITH_AMPLIFIER=Off) in order to use Apex")
