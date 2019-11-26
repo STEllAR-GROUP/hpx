@@ -19,22 +19,26 @@ write_basic_package_version_file(
 
 # Export HPXModulesTargets in the build directory
 export(TARGETS ${HPX_EXPORT_MODULES_TARGETS}
+  NAMESPACE HPX::
   FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXModulesTargets.cmake"
 )
 
-# Export HPXTargets in the install directory
+# Export HPXModulesTargets in the install directory
 install(EXPORT HPXModulesTargets
+  NAMESPACE HPX::
   FILE HPXModulesTargets.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
 )
 
 # Export HPXTargets in the build directory
 export(TARGETS ${HPX_EXPORT_TARGETS}
+  NAMESPACE HPX::
   FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXTargets.cmake"
 )
 
 # Export HPXTargets in the install directory
 install(EXPORT HPXTargets
+  NAMESPACE HPX::
   FILE HPXTargets.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
 )
