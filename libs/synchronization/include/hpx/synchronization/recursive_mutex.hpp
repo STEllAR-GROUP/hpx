@@ -81,48 +81,6 @@ namespace hpx { namespace lcos { namespace local {
                 }
             }
 
-            /// Attempts to acquire ownership of the \a recursive_mutex.
-            /// Suspends the current HPX-thread until \a wait_until if ownership
-            /// cannot be obtained immediately.
-            ///
-            /// \returns \a true if ownership was acquired; otherwise, \a false.
-            ///
-            /// \throws Throws \a hpx#bad_parameter if an error occurs while
-            ///         suspending. Throws \a hpx#yield_aborted if the mutex is
-            ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-            ///         called outside of a HPX-thread.
-            //
-            //bool timed_lock(::boost::system_time const& wait_until);
-            //{
-            //    threads::thread_id_type const current_thread_id =
-            //        threads::get_self_id();
-            //
-            //    return try_recursive_lock(current_thread_id) ||
-            //           try_timed_lock(current_thread_id, wait_until);
-            //}
-
-            /// Attempts to acquire ownership of the \a recursive_mutex.
-            /// Suspends the current HPX-thread until \a timeout if ownership cannot
-            /// be obtained immediately.
-            ///
-            /// \returns \a true if ownership was acquired; otherwise, \a false.
-            ///
-            /// \throws Throws \a hpx#bad_parameter if an error occurs while
-            ///         suspending. Throws \a hpx#yield_aborted if the mutex is
-            ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-            ///         called outside of a HPX-thread.
-            //
-            //template<typename Duration>
-            //bool timed_lock(Duration const& timeout)
-            //{
-            //    return timed_lock(boost::get_system_time() + timeout);
-            //}
-            //
-            //bool timed_lock(boost::xtime const& timeout)
-            //{
-            //    return timed_lock(boost::posix_time::ptime(timeout));
-            //}
-            //
             /// Release ownership of the \a recursive_mutex.
             ///
             /// \throws Throws \a hpx#bad_parameter if an error occurs while
