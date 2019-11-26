@@ -11,8 +11,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/local_lcos/conditional_trigger.hpp>
-#include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/local_lcos/promise.hpp>
+#include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
@@ -22,10 +22,9 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex = lcos::local::spinlock >
+    template <typename Mutex = lcos::local::spinlock>
     struct base_trigger
     {
     protected:
@@ -40,16 +39,16 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        base_trigger(base_trigger && rhs)
-          : mtx_(),
-            promise_(std::move(rhs.promise_)),
-            generation_(rhs.generation_),
-            conditions_(std::move(rhs.conditions_))
+        base_trigger(base_trigger&& rhs)
+          : mtx_()
+          , promise_(std::move(rhs.promise_))
+          , generation_(rhs.generation_)
+          , conditions_(std::move(rhs.conditions_))
         {
             rhs.generation_ = std::size_t(-1);
         }
 
-        base_trigger& operator=(base_trigger && rhs)
+        base_trigger& operator=(base_trigger&& rhs)
         {
             if (this != &rhs)
             {
@@ -87,8 +86,9 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(generation_ != std::size_t(-1));
             ++generation_;
 
-            trigger_conditions(ec);   // re-check/trigger condition, if needed
-            if (!ec) {
+            trigger_conditions(ec);    // re-check/trigger condition, if needed
+            if (!ec)
+            {
                 if (generation_value)
                     *generation_value = generation_;
                 return promise_.get_future(ec);
@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace local
             if (&ec != &throws)
                 ec = make_success_code();
 
-            promise_.set_value();           // fire event
+            promise_.set_value();    // fire event
             promise_ = promise<void>();
 
             if (&ec != &throws)
@@ -126,7 +126,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 this_.conditions_.push_back(&cond);
                 it_ = this_.conditions_.end();
-                --it_;      // refer to the newly added element
+                --it_;    // refer to the newly added element
             }
 
             ~manage_condition()
@@ -135,8 +135,8 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename Condition>
-            future<void> get_future(Condition&& func,
-                error_code& ec = hpx::throws)
+            future<void> get_future(
+                Condition&& func, error_code& ec = hpx::throws)
             {
                 return (*it_)->get_future(std::forward<Condition>(func), ec);
             }
@@ -150,7 +150,7 @@ namespace hpx { namespace lcos { namespace local
         ///        stage.
         void synchronize(std::size_t generation_value,
             char const* function_name = "base_and_gate<>::synchronize",
-            error_code& ec= throws)
+            error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(mtx_);
             synchronize(generation_value, l, function_name, ec);
@@ -160,7 +160,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename Lock>
         void synchronize(std::size_t generation_value, Lock& l,
             char const* function_name = "base_and_gate<>::synchronize",
-            error_code& ec= throws)
+            error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -171,19 +171,19 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
-           // make sure this set operation has not arrived ahead of time
+            // make sure this set operation has not arrived ahead of time
             if (!test_condition(generation_value))
             {
                 conditional_trigger c;
                 manage_condition cond(*this, c);
 
                 future<void> f = cond.get_future(util::bind(
-                        &base_trigger::test_condition, this, generation_value));
+                    &base_trigger::test_condition, this, generation_value));
 
                 {
                     hpx::util::unlock_guard<Lock> ul(l);
                     f.get();
-                }   // make sure lock gets re-acquired
+                }    // make sure lock gets re-acquired
             }
 
             if (&ec != &throws)
@@ -197,7 +197,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
-            trigger_conditions();   // re-check/trigger condition, if needed
+            trigger_conditions();    // re-check/trigger condition, if needed
 
             return retval;
         }
@@ -225,16 +225,14 @@ namespace hpx { namespace lcos { namespace local
         typedef base_trigger<no_mutex> base_type;
 
     public:
-        trigger()
-        {
-        }
+        trigger() {}
 
-        trigger(trigger && rhs)
+        trigger(trigger&& rhs)
           : base_type(std::move(static_cast<base_type&>(rhs)))
         {
         }
 
-        trigger& operator=(trigger && rhs)
+        trigger& operator=(trigger&& rhs)
         {
             if (this != &rhs)
                 static_cast<base_type&>(*this) = std::move(rhs);
@@ -244,11 +242,12 @@ namespace hpx { namespace lcos { namespace local
         template <typename Lock>
         void synchronize(std::size_t generation_value, Lock& l,
             char const* function_name = "trigger::synchronize",
-            error_code& ec= throws)
+            error_code& ec = throws)
         {
-            this->base_type::synchronize(generation_value, l, function_name, ec);
+            this->base_type::synchronize(
+                generation_value, l, function_name, ec);
         }
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif

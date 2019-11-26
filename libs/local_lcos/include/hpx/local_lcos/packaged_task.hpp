@@ -21,12 +21,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     template <typename Sig>
     class packaged_task;
 
-    template <typename R, typename ...Ts>
+    template <typename R, typename... Ts>
     class packaged_task<R(Ts...)>
     {
         typedef util::unique_function_nonser<R(Ts...)> function_type;
@@ -36,37 +35,35 @@ namespace hpx { namespace lcos { namespace local
         packaged_task()
           : function_()
           , promise_()
-        {}
+        {
+        }
 
-        template <
-            typename F, typename FD = typename std::decay<F>::type,
+        template <typename F, typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
-                !std::is_same<FD, packaged_task>::value
-             && traits::is_invocable_r<R, FD&, Ts...>::value
-            >::type
-        >
+                !std::is_same<FD, packaged_task>::value &&
+                traits::is_invocable_r<R, FD&, Ts...>::value>::type>
         explicit packaged_task(F&& f)
           : function_(std::forward<F>(f))
           , promise_()
-        {}
+        {
+        }
 
-        template <
-            typename Allocator,
-            typename F, typename FD = typename std::decay<F>::type,
+        template <typename Allocator, typename F,
+            typename FD = typename std::decay<F>::type,
             typename Enable = typename std::enable_if<
-                !std::is_same<FD, packaged_task>::value
-             && traits::is_invocable_r<R, FD&, Ts...>::value
-            >::type
-        >
-        explicit packaged_task(std::allocator_arg_t, Allocator const& a, F && f)
+                !std::is_same<FD, packaged_task>::value &&
+                traits::is_invocable_r<R, FD&, Ts...>::value>::type>
+        explicit packaged_task(std::allocator_arg_t, Allocator const& a, F&& f)
           : function_(std::forward<F>(f))
           , promise_(std::allocator_arg, a)
-        {}
+        {
+        }
 
         packaged_task(packaged_task&& rhs)
           : function_(std::move(rhs.function_))
           , promise_(std::move(rhs.promise_))
-        {}
+        {
+        }
 
         packaged_task& operator=(packaged_task&& rhs)
         {
@@ -136,25 +133,29 @@ namespace hpx { namespace lcos { namespace local
 
     private:
         // synchronous execution
-        template <typename ...Vs>
+        template <typename... Vs>
         void invoke_impl(/*is_void=*/std::false_type, Vs&&... vs)
         {
             try
             {
                 promise_.set_value(function_(std::forward<Vs>(vs)...));
-            } catch(...) {
+            }
+            catch (...)
+            {
                 promise_.set_exception(std::current_exception());
             }
         }
 
-        template <typename ...Vs>
+        template <typename... Vs>
         void invoke_impl(/*is_void=*/std::true_type, Vs&&... vs)
         {
             try
             {
                 function_(std::forward<Ts>(vs)...);
                 promise_.set_value();
-            } catch(...) {
+            }
+            catch (...)
+            {
                 promise_.set_exception(std::current_exception());
             }
         }
@@ -163,15 +164,15 @@ namespace hpx { namespace lcos { namespace local
         function_type function_;
         local::promise<R> promise_;
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
-namespace std
-{
+namespace std {
     // Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename Sig, typename Allocator>
     struct uses_allocator<hpx::lcos::local::packaged_task<Sig>, Allocator>
       : std::true_type
-    {};
-}
+    {
+    };
+}    // namespace std
 
 #endif /*HPX_LCOS_LOCAL_PACKAGED_TASK_HPP*/

@@ -23,8 +23,7 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex = lcos::local::spinlock>
     struct base_and_gate
@@ -40,21 +39,22 @@ namespace hpx { namespace lcos { namespace local
         ///        the number of participants to synchronize the control flow
         ///        with.
         base_and_gate(std::size_t count = 0)
-          : received_segments_(count), generation_(0)
+          : received_segments_(count)
+          , generation_(0)
         {
         }
 
-        base_and_gate(base_and_gate && rhs) noexcept
-          : mtx_(),
-            received_segments_(std::move(rhs.received_segments_)),
-            promise_(std::move(rhs.promise_)),
-            generation_(rhs.generation_),
-            conditions_(std::move(rhs.conditions_))
+        base_and_gate(base_and_gate&& rhs) noexcept
+          : mtx_()
+          , received_segments_(std::move(rhs.received_segments_))
+          , promise_(std::move(rhs.promise_))
+          , generation_(rhs.generation_)
+          , conditions_(std::move(rhs.conditions_))
         {
             rhs.generation_ = std::size_t(-1);
         }
 
-        base_and_gate& operator=(base_and_gate && rhs) noexcept
+        base_and_gate& operator=(base_and_gate&& rhs) noexcept
         {
             if (this != &rhs)
             {
@@ -107,12 +107,15 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(count != 0);
 
             init_locked(outer_lock, l, count, ec);
-            if (!ec) {
+            if (!ec)
+            {
                 HPX_ASSERT(generation_ != std::size_t(-1));
                 ++generation_;
 
-                trigger_conditions(ec);   // re-check/trigger condition, if needed
-                if (!ec) {
+                // re-check/trigger condition, if needed
+                trigger_conditions(ec);
+                if (!ec)
+                {
                     if (generation_value)
                         *generation_value = generation_;
                     return promise_.get_future(ec);
@@ -153,9 +156,12 @@ namespace hpx { namespace lcos { namespace local
                 generation_ = 1;
             }
 
-            if (!ec) {
-                trigger_conditions(ec);   // re-check/trigger condition, if needed
-                if (!ec) {
+            if (!ec)
+            {
+                // re-check/trigger condition, if needed
+                trigger_conditions(ec);
+                if (!ec)
+                {
                     if (generation_value)
                         *generation_value = generation_;
                     return promise_.get_shared_future(ec);
@@ -165,7 +171,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
     public:
-        shared_future<void> get_shared_future(std::size_t count = std::size_t(-1),
+        shared_future<void> get_shared_future(
+            std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -177,7 +184,8 @@ namespace hpx { namespace lcos { namespace local
     protected:
         /// \brief Set the data which has to go into the segment \a which.
         template <typename OuterLock>
-        bool set(std::size_t which, OuterLock & outer_lock, error_code& ec = throws)
+        bool set(
+            std::size_t which, OuterLock& outer_lock, error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(mtx_);
             if (which >= received_segments_.size())
@@ -210,13 +218,13 @@ namespace hpx { namespace lcos { namespace local
                 // we have received the last missing segment
                 promise<void> p;
                 std::swap(p, promise_);
-                received_segments_.reset();     // reset data store
+                received_segments_.reset();    // reset data store
 
                 // Unlock the lock to avoid locking problems when triggering
                 // the promise
                 l.unlock();
                 outer_lock.unlock();
-                p.set_value();              // fire event
+                p.set_value();    // fire event
 
                 return true;
             }
@@ -245,7 +253,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 this_.conditions_.push_back(&cond);
                 it_ = this_.conditions_.end();
-                --it_;      // refer to the newly added element
+                --it_;    // refer to the newly added element
             }
 
             ~manage_condition()
@@ -254,8 +262,8 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename Condition>
-            future<void> get_future(Condition&& func,
-                error_code& ec = hpx::throws)
+            future<void> get_future(
+                Condition&& func, error_code& ec = hpx::throws)
             {
                 return (*it_)->get_future(std::forward<Condition>(func), ec);
             }
@@ -269,7 +277,7 @@ namespace hpx { namespace lcos { namespace local
         ///        stage.
         void synchronize(std::size_t generation_value,
             char const* function_name = "base_and_gate<>::synchronize",
-            error_code& ec= throws)
+            error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(mtx_);
             synchronize(generation_value, l, function_name, ec);
@@ -279,7 +287,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename Lock>
         void synchronize(std::size_t generation_value, Lock& l,
             char const* function_name = "base_and_gate<>::synchronize",
-            error_code& ec= throws)
+            error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -303,7 +311,7 @@ namespace hpx { namespace lcos { namespace local
                 {
                     hpx::util::unlock_guard<Lock> ul(l);
                     f.get();
-                }   // make sure lock gets re-acquired
+                }    // make sure lock gets re-acquired
             }
 
             if (&ec != &throws)
@@ -317,7 +325,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
-            trigger_conditions();   // re-check/trigger condition, if needed
+            trigger_conditions();    // re-check/trigger condition, if needed
 
             return retval;
         }
@@ -344,8 +352,8 @@ namespace hpx { namespace lcos { namespace local
             }
 
             if (received_segments_.size() != count)
-                received_segments_.resize(count);   // resize the bitmap
-            received_segments_.reset();         // reset all existing bits
+                received_segments_.resize(count);    // resize the bitmap
+            received_segments_.reset();              // reset all existing bits
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -358,7 +366,6 @@ namespace hpx { namespace lcos { namespace local
         std::size_t generation_;
         condition_list_type conditions_;
     };
-
 
     ///////////////////////////////////////////////////////////////////////////
     // Note: This type is not thread-safe. It has to be protected from
@@ -375,12 +382,12 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        and_gate(and_gate && rhs)
+        and_gate(and_gate&& rhs)
           : base_type(std::move(static_cast<base_type&>(rhs)))
         {
         }
 
-        and_gate& operator=(and_gate && rhs)
+        and_gate& operator=(and_gate&& rhs)
         {
             if (this != &rhs)
                 static_cast<base_type&>(*this) = std::move(rhs);
@@ -388,8 +395,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Lock>
-        future<void> get_future(Lock& l,
-            std::size_t count = std::size_t(-1),
+        future<void> get_future(Lock& l, std::size_t count = std::size_t(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -417,10 +423,10 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "and_gate::synchronize",
             error_code& ec = throws)
         {
-            this->base_type::synchronize(generation_value, l, function_name, ec);
+            this->base_type::synchronize(
+                generation_value, l, function_name, ec);
         }
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif
-

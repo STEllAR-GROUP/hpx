@@ -17,16 +17,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 void sum(std::vector<int> const& s, hpx::lcos::local::channel<int> c)
 {
-    c.set(std::accumulate(s.begin(), s.end(), 0));      // send sum to channel
+    c.set(std::accumulate(s.begin(), s.end(), 0));    // send sum to channel
 }
 
 void calculate_sum()
 {
-    std::vector<int> s = { 7, 2, 8, -9, 4, 0 };
+    std::vector<int> s = {7, 2, 8, -9, 4, 0};
     hpx::lcos::local::channel<int> c;
 
-    hpx::apply(&sum, std::vector<int>(s.begin(), s.begin() + s.size()/2), c);
-    hpx::apply(&sum, std::vector<int>(s.begin() + s.size()/2, s.end()), c);
+    hpx::apply(&sum, std::vector<int>(s.begin(), s.begin() + s.size() / 2), c);
+    hpx::apply(&sum, std::vector<int>(s.begin() + s.size() / 2, s.end()), c);
 
     int x = c.get(hpx::launch::sync);    // receive from c
     int y = c.get(hpx::launch::sync);
@@ -37,14 +37,12 @@ void calculate_sum()
 
 ///////////////////////////////////////////////////////////////////////////////
 void ping(
-    hpx::lcos::local::send_channel<std::string> pings,
-    std::string const& msg)
+    hpx::lcos::local::send_channel<std::string> pings, std::string const& msg)
 {
     pings.set(msg);
 }
 
-void pong(
-    hpx::lcos::local::receive_channel<std::string> pings,
+void pong(hpx::lcos::local::receive_channel<std::string> pings,
     hpx::lcos::local::send_channel<std::string> pongs)
 {
     std::string msg = pings.get(hpx::launch::sync);
@@ -84,10 +82,8 @@ void ping_void(hpx::lcos::local::send_channel<> pings)
     pings.set();
 }
 
-void pong_void(
-    hpx::lcos::local::receive_channel<> pings,
-    hpx::lcos::local::send_channel<> pongs,
-    bool& pingponged)
+void pong_void(hpx::lcos::local::receive_channel<> pings,
+    hpx::lcos::local::send_channel<> pongs, bool& pingponged)
 {
     pings.get(hpx::launch::sync);
     pongs.set();
@@ -136,26 +132,24 @@ void dispatch_work()
     std::atomic<int> received_jobs(0);
     std::atomic<bool> was_closed(false);
 
-    hpx::apply(
-        [jobs, done, &received_jobs, &was_closed]() mutable
+    hpx::apply([jobs, done, &received_jobs, &was_closed]() mutable {
+        while (true)
         {
-            while(true)
+            hpx::error_code ec(hpx::lightweight);
+            int next = jobs.get(hpx::launch::sync, ec);
+            (void) next;
+            if (!ec)
             {
-                hpx::error_code ec(hpx::lightweight);
-                int next = jobs.get(hpx::launch::sync, ec);
-                (void)next;
-                if (!ec)
-                {
-                    ++received_jobs;
-                }
-                else
-                {
-                    was_closed = true;
-                    done.set();
-                    break;
-                }
+                ++received_jobs;
             }
-        });
+            else
+            {
+                was_closed = true;
+                done.set();
+                break;
+            }
+        }
+    });
 
     for (int j = 1; j <= 3; ++j)
     {
@@ -182,7 +176,7 @@ void channel_range()
 
     for (auto const& elem : queue)
     {
-        (void)elem;
+        (void) elem;
         ++received_elements;
     }
 
@@ -201,7 +195,7 @@ void channel_range_void()
 
     for (auto const& elem : queue)
     {
-        (void)elem;
+        (void) elem;
         ++received_elements;
     }
 
@@ -212,13 +206,15 @@ void channel_range_void()
 void deadlock_test()
 {
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::lcos::local::channel<int> c;
         int value = c.get(hpx::launch::sync);
         HPX_TEST(false);
-        (void)value;
+        (void) value;
     }
-    catch(hpx::exception const&) {
+    catch (hpx::exception const&)
+    {
         caught_exception = true;
     }
     HPX_TEST(caught_exception);
@@ -227,15 +223,17 @@ void deadlock_test()
 void closed_channel_get()
 {
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::lcos::local::channel<int> c;
         c.close();
 
         int value = c.get(hpx::launch::sync);
         HPX_TEST(false);
-        (void)value;
+        (void) value;
     }
-    catch(hpx::exception const&) {
+    catch (hpx::exception const&)
+    {
         caught_exception = true;
     }
     HPX_TEST(caught_exception);
@@ -244,18 +242,21 @@ void closed_channel_get()
 void closed_channel_get_generation()
 {
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::lcos::local::channel<int> c;
-        c.set(42, 122);         // setting value for generation 122
+        c.set(42, 122);    // setting value for generation 122
         c.close();
 
         HPX_TEST_EQ(c.get(hpx::launch::sync, 122), 42);
 
-        int value = c.get(hpx::launch::sync, 123); // asking for generation 123
+        int value =
+            c.get(hpx::launch::sync, 123);    // asking for generation 123
         HPX_TEST(false);
-        (void)value;
+        (void) value;
     }
-    catch(hpx::exception const&) {
+    catch (hpx::exception const&)
+    {
         caught_exception = true;
     }
     HPX_TEST(caught_exception);
@@ -264,14 +265,16 @@ void closed_channel_get_generation()
 void closed_channel_set()
 {
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::lcos::local::channel<int> c;
         c.close();
 
         c.set(42);
         HPX_TEST(false);
     }
-    catch(hpx::exception const&) {
+    catch (hpx::exception const&)
+    {
         caught_exception = true;
     }
     HPX_TEST(caught_exception);
@@ -281,13 +284,15 @@ void closed_channel_set()
 void deadlock_test1()
 {
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::lcos::local::one_element_channel<int> c;
         int value = c.get(hpx::launch::sync);
         HPX_TEST(false);
-        (void)value;
+        (void) value;
     }
-    catch(hpx::exception const&) {
+    catch (hpx::exception const&)
+    {
         caught_exception = true;
     }
     HPX_TEST(caught_exception);
@@ -296,15 +301,17 @@ void deadlock_test1()
 void closed_channel_get1()
 {
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::lcos::local::one_element_channel<int> c;
         c.close();
 
         int value = c.get(hpx::launch::sync);
         HPX_TEST(false);
-        (void)value;
+        (void) value;
     }
-    catch(hpx::exception const&) {
+    catch (hpx::exception const&)
+    {
         caught_exception = true;
     }
     HPX_TEST(caught_exception);
@@ -313,14 +320,16 @@ void closed_channel_get1()
 void closed_channel_set1()
 {
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::lcos::local::one_element_channel<int> c;
         c.close();
 
         c.set(42);
         HPX_TEST(false);
     }
-    catch(hpx::exception const&) {
+    catch (hpx::exception const&)
+    {
         caught_exception = true;
     }
     HPX_TEST(caught_exception);

@@ -19,13 +19,11 @@
 
 #include <exception>
 #include <memory>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
-namespace hpx { namespace lcos { namespace local
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos { namespace local {
+    namespace detail {
         template <typename R, typename SharedState>
         class promise_base
         {
@@ -37,7 +35,8 @@ namespace hpx { namespace lcos { namespace local
               : shared_state_(new shared_state_type(init_no_addref{}), false)
               , future_retrieved_(false)
               , shared_future_retrieved_(false)
-            {}
+            {
+            }
 
             template <typename Allocator>
             promise_base(std::allocator_arg_t, Allocator const& a)
@@ -45,27 +44,25 @@ namespace hpx { namespace lcos { namespace local
               , future_retrieved_(false)
               , shared_future_retrieved_(false)
             {
-                typedef typename traits::detail::shared_state_allocator<
-                        SharedState, Allocator
-                    >::type allocator_shared_state_type;
+                typedef
+                    typename traits::detail::shared_state_allocator<SharedState,
+                        Allocator>::type allocator_shared_state_type;
 
-                typedef typename
-                        std::allocator_traits<Allocator>::template
-                            rebind_alloc<allocator_shared_state_type>
-                    other_allocator;
+                typedef typename std::allocator_traits<Allocator>::
+                    template rebind_alloc<allocator_shared_state_type>
+                        other_allocator;
                 typedef std::allocator_traits<other_allocator> traits;
-                typedef std::unique_ptr<
-                        allocator_shared_state_type,
-                        util::allocator_deleter<other_allocator>
-                    > unique_pointer;
+                typedef std::unique_ptr<allocator_shared_state_type,
+                    util::allocator_deleter<other_allocator>>
+                    unique_pointer;
 
                 other_allocator alloc(a);
-                unique_pointer p (traits::allocate(alloc, 1),
+                unique_pointer p(traits::allocate(alloc, 1),
                     util::allocator_deleter<other_allocator>{alloc});
 
                 using lcos::detail::in_place;
-                traits::construct(alloc, p.get(), init_no_addref{}, in_place{},
-                    alloc);
+                traits::construct(
+                    alloc, p.get(), init_no_addref{}, in_place{}, alloc);
                 shared_state_.reset(p.release(), false);
             }
 
@@ -136,7 +133,7 @@ namespace hpx { namespace lcos { namespace local
                 }
 
                 future_retrieved_ = true;
-                return traits::future_access<future<R> >::create(shared_state_);
+                return traits::future_access<future<R>>::create(shared_state_);
             }
 
             shared_future<R> get_shared_future(error_code& ec = throws)
@@ -163,10 +160,8 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename... Ts>
-            typename std::enable_if<
-                std::is_constructible<R, Ts&&...>::value ||
-                    std::is_void<R>::value
-            >::type
+            typename std::enable_if<std::is_constructible<R, Ts&&...>::value ||
+                std::is_void<R>::value>::type
             set_value(Ts&&... ts)
             {
                 if (shared_state_ == nullptr)
@@ -226,7 +221,7 @@ namespace hpx { namespace lcos { namespace local
             bool future_retrieved_;
             bool shared_future_retrieved_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
@@ -238,7 +233,8 @@ namespace hpx { namespace lcos { namespace local
         // Effects: constructs a promise object and a shared state.
         promise()
           : base_type()
-        {}
+        {
+        }
 
         // Effects: constructs a promise object and a shared state. The
         // constructor uses the allocator a to allocate the memory for the
@@ -246,7 +242,8 @@ namespace hpx { namespace lcos { namespace local
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
-        {}
+        {
+        }
 
         // Effects: constructs a new promise object and transfers ownership of
         //          the shared state of other (if any) to the newly-
@@ -254,11 +251,11 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: other has no shared state.
         promise(promise&& other) noexcept
           : base_type(std::move(other))
-        {}
+        {
+        }
 
         // Effects: Abandons any shared state
-        ~promise()
-        {}
+        ~promise() {}
 
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
@@ -354,7 +351,7 @@ namespace hpx { namespace lcos { namespace local
         //   - promise_already_satisfied if its shared state already has a
         //     stored value or exception.
         //   - no_state if *this has no shared state.
-        template <typename ... Ts>
+        template <typename... Ts>
         void set_value(Ts&&... ts)
         {
             base_type::set_value(std::forward<Ts>(ts)...);
@@ -383,7 +380,8 @@ namespace hpx { namespace lcos { namespace local
         // Effects: constructs a promise object and a shared state.
         promise()
           : base_type()
-        {}
+        {
+        }
 
         // Effects: constructs a promise object and a shared state. The
         // constructor uses the allocator a to allocate the memory for the
@@ -391,7 +389,8 @@ namespace hpx { namespace lcos { namespace local
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
-        {}
+        {
+        }
 
         // Effects: constructs a new promise object and transfers ownership of
         //          the shared state of other (if any) to the newly-
@@ -399,11 +398,11 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: other has no shared state.
         promise(promise&& other) noexcept
           : base_type(std::move(other))
-        {}
+        {
+        }
 
         // Effects: Abandons any shared state
-        ~promise()
-        {}
+        ~promise() {}
 
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
@@ -487,7 +486,8 @@ namespace hpx { namespace lcos { namespace local
         // Effects: constructs a promise object and a shared state.
         promise()
           : base_type()
-        {}
+        {
+        }
 
         // Effects: constructs a promise object and a shared state. The
         // constructor uses the allocator a to allocate the memory for the
@@ -495,7 +495,8 @@ namespace hpx { namespace lcos { namespace local
         template <typename Allocator>
         promise(std::allocator_arg_t, Allocator const& a)
           : base_type(std::allocator_arg, a)
-        {}
+        {
+        }
 
         // Effects: constructs a new promise object and transfers ownership of
         //          the shared state of other (if any) to the newly-
@@ -503,11 +504,11 @@ namespace hpx { namespace lcos { namespace local
         // Postcondition: other has no shared state.
         promise(promise&& other) noexcept
           : base_type(std::move(other))
-        {}
+        {
+        }
 
         // Effects: Abandons any shared state
-        ~promise()
-        {}
+        ~promise() {}
 
         // Effects: Abandons any shared state (30.6.4) and then as if
         //          promise(std::move(other)).swap(*this).
@@ -589,15 +590,15 @@ namespace hpx { namespace lcos { namespace local
     {
         x.swap(y);
     }
-}}}
+}}}    // namespace hpx::lcos::local
 
-namespace std
-{
+namespace std {
     // Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename R, typename Allocator>
     struct uses_allocator<hpx::lcos::local::promise<R>, Allocator>
       : std::true_type
-    {};
-}
+    {
+    };
+}    // namespace std
 
 #endif

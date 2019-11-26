@@ -10,11 +10,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/synchronization/no_mutex.hpp>
-#include <hpx/local_lcos/promise.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/local_lcos/promise.hpp>
+#include <hpx/synchronization/no_mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -23,8 +23,7 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Mutex = lcos::local::spinlock>
     struct receive_buffer
@@ -42,7 +41,8 @@ namespace hpx { namespace lcos { namespace local
             entry_data()
               : can_be_deleted_(false)
               , value_set_(false)
-            {}
+            {
+            }
 
             hpx::future<T> get_future()
             {
@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
             template <typename Val>
-            void set_value(Val && val)
+            void set_value(Val&& val)
             {
                 value_set_ = true;
                 promise_.set_value(std::forward<Val>(val));
@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace local
             bool value_set_;
         };
 
-        typedef std::map<std::size_t, std::shared_ptr<entry_data> >
+        typedef std::map<std::size_t, std::shared_ptr<entry_data>>
             buffer_map_type;
         typedef typename buffer_map_type::iterator iterator;
 
@@ -81,7 +81,8 @@ namespace hpx { namespace lcos { namespace local
             erase_on_exit(buffer_map_type& buffer_map, iterator it)
               : buffer_map_(buffer_map)
               , it_(it)
-            {}
+            {
+            }
 
             ~erase_on_exit()
             {
@@ -98,14 +99,15 @@ namespace hpx { namespace lcos { namespace local
         receive_buffer(receive_buffer&& other) noexcept
           : mtx_()
           , buffer_map_(std::move(other.buffer_map_))
-        {}
+        {
+        }
 
         ~receive_buffer()
         {
             HPX_ASSERT(buffer_map_.empty());
         }
 
-        receive_buffer& operator=(receive_buffer && other) noexcept
+        receive_buffer& operator=(receive_buffer&& other) noexcept
         {
             if (this != &other)
             {
@@ -165,7 +167,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Lock = hpx::lcos::local::no_mutex>
-        void store_received(std::size_t step, T && val, Lock* lock = nullptr)
+        void store_received(std::size_t step, T&& val, Lock* lock = nullptr)
         {
             std::shared_ptr<entry_data> entry;
 
@@ -204,8 +206,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // return the number of deleted buffer entries
-        std::size_t cancel_waiting(std::exception_ptr const& e,
-            bool force_delete_entries = false)
+        std::size_t cancel_waiting(
+            std::exception_ptr const& e, bool force_delete_entries = false)
         {
             std::lock_guard<mutex_type> l(mtx_);
 
@@ -229,9 +231,8 @@ namespace hpx { namespace lcos { namespace local
             iterator it = buffer_map_.find(step);
             if (it == buffer_map_.end())
             {
-                std::pair<iterator, bool> res =
-                    buffer_map_.insert(
-                        std::make_pair(step, std::make_shared<entry_data>()));
+                std::pair<iterator, bool> res = buffer_map_.insert(
+                    std::make_pair(step, std::make_shared<entry_data>()));
                 if (!res.second)
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
@@ -263,8 +264,10 @@ namespace hpx { namespace lcos { namespace local
 
         public:
             entry_data()
-              : can_be_deleted_(false), value_set_(false)
-            {}
+              : can_be_deleted_(false)
+              , value_set_(false)
+            {
+            }
 
             hpx::future<void> get_future()
             {
@@ -293,15 +296,17 @@ namespace hpx { namespace lcos { namespace local
             bool value_set_;
         };
 
-        typedef std::map<std::size_t, std::shared_ptr<entry_data> >
+        typedef std::map<std::size_t, std::shared_ptr<entry_data>>
             buffer_map_type;
         typedef typename buffer_map_type::iterator iterator;
 
         struct erase_on_exit
         {
             erase_on_exit(buffer_map_type& buffer_map, iterator it)
-              : buffer_map_(buffer_map), it_(it)
-            {}
+              : buffer_map_(buffer_map)
+              , it_(it)
+            {
+            }
 
             ~erase_on_exit()
             {
@@ -315,18 +320,19 @@ namespace hpx { namespace lcos { namespace local
     public:
         receive_buffer() {}
 
-        receive_buffer(receive_buffer && other)
+        receive_buffer(receive_buffer&& other)
           : buffer_map_(std::move(other.buffer_map_))
-        {}
+        {
+        }
 
         ~receive_buffer()
         {
             HPX_ASSERT(buffer_map_.empty());
         }
 
-        receive_buffer& operator=(receive_buffer && other)
+        receive_buffer& operator=(receive_buffer&& other)
         {
-            if(this != &other)
+            if (this != &other)
             {
                 buffer_map_ = std::move(other.buffer_map_);
             }
@@ -422,8 +428,8 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // return the number of deleted buffer entries
-        std::size_t cancel_waiting(std::exception_ptr const& e,
-            bool force_delete_entries = false)
+        std::size_t cancel_waiting(
+            std::exception_ptr const& e, bool force_delete_entries = false)
         {
             std::lock_guard<mutex_type> l(mtx_);
 
@@ -447,9 +453,8 @@ namespace hpx { namespace lcos { namespace local
             iterator it = buffer_map_.find(step);
             if (it == buffer_map_.end())
             {
-                std::pair<iterator, bool> res =
-                    buffer_map_.insert(
-                        std::make_pair(step, std::make_shared<entry_data>()));
+                std::pair<iterator, bool> res = buffer_map_.insert(
+                    std::make_pair(step, std::make_shared<entry_data>()));
                 if (!res.second)
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
@@ -465,7 +470,6 @@ namespace hpx { namespace lcos { namespace local
         mutable mutex_type mtx_;
         buffer_map_type buffer_map_;
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif
-

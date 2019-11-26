@@ -10,35 +10,33 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
-#include <hpx/functional/function.hpp>
 
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
     struct conditional_trigger
     {
     public:
         conditional_trigger() = default;
 
-        conditional_trigger(conditional_trigger && rhs) noexcept = default;
+        conditional_trigger(conditional_trigger&& rhs) noexcept = default;
 
         conditional_trigger& operator=(
             conditional_trigger&& rhs) noexcept = default;
 
         /// \brief get a future allowing to wait for the trigger to fire
         template <typename Condition>
-        future<void> get_future(Condition&& func,
-            error_code& ec = hpx::throws)
+        future<void> get_future(Condition&& func, error_code& ec = hpx::throws)
         {
             cond_.assign(std::forward<Condition>(func));
 
             future<void> f = promise_.get_future(ec);
 
-            set(ec);      // trigger as soon as possible
+            set(ec);    // trigger as soon as possible
 
             return f;
         }
@@ -57,7 +55,7 @@ namespace hpx { namespace lcos { namespace local
             // trigger this object
             if (cond_ && cond_())
             {
-                promise_.set_value();           // fire event
+                promise_.set_value();    // fire event
                 promise_ = promise<void>();
                 return true;
             }
@@ -69,6 +67,6 @@ namespace hpx { namespace lcos { namespace local
         lcos::local::promise<void> promise_;
         util::function_nonser<bool()> cond_;
     };
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif

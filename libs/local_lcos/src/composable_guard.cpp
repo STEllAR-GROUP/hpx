@@ -17,14 +17,12 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos { namespace local
-{
+namespace hpx { namespace lcos { namespace local {
     static void run_composable(detail::guard_task* task);
 
     static void nothing() {}
 
-    namespace detail
-    {
+    namespace detail {
         // A link in the list of tasks attached
         // to a guard
         struct guard_task : detail::debug_object
@@ -34,9 +32,17 @@ namespace hpx { namespace lcos { namespace local
             bool const single_guard;
 
             guard_task()
-              : next(nullptr), run(nothing), single_guard(true) {}
+              : next(nullptr)
+              , run(nothing)
+              , single_guard(true)
+            {
+            }
             guard_task(bool sg)
-              : next(nullptr), run(nothing), single_guard(sg) {}
+              : next(nullptr)
+              , run(nothing)
+              , single_guard(sg)
+            {
+            }
         };
 
         void free(guard_task* task)
@@ -46,11 +52,12 @@ namespace hpx { namespace lcos { namespace local
             task->check_();
             delete task;
         }
-    }
+    }    // namespace detail
 
     void guard_set::sort()
     {
-        if (!sorted) {
+        if (!sorted)
+        {
             std::sort(guards.begin(), guards.end());
             (*guards.begin())->check_();
             sorted = true;
@@ -65,19 +72,21 @@ namespace hpx { namespace lcos { namespace local
         detail::guard_task** stages;
 
         stage_data(detail::guard_function task_,
-            std::vector<std::shared_ptr<guard> >& guards)
+            std::vector<std::shared_ptr<guard>>& guards)
           : gs()
           , task(std::move(task_))
           , n(guards.size())
           , stages(new detail::guard_task*[n])
         {
-            for (std::size_t i=0; i<n; i++) {
+            for (std::size_t i = 0; i < n; i++)
+            {
                 stages[i] = new detail::guard_task(false);
             }
         }
 
-        ~stage_data() {
-            if(stages == nullptr)
+        ~stage_data()
+        {
+            if (stages == nullptr)
                 abort();
             HPX_ASSERT(n == gs.size());
             delete[] stages;
@@ -90,14 +99,18 @@ namespace hpx { namespace lcos { namespace local
         HPX_ASSERT(task != nullptr);
         task->check_();
         detail::guard_task* prev = g.task.exchange(task);
-        if (prev != nullptr) {
+        if (prev != nullptr)
+        {
             prev->check_();
             detail::guard_task* zero = nullptr;
-            if (!prev->next.compare_exchange_strong(zero, task)) {
+            if (!prev->next.compare_exchange_strong(zero, task))
+            {
                 run_composable(task);
                 free(prev);
             }
-        } else {
+        }
+        else
+        {
             run_composable(task);
         }
     }
@@ -106,19 +119,26 @@ namespace hpx { namespace lcos { namespace local
     {
         stage_data* sd;
         std::size_t n;
-        stage_task_cleanup(stage_data* sd_, std::size_t n_) : sd(sd_), n(n_) {}
-        ~stage_task_cleanup() {
+        stage_task_cleanup(stage_data* sd_, std::size_t n_)
+          : sd(sd_)
+          , n(n_)
+        {
+        }
+        ~stage_task_cleanup()
+        {
             detail::guard_task* zero = nullptr;
             // The tasks on the other guards had single_task marked,
             // so they haven't had their next field set yet. Setting
             // the next field is necessary if they are going to
             // continue processing.
-            for (std::size_t k=0; k<n; k++) {
+            for (std::size_t k = 0; k < n; k++)
+            {
                 detail::guard_task* lt = sd->stages[k];
                 lt->check_();
                 HPX_ASSERT(!lt->single_guard);
                 zero = nullptr;
-                if (!lt->next.compare_exchange_strong(zero, lt)) {
+                if (!lt->next.compare_exchange_strong(zero, lt))
+                {
                     HPX_ASSERT(zero != lt);
                     run_composable(zero);
                     free(lt);
@@ -131,10 +151,13 @@ namespace hpx { namespace lcos { namespace local
     static void stage_task(stage_data* sd, std::size_t i, std::size_t n)
     {
         // if this is the last task in the set...
-        if (i+1 == n) {
+        if (i + 1 == n)
+        {
             stage_task_cleanup stc(sd, n);
             sd->task();
-        } else {
+        }
+        else
+        {
             std::size_t k = i + 1;
             detail::guard_task* stage = sd->stages[k];
             stage->run = util::bind_front(stage_task, sd, k, n);
@@ -146,10 +169,13 @@ namespace hpx { namespace lcos { namespace local
     void run_guarded(guard_set& guards, detail::guard_function task)
     {
         std::size_t n = guards.guards.size();
-        if (n == 0) {
+        if (n == 0)
+        {
             task();
             return;
-        } else if (n == 1) {
+        }
+        else if (n == 1)
+        {
             run_guarded(*guards.guards[0], std::move(task));
             guards.check_();
             return;
@@ -159,8 +185,8 @@ namespace hpx { namespace lcos { namespace local
         int k = 0;
         sd->stages[k]->run = util::bind_front(stage_task, sd, k, n);
         sd->gs = guards;
-        detail::guard_task* stage = sd->stages[k]; //-V108
-        run_guarded(*sd->gs.get(k), stage); //-V106
+        detail::guard_task* stage = sd->stages[k];    //-V108
+        run_guarded(*sd->gs.get(k), stage);           //-V106
     }
 
     void run_guarded(guard& guard, detail::guard_function task)
@@ -177,8 +203,12 @@ namespace hpx { namespace lcos { namespace local
     struct run_composable_cleanup
     {
         detail::guard_task* task;
-        run_composable_cleanup(detail::guard_task* task_) : task(task_) {}
-        ~run_composable_cleanup() {
+        run_composable_cleanup(detail::guard_task* task_)
+          : task(task_)
+        {
+        }
+        ~run_composable_cleanup()
+        {
             detail::guard_task* zero = nullptr;
             // If single_guard is false, then this is one of the
             // setup tasks for a multi-guarded task. By not setting
@@ -186,7 +216,8 @@ namespace hpx { namespace lcos { namespace local
             // to this guard.
             HPX_ASSERT(task != nullptr);
             task->check_();
-            if (!task->next.compare_exchange_strong(zero, task)) {
+            if (!task->next.compare_exchange_strong(zero, task))
+            {
                 HPX_ASSERT(zero != nullptr);
                 run_composable(zero);
                 free(task);
@@ -195,18 +226,21 @@ namespace hpx { namespace lcos { namespace local
     };
 
     using hpx::lcos::local::detail::guard_task;
-    guard_task *empty = new guard_task;
+    guard_task* empty = new guard_task;
 
     static void run_composable(detail::guard_task* task)
     {
-        if(task == empty)
+        if (task == empty)
             return;
         HPX_ASSERT(task != nullptr);
         task->check_();
-        if (task->single_guard) {
+        if (task->single_guard)
+        {
             run_composable_cleanup rcc(task);
             task->run();
-        } else {
+        }
+        else
+        {
             task->run();
             // Note that by this point in the execution
             // the task data structure has probably
@@ -214,13 +248,15 @@ namespace hpx { namespace lcos { namespace local
         }
     }
 
-    guard::~guard() {
-        guard_task *zero = nullptr;
-        guard_task *current = task.load();
-        if(current == nullptr)
+    guard::~guard()
+    {
+        guard_task* zero = nullptr;
+        guard_task* current = task.load();
+        if (current == nullptr)
             return;
-        if(!current->next.compare_exchange_strong(zero,empty)) {
+        if (!current->next.compare_exchange_strong(zero, empty))
+        {
             free(zero);
         }
     }
-}}}
+}}}    // namespace hpx::lcos::local

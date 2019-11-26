@@ -25,11 +25,9 @@ void test_safe_destruction()
 
         // Delay returning from p.set_value() below to destroy the promise
         // before set_value returns.
-        outer = inner.then(
-            [](hpx::shared_future<void> &&)
-            {
-                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-            });
+        outer = inner.then([](hpx::shared_future<void>&&) {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        });
 
         // create a thread which will make the inner future ready
         t = hpx::thread([&p]() { p.set_value(); });

@@ -10,12 +10,10 @@
 
 #if defined(HPX_LOCAL_LCOS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/lcos/local/channel.hpp is deprecated, \
+#pragma message("The header hpx/lcos/local/channel.hpp is deprecated, \
     please include hpx/local_lcos/channel.hpp instead")
 #else
-#warning \
-    "The header hpx/lcos/local/channel.hpp is deprecated, \
+#warning "The header hpx/lcos/local/channel.hpp is deprecated, \
     please include hpx/local_lcos/channel.hpp instead"
 #endif
 #endif

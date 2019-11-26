@@ -83,9 +83,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/local_lcos/packaged_task.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/local_lcos/packaged_task.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -93,10 +93,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos { namespace local
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos { namespace local {
+    namespace detail {
         struct debug_object
         {
 #ifdef HPX_DEBUG
@@ -106,14 +104,17 @@ namespace hpx { namespace lcos { namespace local
 
             debug_object()
               : magic(debug_magic)
-            {}
+            {
+            }
 
-            ~debug_object() {
+            ~debug_object()
+            {
                 check_();
                 magic = ~debug_magic;
             }
 
-            void check_() {
+            void check_()
+            {
                 HPX_ASSERT(magic != ~debug_magic);
                 HPX_ASSERT(magic == debug_magic);
             }
@@ -129,20 +130,23 @@ namespace hpx { namespace lcos { namespace local
         HPX_API_EXPORT void free(guard_task* task);
 
         typedef util::unique_function_nonser<void()> guard_function;
-    }
+    }    // namespace detail
 
     class guard : public detail::debug_object
     {
     public:
         detail::guard_atomic task;
 
-        guard() : task(nullptr) {}
+        guard()
+          : task(nullptr)
+        {
+        }
         HPX_API_EXPORT ~guard();
     };
 
     class guard_set : public detail::debug_object
     {
-        std::vector<std::shared_ptr<guard> > guards;
+        std::vector<std::shared_ptr<guard>> guards;
         // the guards need to be sorted, but we don't
         // want to sort them more often than necessary
         bool sorted;
@@ -150,18 +154,27 @@ namespace hpx { namespace lcos { namespace local
         void sort();
 
     public:
-        guard_set() : guards(), sorted(true) {}
-         ~guard_set() {}
+        guard_set()
+          : guards()
+          , sorted(true)
+        {
+        }
+        ~guard_set() {}
 
-        std::shared_ptr<guard> get(std::size_t i) { return guards[i]; }
+        std::shared_ptr<guard> get(std::size_t i)
+        {
+            return guards[i];
+        }
 
-        void add(std::shared_ptr<guard> const& guard_ptr) {
+        void add(std::shared_ptr<guard> const& guard_ptr)
+        {
             HPX_ASSERT(guard_ptr.get() != nullptr);
             guards.push_back(guard_ptr);
             sorted = false;
         }
 
-        std::size_t size() {
+        std::size_t size()
+        {
             return guards.size();
         }
 
@@ -173,23 +186,26 @@ namespace hpx { namespace lcos { namespace local
     /// mutex is locked before the task runs, and unlocked afterwards.
     HPX_API_EXPORT void run_guarded(guard& guard, detail::guard_function task);
 
-    template <typename F, typename ...Args>
+    template <typename F, typename... Args>
     void run_guarded(guard& guard, F&& f, Args&&... args)
     {
-        return run_guarded(guard, detail::guard_function(
-            util::deferred_call(std::forward<F>(f), std::forward<Args>(args)...)));
+        return run_guarded(guard,
+            detail::guard_function(util::deferred_call(
+                std::forward<F>(f), std::forward<Args>(args)...)));
     }
 
     /// Conceptually, a guard_set acts like a set of mutexes on an asynchronous task.
     /// The mutexes are locked before the task runs, and unlocked afterwards.
-    HPX_API_EXPORT void run_guarded(guard_set& guards, detail::guard_function task);
+    HPX_API_EXPORT void run_guarded(
+        guard_set& guards, detail::guard_function task);
 
-    template <typename F, typename ...Args>
+    template <typename F, typename... Args>
     void run_guarded(guard_set& guards, F&& f, Args&&... args)
     {
-        return run_guarded(guards, detail::guard_function(
-            util::deferred_call(std::forward<F>(f), std::forward<Args>(args)...)));
+        return run_guarded(guards,
+            detail::guard_function(util::deferred_call(
+                std::forward<F>(f), std::forward<Args>(args)...)));
     }
-}}}
+}}}    // namespace hpx::lcos::local
 
 #endif /*HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP*/

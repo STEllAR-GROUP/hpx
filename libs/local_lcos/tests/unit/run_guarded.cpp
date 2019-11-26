@@ -3,18 +3,18 @@
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#include <hpx/hpx.hpp>
-#include <hpx/local_lcos/composable_guard.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/local_lcos/composable_guard.hpp>
+#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <iostream>
 #include <memory>
+#include <stdlib.h>
 #include <string>
 #include <vector>
-#include <stdlib.h>
 
 typedef std::atomic<int> int_atomic;
 int_atomic i1(0), i2(0);
@@ -22,36 +22,39 @@ hpx::lcos::local::guard_set guards;
 std::shared_ptr<hpx::lcos::local::guard> l1(new hpx::lcos::local::guard());
 std::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
 
-void incr1() {
+void incr1()
+{
     // implicitly lock l1
     int tmp = i1.load();
-    HPX_TEST(i1.compare_exchange_strong(tmp,tmp+1));
+    HPX_TEST(i1.compare_exchange_strong(tmp, tmp + 1));
     // implicitly unlock l1
 }
-void incr2() {
+void incr2()
+{
     // implicitly lock l2
     int tmp = i2.load();
-    HPX_TEST(i2.compare_exchange_strong(tmp,tmp+1));
+    HPX_TEST(i2.compare_exchange_strong(tmp, tmp + 1));
     // implicitly unlock l2
 }
-void both() {
+void both()
+{
     // implicitly lock l1 and l2
     int tmp = i1.load();
-    HPX_TEST(i1.compare_exchange_strong(tmp,tmp+1));
+    HPX_TEST(i1.compare_exchange_strong(tmp, tmp + 1));
     tmp = i2.load();
-    HPX_TEST(i2.compare_exchange_strong(tmp,tmp+1));
+    HPX_TEST(i2.compare_exchange_strong(tmp, tmp + 1));
     // implicitly unlock l1 and l2
 }
 
 int increments = 3000;
 
-
 void check_()
 {
-    HPX_TEST(2*increments == i1 && 2*increments == i2);
+    HPX_TEST(2 * increments == i1 && 2 * increments == i2);
 }
 
-int hpx_main(hpx::program_options::variables_map& vm) {
+int hpx_main(hpx::program_options::variables_map& vm)
+{
     if (vm.count("increments"))
         increments = vm["increments"].as<int>();
 
@@ -59,33 +62,32 @@ int hpx_main(hpx::program_options::variables_map& vm) {
     guards.add(l1);
     guards.add(l2);
 
-    for(int i=0;i<increments;i++) {
+    for (int i = 0; i < increments; i++)
+    {
         // spawn 3 asynchronous tasks
-        run_guarded(guards,both);
-        run_guarded(*l1,incr1);
-        run_guarded(*l2,incr2);
+        run_guarded(guards, both);
+        run_guarded(*l1, incr1);
+        run_guarded(*l2, incr2);
     }
 
     run_guarded(guards, &::check_);
     return hpx::finalize();
 }
 
-int main(int argc, char* argv[]) {
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+int main(int argc, char* argv[])
+{
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("increments,n", hpx::program_options::value<int>()->default_value(3000),
-            "the number of times to increment the counters")
-        ;
+    desc_commandline.add_options()("increments,n",
+        hpx::program_options::value<int>()->default_value(3000),
+        "the number of times to increment the counters");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,
-      "HPX main exited with non-zero status");
+        "HPX main exited with non-zero status");
     return hpx::util::report_errors();
 }
