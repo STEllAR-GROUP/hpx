@@ -13,7 +13,7 @@ hpx_set_cmake_policy(CMP0060 NEW)
 
 function(hpx_setup_target target)
   # retrieve arguments
-  set(options EXPORT NOHPX_INIT INSTALL INSTALL_HEADERS INTERNAL_FLAGS NOLIBS PLUGIN
+  set(options EXPORT INSTALL INSTALL_HEADERS INTERNAL_FLAGS NOLIBS PLUGIN
     NONAMEPREFIX NOTLLKEYWORD)
   set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX HEADER_ROOT)
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS INSTALL_PDB)
@@ -81,11 +81,6 @@ function(hpx_setup_target target)
     set(__tll_public PUBLIC)
   endif()
 
-  set(nohpxinit FALSE)
-  if(target_NOHPX_INIT)
-    set(nohpxinit TRUE)
-  endif()
-
   set(target_STATIC_LINKING OFF)
   if(HPX_WITH_STATIC_LINKING)
     set(target_STATIC_LINKING ON)
@@ -108,55 +103,25 @@ function(hpx_setup_target target)
   endif()
 
   if("${_type}" STREQUAL "EXECUTABLE")
-    if(target_HPX_PREFIX)
-      set(_prefix ${target_HPX_PREFIX})
-    else()
-      set(_prefix ${HPX_PREFIX})
-    endif()
-
-    if(MSVC)
-      string(REPLACE ";" ":" _prefix "${_prefix}")
-    endif()
-
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_APPLICATION_NAME=${name}"
-                 "HPX_APPLICATION_STRING=\"${name}\""
-                 "HPX_PREFIX=\"${_prefix}\""
-                 "HPX_APPLICATION_EXPORTS")
+                 "HPX_APPLICATION_STRING=\"${name}\"")
+
+    if(target_HPX_PREFIX)
+      set(_prefix ${target_HPX_PREFIX})
+
+      if(MSVC)
+        string(REPLACE ";" ":" _prefix "${_prefix}")
+      endif()
+
+      set_property(TARGET ${target} APPEND
+                   PROPERTY COMPILE_DEFINITIONS
+                   "HPX_PREFIX=\"${_prefix}\"")
+    endif()
   endif()
 
-  if("${_type}" STREQUAL "LIBRARY")
-    set(nohpxinit FALSE)
-    if(DEFINED HPX_LIBRARY_VERSION AND DEFINED HPX_SOVERSION)
-      # set properties of generated shared library
-      set_target_properties(${target}
-        PROPERTIES
-        VERSION ${HPX_LIBRARY_VERSION}
-        SOVERSION ${HPX_SOVERSION})
-    endif()
-    if(NOT target_NONAMEPREFIX)
-      hpx_set_lib_name(${target} ${name})
-    endif()
-    set_target_properties(${target}
-      PROPERTIES
-      # create *nix style library versions + symbolic links
-      # allow creating static and shared libs without conflicts
-      CLEAN_DIRECT_OUTPUT 1
-      OUTPUT_NAME ${name})
-    if(target_PLUGIN)
-      set(plugin_name "HPX_PLUGIN_NAME=hpx_${name}")
-    endif()
-    set(nohpxinit TRUE)
-
-    set_property(TARGET ${target} APPEND
-                 PROPERTY COMPILE_DEFINITIONS
-                 "HPX_LIBRARY_EXPORTS"
-                 ${plugin_name})
-  endif()
-
-  if("${_type}" STREQUAL "COMPONENT")
-    set(nohpxinit FALSE)
+  if("${_type}" STREQUAL "LIBRARY" OR "${_type}" STREQUAL "COMPONENT")
     if(DEFINED HPX_LIBRARY_VERSION AND DEFINED HPX_SOVERSION)
     # set properties of generated shared library
       set_target_properties(${target}
@@ -173,49 +138,36 @@ function(hpx_setup_target target)
       # allow creating static and shared libs without conflicts
       CLEAN_DIRECT_OUTPUT 1
       OUTPUT_NAME ${name})
-    set(nohpxinit TRUE)
+  endif()
 
+  if("${_type}" STREQUAL "LIBRARY" AND target_PLUGIN)
+    set(plugin_name "HPX_PLUGIN_NAME=hpx_${name}")
+    target_link_libraries(${target} ${__tll_public}
+      $<TARGET_NAME_IF_EXISTS:plugin>
+      $<TARGET_NAME_IF_EXISTS:HPX::plugin>)
+  endif()
+
+  if("${_type}" STREQUAL "COMPONENT")
     set_property(TARGET ${target} APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_COMPONENT_NAME=hpx_${name}"
-                 "HPX_COMPONENT_STRING=\"hpx_${name}\""
-                 "HPX_COMPONENT_EXPORTS")
+                 "HPX_COMPONENT_STRING=\"hpx_${name}\"")
+    target_link_libraries(${target} ${__tll_public}
+      $<TARGET_NAME_IF_EXISTS:component>
+      $<TARGET_NAME_IF_EXISTS:HPX::component>)
   endif()
 
-  # We force the -DDEBUG and -D_DEBUG defines in debug mode to avoid
-  # ABI differences
-  # if hpx is an imported target, get the config debug/release
-  set(HPX_IMPORT_CONFIG "NOTFOUND")
-  if (TARGET "hpx")
-    get_target_property(HPX_IMPORT_CONFIG "hpx" IMPORTED_CONFIGURATIONS)
-  endif()
-  if(HPX_IMPORT_CONFIG MATCHES NOTFOUND)
-    # we are building HPX not importing, so we should use the $<CONFIG:variable
-    set(_USE_CONFIG 1)
-  else()
-    # hpx is an imported target, so set HPX_DEBUG based on build config of hpx library
-    set(_USE_CONFIG 0)
-  endif()
-
-  if(NOT target_NOLIBS)
-    if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${_type}" STREQUAL "EXECUTABLE") AND
-       (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
-      set(hpx_libs hpx_wrap)
-    endif()
-    set(hpx_libs ${hpx_libs} hpx)
-    if(NOT target_STATIC_LINKING)
-      set(hpx_libs ${hpx_libs})
-      if(NOT nohpxinit)
-        set(hpx_libs hpx_init ${hpx_libs})
-      endif()
-    endif()
-    hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)
-    set(hpx_libs ${hpx_libs} ${target_COMPONENT_DEPENDENCIES})
-  else()
+  if(target_NOLIBS)
     target_compile_options(${target} ${__tll_public} ${CXX_FLAG})
+  else()
+    target_link_libraries(${target} ${__tll_public}
+      $<TARGET_NAME_IF_EXISTS:hpx>
+      $<TARGET_NAME_IF_EXISTS:HPX::hpx>)
+    hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)
+    target_link_libraries(${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES})
   endif()
 
-  target_link_libraries(${target} ${__tll_public} ${hpx_libs} ${target_DEPENDENCIES})
+  target_link_libraries(${target} ${__tll_public} ${target_DEPENDENCIES})
 
   if(target_INTERNAL_FLAGS AND TARGET hpx_internal_flags)
     target_link_libraries(${target} ${__tll_private} hpx_internal_flags)
