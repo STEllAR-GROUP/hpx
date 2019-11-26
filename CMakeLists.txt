@@ -542,6 +542,10 @@ hpx_option(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION BOOL
 # global variables
 add_library(hpx_base_libraries INTERFACE)
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  target_link_libraries(hpx_base_libraries INTERFACE imf svml irng intlc)
+endif()
+
 if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_info("Stack traces are enabled.")
   hpx_add_config_define(HPX_HAVE_STACKTRACES)
