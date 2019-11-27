@@ -37,6 +37,7 @@ add_hpx_module(resource_partitioner
   HEADERS ${resource_partitioner_headers}
   COMPAT_HEADERS ${resource_partitioner_compat_headers}
   DEPENDENCIES
+    hpx_affinity
     hpx_allocator_support
     hpx_assertion
     hpx_cache

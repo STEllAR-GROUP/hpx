@@ -10,7 +10,6 @@ set(tests
     config_entry
     pack_traversal
     pack_traversal_async
-    parse_slurm_nodelist
     serializable_any
     serializable_boost_any
     tagged
@@ -24,11 +23,6 @@ set(subdirs
    )
 
 ###############################################################################
-if(HWLOC_FOUND)
-  set(tests ${tests} parse_affinity_options)
-  set(parse_affinity_options_PARAMETERS THREADS_PER_LOCALITY 2)
-endif()
-
 set(serialize_buffer_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 foreach(test ${tests})

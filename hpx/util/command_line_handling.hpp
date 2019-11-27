@@ -23,6 +23,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
+    namespace detail {
+        HPX_EXPORT bool check_mpi_environment(runtime_configuration const& cfg);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Helper functions for retrieving command line options (with error
     // checking)

@@ -53,6 +53,7 @@ add_hpx_module(collectives
       hpx/collectives/detail/barrier_node.hpp
       hpx/collectives/detail/latch.hpp
     DEPENDENCIES
+      hpx_affinity
       hpx_allocator_support
       hpx_assertion
       hpx_cache

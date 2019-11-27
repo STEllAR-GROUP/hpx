@@ -14,10 +14,12 @@ All modules
 .. toctree::
    :maxdepth: 2
 
+   /libs/affinity/docs/index.rst
    /libs/algorithms/docs/index.rst
    /libs/allocator_support/docs/index.rst
    /libs/assertion/docs/index.rst
    /libs/basic_execution/docs/index.rst
+   /libs/batch_environments/docs/index.rst
    /libs/cache/docs/index.rst
    /libs/checkpoint/docs/index.rst
    /libs/collectives/docs/index.rst

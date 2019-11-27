@@ -8,7 +8,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/runtime/threads/detail/io_service_thread_pool.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/io_service_pool.hpp>

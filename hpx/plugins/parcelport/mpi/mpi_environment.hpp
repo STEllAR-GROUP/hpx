@@ -38,8 +38,6 @@ namespace hpx { namespace util
 
         static std::string get_processor_name();
 
-        static bool check_mpi_environment(runtime_configuration const& cfg);
-
         struct scoped_lock
         {
             scoped_lock();

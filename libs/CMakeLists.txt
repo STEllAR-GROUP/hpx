@@ -11,10 +11,12 @@ include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
 set(HPX_LIBS
+  affinity
   algorithms
   allocator_support
   assertion
   basic_execution
+  batch_environments
   cache
   checkpoint
   collectives
