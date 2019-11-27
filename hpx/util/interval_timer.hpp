@@ -13,6 +13,8 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+
 #include <algorithm>
 #include <cstdint>
 #include <memory>
