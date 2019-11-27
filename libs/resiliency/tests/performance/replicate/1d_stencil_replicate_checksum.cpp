@@ -20,9 +20,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/synchronization.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/resiliency/resiliency.hpp>
+#include <hpx/synchronization.hpp>
 #include <boost/range/irange.hpp>
 
 #include <cstddef>

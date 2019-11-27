@@ -7,12 +7,11 @@
 #if !defined(FIRST_ARGUMENT_HPP)
 #define FIRST_ARGUMENT_HPP
 
-#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <type_traits>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
@@ -36,13 +35,13 @@ namespace hpx { namespace util
         struct function_first_argument;
 
         template <typename ReturnType>
-        struct function_first_argument<ReturnType(*)()>
+        struct function_first_argument<ReturnType (*)()>
         {
             using type = std::false_type;
         };
 
         template <typename ReturnType, typename Arg0, typename... Args>
-        struct function_first_argument< ReturnType(*)(Arg0, Args...) >
+        struct function_first_argument<ReturnType (*)(Arg0, Args...)>
         {
             using type = typename std::decay<Arg0>::type;
         };
@@ -52,48 +51,50 @@ namespace hpx { namespace util
         struct lambda_first_argument;
 
         template <typename ClassType, typename ReturnType>
-        struct lambda_first_argument<ReturnType(ClassType::*)() const>
+        struct lambda_first_argument<ReturnType (ClassType::*)() const>
         {
             using type = std::false_type;
         };
 
-        template <typename ClassType,
-            typename ReturnType, typename Arg0, typename... Args>
-        struct lambda_first_argument<
-            ReturnType(ClassType::*)(Arg0, Args...) const>
+        template <typename ClassType, typename ReturnType, typename Arg0,
+            typename... Args>
+        struct lambda_first_argument<ReturnType (ClassType::*)(Arg0, Args...)
+                const>
         {
             using type = typename std::decay<Arg0>::type;
         };
-    }
+    }    // namespace detail
 
     template <typename F, typename Enable = void>
     struct first_argument
-    {};
+    {
+    };
 
     // Specialization for actions
     template <typename F>
     struct first_argument<F,
-         typename std::enable_if<hpx::traits::is_action<F>::value>::type>
-    : detail::tuple_first_argument<typename F::arguments_type>
-    {};
+        typename std::enable_if<hpx::traits::is_action<F>::value>::type>
+      : detail::tuple_first_argument<typename F::arguments_type>
+    {
+    };
 
     // Specialization for functions
     template <typename F>
     struct first_argument<F,
-         typename std::enable_if<!hpx::traits::is_action<F>::value
-            && std::is_function<
-                typename std::remove_pointer<F>::type>::value >::type>
-    : detail::function_first_argument<F>
-    {};
+        typename std::enable_if<!hpx::traits::is_action<F>::value &&
+            std::is_function<typename std::remove_pointer<F>::type>::value>::
+            type> : detail::function_first_argument<F>
+    {
+    };
 
     // Specialization for lambdas
     template <typename F>
     struct first_argument<F,
-         typename std::enable_if<!hpx::traits::is_action<F>::value
-            && !std::is_function<
-                typename std::remove_pointer<F>::type>::value >::type>
-    : detail::lambda_first_argument<decltype(&F::operator())>
-    {};
-}}
+        typename std::enable_if<!hpx::traits::is_action<F>::value &&
+            !std::is_function<typename std::remove_pointer<F>::type>::value>::
+            type> : detail::lambda_first_argument<decltype(&F::operator())>
+    {
+    };
+}}    // namespace hpx::util
 
 #endif

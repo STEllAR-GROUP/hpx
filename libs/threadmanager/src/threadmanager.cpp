@@ -27,10 +27,10 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 #include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/synchronization/detail/yield_k.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <cstddef>

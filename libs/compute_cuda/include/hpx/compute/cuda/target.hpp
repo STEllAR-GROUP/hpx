@@ -15,9 +15,9 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/compute/cuda/get_targets.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <hpx/serialization/serialization_fwd.hpp>
 

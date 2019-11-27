@@ -200,7 +200,6 @@ namespace hpx { namespace lcos {
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/local_lcos/and_gate.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -211,6 +210,7 @@ namespace hpx { namespace lcos {
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 

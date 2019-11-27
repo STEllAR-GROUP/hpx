@@ -10,8 +10,8 @@
 #define HPX_COMPUTE_TARGET_DISTRIBUTION_POLICY
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <mutex>
