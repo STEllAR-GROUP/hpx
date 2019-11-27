@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/type_support/always_void.hpp>

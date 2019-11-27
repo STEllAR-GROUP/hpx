@@ -30,7 +30,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/always_void.hpp>

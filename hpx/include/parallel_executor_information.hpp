@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/parallel/executors/execution_information.hpp>
-#include <hpx/parallel/executors/thread_execution_information.hpp>
+#include <hpx/execution/parallel/executors/execution_information.hpp>
+#include <hpx/execution/parallel/executors/thread_execution_information.hpp>
 
 #endif

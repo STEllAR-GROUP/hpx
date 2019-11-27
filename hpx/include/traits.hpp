@@ -54,13 +54,13 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/is_executor_parameters.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/traits/is_timed_executor.hpp>
+#include <hpx/execution/traits/is_timed_executor.hpp>
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/traits/pointer_category.hpp>

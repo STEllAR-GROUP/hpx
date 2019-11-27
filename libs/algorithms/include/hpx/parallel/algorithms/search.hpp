@@ -13,9 +13,9 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/execution/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/execution/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>

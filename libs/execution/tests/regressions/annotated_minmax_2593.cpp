@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
-#include <hpx/parallel/executor_parameters.hpp>
+#include <hpx/execution/parallel/executor_parameters.hpp>
 #include <hpx/testing.hpp>
 
 #include <vector>

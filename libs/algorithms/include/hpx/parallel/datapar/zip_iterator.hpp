@@ -16,9 +16,9 @@
 #include <hpx/type_support/pack.hpp>
 
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
-#include <hpx/parallel/traits/vector_pack_alignment_size.hpp>
-#include <hpx/parallel/traits/vector_pack_load_store.hpp>
-#include <hpx/parallel/traits/vector_pack_type.hpp>
+#include <hpx/execution/parallel/traits/vector_pack_alignment_size.hpp>
+#include <hpx/execution/parallel/traits/vector_pack_load_store.hpp>
+#include <hpx/execution/parallel/traits/vector_pack_type.hpp>
 
 #include <algorithm>
 #include <cstddef>

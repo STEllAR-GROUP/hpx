@@ -8,8 +8,8 @@
 #define HPX_EXECUTION
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/execution.hpp>
-#include <hpx/parallel/executors.hpp>
+#include <hpx/execution/parallel/execution.hpp>
+#include <hpx/execution/parallel/executors.hpp>
 
 #endif
 

@@ -14,7 +14,7 @@
 #include <hpx/async.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/hpx_finalize.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/execution/parallel/execution_policy.hpp>
 
 #include <exception>
 #include <list>

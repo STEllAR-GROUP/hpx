@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/traits/executor_traits.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 
 #include <hpx/compute/host/target.hpp>
 

@@ -18,7 +18,7 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/execution/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

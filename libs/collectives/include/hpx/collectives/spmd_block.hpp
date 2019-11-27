@@ -16,7 +16,7 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/parallel/execution.hpp>
+#include <hpx/execution/parallel/execution.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/serialize.hpp>

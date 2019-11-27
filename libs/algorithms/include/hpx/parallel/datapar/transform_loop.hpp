@@ -13,12 +13,12 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/datapar/execution_policy_fwd.hpp>
+#include <hpx/execution/parallel/datapar/execution_policy_fwd.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/execution/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/transform_loop.hpp>
-#include <hpx/traits/is_execution_policy.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <algorithm>

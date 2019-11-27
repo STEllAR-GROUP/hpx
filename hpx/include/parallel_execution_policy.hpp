@@ -8,7 +8,7 @@
 #define HPX_EXECUTION_POLICY_MAY_27_2014_0910PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/execution/parallel/execution_policy.hpp>
 
 #endif
 

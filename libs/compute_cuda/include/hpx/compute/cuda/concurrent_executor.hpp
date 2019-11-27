@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/traits/executor_traits.hpp>
+#include <hpx/execution/traits/executor_traits.hpp>
 
 #include <hpx/compute/cuda/concurrent_executor_parameters.hpp>
 #include <hpx/compute/cuda/default_executor.hpp>

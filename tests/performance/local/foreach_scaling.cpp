@@ -11,7 +11,7 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/timing.hpp>
 
-#include <hpx/parallel/executors/parallel_executor_aggregated.hpp>
+#include <hpx/execution/parallel/executors/parallel_executor_aggregated.hpp>
 
 #include "worker_timed.hpp"
 

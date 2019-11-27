@@ -16,13 +16,13 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/functional/deferred_call.hpp>
 
-#include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/parallel_executor.hpp>
+#include <hpx/execution/parallel/executors/execution.hpp>
+#include <hpx/execution/parallel/executors/parallel_executor.hpp>
 
 #include <exception>
 #include <functional>

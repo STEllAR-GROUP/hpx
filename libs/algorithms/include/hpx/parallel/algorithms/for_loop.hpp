@@ -26,10 +26,10 @@
 #include <hpx/util/annotated_function.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/execution/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
-#include <hpx/parallel/execution_policy.hpp>
+#include <hpx/execution/parallel/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>

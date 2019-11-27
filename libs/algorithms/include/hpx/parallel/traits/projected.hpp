@@ -11,9 +11,9 @@
 #include <hpx/functional/result_of.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/traits/vector_pack_load_store.hpp>
-#include <hpx/parallel/traits/vector_pack_type.hpp>
-#include <hpx/traits/is_execution_policy.hpp>
+#include <hpx/execution/parallel/traits/vector_pack_load_store.hpp>
+#include <hpx/execution/parallel/traits/vector_pack_type.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
