@@ -31,7 +31,7 @@ Issue tracker
 If you stumble over a bug or missing feature in |hpx|, please
 submit an issue to our |hpx_github_issues|_ page. For more information on how to
 submit support requests or other means of getting in contact with the developers,
-please see the |support|_.
+please see the |support|_ page.
 
 Continuous testing
 ==================
