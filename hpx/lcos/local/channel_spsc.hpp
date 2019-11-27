@@ -55,6 +55,12 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT(size != 0);
 
+            // invoke constructors for allocated buffer
+            for (std::size_t i = 0; i != size_; ++i)
+            {
+                new (&buffer_[i]) T();
+            }
+
             head_.data_.store(0, std::memory_order_relaxed);
             tail_.data_.store(0, std::memory_order_relaxed);
         }
@@ -92,6 +98,12 @@ namespace hpx { namespace lcos { namespace local {
 
         ~channel_spsc()
         {
+            // invoke destructors for allocated buffer
+            for (std::size_t i = 0; i != size_; ++i)
+            {
+                (&buffer_[i])->~T();
+            }
+
             if (!closed_.load(std::memory_order_relaxed))
             {
                 close();
@@ -154,13 +166,18 @@ namespace hpx { namespace lcos { namespace local {
         std::size_t close()
         {
             bool expected = false;
-            if (!closed_.compare_exchange_strong(expected, true))
+            if (!closed_.compare_exchange_weak(expected, true))
             {
                 HPX_THROW_EXCEPTION(hpx::invalid_status,
                     "hpx::lcos::local::channel_spsc::close",
                     "attempting to close an already closed channel");
             }
             return 0;
+        }
+
+        std::size_t capacity() const
+        {
+            return size_ - 1;
         }
 
     private:

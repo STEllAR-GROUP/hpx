@@ -6,8 +6,8 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#if !defined(HPX_LCOS_LOCAL_CHANNEL_MPMC_NOV_24_2019_1141AM)
-#define HPX_LCOS_LOCAL_CHANNEL_MPMC_NOV_24_2019_1141AM
+#if !defined(HPX_LCOS_LOCAL_CHANNEL_MPSC_NOV_27_2019_1021AM)
+#define HPX_LCOS_LOCAL_CHANNEL_MPSC_NOV_27_2019_1021AM
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -16,6 +16,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/thread_support.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <mutex>
@@ -26,31 +27,33 @@ namespace hpx { namespace lcos { namespace local {
     ////////////////////////////////////////////////////////////////////////////
     // A simple but very high performance implementation of the channel concept.
     // This channel is bounded to a size given at construction time and supports
-    // multiple producers and multiple consumers. The data is stored in a
+    // a multiple producers and a single consumer. The data is stored in a
     // ring-buffer.
     template <typename T, typename Mutex = util::spinlock>
-    class bounded_channel
+    class base_channel_mpsc
     {
     private:
         using mutex_type = Mutex;
 
         bool is_full(std::size_t tail) const noexcept
         {
-            std::size_t numitems = size_ + tail - head_.data_;
+            std::size_t numitems =
+                size_ + tail - head_.data_.load(std::memory_order_relaxed);
+
             if (numitems < size_)
             {
                 return numitems == size_ - 1;
             }
-            return numitems - size_ == size_ - 1;
+            return (numitems - size_ == size_ - 1);
         }
 
         bool is_empty(std::size_t head) const noexcept
         {
-            return head == tail_.data_;
+            return head == tail_.data_.tail_.load(std::memory_order_relaxed);
         }
 
     public:
-        explicit bounded_channel(std::size_t size)
+        explicit base_channel_mpsc(std::size_t size)
           : size_(size + 1)
           , buffer_(new T[size + 1])
           , closed_(false)
@@ -63,57 +66,65 @@ namespace hpx { namespace lcos { namespace local {
                 new (&buffer_[i]) T();
             }
 
-            head_.data_ = 0;
-            tail_.data_ = 0;
+            head_.data_.store(0, std::memory_order_relaxed);
+            tail_.data_.tail_.store(0, std::memory_order_relaxed);
         }
 
-        bounded_channel(bounded_channel&& rhs) noexcept
-          : head_(rhs.head_)
-          , tail_(rhs.tail_)
-          , size_(rhs.size_)
+        base_channel_mpsc(base_channel_mpsc&& rhs) noexcept
+          : size_(rhs.size_)
           , buffer_(std::move(rhs.buffer_))
-          , closed_(rhs.closed_)
         {
-            rhs.size_ = 0;
-            rhs.closed_ = true;
+            head_.data_.store(rhs.head_.data_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            tail_.data_.tail_.store(
+                rhs.tail_.data_.tail_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+
+            closed_.store(rhs.closed_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            rhs.closed_.store(true, std::memory_order_release);
         }
 
-        bounded_channel& operator=(bounded_channel&& rhs) noexcept
+        base_channel_mpsc& operator=(base_channel_mpsc&& rhs) noexcept
         {
-            head_ = rhs.head_;
-            tail_ = rhs.tail_;
+            head_.data_.store(rhs.head_.data_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            tail_.data_.tail_.store(
+                rhs.tail_.data_.tail_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+
             size_ = rhs.size_;
             buffer_ = std::move(rhs.buffer_);
-            closed_ = rhs.closed_;
-            rhs.closed_ = true;
+
+            closed_.store(rhs.closed_.load(std::memory_order_acquire),
+                std::memory_order_relaxed);
+            rhs.closed_.store(true, std::memory_order_release);
+
             return *this;
         }
 
-        ~bounded_channel()
+        ~base_channel_mpsc()
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-
             // invoke destructors for allocated buffer
             for (std::size_t i = 0; i != size_; ++i)
             {
                 (&buffer_[i])->~T();
             }
 
-            if (!closed_)
+            if (!closed_.load(std::memory_order_relaxed))
             {
-                close(l);
+                close();
             }
         }
 
         bool get(T* val = nullptr) const noexcept
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            if (closed_)
+            if (closed_.load(std::memory_order_relaxed))
             {
                 return false;
             }
 
-            std::size_t head = head_.data_;
+            std::size_t head = head_.data_.load(std::memory_order_relaxed);
 
             if (is_empty(head))
             {
@@ -130,20 +141,22 @@ namespace hpx { namespace lcos { namespace local {
             {
                 head = 0;
             }
-            head_.data_ = head;
+            head_.data_.store(head, std::memory_order_release);
 
             return true;
         }
 
         bool set(T&& t) noexcept
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            if (closed_)
+            if (closed_.load(std::memory_order_relaxed))
             {
                 return false;
             }
 
-            std::size_t tail = tail_.data_;
+            std::unique_lock<mutex_type> l(tail_.data_.mtx_);
+
+            std::size_t tail =
+                tail_.data_.tail_.load(std::memory_order_acquire);
 
             if (is_full(tail))
             {
@@ -155,15 +168,21 @@ namespace hpx { namespace lcos { namespace local {
             {
                 tail = 0;
             }
-            tail_.data_ = tail;
+            tail_.data_.tail_.store(tail, std::memory_order_relaxed);
 
             return true;
         }
 
         std::size_t close()
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            return close(l);
+            bool expected = false;
+            if (!closed_.compare_exchange_weak(expected, true))
+            {
+                HPX_THROW_EXCEPTION(hpx::invalid_status,
+                    "hpx::lcos::local::base_channel_mpsc::close",
+                    "attempting to close an already closed channel");
+            }
+            return 0;
         }
 
         std::size_t capacity() const
@@ -171,29 +190,17 @@ namespace hpx { namespace lcos { namespace local {
             return size_ - 1;
         }
 
-    protected:
-        std::size_t close(std::unique_lock<mutex_type>& l)
-        {
-            HPX_ASSERT_OWNS_LOCK(l);
-
-            if (closed_)
-            {
-                l.unlock();
-                HPX_THROW_EXCEPTION(hpx::invalid_status,
-                    "hpx::lcos::local::bounded_channel::close",
-                    "attempting to close an already closed channel");
-            }
-
-            closed_ = true;
-            return 0;
-        }
-
     private:
-        // keep the mutex, the head, and the tail pointer in separate cache
+        // keep the mutex with the tail and the head pointer in separate cache
         // lines
-        mutable hpx::util::cache_aligned_data<mutex_type> mtx_;
-        mutable hpx::util::cache_aligned_data<std::size_t> head_;
-        hpx::util::cache_aligned_data<std::size_t> tail_;
+        struct tail_data
+        {
+            mutex_type mtx_;
+            std::atomic<std::size_t> tail_;
+        };
+
+        mutable hpx::util::cache_aligned_data<std::atomic<std::size_t>> head_;
+        hpx::util::cache_aligned_data<tail_data> tail_;
 
         // a channel of size n can buffer n-1 items
         std::size_t size_;
@@ -202,17 +209,14 @@ namespace hpx { namespace lcos { namespace local {
         std::unique_ptr<T[]> buffer_;
 
         // this channel was closed, i.e. no further operations are possible
-        bool closed_;
+        std::atomic<bool> closed_;
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    // For use with HPX threads, the channel_mpmc defined here is the fastest
-    // (even faster than the channel_spsc). Using hpx::util::spinlock as the
-    // means of synchronization enables the use of this channel with non-HPX
-    // threads, however the performance degrades by a factor of ten compared to
-    // using hpx::lcos::local::spinlock.
+    // Using hpx::util::spinlock as the means of synchronization enables the use
+    // of this channel with non-HPX threads.
     template <typename T>
-    using channel_mpmc = bounded_channel<T, hpx::lcos::local::spinlock>;
+    using channel_mpsc = base_channel_mpsc<T, hpx::lcos::local::spinlock>;
 
 }}}    // namespace hpx::lcos::local
 
