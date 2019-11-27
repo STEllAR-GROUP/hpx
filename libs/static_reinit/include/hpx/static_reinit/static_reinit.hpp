@@ -10,8 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // This is a global API allowing to register functions to be called before
     // the runtime system is about to start and after the runtime system has
@@ -26,8 +25,6 @@ namespace hpx { namespace util
 
     // Invoke all globally registered destruction functions
     HPX_API_EXPORT void reinit_destruct();
-}}
+}}    // namespace hpx::util
 
 #endif
-
-

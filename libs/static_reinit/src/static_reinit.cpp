@@ -14,8 +14,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     struct reinit_functions_storage
     {
@@ -30,8 +29,8 @@ namespace hpx { namespace util
         typedef std::pair<construct_type, destruct_type> value_type;
         typedef std::vector<value_type> reinit_functions_type;
 
-        void register_functions(construct_type const& construct,
-            destruct_type const& destruct)
+        void register_functions(
+            construct_type const& construct, destruct_type const& destruct)
         {
             std::lock_guard<mutex_type> l(mtx_);
             funcs_.push_back(value_type(construct, destruct));
@@ -55,7 +54,9 @@ namespace hpx { namespace util
             }
         }
 
-        struct storage_tag {};
+        struct storage_tag
+        {
+        };
         static reinit_functions_storage& get();
 
     private:
@@ -90,4 +91,4 @@ namespace hpx { namespace util
     {
         reinit_functions_storage::get().destruct_all();
     }
-}}
+}}    // namespace hpx::util

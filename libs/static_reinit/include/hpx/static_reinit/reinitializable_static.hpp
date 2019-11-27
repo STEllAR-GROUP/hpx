@@ -14,18 +14,19 @@
 #include <hpx/static_reinit/static_reinit.hpp>
 
 #include <cstddef>
-#include <memory>   // for placement new
+#include <memory>    // for placement new
 #include <mutex>
 #include <type_traits>
 
+// clang-format off
 #if !defined(HPX_WINDOWS)
 #  define HPX_EXPORT_REINITIALIZABLE_STATIC HPX_EXPORT
 #else
 #  define HPX_EXPORT_REINITIALIZABLE_STATIC
 #endif
+// clang-format on
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     //  Provides thread-safe initialization of a single static instance of T.
     //
@@ -75,8 +76,7 @@ namespace hpx { namespace util
         static void default_constructor()
         {
             default_construct();
-            reinit_register(
-                &reinitializable_static::default_construct,
+            reinit_register(&reinitializable_static::default_construct,
                 &reinitializable_static::destruct);
         }
 
@@ -84,8 +84,9 @@ namespace hpx { namespace util
         static void value_constructor(U const* pv)
         {
             value_construct(*pv);
-            reinit_register(util::bind_front(
-                &reinitializable_static::template value_construct<U>, *pv),
+            reinit_register(
+                util::bind_front(
+                    &reinitializable_static::template value_construct<U>, *pv),
                 &reinitializable_static::destruct);
         }
 
@@ -97,8 +98,8 @@ namespace hpx { namespace util
         {
 #if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
-            std::call_once(constructed_,
-                &reinitializable_static::default_constructor);
+            std::call_once(
+                constructed_, &reinitializable_static::default_constructor);
 #endif
         }
 
@@ -110,7 +111,7 @@ namespace hpx { namespace util
             std::call_once(constructed_,
                 util::bind_front(
                     &reinitializable_static::template value_constructor<U>,
-                    const_cast<U const *>(std::addressof(val))));
+                    const_cast<U const*>(std::addressof(val))));
 #endif
         }
 
@@ -155,12 +156,9 @@ namespace hpx { namespace util
         reinitializable_static<T, Tag, N>::data_[N];
 
     template <typename T, typename Tag, std::size_t N>
-    std::once_flag reinitializable_static<
-        T, Tag, N>::constructed_;
-}}
+    std::once_flag reinitializable_static<T, Tag, N>::constructed_;
+}}    // namespace hpx::util
 
 #undef HPX_EXPORT_REINITIALIZABLE_STATIC
 
 #endif
-
-
