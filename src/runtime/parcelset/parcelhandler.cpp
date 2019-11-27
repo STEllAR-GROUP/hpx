@@ -1611,7 +1611,8 @@ namespace hpx { namespace parcelset
 #endif
             ;
 
-        for (plugins::parcelport_factory_base* f : parcelhandler::get_parcelport_factories())
+        for (plugins::parcelport_factory_base* f :
+            parcelhandler::get_parcelport_factories())
         {
             f->get_plugin_info(ini_defs);
         }

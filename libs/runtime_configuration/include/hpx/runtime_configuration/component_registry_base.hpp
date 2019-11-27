@@ -15,8 +15,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_registry_base has to be used as a base class for all
     /// component registries.
@@ -50,32 +49,32 @@ namespace hpx { namespace components
         ///         on any error.
         virtual void register_component_type() = 0;
     };
-}}
+}}    // namespace hpx::components
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used to register the given component factory with
 /// Hpx.Plugin. This macro has to be used for each of the components.
-#define HPX_REGISTER_COMPONENT_REGISTRY(RegistryType, componentname)          \
-    HPX_PLUGIN_EXPORT(HPX_PLUGIN_COMPONENT_PREFIX,                            \
-        hpx::components::component_registry_base, RegistryType,               \
-        componentname, registry)                                              \
+#define HPX_REGISTER_COMPONENT_REGISTRY(RegistryType, componentname)           \
+    HPX_PLUGIN_EXPORT(HPX_PLUGIN_COMPONENT_PREFIX,                             \
+        hpx::components::component_registry_base, RegistryType, componentname, \
+        registry)                                                              \
 /**/
-#define HPX_REGISTER_COMPONENT_REGISTRY_DYNAMIC(RegistryType, componentname)  \
-    HPX_PLUGIN_EXPORT_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,                    \
-        hpx::components::component_registry_base, RegistryType,               \
-        componentname, registry)                                              \
+#define HPX_REGISTER_COMPONENT_REGISTRY_DYNAMIC(RegistryType, componentname)   \
+    HPX_PLUGIN_EXPORT_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,                     \
+        hpx::components::component_registry_base, RegistryType, componentname, \
+        registry)                                                              \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_APPLICATION_NAME)
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
-#define HPX_REGISTER_REGISTRY_MODULE()                                        \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, registry);            \
-    HPX_INIT_REGISTRY_MODULE_STATIC(HPX_PLUGIN_COMPONENT_PREFIX, registry)    \
+#define HPX_REGISTER_REGISTRY_MODULE()                                         \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, registry);             \
+    HPX_INIT_REGISTRY_MODULE_STATIC(HPX_PLUGIN_COMPONENT_PREFIX, registry)     \
 /**/
-#define HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()                                \
-    HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX, registry)     \
+#define HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()                                 \
+    HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX, registry)      \
 /**/
 #else
 // in executables (when HPX_APPLICATION_NAME is defined) this needs to expand
@@ -85,4 +84,3 @@ namespace hpx { namespace components
 #endif
 
 #endif
-

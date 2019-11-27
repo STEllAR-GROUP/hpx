@@ -13,9 +13,9 @@
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/state.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <cstddef>
 #include <string>

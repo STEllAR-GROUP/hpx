@@ -12,38 +12,37 @@
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_WINDOWS)
-#  include <windows.h>
+#include <windows.h>
 #elif defined(__linux) || defined(linux) || defined(__linux__)
-#  include <unistd.h>
-#  include <sys/stat.h>
-#  include <linux/limits.h>
-#  include <vector>
+#include <linux/limits.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <vector>
 #elif __APPLE__
-#  include <mach-o/dyld.h>
+#include <mach-o/dyld.h>
 #elif defined(__FreeBSD__)
-#  include <sys/types.h>
-#  include <sys/sysctl.h>
-#  include <algorithm>
-#  include <iterator>
-#  include <vector>
+#include <algorithm>
+#include <iterator>
+#include <sys/sysctl.h>
+#include <sys/types.h>
+#include <vector>
 #endif
 
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     static const char* prefix_ = nullptr;
 
-    void set_hpx_prefix(const char * prefix)
+    void set_hpx_prefix(const char* prefix)
     {
         if (prefix_ == nullptr)
             prefix_ = prefix;
@@ -58,12 +57,14 @@ namespace hpx { namespace util
     std::string find_prefix(std::string const& library)
     {
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__MIC)
-        try {
+        try
+        {
             error_code ec(hpx::throwmode::lightweight);
             hpx::util::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
 
             dll.load_library(ec);
-            if (ec) return hpx_prefix();
+            if (ec)
+                return hpx_prefix();
 
             using hpx::filesystem::path;
 
@@ -75,21 +76,23 @@ namespace hpx { namespace util
 
             return prefix;
         }
-        catch (std::logic_error const&) {
-            ;   // just ignore loader problems
+        catch (std::logic_error const&)
+        {
+            ;    // just ignore loader problems
         }
 #endif
         return hpx_prefix();
     }
 
-    std::string find_prefixes(std::string const& suffix, std::string const& library)
+    std::string find_prefixes(
+        std::string const& suffix, std::string const& library)
     {
         std::string prefixes = find_prefix(library);
-        typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+        typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
         boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
         tokenizer tokens(prefixes, sep);
         std::string result;
-        for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+        for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
         {
             if (it != tokens.begin())
                 result += HPX_INI_PATH_DELIMITER;
@@ -130,7 +133,7 @@ namespace hpx { namespace util
 #if defined(HPX_WINDOWS)
         HPX_UNUSED(argv0);
 
-        char exe_path[MAX_PATH + 1] = { '\0' };
+        char exe_path[MAX_PATH + 1] = {'\0'};
         if (!GetModuleFileNameA(nullptr, exe_path, sizeof(exe_path)))
         {
             HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
@@ -200,17 +203,17 @@ namespace hpx { namespace util
                     // NOTE: If someone was using an HPX application that was
                     // seteuid'd to root, this may fail.
                     if (0 == ::stat(r.c_str(), &s))
-                        if ((s.st_uid == ::geteuid()) && (s.st_mode & S_IXUSR)
-                         && (s.st_gid == ::getegid()) && (s.st_mode & S_IXGRP)
-                                                      && (s.st_mode & S_IXOTH))
+                        if ((s.st_uid == ::geteuid()) &&
+                            (s.st_mode & S_IXUSR) &&
+                            (s.st_gid == ::getegid()) &&
+                            (s.st_mode & S_IXGRP) && (s.st_mode & S_IXOTH))
                             return r;
                 }
             }
         }
 
         HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
-            "get_executable_filename",
-            "unable to find executable filename");
+            "get_executable_filename", "unable to find executable filename");
 
 #elif defined(__APPLE__)
         HPX_UNUSED(argv0);
@@ -224,13 +227,13 @@ namespace hpx { namespace util
                 "get_executable_filename",
                 "unable to find executable filename");
         }
-        exe_path[len-1] = '\0';
+        exe_path[len - 1] = '\0';
         r = exe_path;
 
 #elif defined(__FreeBSD__)
         HPX_UNUSED(argv0);
 
-        int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+        int mib[] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
         size_t cb = 0;
         sysctl(mib, 4, nullptr, &cb, nullptr, 0);
         if (cb)
@@ -241,10 +244,9 @@ namespace hpx { namespace util
         }
 
 #else
-#  error Unsupported platform
+#error Unsupported platform
 #endif
 
         return r;
     }
-}}
-
+}}    // namespace hpx::util

@@ -19,13 +19,13 @@
 #include <map>
 #include <mutex>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 // suppress warnings about dependent classes not being exported from the dll
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4091 4251 4231 4275 4660)
+#pragma warning(disable : 4091 4251 4231 4275 4660)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,21 +33,23 @@
 #define HPX_SECTION_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT section
     {
     public:
-        typedef util::function_nonser<
-                void(std::string const&, std::string const&)
-            > entry_changed_func;
+        typedef util::function_nonser<void(
+            std::string const&, std::string const&)>
+            entry_changed_func;
         typedef std::pair<std::string, entry_changed_func> entry_type;
         typedef std::map<std::string, entry_type> entry_map;
         typedef std::map<std::string, section> section_map;
 
     private:
-        section *this_() { return this; }
+        section* this_()
+        {
+            return this;
+        }
 
         using mutex_type = util::spinlock;
 
@@ -71,35 +73,37 @@ namespace hpx { namespace util
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
     protected:
-        void line_msg(std::string msg, std::string const& file,
-            int lnum = 0, std::string const& line = "");
+        void line_msg(std::string msg, std::string const& file, int lnum = 0,
+            std::string const& line = "");
 
         section& clone_from(section const& rhs, section* root = nullptr);
 
     private:
         void add_section(std::unique_lock<mutex_type>& l,
             std::string const& sec_name, section& sec, section* root = nullptr);
-        bool has_section(std::unique_lock<mutex_type>& l,
-            std::string const& sec_name) const;
+        bool has_section(
+            std::unique_lock<mutex_type>& l, std::string const& sec_name) const;
 
-        section* get_section (std::unique_lock<mutex_type>& l,
-            std::string const& sec_name);
-        section const* get_section (std::unique_lock<mutex_type>& l,
-            std::string const& sec_name) const;
+        section* get_section(
+            std::unique_lock<mutex_type>& l, std::string const& sec_name);
+        section const* get_section(
+            std::unique_lock<mutex_type>& l, std::string const& sec_name) const;
 
         ///////////////////////////////////////////////////////////////////////////
-        section* add_section_if_new(std::unique_lock<mutex_type>& l,
-            std::string const& sec_name);
+        section* add_section_if_new(
+            std::unique_lock<mutex_type>& l, std::string const& sec_name);
 
-        void add_entry(std::unique_lock<mutex_type>& l, std::string const& fullkey,
-            std::string const& key, std::string val);
-        void add_entry(std::unique_lock<mutex_type>& l, std::string const& fullkey,
-            std::string const& key, entry_type const& val);
+        void add_entry(std::unique_lock<mutex_type>& l,
+            std::string const& fullkey, std::string const& key,
+            std::string val);
+        void add_entry(std::unique_lock<mutex_type>& l,
+            std::string const& fullkey, std::string const& key,
+            entry_type const& val);
 
-        bool has_entry(std::unique_lock<mutex_type>& l,
-            std::string const& key) const;
-        std::string get_entry(std::unique_lock<mutex_type>& l,
-            std::string const& key) const;
+        bool has_entry(
+            std::unique_lock<mutex_type>& l, std::string const& key) const;
+        std::string get_entry(
+            std::unique_lock<mutex_type>& l, std::string const& key) const;
         std::string get_entry(std::unique_lock<mutex_type>& l,
             std::string const& key, std::string const& dflt) const;
 
@@ -118,9 +122,9 @@ namespace hpx { namespace util
             std::vector<std::string> const& lines, bool verify_existing = true,
             bool weed_out_comments = true, bool replace_existing = true);
 
-        void parse(std::string const& sourcename,
-            std::string const& line, bool verify_existing = true,
-            bool weed_out_comments = true, bool replace_existing = true)
+        void parse(std::string const& sourcename, std::string const& line,
+            bool verify_existing = true, bool weed_out_comments = true,
+            bool replace_existing = true)
         {
             std::vector<std::string> lines;
             lines.push_back(line);
@@ -133,8 +137,8 @@ namespace hpx { namespace util
         void merge(section& second);
         void dump(int ind = 0, std::ostream& strm = std::cout) const;
 
-        void add_section(std::string const& sec_name, section& sec,
-            section* root = nullptr)
+        void add_section(
+            std::string const& sec_name, section& sec, section* root = nullptr)
         {
             std::unique_lock<mutex_type> l(mtx_);
             add_section(l, sec_name, sec, root);
@@ -152,20 +156,26 @@ namespace hpx { namespace util
             return has_section(l, sec_name);
         }
 
-        section* get_section (std::string const& sec_name)
+        section* get_section(std::string const& sec_name)
         {
             std::unique_lock<mutex_type> l(mtx_);
             return get_section(l, sec_name);
         }
 
-        section const* get_section (std::string const& sec_name) const
+        section const* get_section(std::string const& sec_name) const
         {
             std::unique_lock<mutex_type> l(mtx_);
             return get_section(l, sec_name);
         }
 
-        section_map& get_sections() { return sections_; }
-        section_map const& get_sections() const { return sections_; }
+        section_map& get_sections()
+        {
+            return sections_;
+        }
+        section_map const& get_sections() const
+        {
+            return sections_;
+        }
 
         void add_entry(std::string const& key, entry_type const& val)
         {
@@ -191,7 +201,8 @@ namespace hpx { namespace util
             return get_entry(l, key);
         }
 
-        std::string get_entry(std::string const& key, std::string const& dflt) const
+        std::string get_entry(
+            std::string const& key, std::string const& dflt) const
         {
             std::unique_lock<mutex_type> l(mtx_);
             return get_entry(l, key, dflt);
@@ -204,17 +215,21 @@ namespace hpx { namespace util
             return get_entry(l, key, hpx::util::to_string(dflt));
         }
 
-        void add_notification_callback(std::string const& key,
-            entry_changed_func const& callback)
+        void add_notification_callback(
+            std::string const& key, entry_changed_func const& callback)
         {
             std::unique_lock<mutex_type> l(mtx_);
             add_notification_callback(l, key, callback);
         }
 
-        entry_map const& get_entries() const { return entries_; }
+        entry_map const& get_entries() const
+        {
+            return entries_;
+        }
 
     private:
-        std::string expand(std::unique_lock<mutex_type>& l, std::string in) const;
+        std::string expand(
+            std::unique_lock<mutex_type>& l, std::string in) const;
 
         void expand(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type) const;
@@ -249,15 +264,26 @@ namespace hpx { namespace util
         void set_root(section* r, bool recursive = false)
         {
             root_ = r;
-            if (recursive) {
+            if (recursive)
+            {
                 section_map::iterator send = sections_.end();
-                for (section_map::iterator si = sections_.begin(); si != send; ++si)
+                for (section_map::iterator si = sections_.begin(); si != send;
+                     ++si)
                     si->second.set_root(r, true);
             }
         }
-        section* get_root() const { return root_; }
-        std::string get_name() const { return name_; }
-        std::string get_parent_name() const { return parent_name_; }
+        section* get_root() const
+        {
+            return root_;
+        }
+        std::string get_name() const
+        {
+            return name_;
+        }
+        std::string get_parent_name() const
+        {
+            return parent_name_;
+        }
         std::string get_full_name() const
         {
             if (!parent_name_.empty())
@@ -265,9 +291,12 @@ namespace hpx { namespace util
             return name_;
         }
 
-        void set_name(std::string const& name) { name_ = name; }
+        void set_name(std::string const& name)
+        {
+            name_ = name;
+        }
     };
 
-}} // namespace hpx::util
+}}    // namespace hpx::util
 
 #endif

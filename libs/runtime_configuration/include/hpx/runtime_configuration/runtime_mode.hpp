@@ -14,19 +14,18 @@
 
 #include <string>
 
-namespace hpx
-{
+namespace hpx {
     /// A HPX runtime can be executed in two different modes: console mode
     /// and worker mode.
     enum runtime_mode
     {
         runtime_mode_invalid = -1,
-        runtime_mode_console = 0,   ///< The runtime is the console locality
-        runtime_mode_worker = 1,    ///< The runtime is a worker locality
-        runtime_mode_connect = 2,   ///< The runtime is a worker locality
-                                    ///< connecting late
-        runtime_mode_default = 3,   ///< The runtime mode will be determined
-                                    ///< based on the command line arguments
+        runtime_mode_console = 0,    ///< The runtime is the console locality
+        runtime_mode_worker = 1,     ///< The runtime is a worker locality
+        runtime_mode_connect = 2,    ///< The runtime is a worker locality
+                                     ///< connecting late
+        runtime_mode_default = 3,    ///< The runtime mode will be determined
+                                     ///< based on the command line arguments
         runtime_mode_last
     };
 
@@ -42,7 +41,8 @@ namespace hpx
     /// representing the name.
     ///
     /// \param mode this represents the runtime mode
-    HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
-}
+    HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(
+        std::string const& mode);
+}    // namespace hpx
 
 #endif /*HPX_RUNTIME_RUNTIME_MODE_HPP*/

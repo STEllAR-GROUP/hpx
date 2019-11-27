@@ -8,15 +8,13 @@
 #ifndef HPX_RUNTIME_CONFIGURATION_AGAS_SERVICE_MODE_HPP
 #define HPX_RUNTIME_CONFIGURATION_AGAS_SERVICE_MODE_HPP
 
-namespace hpx { namespace agas
-{
+namespace hpx { namespace agas {
     enum service_mode
     {
         service_mode_invalid = -1,
         service_mode_bootstrap = 0,
         service_mode_hosted = 1
     };
-}}
+}}    // namespace hpx::agas
 
 #endif /*HPX_RUNTIME_CONFIGURATION_AGAS_SERVICE_MODE_HPP*/
-

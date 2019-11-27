@@ -11,12 +11,12 @@
 #include <hpx/filesystem.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/runtime_configuration/plugin_registry_base.hpp>
-#include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/find_prefix.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/assign/std/vector.hpp>
@@ -26,45 +26,48 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
-#include <random>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    bool handle_ini_file (section& ini, std::string const& loc)
+    bool handle_ini_file(section& ini, std::string const& loc)
     {
-        try {
+        try
+        {
             namespace fs = filesystem;
             fs::error_code ec;
             if (!fs::exists(loc, ec) || ec)
-                return false;       // avoid exception on missing file
-            ini.read (loc);
+                return false;    // avoid exception on missing file
+            ini.read(loc);
         }
-        catch (hpx::exception const& /*e*/) {
+        catch (hpx::exception const& /*e*/)
+        {
             return false;
         }
         return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool handle_ini_file_env (section& ini, char const* env_var,
-        char const* file_suffix)
+    bool handle_ini_file_env(
+        section& ini, char const* env_var, char const* file_suffix)
     {
         char const* env = getenv(env_var);
-        if (nullptr != env) {
+        if (nullptr != env)
+        {
             namespace fs = filesystem;
 
-            fs::path inipath (env);
+            fs::path inipath(env);
             if (nullptr != file_suffix)
                 inipath /= fs::path(file_suffix);
 
-            if (handle_ini_file(ini, inipath.string())) {
-                LBT_(info) << "loaded configuration (${" << env_var << "}): "
-                           << inipath.string();
+            if (handle_ini_file(ini, inipath.string()))
+            {
+                LBT_(info) << "loaded configuration (${" << env_var
+                           << "}): " << inipath.string();
                 return true;
             }
         }
@@ -76,18 +79,19 @@ namespace hpx { namespace util
     //
     // returns true if at least one alternative location has been read
     // successfully
-    bool init_ini_data_base (section& ini, std::string& hpx_ini_file)
+    bool init_ini_data_base(section& ini, std::string& hpx_ini_file)
     {
         namespace fs = filesystem;
 
         // fall back: use compile time prefix
         std::string ini_paths(ini.get_entry("hpx.master_ini_path"));
-        std::string ini_paths_suffixes(ini.get_entry("hpx.master_ini_path_suffixes"));
+        std::string ini_paths_suffixes(
+            ini.get_entry("hpx.master_ini_path_suffixes"));
 
         // split off the separate paths from the given path list
-        typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;
+        typedef boost::tokenizer<boost::char_separator<char>> tokenizer_type;
 
-        boost::char_separator<char> sep (HPX_INI_PATH_DELIMITER);
+        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
         tokenizer_type tok_paths(ini_paths, sep);
         tokenizer_type::iterator end_paths = tok_paths.end();
         tokenizer_type tok_suffixes(ini_paths_suffixes, sep);
@@ -115,22 +119,25 @@ namespace hpx { namespace util
         // look in the current directory first
         std::string cwd = fs::current_path().string() + "/.hpx.ini";
         {
-            bool result2 = handle_ini_file (ini, cwd);
-            if (result2) {
+            bool result2 = handle_ini_file(ini, cwd);
+            if (result2)
+            {
                 LBT_(info) << "loaded configuration: " << cwd;
             }
             result = result2 || result;
         }
 
         // look for master ini in the HPX_INI environment
-        result = handle_ini_file_env (ini, "HPX_INI") || result;
+        result = handle_ini_file_env(ini, "HPX_INI") || result;
 
         // afterwards in the standard locations
-#if !defined(HPX_WINDOWS)   // /etc/hpx.ini doesn't make sense for Windows
+#if !defined(HPX_WINDOWS)    // /etc/hpx.ini doesn't make sense for Windows
         {
             bool result2 = handle_ini_file(ini, "/etc/hpx.ini");
-            if (result2) {
-                LBT_(info) << "loaded configuration: " << "/etc/hpx.ini";
+            if (result2)
+            {
+                LBT_(info) << "loaded configuration: "
+                           << "/etc/hpx.ini";
             }
             result = result2 || result;
         }
@@ -139,19 +146,24 @@ namespace hpx { namespace util
         result = handle_ini_file_env(ini, "HOME", "/.hpx.ini") || result;
         result = handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
 
-        if (!hpx_ini_file.empty()) {
+        if (!hpx_ini_file.empty())
+        {
             namespace fs = filesystem;
             fs::error_code ec;
-            if (!fs::exists(hpx_ini_file, ec) || ec) {
-                std::cerr << "hpx::init: command line warning: file specified using "
-                             "--hpx::config does not exist ("
+            if (!fs::exists(hpx_ini_file, ec) || ec)
+            {
+                std::cerr
+                    << "hpx::init: command line warning: file specified using "
+                       "--hpx::config does not exist ("
                     << hpx_ini_file << ")." << std::endl;
                 hpx_ini_file.clear();
                 result = false;
             }
-            else {
+            else
+            {
                 bool result2 = handle_ini_file(ini, hpx_ini_file);
-                if (result2) {
+                if (result2)
+                {
                     LBT_(info) << "loaded configuration: " << hpx_ini_file;
                 }
                 return result || result2;
@@ -167,26 +179,28 @@ namespace hpx { namespace util
         namespace fs = filesystem;
 
         // now merge all information into one global structure
-        std::string ini_path(ini.get_entry("hpx.ini_path", HPX_DEFAULT_INI_PATH));
-        std::vector <std::string> ini_paths;
+        std::string ini_path(
+            ini.get_entry("hpx.ini_path", HPX_DEFAULT_INI_PATH));
+        std::vector<std::string> ini_paths;
 
         // split off the separate paths from the given path list
-        typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;
+        typedef boost::tokenizer<boost::char_separator<char>> tokenizer_type;
 
-        boost::char_separator<char> sep (HPX_INI_PATH_DELIMITER);
+        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
         tokenizer_type tok(ini_path, sep);
         tokenizer_type::iterator end = tok.end();
-        for (tokenizer_type::iterator it = tok.begin (); it != end; ++it)
-            ini_paths.push_back (*it);
+        for (tokenizer_type::iterator it = tok.begin(); it != end; ++it)
+            ini_paths.push_back(*it);
 
         // have all path elements, now find ini files in there...
         std::vector<std::string>::iterator ini_end = ini_paths.end();
         for (std::vector<std::string>::iterator it = ini_paths.begin();
              it != ini_end; ++it)
         {
-            try {
+            try
+            {
                 fs::directory_iterator nodir;
-                fs::path this_path (*it);
+                fs::path this_path(*it);
 
                 fs::error_code ec;
                 if (!fs::exists(this_path, ec) || ec)
@@ -198,16 +212,20 @@ namespace hpx { namespace util
                         continue;
 
                     // read and merge the ini file into the main ini hierarchy
-                    try {
-                        ini.merge ((*dir).path().string());
-                        LBT_(info) << "loaded configuration: " << (*dir).path().string();
+                    try
+                    {
+                        ini.merge((*dir).path().string());
+                        LBT_(info) << "loaded configuration: "
+                                   << (*dir).path().string();
                     }
-                    catch (hpx::exception const& /*e*/) {
+                    catch (hpx::exception const& /*e*/)
+                    {
                         ;
                     }
                 }
             }
-            catch (fs::filesystem_error const& /*e*/) {
+            catch (fs::filesystem_error const& /*e*/)
+            {
                 ;
             }
         }
@@ -221,24 +239,28 @@ namespace hpx { namespace util
         hpx::util::plugin::get_plugins_list_type get_factory, error_code& ec)
     {
         hpx::util::plugin::static_plugin_factory<
-            components::component_registry_base> pf(get_factory);
-        std::vector<std::shared_ptr<components::component_registry_base>> registries;
+            components::component_registry_base>
+            pf(get_factory);
+        std::vector<std::shared_ptr<components::component_registry_base>>
+            registries;
 
         // retrieve the names of all known registries
         std::vector<std::string> names;
         pf.get_names(names, ec);
-        if (ec) return registries;
+        if (ec)
+            return registries;
 
         std::vector<std::string> ini_data;
-        if (names.empty()) {
+        if (names.empty())
+        {
             // This HPX module does not export any factories, but
             // might export startup/shutdown functions. Create some
             // default configuration data.
             using namespace boost::assign;
 #if defined(HPX_DEBUG)
             // demangle the name in debug mode
-            if (name[name.size()-1] == 'd')
-                name.resize(name.size()-1);
+            if (name[name.size() - 1] == 'd')
+                name.resize(name.size() - 1);
 #endif
             ini_data += std::string("[hpx.components.") + name + "]";
             ini_data += "name = " + name;
@@ -246,7 +268,8 @@ namespace hpx { namespace util
             ini_data += "enabled = 1";
             ini_data += "static = 1";
         }
-        else {
+        else
+        {
             registries.reserve(names.size());
             // ask all registries
             for (std::string const& s : names)
@@ -254,7 +277,8 @@ namespace hpx { namespace util
                 // create the component registry object
                 std::shared_ptr<components::component_registry_base> registry(
                     pf.create(s, ec));
-                if (ec) continue;
+                if (ec)
+                    continue;
 
                 registry->get_component_info(ini_data, "", true);
                 registries.push_back(registry);
@@ -276,18 +300,20 @@ namespace hpx { namespace util
         // retrieve the names of all known registries
         std::vector<std::string> names;
         pf.get_names(names, ec);
-        if (ec) return;
+        if (ec)
+            return;
 
         std::vector<std::string> ini_data;
-        if (names.empty()) {
+        if (names.empty())
+        {
             // This HPX module does not export any factories, but
             // might export startup/shutdown functions. Create some
             // default configuration data.
             using namespace boost::assign;
 #if defined(HPX_DEBUG)
             // demangle the name in debug mode
-            if (name[name.size()-1] == 'd')
-                name.resize(name.size()-1);
+            if (name[name.size() - 1] == 'd')
+                name.resize(name.size() - 1);
 #endif
             ini_data += std::string("[hpx.components.") + name + "]";
             ini_data += "name = " + name;
@@ -295,20 +321,20 @@ namespace hpx { namespace util
             ini_data += "no_factory = 1";
             ini_data += "enabled = 1";
         }
-        else {
+        else
+        {
             // ask all registries
             for (std::string const& s : names)
             {
                 // create the component registry object
-                std::shared_ptr<components::component_registry_base>
-                    registry (pf.create(s, ec));
-                if (ec) return;
+                std::shared_ptr<components::component_registry_base> registry(
+                    pf.create(s, ec));
+                if (ec)
+                    return;
 
                 registry->get_component_info(ini_data, curr);
-                hpx::register_startup_function([registry]()
-                {
-                    registry->register_component_type();
-                });
+                hpx::register_startup_function(
+                    [registry]() { registry->register_component_type(); });
             }
         }
 
@@ -318,31 +344,34 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
         std::string const& curr, std::string const& name, error_code& ec)
     {
-        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
             plugin_list_type;
 
         plugin_list_type plugin_registries;
-        hpx::util::plugin::plugin_factory<plugins::plugin_registry_base>
-            pf(d, "plugin");
+        hpx::util::plugin::plugin_factory<plugins::plugin_registry_base> pf(
+            d, "plugin");
 
         // retrieve the names of all known registries
         std::vector<std::string> names;
-        pf.get_names(names, ec);      // throws on error
-        if (ec) return plugin_registries;
+        pf.get_names(names, ec);    // throws on error
+        if (ec)
+            return plugin_registries;
 
         std::vector<std::string> ini_data;
-        if (!names.empty()) {
+        if (!names.empty())
+        {
             // ask all registries
             for (std::string const& s : names)
             {
                 // create the plugin registry object
-                std::shared_ptr<plugins::plugin_registry_base>
-                    registry(pf.create(s, ec));
-                if (ec) continue;
+                std::shared_ptr<plugins::plugin_registry_base> registry(
+                    pf.create(s, ec));
+                if (ec)
+                    continue;
 
                 registry->get_plugin_info(ini_data);
                 plugin_registries.push_back(registry);
@@ -355,8 +384,7 @@ namespace hpx { namespace util
         return plugin_registries;
     }
 
-    namespace detail
-    {
+    namespace detail {
         inline bool cmppath_less(
             std::pair<filesystem::path, std::string> const& lhs,
             std::pair<filesystem::path, std::string> const& rhs)
@@ -370,36 +398,38 @@ namespace hpx { namespace util
         {
             return lhs.first == rhs.first;
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     init_ini_data_default(std::string const& libs, util::section& ini,
         std::map<std::string, filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules)
     {
         namespace fs = filesystem;
 
-        typedef std::vector<std::pair<fs::path, std::string> >::iterator
+        typedef std::vector<std::pair<fs::path, std::string>>::iterator
             iterator_type;
 
-        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
             plugin_list_type;
 
         plugin_list_type plugin_registries;
 
         // list of modules to load
-        std::vector<std::pair<fs::path, std::string> > libdata;
-        try {
+        std::vector<std::pair<fs::path, std::string>> libdata;
+        try
+        {
             fs::directory_iterator nodir;
             fs::path libs_path(libs);
 
             fs::error_code ec;
             if (!fs::exists(libs_path, ec) || ec)
-                return plugin_registries;     // given directory doesn't exist
+                return plugin_registries;    // given directory doesn't exist
 
             // retrieve/create section [hpx.components]
-            if (!ini.has_section("hpx.components")) {
+            if (!ini.has_section("hpx.components"))
+            {
                 util::section* hpx_sec = ini.get_section("hpx");
                 HPX_ASSERT(nullptr != hpx_sec);
 
@@ -423,11 +453,12 @@ namespace hpx { namespace util
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif
-#if defined(__APPLE__) // shared library version is added berfore extension
+#if defined(__APPLE__)    // shared library version is added berfore extension
                 const std::string version = hpx::full_version_as_string();
                 std::string::size_type i = name.find(version);
                 if (i != std::string::npos)
-                    name.erase(i - 1, version.length() + 1); // - 1 for one more dot
+                    name.erase(
+                        i - 1, version.length() + 1);    // - 1 for one more dot
 #endif
                 // ensure base directory, remove symlinks, etc.
                 fs::error_code fsec;
@@ -442,17 +473,21 @@ namespace hpx { namespace util
                 std::pair<std::map<std::string, fs::path>::iterator, bool> p =
                     basenames.insert(std::make_pair(basename, canonical_curr));
 
-                if (p.second) {
+                if (p.second)
+                {
                     libdata.push_back(std::make_pair(canonical_curr, name));
                 }
-                else {
-                    LRT_(warning) << "skipping module " << basename
-                        << " (" << canonical_curr.string() << ")"
-                        << ": ignored because of: " << (*p.first).second.string();
+                else
+                {
+                    LRT_(warning) << "skipping module " << basename << " ("
+                                  << canonical_curr.string() << ")"
+                                  << ": ignored because of: "
+                                  << (*p.first).second.string();
                 }
             }
         }
-        catch (fs::filesystem_error const& e) {
+        catch (fs::filesystem_error const& e)
+        {
             LRT_(info) << "caught filesystem error: " << e.what();
         }
 
@@ -474,10 +509,10 @@ namespace hpx { namespace util
             error_code ec(lightweight);
             hpx::util::plugin::dll d(p.first.string(), p.second);
             d.load_library(ec);
-            if (ec) {
-                LRT_(info)
-                    << "skipping (load_library failed): " << p.first.string()
-                    << ": " << get_error_what(ec);
+            if (ec)
+            {
+                LRT_(info) << "skipping (load_library failed): "
+                           << p.first.string() << ": " << get_error_what(ec);
                 continue;
             }
 
@@ -486,14 +521,14 @@ namespace hpx { namespace util
             // get the component factory
             std::string curr_fullname(p.first.parent_path().string());
             load_component_factory(d, ini, curr_fullname, p.second, ec);
-            if (ec) {
-                LRT_(info)
-                    << "skipping (load_component_factory failed): "
-                    << p.first.string()
-                    << ": " << get_error_what(ec);
-                ec = error_code(lightweight);   // reinit ec
+            if (ec)
+            {
+                LRT_(info) << "skipping (load_component_factory failed): "
+                           << p.first.string() << ": " << get_error_what(ec);
+                ec = error_code(lightweight);    // reinit ec
             }
-            else {
+            else
+            {
                 LRT_(debug)
                     << "load_component_factory succeeded: " << p.first.string();
                 must_keep_loaded = true;
@@ -503,13 +538,13 @@ namespace hpx { namespace util
             plugin_list_type tmp_regs =
                 load_plugin_factory(d, ini, curr_fullname, p.second, ec);
 
-            if (ec) {
-                LRT_(info)
-                    << "skipping (load_plugin_factory failed): "
-                    << p.first.string()
-                    << ": " << get_error_what(ec);
+            if (ec)
+            {
+                LRT_(info) << "skipping (load_plugin_factory failed): "
+                           << p.first.string() << ": " << get_error_what(ec);
             }
-            else {
+            else
+            {
                 LRT_(debug)
                     << "load_plugin_factory succeeded: " << p.first.string();
 
@@ -519,10 +554,11 @@ namespace hpx { namespace util
             }
 
             // store loaded library for future use
-            if (must_keep_loaded) {
+            if (must_keep_loaded)
+            {
                 modules.insert(std::make_pair(p.second, std::move(d)));
             }
         }
         return plugin_registries;
     }
-}}
+}}    // namespace hpx::util

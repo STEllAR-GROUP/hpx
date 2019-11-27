@@ -27,8 +27,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // The runtime_configuration class is a wrapper for the runtime
     // configuration data allowing to extract configuration information in a
@@ -50,11 +49,12 @@ namespace hpx { namespace util
         // any explicit command line options
         void reconfigure(std::vector<std::string> const& ini_defs);
 
-        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
-            load_modules();
+        std::vector<std::shared_ptr<plugins::plugin_registry_base>>
+        load_modules();
 
-        void load_components_static(std::vector<
-            components::static_factory_load_data_type> const& static_modules);
+        void load_components_static(
+            std::vector<components::static_factory_load_data_type> const&
+                static_modules);
 
         // Returns the AGAS mode of this locality, returns either hosted (for
         // localities connecting to a remote AGAS server) or bootstrap for the
@@ -87,8 +87,8 @@ namespace hpx { namespace util
 
         // Load application specific configuration and merge it with the
         // default configuration loaded from hpx.ini
-        bool load_application_configuration(char const* filename,
-            error_code& ec = throws);
+        bool load_application_configuration(
+            char const* filename, error_code& ec = throws);
 
         // Can be set to true if we want to use the ITT notify tools API.
         bool get_itt_notify_mode() const;
@@ -104,7 +104,8 @@ namespace hpx { namespace util
         bool enable_spinlock_deadlock_detection() const;
         std::size_t get_spinlock_deadlock_detection_limit() const;
 
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__FreeBSD__)
         bool use_stack_guard_pages() const;
 #endif
 
@@ -121,7 +122,8 @@ namespace hpx { namespace util
         }
 
         // Will return the requested stack size to use for an HPX-threads.
-        std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize) const;
+        std::ptrdiff_t get_stack_size(
+            threads::thread_stacksize stacksize) const;
 
         // Return the configured sizes of any of the know thread pools
         std::size_t get_thread_pool_size(char const* poolname) const;
@@ -133,7 +135,7 @@ namespace hpx { namespace util
         std::uint64_t get_max_inbound_message_size() const;
         std::uint64_t get_max_outbound_message_size() const;
 
-        std::map<std::string, hpx::util::plugin::dll> & modules()
+        std::map<std::string, hpx::util::plugin::dll>& modules()
         {
             return modules_;
         }
@@ -164,8 +166,7 @@ namespace hpx { namespace util
         void load_component_path(
             std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
                 plugin_registries,
-            std::string const& path,
-            std::set<std::string>& component_paths,
+            std::string const& path, std::set<std::string>& component_paths,
             std::map<std::string, filesystem::path>& basenames);
 
     public:
@@ -184,6 +185,6 @@ namespace hpx { namespace util
 
         std::map<std::string, hpx::util::plugin::dll> modules_;
     };
-}}
+}}    // namespace hpx::util
 
 #endif /*HPX_UTIL_RUNTIME_CONFIGURATION_HPP*/
