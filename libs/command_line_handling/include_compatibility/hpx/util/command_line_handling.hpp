@@ -10,7 +10,8 @@
 
 #if defined(HPX_COMMAND_LINE_HANDLING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message("The header hpx/util/command_line_handling.hpp is deprecated, \
+#pragma message(                                                               \
+    "The header hpx/util/command_line_handling.hpp is deprecated, \
     please include hpx/command_line_handling/command_line_handling.hpp instead")
 #else
 #warning "The header hpx/util/command_line_handling.hpp is deprecated, \

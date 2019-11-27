@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/datastructures/any.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/command_line_handling/parse_command_line.hpp>
-#include <hpx/errors.hpp>
 
 #include <cctype>
 #include <cstddef>
@@ -21,13 +21,10 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
-        inline std::string
-        trim_whitespace (std::string const &s)
+        inline std::string trim_whitespace(std::string const& s)
         {
             using size_type = std::string::size_type;
 
@@ -53,7 +50,7 @@ namespace hpx { namespace util
 
             if (s.size() < hpx_prefix_len ||
                 s.compare(0, hpx_prefix_len, hpx_prefix) != 0 ||
-                !std::isdigit(s[hpx_prefix_len]))  // -V557
+                !std::isdigit(s[hpx_prefix_len]))    // -V557
             {
                 return false;
             }
@@ -64,20 +61,23 @@ namespace hpx { namespace util
                 return false;
 
             if (hpx::util::from_string<std::size_t>(
-                    s.substr(hpx_prefix_len, p-hpx_prefix_len),
+                    s.substr(hpx_prefix_len, p - hpx_prefix_len),
                     std::size_t(-1)) == node)
             {
                 // this option is for the current locality only
                 std::string::size_type p1 = s.find_first_of('=', p);
-                if (p1 != std::string::npos) {
+                if (p1 != std::string::npos)
+                {
                     // the option has a value
-                    std::string o("hpx:" + trim_whitespace(s.substr(p+1, p1-p-1)));
-                    std::string v(trim_whitespace(s.substr(p1+1)));
+                    std::string o(
+                        "hpx:" + trim_whitespace(s.substr(p + 1, p1 - p - 1)));
+                    std::string v(trim_whitespace(s.substr(p1 + 1)));
                     opt = std::make_pair(o, v);
                 }
-                else {
+                else
+                {
                     // no value
-                    std::string o("hpx:" + trim_whitespace(s.substr(p+1)));
+                    std::string o("hpx:" + trim_whitespace(s.substr(p + 1)));
                     opt = std::make_pair(o, std::string());
                 }
                 return true;
@@ -101,51 +101,61 @@ namespace hpx { namespace util
             if (opt.size() < 2 || opt[0] != '-')
                 return result;
 
-            util::section const* sec = ini.get_section("hpx.commandline.aliases");
+            util::section const* sec =
+                ini.get_section("hpx.commandline.aliases");
             if (nullptr == sec)
-                return result;     // no alias mappings are defined
+                return result;    // no alias mappings are defined
 
             // we found shortcut option definitions, try to find mapping
             std::string expand_to;
             std::string::size_type start_at = 2;
             bool long_option = false;
-            if (opt.size() > 2 && opt[1] != '-') {
+            if (opt.size() > 2 && opt[1] != '-')
+            {
                 // short option with value: first two letters have to match
-                expand_to = trim_whitespace(sec->get_entry(opt.substr(0, start_at), ""));
+                expand_to = trim_whitespace(
+                    sec->get_entry(opt.substr(0, start_at), ""));
             }
-            else {
+            else
+            {
                 // short option (no value) or long option
-                if (opt[1] == '-') {
+                if (opt[1] == '-')
+                {
                     start_at = opt.find_last_of('=');
                     long_option = true;
                 }
 
-                if (start_at != std::string::npos) {
+                if (start_at != std::string::npos)
+                {
                     expand_to = trim_whitespace(
                         sec->get_entry(opt.substr(0, start_at), ""));
                 }
-                else {
+                else
+                {
                     expand_to = trim_whitespace(sec->get_entry(opt, ""));
                 }
             }
 
             if (expand_to.size() < 2 || expand_to.substr(0, 2) != "--")
-                return result;     // no sensible alias is defined for this option
+                return result;    // no sensible alias is defined for this option
             expand_to.erase(0, 2);
 
             std::string::size_type p = expand_to.find_first_of('=');
-            if (p != std::string::npos) {
+            if (p != std::string::npos)
+            {
                 // the option alias defines its own value
                 std::string o(trim_whitespace(expand_to.substr(0, p)));
-                std::string v(trim_whitespace(expand_to.substr(p+1)));
+                std::string v(trim_whitespace(expand_to.substr(p + 1)));
                 result = std::make_pair(o, v);
             }
-            else if (start_at != std::string::npos && start_at < opt.size()) {
+            else if (start_at != std::string::npos && start_at < opt.size())
+            {
                 // extract value from original option
-                result = std::make_pair(expand_to,
-                    opt.substr(start_at + (long_option ? 1 : 0)));
+                result = std::make_pair(
+                    expand_to, opt.substr(start_at + (long_option ? 1 : 0)));
             }
-            else {
+            else
+            {
                 // no value
                 result = std::make_pair(expand_to, std::string());
             }
@@ -160,14 +170,18 @@ namespace hpx { namespace util
         struct option_parser
         {
             option_parser(util::section const& ini, std::size_t node)
-              : ini_(ini), node_(node)
-            {}
+              : ini_(ini)
+              , node_(node)
+            {
+            }
 
-            std::pair<std::string, std::string> operator()(std::string const& s) const
+            std::pair<std::string, std::string> operator()(
+                std::string const& s) const
             {
                 // handle special syntax for configuration files @filename
                 if ('@' == s[0])
-                    return std::make_pair(std::string("hpx:options-file"), s.substr(1));
+                    return std::make_pair(
+                        std::string("hpx:options-file"), s.substr(1));
 
                 // handle node specific options
                 std::pair<std::string, std::string> opt;
@@ -188,10 +202,10 @@ namespace hpx { namespace util
         ///////////////////////////////////////////////////////////////////////
         hpx::program_options::basic_command_line_parser<char>&
         get_commandline_parser(
-            hpx::program_options::basic_command_line_parser<char>& p,
-            int mode)
+            hpx::program_options::basic_command_line_parser<char>& p, int mode)
         {
-            if ((mode & ~util::report_missing_config_file) == util::allow_unregistered)
+            if ((mode & ~util::report_missing_config_file) ==
+                util::allow_unregistered)
                 return p.allow_unregistered();
             return p;
         }
@@ -199,24 +213,28 @@ namespace hpx { namespace util
         ///////////////////////////////////////////////////////////////////////
         // Read all options from a given config file, parse and add them to the
         // given variables_map
-        bool read_config_file_options(std::string const &filename,
-            hpx::program_options::options_description const &desc,
-            hpx::program_options::variables_map &vm,
-            util::section const& rtcfg, std::size_t node, int error_mode)
+        bool read_config_file_options(std::string const& filename,
+            hpx::program_options::options_description const& desc,
+            hpx::program_options::variables_map& vm, util::section const& rtcfg,
+            std::size_t node, int error_mode)
         {
             std::ifstream ifs(filename.c_str());
-            if (!ifs.is_open()) {
-                if (error_mode & util::report_missing_config_file) {
-                    std::cerr << "hpx::init: command line warning: command line "
-                          "options file not found (" << filename << ")"
-                        << std::endl;
+            if (!ifs.is_open())
+            {
+                if (error_mode & util::report_missing_config_file)
+                {
+                    std::cerr
+                        << "hpx::init: command line warning: command line "
+                           "options file not found ("
+                        << filename << ")" << std::endl;
                 }
                 return false;
             }
 
             std::vector<std::string> options;
             std::string line;
-            while (std::getline(ifs, line)) {
+            while (std::getline(ifs, line))
+            {
                 // skip empty lines
                 std::string::size_type pos = line.find_first_not_of(" \t");
                 if (pos == std::string::npos)
@@ -226,9 +244,11 @@ namespace hpx { namespace util
                 line = trim_whitespace(line);
 
                 // skip comment lines
-                if ('#' != line[0]) {
+                if ('#' != line[0])
+                {
                     std::string::size_type p1 = line.find_first_of(" \t");
-                    if (p1 != std::string::npos) {
+                    if (p1 != std::string::npos)
+                    {
                         // rebuild the line connecting the parts with a '='
                         line = trim_whitespace(line.substr(0, p1)) + '=' +
                             trim_whitespace(line.substr(p1));
@@ -240,18 +260,19 @@ namespace hpx { namespace util
             // add options to parsed settings
             if (!options.empty())
             {
-                using hpx::program_options::value;
-                using hpx::program_options::store;
                 using hpx::program_options::basic_command_line_parser;
                 using hpx::program_options::command_line_parser;
+                using hpx::program_options::store;
+                using hpx::program_options::value;
                 using namespace hpx::program_options::command_line_style;
 
                 store(detail::get_commandline_parser(
-                        command_line_parser(options)
-                            .options(desc)
-                            .style(unix_style)
-                            .extra_parser(detail::option_parser(rtcfg, node)),
-                        error_mode).run(),
+                          command_line_parser(options)
+                              .options(desc)
+                              .style(unix_style)
+                              .extra_parser(detail::option_parser(rtcfg, node)),
+                          error_mode)
+                          .run(),
                     vm);
                 notify(vm);
             }
@@ -269,12 +290,13 @@ namespace hpx { namespace util
             if (appname.empty())
                 return;
 
-            filesystem::path dir (filesystem::initial_path());
-            filesystem::path app (appname);
+            filesystem::path dir(filesystem::initial_path());
+            filesystem::path app(appname);
             appname = filesystem::basename(app.filename());
 
             // walk up the hierarchy, trying to find a file <appname>.cfg
-            while (!dir.empty()) {
+            while (!dir.empty())
+            {
                 filesystem::path filename = dir / (appname + ".cfg");
                 bool result = read_config_file_options(filename.string(),
                     desc_cfgfile, vm, ini, node,
@@ -282,10 +304,10 @@ namespace hpx { namespace util
                 if (result)
                     break;    // break on the first options file found
 
-                // Boost filesystem and C++17 filesystem behave differently
-                // here. Boost filesystem returns an empty path for
-                // "/".parent_path() whereas C++17 filesystem will keep
-                // returning "/".
+                    // Boost filesystem and C++17 filesystem behave differently
+                    // here. Boost filesystem returns an empty path for
+                    // "/".parent_path() whereas C++17 filesystem will keep
+                    // returning "/".
 #if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
                 auto dir_prev = dir;
                 dir = dir.parent_path();    // chop off last directory part
@@ -303,19 +325,20 @@ namespace hpx { namespace util
             util::section const& ini, std::size_t node, int error_mode)
         {
             using hpx::program_options::options_description;
-            if (vm.count("hpx:options-file")) {
-                std::vector<std::string> const &cfg_files =
-                    vm["hpx:options-file"].as<std::vector<std::string> >();
+            if (vm.count("hpx:options-file"))
+            {
+                std::vector<std::string> const& cfg_files =
+                    vm["hpx:options-file"].as<std::vector<std::string>>();
 
                 for (std::string const& cfg_file : cfg_files)
                 {
                     // parse a single config file and store the results
-                    read_config_file_options(cfg_file, desc_cfgfile, vm, ini,
-                        node, error_mode);
+                    read_config_file_options(
+                        cfg_file, desc_cfgfile, vm, ini, node, error_mode);
                 }
             }
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
@@ -327,16 +350,18 @@ namespace hpx { namespace util
         hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
-        using hpx::program_options::options_description;
-        using hpx::program_options::positional_options_description;
-        using hpx::program_options::value;
-        using hpx::program_options::store;
-        using hpx::program_options::command_line_parser;
-        using hpx::program_options::parsed_options;
         using hpx::program_options::basic_command_line_parser;
+        using hpx::program_options::command_line_parser;
+        using hpx::program_options::options_description;
+        using hpx::program_options::parsed_options;
+        using hpx::program_options::positional_options_description;
+        using hpx::program_options::store;
+        using hpx::program_options::value;
         using namespace hpx::program_options::command_line_style;
 
-        try {
+        try
+        {
+            // clang-format off
             options_description cmdline_options(
                 "HPX options (allowed on command line only)");
             cmdline_options.add_options()
@@ -353,10 +378,13 @@ namespace hpx { namespace util
             options_description hpx_options(
                 "HPX options (additionally allowed in an options file)");
             options_description hidden_options("Hidden options");
+            // clang-format on
 
-            switch (mode) {
+            switch (mode)
+            {
             case runtime_mode_default:
 #if defined(HPX_HAVE_NETWORKING)
+                // clang-format off
                 hpx_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
@@ -367,6 +395,7 @@ namespace hpx { namespace util
                 hpx_options.add_options()
                     ("hpx:console", "run this instance in console mode")
                 ;
+                // clang-format on
 #endif
                 break;
 
@@ -377,18 +406,22 @@ namespace hpx { namespace util
                 // If the runtime for this application is always run in
                 // worker mode, silently ignore the worker option for
                 // hpx_pbs compatibility.
+                // clang-format off
                 hidden_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
                     ("hpx:connect", "run this instance in worker mode, "
                         "but connecting late")
                 ;
+                // clang-format on
                 break;
 #else
             case runtime_mode_console:
+                // clang-format off
                 hidden_options.add_options()
                     ("hpx:console", "run this instance in console mode")
                 ;
+                // clang-format on
                 break;
 #endif
 
@@ -399,6 +432,7 @@ namespace hpx { namespace util
             }
 
             // general options definitions
+            // clang-format off
             hpx_options.add_options()
                 ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
@@ -607,6 +641,7 @@ namespace hpx { namespace util
             hidden_options.add_options()
                 ("hpx:ignore", "this option will be silently ignored")
             ;
+            // clang-format off
 
             // construct the overall options description and parse the
             // command line

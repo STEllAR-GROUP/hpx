@@ -16,71 +16,59 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
 
-/// Parse a sed command.
-///
-/// \param input    [in] The content to parse.
-/// \param search   [out] If the parsing is successful, this string is set to
-///                 the search expression.
-/// \param search   [out] If the parsing is successful, this string is set to
-///                 the replace expression.
-///
-/// \returns \a true if the parsing was successful, false otherwise.
-///
-/// \note Currently, only supports search and replace syntax (s/search/replace/)
-HPX_EXPORT bool parse_sed_expression(
-    std::string const& input
-  , std::string& search
-  , std::string& replace
-    );
+    /// Parse a sed command.
+    ///
+    /// \param input    [in] The content to parse.
+    /// \param search   [out] If the parsing is successful, this string is set to
+    ///                 the search expression.
+    /// \param search   [out] If the parsing is successful, this string is set to
+    ///                 the replace expression.
+    ///
+    /// \returns \a true if the parsing was successful, false otherwise.
+    ///
+    /// \note Currently, only supports search and replace syntax (s/search/replace/)
+    HPX_EXPORT bool parse_sed_expression(
+        std::string const& input, std::string& search, std::string& replace);
 
-/// An unary function object which applies a sed command to its subject and
-/// returns the resulting string.
-///
-/// \note Currently, only supports search and replace syntax (s/search/replace/)
-struct HPX_EXPORT sed_transform
-{
-  private:
-    struct command;
-
-    std::shared_ptr<command> command_;
-
-  public:
-    sed_transform(
-        std::string const& search
-      , std::string const& replace
-        );
-
-    sed_transform(
-        std::string const& expression
-        );
-
-    std::string operator()(
-        std::string const& input
-        ) const;
-
-    explicit operator bool() const noexcept
+    /// An unary function object which applies a sed command to its subject and
+    /// returns the resulting string.
+    ///
+    /// \note Currently, only supports search and replace syntax (s/search/replace/)
+    struct HPX_EXPORT sed_transform
     {
-        // avoid compiler warning about conversion to bool
-        return command_.get() ? true : false;
-    }
+    private:
+        struct command;
 
-    bool operator!() const
-    {
-        return !command_.get();
-    }
-};
+        std::shared_ptr<command> command_;
 
-}}
+    public:
+        sed_transform(std::string const& search, std::string const& replace);
+
+        sed_transform(std::string const& expression);
+
+        std::string operator()(std::string const& input) const;
+
+        explicit operator bool() const noexcept
+        {
+            // avoid compiler warning about conversion to bool
+            return command_.get() ? true : false;
+        }
+
+        bool operator!() const
+        {
+            return !command_.get();
+        }
+    };
+
+}}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
 
-#endif // HPX_EC1602ED_CCC2_471C_BC28_1DBB98902F40
-
+#endif    // HPX_EC1602ED_CCC2_471C_BC28_1DBB98902F40

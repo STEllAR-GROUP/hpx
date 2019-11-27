@@ -15,22 +15,22 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable:4251)
+#pragma warning(disable : 4251)
 #endif
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // Try to map a given host name based on the list of mappings read from a
     // file
     struct HPX_EXPORT map_hostnames
     {
-        typedef util::function_nonser<
-            std::string(std::string const&)> transform_function_type;
+        typedef util::function_nonser<std::string(std::string const&)>
+            transform_function_type;
 
         map_hostnames(bool debug = false)
           : debug_(debug)
-        {}
+        {
+        }
 
         void use_suffix(std::string const& suffix)
         {
@@ -49,13 +49,13 @@ namespace hpx { namespace util
 
         std::string map(std::string host_name, std::uint16_t port) const;
 
-      private:
+    private:
         transform_function_type transform_;
         std::string suffix_;
         std::string prefix_;
         bool debug_;
     };
-}}
+}}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

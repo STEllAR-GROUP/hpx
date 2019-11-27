@@ -8,8 +8,8 @@
 #define HPX_UTIL_PARSE_COMMAND_LINE_NOV_30_2011_0652PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 
 #include <hpx/program_options.hpp>
 
@@ -18,8 +18,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     enum commandline_error_mode
     {
         return_on_error,
@@ -49,18 +48,17 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT std::string reconstruct_command_line(
-        hpx::program_options::variables_map const &vm);
+        hpx::program_options::variables_map const& vm);
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         inline std::string enquote(std::string const& arg)
         {
             if (arg.find_first_of(" \t\"") != std::string::npos)
                 return std::string("\"") + arg + "\"";
             return arg;
         }
-    }
-}}
+    }    // namespace detail
+}}       // namespace hpx::util
 
 #endif

@@ -8,12 +8,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/config/version.hpp>
 #include <hpx/config/config_strings.hpp>
-
+#include <hpx/config/version.hpp>
+#include <hpx/format.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/format.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/config.hpp>
@@ -32,8 +31,7 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     std::uint8_t major_version()
     {
         return HPX_VERSION_MAJOR;
@@ -56,10 +54,8 @@ namespace hpx
 
     std::string full_version_as_string()
     {
-        return hpx::util::format("{}.{}.{}", //-V609
-            HPX_VERSION_MAJOR,
-            HPX_VERSION_MINOR,
-            HPX_VERSION_SUBMINOR);
+        return hpx::util::format("{}.{}.{}",    //-V609
+            HPX_VERSION_MAJOR, HPX_VERSION_MINOR, HPX_VERSION_SUBMINOR);
     }
 
     std::uint8_t agas_version()
@@ -79,8 +75,8 @@ namespace hpx
 
         // add type and library version
 #if defined(OPEN_MPI)
-        strm << "OpenMPI V" << OMPI_MAJOR_VERSION << "."
-             << OMPI_MINOR_VERSION << "." << OMPI_RELEASE_VERSION;
+        strm << "OpenMPI V" << OMPI_MAJOR_VERSION << "." << OMPI_MINOR_VERSION
+             << "." << OMPI_RELEASE_VERSION;
 #elif defined(MPICH)
         strm << "MPICH V" << MPICH_VERSION;
 #elif defined(MVAPICH2_VERSION)
@@ -109,7 +105,8 @@ namespace hpx
             "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"
-            "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
+            "file LICENSE_1_0.txt or copy at "
+            "http://www.boost.org/LICENSE_1_0.txt)\n";
         return copyright;
     }
 
@@ -117,8 +114,9 @@ namespace hpx
     std::string full_build_string()
     {
         std::ostringstream strm;
-        strm << "{config}:\n" << configuration_string()
-             << "{version}: " << build_string() << "\n"
+        strm << "{config}:\n"
+             << configuration_string() << "{version}: " << build_string()
+             << "\n"
              << "{boost}: " << boost_version() << "\n"
              << "{build-type}: " << build_type() << "\n"
              << "{date}: " << build_date_time() << "\n"
@@ -151,16 +149,16 @@ namespace hpx
         strm << "\n";
 
 #if defined(HPX_PARCEL_MAX_CONNECTIONS)
-        strm << "  HPX_PARCEL_MAX_CONNECTIONS="
-             << HPX_PARCEL_MAX_CONNECTIONS << "\n";
+        strm << "  HPX_PARCEL_MAX_CONNECTIONS=" << HPX_PARCEL_MAX_CONNECTIONS
+             << "\n";
 #endif
 #if defined(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY)
         strm << "  HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY="
              << HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY << "\n";
 #endif
 #if defined(HPX_AGAS_LOCAL_CACHE_SIZE)
-        strm << "  HPX_AGAS_LOCAL_CACHE_SIZE="
-             << HPX_AGAS_LOCAL_CACHE_SIZE << "\n";
+        strm << "  HPX_AGAS_LOCAL_CACHE_SIZE=" << HPX_AGAS_LOCAL_CACHE_SIZE
+             << "\n";
 #endif
 #if defined(HPX_HAVE_MALLOC)
         strm << "  HPX_HAVE_MALLOC=" << HPX_HAVE_MALLOC << "\n";
@@ -200,28 +198,23 @@ namespace hpx
 
     std::string build_string()
     {
-        return hpx::util::format("V{}{} (AGAS: V{}.{}), Git: {:.10}", //-V609
-            full_version_as_string(), HPX_VERSION_TAG,
-            HPX_AGAS_VERSION / 0x10, HPX_AGAS_VERSION % 0x10,
-            HPX_HAVE_GIT_COMMIT);
+        return hpx::util::format("V{}{} (AGAS: V{}.{}), Git: {:.10}",    //-V609
+            full_version_as_string(), HPX_VERSION_TAG, HPX_AGAS_VERSION / 0x10,
+            HPX_AGAS_VERSION % 0x10, HPX_HAVE_GIT_COMMIT);
     }
 
     std::string boost_version()
     {
         // BOOST_VERSION: 105800
-        return hpx::util::format("V{}.{}.{}",
-            BOOST_VERSION / 100000,
-            BOOST_VERSION / 100 % 1000,
-            BOOST_VERSION % 100);
+        return hpx::util::format("V{}.{}.{}", BOOST_VERSION / 100000,
+            BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
     }
 
     std::string hwloc_version()
     {
         // HWLOC_API_VERSION: 0x00010700
-        return hpx::util::format("V{}.{}.{}",
-            HWLOC_API_VERSION / 0x10000,
-            HWLOC_API_VERSION / 0x100 % 0x100,
-            HWLOC_API_VERSION % 0x100);
+        return hpx::util::format("V{}.{}.{}", HWLOC_API_VERSION / 0x10000,
+            HWLOC_API_VERSION / 0x100 % 0x100, HWLOC_API_VERSION % 0x100);
     }
 
 #if defined(HPX_HAVE_MALLOC)
@@ -248,31 +241,25 @@ namespace hpx
 
     std::string complete_version()
     {
-        std::string version = hpx::util::format(
-            "Versions:\n"
-            "  HPX: {}\n"
-            "  Boost: {}\n"
-            "  Hwloc: {}\n"
+        std::string version = hpx::util::format("Versions:\n"
+                                                "  HPX: {}\n"
+                                                "  Boost: {}\n"
+                                                "  Hwloc: {}\n"
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-            "  MPI: {}\n"
+                                                "  MPI: {}\n"
 #endif
-            "\n"
-            "Build:\n"
-            "  Type: {}\n"
-            "  Date: {}\n"
-            "  Platform: {}\n"
-            "  Compiler: {}\n"
-            "  Standard Library: {}\n",
-            build_string(),
-            boost_version(),
-            hwloc_version(),
+                                                "\n"
+                                                "Build:\n"
+                                                "  Type: {}\n"
+                                                "  Date: {}\n"
+                                                "  Platform: {}\n"
+                                                "  Compiler: {}\n"
+                                                "  Standard Library: {}\n",
+            build_string(), boost_version(), hwloc_version(),
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             mpi_version(),
 #endif
-            build_type(),
-            build_date_time(),
-            boost_platform(),
-            boost_compiler(),
+            build_type(), build_date_time(), boost_platform(), boost_compiler(),
             boost_stdlib());
 
 #if defined(HPX_HAVE_MALLOC)
@@ -289,6 +276,6 @@ namespace hpx
 
     std::string build_date_time()
     {
-        return std::string(__DATE__)  + " " + __TIME__;
+        return std::string(__DATE__) + " " + __TIME__;
     }
-}
+}    // namespace hpx

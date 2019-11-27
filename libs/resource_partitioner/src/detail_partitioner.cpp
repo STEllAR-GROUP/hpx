@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -6,30 +6,30 @@
 
 #include <hpx/command_line_handling/command_line_handling.hpp>
 
+#include <hpx/config/asio.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/batch_environments.hpp>
-#include <hpx/config/asio.hpp>
+#include <hpx/command_line_handling/parse_command_line.hpp>
+#include <hpx/debugging.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
-#include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/debugging.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
-#include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/asio/ip/host_name.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/variables_map.hpp>
+#include <boost/asio/ip/host_name.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -45,17 +45,16 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         std::string runtime_configuration_string(
             util::command_line_handling const& cfg)
         {
             std::ostringstream strm;
 
             // runtime mode
-            strm << "  {mode}: " << get_runtime_mode_name(cfg.rtcfg_.mode_) << "\n";
+            strm << "  {mode}: " << get_runtime_mode_name(cfg.rtcfg_.mode_)
+                 << "\n";
 
             if (cfg.num_localities_ != 1)
                 strm << "  {localities}: " << cfg.num_localities_ << "\n";
@@ -78,7 +77,8 @@ namespace hpx { namespace util
             return 1;
         }
 
-        int print_info(std::ostream& out, util::command_line_handling const& cfg)
+        int print_info(
+            std::ostream& out, util::command_line_handling const& cfg)
         {
             out << "Static configuration:\n---------------------\n";
             out << hpx::configuration_string() << std::endl;
@@ -96,7 +96,7 @@ namespace hpx { namespace util
             std::string::size_type pos = 0;
             while ((pos = str.find_first_of(s, pos)) != std::string::npos)
             {
-                str.replace (pos, 1, r);
+                str.replace(pos, 1, r);
                 pos += inc;
             }
         }
@@ -118,47 +118,40 @@ namespace hpx { namespace util
             std::size_t threads, std::size_t batch_threads)
         {
             std::cerr << "hpx::init: command line warning: --hpx:threads "
-                    "used when running with "
-                << batch_name
-                << ", requesting a larger number of threads ("
-                << threads
-                << ") than cores have been assigned by "
-                << batch_name
-                << " ("
-                << batch_threads
-                << "), the application might not run properly."
-                << std::endl;
+                         "used when running with "
+                      << batch_name
+                      << ", requesting a larger number of threads (" << threads
+                      << ") than cores have been assigned by " << batch_name
+                      << " (" << batch_threads
+                      << "), the application might not run properly."
+                      << std::endl;
         }
 
         void report_locality_warning_batch(std::string const& batch_name,
             std::size_t batch_localities, std::size_t num_localities)
         {
             std::cerr << "hpx::init: command line warning: "
-                    "--hpx:localities used when running with "
-                << batch_name
-                << ", requesting a different number of localities ("
-                << num_localities
-                << ") than have been assigned by "
-                << batch_name
-                << " ("
-                << batch_localities
-                << "), the application might not run properly."
-                << std::endl;
+                         "--hpx:localities used when running with "
+                      << batch_name
+                      << ", requesting a different number of localities ("
+                      << num_localities << ") than have been assigned by "
+                      << batch_name << " (" << batch_localities
+                      << "), the application might not run properly."
+                      << std::endl;
         }
 
         void report_locality_warning(std::string const& batch_name,
             std::size_t cmdline_localities, std::size_t num_localities)
         {
             std::cerr << "hpx::init: command line warning: "
-                    "--hpx:localities used when running with "
-                << batch_name
-                << ", requesting a different number of localities ("
-                << num_localities
-                << ") than have been assigned on the command line "
-                << " ("
-                << cmdline_localities
-                << "), the application might not run properly."
-                << std::endl;
+                         "--hpx:localities used when running with "
+                      << batch_name
+                      << ", requesting a different number of localities ("
+                      << num_localities
+                      << ") than have been assigned on the command line "
+                      << " (" << cmdline_localities
+                      << "), the application might not run properly."
+                      << std::endl;
         }
 
         std::string convert_to_log_file(std::string const& dest)
@@ -191,15 +184,15 @@ namespace hpx { namespace util
                     num_localities = cfg_num_localities;
             }
 
-            if (!initial && env.found_batch_environment() &&
-                using_nodelist && (batch_localities != num_localities) &&
-                (num_localities != 1))
+            if (!initial && env.found_batch_environment() && using_nodelist &&
+                (batch_localities != num_localities) && (num_localities != 1))
             {
-                detail::report_locality_warning_batch(env.get_batch_name(),
-                    batch_localities, num_localities);
+                detail::report_locality_warning_batch(
+                    env.get_batch_name(), batch_localities, num_localities);
             }
 
-            if (vm.count("hpx:localities")) {
+            if (vm.count("hpx:localities"))
+            {
                 std::size_t localities = vm["hpx:localities"].as<std::size_t>();
 
                 if (localities == 0)
@@ -212,8 +205,8 @@ namespace hpx { namespace util
                     using_nodelist && (localities != num_localities) &&
                     (num_localities != 1))
                 {
-                    detail::report_locality_warning(env.get_batch_name(),
-                        localities, num_localities);
+                    detail::report_locality_warning(
+                        env.get_batch_name(), localities, num_localities);
                 }
                 num_localities = localities;
             }
@@ -264,7 +257,7 @@ namespace hpx { namespace util
                 std::string affinity_desc;
 
                 std::vector<std::string> bind_affinity =
-                    vm["hpx:bind"].as<std::vector<std::string> >();
+                    vm["hpx:bind"].as<std::vector<std::string>>();
                 for (std::string const& s : bind_affinity)
                 {
                     if (!affinity_desc.empty())
@@ -310,7 +303,8 @@ namespace hpx { namespace util
                     vm["hpx:numa-sensitive"].as<std::size_t>();
                 if (numa_sensitive > 2)
                 {
-                    throw hpx::detail::command_line_error("Invalid argument "
+                    throw hpx::detail::command_line_error(
+                        "Invalid argument "
                         "value for --hpx:numa-sensitive. Allowed values are "
                         "0, 1, or 2");
                 }
@@ -318,12 +312,12 @@ namespace hpx { namespace util
             }
 
             // use either cfgmap value or default
-            return cfgmap.get_value<std::size_t>("hpx.numa_sensitive", default_);
+            return cfgmap.get_value<std::size_t>(
+                "hpx.numa_sensitive", default_);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        std::size_t get_number_of_default_threads(
-            bool use_process_mask)
+        std::size_t get_number_of_default_threads(bool use_process_mask)
         {
             if (use_process_mask)
             {
@@ -368,10 +362,11 @@ namespace hpx { namespace util
 
             // assuming we assign the first N cores ...
             std::size_t core = 0;
-            for(; core < num_cores; ++core)
+            for (; core < num_cores; ++core)
             {
                 batch_threads -= top.get_number_of_core_pus(core);
-                if(batch_threads == 0) break;
+                if (batch_threads == 0)
+                    break;
             }
 
             return core + 1;
@@ -390,8 +385,7 @@ namespace hpx { namespace util
                 get_number_of_default_threads(use_process_mask);
             const std::size_t init_cores =
                 get_number_of_default_cores(env, use_process_mask);
-            const std::size_t batch_threads =
-                env.retrieve_number_of_threads();
+            const std::size_t batch_threads = env.retrieve_number_of_threads();
 
             std::size_t default_threads = init_threads;
 
@@ -450,23 +444,24 @@ namespace hpx { namespace util
                 }
                 else
                 {
-                    threads =
-                        hpx::util::from_string<std::size_t>(threads_str);
+                    threads = hpx::util::from_string<std::size_t>(threads_str);
                 }
 
                 if (threads == 0)
                 {
-                    throw hpx::detail::command_line_error("Number of --hpx:threads "
-                        "must be greater than 0");
+                    throw hpx::detail::command_line_error(
+                        "Number of --hpx:threads must be greater than 0");
                 }
 
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
                 if (threads > HPX_HAVE_MAX_CPU_COUNT)
                 {
+                    // clang-format off
                     throw hpx::detail::command_line_error("Requested more than "
                         HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
                         "to use for this application, use the option "
                         "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+                    // clang-format on
                 }
 #endif
             }
@@ -485,21 +480,23 @@ namespace hpx { namespace util
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
             if (min_os_threads > HPX_HAVE_MAX_CPU_COUNT)
             {
-                throw hpx::detail::command_line_error("Requested more than "
-                    HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)
-                    " hpx.force_min_os_threads "
-                    "to use for this application, use the option "
-                    "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+                throw hpx::detail::command_line_error(
+                    "Requested more than " HPX_PP_STRINGIZE(
+                        HPX_HAVE_MAX_CPU_COUNT) " hpx.force_min_os_threads "
+                                                "to use for this application, "
+                                                "use the option "
+                                                "-DHPX_WITH_MAX_CPU_COUNT=<N> "
+                                                "when configuring HPX.");
             }
 #endif
 
             threads = (std::max)(threads, min_os_threads);
 
-            if (!initial && env.found_batch_environment() &&
-                using_nodelist && (threads > batch_threads))
+            if (!initial && env.found_batch_environment() && using_nodelist &&
+                (threads > batch_threads))
             {
-                detail::report_thread_warning(env.get_batch_name(),
-                    threads, batch_threads);
+                detail::report_thread_warning(
+                    env.get_batch_name(), threads, batch_threads);
             }
             return threads;
         }
@@ -508,7 +505,8 @@ namespace hpx { namespace util
             hpx::program_options::variables_map& vm, std::size_t num_threads,
             util::batch_environment& env, bool use_process_mask)
         {
-            std::string cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
+            std::string cores_str =
+                cfgmap.get_value<std::string>("hpx.cores", "");
             if ("all" == cores_str)
             {
                 cfgmap.config_["hpx.cores"] = std::to_string(
@@ -527,8 +525,7 @@ namespace hpx { namespace util
                 }
                 else
                 {
-                    num_cores =
-                        hpx::util::from_string<std::size_t>(cores_str);
+                    num_cores = hpx::util::from_string<std::size_t>(cores_str);
                 }
             }
 
@@ -537,8 +534,8 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
 #if !defined(HPX_HAVE_NETWORKING)
-        void check_networking_option(hpx::program_options::variables_map& vm,
-            char const* option)
+        void check_networking_option(
+            hpx::program_options::variables_map& vm, char const* option)
         {
             if (vm.count(option) != 0)
             {
@@ -568,26 +565,26 @@ namespace hpx { namespace util
 #endif
         }
 
-        bool detect_mpi_environment(util::runtime_configuration const& cfg,
-            char const* default_env)
+        bool detect_mpi_environment(
+            util::runtime_configuration const& cfg, char const* default_env)
         {
 #if defined(__bgq__)
             // If running on BG/Q, we can safely assume to always run in an
             // MPI environment
             return true;
 #else
-            std::string mpi_environment_strings = cfg.get_entry(
-                "hpx.parcel.mpi.env", default_env);
+            std::string mpi_environment_strings =
+                cfg.get_entry("hpx.parcel.mpi.env", default_env);
 
-            typedef
-                boost::tokenizer<boost::char_separator<char> >
-                tokenizer;
+            typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
             boost::char_separator<char> sep(";,: ");
             tokenizer tokens(mpi_environment_strings, sep);
-            for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+            for (tokenizer::iterator it = tokens.begin(); it != tokens.end();
+                 ++it)
             {
-                char *env = std::getenv(it->c_str());
-                if(env) return true;
+                char* env = std::getenv(it->c_str());
+                if (env)
+                    return true;
             }
             return false;
 #endif
@@ -605,7 +602,8 @@ namespace hpx { namespace util
             // The bottom line is that we use the MPI parcelport either when the
             // application was executed using mpirun or if the tcp/ip parcelport
             // was disabled.
-            if (!detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV) &&
+            if (!detail::detect_mpi_environment(
+                    cfg, HPX_HAVE_PARCELPORT_MPI_ENV) &&
                 get_entry_as(cfg, "hpx.parcel.tcp.enable", 1))
             {
                 return false;
@@ -616,7 +614,7 @@ namespace hpx { namespace util
             return false;
 #endif
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////
     std::size_t get_num_high_priority_queues(
@@ -730,9 +728,10 @@ namespace hpx { namespace util
 
         bool debug_clp = node != std::size_t(-1) && vm.count("hpx:debug-clp");
 
-        if (vm.count("hpx:ini")) {
+        if (vm.count("hpx:ini"))
+        {
             std::vector<std::string> cfg =
-                vm["hpx:ini"].as<std::vector<std::string> >();
+                vm["hpx:ini"].as<std::vector<std::string>>();
             std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
             cfgmap.add(cfg);
         }
@@ -747,33 +746,34 @@ namespace hpx { namespace util
 
         // The AGAS host name and port number are pre-initialized from
         //the command line
-        std::string agas_host =
-            cfgmap.get_value<std::string>("hpx.agas.address",
-                rtcfg_.get_entry("hpx.agas.address", ""));
+        std::string agas_host = cfgmap.get_value<std::string>(
+            "hpx.agas.address", rtcfg_.get_entry("hpx.agas.address", ""));
         std::uint16_t agas_port =
             cfgmap.get_value<std::uint16_t>("hpx.agas.port",
                 hpx::util::from_string<std::uint16_t>(
-                    rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)
-                ));
+                    rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)));
 
-        if (vm.count("hpx:agas")) {
+        if (vm.count("hpx:agas"))
+        {
             if (!util::split_ip_address(
-                vm["hpx:agas"].as<std::string>(), agas_host, agas_port))
+                    vm["hpx:agas"].as<std::string>(), agas_host, agas_port))
             {
-                std::cerr
-                    << "hpx::init: command line warning: illegal port "
-                        "number given, using default value instead."
-                    << std::endl;
+                std::cerr << "hpx::init: command line warning: illegal port "
+                             "number given, using default value instead."
+                          << std::endl;
             }
         }
 
         // Check command line arguments.
 
-        if (vm.count("hpx:iftransform")) {
-            util::sed_transform iftransform(vm["hpx:iftransform"].as<std::string>());
+        if (vm.count("hpx:iftransform"))
+        {
+            util::sed_transform iftransform(
+                vm["hpx:iftransform"].as<std::string>());
 
             // Check for parsing failures
-            if (!iftransform) {
+            if (!iftransform)
+            {
                 throw hpx::detail::command_line_error(hpx::util::format(
                     "Could not parse --hpx:iftransform argument '{1}'",
                     vm["hpx:iftransform"].as<std::string>()));
@@ -789,9 +789,10 @@ namespace hpx { namespace util
         std::vector<std::string> nodelist;
 
 #if defined(HPX_HAVE_NETWORKING)
-        if(vm.count("hpx:nodefile"))
+        if (vm.count("hpx:nodefile"))
         {
-            if (vm.count("hpx:nodes")) {
+            if (vm.count("hpx:nodes"))
+            {
                 throw hpx::detail::command_line_error(
                     "Ambiguous command line options. "
                     "Do not specify more than one of the --hpx:nodefile and "
@@ -805,13 +806,16 @@ namespace hpx { namespace util
                 if (debug_clp)
                     std::cerr << "opened: " << node_file << std::endl;
                 std::string line;
-                while (std::getline(ifs, line)) {
-                    if (!line.empty()) {
+                while (std::getline(ifs, line))
+                {
+                    if (!line.empty())
+                    {
                         nodelist.push_back(line);
                     }
                 }
             }
-            else {
+            else
+            {
                 if (debug_clp)
                     std::cerr << "failed opening: " << node_file << std::endl;
 
@@ -820,8 +824,9 @@ namespace hpx { namespace util
                     "Could not open nodefile: '{}'", node_file));
             }
         }
-        else if (vm.count("hpx:nodes")) {
-            nodelist = vm["hpx:nodes"].as<std::vector<std::string> >();
+        else if (vm.count("hpx:nodes"))
+        {
+            nodelist = vm["hpx:nodes"].as<std::vector<std::string>>();
         }
 #endif
         use_process_mask_ =
@@ -846,15 +851,15 @@ namespace hpx { namespace util
 
         bool have_mpi = detail::check_mpi_environment(rtcfg_);
 
-        util::batch_environment env(nodelist, have_mpi, debug_clp,
-            enable_batch_env);
+        util::batch_environment env(
+            nodelist, have_mpi, debug_clp, enable_batch_env);
 
 #if defined(HPX_HAVE_NETWORKING)
-        if(!nodelist.empty())
+        if (!nodelist.empty())
         {
             using_nodelist = true;
-            ini_config.emplace_back("hpx.nodes!=" + env.init_from_nodelist(
-                nodelist, agas_host));
+            ini_config.emplace_back(
+                "hpx.nodes!=" + env.init_from_nodelist(nodelist, agas_host));
         }
 
         // let the batch environment decide about the AGAS host
@@ -872,15 +877,14 @@ namespace hpx { namespace util
 
         // handling number of localities, those might have already been initialized
         // from MPI environment
-        num_localities_ = detail::handle_num_localities(cfgmap, vm, env,
-            using_nodelist, num_localities_, initial);
+        num_localities_ = detail::handle_num_localities(
+            cfgmap, vm, env, using_nodelist, num_localities_, initial);
 
         // Determine our network port, use arbitrary port if running on one
         // locality.
         hpx_host = cfgmap.get_value<std::string>("hpx.parcel.address",
-                env.host_name(
-                    rtcfg_.get_entry("hpx.parcel.address", HPX_INITIAL_IP_ADDRESS)
-                ));
+            env.host_name(rtcfg_.get_entry(
+                "hpx.parcel.address", HPX_INITIAL_IP_ADDRESS)));
 
         // we expect dynamic connections if:
         //  - --hpx:expect-connecting-localities or
@@ -893,18 +897,18 @@ namespace hpx { namespace util
         if (vm.count("hpx:expect-connecting-localities"))
             expect_connections = true;
 
-        ini_config.emplace_back(std::string("hpx.expect_connecting_localities=") +
+        ini_config.emplace_back(
+            std::string("hpx.expect_connecting_localities=") +
             (expect_connections ? "1" : "0"));
 
         if (num_localities_ != 1 || expect_connections)
         {
-            initial_hpx_port =
-                hpx::util::from_string<std::uint16_t>(
-                    rtcfg_.get_entry("hpx.parcel.port", HPX_INITIAL_IP_PORT));
+            initial_hpx_port = hpx::util::from_string<std::uint16_t>(
+                rtcfg_.get_entry("hpx.parcel.port", HPX_INITIAL_IP_PORT));
         }
 
-        hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
-            initial_hpx_port);
+        hpx_port = cfgmap.get_value<std::uint16_t>(
+            "hpx.parcel.port", initial_hpx_port);
 
         run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
@@ -916,13 +920,15 @@ namespace hpx { namespace util
 
         // If the user has not specified an explicit runtime mode we
         // retrieve it from the command line.
-        if (hpx::runtime_mode_default == rtcfg_.mode_) {
+        if (hpx::runtime_mode_default == rtcfg_.mode_)
+        {
 #if defined(HPX_HAVE_NETWORKING)
             // The default mode is console, i.e. all workers need to be
             // started with --worker/-w.
             rtcfg_.mode_ = hpx::runtime_mode_console;
             if (vm.count("hpx:console") + vm.count("hpx:worker") +
-                vm.count("hpx:connect") > 1)
+                    vm.count("hpx:connect") >
+                1)
             {
                 throw hpx::detail::command_line_error(
                     "Ambiguous command line options. "
@@ -932,7 +938,8 @@ namespace hpx { namespace util
 
             // In these cases we default to executing with an empty
             // hpx_main, except if specified otherwise.
-            if (vm.count("hpx:worker")) {
+            if (vm.count("hpx:worker"))
+            {
                 rtcfg_.mode_ = hpx::runtime_mode_worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
@@ -945,7 +952,8 @@ namespace hpx { namespace util
                 }
 #endif
             }
-            else if (vm.count("hpx:connect")) {
+            else if (vm.count("hpx:connect"))
+            {
                 rtcfg_.mode_ = hpx::runtime_mode_connect;
             }
 #else
@@ -956,12 +964,12 @@ namespace hpx { namespace util
 #if defined(HPX_HAVE_NETWORKING)
         // we initialize certain settings if --node is specified (or data
         // has been retrieved from the environment)
-        if (rtcfg_.mode_ == hpx::runtime_mode_connect) {
+        if (rtcfg_.mode_ == hpx::runtime_mode_connect)
+        {
             // when connecting we need to select a unique port
             hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
-                hpx::util::from_string<std::uint16_t>(
-                    rtcfg_.get_entry("hpx.parcel.port", HPX_CONNECTING_IP_PORT)
-                ));
+                hpx::util::from_string<std::uint16_t>(rtcfg_.get_entry(
+                    "hpx.parcel.port", HPX_CONNECTING_IP_PORT)));
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
             // do not execute any explicit hpx_main except if asked
@@ -973,10 +981,13 @@ namespace hpx { namespace util
             }
 #endif
         }
-        else if (node != std::size_t(-1) || vm.count("hpx:node")) {
+        else if (node != std::size_t(-1) || vm.count("hpx:node"))
+        {
             // command line overwrites the environment
-            if (vm.count("hpx:node")) {
-                if (vm.count("hpx:agas")) {
+            if (vm.count("hpx:node"))
+            {
+                if (vm.count("hpx:agas"))
+                {
                     throw hpx::detail::command_line_error(
                         "Command line option --hpx:node "
                         "is not compatible with --hpx:agas");
@@ -984,13 +995,16 @@ namespace hpx { namespace util
                 node = vm["hpx:node"].as<std::size_t>();
             }
 
-            if (!vm.count("hpx:worker")) {
-                if (env.agas_node() == node) {
+            if (!vm.count("hpx:worker"))
+            {
+                if (env.agas_node() == node)
+                {
                     // console node, by default runs AGAS
                     run_agas_server = true;
                     rtcfg_.mode_ = hpx::runtime_mode_console;
                 }
-                else {
+                else
+                {
                     // don't use port zero for non-console localities
                     if (hpx_port == 0 && node != 0)
                         hpx_port = HPX_INITIAL_IP_PORT;
@@ -1015,22 +1029,24 @@ namespace hpx { namespace util
             // worker and the node number is zero
             if (!vm.count("hpx:worker") || node != 0)
             {
-                ini_config.emplace_back("hpx.locality!=" + std::to_string(node));
+                ini_config.emplace_back(
+                    "hpx.locality!=" + std::to_string(node));
             }
         }
 
-        if (vm.count("hpx:hpx")) {
-            if (!util::split_ip_address(vm["hpx:hpx"].as<std::string>(),
-                    hpx_host, hpx_port))
+        if (vm.count("hpx:hpx"))
+        {
+            if (!util::split_ip_address(
+                    vm["hpx:hpx"].as<std::string>(), hpx_host, hpx_port))
             {
-                std::cerr
-                    << "hpx::init: command line warning: illegal port "
-                        "number given, using default value instead."
-                    << std::endl;
+                std::cerr << "hpx::init: command line warning: illegal port "
+                             "number given, using default value instead."
+                          << std::endl;
             }
         }
 
-        if ((vm.count("hpx:connect") || rtcfg_.mode_ == hpx::runtime_mode_connect) &&
+        if ((vm.count("hpx:connect") ||
+                rtcfg_.mode_ == hpx::runtime_mode_connect) &&
             hpx_host == "127.0.0.1")
         {
             hpx_host = hpx::util::resolve_public_ip_address();
@@ -1084,7 +1100,8 @@ namespace hpx { namespace util
             pu_offset_ = std::size_t(-1);
             ini_config.emplace_back("hpx.pu_offset=0");
 #else
-            ini_config.emplace_back("hpx.pu_offset=" + std::to_string(pu_offset_));
+            ini_config.emplace_back(
+                "hpx.pu_offset=" + std::to_string(pu_offset_));
 #endif
         }
         else
@@ -1092,14 +1109,15 @@ namespace hpx { namespace util
             ini_config.emplace_back("hpx.pu_offset=0");
         }
 
-        numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
-            affinity_bind_.empty() ? 0 : 1);
+        numa_sensitive_ = detail::handle_numa_sensitive(
+            cfgmap, vm, affinity_bind_.empty() ? 0 : 1);
         ini_config.emplace_back(
             "hpx.numa_sensitive=" + std::to_string(numa_sensitive_));
 
         // default affinity mode is now 'balanced' (only if no pu-step or
         // pu-offset is given)
-        if (pu_step_ == 1 && pu_offset_ == std::size_t(-1) && affinity_bind_.empty())
+        if (pu_step_ == 1 && pu_offset_ == std::size_t(-1) &&
+            affinity_bind_.empty())
         {
 #if defined(__APPLE__)
             affinity_bind_ = "none";
@@ -1110,13 +1128,14 @@ namespace hpx { namespace util
         }
 
         // handle number of cores and threads
-        num_threads_ = detail::handle_num_threads(
-            cfgmap, rtcfg_, vm, env, using_nodelist, initial, use_process_mask_);
+        num_threads_ = detail::handle_num_threads(cfgmap, rtcfg_, vm, env,
+            using_nodelist, initial, use_process_mask_);
         num_cores_ = detail::handle_num_cores(
             cfgmap, vm, num_threads_, env, use_process_mask_);
 
         // Set number of cores and OS threads in configuration.
-        ini_config.emplace_back("hpx.os_threads=" + std::to_string(num_threads_));
+        ini_config.emplace_back(
+            "hpx.os_threads=" + std::to_string(num_threads_));
         ini_config.emplace_back("hpx.cores=" + std::to_string(num_cores_));
 
         // map host names to ip addresses, if requested
@@ -1124,7 +1143,8 @@ namespace hpx { namespace util
         agas_host = mapnames.map(agas_host, agas_port);
 
         // sanity checks
-        if (num_localities_ == 1 && !vm.count("hpx:agas") && !vm.count("hpx:node"))
+        if (num_localities_ == 1 && !vm.count("hpx:agas") &&
+            !vm.count("hpx:node"))
         {
             // We assume we have to run the AGAS server if the number of
             // localities to run on is not specified (or is '1')
@@ -1135,21 +1155,25 @@ namespace hpx { namespace util
         }
 
 #if defined(HPX_HAVE_NETWORKING)
-        if (hpx_host == agas_host && hpx_port == agas_port) {
+        if (hpx_host == agas_host && hpx_port == agas_port)
+        {
             // we assume that we need to run the agas server if the user
             // asked for the same network addresses for HPX and AGAS
             run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
         }
-        else if (run_agas_server) {
+        else if (run_agas_server)
+        {
             // otherwise, if the user instructed us to run the AGAS server,
             // we set the AGAS network address to the same value as the HPX
             // network address
-            if (agas_host == HPX_INITIAL_IP_ADDRESS) {
+            if (agas_host == HPX_INITIAL_IP_ADDRESS)
+            {
                 agas_host = hpx_host;
                 agas_port = hpx_port;
             }
         }
-        else if (env.found_batch_environment()) {
+        else if (env.found_batch_environment())
+        {
             // in batch mode, if the network addresses are different and we
             // should not run the AGAS server we assume to be in worker mode
             rtcfg_.mode_ = hpx::runtime_mode_worker;
@@ -1171,12 +1195,14 @@ namespace hpx { namespace util
         ini_config.emplace_back("hpx.agas.address=" + agas_host);
         ini_config.emplace_back("hpx.agas.port=" + std::to_string(agas_port));
 
-        if (run_agas_server) {
+        if (run_agas_server)
+        {
             ini_config.emplace_back("hpx.agas.service_mode=bootstrap");
         }
 
         // we can't run the AGAS server while connecting
-        if (run_agas_server && rtcfg_.mode_ == runtime_mode_connect) {
+        if (run_agas_server && rtcfg_.mode_ == runtime_mode_connect)
+        {
             throw hpx::detail::command_line_error(
                 "Command line option error: can't run AGAS server"
                 "while connecting to a running application.");
@@ -1200,11 +1226,12 @@ namespace hpx { namespace util
             get_runtime_mode_name(rtcfg_.mode_));
 
         bool noshutdown_evaluate = false;
-        if (vm.count("hpx:print-counter-at")) {
+        if (vm.count("hpx:print-counter-at"))
+        {
             std::vector<std::string> print_counters_at =
-                vm["hpx:print-counter-at"].as<std::vector<std::string> >();
+                vm["hpx:print-counter-at"].as<std::vector<std::string>>();
 
-            for (std::string const& s: print_counters_at)
+            for (std::string const& s : print_counters_at)
             {
                 if (0 == std::string("startup").find(s))
                 {
@@ -1226,12 +1253,14 @@ namespace hpx { namespace util
                 throw hpx::detail::command_line_error(hpx::util::format(
                     "Invalid argument for option --hpx:print-counter-at: "
                     "'{1}', allowed values: 'startup', 'shutdown' (default), "
-                    "'noshutdown'", s));
+                    "'noshutdown'",
+                    s));
             }
         }
 
         // if any counters have to be evaluated, always print at the end
-        if (vm.count("hpx:print-counter") || vm.count("hpx:print-counter-reset"))
+        if (vm.count("hpx:print-counter") ||
+            vm.count("hpx:print-counter-reset"))
         {
             if (!noshutdown_evaluate)
                 ini_config.emplace_back("hpx.print_counter.shutdown!=1");
@@ -1239,10 +1268,12 @@ namespace hpx { namespace util
                 ini_config.emplace_back("hpx.print_counter.reset!=1");
         }
 
-        if (debug_clp) {
+        if (debug_clp)
+        {
             std::cerr << "Configuration before runtime start:\n";
             std::cerr << "-----------------------------------\n";
-            for (std::string const& s : ini_config) {
+            for (std::string const& s : ini_config)
+            {
                 std::cerr << s << std::endl;
             }
             std::cerr << "-----------------------------------\n";
@@ -1257,7 +1288,8 @@ namespace hpx { namespace util
         std::vector<std::string>& ini_config)
     {
 #if defined(HPX_HAVE_LOGGING)
-        if (vm.count("hpx:debug-hpx-log")) {
+        if (vm.count("hpx:debug-hpx-log"))
+        {
             ini_config.emplace_back("hpx.logging.console.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-hpx-log"].as<std::string>()));
@@ -1268,7 +1300,8 @@ namespace hpx { namespace util
             ini_config.emplace_back("hpx.logging.level=5");
         }
 
-        if (vm.count("hpx:debug-agas-log")) {
+        if (vm.count("hpx:debug-agas-log"))
+        {
             ini_config.emplace_back("hpx.logging.console.agas.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-agas-log"].as<std::string>()));
@@ -1279,7 +1312,8 @@ namespace hpx { namespace util
             ini_config.emplace_back("hpx.logging.agas.level=5");
         }
 
-        if (vm.count("hpx:debug-parcel-log")) {
+        if (vm.count("hpx:debug-parcel-log"))
+        {
             ini_config.emplace_back("hpx.logging.console.parcel.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-parcel-log"].as<std::string>()));
@@ -1290,7 +1324,8 @@ namespace hpx { namespace util
             ini_config.emplace_back("hpx.logging.parcel.level=5");
         }
 
-        if (vm.count("hpx:debug-timing-log")) {
+        if (vm.count("hpx:debug-timing-log"))
+        {
             ini_config.emplace_back("hpx.logging.console.timing.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-timing-log"].as<std::string>()));
@@ -1301,8 +1336,10 @@ namespace hpx { namespace util
             ini_config.emplace_back("hpx.logging.timing.level=1");
         }
 
-        if (vm.count("hpx:debug-app-log")) {
-            ini_config.emplace_back("hpx.logging.console.application.destination=" +
+        if (vm.count("hpx:debug-app-log"))
+        {
+            ini_config.emplace_back(
+                "hpx.logging.console.application.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-app-log"].as<std::string>()));
             ini_config.emplace_back("hpx.logging.application.destination=" +
@@ -1312,16 +1349,16 @@ namespace hpx { namespace util
             ini_config.emplace_back("hpx.logging.application.level=5");
         }
 #else
-        if (vm.count("hpx:debug-hpx-log") ||
-            vm.count("hpx:debug-agas-log") ||
+        if (vm.count("hpx:debug-hpx-log") || vm.count("hpx:debug-agas-log") ||
             vm.count("hpx:debug-parcel-log") ||
-            vm.count("hpx:debug-timing-log") ||
-            vm.count("hpx:debug-app-log"))
+            vm.count("hpx:debug-timing-log") || vm.count("hpx:debug-app-log"))
         {
+            // clang-format off
             throw hpx::detail::command_line_error(
                 "Command line option error: can't enable logging while it "
                 "was disabled at configuration time. Please re-configure "
                 "HPX using the option -DHPX_WITH_LOGGING=On.");
+            // clang-format on
         }
 #endif
     }
@@ -1334,7 +1371,7 @@ namespace hpx { namespace util
         for (int i = 0; i < argc; ++i)
         {
             // quote only if it contains whitespace
-            std::string arg(argv[i]); //-V108
+            std::string arg(argv[i]);    //-V108
             cmd_line += detail::encode_and_enquote(arg);
 
             if ((i + 1) != argc)
@@ -1352,11 +1389,13 @@ namespace hpx { namespace util
     {
         std::string unregistered_options_cmd_line;
 
-        if (!unregistered_options.empty()) {
+        if (!unregistered_options.empty())
+        {
             typedef std::vector<std::string>::const_iterator iterator_type;
 
-            iterator_type  end = unregistered_options.end();
-            for (iterator_type  it = unregistered_options.begin(); it != end; ++it)
+            iterator_type end = unregistered_options.end();
+            for (iterator_type it = unregistered_options.begin(); it != end;
+                 ++it)
                 unregistered_options_cmd_line +=
                     " " + detail::encode_and_enquote(*it);
 
@@ -1376,27 +1415,33 @@ namespace hpx { namespace util
     bool command_line_handling::handle_help_options(
         hpx::program_options::options_description const& help)
     {
-        if (vm_.count("hpx:help")) {
+        if (vm_.count("hpx:help"))
+        {
             std::string help_option(vm_["hpx:help"].as<std::string>());
-            if (0 == std::string("minimal").find(help_option)) {
+            if (0 == std::string("minimal").find(help_option))
+            {
                 // print static help only
                 std::cout << help << std::endl;
                 return true;
             }
-            else if (0 == std::string("full").find(help_option)) {
+            else if (0 == std::string("full").find(help_option))
+            {
                 // defer printing help until after dynamic part has been
                 // acquired
                 std::ostringstream strm;
                 strm << help << std::endl;
-                ini_config_.emplace_back("hpx.cmd_line_help!=" +
-                    detail::encode_string(strm.str()));
+                ini_config_.emplace_back(
+                    "hpx.cmd_line_help!=" + detail::encode_string(strm.str()));
                 ini_config_.emplace_back(
                     "hpx.cmd_line_help_option!=" + help_option);
             }
-            else {
-                throw hpx::detail::command_line_error(hpx::util::format(
-                    "Invalid argument for option --hpx:help: '{1}', allowed values: "
-                    "'minimal' (default) and 'full'", help_option));
+            else
+            {
+                throw hpx::detail::command_line_error(
+                    hpx::util::format("Invalid argument for option --hpx:help: "
+                                      "'{1}', allowed values: "
+                                      "'minimal' (default) and 'full'",
+                        help_option));
             }
         }
         return false;
@@ -1405,17 +1450,21 @@ namespace hpx { namespace util
     void command_line_handling::handle_attach_debugger()
     {
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
-        if(vm_.count("hpx:attach-debugger"))
+        if (vm_.count("hpx:attach-debugger"))
         {
             std::string option = vm_["hpx:attach-debugger"].as<std::string>();
             if (option != "off" && option != "startup" &&
-                option != "exception" && option != "test-failure") {
+                option != "exception" && option != "test-failure")
+            {
+                // clang-format off
                 std::cerr <<
                     "hpx::init: command line warning: --hpx:attach-debugger: "
                     "invalid option: " << option << ". Allowed values are "
                     "'off', 'startup', 'exception' or 'test-failure'" << std::endl;
+                // clang-format on
             }
-            else {
+            else
+            {
                 if (option == "startup")
                     attach_debugger();
 
@@ -1435,12 +1484,8 @@ namespace hpx { namespace util
 
         // extract all command line arguments from configuration settings and
         // remove them from this list
-        auto it = std::stable_partition(
-            ini_config_.begin(), ini_config_.end(),
-            [](std::string const& e)
-            {
-                return e.find("--hpx:") != 0;
-            });
+        auto it = std::stable_partition(ini_config_.begin(), ini_config_.end(),
+            [](std::string const& e) { return e.find("--hpx:") != 0; });
 
         std::move(it, ini_config_.end(), std::back_inserter(options));
         ini_config_.erase(it, ini_config_.end());
@@ -1474,8 +1519,8 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
-        hpx::program_options::options_description const& desc_cmdline,
-        int argc, char** argv)
+        hpx::program_options::options_description const& desc_cmdline, int argc,
+        char** argv)
     {
         // set the flag signaling that command line parsing has been done
         cmd_line_parsed_ = true;
@@ -1533,8 +1578,9 @@ namespace hpx { namespace util
             // Make sure any aliases defined on the command line get used
             // for the option analysis below.
             std::vector<std::string> cfg;
-            if (prevm.count("hpx:ini")) {
-                cfg = prevm["hpx:ini"].as<std::vector<std::string> >();
+            if (prevm.count("hpx:ini"))
+            {
+                cfg = prevm["hpx:ini"].as<std::vector<std::string>>();
                 cfgmap.add(cfg);
             }
 
@@ -1554,7 +1600,7 @@ namespace hpx { namespace util
 
         // load plugin modules (after first pass of command line handling,
         // so that settings given on command line could propagate to modules)
-        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+        std::vector<std::shared_ptr<plugins::plugin_registry_base>>
             plugin_registries = rtcfg_.load_modules();
 
         // Re-run program option analysis, ini settings (such as aliases)
@@ -1598,11 +1644,13 @@ namespace hpx { namespace util
 
         // help can be printed only after the runtime mode has been set
         if (handle_help_options(help))
-            return 1;     // exit application gracefully
+            return 1;    // exit application gracefully
 
         // print version/copyright information
-        if (vm_.count("hpx:version")) {
-            if(!version_printed_){
+        if (vm_.count("hpx:version"))
+        {
+            if (!version_printed_)
+            {
                 detail::print_version(std::cout);
                 version_printed_ = true;
             }
@@ -1610,8 +1658,10 @@ namespace hpx { namespace util
         }
 
         // print configuration information (static and dynamic)
-        if (vm_.count("hpx:info")) {
-            if(!info_printed_){
+        if (vm_.count("hpx:info"))
+        {
+            if (!info_printed_)
+            {
                 detail::print_info(std::cout, *this);
                 info_printed_ = true;
             }
@@ -1621,4 +1671,4 @@ namespace hpx { namespace util
         // all is good
         return 0;
     }
-}}
+}}    // namespace hpx::util

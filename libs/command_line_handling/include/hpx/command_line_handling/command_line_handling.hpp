@@ -8,12 +8,12 @@
 #define HPX_UTIL_COMMAND_LINE_HANDLING_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/util/manage_config.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/util/manage_config.hpp>
 
 #include <cstddef>
 #include <string>
@@ -21,8 +21,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     namespace detail {
         HPX_EXPORT bool check_mpi_environment(runtime_configuration const& cfg);
     }
@@ -46,20 +45,21 @@ namespace hpx { namespace util
     struct command_line_handling
     {
         command_line_handling()
-          : rtcfg_(nullptr, runtime_mode_default),
-            node_(std::size_t(-1)),
-            num_threads_(1),
-            num_cores_(1),
-            num_localities_(1),
-            pu_step_(1),
-            pu_offset_(std::size_t(-1)),
-            numa_sensitive_(0),
-            use_process_mask_(false),
-            cmd_line_parsed_(false),
-            info_printed_(false),
-            version_printed_(false),
-            parse_result_(0)
-        {}
+          : rtcfg_(nullptr, runtime_mode_default)
+          , node_(std::size_t(-1))
+          , num_threads_(1)
+          , num_cores_(1)
+          , num_localities_(1)
+          , pu_step_(1)
+          , pu_offset_(std::size_t(-1))
+          , numa_sensitive_(0)
+          , use_process_mask_(false)
+          , cmd_line_parsed_(false)
+          , info_printed_(false)
+          , version_printed_(false)
+          , parse_result_(0)
+        {
+        }
 
         int call(hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv);
@@ -68,9 +68,8 @@ namespace hpx { namespace util
         util::runtime_configuration rtcfg_;
 
         std::vector<std::string> ini_config_;
-        util::function_nonser<
-            int(hpx::program_options::variables_map& vm)
-        > hpx_main_f_;
+        util::function_nonser<int(hpx::program_options::variables_map& vm)>
+            hpx_main_f_;
 
         std::size_t node_;
         std::size_t num_threads_;
@@ -108,6 +107,6 @@ namespace hpx { namespace util
         std::vector<std::string> preprocess_config_settings(
             int argc, char** argv);
     };
-}}
+}}    // namespace hpx::util
 
 #endif /*HPX_UTIL_COMMAND_LINE_HANDLING_HPP*/
