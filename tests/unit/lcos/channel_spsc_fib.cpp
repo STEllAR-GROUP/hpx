@@ -87,8 +87,8 @@ void consume_numbers(int n, hpx::lcos::local::channel_spsc<bool>& c1,
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    hpx::lcos::local::channel_spsc<bool> c1(0);
-    hpx::lcos::local::channel_spsc<int> c2(0);
+    hpx::lcos::local::channel_spsc<bool> c1(1);
+    hpx::lcos::local::channel_spsc<int> c2(1);
     hpx::lcos::local::channel_spsc<int> c3(5);
 
     hpx::future<void> producer =

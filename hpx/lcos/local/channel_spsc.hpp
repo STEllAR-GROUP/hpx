@@ -6,10 +6,11 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#if !defined(HPX_LCOS_LOCAL_CHANNEL_spsc_NOV_24_2019_1141AM)
-#define HPX_LCOS_LOCAL_CHANNEL_spsc_NOV_24_2019_1141AM
+#if !defined(HPX_LCOS_LOCAL_CHANNEL_SPSC_NOV_24_2019_1141AM)
+#define HPX_LCOS_LOCAL_CHANNEL_SPSC_NOV_24_2019_1141AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/concurrency.hpp>
 #include <hpx/errors.hpp>
 
@@ -46,22 +47,14 @@ namespace hpx { namespace lcos { namespace local {
             return head == tail_.data_.load(std::memory_order_acquire);
         }
 
-        bool is_full_unbuffered() const noexcept
-        {
-            return head_.data_.load(std::memory_order_relaxed) != 0;
-        }
-
-        bool is_empty_unbuffered() const noexcept
-        {
-            return head_.data_.load(std::memory_order_acquire) == 0;
-        }
-
     public:
         explicit channel_spsc(std::size_t size)
           : size_(size + 1)
           , buffer_(new T[size + 1])
           , closed_(false)
         {
+            HPX_ASSERT(size != 0);
+
             head_.data_.store(0, std::memory_order_relaxed);
             tail_.data_.store(0, std::memory_order_relaxed);
         }
@@ -112,44 +105,25 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            if (size_ <= 1)
+            std::size_t head = head_.data_.load(std::memory_order_relaxed);
+
+            if (is_empty(head))
             {
-                // unbuffered operation
-                if (is_empty_unbuffered())
-                {
-                    return false;
-                }
-
-                if (val == nullptr)
-                {
-                    return true;
-                }
-
-                *val = std::move(buffer_[0]);
-                head_.data_.store(0, std::memory_order_release);
+                return false;
             }
-            else
+
+            if (val == nullptr)
             {
-                // buffered operation
-                std::size_t head = head_.data_.load(std::memory_order_relaxed);
-
-                if (is_empty(head))
-                {
-                    return false;
-                }
-
-                if (val == nullptr)
-                {
-                    return true;
-                }
-
-                *val = std::move(buffer_[head]);
-                if (++head >= size_)
-                {
-                    head = 0;
-                }
-                head_.data_.store(head, std::memory_order_release);
+                return true;
             }
+
+            *val = std::move(buffer_[head]);
+            if (++head >= size_)
+            {
+                head = 0;
+            }
+            head_.data_.store(head, std::memory_order_release);
+
             return true;
         }
 
@@ -160,34 +134,20 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            if (size_ <= 1)
+            std::size_t tail = tail_.data_.load(std::memory_order_relaxed);
+
+            if (is_full(tail))
             {
-                // unbuffered operation
-                if (is_full_unbuffered())
-                {
-                    return false;
-                }
-
-                buffer_[0] = std::move(t);
-                head_.data_.store(1, std::memory_order_release);
+                return false;
             }
-            else
+
+            buffer_[tail] = std::move(t);
+            if (++tail >= size_)
             {
-                // buffered operation
-                std::size_t tail = tail_.data_.load(std::memory_order_relaxed);
-
-                if (is_full(tail))
-                {
-                    return false;
-                }
-
-                buffer_[tail] = std::move(t);
-                if (++tail >= size_)
-                {
-                    tail = 0;
-                }
-                tail_.data_.store(tail, std::memory_order_release);
+                tail = 0;
             }
+            tail_.data_.store(tail, std::memory_order_release);
+
             return true;
         }
 

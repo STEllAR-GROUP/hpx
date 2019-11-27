@@ -10,6 +10,7 @@
 #define HPX_LCOS_LOCAL_CHANNEL_MPMC_NOV_24_2019_1141AM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/concurrency.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -27,7 +28,7 @@ namespace hpx { namespace lcos { namespace local {
     // This channel is bounded to a size given at construction time and supports
     // multiple producers and multiple consumers. The data is stored in a
     // ring-buffer.
-    template <typename T, typename Mutex = lcos::local::spinlock>
+    template <typename T, typename Mutex = util::spinlock>
     class base_channel_mpmc
     {
     private:
@@ -48,22 +49,14 @@ namespace hpx { namespace lcos { namespace local {
             return head == tail_.data_;
         }
 
-        bool is_full_unbuffered() const noexcept
-        {
-            return head_.data_ != 0;
-        }
-
-        bool is_empty_unbuffered() const noexcept
-        {
-            return head_.data_ == 0;
-        }
-
     public:
         explicit base_channel_mpmc(std::size_t size)
           : size_(size + 1)
           , buffer_(new T[size + 1])
           , closed_(false)
         {
+            HPX_ASSERT(size != 0);
+
             head_.data_ = 0;
             tail_.data_ = 0;
         }
@@ -107,44 +100,25 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            if (size_ <= 1)
+            std::size_t head = head_.data_;
+
+            if (is_empty(head))
             {
-                // unbuffered operation
-                if (is_empty_unbuffered())
-                {
-                    return false;
-                }
-
-                if (val == nullptr)
-                {
-                    return true;
-                }
-
-                *val = std::move(buffer_[0]);
-                head_.data_ = 0;
+                return false;
             }
-            else
+
+            if (val == nullptr)
             {
-                // buffered operation
-                std::size_t head = head_.data_;
-
-                if (is_empty(head))
-                {
-                    return false;
-                }
-
-                if (val == nullptr)
-                {
-                    return true;
-                }
-
-                *val = std::move(buffer_[head]);
-                if (++head >= size_)
-                {
-                    head = 0;
-                }
-                head_.data_ = head;
+                return true;
             }
+
+            *val = std::move(buffer_[head]);
+            if (++head >= size_)
+            {
+                head = 0;
+            }
+            head_.data_ = head;
+
             return true;
         }
 
@@ -156,34 +130,20 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            if (size_ <= 1)
+            std::size_t tail = tail_.data_;
+
+            if (is_full(tail))
             {
-                // unbuffered operation
-                if (is_full_unbuffered())
-                {
-                    return false;
-                }
-
-                buffer_[0] = std::move(t);
-                head_.data_ = 1;
+                return false;
             }
-            else
+
+            buffer_[tail] = std::move(t);
+            if (++tail >= size_)
             {
-                // buffered operation
-                std::size_t tail = tail_.data_;
-
-                if (is_full(tail))
-                {
-                    return false;
-                }
-
-                buffer_[tail] = std::move(t);
-                if (++tail >= size_)
-                {
-                    tail = 0;
-                }
-                tail_.data_ = tail;
+                tail = 0;
             }
+            tail_.data_ = tail;
+
             return true;
         }
 
