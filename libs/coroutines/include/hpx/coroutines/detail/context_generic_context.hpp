@@ -44,13 +44,13 @@
 
 extern "C" {
 void* __splitstack_makecontext(
-    std::size_t, void* [HPX_COROUTINES_SEGMENTS], std::size_t*);
-void __splitstack_releasecontext(void* [HPX_COROUTINES_SEGMENTS]);
-void __splitstack_resetcontext(void* [HPX_COROUTINES_SEGMENTS]);
+    std::size_t, void * [HPX_COROUTINES_SEGMENTS], std::size_t*);
+void __splitstack_releasecontext(void * [HPX_COROUTINES_SEGMENTS]);
+void __splitstack_resetcontext(void * [HPX_COROUTINES_SEGMENTS]);
 void __splitstack_block_signals_context(
-    void* [HPX_COROUTINES_SEGMENTS], int* new_value, int* old_value);
-void __splitstack_getcontext(void* [HPX_COROUTINES_SEGMENTS]);
-void __splitstack_setcontext(void* [HPX_COROUTINES_SEGMENTS]);
+    void * [HPX_COROUTINES_SEGMENTS], int* new_value, int* old_value);
+void __splitstack_getcontext(void * [HPX_COROUTINES_SEGMENTS]);
+void __splitstack_setcontext(void * [HPX_COROUTINES_SEGMENTS]);
 }
 
 #if !defined(SIGSTKSZ)

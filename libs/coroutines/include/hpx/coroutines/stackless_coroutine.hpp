@@ -233,8 +233,8 @@ namespace hpx { namespace threads { namespace coroutines {
 
 namespace hpx { namespace threads { namespace coroutines {
 
-    HPX_FORCEINLINE stackless_coroutine::result_type
-    stackless_coroutine::operator()(arg_type arg)
+    HPX_FORCEINLINE stackless_coroutine::result_type stackless_coroutine::
+    operator()(arg_type arg)
     {
         HPX_ASSERT(is_ready());
 
