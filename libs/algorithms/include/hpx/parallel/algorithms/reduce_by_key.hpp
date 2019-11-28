@@ -10,7 +10,7 @@
 #define HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015
 //
 #include <hpx/config.hpp>
-#include <hpx/execution/parallel/executors/execution.hpp>
+#include <hpx/execution/executors/execution.hpp>
 //
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/range.hpp>

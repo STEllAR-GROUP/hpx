@@ -44,8 +44,8 @@
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <hpx/execution/parallel/executors/execution.hpp>
-#include <hpx/execution/parallel/executors/parallel_executor.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/parallel_executor.hpp>
 
 #include <boost/ref.hpp>
 

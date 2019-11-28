@@ -16,10 +16,10 @@
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <hpx/execution/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/execution/parallel/execution_policy.hpp>
-#include <hpx/execution/parallel/executors/execution.hpp>
-#include <hpx/execution/parallel/executors/execution_parameters.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/execution_policy.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>

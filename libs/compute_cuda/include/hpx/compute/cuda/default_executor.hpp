@@ -20,7 +20,7 @@
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/execution/parallel/executors/execution.hpp>
+#include <hpx/execution/executors/execution.hpp>
 
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/cuda/default_executor_parameters.hpp>

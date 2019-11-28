@@ -6,16 +6,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/parallel/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/algorithms/detail/is_negative.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message( \
     "The header hpx/parallel/algorithms/detail/is_negative.hpp is deprecated, \
-    please include hpx/execution/parallel/algorithms/detail/is_negative.hpp instead")
+    please include hpx/execution/algorithms/detail/is_negative.hpp instead")
 #else
 #warning \
     "The header hpx/parallel/algorithms/detail/is_negative.hpp is deprecated, \
-    please include hpx/execution/parallel/algorithms/detail/is_negative.hpp instead"
+    please include hpx/execution/algorithms/detail/is_negative.hpp instead"
 #endif
 #endif

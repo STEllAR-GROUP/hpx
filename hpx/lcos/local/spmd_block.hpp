@@ -10,7 +10,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/mutex.hpp>
-#include <hpx/execution/parallel/execution_policy.hpp>
+#include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/pack.hpp>

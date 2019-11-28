@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 
-#include <hpx/execution/parallel/execution_policy.hpp>
+#include <hpx/execution/execution_policy.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail {

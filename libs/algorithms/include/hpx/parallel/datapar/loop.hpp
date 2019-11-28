@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/execution/parallel/datapar/execution_policy_fwd.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/datapar/execution_policy_fwd.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/execution/parallel/traits/vector_pack_alignment_size.hpp>
 #include <hpx/execution/parallel/traits/vector_pack_load_store.hpp>

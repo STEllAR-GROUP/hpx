@@ -6,16 +6,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message( \
     "The header hpx/parallel/algorithms/detail/predicates.hpp is deprecated, \
-    please include hpx/execution/parallel/algorithms/detail/predicates.hpp instead")
+    please include hpx/execution/algorithms/detail/predicates.hpp instead")
 #else
 #warning \
     "The header hpx/parallel/algorithms/detail/predicates.hpp is deprecated, \
-    please include hpx/execution/parallel/algorithms/detail/predicates.hpp instead"
+    please include hpx/execution/algorithms/detail/predicates.hpp instead"
 #endif
 #endif

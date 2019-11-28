@@ -20,8 +20,8 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <hpx/execution/parallel/executors/execution.hpp>
-#include <hpx/execution/parallel/executors/parallel_executor.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/parallel_executor.hpp>
 
 #include <type_traits>
 #include <utility>

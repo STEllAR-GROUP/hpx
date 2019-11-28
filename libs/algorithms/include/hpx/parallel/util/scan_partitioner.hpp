@@ -17,9 +17,9 @@
 #include <hpx/errors.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <hpx/execution/parallel/execution_policy.hpp>
-#include <hpx/execution/parallel/executors/execution.hpp>
-#include <hpx/execution/parallel/executors/execution_parameters.hpp>
+#include <hpx/execution/execution_policy.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>

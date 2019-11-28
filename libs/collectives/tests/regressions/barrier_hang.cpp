@@ -7,8 +7,8 @@
 #include <hpx/collectives.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/execution/parallel/execution.hpp>
-#include <hpx/execution/parallel/execution_policy.hpp>
+#include <hpx/execution/execution.hpp>
+#include <hpx/execution/execution_policy.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>

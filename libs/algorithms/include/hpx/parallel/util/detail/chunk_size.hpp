@@ -14,10 +14,10 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/execution/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/execution/parallel/algorithms/detail/predicates.hpp>
-#include <hpx/execution/parallel/executors/execution_information.hpp>
-#include <hpx/execution/parallel/executors/execution_parameters.hpp>
+#include <hpx/execution/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/executors/execution_information.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/parallel/util/detail/chunk_size_iterator.hpp>
 
 #include <algorithm>

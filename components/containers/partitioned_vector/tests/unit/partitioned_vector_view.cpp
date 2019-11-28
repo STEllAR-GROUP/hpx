@@ -10,7 +10,7 @@
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/partitioned_vector_view.hpp>
 #include <hpx/collectives/spmd_block.hpp>
-#include <hpx/execution/parallel/execution_policy.hpp>
+#include <hpx/execution/execution_policy.hpp>
 
 #include <hpx/testing.hpp>
 

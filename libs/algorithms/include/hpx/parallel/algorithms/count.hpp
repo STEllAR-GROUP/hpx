@@ -18,7 +18,7 @@
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/execution/parallel/execution_policy.hpp>
+#include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/execution/parallel/traits/vector_pack_count_bits.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

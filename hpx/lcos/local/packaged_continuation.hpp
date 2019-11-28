@@ -21,8 +21,8 @@
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <hpx/execution/parallel/executors/execution.hpp>
-#include <hpx/execution/parallel/executors/post_policy_dispatch.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/post_policy_dispatch.hpp>
 
 #include <exception>
 #include <functional>

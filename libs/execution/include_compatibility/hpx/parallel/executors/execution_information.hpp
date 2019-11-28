@@ -6,16 +6,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/parallel/executors/execution_information.hpp>
+#include <hpx/execution/executors/execution_information.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message( \
     "The header hpx/parallel/executors/execution_information.hpp is deprecated, \
-    please include hpx/execution/parallel/executors/execution_information.hpp instead")
+    please include hpx/execution/executors/execution_information.hpp instead")
 #else
 #warning \
     "The header hpx/parallel/executors/execution_information.hpp is deprecated, \
-    please include hpx/execution/parallel/executors/execution_information.hpp instead"
+    please include hpx/execution/executors/execution_information.hpp instead"
 #endif
 #endif

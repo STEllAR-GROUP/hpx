@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/execution/parallel/executors/thread_pool_os_executors.hpp>
+#include <hpx/execution/executors/thread_pool_os_executors.hpp>
 #include <hpx/testing.hpp>
 
 #include <algorithm>
