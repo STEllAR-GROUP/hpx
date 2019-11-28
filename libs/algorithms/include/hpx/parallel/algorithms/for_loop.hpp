@@ -25,11 +25,11 @@
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/annotated_function.hpp>
 
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
-#include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>

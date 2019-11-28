@@ -10,9 +10,9 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_FILL_FEB_23_2018_0057AM
 
 #include <hpx/config.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
 
 #include <hpx/parallel/algorithms/fill.hpp>
 

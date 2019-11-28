@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/collectives.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/hpx_main.hpp>
 #include <hpx/execution/execution.hpp>
 #include <hpx/execution/execution_policy.hpp>
+#include <hpx/hpx.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>

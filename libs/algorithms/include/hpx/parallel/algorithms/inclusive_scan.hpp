@@ -16,8 +16,8 @@
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/util/unwrap.hpp>
 
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/execution/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>

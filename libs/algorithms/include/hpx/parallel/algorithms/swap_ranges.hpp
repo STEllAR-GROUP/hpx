@@ -12,9 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
+#include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>

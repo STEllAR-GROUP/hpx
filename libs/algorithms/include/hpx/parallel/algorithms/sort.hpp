@@ -18,13 +18,13 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/exception_list.hpp>
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

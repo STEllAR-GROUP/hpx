@@ -13,9 +13,9 @@
 
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
+#include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
-#include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

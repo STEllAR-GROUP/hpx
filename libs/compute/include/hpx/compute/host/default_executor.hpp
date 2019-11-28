@@ -8,9 +8,9 @@
 #define HPX_COMPUTE_HOST_DEFAULT_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/lcos/future.hpp>
 
 #include <hpx/compute/host/target.hpp>
 

@@ -19,8 +19,8 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/execution/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
