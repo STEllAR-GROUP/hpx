@@ -11,7 +11,23 @@
 synchronization
 ===============
 
-TODO: High-level description of the library.
+This module provides synchronization primitives which should be used rather than
+the C++ standard ones:
+
+* :cpp:class:`hpx::lcos::local::barrier`
+* :cpp:class:`hpx::lcos::local::condition_variable`
+* :cpp:class:`hpx::lcos::local::counting_semaphore`
+* :cpp:class:`hpx::lcos::local::event`
+* :cpp:class:`hpx::lcos::local::latch`
+* :cpp:class:`hpx::lcos::local::mutex`
+* :cpp:struct:`hpx::lcos::local::no_mutex`
+* :cpp:struct:`hpx::lcos::local::once_flag`
+* :cpp:struct:`hpx::lcos::local::recursive_mutex`
+* :cpp:class:`hpx::lcos::local::shared_mutex`
+* :cpp:class:`hpx::lcos::local::sliding_semaphore`
+* :cpp:struct:`hpx::lcos::local::spinlock` (`std::mutex` compatible spinlock)
+* :cpp:struct:`hpx::lcos::local::spinlock_no_backoff` (`boost::mutex` compatible spinlock)
+* :cpp:class:`hpx::lcos::local::spinlock_pool`
 
 See the :ref:`API reference <libs_synchronization_api>` of this module for more
 details.
