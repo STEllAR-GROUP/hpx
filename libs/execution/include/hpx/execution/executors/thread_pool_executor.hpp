@@ -14,16 +14,17 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async_launch_policy_dispatch.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/executors/fused_bulk_execute.hpp>
+#include <hpx/execution/executors/post_policy_dispatch.hpp>
+#include <hpx/execution/executors/static_chunk_size.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/execution/executors/fused_bulk_execute.hpp>
-#include <hpx/execution/executors/post_policy_dispatch.hpp>
-#include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -33,7 +34,6 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

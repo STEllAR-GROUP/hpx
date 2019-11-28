@@ -8,11 +8,11 @@
 #define HPX_PARALLEL_EXECUTORS_THIS_THREAD_EXECUTORS_JUL_16_2015_0809PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/thread_execution.hpp>
 #include <hpx/execution/executors/thread_execution_information.hpp>
 #include <hpx/execution/executors/thread_timed_execution.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/executors/this_thread_executors.hpp>
 
 namespace hpx { namespace parallel { namespace execution {

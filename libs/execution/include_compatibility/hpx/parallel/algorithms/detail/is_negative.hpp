@@ -10,11 +10,11 @@
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/parallel/algorithms/detail/is_negative.hpp is deprecated, \
     please include hpx/execution/algorithms/detail/is_negative.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/parallel/algorithms/detail/is_negative.hpp is deprecated, \
     please include hpx/execution/algorithms/detail/is_negative.hpp instead"
 #endif

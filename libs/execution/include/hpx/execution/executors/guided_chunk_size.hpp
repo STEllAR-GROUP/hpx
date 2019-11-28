@@ -10,8 +10,8 @@
 #define HPX_PARALLEL_GUIDED_CHUNK_SIZE_AUG_01_2015_0238PM
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <algorithm>
 #include <cstddef>

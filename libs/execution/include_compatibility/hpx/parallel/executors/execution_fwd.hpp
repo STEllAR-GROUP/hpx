@@ -10,12 +10,11 @@
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/parallel/executors/execution_fwd.hpp is deprecated, \
     please include hpx/execution/executors/execution_fwd.hpp instead")
 #else
-#warning \
-    "The header hpx/parallel/executors/execution_fwd.hpp is deprecated, \
+#warning "The header hpx/parallel/executors/execution_fwd.hpp is deprecated, \
     please include hpx/execution/executors/execution_fwd.hpp instead"
 #endif
 #endif

@@ -13,12 +13,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor_parameters.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/execution/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>

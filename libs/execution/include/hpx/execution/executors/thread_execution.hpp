@@ -15,14 +15,14 @@
 #include <hpx/lcos/dataflow.hpp>
 #endif
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

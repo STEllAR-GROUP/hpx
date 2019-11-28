@@ -10,12 +10,11 @@
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/parallel/traits/vector_pack_type.hpp is deprecated, \
     please include hpx/execution/parallel/traits/vector_pack_type.hpp instead")
 #else
-#warning \
-    "The header hpx/parallel/traits/vector_pack_type.hpp is deprecated, \
+#warning "The header hpx/parallel/traits/vector_pack_type.hpp is deprecated, \
     please include hpx/execution/parallel/traits/vector_pack_type.hpp instead"
 #endif
 #endif

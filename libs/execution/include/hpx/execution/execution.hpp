@@ -7,8 +7,8 @@
 #if !defined(HPX_PARALLEL_EXECUTION_DEC_25_2106_0102PM)
 #define HPX_PARALLEL_EXECUTION_DEC_25_2106_0102PM
 
-#include <hpx/execution/executors.hpp>
 #include <hpx/execution/execution.hpp>
+#include <hpx/execution/executors.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/thread_execution.hpp>

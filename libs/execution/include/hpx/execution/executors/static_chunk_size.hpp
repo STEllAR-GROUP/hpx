@@ -10,8 +10,8 @@
 #define HPX_PARALLEL_STATIC_CHUNK_SIZE_JUL_31_2015_0740PM
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
 

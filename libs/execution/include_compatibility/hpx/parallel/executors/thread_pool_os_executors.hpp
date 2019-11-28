@@ -10,11 +10,11 @@
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/parallel/executors/thread_pool_os_executors.hpp is deprecated, \
     please include hpx/execution/executors/thread_pool_os_executors.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/parallel/executors/thread_pool_os_executors.hpp is deprecated, \
     please include hpx/execution/executors/thread_pool_os_executors.hpp instead"
 #endif

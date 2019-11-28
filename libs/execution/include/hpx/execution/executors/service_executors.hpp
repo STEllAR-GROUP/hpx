@@ -10,11 +10,11 @@
 #define HPX_PARALLEL_EXECUTORS_SERVICE_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/executors/thread_execution.hpp>
-#include <hpx/runtime/threads/executors/service_executors.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/threads/executors/service_executors.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
     /// A \a service_executor exposes one of the predefined HPX thread pools

@@ -10,12 +10,10 @@
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/traits/is_timed_executor.hpp is deprecated, \
+#pragma message("The header hpx/traits/is_timed_executor.hpp is deprecated, \
     please include hpx/execution/traits/is_timed_executor.hpp instead")
 #else
-#warning \
-    "The header hpx/traits/is_timed_executor.hpp is deprecated, \
+#warning "The header hpx/traits/is_timed_executor.hpp is deprecated, \
     please include hpx/execution/traits/is_timed_executor.hpp instead"
 #endif
 #endif

@@ -10,11 +10,11 @@
 #define HPX_PARALLEL_EXECUTORS_POOL_EXECUTOR_FEB_17_2018_0327PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/thread_execution.hpp>
 #include <hpx/execution/executors/thread_execution_information.hpp>
 #include <hpx/execution/executors/thread_timed_execution.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution {

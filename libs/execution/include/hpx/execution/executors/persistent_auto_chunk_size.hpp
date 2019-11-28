@@ -10,9 +10,9 @@
 #define HPX_PARALLEL_PERSISTENT_AUTO_CHUNK_SIZE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/execution/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/execution/traits/is_executor_parameters.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -23,15 +23,15 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
 #endif
+#include <hpx/execution/executors/fused_bulk_execute.hpp>
+#include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/execution/executors/fused_bulk_execute.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/unwrap.hpp>

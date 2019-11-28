@@ -10,11 +10,11 @@
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/parallel/traits/vector_pack_alignment_size.hpp is deprecated, \
     please include hpx/execution/parallel/traits/vector_pack_alignment_size.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/parallel/traits/vector_pack_alignment_size.hpp is deprecated, \
     please include hpx/execution/parallel/traits/vector_pack_alignment_size.hpp instead"
 #endif

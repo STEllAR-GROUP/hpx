@@ -10,11 +10,11 @@
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/parallel/algorithms/detail/predicates.hpp is deprecated, \
     please include hpx/execution/algorithms/detail/predicates.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/parallel/algorithms/detail/predicates.hpp is deprecated, \
     please include hpx/execution/algorithms/detail/predicates.hpp instead"
 #endif
