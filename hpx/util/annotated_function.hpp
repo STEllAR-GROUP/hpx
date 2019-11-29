@@ -19,7 +19,6 @@
 #include <hpx/util/thread_description.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
-#include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #elif defined(HPX_HAVE_APEX)
 #include <hpx/util/external_timer.hpp>

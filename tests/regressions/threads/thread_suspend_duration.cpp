@@ -9,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/lcos/local/barrier.hpp>
+#include <hpx/synchronization/barrier.hpp>
 
 #include <chrono>
 #include <cstddef>

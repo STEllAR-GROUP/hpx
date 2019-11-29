@@ -10,7 +10,8 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 
 #include <algorithm>
 #include <cstddef>

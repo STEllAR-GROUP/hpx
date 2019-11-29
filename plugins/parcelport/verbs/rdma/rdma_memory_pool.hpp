@@ -7,8 +7,8 @@
 #ifndef HPX_PARCELSET_POLICIES_VERBS_MEMORY_POOL
 #define HPX_PARCELSET_POLICIES_VERBS_MEMORY_POOL
 
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 //
 #include <atomic>
 #include <stack>

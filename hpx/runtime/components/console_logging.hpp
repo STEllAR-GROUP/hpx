@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>

@@ -8,7 +8,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/local_lcos/packaged_task.hpp>
 
 #include <cstddef>
 #include <cstdint>

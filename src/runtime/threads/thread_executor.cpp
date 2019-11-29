@@ -6,12 +6,12 @@
 
 #include <hpx/runtime/threads/thread_executor.hpp>
 
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 
 #include <cstddef>
 #include <mutex>

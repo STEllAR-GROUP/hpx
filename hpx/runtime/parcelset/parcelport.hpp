@@ -16,7 +16,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/runtime/applier_fwd.hpp>

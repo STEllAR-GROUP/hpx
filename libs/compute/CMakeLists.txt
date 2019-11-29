@@ -57,8 +57,14 @@ add_hpx_module(compute
     hpx_program_options
     hpx_resource_partitioner
     hpx_serialization
+    hpx_synchronization
     hpx_threadmanager
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
 
+# Temporary since the module still depends on some runtime files
+target_link_libraries(hpx_compute PUBLIC
+  hpx_static_reinit
+  hpx_local_lcos
+  )

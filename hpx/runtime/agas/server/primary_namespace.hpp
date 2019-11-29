@@ -13,7 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/actions/component_action.hpp>

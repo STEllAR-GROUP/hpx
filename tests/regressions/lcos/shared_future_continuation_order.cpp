@@ -8,7 +8,7 @@
 // order as they have been attached.
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/include/local_lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>

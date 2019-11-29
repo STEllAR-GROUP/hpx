@@ -11,7 +11,7 @@
 
 #include <hpx/datastructures/any.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
 #include <map>

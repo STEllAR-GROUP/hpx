@@ -33,17 +33,14 @@ set(tests
     future_serialization_1898
     future_unwrap_878
     future_unwrap_1182
-    ignore_while_locked_1485
     lifetime_588
     lifetime_588_1
     promise_leak_996
     promise_1620
     receive_buffer_1733
-    safely_destroy_promise_1481
     set_hpx_limit_798
     shared_future_continuation_order
     shared_future_then_2166
-    shared_mutex_1702
     shared_stated_leaked_1211
     shared_future_then_with_executor_3634
     sliding_semaphore_2338
@@ -69,13 +66,10 @@ set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
 set(dataflow_recursion_1613_PARAMETERS THREADS_PER_LOCALITY 2)
 set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
 set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
-set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
-set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
-set(shared_mutex_1702_LIBRARIES hpx::boost)
 set(sliding_semaphore_2338_PARAMETERS THREADS_PER_LOCALITY 2)
 set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)

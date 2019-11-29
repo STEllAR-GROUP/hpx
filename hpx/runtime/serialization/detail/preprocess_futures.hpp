@@ -11,8 +11,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/promise.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/local_lcos/promise.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>
 
 #include <cstddef>

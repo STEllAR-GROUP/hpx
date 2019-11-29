@@ -36,6 +36,7 @@ set(HPX_LIBS
   hardware
   hashing
   iterator_support
+  local_lcos
   logging
   memory
   plugin
@@ -45,7 +46,9 @@ set(HPX_LIBS
   resource_partitioner
   segmented_algorithms
   serialization
+  static_reinit
   statistics
+  synchronization
   testing
   thread_support
   threadmanager

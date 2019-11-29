@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #include <hpx/util_fwd.hpp>
 

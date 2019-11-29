@@ -12,9 +12,9 @@
 #if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/affinity/affinity_data.hpp>
+#include <hpx/synchronization/counting_semaphore.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/timing/steady_clock.hpp>

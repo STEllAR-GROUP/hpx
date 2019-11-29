@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/include/future.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
 

@@ -39,6 +39,7 @@ All modules
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
    /libs/iterator_support/docs/index.rst
+   /libs/local_lcos/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
    /libs/plugin/docs/index.rst
@@ -48,7 +49,9 @@ All modules
    /libs/resource_partitioner/docs/index.rst
    /libs/segmented_algorithms/docs/index.rst
    /libs/serialization/docs/index.rst
+   /libs/static_reinit/docs/index.rst
    /libs/statistics/docs/index.rst
+   /libs/synchronization/docs/index.rst
    /libs/testing/docs/index.rst
    /libs/thread_support/docs/index.rst
    /libs/threadmanager/docs/index.rst

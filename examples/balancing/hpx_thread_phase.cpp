@@ -7,8 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/lcos/local/barrier.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/barrier.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/functional/bind.hpp>
 
 #include <boost/lockfree/queue.hpp>

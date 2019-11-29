@@ -19,7 +19,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 
 #include <cstddef>
 #include <exception>

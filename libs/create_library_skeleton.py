@@ -275,6 +275,7 @@ endif()
 '''
 
 libs_cmakelists += '''
+hpx_info("")
 hpx_info("Configuring modules:")
 
 # variables needed for modules.cpp

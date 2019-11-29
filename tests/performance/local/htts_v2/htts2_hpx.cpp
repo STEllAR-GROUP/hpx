@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/local/barrier.hpp>
+#include <hpx/synchronization/barrier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/format.hpp>

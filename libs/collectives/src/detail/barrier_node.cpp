@@ -9,6 +9,7 @@
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/local_lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>

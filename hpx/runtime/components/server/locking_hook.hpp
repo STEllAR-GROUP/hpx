@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
