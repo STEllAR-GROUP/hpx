@@ -9,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/lcos/local/channel_spsc.hpp>
+#include <hpx/synchronization/channel_mpsc.hpp>
 #include <hpx/timing.hpp>
 
 #include <cstddef>
@@ -31,7 +31,7 @@ struct data
 constexpr int NUM_TESTS = 100000000;
 
 ///////////////////////////////////////////////////////////////////////////////
-inline data channel_get(hpx::lcos::local::channel_spsc<data> const& c)
+inline data channel_get(hpx::lcos::local::channel_mpsc<data> const& c)
 {
     data result;
     while (!c.get(&result))
@@ -41,7 +41,7 @@ inline data channel_get(hpx::lcos::local::channel_spsc<data> const& c)
     return result;
 }
 
-inline void channel_set(hpx::lcos::local::channel_spsc<data>& c, data&& val)
+inline void channel_set(hpx::lcos::local::channel_mpsc<data>& c, data&& val)
 {
     while (!c.set(std::move(val)))    // NOLINT
     {
@@ -51,7 +51,7 @@ inline void channel_set(hpx::lcos::local::channel_spsc<data>& c, data&& val)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Produce
-double thread_func_0(hpx::lcos::local::channel_spsc<data>& c)
+double thread_func_0(hpx::lcos::local::channel_mpsc<data>& c)
 {
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
@@ -66,7 +66,7 @@ double thread_func_0(hpx::lcos::local::channel_spsc<data>& c)
 }
 
 // Consume
-double thread_func_1(hpx::lcos::local::channel_spsc<data>& c)
+double thread_func_1(hpx::lcos::local::channel_mpsc<data>& c)
 {
     std::uint64_t start = hpx::util::high_resolution_clock::now();
 
@@ -86,7 +86,7 @@ double thread_func_1(hpx::lcos::local::channel_spsc<data>& c)
 
 int main(int argc, char* argv[])
 {
-    hpx::lcos::local::channel_spsc<data> c(10000);
+    hpx::lcos::local::channel_mpsc<data> c(10000);
 
     hpx::future<double> producer = hpx::async(thread_func_0, std::ref(c));
     hpx::future<double> consumer = hpx::async(thread_func_1, std::ref(c));

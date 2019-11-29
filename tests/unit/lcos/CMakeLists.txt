@@ -23,12 +23,6 @@ set(tests
     async_remote_client
     async_unwrap_result
     channel
-    channel_mpmc_fib
-    channel_mpmc_shift
-    channel_mpsc_fib
-    channel_mpsc_shift
-    channel_spsc_fib
-    channel_spsc_shift
     client_then
     future
     future_ref
@@ -79,13 +73,6 @@ set(async_remote_PARAMETERS LOCALITIES 2)
 set(async_remote_client_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_client_PARAMETERS LOCALITIES 2)
-
-set(channel_mpmc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
-set(channel_mpmc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
-set(channel_mpsc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
-set(channel_mpsc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
-set(channel_spsc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
-set(channel_spsc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)

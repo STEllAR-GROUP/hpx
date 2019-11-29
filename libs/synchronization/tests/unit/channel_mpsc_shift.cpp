@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/local/channel_spsc.hpp>
+#include <hpx/synchronization/channel_mpsc.hpp>
 
 #include <hpx/testing.hpp>
 
@@ -20,7 +20,7 @@ constexpr int NUM_WORKERS = 1000;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-inline T channel_get(hpx::lcos::local::channel_spsc<T> const& c)
+inline T channel_get(hpx::lcos::local::channel_mpsc<T> const& c)
 {
     T result;
     while (!c.get(&result))
@@ -31,7 +31,7 @@ inline T channel_get(hpx::lcos::local::channel_spsc<T> const& c)
 }
 
 template <typename T>
-inline void channel_set(hpx::lcos::local::channel_spsc<T>& c, T val)
+inline void channel_set(hpx::lcos::local::channel_mpsc<T>& c, T val)
 {
     while (!c.set(std::move(val)))    // NOLINT
     {
@@ -40,8 +40,8 @@ inline void channel_set(hpx::lcos::local::channel_spsc<T>& c, T val)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int thread_func(int i, hpx::lcos::local::channel_spsc<int>& channel,
-    hpx::lcos::local::channel_spsc<int>& next)
+int thread_func(int i, hpx::lcos::local::channel_mpsc<int>& channel,
+    hpx::lcos::local::channel_mpsc<int>& next)
 {
     channel_set(channel, i);
     return channel_get(next);
@@ -50,7 +50,7 @@ int thread_func(int i, hpx::lcos::local::channel_spsc<int>& channel,
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    std::vector<hpx::lcos::local::channel_spsc<int>> channels;
+    std::vector<hpx::lcos::local::channel_mpsc<int>> channels;
     channels.reserve(NUM_WORKERS);
 
     std::vector<hpx::future<int>> workers;

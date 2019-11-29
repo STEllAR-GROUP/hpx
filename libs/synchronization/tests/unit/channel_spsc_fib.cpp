@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/local/channel_spsc.hpp>
+#include <hpx/synchronization/channel_spsc.hpp>
 
 #include <hpx/testing.hpp>
 

@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/local/channel_mpmc.hpp>
+#include <hpx/synchronization/channel_mpmc.hpp>
 
 #include <hpx/testing.hpp>
 

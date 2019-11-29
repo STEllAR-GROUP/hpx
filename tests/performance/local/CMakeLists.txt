@@ -10,9 +10,6 @@ set(boost_library_dependencies ${Boost_LIBRARIES})
 set(benchmarks
     agas_cache_timings
     async_overheads
-    channel_mpmc_throughput
-    channel_mpsc_throughput
-    channel_spsc_throughput
     delay_baseline
     delay_baseline_threaded
     hpx_homogeneous_timed_task_spawn_executors
@@ -146,16 +143,6 @@ set(benchmarks ${benchmarks}
     stream
     partitioned_vector_foreach
    )
-
-set(channel_mpmc_throughput_FLAGS DEPENDENCIES
-    hpx_assertion hpx_concurrency hpx_errors hpx_timing hpx_thread_support)
-set(channel_mpmc_throughput_PARAMETERS THREADS_PER_LOCALITY 2)
-set(channel_mpsc_throughput_FLAGS DEPENDENCIES
-    hpx_assertion hpx_concurrency hpx_errors hpx_timing hpx_thread_support)
-set(channel_mpsc_throughput_PARAMETERS THREADS_PER_LOCALITY 2)
-set(channel_spsc_throughput_FLAGS DEPENDENCIES
-    hpx_assertion hpx_concurrency hpx_errors hpx_timing hpx_thread_support)
-set(channel_spsc_throughputs_PARAMETERS THREADS_PER_LOCALITY 2)
 
 set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(function_object_wrapper_overhead_FLAGS DEPENDENCIES hpx_timing)

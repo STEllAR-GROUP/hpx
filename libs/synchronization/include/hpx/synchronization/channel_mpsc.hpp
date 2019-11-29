@@ -13,7 +13,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support.hpp>
 
 #include <atomic>
