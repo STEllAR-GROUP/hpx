@@ -50,6 +50,7 @@ set(HPX_LIBS
   resiliency
   resource_partitioner
   runtime_configuration
+  schedulers
   segmented_algorithms
   serialization
   static_reinit

@@ -1,0 +1,49 @@
+# Copyright (c) 2019 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+set(schedulers_headers
+  hpx/schedulers/local_priority_queue_scheduler.hpp
+  hpx/schedulers/local_queue_scheduler.hpp
+  hpx/schedulers/lockfree_queue_backends.hpp
+  hpx/schedulers/queue_helpers.hpp
+  hpx/schedulers/shared_priority_queue_scheduler.hpp
+  hpx/schedulers/static_priority_queue_scheduler.hpp
+  hpx/schedulers/static_queue_scheduler.hpp
+  hpx/schedulers/thread_queue.hpp
+  hpx/schedulers/thread_queue_mc.hpp
+  hpx/schedulers.hpp)
+
+set(schedulers_compat_headers
+  hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp
+  hpx/runtime/threads/policies/local_queue_scheduler.hpp
+  hpx/runtime/threads/policies/lockfree_queue_backends.hpp
+  hpx/runtime/threads/policies/queue_helpers.hpp
+  hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp
+  hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp
+  hpx/runtime/threads/policies/static_queue_scheduler.hpp
+  hpx/runtime/threads/policies/thread_queue.hpp
+  hpx/runtime/threads/policies/thread_queue_mc.hpp
+  hpx/runtime/threads/policies/schedulers.hpp)
+
+include(HPX_AddModule)
+add_hpx_module(schedulers
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN OFF
+  HEADERS ${schedulers_headers}
+  COMPAT_HEADERS ${schedulers_compat_headers}
+  DEPENDENCIES hpx_thread_data
+  CMAKE_SUBDIRS examples tests
+)
+
+include(HPX_PrintSummary)
+create_configuration_summary(
+  "  Module configuration summary (schedulers):" "schedulers")

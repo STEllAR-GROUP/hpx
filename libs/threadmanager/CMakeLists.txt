@@ -44,6 +44,7 @@ add_hpx_module(threadmanager
     hpx_program_options
     hpx_resource_partitioner
     hpx_runtime_configuration
+    hpx_schedulers
     hpx_serialization
     hpx_topology
   CMAKE_SUBDIRS examples tests
