@@ -38,7 +38,7 @@ set(local_lcos_sources
 
 include(HPX_AddModule)
 add_hpx_module(local_lcos
-  COMPATIBILITY_HEADERS OFF
+  COMPATIBILITY_HEADERS ON # Added in 1.4.0
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   SOURCES ${local_lcos_sources}
