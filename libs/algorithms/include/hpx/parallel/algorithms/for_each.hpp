@@ -78,7 +78,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F>
         struct invoke_projected<F, util::projection_identity>
         {
-            invoke_projected(typename hpx::util::decay<F>::type& f,
+            HPX_HOST_DEVICE invoke_projected(
+                typename hpx::util::decay<F>::type& f,
                 util::projection_identity)
               : f_(f)
             {

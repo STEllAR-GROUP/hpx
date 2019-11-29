@@ -146,7 +146,7 @@ namespace hpx { namespace compute { namespace cuda {
             std::size_t count, Ts&&... ts) const
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_ASSERT(false)
+            HPX_ASSERT(false);
             return hpx::future<std::vector<bulk_locality_result>>();
 #else
             std::vector<hpx::id_type> localities;

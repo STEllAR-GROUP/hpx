@@ -5,20 +5,20 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks
-  synchronize)
-
-if(HPX_WITH_CUDA)
-  set_source_files_properties(synchronize.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
+if(NOT HPX_WITH_CUDA)
+  return()
 endif()
 
-if(HPX_WITH_CUDA_CLANG)
-  set_source_files_properties(synchronize.cpp PROPERTIES COMPILE_FLAGS -xcuda)
-endif()
+set(benchmarks synchronize)
+
+set(synchronize_CUDA ON)
 
 foreach(benchmark ${benchmarks})
-  set(sources
-      ${benchmark}.cpp)
+  if(${${benchmark}_CUDA})
+    set(sources ${benchmark}.cu)
+  else()
+    set(sources ${benchmark}.cpp)
+  endif()
 
   source_group("Source Files" FILES ${sources})
 
