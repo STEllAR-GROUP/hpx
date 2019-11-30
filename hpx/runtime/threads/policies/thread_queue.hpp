@@ -17,8 +17,8 @@
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
-#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
+#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_data_stackful.hpp>
 #include <hpx/runtime/threads/thread_data_stackless.hpp>
@@ -115,7 +115,8 @@ namespace hpx { namespace threads { namespace policies {
         using task_description =
             util::tuple<thread_init_data, thread_state_enum, std::uint64_t>;
 #else
-        using task_description = util::tuple<thread_init_data, thread_state_enum>;
+        using task_description =
+            util::tuple<thread_init_data, thread_state_enum>;
 #endif
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME

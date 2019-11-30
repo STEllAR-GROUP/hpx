@@ -16,23 +16,23 @@
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/program_options.hpp>
 #include <hpx/util/annotated_function.hpp>
 
 #include <cstddef>
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
 // dummy function we will call using async
-void dummy_task(const std::string &name, std::size_t n)
+void dummy_task(const std::string& name, std::size_t n)
 {
     hpx::util::annotate_function t(name);
     // no other work can take place on this thread whilst it sleeps
@@ -43,13 +43,18 @@ void dummy_task(const std::string &name, std::size_t n)
     }
 }
 
-inline std::size_t st_rand() { return std::size_t(std::rand()); }
+inline std::size_t st_rand()
+{
+    return std::size_t(std::rand());
+}
 
 int hpx_main(variables_map& vm)
 {
     auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
     std::cout << "Scheduler is " << sched->get_description() << std::endl;
-    if (std::string("core-shared_priority_queue_scheduler") == sched->get_description()) {
+    if (std::string("core-shared_priority_queue_scheduler") ==
+        sched->get_description())
+    {
         std::cout << "Setting shared-priority mode flags" << std::endl;
         sched->add_remove_scheduler_mode(
             // add these flags
@@ -66,53 +71,59 @@ int hpx_main(variables_map& vm)
                 hpx::threads::policies::reduce_thread_priority |
                 hpx::threads::policies::delay_exit |
                 hpx::threads::policies::fast_idle_mode |
-                hpx::threads::policies::enable_elasticity)
-        );
+                hpx::threads::policies::enable_elasticity));
     }
 
     // setup executors for different task priorities on the pools
     hpx::threads::scheduled_executor HP_executor =
-            hpx::threads::executors::pool_executor("default",
-                hpx::threads::thread_priority_high);
+        hpx::threads::executors::pool_executor(
+            "default", hpx::threads::thread_priority_high);
 
     hpx::threads::scheduled_executor NP_executor =
-            hpx::threads::executors::pool_executor("default",
-                hpx::threads::thread_priority_default);
+        hpx::threads::executors::pool_executor(
+            "default", hpx::threads::thread_priority_default);
 
     // randomly create normal priority tasks
     // and then a set of HP tasks in periodic bursts
     // Use task plotting tools to validate that scheduling is correct
     const int np_loop = vm["nnp"].as<int>();
     const int hp_loop = vm["nhp"].as<int>();
-    const int np_m    = vm["mnp"].as<int>();
-    const int hp_m    = vm["mhp"].as<int>();
-    const int cycles  = vm["cycles"].as<int>();
+    const int np_m = vm["mnp"].as<int>();
+    const int hp_m = vm["mhp"].as<int>();
+    const int cycles = vm["cycles"].as<int>();
 
     const int np_total = np_loop * cycles;
     //
-    std::atomic<int> counter((np_loop + hp_loop)*cycles);
+    std::atomic<int> counter((np_loop + hp_loop) * cycles);
     std::atomic<int> counter1(0);
     {
         hpx::util::annotate_function annotate("launch");
-        for (int i=0; i<np_total; ++i)
+        for (int i = 0; i < np_total; ++i)
         {
             // normal priority
-            auto f3 = hpx::async(NP_executor, &dummy_task, "NP task", np_m).
-                then(hpx::launch::sync, [&](auto &&){
-                    counter--;
-                    if (++counter1 % np_loop == 0) {
-                        hpx::util::annotate_function annotate("launch");
-                        for (int j=0; j<hp_loop; ++j)
+            auto f3 =
+                hpx::async(NP_executor, &dummy_task, "NP task", np_m)
+                    .then(hpx::launch::sync, [&](auto&&) {
+                        counter--;
+                        if (++counter1 % np_loop == 0)
                         {
-                            // high priority
-                            auto f1 = hpx::async(HP_executor, &dummy_task, "HP task", hp_m).
-                                    then(hpx::launch::sync, [&](auto &&){ counter--; });
+                            hpx::util::annotate_function annotate("launch");
+                            for (int j = 0; j < hp_loop; ++j)
+                            {
+                                // high priority
+                                auto f1 = hpx::async(
+                                    HP_executor, &dummy_task, "HP task", hp_m)
+                                              .then(hpx::launch::sync,
+                                                  [&](auto&&) { counter--; });
+                            }
                         }
-                    }
-                });
+                    });
         }
     }
-    do { hpx::this_thread::yield(); } while (counter>0);
+    do
+    {
+        hpx::this_thread::yield();
+    } while (counter > 0);
 
     return hpx::finalize();
 }

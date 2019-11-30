@@ -270,9 +270,7 @@ int main(int argc, char* argv[])
                       << std::endl;
 
             numa_scheduler::init_parameter_type scheduler_init(
-                init.num_threads_,
-                {1, 1, 64},
-                init.affinity_data_,
+                init.num_threads_, {1, 1, 64}, init.affinity_data_,
                 thread_queue_init, "shared-priority-scheduler");
             std::unique_ptr<numa_scheduler> scheduler(
                 new numa_scheduler(scheduler_init));
@@ -281,8 +279,8 @@ int main(int argc, char* argv[])
                 scheduler_mode::delay_exit);
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<
-                    numa_scheduler>(std::move(scheduler), init));
+                new hpx::threads::detail::scheduled_thread_pool<numa_scheduler>(
+                    std::move(scheduler), init));
             return pool;
         });
 
@@ -299,15 +297,12 @@ int main(int argc, char* argv[])
             [](hpx::threads::thread_pool_init_parameters init,
                 hpx::threads::policies::thread_queue_init_parameters
                     thread_queue_init)
-                -> std::unique_ptr<hpx::threads::thread_pool_base>
-            {
+                -> std::unique_ptr<hpx::threads::thread_pool_base> {
                 std::cout << "User defined scheduler creation callback "
                           << std::endl;
 
                 numa_scheduler::init_parameter_type scheduler_init(
-                    init.num_threads_,
-                    {1, 1, 64},
-                    init.affinity_data_,
+                    init.num_threads_, {1, 1, 64}, init.affinity_data_,
                     thread_queue_init, "shared-priority-scheduler");
 
                 std::unique_ptr<numa_scheduler> scheduler(

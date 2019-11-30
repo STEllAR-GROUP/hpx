@@ -36,15 +36,16 @@
 //#define NUMA_BINDING_ALLOCATOR_INIT_MEMORY
 
 #ifndef NDEBUG
-# define NUMA_BINDING_ALLOCATOR_DEBUG true
+#define NUMA_BINDING_ALLOCATOR_DEBUG true
 #else
-# if !defined(NUMA_BINDING_ALLOCATOR_DEBUG)
-#  define NUMA_BINDING_ALLOCATOR_DEBUG true
-# endif
+#if !defined(NUMA_BINDING_ALLOCATOR_DEBUG)
+#define NUMA_BINDING_ALLOCATOR_DEBUG true
+#endif
 #endif
 
 namespace hpx {
-    static hpx::debug::enable_print<NUMA_BINDING_ALLOCATOR_DEBUG> nba_deb("NUM_B_A");
+    static hpx::debug::enable_print<NUMA_BINDING_ALLOCATOR_DEBUG> nba_deb(
+        "NUM_B_A");
 }
 
 namespace hpx { namespace threads { namespace executors {
@@ -59,12 +60,12 @@ namespace hpx { namespace threads { namespace executors {
         // The arguments must be const ref versions of the equivalent task arguments
         int operator()(const int& domain) const
         {
-            nba_deb.debug(debug::str<>("pool_numa_hint")
-                , "allocator returns domain " , domain);
+            nba_deb.debug(debug::str<>("pool_numa_hint"),
+                "allocator returns domain ", domain);
             return domain;
         }
     };
-}}}
+}}}    // namespace hpx::threads::executors
 
 namespace hpx { namespace compute { namespace host {
     template <typename T>
@@ -78,8 +79,7 @@ namespace hpx { namespace compute { namespace host {
         // should touch this page. The thread with the matching domain will
         // perform a memory read/write on the page.
         virtual std::size_t operator()(const T* const /*base_ptr*/,
-            const T* const /*page_ptr*/,
-            const std::size_t /*page_size*/,
+            const T* const /*page_ptr*/, const std::size_t /*page_size*/,
             const std::size_t /*domains*/) const
         {
             return 0;
@@ -174,8 +174,8 @@ namespace hpx { namespace compute { namespace host {
 
         // construct without a memory binder function
         // only first touch or interleave policies are valid
-        numa_binding_allocator(threads::hpx_hwloc_membind_policy policy,
-            unsigned int flags)
+        numa_binding_allocator(
+            threads::hpx_hwloc_membind_policy policy, unsigned int flags)
           : policy_(policy)
           , flags_(flags)
           , init_mutex()
@@ -188,8 +188,7 @@ namespace hpx { namespace compute { namespace host {
         // construct using a memory binder function for placing pages
         // according to a user defined pattern using first touch policy
         numa_binding_allocator(numa_binding_helper_ptr bind_func,
-            threads::hpx_hwloc_membind_policy policy,
-            unsigned int flags)
+            threads::hpx_hwloc_membind_policy policy, unsigned int flags)
           : binding_helper_(bind_func)
           , policy_(policy)
           , flags_(flags)
@@ -281,8 +280,8 @@ namespace hpx { namespace compute { namespace host {
                 result = reinterpret_cast<pointer>(
                     threads::topology().allocate_membind(
                         n * sizeof(T), bitmap, policy_, 0));
-                nba_deb.debug(debug::str<>("alloc:firsttouch")
-                              , debug::hex<12, void*>(result));
+                nba_deb.debug(debug::str<>("alloc:firsttouch"),
+                    debug::hex<12, void*>(result));
             }
             else if (policy_ ==
                 threads::hpx_hwloc_membind_policy::membind_interleave)
@@ -294,8 +293,8 @@ namespace hpx { namespace compute { namespace host {
                 result = reinterpret_cast<pointer>(
                     threads::topology().allocate_membind(
                         n * sizeof(T), bitmap, policy_, 0));
-                nba_deb.debug(debug::str<>("alloc:interleave")
-                              , debug::hex<12, void*>(result));
+                nba_deb.debug(debug::str<>("alloc:interleave"),
+                    debug::hex<12, void*>(result));
             }
             else if (policy_ == threads::hpx_hwloc_membind_policy::membind_user)
             {
@@ -307,8 +306,8 @@ namespace hpx { namespace compute { namespace host {
                     threads::topology().allocate_membind(n * sizeof(T), bitmap,
                         threads::hpx_hwloc_membind_policy::membind_firsttouch,
                         0));
-                nba_deb.debug(debug::str<>("alloc:user(bind)")
-                              , debug::hex<12, void*>(result));
+                nba_deb.debug(debug::str<>("alloc:user(bind)"),
+                    debug::hex<12, void*>(result));
 #if defined(NUMA_ALLOCATOR_LINUX)
                 // if Transparent Huge Pages (THP) are enabled, this prevents
                 // pages from being merged into a single numa bound block
@@ -332,9 +331,9 @@ namespace hpx { namespace compute { namespace host {
         // originally produced p; otherwise, the behavior is undefined.
         void deallocate(pointer p, size_type n)
         {
-            nba_deb.debug(debug::str<>("deallocate")
-                , "calling membind for size (bytes) "
-                , debug::hex<2>(n * sizeof(T)));
+            nba_deb.debug(debug::str<>("deallocate"),
+                "calling membind for size (bytes) ",
+                debug::hex<2>(n * sizeof(T)));
 #ifdef NUMA_BINDING_ALLOCATOR_DEBUG_PAGE_BINDING
             display_binding(p, binding_helper_);
 #endif
@@ -382,8 +381,7 @@ namespace hpx { namespace compute { namespace host {
                 // if (status[0]<0) std::cout << "." << decnumber(status[0]) << ".";
                 return -1;
             }
-            HPX_THROW_EXCEPTION(kernel_error,
-                "get_numa_domain",
+            HPX_THROW_EXCEPTION(kernel_error, "get_numa_domain",
                 "Error getting numa domain with syscall");
 #else
             return threads::get_topology().get_numa_domain(page);
@@ -407,8 +405,7 @@ namespace hpx { namespace compute { namespace host {
             if (syscall(__NR_move_pages, 0, count, pages.data(), nullptr,
                     status.data(), 0) < 0)
             {
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "get_page_numa_domains",
+                HPX_THROW_EXCEPTION(kernel_error, "get_page_numa_domains",
                     "Error getting numa domains with syscall");
             }
 
@@ -458,15 +455,15 @@ namespace hpx { namespace compute { namespace host {
                 HPX_ASSERT(i1 == i2);
 #endif
                 size_type domain = hwloc_bitmap_first(nodesets[i]->get_bmp());
-                nba_deb.debug("Launching First-Touch task for domain "
-                    , debug::dec<2>(domain) , " " , nodesets[i]);
+                nba_deb.debug("Launching First-Touch task for domain ",
+                    debug::dec<2>(domain), " ", nodesets[i]);
                 auto f1 = hpx::async(numa_executor,
-                                     util::bind(&numa_binding_allocator::touch_pages, this, p, n,
-                                         binding_helper_, util::placeholders::_1, nodesets),
-                                     domain);
-                nba_deb.debug(debug::str<>("First-Touch")
-                    , "add task future to vector for domain "
-                    , debug::dec<2>(domain) , " " , nodesets[i]);
+                    util::bind(&numa_binding_allocator::touch_pages, this, p, n,
+                        binding_helper_, util::placeholders::_1, nodesets),
+                    domain);
+                nba_deb.debug(debug::str<>("First-Touch"),
+                    "add task future to vector for domain ",
+                    debug::dec<2>(domain), " ", nodesets[i]);
                 tasks.push_back(std::move(f1));
             }
             wait_all(tasks);
@@ -551,7 +548,7 @@ namespace hpx { namespace compute { namespace host {
                 dynamic_cast<const threads::topology*>(&threads::get_topology())
                     ->bitmap_to_mask(bitmap->get_bmp(), HWLOC_OBJ_NUMANODE);
 
-            nba_deb.debug(debug::str<>("Pool numa mask") , numa_mask);
+            nba_deb.debug(debug::str<>("Pool numa mask"), numa_mask);
 
             std::vector<threads::hwloc_bitmap_ptr> nodesets;
             for (size_type i = 0; i < threads::mask_size(numa_mask); ++i)
@@ -564,8 +561,8 @@ namespace hpx { namespace compute { namespace host {
                     nodesets.push_back(
                         std::make_shared<threads::hpx_hwloc_bitmap_wrapper>(
                             bitmap));
-                    nba_deb.debug(debug::str<>("Node mask")
-                        , i , " is " , nodesets.back());
+                    nba_deb.debug(
+                        debug::str<>("Node mask"), i, " is ", nodesets.back());
                 }
             }
             return nodesets;
@@ -582,8 +579,8 @@ namespace hpx { namespace compute { namespace host {
             pointer page_ptr = p;
             HPX_ASSERT(reinterpret_cast<std::intptr_t>(p) % pagesize == 0);
 
-            nba_deb.debug(debug::str<>("Touch pages")
-                , "for numa " , debug::dec<2>(numa_domain));
+            nba_deb.debug(debug::str<>("Touch pages"), "for numa ",
+                debug::dec<2>(numa_domain));
             for (size_type i = 0; i < num_pages; ++i)
             {
                 // we pass the base pointer and current page pointer
@@ -592,7 +589,7 @@ namespace hpx { namespace compute { namespace host {
                 if (dom == numa_domain)
                 {
                     HPX_ASSERT((std::size_t(page_ptr) &
-                                (threads::get_memory_page_size()-1)) == 0);
+                                   (threads::get_memory_page_size() - 1)) == 0);
                     // trigger a memory read and rewrite without changing contents
                     volatile T* vaddr = const_cast<volatile T*>(page_ptr);
                     *vaddr = *vaddr;
@@ -627,8 +624,8 @@ namespace hpx { namespace compute { namespace host {
             pointer page_ptr = p;
             HPX_ASSERT(reinterpret_cast<std::intptr_t>(p) % pagesize == 0);
 
-            nba_deb.debug(debug::str<>("Bind pages ")
-                , "for numa " , debug::dec<2>(numa_domain));
+            nba_deb.debug(debug::str<>("Bind pages "), "for numa ",
+                debug::dec<2>(numa_domain));
             for (size_type i = 0; i < num_pages; ++i)
             {
                 // we pass the base pointer and current page pointer
@@ -652,12 +649,12 @@ namespace hpx { namespace compute { namespace host {
         }
 
         std::shared_ptr<numa_binding_helper<T>> binding_helper_;
-        threads::hpx_hwloc_membind_policy       policy_;
-        unsigned int                            flags_;
+        threads::hpx_hwloc_membind_policy policy_;
+        unsigned int flags_;
 
     private:
         mutable std::mutex init_mutex;
     };
-}}}
+}}}    // namespace hpx::compute::host
 
 #endif

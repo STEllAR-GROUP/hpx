@@ -10,8 +10,7 @@
 #include <cstdint>
 #include <tuple>
 
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     namespace {
         std::size_t& thread_num_tss()
         {
@@ -21,13 +20,11 @@ namespace hpx { namespace threads { namespace detail
 
         thread_tuple& thread_numbers_tss()
         {
-            HPX_NATIVE_TLS thread_tuple
-                thread_numbers_tss_ = {
-                    std::uint16_t(-1), std::uint16_t(-1)
-                };
+            HPX_NATIVE_TLS thread_tuple thread_numbers_tss_ = {
+                std::uint16_t(-1), std::uint16_t(-1)};
             return thread_numbers_tss_;
         }
-    }
+    }    // namespace
 
     std::size_t set_thread_num_tss(std::size_t num)
     {
@@ -40,7 +37,7 @@ namespace hpx { namespace threads { namespace detail
         return thread_num_tss();
     }
 
-    void set_thread_numbers_tss(const thread_tuple &tup)
+    void set_thread_numbers_tss(const thread_tuple& tup)
     {
         thread_numbers_tss() = tup;
     }
@@ -50,4 +47,4 @@ namespace hpx { namespace threads { namespace detail
         return thread_numbers_tss();
     }
 
-}}}
+}}}    // namespace hpx::threads::detail

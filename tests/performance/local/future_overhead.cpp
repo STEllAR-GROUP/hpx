@@ -22,9 +22,9 @@
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/synchronization.hpp>
 #include <hpx/runtime/threads/executors/limiting_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/synchronization.hpp>
 
 #include <array>
 #include <atomic>
@@ -250,7 +250,9 @@ void measure_function_futures_limiting_executor(
     std::atomic<std::uint64_t> sanity_check(count);
 
     auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
-    if (std::string("core-shared_priority_queue_scheduler") == sched->get_description()) {
+    if (std::string("core-shared_priority_queue_scheduler") ==
+        sched->get_description())
+    {
         sched->add_remove_scheduler_mode(
             // add these flags
             hpx::threads::policies::scheduler_mode(
@@ -261,12 +263,11 @@ void measure_function_futures_limiting_executor(
             hpx::threads::policies::scheduler_mode(
                 hpx::threads::policies::enable_stealing_numa |
                 hpx::threads::policies::assign_work_thread_parent |
-                hpx::threads::policies::steal_high_priority_first)
-        );
+                hpx::threads::policies::steal_high_priority_first));
     }
 
     // test a parallel algorithm on custom pool with high priority
-    auto const chunk_size = count/(num_threads*2);
+    auto const chunk_size = count / (num_threads * 2);
     hpx::parallel::execution::static_chunk_size fixed(chunk_size);
 
     // start the clock
@@ -275,8 +276,7 @@ void measure_function_futures_limiting_executor(
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(
-            hpx::parallel::execution::par.with(fixed)
-            , 0, count, [&](int) {
+            hpx::parallel::execution::par.with(fixed), 0, count, [&](int) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
@@ -342,9 +342,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv)
     hpx::parallel::for_loop(hpx::parallel::execution::par.with(
                                 hpx::parallel::execution::static_chunk_size(1),
                                 unlimited_number_of_chunks()),
-        0, count, [](std::uint64_t) {
-            null_function();
-        });
+        0, count, [](std::uint64_t) { null_function(); });
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -412,7 +410,9 @@ void measure_function_futures_create_thread_hierarchical_placement(
 
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
 
-    if (std::string("core-shared_priority_queue_scheduler") == sched->get_description()) {
+    if (std::string("core-shared_priority_queue_scheduler") ==
+        sched->get_description())
+    {
         sched->add_remove_scheduler_mode(
             hpx::threads::policies::scheduler_mode(
                 hpx::threads::policies::assign_work_thread_parent),
@@ -421,8 +421,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
                 hpx::threads::policies::enable_stealing_numa |
                 hpx::threads::policies::assign_work_round_robin |
                 hpx::threads::policies::steal_after_local |
-                hpx::threads::policies::steal_high_priority_first)
-        );
+                hpx::threads::policies::steal_high_priority_first));
     }
     auto const func = [&l]() {
         null_function();

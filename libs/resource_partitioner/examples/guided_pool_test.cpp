@@ -270,8 +270,7 @@ int main(int argc, char* argv[])
             std::cout << "User defined scheduler creation callback "
                       << std::endl;
             high_priority_sched::init_parameter_type scheduler_init(
-                init.num_threads_, {1, 1, 64},
-                init.affinity_data_,
+                init.num_threads_, {1, 1, 64}, init.affinity_data_,
                 thread_queue_init, "shared-priority-scheduler");
             std::unique_ptr<high_priority_sched> scheduler(
                 new high_priority_sched(scheduler_init));
@@ -279,8 +278,8 @@ int main(int argc, char* argv[])
             init.mode_ = scheduler_mode(scheduler_mode::delay_exit);
 
             std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<high_priority_sched
-                    >(std::move(scheduler), init));
+                new hpx::threads::detail::scheduled_thread_pool<
+                    high_priority_sched>(std::move(scheduler), init));
             return pool;
         });
 

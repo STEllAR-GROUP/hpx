@@ -15,8 +15,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     HPX_EXPORT std::size_t set_thread_num_tss(std::size_t num);
     HPX_EXPORT std::size_t get_thread_num_tss();
     //
@@ -29,7 +28,8 @@ namespace hpx { namespace threads { namespace detail
     {
         reset_tss_helper(std::size_t thread_num)
           : thread_num_(set_thread_num_tss(thread_num))
-        {}
+        {
+        }
 
         ~reset_tss_helper()
         {
@@ -44,7 +44,7 @@ namespace hpx { namespace threads { namespace detail
     private:
         std::size_t thread_num_;
     };
-}}}
+}}}    // namespace hpx::threads::detail
 
 #include <hpx/config/warnings_suffix.hpp>
 
