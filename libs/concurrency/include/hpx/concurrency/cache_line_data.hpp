@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+#include <type_traits>
 
 namespace hpx {
 

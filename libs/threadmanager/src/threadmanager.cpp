@@ -485,9 +485,9 @@ namespace hpx { namespace threads {
 #if defined(HPX_HAVE_LOCAL_WORKSTEALING_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
-                std::string affinity_desc;
-                std::size_t numa_sensitive =
-                    hpx::util::get_affinity_description(cfg_, affinity_desc);
+                std::size_t num_high_priority_queues =
+                    hpx::util::get_num_high_priority_queues(
+                        cfg_, rp.get_num_threads(name));
 
                 // instantiate the scheduler
                 using local_sched_type =
@@ -495,7 +495,7 @@ namespace hpx { namespace threads {
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
-                    thread_pool_init.affinity_data_, numa_sensitive,
+                    thread_pool_init.affinity_data_, num_high_priority_queues,
                     thread_queue_init, "core-local_workstealing_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
