@@ -683,7 +683,7 @@ if(HPX_WITH_HPXMP)
     hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
       "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
     hpx_option(HPX_WITH_HPXMP_TAG STRING
-      "hpxMP repository tag or branch" "v0.2.0" CATEGORY "OpenMP")
+      "hpxMP repository tag or branch" "v0.3.0" CATEGORY "OpenMP")
   else()
     hpx_warn("hpxMP can be used only when compiling with clang or gcc")
     set(HPX_WITH_HPXMP OFF)
