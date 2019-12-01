@@ -98,7 +98,7 @@ namespace hpx { namespace detail
                     // make sure this thread is executed last
                     // yield_to
                     hpx::this_thread::suspend(threads::pending, tid,
-                        "async_launch_policy_dispatch<fork>");
+                        "async_launch_policy_dispatch<launch>");
                 }
             }
             return p.get_future();

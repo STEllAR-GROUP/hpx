@@ -23,6 +23,7 @@
 #include <hpx/synchronization.hpp>
 
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -237,8 +238,8 @@ namespace hpx { namespace threads { namespace policies {
 
         local_workstealing_scheduler(init_parameter_type const& init,
             bool deferred_initialization = true)
-          : scheduler_base(
-                init.num_queues_, init.description_, init.thread_queue_init_)
+          : scheduler_base(init.num_queues_, init.description_,
+                init.thread_queue_init_, policies::fast_idle_mode)
           , data_(init.num_queues_)
           , low_priority_queue_(init.num_queues_ - 1, thread_queue_init_)
           , curr_queue_(0)
@@ -531,17 +532,39 @@ namespace hpx { namespace threads { namespace policies {
             bool empty = true;
             for (std::size_t i = 0; i != num_queues_; ++i)
             {
-                empty = data_[i].data_.queue_->cleanup_terminated(delete_all) &&
-                    empty;
+                auto& d = data_[i].data_;
+                if (i < num_high_priority_queues_)
+                {
+                    empty = d.high_priority_queue_->cleanup_terminated(
+                                delete_all) &&
+                        empty;
+                }
+                empty = d.queue_->cleanup_terminated(delete_all) && empty;
             }
-            return empty;
+            return low_priority_queue_.cleanup_terminated(delete_all) && empty;
         }
 
         bool cleanup_terminated(
             std::size_t num_thread, bool delete_all) override
         {
-            return data_[num_thread].data_.queue_->cleanup_terminated(
-                delete_all);
+            auto& d = data_[num_thread].data_;
+            bool empty = d.queue_->cleanup_terminated(delete_all);
+            if (!delete_all)
+                return empty;
+
+            if (num_thread < num_high_priority_queues_)
+            {
+                empty =
+                    d.high_priority_queue_->cleanup_terminated(delete_all) &&
+                    empty;
+            }
+
+            if (num_thread == num_queues_ - 1)
+            {
+                return low_priority_queue_.cleanup_terminated(delete_all) &&
+                    empty;
+            }
+            return empty;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -589,8 +612,10 @@ namespace hpx { namespace threads { namespace policies {
                     num %= num_high_priority_queues_;
                 }
 
+                // we never stage high priority threads, so there is no need to
+                // call wait_or_add_new for those.
                 data_[num].data_.high_priority_queue_->create_thread(
-                    data, id, initial_state, run_now, ec);
+                    data, id, initial_state, true, ec);
                 return;
             }
 
@@ -629,7 +654,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // Pass steal request on to another worker.
-        // Returns true if we handled our own steal request.
+        // Returns true if we have handled our own steal request.
         bool decline_or_forward_steal_request(
             scheduler_data& d, steal_request& req) noexcept
         {
@@ -719,7 +744,7 @@ namespace hpx { namespace threads { namespace policies {
 
                 thread_data* thrd = nullptr;
                 while (--max_num_to_steal != 0 &&
-                    d.queue_->get_next_thread(thrd, true, true))
+                    d.queue_->get_next_thread(thrd, false, true))
                 {
                     d.queue_->increment_num_stolen_from_pending();
                     thrds.tasks_.push_back(thrd);
@@ -728,9 +753,15 @@ namespace hpx { namespace threads { namespace policies {
                 // we are ready to send at least one task
                 if (!thrds.tasks_.empty())
                 {
-                    // send these tasks to the core that has sent the steal request
+                    // send these tasks to the core that has sent the steal
+                    // request
                     thrds.num_thread_ = d.num_thread_;
                     req.channel_->set(std::move(thrds));
+
+                    // wake the thread up so that it can pick up the stolen
+                    // tasks
+                    do_some_work(req.num_thread_);
+
                     return true;
                 }
             }
@@ -1339,9 +1370,10 @@ namespace hpx { namespace threads { namespace policies {
                     else
                     {
                         d.queue_->schedule_thread(thrds.tasks_.back(), true);
+                        d.queue_->increment_num_stolen_to_pending();
+                        ++added;
                     }
 
-                    d.queue_->increment_num_stolen_to_pending();
                     return true;
                 }
             }
@@ -1360,21 +1392,13 @@ namespace hpx { namespace threads { namespace policies {
 
             added = 0;
 
-            bool result = true;
             auto& d = data_[num_thread].data_;
 
-            if (num_thread < num_high_priority_queues_)
-            {
-                result = d.high_priority_queue_->wait_or_add_new(
-                             running, added, enable_stealing) &&
-                    result;
-                if (0 != added)
-                    return result;
-            }
+            // We don't need to call wait_or_add_new for high priority threads
+            // as these threads are never created 'staged'.
 
-            result =
-                d.queue_->wait_or_add_new(running, added, enable_stealing) &&
-                result;
+            bool result =
+                d.queue_->wait_or_add_new(running, added, enable_stealing);
 
             // check if work was available
             if (0 != added)
@@ -1440,6 +1464,7 @@ namespace hpx { namespace threads { namespace policies {
                 }
             }
 #endif
+
             return result;
         }
 

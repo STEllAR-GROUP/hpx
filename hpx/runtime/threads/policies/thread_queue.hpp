@@ -312,12 +312,12 @@ namespace hpx { namespace threads { namespace policies {
                 }
                 else if (work_items_.empty())
                 {
-                    add_count =
-                        parameters_
-                            .min_add_new_count_;    // add this number of threads
+                    // add this number of threads
+                    add_count = parameters_.min_add_new_count_;
+
+                    // increase max_thread_count
                     parameters_.max_thread_count_ +=
-                        parameters_
-                            .min_add_new_count_;    // increase max_thread_count //-V101
+                        parameters_.min_add_new_count_;    //-V101
                 }
                 else
                 {

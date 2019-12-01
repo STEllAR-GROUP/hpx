@@ -13,7 +13,6 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include <type_traits>
 
 namespace hpx {
 
@@ -106,7 +105,7 @@ namespace hpx {
             {
             }
 
-            // no ned to pad to cache line size
+            // no need to pad to cache line size bytes
             Data data_;
         };
 

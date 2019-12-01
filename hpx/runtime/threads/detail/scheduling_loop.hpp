@@ -895,7 +895,7 @@ namespace hpx { namespace threads { namespace detail
                         policies::fast_idle_mode))
                 {
                     // speed up idle suspend if no work was stolen
-                    idle_loop_count -= params.max_idle_loop_count_ / 256;
+                    idle_loop_count -= params.max_idle_loop_count_ / 1024;
                     added = std::size_t(-1);
                 }
 

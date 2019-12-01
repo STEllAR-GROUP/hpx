@@ -72,7 +72,8 @@ namespace hpx { namespace resource {
         abp_priority_fifo = 5,
         abp_priority_lifo = 6,
         shared_priority = 7,
-        local_workstealing = 8,
+        local_workstealing_fifo = 8,
+        local_workstealing_lifo = 9,
     };
 }}    // namespace hpx::resource
 

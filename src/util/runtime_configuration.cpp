@@ -190,7 +190,7 @@ namespace hpx { namespace util
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
-            "scheduler = local-workstealing",
+            "scheduler = local-workstealing-fifo",
             "affinity = core",
             "pu_step = 1",
             "pu_offset = 0",

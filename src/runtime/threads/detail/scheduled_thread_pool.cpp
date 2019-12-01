@@ -49,6 +49,11 @@ template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
 template class HPX_EXPORT hpx::threads::policies::local_workstealing_scheduler<>;
 template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_workstealing_scheduler<>>;
+template class HPX_EXPORT hpx::threads::policies::local_workstealing_scheduler<
+    std::mutex, hpx::threads::policies::lockfree_lifo>;
+template class HPX_EXPORT hpx::threads::detail::scheduled_thread_pool<
+    hpx::threads::policies::local_workstealing_scheduler<std::mutex,
+        hpx::threads::policies::lockfree_lifo>>;
 #endif
 
 #if defined(HPX_HAVE_ABP_SCHEDULER) && defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
