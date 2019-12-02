@@ -30,6 +30,7 @@
 #include <cstdint>
 #include <type_traits>
 #include <utility>
+#include <string>
 
 namespace hpx { namespace util
 {
