@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,12 +8,14 @@
 #define HPX_ASYNC_LAUNCH_POLICY_DISPATCH_NOV_26_2017_1243PM
 
 #include <hpx/config.hpp>
+#include <hpx/lcos/async_fwd.hpp>    // declare async_launch_policy_dispatch
+#include <hpx/lcos_fwd.hpp>          // declare futures_factory
+
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -98,10 +100,22 @@ namespace hpx { namespace detail
                     // make sure this thread is executed last
                     // yield_to
                     hpx::this_thread::suspend(threads::pending, tid,
-                        "async_launch_policy_dispatch<fork>");
+                        "async_launch_policy_dispatch<launch>");
                 }
             }
             return p.get_future();
+        }
+
+        template <typename F, typename... Ts>
+        HPX_FORCEINLINE static typename std::enable_if<
+            traits::detail::is_deferred_invocable<F, Ts...>::value,
+            hpx::future<typename util::detail::invoke_deferred_result<F,
+                Ts...>::type>>::type
+        call(launch policy, threads::thread_schedule_hint hint, F&& f,
+            Ts&&... ts)
+        {
+            return call(policy, threads::detail::get_self_or_default_pool(),
+                hint, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename... Ts>

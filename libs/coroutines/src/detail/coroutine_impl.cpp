@@ -34,6 +34,7 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
+#include <hpx/coroutines/detail/coroutine_stackful_self_direct.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -93,5 +94,39 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         // should not get here, never
         HPX_ASSERT(this->m_state == super_type::ctx_running);
+    }
+
+    // execute the coroutine function directly in the context of the calling
+    // thread
+    coroutine_impl::result_type coroutine_impl::invoke_directly(
+        coroutine_impl::arg_type arg) noexcept
+    {
+        m_state = ctx_running;
+
+        std::exception_ptr tinfo;
+        {
+            coroutine_self* old_self = coroutine_self::get_self();
+            coroutine_stackful_self_direct self(this, old_self);
+            reset_self_on_exit on_exit(&self, old_self);
+            try
+            {
+                m_result = m_fun(arg);
+                HPX_ASSERT(m_result.first == thread_state_enum::terminated);
+            }
+            catch (...)
+            {
+                tinfo = std::current_exception();
+            }
+            this->reset_tss();
+        }
+        this->reset();
+
+        m_state = ctx_exited;
+
+        if (tinfo)
+        {
+            std::rethrow_exception(tinfo);
+        }
+        return m_result;
     }
 }}}}    // namespace hpx::threads::coroutines::detail

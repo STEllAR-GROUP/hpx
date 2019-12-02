@@ -15,8 +15,12 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/util.hpp>
 
+#include <hpx/parallel/executors/scoped_parallel_executor.hpp>
+
 #include <cstdint>
 #include <iostream>
+#include <string>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 //[fibonacci
@@ -25,14 +29,11 @@ std::uint64_t fibonacci(std::uint64_t n)
     if (n < 2)
         return n;
 
-    // Invoking the Fibonacci algorithm twice is inefficient.
-    // However, we intentionally demonstrate it this way to create some
-    // heavy workload.
+    hpx::parallel::execution::scoped_parallel_executor exec;
+    hpx::future<std::uint64_t> n1 = hpx::async(exec, fibonacci, n - 1);
+    std::uint64_t n2 = fibonacci(n - 2);
 
-    hpx::future<std::uint64_t> n1 = hpx::async(fibonacci, n - 1);
-    hpx::future<std::uint64_t> n2 = hpx::async(fibonacci, n - 2);
-
-    return n1.get() + n2.get();   // wait for the Futures to return their values
+    return n1.get() + n2;    // wait for the Future to return their values
 }
 //fibonacci]
 
@@ -40,6 +41,8 @@ std::uint64_t fibonacci(std::uint64_t n)
 //[hpx_main
 int hpx_main(hpx::program_options::variables_map& vm)
 {
+    hpx::threads::add_scheduler_mode(hpx::threads::policies::fast_idle_mode);
+
     // extract command line argument, i.e. fib(N)
     std::uint64_t n = vm["n-value"].as<std::uint64_t>();
 
@@ -53,7 +56,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::finalize();    // Handles HPX shutdown
 }
 //hpx_main]
 
@@ -62,16 +65,20 @@ int hpx_main(hpx::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     desc_commandline.add_options()
-        ( "n-value",
-          hpx::program_options::value<std::uint64_t>()->default_value(10),
-          "n value for the Fibonacci function")
-        ;
+        ("n-value",
+            hpx::program_options::value<std::uint64_t>()->default_value(10),
+            "n value for the Fibonacci function");
+    // clang-format on
+
+    // use LIFO scheduler
+    std::vector<std::string> cfg = {"--hpx:queuing=local-priority-lifo"};
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(desc_commandline, argc, argv, cfg);
 }
 //main]

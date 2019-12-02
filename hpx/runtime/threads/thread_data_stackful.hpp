@@ -57,7 +57,7 @@ namespace hpx { namespace threads {
         static util::internal_allocator<thread_data_stackful> thread_alloc_;
 
     public:
-        coroutine_type::result_type call(
+        HPX_FORCEINLINE coroutine_type::result_type call(
             hpx::basic_execution::this_thread::detail::agent_storage*
                 agent_storage)
         {
@@ -67,6 +67,14 @@ namespace hpx { namespace threads {
             hpx::basic_execution::this_thread::reset_agent ctx(
                 agent_storage, agent_);
             return coroutine_(set_state_ex(wait_signaled));
+        }
+
+        HPX_FORCEINLINE coroutine_type::result_type invoke_directly()
+        {
+            HPX_ASSERT(get_state().state() == active);
+            HPX_ASSERT(this == coroutine_.get_thread_id().get());
+
+            return coroutine_.invoke_directly(set_state_ex(wait_signaled));
         }
 
 #if defined(HPX_DEBUG)

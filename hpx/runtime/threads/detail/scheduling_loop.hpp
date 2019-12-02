@@ -810,7 +810,13 @@ namespace hpx { namespace threads { namespace detail
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
                     ++counters.executed_threads_;
 #endif
-                    scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);
+                    // if this thread has run as a child we don't destroy it
+                    // here, the parent will do that
+                    if (!thrd->runs_as_child())
+                    {
+                        scheduler.SchedulingPolicy::destroy_thread(
+                            thrd, busy_loop_count);
+                    }
                 }
             }
 
@@ -894,7 +900,7 @@ namespace hpx { namespace threads { namespace detail
                         policies::fast_idle_mode))
                 {
                     // speed up idle suspend if no work was stolen
-                    idle_loop_count -= params.max_idle_loop_count_ / 256;
+                    idle_loop_count -= params.max_idle_loop_count_ / 1024;
                     added = std::size_t(-1);
                 }
 

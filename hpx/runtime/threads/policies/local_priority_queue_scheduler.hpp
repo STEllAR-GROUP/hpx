@@ -128,7 +128,7 @@ namespace hpx { namespace threads { namespace policies {
           , affinity_data_(init.affinity_data_)
           , num_queues_(init.num_queues_)
           , num_high_priority_queues_(init.num_high_priority_queues_)
-          , low_priority_queue_(0, thread_queue_init_)
+          , low_priority_queue_(init.num_queues_ - 1, thread_queue_init_)
           , queues_(num_queues_)
           , high_priority_queues_(num_queues_)
           , victim_threads_(num_queues_)
@@ -157,7 +157,7 @@ namespace hpx { namespace threads { namespace policies {
             }
         }
 
-        virtual ~local_priority_queue_scheduler()
+        ~local_priority_queue_scheduler() override
         {
             for (std::size_t i = 0; i != num_queues_; ++i)
             {
@@ -832,8 +832,7 @@ namespace hpx { namespace threads { namespace policies {
                 case thread_priority_unknown:
                 {
                     HPX_THROW_EXCEPTION(bad_parameter,
-                        "local_priority_queue_scheduler::get_thread_"
-                        "count",
+                        "local_priority_queue_scheduler::get_thread_count",
                         "unknown thread priority value "
                         "(thread_priority_unknown)");
                     return 0;
@@ -1284,7 +1283,7 @@ namespace hpx { namespace threads { namespace policies {
 
         void reset_thread_distribution() override
         {
-            curr_queue_.store(0);
+            curr_queue_.store(0, std::memory_order_release);
         }
 
     protected:

@@ -19,10 +19,11 @@
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/functional/unique_function.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/functional/unique_function.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -71,11 +72,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (stacksize == threads::thread_stacksize_default)
             stacksize = stacksize_;
 
+        schedulehint.mode = threads::thread_schedule_hint_mode_thread;
+        schedulehint.hint =
+            static_cast<std::int16_t>(get_worker_thread_num());
         register_thread_nullary(std::move(f), desc, initial_state, run_now,
-            priority_,
-            threads::thread_schedule_hint(
-                static_cast<std::int16_t>(get_next_thread_num())),
-            stacksize, ec);
+            priority_, schedulehint, stacksize, ec);
     }
 
     // Schedule given function for execution in this executor no sooner

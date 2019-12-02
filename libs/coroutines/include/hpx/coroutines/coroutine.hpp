@@ -47,6 +47,7 @@
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines {
+
     /////////////////////////////////////////////////////////////////////////////
     class coroutine
     {
@@ -110,6 +111,12 @@ namespace hpx { namespace threads { namespace coroutines {
             impl_.invoke();
 
             return impl_.result();
+        }
+
+        HPX_FORCEINLINE result_type invoke_directly(arg_type arg = arg_type())
+        {
+            HPX_ASSERT(impl_.is_ready());
+            return impl_.invoke_directly(arg);
         }
 
         bool is_ready() const

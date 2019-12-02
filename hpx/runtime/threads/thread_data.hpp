@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -31,6 +31,8 @@
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/external_timer.hpp>
 #endif
+
+#include <boost/container/small_vector.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -486,6 +488,35 @@ namespace hpx { namespace threads {
         void run_thread_exit_callbacks();
         void free_thread_exit_callbacks();
 
+        // no need to protect the variables related to scoped children as those
+        // are supposed to be accessed by ourselves only
+        bool runs_as_child() const noexcept
+        {
+            return runs_as_child_;
+        }
+
+        bool has_scoped_children() const noexcept
+        {
+            return !scoped_children_.empty();
+        }
+        thread_data* pop_child()
+        {
+            HPX_ASSERT(get_self_id_data() == this);
+            if (scoped_children_.empty())
+            {
+                return nullptr;
+            }
+            thread_data* result = scoped_children_.front();
+            scoped_children_.erase(scoped_children_.begin());
+            return result;
+        }
+        void push_child(thread_data* c)
+        {
+            HPX_ASSERT(get_self_id_data() == this);
+            scoped_children_.push_back(c);
+        }
+        void delete_scoped_children();
+
         policies::scheduler_base* get_scheduler_base() const noexcept
         {
             return scheduler_base_;
@@ -509,6 +540,16 @@ namespace hpx { namespace threads {
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
         inline coroutine_type::result_type operator()(
+            hpx::basic_execution::this_thread::detail::agent_storage*
+                agent_storage);
+
+        /// \brief Directly execute the thread function (inline)
+        ///
+        /// \returns        This function returns the thread state the thread
+        ///                 should be scheduled from this point on. The thread
+        ///                 manager will use the returned value to set the
+        ///                 thread's scheduling status.
+        inline coroutine_type::result_type invoke_directly(
             hpx::basic_execution::this_thread::detail::agent_storage*
                 agent_storage);
 
@@ -589,6 +630,10 @@ namespace hpx { namespace threads {
         bool enabled_interrupt_;
         bool ran_exit_funcs_;
 
+        // support scoped child execution
+        bool const runs_as_child_;
+        boost::container::small_vector<thread_data*, 2> scoped_children_;
+
         // Singly linked list (heap-allocated)
         std::forward_list<util::function_nonser<void()>> exit_funcs_;
 
@@ -620,7 +665,7 @@ namespace hpx { namespace threads {
 
 namespace hpx { namespace threads {
 
-    inline coroutine_type::result_type thread_data::operator()(
+    HPX_FORCEINLINE coroutine_type::result_type thread_data::operator()(
         hpx::basic_execution::this_thread::detail::agent_storage* agent_storage)
     {
         if (is_stackless_)
@@ -629,5 +674,29 @@ namespace hpx { namespace threads {
         }
         return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
+
+    HPX_FORCEINLINE coroutine_type::result_type thread_data::invoke_directly(
+        hpx::basic_execution::this_thread::detail::agent_storage* agent_storage)
+    {
+        coroutine_type::result_type result(
+            thread_state_enum::terminated, invalid_thread_id);
+
+        if (is_stackless_)
+        {
+            result = static_cast<thread_data_stackless*>(this)->call();
+        }
+        else
+        {
+            result = static_cast<thread_data_stackful*>(this)->invoke_directly();
+        }
+
+        if (result.first == terminated && has_scoped_children())
+        {
+            delete_scoped_children();
+        }
+
+        return result;
+    }
 }}
+
 #endif /*HPX_RUNTIME_THREADS_THREAD_DATA_HPP*/

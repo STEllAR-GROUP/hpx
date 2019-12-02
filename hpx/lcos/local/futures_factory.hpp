@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,14 +10,17 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos_fwd.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/threads/detail/execute_thread.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -33,6 +36,7 @@
 #include <utility>
 
 namespace hpx { namespace lcos { namespace local {
+
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename Result, typename F, typename Executor,
@@ -47,32 +51,71 @@ namespace hpx { namespace lcos { namespace local {
             typedef typename Base::init_no_addref init_no_addref;
 
             F f_;
+            bool runs_as_child_;
 
             task_object(F const& f)
               : f_(f)
+              , runs_as_child_(false)
             {
             }
 
             task_object(F&& f)
               : f_(std::move(f))
+              , runs_as_child_(false)
             {
             }
 
             task_object(init_no_addref no_addref, F const& f)
               : base_type(no_addref)
               , f_(f)
+              , runs_as_child_(false)
             {
             }
 
             task_object(init_no_addref no_addref, F&& f)
               : base_type(no_addref)
               , f_(std::move(f))
+              , runs_as_child_(false)
             {
             }
 
             void do_run() override
             {
                 return do_run_impl(std::is_void<Result>());
+            }
+
+            // overload get_result_void to be able to run child tasks, if needed
+            util::unused_type* get_result_void(error_code& ec = throws) override
+            {
+                if (runs_as_child_)
+                {
+                    threads::thread_data* self = threads::get_self_id_data();
+                    if (self->has_scoped_children())
+                    {
+                        auto state =
+                            this->state_.load(std::memory_order_acquire);
+                        while (state == this->empty)
+                        {
+                            // this thread would block on the future
+                            threads::thread_data* child = self->pop_child();
+
+                            // we should not run out of children
+                            HPX_ASSERT(child != nullptr);
+
+                            // execute the child inline
+                            if (!threads::detail::execute_thread(child))
+                            {
+                                // the executed task did not run to completion
+                                self->push_child(child);
+                            }
+
+                            // recheck our state
+                            state =
+                                this->state_.load(std::memory_order_acquire);
+                        }
+                    }
+                }
+                return this->base_type::get_result_void(ec);
             }
 
         private:
@@ -118,20 +161,48 @@ namespace hpx { namespace lcos { namespace local {
 
                 if (policy == launch::fork)
                 {
-                    return threads::register_thread_nullary(pool,
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)),
-                        util::thread_description(f_, annotation),
-                        threads::pending_do_not_schedule, true,
-                        threads::thread_priority_boost,
-                        threads::thread_schedule_hint(
-                            static_cast<std::int16_t>(get_worker_thread_num())),
-                        stacksize, ec);
+                    schedulehint.mode =
+                        threads::thread_schedule_hint_mode_thread;
+                    schedulehint.hint =
+                        static_cast<std::int16_t>(get_worker_thread_num());
+                    threads::thread_id_type id =
+                        threads::register_thread_nullary(pool,
+                            util::deferred_call(
+                                &base_type::run_impl, std::move(this_)),
+                            util::thread_description(f_, annotation),
+                            threads::pending_do_not_schedule, true,
+                            threads::thread_priority_boost, schedulehint,
+                            stacksize, ec);
+
+                    if (schedulehint.runs_as_child)
+                    {
+                        runs_as_child_ = true;
+                        threads::get_self_id_data()->push_child(
+                            threads::get_thread_id_data(id));
+                    }
+                    return id;
+                }
+
+                if (schedulehint.runs_as_child)
+                {
+                    threads::thread_id_type id =
+                        threads::register_thread_nullary(pool,
+                            util::deferred_call(
+                                &base_type::run_impl, std::move(this_)),
+                            util::thread_description(f_, annotation),
+                            threads::pending, true, priority, schedulehint,
+                            stacksize, ec);
+
+                    runs_as_child_ = true;
+                    threads::get_self_id_data()->push_child(
+                        threads::get_thread_id_data(id));
+
+                    return id;
                 }
 
                 threads::register_thread_nullary(pool,
                     util::deferred_call(&base_type::run_impl, std::move(this_)),
-                    util::thread_description(f_, "task_object::apply"),
+                    util::thread_description(f_, annotation),
                     threads::pending, false, priority, schedulehint, stacksize,
                     ec);
                 return threads::invalid_thread_id;
@@ -230,7 +301,6 @@ namespace hpx { namespace lcos { namespace local {
 
             task_object(init_no_addref no_addref, F&& f)
               : base_type(no_addref, std::move(f))
-              , exec_(nullptr)
             {
             }
 
@@ -255,43 +325,23 @@ namespace hpx { namespace lcos { namespace local {
                 threads::thread_schedule_hint schedulehint,
                 error_code& ec) override
             {
-                this->check_started();
-
-                typedef typename Base::future_base_type future_base_type;
-                future_base_type this_(this);
-
                 if (exec_)
                 {
+                    this->check_started();
+
+                    typedef typename Base::future_base_type future_base_type;
+                    future_base_type this_(this);
+
                     parallel::execution::post(*exec_,
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         schedulehint, annotation);
                     return threads::invalid_thread_id;
                 }
-                else if (policy == launch::fork)
-                {
-                    return threads::register_thread_nullary(pool,
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)),
-                        util::thread_description(
-                            this->f_, annotation),
-                        threads::pending_do_not_schedule, true,
-                        threads::thread_priority_boost,
-                        threads::thread_schedule_hint(
-                            static_cast<std::int16_t>(get_worker_thread_num())),
-                        stacksize, ec);
-                }
-                else
-                {
-                    threads::register_thread_nullary(pool,
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)),
-                        util::thread_description(
-                            this->f_, annotation),
-                        threads::pending, false, priority, schedulehint,
-                        stacksize, ec);
-                    return threads::invalid_thread_id;
-                }
+
+                return this->base_type::apply(
+                    pool, annotation, policy, priority, stacksize,
+                    schedulehint, ec);
             }
         };
 
@@ -460,16 +510,15 @@ namespace hpx { namespace traits { namespace detail {
 }}}    // namespace hpx::traits::detail
 
 namespace hpx { namespace lcos { namespace local {
+
     ///////////////////////////////////////////////////////////////////////////
     // The futures_factory is very similar to a packaged_task except that it
     // allows for the owner to go out of scope before the future becomes ready.
     // We provide this class to avoid semantic differences to the C++11
     // std::packaged_task, while otoh it is a very convenient way for us to
     // implement hpx::async.
-    template <typename Func, bool Cancelable = false>
-    class futures_factory;
-
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Result, bool Cancelable, typename Executor = void>
         struct create_task_object;

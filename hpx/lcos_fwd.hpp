@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -76,6 +76,9 @@ namespace hpx
 
             template <typename R>
             class promise;
+
+            template <typename Func, bool Cancelable = false>
+            class futures_factory;
         }
 
         // forward declare wait_all()

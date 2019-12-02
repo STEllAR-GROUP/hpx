@@ -47,8 +47,8 @@ namespace hpx { namespace detail
         call(F && f, Ts &&... ts)
         {
             parallel::execution::parallel_executor exec;
-            return parallel::execution::async_execute(
-                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return exec.async_execute(
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
     };
 

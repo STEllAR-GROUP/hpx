@@ -14,6 +14,7 @@
 #include <hpx/logging.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/external_timer.hpp>
@@ -48,6 +49,7 @@ namespace hpx { namespace threads {
         , requested_interrupt_(false)
         , enabled_interrupt_(true)
         , ran_exit_funcs_(false)
+        , runs_as_child_(init_data.schedulehint.runs_as_child)
         , scheduler_base_(init_data.scheduler_base)
         , stacksize_(init_data.stacksize)
         , queue_(queue)
@@ -76,8 +78,22 @@ namespace hpx { namespace threads {
 #endif
     }
 
+    void thread_data::delete_scoped_children()
+    {
+        for(auto* thrd : scoped_children_)
+        {
+            static std::int64_t fake_busy_count = 0;
+            thrd->get_scheduler_base()->destroy_thread(thrd, fake_busy_count);
+        }
+        scoped_children_.clear();
+    }
+
     thread_data::~thread_data()
     {
+        if (has_scoped_children())
+        {
+            delete_scoped_children();
+        }
         free_thread_exit_callbacks();
     }
 
@@ -157,7 +173,7 @@ namespace hpx { namespace threads {
         current_state_.store(thread_state(newstate, wait_signaled));
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-        description_ = (init_data.description);
+        description_ = init_data.description;
         lco_description_ = util::thread_description();
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -175,6 +191,11 @@ namespace hpx { namespace threads {
         requested_interrupt_ = false;
         enabled_interrupt_ = true;
         ran_exit_funcs_ = false;
+
+        *const_cast<bool*>(&runs_as_child_) =
+            init_data.schedulehint.runs_as_child;
+        scoped_children_.clear();
+
         exit_funcs_.clear();
         scheduler_base_ = init_data.scheduler_base;
 
