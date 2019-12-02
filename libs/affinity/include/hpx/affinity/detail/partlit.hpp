@@ -41,12 +41,10 @@
 #include <string>
 #include <type_traits>
 
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     template <typename Char, typename Iterator, typename Attribute>
     inline bool partial_string_parse(
-        Char const* str
-      , Iterator& first, Iterator const& last, Attribute& attr)
+        Char const* str, Iterator& first, Iterator const& last, Attribute& attr)
     {
         Iterator i = first;
         Char ch = *str;
@@ -68,9 +66,8 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename String, typename Iterator, typename Attribute>
-    inline bool partial_string_parse(
-        String const& str
-      , Iterator& first, Iterator const& last, Attribute& attr)
+    inline bool partial_string_parse(String const& str, Iterator& first,
+        Iterator const& last, Attribute& attr)
     {
         Iterator i = first;
         typename String::const_iterator stri = str.begin();
@@ -92,9 +89,8 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Char, typename Iterator, typename Attribute>
-    inline bool partial_string_parse(
-        Char const* uc_i, Char const* lc_i
-      , Iterator& first, Iterator const& last, Attribute& attr)
+    inline bool partial_string_parse(Char const* uc_i, Char const* lc_i,
+        Iterator& first, Iterator const& last, Attribute& attr)
     {
         Iterator i = first;
 
@@ -114,9 +110,8 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename String, typename Iterator, typename Attribute>
-    inline bool partial_string_parse(
-        String const& ucstr, String const& lcstr
-      , Iterator& first, Iterator const& last, Attribute& attr)
+    inline bool partial_string_parse(String const& ucstr, String const& lcstr,
+        Iterator& first, Iterator const& last, Attribute& attr)
     {
         typename String::const_iterator uc_i = ucstr.begin();
         typename String::const_iterator uc_last = ucstr.end();
@@ -140,51 +135,51 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     BOOST_SPIRIT_TERMINAL_NAME_EX(partlit, partlit_type)
-}}}
+}}}    // namespace hpx::threads::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace spirit
-{
+namespace boost { namespace spirit {
     // enables partlit(...)
     template <typename A0>
-    struct use_terminal<qi::domain
-          , terminal_ex<hpx::threads::detail::tag::partlit, fusion::vector1<A0> >
-          , typename std::enable_if<traits::is_string<A0>::value>::type>
-      : mpl::true_ {};
-}}
+    struct use_terminal<qi::domain,
+        terminal_ex<hpx::threads::detail::tag::partlit, fusion::vector1<A0>>,
+        typename std::enable_if<traits::is_string<A0>::value>::type>
+      : mpl::true_
+    {
+    };
+}}    // namespace boost::spirit
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // Parse for (possibly partial) literal strings
     template <typename String, bool no_attribute>
-    struct partial_literal_string //-V690
+    struct partial_literal_string    //-V690
       : boost::spirit::qi::primitive_parser<
-            partial_literal_string<String, no_attribute> >
+            partial_literal_string<String, no_attribute>>
     {
         typedef typename std::remove_const<
-            typename boost::spirit::traits::char_type_of<String>::type
-        >::type char_type;
+            typename boost::spirit::traits::char_type_of<String>::type>::type
+            char_type;
         typedef std::basic_string<char_type> string_type;
 
         partial_literal_string(
-                typename std::add_lvalue_reference<String>::type str_)
+            typename std::add_lvalue_reference<String>::type str_)
           : str(str_)
-        {}
+        {
+        }
 
         template <typename Context, typename Iterator>
         struct attribute
         {
-            typedef typename std::conditional<
-                    no_attribute, boost::spirit::unused_type, string_type
-                >::type type;
+            typedef typename std::conditional<no_attribute,
+                boost::spirit::unused_type, string_type>::type type;
         };
 
-        template <typename Iterator, typename Context
-          , typename Skipper, typename Attribute>
-        bool parse(Iterator& first, Iterator const& last
-          , Context& /*context*/, Skipper const& skipper, Attribute& attr_) const
+        template <typename Iterator, typename Context, typename Skipper,
+            typename Attribute>
+        bool parse(Iterator& first, Iterator const& last, Context& /*context*/,
+            Skipper const& skipper, Attribute& attr_) const
         {
             boost::spirit::qi::skip_over(first, last, skipper);
             return partial_string_parse(str, first, last, attr_);
@@ -200,21 +195,22 @@ namespace hpx { namespace threads { namespace detail
 
     private:
         // silence MSVC warning C4512: assignment operator could not be generated
-        partial_literal_string& operator= (partial_literal_string const&);
+        partial_literal_string& operator=(partial_literal_string const&);
     };
 
     template <typename String, bool no_attribute>
     struct no_case_partial_literal_string
       : boost::spirit::qi::primitive_parser<
-            no_case_partial_literal_string<String, no_attribute> >
+            no_case_partial_literal_string<String, no_attribute>>
     {
         typedef typename std::remove_const<
-            typename boost::spirit::traits::char_type_of<String>::type
-        >::type char_type;
+            typename boost::spirit::traits::char_type_of<String>::type>::type
+            char_type;
         typedef std::basic_string<char_type> string_type;
 
         template <typename CharEncoding>
-        no_case_partial_literal_string(char_type const* in, CharEncoding encoding)
+        no_case_partial_literal_string(
+            char_type const* in, CharEncoding encoding)
           : str_lo(in)
           , str_hi(in)
         {
@@ -225,23 +221,24 @@ namespace hpx { namespace threads { namespace detail
             {
                 typedef typename CharEncoding::char_type encoded_char_type;
 
-                *loi = static_cast<char_type>(encoding.tolower(encoded_char_type(*loi)));
-                *hii = static_cast<char_type>(encoding.toupper(encoded_char_type(*hii)));
+                *loi = static_cast<char_type>(
+                    encoding.tolower(encoded_char_type(*loi)));
+                *hii = static_cast<char_type>(
+                    encoding.toupper(encoded_char_type(*hii)));
             }
         }
 
         template <typename Context, typename Iterator>
         struct attribute
         {
-            typedef typename std::conditional<
-                    no_attribute, boost::spirit::unused_type, string_type
-                >::type type;
+            typedef typename std::conditional<no_attribute,
+                boost::spirit::unused_type, string_type>::type type;
         };
 
-        template <typename Iterator, typename Context
-          , typename Skipper, typename Attribute>
-        bool parse(Iterator& first, Iterator const& last
-          , Context& /*context*/, Skipper const& skipper, Attribute& attr_) const
+        template <typename Iterator, typename Context, typename Skipper,
+            typename Attribute>
+        bool parse(Iterator& first, Iterator const& last, Context& /*context*/,
+            Skipper const& skipper, Attribute& attr_) const
         {
             boost::spirit::qi::skip_over(first, last, skipper);
             return partial_string_parse(str_lo, str_hi, first, last, attr_);
@@ -250,33 +247,33 @@ namespace hpx { namespace threads { namespace detail
         template <typename Context>
         boost::spirit::info what(Context& /*context*/) const
         {
-            return boost::spirit::info("no-case-partial-literal-string", str_lo);
+            return boost::spirit::info(
+                "no-case-partial-literal-string", str_lo);
         }
 
         string_type str_lo, str_hi;
     };
-}}}
+}}}    // namespace hpx::threads::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace spirit { namespace qi
-{
+namespace boost { namespace spirit { namespace qi {
     // Parser generators: make_xxx function (objects)
 
     // partlit("...")
     template <typename Modifiers, typename A0>
     struct make_primitive<
-        terminal_ex<hpx::threads::detail::tag::partlit, fusion::vector1<A0> >
-      , Modifiers
-      , typename std::enable_if<traits::is_string<A0>::value>::type>
+        terminal_ex<hpx::threads::detail::tag::partlit, fusion::vector1<A0>>,
+        Modifiers, typename std::enable_if<traits::is_string<A0>::value>::type>
     {
-        typedef has_modifier<Modifiers, tag::char_code_base<tag::no_case> > no_case;
+        typedef has_modifier<Modifiers, tag::char_code_base<tag::no_case>>
+            no_case;
 
         typedef typename add_const<A0>::type const_string;
-        typedef typename std::conditional<
-            no_case::value
-          , hpx::threads::detail::no_case_partial_literal_string<const_string, true>
-          , hpx::threads::detail::partial_literal_string<const_string, true>
-        >::type result_type;
+        typedef typename std::conditional<no_case::value,
+            hpx::threads::detail::no_case_partial_literal_string<const_string,
+                true>,
+            hpx::threads::detail::partial_literal_string<const_string,
+                true>>::type result_type;
 
         template <typename Terminal>
         result_type operator()(Terminal const& term, unused_type) const
@@ -300,24 +297,26 @@ namespace boost { namespace spirit { namespace qi
             return result_type(traits::get_c_string(str), encoding);
         }
     };
-}}}
+}}}    // namespace boost::spirit::qi
 
-namespace boost { namespace spirit { namespace traits
-{
+namespace boost { namespace spirit { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename String, bool no_attribute, typename Attribute
-      ,typename Context, typename Iterator>
+    template <typename String, bool no_attribute, typename Attribute,
+        typename Context, typename Iterator>
     struct handles_container<
-            hpx::threads::detail::partial_literal_string<String, no_attribute>
-      , Attribute, Context, Iterator>
-      : mpl::true_ {};
+        hpx::threads::detail::partial_literal_string<String, no_attribute>,
+        Attribute, Context, Iterator> : mpl::true_
+    {
+    };
 
-    template <typename String, bool no_attribute, typename Attribute
-      , typename Context, typename Iterator>
+    template <typename String, bool no_attribute, typename Attribute,
+        typename Context, typename Iterator>
     struct handles_container<
-            hpx::threads::detail::no_case_partial_literal_string<String, no_attribute>
-      , Attribute, Context, Iterator>
-      : mpl::true_ {};
-}}}
+        hpx::threads::detail::no_case_partial_literal_string<String,
+            no_attribute>,
+        Attribute, Context, Iterator> : mpl::true_
+    {
+    };
+}}}    // namespace boost::spirit::traits
 
 #endif
