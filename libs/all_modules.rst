@@ -40,6 +40,7 @@ All modules
    /libs/functional/docs/index.rst
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
+   /libs/io_service/docs/index.rst
    /libs/iterator_support/docs/index.rst
    /libs/local_lcos/docs/index.rst
    /libs/logging/docs/index.rst
