@@ -227,5 +227,9 @@ function(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx17_std_in_place_type_t(
       DEFINITIONS HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
+
+    hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments(
+      DEFINITIONS HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS)
+
   endif()
 endfunction()
