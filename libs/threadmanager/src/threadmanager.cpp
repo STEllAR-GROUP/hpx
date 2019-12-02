@@ -184,6 +184,7 @@ namespace hpx { namespace threads {
         if (size == thread_stacksize_unknown)
             return "unknown";
 
+        // TODO: Hold on to reference of runtime_configuration.
         util::runtime_configuration const& rtcfg = hpx::get_config();
         if (rtcfg.get_stack_size(thread_stacksize_small) == size)
             size = thread_stacksize_small;
