@@ -9,7 +9,6 @@
 
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/executors.hpp>
-#include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_specific_ptr.hpp>
