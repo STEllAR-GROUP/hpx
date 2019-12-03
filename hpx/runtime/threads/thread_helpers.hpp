@@ -468,31 +468,6 @@ namespace hpx { namespace threads {
     ///         \a hpx#invalid_status.
     HPX_EXPORT threads::thread_pool_base* get_pool(
         thread_id_type const& id, error_code& ec = throws);
-
-    /// \cond NOINTERNAL
-    /// Reset internal (round robin) thread distribution scheme
-    HPX_API_EXPORT void reset_thread_distribution();
-
-    /// Set the new scheduler mode
-    HPX_API_EXPORT void set_scheduler_mode(
-        threads::policies::scheduler_mode new_mode);
-
-    /// Add the given flags to the scheduler mode
-    HPX_API_EXPORT void add_scheduler_mode(
-        threads::policies::scheduler_mode to_add);
-
-    /// Add/remove the given flags to the scheduler mode
-    HPX_API_EXPORT void add_remove_scheduler_mode(
-        threads::policies::scheduler_mode to_add,
-        threads::policies::scheduler_mode to_remove);
-
-    /// Remove the given flags from the scheduler mode
-    HPX_API_EXPORT void remove_scheduler_mode(
-        threads::policies::scheduler_mode to_remove);
-
-    /// Get the global topology instance
-    HPX_API_EXPORT topology const& get_topology();
-    /// \endcond
 }}    // namespace hpx::threads
 
 namespace hpx { namespace this_thread {
