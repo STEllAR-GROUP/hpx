@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 namespace hpx {
@@ -40,6 +41,13 @@ namespace hpx {
                            (data_size % threads::get_cache_line_size())) %
                     threads::get_cache_line_size();
             }
+
+            template <typename Data>
+            struct needs_padding
+              : std::integral_constant<bool,
+                    detail::get_cache_line_padding_size(sizeof(Data)) != 0>
+            {
+            };
         }    // namespace detail
 
         // NOTE: We do not use alignas here because asking for overaligned
@@ -52,7 +60,8 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////////
         // special struct to ensure cache line alignment of a data type
-        template <typename Data>
+        template <typename Data,
+            typename NeedsPadding = typename detail::needs_padding<Data>::type>
         struct cache_aligned_data
         {
             cache_aligned_data()
@@ -76,6 +85,28 @@ namespace hpx {
             //  cppcheck-suppress unusedVariable
             char cacheline_pad[detail::get_cache_line_padding_size(
                 sizeof(Data))];
+        };
+
+        template <typename Data>
+        struct cache_aligned_data<Data, std::false_type>
+        {
+            cache_aligned_data()
+              : data_{}
+            {
+            }
+
+            cache_aligned_data(Data&& data)
+              : data_{std::move(data)}
+            {
+            }
+
+            cache_aligned_data(Data const& data)
+              : data_{data}
+            {
+            }
+
+            // no ned to pad to cache line size
+            Data data_;
         };
 
         ///////////////////////////////////////////////////////////////////////////
