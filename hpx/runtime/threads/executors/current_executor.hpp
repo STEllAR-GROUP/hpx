@@ -101,6 +101,42 @@ namespace hpx { namespace threads { namespace executors
     };
 }}}
 
+namespace hpx { namespace threads {
+    ///  Returns a reference to the executor which was used to create
+    /// the given thread.
+    ///
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the thread-manager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.
+    ///
+    HPX_API_EXPORT threads::executors::current_executor get_executor(
+        thread_id_type const& id, error_code& ec = throws);
+}}
+
+namespace hpx { namespace this_thread {
+    /// Returns a reference to the executor which was used to create the current
+    /// thread.
+    ///
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
+    ///         to an appropriate value when an error occurs. Otherwise, this
+    ///         function will throw an \a hpx#exception with an error code of
+    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw
+    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         If this function is called while the thread-manager is not
+    ///         running, it will throw an \a hpx#exception with an error code of
+    ///         \a hpx#invalid_status.
+    ///
+    HPX_EXPORT threads::executors::current_executor get_executor(
+        error_code& ec = throws);
+}}
+
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif /*HPX_RUNTIME_THREADS_EXECUTORS_CURRENT_EXECUTOR_HPP*/

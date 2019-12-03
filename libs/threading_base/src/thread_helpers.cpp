@@ -312,23 +312,6 @@ namespace hpx { namespace threads {
         return get_thread_id_data(id)->set_backtrace(bt);
     }
 
-    threads::executors::current_executor get_executor(
-        thread_id_type const& id, error_code& ec)
-    {
-        if (HPX_UNLIKELY(!id))
-        {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_executor",
-                "null thread id encountered");
-            return executors::current_executor(nullptr);
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return executors::current_executor(
-            get_thread_id_data(id)->get_scheduler_base());
-    }
-
     threads::thread_pool_base* get_pool(
         thread_id_type const& id, error_code& ec)
     {
@@ -567,11 +550,6 @@ namespace hpx { namespace this_thread {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::executors::current_executor get_executor(error_code& ec)
-    {
-        return threads::get_executor(threads::get_self_id(), ec);
-    }
-
     threads::thread_pool_base* get_pool(error_code& ec)
     {
         return threads::get_pool(threads::get_self_id(), ec);
