@@ -90,7 +90,8 @@ namespace hpx { namespace detail
                 std::forward<F>(f), std::forward<Ts>(ts)...));
             if (hpx::detail::has_async_policy(policy))
             {
-                threads::thread_id_type tid = p.apply(pool, policy,
+                threads::thread_id_type tid = p.apply(pool,
+                    "async_launch_policy_dispatch", policy,
                     policy.priority(), threads::thread_stacksize_default, hint);
                 if (tid && policy == launch::fork)
                 {

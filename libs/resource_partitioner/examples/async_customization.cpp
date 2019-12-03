@@ -114,7 +114,7 @@ struct test_async_executor
         lcos::local::futures_factory<result_type()> p(executor_,
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -152,7 +152,7 @@ struct test_async_executor
             util::deferred_call(std::forward<F>(f),
                 std::forward<Future>(predecessor), std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom then", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -212,7 +212,7 @@ struct test_async_executor
                     predecessor),
                 std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom then", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -260,7 +260,7 @@ struct test_async_executor
             util::deferred_call(std::forward<F>(f),
                 std::forward<util::tuple<InnerFutures...>>(predecessor)));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom async", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
