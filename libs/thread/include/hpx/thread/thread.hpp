@@ -36,7 +36,7 @@ namespace hpx
         std::function<void(std::exception_ptr const& e)>;
     void set_thread_termination_handler(thread_termination_handler_type f);
 
-    class thread
+    class HPX_EXPORT thread
     {
         typedef lcos::local::spinlock mutex_type;
         void terminate(const char* function, const char* reason) const;

@@ -25,11 +25,11 @@ if (HPX_WITH_PARCELPORT_VERBS)
       hpx_assertion
       hpx_config
       hpx_format
-      hpx_performance_counters
-      hpx_preprocessor
-      hpx_plugin
-      hpx_timing
       hpx_threadmanager
+      hpx_timing
+      hpx_plugin
+      hpx_preprocessor
+      hpx_thread
       hpx::verbs
       hpx::boost
     INCLUDE_DIRS
