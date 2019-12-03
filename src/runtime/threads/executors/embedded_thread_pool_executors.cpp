@@ -26,6 +26,7 @@
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/basic_execution/this_thread.hpp>

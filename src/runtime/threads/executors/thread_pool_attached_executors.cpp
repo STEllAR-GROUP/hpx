@@ -22,7 +22,7 @@
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
 #include <chrono>

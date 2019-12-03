@@ -49,4 +49,46 @@ namespace hpx { namespace resource
         std::size_t pool_index);
 }}
 
+namespace hpx { namespace threads {
+    ///    The function \a get_thread_count returns the number of currently
+    /// known threads.
+    ///
+    /// \param state    [in] This specifies the thread-state for which the
+    ///                 number of threads should be retrieved.
+    ///
+    /// \note If state == unknown this function will not only return the
+    ///       number of currently existing threads, but will add the number
+    ///       of registered task descriptions (which have not been
+    ///       converted into threads yet).
+    HPX_API_EXPORT std::int64_t get_thread_count(
+        thread_state_enum state = unknown);
+
+    /// The function \a get_thread_count returns the number of currently
+    /// known threads.
+    ///
+    /// \param priority [in] This specifies the thread-priority for which the
+    ///                 number of threads should be retrieved.
+    /// \param state    [in] This specifies the thread-state for which the
+    ///                 number of threads should be retrieved.
+    ///
+    /// \note If state == unknown this function will not only return the
+    ///       number of currently existing threads, but will add the number
+    ///       of registered task descriptions (which have not been
+    ///       converted into threads yet).
+    HPX_API_EXPORT std::int64_t get_thread_count(
+        thread_priority priority, thread_state_enum state = unknown);
+
+    /// The function \a enumerate_threads will invoke the given function \a f
+    /// for each thread with a matching thread state.
+    ///
+    /// \param f        [in] The function which should be called for each
+    ///                 matching thread. Returning 'false' from this function
+    ///                 will stop the enumeration process.
+    /// \param state    [in] This specifies the thread-state for which the
+    ///                 threads should be enumerated.
+    HPX_API_EXPORT bool enumerate_threads(
+        util::function_nonser<bool(thread_id_type)> const& f,
+        thread_state_enum state = unknown);
+}}
+
 #endif
