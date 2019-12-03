@@ -5,6 +5,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+  channel_mpmc_fib
+  channel_mpmc_shift
+  channel_mpsc_fib
+  channel_mpsc_shift
+  channel_spsc_fib
+  channel_spsc_shift
   condition_variable
   counting_semaphore
   local_latch
@@ -15,6 +21,13 @@ set(tests
   local_mutex
   sliding_semaphore
   )
+
+set(channel_mpmc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
+set(channel_mpmc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
+set(channel_mpsc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
+set(channel_mpsc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
+set(channel_spsc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
+set(channel_spsc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -78,7 +91,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
 
 endif()
 
-#########################################################################################
+################################################################################
 set(subdirs
     shared_mutex
    )

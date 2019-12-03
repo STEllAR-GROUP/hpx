@@ -17,6 +17,9 @@ set(synchronization_headers
   hpx/synchronization/detail/counting_semaphore.hpp
   hpx/synchronization/detail/sliding_semaphore.hpp
   hpx/synchronization/event.hpp
+  hpx/synchronization/channel_mpmc.hpp
+  hpx/synchronization/channel_mpsc.hpp
+  hpx/synchronization/channel_spsc.hpp
   hpx/synchronization/latch.hpp
   hpx/synchronization/mutex.hpp
   hpx/synchronization/no_mutex.hpp
