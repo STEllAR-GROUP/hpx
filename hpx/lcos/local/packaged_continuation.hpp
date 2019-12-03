@@ -376,8 +376,12 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             hpx::intrusive_ptr<continuation> this_(this);
+            const char * annotation =
+                traits::get_function_annotation<typename hpx::util::decay<F>::type>::call(f_);
             hpx::util::thread_description desc(
-                "hpx::parallel::execution::parallel_executor::post");
+                annotation == nullptr ?
+                "hpx::parallel::execution::parallel_executor::post" :
+                annotation);
 
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
@@ -422,8 +426,12 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             hpx::intrusive_ptr<continuation> this_(this);
+            const char * annotation =
+                traits::get_function_annotation<typename hpx::util::decay<F>::type>::call(f_);
             hpx::util::thread_description desc(
-                "hpx::parallel::execution::parallel_executor::post");
+                annotation == nullptr ?
+                "hpx::parallel::execution::parallel_executor::post" :
+                annotation);
 
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
