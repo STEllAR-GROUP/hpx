@@ -571,9 +571,8 @@ namespace hpx { namespace threads { namespace policies {
             if (/*HPX_UNLIKELY*/ (!p.second))
             {
                 std::string map_size = std::to_string(thread_map_.size());
-                threads::thread_id_type tid2 = *(p.first);
-                threads::thread_data* td = get_thread_id_data(tid2);
-
+                // threads::thread_id_type tid2 = *(p.first);
+                // threads::thread_data* td = get_thread_id_data(tid2);
                 //std::ostringstream address;
                 //address << (void const*) td;
                 //std::string prev = address.str();

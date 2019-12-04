@@ -54,7 +54,7 @@ static_assert(false,
 #else
 
 #ifndef NDEBUG
-#define SHARED_PRIORITY_SCHEDULER_DEBUG true
+#define SHARED_PRIORITY_SCHEDULER_DEBUG false
 #else
 #if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
 #define SHARED_PRIORITY_SCHEDULER_DEBUG false
@@ -77,10 +77,10 @@ namespace hpx { namespace threads { namespace policies {
 ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
             using default_shared_priority_queue_scheduler_terminated_queue =
-                lockfree_lifo;    // concurrentqueue_fifo; // lockfree_lifo;
+                lockfree_lifo;
 #else
             using default_shared_priority_queue_scheduler_terminated_queue =
-                lockfree_lifo;    // concurrentqueue_fifo; // lockfree_fifo;
+                lockfree_lifo;
 #endif
 
             // Holds core/queue ratios used by schedulers.
@@ -1085,7 +1085,7 @@ namespace hpx { namespace threads { namespace policies {
                         std::this_thread::yield();
                     }
 
-                    // store local and global thread number references
+                    // store local thread number and pool index in thread local storage
                     hpx::threads::detail::set_thread_numbers_tss(
                         std::make_tuple(
                             local_thread, parent_pool_->get_pool_id().index()));

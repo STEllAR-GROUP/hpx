@@ -17,7 +17,7 @@ set(tests
     suspend_thread_timed
 )
 
-set(cross_pool_injectionr_PARAMETERS THREADS_PER_LOCALITY all)
+set(cross_pool_injection_PARAMETERS THREADS_PER_LOCALITY all)
 set(scheduler_priority_check_PARAMETERS THREADS_PER_LOCALITY all)
 set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_disabled_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -41,7 +41,6 @@ foreach(test ${tests})
     ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    DEPENDENCIES hpx_debugging hpx_testing
     FOLDER "Tests/Unit/ResourcePartitioner/")
 
   add_hpx_unit_test("resource" ${test} ${${test}_PARAMETERS})

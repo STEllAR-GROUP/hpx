@@ -27,6 +27,7 @@
 #include <atomic>
 #include <cstddef>
 #include <iostream>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -44,12 +45,16 @@ void dummy_task(std::size_t n)
     }
 }
 
-inline std::size_t st_rand()
+inline std::size_t st_rand(std::size_t a, std::size_t b)
 {
-    return std::size_t(std::rand());
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<std::size_t> dist(a, b);
+    //
+    return std::size_t(dist(gen));
 }
 
-int hpx_main(int argc, char* argv[])
+int hpx_main(int argc, char* /*argv*/[])
 {
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("default"));
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("pool-0"));
@@ -100,8 +105,8 @@ int hpx_main(int argc, char* argv[])
     for (int i = 0; i < loops; ++i)
     {
         // high priority
-        std::size_t random_pool_1 = st_rand() % num_pools;
-        std::size_t random_pool_2 = st_rand() % num_pools;
+        std::size_t random_pool_1 = st_rand(0,num_pools);
+        std::size_t random_pool_2 = st_rand(0,num_pools);
         auto& exec_1 = HP_executors[random_pool_1];
         auto& exec_2 = HP_executors[random_pool_2];
         auto f1 = hpx::async(exec_1, &dummy_task, 0);
@@ -120,8 +125,8 @@ int hpx_main(int argc, char* argv[])
     for (int i = 0; i < loops; ++i)
     {
         // normal priority
-        std::size_t random_pool_1 = st_rand() % num_pools;
-        std::size_t random_pool_2 = st_rand() % num_pools;
+        std::size_t random_pool_1 = st_rand(0,num_pools);
+        std::size_t random_pool_2 = st_rand(0,num_pools);
         auto& exec_3 = NP_executors[random_pool_1];
         auto& exec_4 = NP_executors[random_pool_2];
         auto f3 = hpx::async(exec_3, &dummy_task, 0);
@@ -140,8 +145,8 @@ int hpx_main(int argc, char* argv[])
     for (int i = 0; i < loops; ++i)
     {
         // mixed priority, HP->NP
-        std::size_t random_pool_1 = st_rand() % num_pools;
-        std::size_t random_pool_2 = st_rand() % num_pools;
+        std::size_t random_pool_1 = st_rand(0,num_pools);
+        std::size_t random_pool_2 = st_rand(0,num_pools);
         auto& exec_5 = HP_executors[random_pool_1];
         auto& exec_6 = NP_executors[random_pool_2];
         auto f5 = hpx::async(exec_5, &dummy_task, 0);
@@ -160,8 +165,8 @@ int hpx_main(int argc, char* argv[])
     for (int i = 0; i < loops; ++i)
     {
         // mixed priority, NP->HP
-        std::size_t random_pool_1 = st_rand() % num_pools;
-        std::size_t random_pool_2 = st_rand() % num_pools;
+        std::size_t random_pool_1 = st_rand(0,num_pools);
+        std::size_t random_pool_2 = st_rand(0,num_pools);
         auto& exec_7 = NP_executors[random_pool_1];
         auto& exec_8 = HP_executors[random_pool_2];
         auto f7 = hpx::async(exec_7, &dummy_task, 0);
@@ -180,12 +185,12 @@ int hpx_main(int argc, char* argv[])
     for (int i = 0; i < loops; ++i)
     {
         // tasks that depend on each other and need to suspend
-        std::size_t random_pool_1 = st_rand() % num_pools;
-        std::size_t random_pool_2 = st_rand() % num_pools;
+        std::size_t random_pool_1 = st_rand(0,num_pools);
+        std::size_t random_pool_2 = st_rand(0,num_pools);
         auto& exec_7 = NP_executors[random_pool_1];
         auto& exec_8 = HP_executors[random_pool_2];
         // random delay up to 5 miliseconds
-        std::size_t delay = st_rand() % 5;
+        std::size_t delay = st_rand(0, 5);
         auto f7 = hpx::async(exec_7, &dummy_task, delay);
         auto f8 = hpx::async(exec_8, [f7(std::move(f7)), &counter]() mutable {
             // if f7 is not ready then f8 will suspend itself on get
@@ -204,12 +209,8 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::size_t max_threads = std::thread::hardware_concurrency();
-    std::vector<std::string> cfg = {
-        "hpx.os_threads=" + std::to_string(max_threads)};
-
     // create the resource partitioner
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+    hpx::resource::partitioner rp(argc, argv);
 
     // before adding pools - set the default pool name to "pool-0"
     rp.set_default_pool_name("pool-0");
@@ -219,6 +220,7 @@ int main(int argc, char* argv[])
     std::cout << "Random seed " << seed << std::endl;
 
     // create N pools
+    std::size_t max_threads = rp.get_number_requested_threads();
     std::string pool_name;
     std::size_t threads_remaining = max_threads;
     std::size_t threads_in_pool = 0;
@@ -233,8 +235,8 @@ int main(int argc, char* argv[])
                 {
                     // pick a random number of threads less than the max
                     threads_in_pool = 1 +
-                        st_rand() %
-                            ((std::max)(std::size_t(1), max_threads / 2));
+                        st_rand(0,
+                            ((std::max)(std::size_t(1), max_threads / 2)));
                     pool_name = "pool-" + std::to_string(num_pools);
                     rp.create_thread_pool(pool_name,
                         hpx::resource::scheduling_policy::shared_priority);

@@ -17,9 +17,12 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace threads { namespace detail {
+    // set/get the global thread Id to/from thread local storage
     HPX_EXPORT std::size_t set_thread_num_tss(std::size_t num);
     HPX_EXPORT std::size_t get_thread_num_tss();
-    //
+
+    // this tuple holds the local thread Id and the pool index
+    // associated with the thread
     using thread_tuple = std::tuple<std::uint16_t, std::uint16_t>;
     HPX_EXPORT void set_thread_numbers_tss(const thread_tuple&);
     HPX_EXPORT thread_tuple get_thread_numbers_tss();
