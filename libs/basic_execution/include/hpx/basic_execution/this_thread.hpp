@@ -12,6 +12,10 @@
 #include <hpx/basic_execution/agent_ref.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+#include <hpx/errors/throw_exception.hpp>
+#endif
+
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -57,5 +61,47 @@ namespace hpx { namespace basic_execution { namespace this_thread {
         agent().sleep_until(sleep_time, desc);
     }
 }}}    // namespace hpx::basic_execution::this_thread
+
+namespace hpx { namespace util {
+    namespace detail {
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+        HPX_API_EXPORT extern bool spinlock_break_on_deadlock;
+        HPX_API_EXPORT extern std::size_t spinlock_deadlock_detection_limit;
+#endif
+
+        inline void yield_k(std::size_t k, const char* thread_name)
+        {
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+            if (k > 32 && spinlock_break_on_deadlock &&
+                k > spinlock_deadlock_detection_limit)
+            {
+                HPX_THROW_EXCEPTION(
+                    deadlock, thread_name, "possible deadlock detected");
+            }
+#endif
+            hpx::basic_execution::this_thread::yield_k(k, thread_name);
+        }
+    }
+
+    template <typename Predicate>
+    inline void yield_while(Predicate && predicate,
+        const char *thread_name = nullptr, bool allow_timed_suspension = true)
+    {
+        if (allow_timed_suspension)
+        {
+            for (std::size_t k = 0; predicate(); ++k)
+            {
+                detail::yield_k(k, thread_name);
+            }
+        }
+        else
+        {
+            for (std::size_t k = 0; predicate(); ++k)
+            {
+                detail::yield_k(k % 32, thread_name);
+            }
+        }
+    }
+}}    // namespace hpx::util::detail
 
 #endif

@@ -76,7 +76,7 @@ namespace hpx { namespace threads { namespace executors {
             {
                 hpx::util::yield_while(
                     [&]() { return (count_ > lower_threshold_); }, nullptr,
-                    hpx::threads::pending, false);
+                    false);
             }
         }
 
