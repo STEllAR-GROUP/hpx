@@ -21,11 +21,11 @@ This module provides local LCOs which return futures:
 * :cpp:class:`hpx::lcos::local::guard`
 * :cpp:class:`hpx::lcos::local::guard_set`
 * :cpp:func:`hpx::lcos::local::run_guarded`
-* :cpp:struct:`hpx::lcos::local::conditional_trigger`
+* :cpp:class:`hpx::lcos::local::conditional_trigger`
 * :cpp:class:`hpx::lcos::local::packaged_task`
 * :cpp:class:`hpx::lcos::local::promise`
-* :cpp:struct:`hpx::lcos::local::receive_buffer`
-* :cpp:struct:`hpx::lcos::local::trigger`
+* :cpp:class:`hpx::lcos::local::receive_buffer`
+* :cpp:class:`hpx::lcos::local::trigger`
 
 See the :ref:`API reference <libs_local_lcos_api>` of this module for more
 details.
