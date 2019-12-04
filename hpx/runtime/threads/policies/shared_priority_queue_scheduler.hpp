@@ -1002,7 +1002,7 @@ namespace hpx { namespace threads { namespace policies {
                                 affinity_data_.get_pu_num(global_id);
                             std::size_t domain =
                                 topo.get_numa_node_number(pu_num);
-#if 1 || defined(SHARED_PRIORITY_SCHEDULER_DEBUG_NUMA)
+#if defined(SHARED_PRIORITY_SCHEDULER_DEBUG_NUMA)
                             if (pu_num > (num_workers_ / 2))
                             {
                                 domain++;
