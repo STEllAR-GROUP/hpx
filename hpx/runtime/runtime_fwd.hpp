@@ -10,7 +10,6 @@
 #define HPX_RUNTIME_RUNTIME_FWD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 namespace hpx
 {

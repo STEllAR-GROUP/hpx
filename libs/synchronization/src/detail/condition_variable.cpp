@@ -11,6 +11,7 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

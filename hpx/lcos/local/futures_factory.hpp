@@ -18,7 +18,6 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/threading_base/thread_description.hpp>

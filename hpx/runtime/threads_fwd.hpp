@@ -9,7 +9,6 @@
 #define HPX_RUNTIME_THREADS_FWD_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/affinity.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>

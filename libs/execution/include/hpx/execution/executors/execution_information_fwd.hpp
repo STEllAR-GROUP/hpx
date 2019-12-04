@@ -14,7 +14,6 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <cstddef>
 #include <type_traits>

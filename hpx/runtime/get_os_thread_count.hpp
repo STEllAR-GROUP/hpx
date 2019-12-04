@@ -10,7 +10,6 @@
 #define HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <cstddef>
 
@@ -20,6 +19,10 @@ namespace hpx
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
     HPX_API_EXPORT std::size_t get_os_thread_count();
+
+    namespace threads {
+        class executor;
+    }
 
     /// \brief Return the number of worker OS- threads used by the given
     ///        executor to execute HPX threads

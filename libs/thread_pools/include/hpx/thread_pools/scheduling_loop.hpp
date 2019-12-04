@@ -16,7 +16,6 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
 #include <hpx/runtime/threads/scoped_background_timer.hpp>

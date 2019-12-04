@@ -16,7 +16,6 @@
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
