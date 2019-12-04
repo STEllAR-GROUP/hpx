@@ -21,12 +21,12 @@
 #include <hpx/testing.hpp>
 #include <hpx/util/annotated_function.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <atomic>
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;

@@ -24,12 +24,12 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/testing.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <atomic>
 
 std::size_t num_pools = 0;
 

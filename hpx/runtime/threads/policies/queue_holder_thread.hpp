@@ -10,8 +10,8 @@
 #define HPX_THREADMANAGER_SCHEDULING_QUEUE_HOLDER_THREAD
 
 #include <hpx/config.hpp>
-#include <hpx/debugging/print.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/debugging/print.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_mc.hpp>

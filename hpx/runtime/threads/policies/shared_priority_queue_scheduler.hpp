@@ -13,8 +13,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/debugging/print.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_holder_numa.hpp>
@@ -31,13 +31,13 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <numeric>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <map>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -110,7 +110,7 @@ namespace hpx { namespace threads { namespace policies {
             ///
             /// Warning: PendingQueuing lifo causes lockup on termination
             template <typename Mutex = std::mutex,
-        typename PendingQueuing = concurrentqueue_fifo,
+                typename PendingQueuing = concurrentqueue_fifo,
                 typename TerminatedQueuing =
                     default_shared_priority_queue_scheduler_terminated_queue>
             class shared_priority_queue_scheduler : public scheduler_base
@@ -140,7 +140,7 @@ namespace hpx { namespace threads { namespace policies {
                     }
 
                     init_parameter(std::size_t num_worker_threads,
-                        const core_ratios &cores_per_queue,
+                        const core_ratios& cores_per_queue,
                         detail::affinity_data const& affinity_data,
                         char const* description)
                       : num_worker_threads_(num_worker_threads)
@@ -578,7 +578,8 @@ namespace hpx { namespace threads { namespace policies {
                             }
                             // try other numa domains NP/LP
                             for (std::uint16_t d = 1; d < num_domains_; ++d,
-                                dom = fast_mod((domain + d), num_domains_))
+                                               dom = fast_mod(
+                                                   (domain + d), num_domains_))
                             {
                                 q_index = fast_mod(q_index, q_counts_[dom]);
                                 result = operation(

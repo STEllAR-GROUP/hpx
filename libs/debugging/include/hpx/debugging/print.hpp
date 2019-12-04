@@ -10,6 +10,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 
+#include <array>
 #include <bitset>
 #include <chrono>
 #include <cstddef>
@@ -17,12 +18,11 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
-#include <string>
-#include <vector>
-#include <utility>
-#include <array>
-#include <type_traits>
 #include <sstream>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 // ------------------------------------------------------------
 // This file provides a simple to use printf style debugging
