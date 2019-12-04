@@ -125,7 +125,7 @@ namespace hpx { namespace threads { namespace policies {
                 struct init_parameter
                 {
                     init_parameter(std::size_t num_worker_threads,
-                        core_ratios cores_per_queue,
+                        const core_ratios &cores_per_queue,
                         detail::affinity_data const& affinity_data,
                         const thread_queue_init_parameters& thread_queue_init,
                         char const* description =
@@ -139,7 +139,7 @@ namespace hpx { namespace threads { namespace policies {
                     }
 
                     init_parameter(std::size_t num_worker_threads,
-                        core_ratios cores_per_queue,
+                        const core_ratios &cores_per_queue,
                         detail::affinity_data const& affinity_data,
                         char const* description)
                       : num_worker_threads_(num_worker_threads)
@@ -300,8 +300,8 @@ namespace hpx { namespace threads { namespace policies {
                     int local_num = local_thread_number();
 
                     std::size_t thread_num = local_num;
-                    std::size_t domain_num = 0;
-                    std::size_t q_index = std::size_t(-1);
+                    std::size_t domain_num;
+                    std::size_t q_index;
 
                     debug::init<const char*> msg(nullptr);
 
@@ -490,7 +490,7 @@ namespace hpx { namespace threads { namespace policies {
                             if (!steal_numa || d == dm1)
                                 break;
                         }
-                        dom = domain;
+
                         for (std::uint16_t d = 0; d < num_domains_;
                              ++d,    // these are executed at the end of a loop
                              dom = fast_mod((domain + d), num_domains_),
@@ -576,10 +576,8 @@ namespace hpx { namespace threads { namespace policies {
                                 }
                             }
                             // try other numa domains NP/LP
-                            dom = fast_mod((domain + 1), num_domains_);
                             for (std::uint16_t d = 1; d < num_domains_; ++d,
-                                               dom = fast_mod(
-                                                   (domain + d), num_domains_))
+                                dom = fast_mod((domain + d), num_domains_))
                             {
                                 q_index = fast_mod(q_index, q_counts_[dom]);
                                 result = operation(
@@ -814,12 +812,12 @@ namespace hpx { namespace threads { namespace policies {
                         }
                         else
                         {
-                            throw std::runtime_error(
-                                "counter problem in thread scheduler");
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
                                     num_workers_);
                             q_index = q_lookup_[thread_num];
+                            throw std::runtime_error(
+                                "counter problem in thread scheduler");
                         }
                         break;
                     }

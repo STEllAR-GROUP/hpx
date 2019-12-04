@@ -157,7 +157,7 @@ namespace hpx { namespace threads { namespace policies {
         struct queue_mc_print
         {
             const QueueType* const q_;
-            queue_mc_print(const QueueType* const q)
+            explicit queue_mc_print(const QueueType* const q)
               : q_(q)
             {
             }
@@ -174,7 +174,7 @@ namespace hpx { namespace threads { namespace policies {
         struct queue_data_print
         {
             const queue_holder_thread* q_;
-            queue_data_print(const queue_holder_thread* q)
+            explicit queue_data_print(const queue_holder_thread* q)
               : q_(q)
             {
             }
@@ -678,7 +678,7 @@ namespace hpx { namespace threads { namespace policies {
         std::size_t add_new_HP(
             std::int64_t add_count, thread_holder_type* addfrom, bool stealing)
         {
-            std::size_t added = 0;
+            std::size_t added;
             if (owns_bp_queue())
             {
                 added =
@@ -701,7 +701,7 @@ namespace hpx { namespace threads { namespace policies {
         std::size_t add_new(
             std::int64_t add_count, thread_holder_type* addfrom, bool stealing)
         {
-            std::size_t added = 0;
+            std::size_t added;
             if (owns_np_queue())
             {
                 added =
@@ -902,7 +902,6 @@ namespace hpx { namespace threads { namespace policies {
         // ------------------------------------------------------------
         void abort_all_suspended_threads()
         {
-            throw std::runtime_error("This function needs to be reimplemented");
             std::scoped_lock lk(thread_map_mtx_.data_);
             thread_map_type::iterator end = thread_map_.end();
             for (thread_map_type::iterator it = thread_map_.begin(); it != end;
@@ -915,6 +914,7 @@ namespace hpx { namespace threads { namespace policies {
                     np_queue_->schedule_work(get_thread_id_data(*it), true);
                 }
             }
+            throw std::runtime_error("This function needs to be reimplemented");
         }
 
         // ------------------------------------------------------------

@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
     public:
-        thread_queue_mc(const thread_queue_init_parameters& parameters,
+        explicit thread_queue_mc(const thread_queue_init_parameters& parameters,
             std::size_t queue_num = std::size_t(-1))
           : parameters_(parameters)
           , queue_index_(queue_num)
