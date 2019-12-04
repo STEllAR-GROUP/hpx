@@ -20,7 +20,7 @@ At this point the module exposes the following collective primitives:
 * :cpp:class:`hpx::collectives::all_to_all`: each participating site provides its
   element of the data to collect while all participating sites receive the data
   from every other site.
-* :cpp:class:`hpx::lcos:barrier`: distributed barrier.
+* :cpp:class:`hpx::lcos::barrier`: distributed barrier.
 * :cpp:func:`hpx::lcos::broadcast`: performs a given action on all given global
   identifiers.
 * :cpp:func:`hpx::lcos::fold`: performs a fold with a given action on all given
