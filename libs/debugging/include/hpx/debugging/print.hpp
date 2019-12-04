@@ -19,6 +19,10 @@
 #include <iterator>
 #include <string>
 #include <vector>
+#include <utility>
+#include <array>
+#include <type_traits>
+#include <sstream>
 
 // ------------------------------------------------------------
 // This file provides a simple to use printf style debugging

@@ -29,6 +29,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <atomic>
 
 std::size_t num_pools = 0;
 
@@ -213,7 +214,7 @@ int main(int argc, char* argv[])
     // before adding pools - set the default pool name to "pool-0"
     rp.set_default_pool_name("pool-0");
 
-    auto seed = std::time(NULL);
+    auto seed = std::time(nullptr);
     std::srand(seed);
     std::cout << "Random seed " << seed << std::endl;
 

@@ -341,19 +341,19 @@ namespace hpx { namespace threads { namespace executors {
                 OuterFuture<util::tuple<InnerFutures...>>, Ts...>::type
                 result_type;
 
-            std::cout
-                << "when_all(fut) : Predecessor : "
-                << util::debug::print_type<
+            gpx_deb.debug(debug::str<>("when_all(fut) : Predecessor")
+                , util::debug::print_type<
                        OuterFuture<util::tuple<InnerFutures...>>>()
-                << "\n"
-                << "when_all(fut) : unwrapped   : "
-                << util::debug::print_type<decltype(unwrapped_futures_tuple)>(
+                , "\n"
+                , "when_all(fut) : unwrapped   : "
+                , util::debug::print_type<decltype(unwrapped_futures_tuple)>(
                        " | ")
-                << "\n"
-                << "then_execute  : Arguments   : "
-                << util::debug::print_type<Ts...>(" | ") << "\n"
-                << "when_all(fut) : Result      : "
-                << util::debug::print_type<result_type>() << "\n";
+                , "\n"
+                , "then_execute  : Arguments   : "
+                , util::debug::print_type<Ts...>(" | ") , "\n"
+                , "when_all(fut) : Result      : "
+                , util::debug::print_type<result_type>() , "\n"
+            );
 #endif
 
             // Please see notes for previous then_execute function above
@@ -400,20 +400,20 @@ namespace hpx { namespace threads { namespace executors {
             int domain = util::invoke_fused(hint_, unwrapped_futures_tuple);
 #endif
 
-#ifdef GUIDED_EXECUTOR_DEBUG
-            std::cout << "dataflow      : Predecessor : "
-                      << util::debug::print_type<util::tuple<InnerFutures...>>()
-                      << "\n"
-                      << "dataflow      : unwrapped   : "
-                      << util::debug::print_type<
+#ifndef GUIDED_EXECUTOR_DEBUG
+            gpx_deb.debug(debug::str<>("dataflow      : Predecessor")
+                      , util::debug::print_type<util::tuple<InnerFutures...>>()
+                      , "\n"
+                      , "dataflow      : unwrapped   : "
+                      , util::debug::print_type<
 #ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
                              int>(" | ")
 #else
                              decltype(unwrapped_futures_tuple)>(" | ")
 #endif
-                      << "\n";
+                      , "\n");
 
-            std::cout << "dataflow hint returning " << domain << "\n";
+            gpx_deb.debug(debug::str<>("dataflow hint"), debug::dec<>(domain));
 #endif
 
             // forward the task execution on to the real internal executor

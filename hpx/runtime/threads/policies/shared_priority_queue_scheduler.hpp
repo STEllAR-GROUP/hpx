@@ -14,7 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/debugging/print.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_holder_numa.hpp>
@@ -37,6 +37,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <map>
 
 #include <hpx/config/warnings_prefix.hpp>
 

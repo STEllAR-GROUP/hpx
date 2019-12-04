@@ -26,6 +26,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <atomic>
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;

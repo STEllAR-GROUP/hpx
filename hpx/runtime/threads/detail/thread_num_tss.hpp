@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <tuple>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
