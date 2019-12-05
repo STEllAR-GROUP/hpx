@@ -186,7 +186,7 @@ namespace hpx { namespace lcos { namespace detail
 
         HPX_FORCEINLINE void done(Futures futures)
         {
-            hpx::util::annotate_function annotate(func_);
+            hpx::util::rename_function annotate(func_);
 
             execute(is_void{}, std::move(futures));
         }

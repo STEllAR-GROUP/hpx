@@ -107,7 +107,7 @@ namespace hpx { namespace lcos { namespace detail
             typename util::invoke_result<Func, Future>::type
         > is_void;
 
-        hpx::util::annotate_function annotate(func);
+        hpx::util::rename_function annotate(func);
         invoke_continuation_nounwrap(
             func, std::forward<Future>(future), cont, is_void());
     }

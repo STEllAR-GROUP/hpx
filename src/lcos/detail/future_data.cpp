@@ -143,7 +143,7 @@ namespace hpx { namespace lcos { namespace detail
         completed_callback_type&& on_completed) noexcept
     {
         try {
-            hpx::util::annotate_function annotate(on_completed);
+            hpx::util::rename_function annotate(on_completed);
             on_completed();
         }
         catch (...) {

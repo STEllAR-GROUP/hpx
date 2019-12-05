@@ -36,28 +36,28 @@ namespace hpx { namespace util
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-    struct annotate_function
+    struct rename_function
     {
-        HPX_NON_COPYABLE(annotate_function);
+        HPX_NON_COPYABLE(rename_function);
 
-        explicit annotate_function(char const* name) {}
+        explicit rename_function(char const* name) {}
         template <typename F>
-        explicit HPX_HOST_DEVICE annotate_function(F && f) {}
+        explicit HPX_HOST_DEVICE rename_function(F && f) {}
 
         // add empty (but non-trivial) destructor to silence warnings
-        HPX_HOST_DEVICE ~annotate_function() {}
+        HPX_HOST_DEVICE ~rename_function() {}
     };
 #elif HPX_HAVE_ITTNOTIFY != 0
-    struct annotate_function
+    struct rename_function
     {
-        HPX_NON_COPYABLE(annotate_function);
+        HPX_NON_COPYABLE(rename_function);
 
-        explicit annotate_function(char const* name)
+        explicit rename_function(char const* name)
           : task_(thread_domain_,
                 hpx::util::itt::string_handle(name))
         {}
         template <typename F>
-        explicit annotate_function(F && f)
+        explicit rename_function(F && f)
           : task_(thread_domain_,
                 hpx::traits::get_function_annotation_itt<
                     typename std::decay<F>::type
@@ -69,11 +69,11 @@ namespace hpx { namespace util
         hpx::util::itt::task task_;
     };
 #else
-    struct annotate_function
+    struct rename_function
     {
-        HPX_NON_COPYABLE(annotate_function);
+        HPX_NON_COPYABLE(rename_function);
 
-        explicit annotate_function(char const* name)
+        explicit rename_function(char const* name)
           : desc_(hpx::threads::get_self_ptr() ?
                 hpx::threads::set_thread_description(
                     hpx::threads::get_self_id(), name) :
@@ -88,7 +88,7 @@ namespace hpx { namespace util
         }
 
         template <typename F>
-        explicit annotate_function(F && f)
+        explicit rename_function(F && f)
           : desc_(hpx::threads::get_self_ptr() ?
                 hpx::threads::set_thread_description(
                     hpx::threads::get_self_id(),
@@ -101,7 +101,7 @@ namespace hpx { namespace util
 #endif
         }
 
-        ~annotate_function()
+        ~rename_function()
         {
             if (hpx::threads::get_self_ptr())
             {
@@ -123,12 +123,12 @@ namespace hpx { namespace util
               : name_(nullptr)
             {}
 
-            annotated_function(F const& f, char const* name)
-              : f_(f), name_(name)
+            annotated_function(char const* name, F const& f)
+              : name_(name), f_(f)
             {}
 
-            annotated_function(F && f, char const* name)
-              : f_(std::move(f)), name_(name)
+            annotated_function(char const* name, F && f)
+              : name_(name), f_(std::move(f))
             {}
 
         public:
@@ -137,7 +137,7 @@ namespace hpx { namespace util
                 typename util::decay_unwrap<F>::type, Ts...>::type
             operator()(Ts && ... ts)
             {
-                annotate_function func(name_);
+                rename_function(get_function_annotation());
                 return util::invoke(f_, std::forward<Ts>(ts)...);
             }
 
@@ -174,44 +174,44 @@ namespace hpx { namespace util
             }
 
         private:
-            typename util::decay_unwrap<F>::type f_;
             char const* name_;
+            typename util::decay_unwrap<F>::type f_;
         };
     }
 
     template <typename F>
     detail::annotated_function<typename std::decay<F>::type>
-    annotated_function(F && f, char const* name = nullptr)
+    annotated_function(char const* name, F && f)
     {
         typedef detail::annotated_function<
             typename std::decay<F>::type
         > result_type;
 
-        return result_type(std::forward<F>(f), name);
+        return result_type(name, std::forward<F>(f));
     }
 
 #else
     ///////////////////////////////////////////////////////////////////////////
-    struct annotate_function
+    struct rename_function
     {
-        HPX_NON_COPYABLE(annotate_function);
+        HPX_NON_COPYABLE(rename_function);
 
-        explicit annotate_function(char const* /*name*/) {}
+        explicit rename_function(char const* /*name*/) {}
         template <typename F>
-        explicit HPX_HOST_DEVICE annotate_function(F && /*f*/) {}
+        explicit HPX_HOST_DEVICE rename_function(F && /*f*/) {}
 
         // add empty (but non-trivial) destructor to silence warnings
-        HPX_HOST_DEVICE ~annotate_function() {}
+        HPX_HOST_DEVICE ~rename_function() {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Given a function as an argument, the user can annotate_function
+    /// \brief Given a function as an argument, the user can rename_function
     /// as well.
     /// Annotating includes setting the thread description per thread id.
     ///
     /// \param function
     template <typename F>
-    F && annotated_function(F && f, char const* = nullptr)
+    F && annotated_function(char const*, F && f)
     {
         return std::forward<F>(f);
     }

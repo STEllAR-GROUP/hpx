@@ -6,6 +6,14 @@
 
 set(tests
     apex_action_count
+    apex_annotated_sync
+    apex_annotated_async
+    apex_direct_action
+    apex_annotated_continuation_async
+    apex_renamed_async
+    apex_annotated_continuation_sync
+    apex_renamed_sync
+    apex_annotated_dataflow
    )
 
 

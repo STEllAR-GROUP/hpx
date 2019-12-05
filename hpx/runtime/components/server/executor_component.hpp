@@ -88,7 +88,8 @@ namespace hpx { namespace components
                 hpx::get_lva<executor_component>::call(lva)->exec_,
                 hpx::util::deferred_call(
                     hpx::util::annotated_function(
-                        &executor_component::execute, desc.get_description()
+                        desc.get_description(),
+                        &executor_component::execute
                     ),
                     std::move(data.func)));
         }

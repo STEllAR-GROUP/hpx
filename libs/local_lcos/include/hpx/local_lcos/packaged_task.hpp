@@ -91,7 +91,7 @@ namespace hpx { namespace lcos { namespace local {
                 return;
             }
 
-            hpx::util::annotate_function annotate(function_);
+            hpx::util::rename_function annotate(function_);
             invoke_impl(std::is_void<R>(), std::forward<Ts>(vs)...);
         }
 

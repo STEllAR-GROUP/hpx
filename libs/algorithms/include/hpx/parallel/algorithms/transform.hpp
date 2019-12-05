@@ -124,7 +124,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 operator()(Iter part_begin, std::size_t part_size,
                     std::size_t /*part_index*/)
             {
-                hpx::util::annotate_function annotate(f_);
+                hpx::util::rename_function annotate(f_);
                 return execute(part_begin, part_size);
             }
         };

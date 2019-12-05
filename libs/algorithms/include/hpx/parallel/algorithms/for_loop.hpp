@@ -141,7 +141,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             HPX_HOST_DEVICE void operator()(
                 B part_begin, std::size_t part_steps, std::size_t part_index)
             {
-                hpx::util::annotate_function annotate(f_);
+                hpx::util::rename_function annotate(f_);
                 execute(part_begin, part_steps, part_index);
             }
         };
