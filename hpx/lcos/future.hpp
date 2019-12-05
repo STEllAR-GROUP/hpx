@@ -21,7 +21,6 @@
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/future_traits.hpp>
-#include <hpx/lcos_fwd.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -44,12 +43,18 @@
     #include <hpx/lcos/detail/future_await_traits.hpp>
 #endif
 
-
 #include <exception>
 #include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
+
+
+namespace hpx {
+    // Due to the removal of the lcos_fwd include
+    using lcos::future;
+    using lcos::shared_future;
+}
 
 namespace hpx { namespace lcos { namespace detail
 {
