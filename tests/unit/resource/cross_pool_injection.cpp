@@ -105,8 +105,8 @@ int hpx_main(int argc, char* /*argv*/[])
     for (int i = 0; i < loops; ++i)
     {
         // high priority
-        std::size_t random_pool_1 = st_rand(0,num_pools);
-        std::size_t random_pool_2 = st_rand(0,num_pools);
+        std::size_t random_pool_1 = st_rand(0,num_pools-1);
+        std::size_t random_pool_2 = st_rand(0,num_pools-1);
         auto& exec_1 = HP_executors[random_pool_1];
         auto& exec_2 = HP_executors[random_pool_2];
         auto f1 = hpx::async(exec_1, &dummy_task, 0);
@@ -125,8 +125,8 @@ int hpx_main(int argc, char* /*argv*/[])
     for (int i = 0; i < loops; ++i)
     {
         // normal priority
-        std::size_t random_pool_1 = st_rand(0,num_pools);
-        std::size_t random_pool_2 = st_rand(0,num_pools);
+        std::size_t random_pool_1 = st_rand(0,num_pools-1);
+        std::size_t random_pool_2 = st_rand(0,num_pools-1);
         auto& exec_3 = NP_executors[random_pool_1];
         auto& exec_4 = NP_executors[random_pool_2];
         auto f3 = hpx::async(exec_3, &dummy_task, 0);
@@ -145,8 +145,8 @@ int hpx_main(int argc, char* /*argv*/[])
     for (int i = 0; i < loops; ++i)
     {
         // mixed priority, HP->NP
-        std::size_t random_pool_1 = st_rand(0,num_pools);
-        std::size_t random_pool_2 = st_rand(0,num_pools);
+        std::size_t random_pool_1 = st_rand(0,num_pools-1);
+        std::size_t random_pool_2 = st_rand(0,num_pools-1);
         auto& exec_5 = HP_executors[random_pool_1];
         auto& exec_6 = NP_executors[random_pool_2];
         auto f5 = hpx::async(exec_5, &dummy_task, 0);
@@ -165,8 +165,8 @@ int hpx_main(int argc, char* /*argv*/[])
     for (int i = 0; i < loops; ++i)
     {
         // mixed priority, NP->HP
-        std::size_t random_pool_1 = st_rand(0,num_pools);
-        std::size_t random_pool_2 = st_rand(0,num_pools);
+        std::size_t random_pool_1 = st_rand(0,num_pools-1);
+        std::size_t random_pool_2 = st_rand(0,num_pools-1);
         auto& exec_7 = NP_executors[random_pool_1];
         auto& exec_8 = HP_executors[random_pool_2];
         auto f7 = hpx::async(exec_7, &dummy_task, 0);
@@ -185,8 +185,8 @@ int hpx_main(int argc, char* /*argv*/[])
     for (int i = 0; i < loops; ++i)
     {
         // tasks that depend on each other and need to suspend
-        std::size_t random_pool_1 = st_rand(0,num_pools);
-        std::size_t random_pool_2 = st_rand(0,num_pools);
+        std::size_t random_pool_1 = st_rand(0,num_pools-1);
+        std::size_t random_pool_2 = st_rand(0,num_pools-1);
         auto& exec_7 = NP_executors[random_pool_1];
         auto& exec_8 = HP_executors[random_pool_2];
         // random delay up to 5 miliseconds
