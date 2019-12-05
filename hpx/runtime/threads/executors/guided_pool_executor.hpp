@@ -35,6 +35,7 @@
 #endif
 
 namespace hpx {
+    // cppcheck-suppress ConfigurationNotChecked
     static hpx::debug::enable_print<GUIDED_POOL_EXECUTOR_DEBUG> gpx_deb(
         "GP_EXEC");
 }

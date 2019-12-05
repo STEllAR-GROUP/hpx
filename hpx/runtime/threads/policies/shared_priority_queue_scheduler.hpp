@@ -362,7 +362,9 @@ namespace hpx { namespace threads { namespace policies {
                                              ->worker_next(num_workers_);
                         }
                         thread_num = select_active_pu(l, thread_num);
+                        // cppcheck-suppress redundantAssignment
                         domain_num = d_lookup_[thread_num];
+                        // cppcheck-suppress redundantAssignment
                         q_index = q_lookup_[thread_num];
                         break;
                     }
