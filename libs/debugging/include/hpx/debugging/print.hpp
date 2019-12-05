@@ -395,6 +395,9 @@ namespace hpx { namespace debug {
     struct enable_print
     {
         enable_print(const char* p) {}
+
+        constexpr bool is_enabled() { return false; }
+
         template <typename... Args>
         inline void debug(Args... args)
         {
@@ -446,6 +449,8 @@ namespace hpx { namespace debug {
           : prefix_(p)
         {
         }
+
+        constexpr bool is_enabled() { return true; }
 
         template <typename... Args>
         void debug(Args... args)

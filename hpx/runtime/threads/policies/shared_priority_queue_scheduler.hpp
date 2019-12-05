@@ -334,8 +334,10 @@ namespace hpx { namespace threads { namespace policies {
                         }
                         else if (!round_robin_)
                         {
-                            domain_num = d_lookup_[thread_num];
-                            q_index = q_lookup_[thread_num];
+                            if (spq_deb.is_enabled()) {
+                                domain_num = d_lookup_[thread_num];
+                                q_index = q_lookup_[thread_num];
+                            }
                             spq_deb.debug(debug::str<>("create_thread"),
                                 "assign_work_thread_parent", "thread_num",
                                 thread_num, "pool",
