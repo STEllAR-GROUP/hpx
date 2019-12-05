@@ -54,13 +54,13 @@ static_assert(false,
 #else
 
 #if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
-# ifndef NDEBUG
-#  define SHARED_PRIORITY_SCHEDULER_DEBUG false
-# else
-#  if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
-#   define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#  endif
-# endif
+#ifndef NDEBUG
+#define SHARED_PRIORITY_SCHEDULER_DEBUG false
+#else
+#if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
+#define SHARED_PRIORITY_SCHEDULER_DEBUG false
+#endif
+#endif
 #endif
 
 namespace hpx {
@@ -128,7 +128,7 @@ namespace hpx { namespace threads { namespace policies {
                 struct init_parameter
                 {
                     init_parameter(std::size_t num_worker_threads,
-                        const core_ratios &cores_per_queue,
+                        const core_ratios& cores_per_queue,
                         detail::affinity_data const& affinity_data,
                         const thread_queue_init_parameters& thread_queue_init,
                         char const* description =
@@ -336,7 +336,8 @@ namespace hpx { namespace threads { namespace policies {
                         }
                         else if (!round_robin_)
                         {
-                            if (spq_deb.is_enabled()) {
+                            if (spq_deb.is_enabled())
+                            {
                                 domain_num = d_lookup_[thread_num];
                                 q_index = q_lookup_[thread_num];
                             }

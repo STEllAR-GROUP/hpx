@@ -340,7 +340,7 @@ namespace hpx { namespace threads { namespace executors {
             typedef typename util::detail::invoke_deferred_result<F,
                 OuterFuture<util::tuple<InnerFutures...>>, Ts...>::type
                 result_type;
-// clang-format on
+            // clang-format off
             gpx_deb.debug(debug::str<>("when_all(fut) : Predecessor")
                 , util::debug::print_type<
                        OuterFuture<util::tuple<InnerFutures...>>>()
@@ -354,7 +354,7 @@ namespace hpx { namespace threads { namespace executors {
                 , "when_all(fut) : Result      : "
                 , util::debug::print_type<result_type>() , "\n"
             );
-// clang-format off
+            // clang-format on
 #endif
 
             // Please see notes for previous then_execute function above
@@ -402,7 +402,7 @@ namespace hpx { namespace threads { namespace executors {
 #endif
 
 #ifndef GUIDED_EXECUTOR_DEBUG
-// clang-format on
+            // clang-format off
             gpx_deb.debug(debug::str<>("dataflow      : Predecessor")
                       , util::debug::print_type<util::tuple<InnerFutures...>>()
                       , "\n"
@@ -416,7 +416,7 @@ namespace hpx { namespace threads { namespace executors {
                       , "\n");
 
             gpx_deb.debug(debug::str<>("dataflow hint"), debug::dec<>(domain));
-// clang-format off
+            // clang-format on
 #endif
 
             // forward the task execution on to the real internal executor
