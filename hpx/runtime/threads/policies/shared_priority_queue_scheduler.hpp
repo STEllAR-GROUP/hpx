@@ -53,12 +53,14 @@ static_assert(false,
     "include \"all\" or \"shared-priority\"");
 #else
 
-#ifndef NDEBUG
-#define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#else
 #if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
-#define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#endif
+# ifndef NDEBUG
+#  define SHARED_PRIORITY_SCHEDULER_DEBUG false
+# else
+#  if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
+#   define SHARED_PRIORITY_SCHEDULER_DEBUG false
+#  endif
+# endif
 #endif
 
 namespace hpx {
