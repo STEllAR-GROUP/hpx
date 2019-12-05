@@ -1,6 +1,4 @@
-//  Copyright (c) 2017-2018 John Biddiscombe
-//  Copyright (c) 2007-2016 Hartmut Kaiser
-//  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c) 2019 John Biddiscombe
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying

@@ -328,8 +328,8 @@ namespace hpx { namespace threads { namespace policies {
                                 "parent offset",
                                 parent_pool_->get_thread_offset(),
                                 parent_pool_->get_pool_name());
-                            // This is a task being injected from a thread on another pool.
-                            // we can schedule on any thread available
+                            // This is a task being injected from a thread on another
+                            // pool - we can schedule on any thread available
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
                                     num_workers_);
@@ -492,7 +492,7 @@ namespace hpx { namespace threads { namespace policies {
                                     debug::dec<3>(q_index));
                                 return result;
                             }
-                            // if no numa stealing - this thread should only check it's own numa
+                            // if no numa stealing, skip other domains
                             if (!steal_numa || d == dm1)
                                 break;
                         }
@@ -514,7 +514,7 @@ namespace hpx { namespace threads { namespace policies {
                                     debug::dec<3>(q_index));
                                 return result;
                             }
-                            // if no numa stealing - this thread should only check it's own numa
+                            // if no numa stealing, skip other domains
                             if (!steal_numa || d == dm1)
                                 break;
                         }
@@ -694,12 +694,6 @@ namespace hpx { namespace threads { namespace policies {
                                 q_index, added, stealing, allow_stealing);
                         };
 
-                    auto null_function =
-                        [&](std::uint16_t domain, std::uint16_t q_index,
-                            thread_holder_type* receiver, std::size_t& added,
-                            bool stealing,
-                            bool allow_stealing) { return false; };
-
                     std::uint16_t domain = d_lookup_[thread_num];
                     std::uint16_t q_index = q_lookup_[thread_num];
                     //
@@ -750,8 +744,8 @@ namespace hpx { namespace threads { namespace policies {
                         debug::set(msg, "HINT_NONE  ");
                         if (local_num < 0)
                         {
-                            // This is a task being injected from a thread on another pool.
-                            // we can schedule on any thread available
+                            // This is a task being injected from a thread on another
+                            // pool - we can schedule on any thread available
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
                                     num_workers_);
@@ -1019,10 +1013,11 @@ namespace hpx { namespace threads { namespace policies {
                         }
                         num_domains_ = domain_map.size();
 
-                        // if we have zero threads on a numa domain, reindex the domains to be
-                        // sequential otherwise it messes up counting as an indexing operation
-                        // this can happen on nodes that have unusual numa topologies with
-                        // (e.g.) High Bandwidth Memory on numa nodes with no processors
+                        // if we have zero threads on a numa domain, reindex the domains
+                        // to be sequential otherwise it messes up counting as an
+                        // indexing operation. This can happen on nodes that have unusual
+                        // numa topologies with (e.g.) High Bandwidth Memory on numa
+                        // nodes with no processors
                         for (std::size_t local_id = 0; local_id < num_workers_;
                              ++local_id)
                         {
@@ -1081,12 +1076,12 @@ namespace hpx { namespace threads { namespace policies {
                     // one thread will be the 'owner' of the queue.
                     // allow one thread at a time to enter this section in incrementing
                     // thread number ordering so that we can init queues and assign them
-                    // with the guarantee that references to threads with lower ids are valid.
+                    // guaranteeing that references to threads with lower ids are valid.
                     // ------------------------------------
                     while (local_thread !=
                         std::get<3>(locations[thread_init_counter_]))
                     {
-                        // std::thread because we can't do an HPX suspend on worker threads
+                        // std::thread because we cannot suspend HPX threads here
                         std::this_thread::yield();
                     }
 
@@ -1149,7 +1144,7 @@ namespace hpx { namespace threads { namespace policies {
                                 }
                                 else
                                 {
-                                    // share the queue with our next lowest thread num neighbour
+                                    // share the queue with our next lowest neighbour
                                     hp_queue = numa_holder_[domain]
                                                    .thread_queue(index - 1)
                                                    ->hp_queue_;
@@ -1165,7 +1160,7 @@ namespace hpx { namespace threads { namespace policies {
                             }
                             else
                             {
-                                // share the queue with our next lowest thread num neighbour
+                                // share the queue with our next lowest neighbour
                                 np_queue = numa_holder_[domain]
                                                .thread_queue(index - 1)
                                                ->np_queue_;
@@ -1183,7 +1178,7 @@ namespace hpx { namespace threads { namespace policies {
                                 }
                                 else
                                 {
-                                    // share the queue with our next lowest thread num neighbour
+                                    // share the queue with our next lowest neighbour
                                     lp_queue = numa_holder_[domain]
                                                    .thread_queue(index - 1)
                                                    ->lp_queue_;
@@ -1212,7 +1207,7 @@ namespace hpx { namespace threads { namespace policies {
                         index++;
                     }
 
-                    // we can now increment the thread counter and allow the next thread to init
+                    // increment the thread counter and allow the next thread to init
                     thread_init_counter_++;
 
                     // we do not want to allow threads to start stealing from others
@@ -1220,7 +1215,7 @@ namespace hpx { namespace threads { namespace policies {
                     // We therefore block at this point until all threads are here.
                     while (thread_init_counter_ < num_workers_)
                     {
-                        // std::thread because we can't suspend HPX threads until initialized
+                        // std::thread because we cannot suspend HPX threads yet
                         std::this_thread::yield();
                     }
 

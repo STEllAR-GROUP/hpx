@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <tuple>
+#include <utility>
 
 namespace hpx { namespace threads { namespace detail {
     namespace {
