@@ -66,7 +66,7 @@ static_assert(false,
 namespace hpx {
     using print_onoff =
         hpx::debug::enable_print<SHARED_PRIORITY_SCHEDULER_DEBUG>;
-    using print_on = hpx::debug::enable_print<true>;
+    using print_on = hpx::debug::enable_print<false>;
     static print_onoff spq_deb("SPQUEUE");
     static print_on spq_arr("SPQUEUE");
 }    // namespace hpx
