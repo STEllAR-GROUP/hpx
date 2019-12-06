@@ -12,7 +12,6 @@
 #include <hpx/debugging/print.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
-#include <hpx/runtime/threads/policies/thread_queue_mc.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_data_stackful.hpp>
 #include <hpx/runtime/threads/thread_data_stackless.hpp>

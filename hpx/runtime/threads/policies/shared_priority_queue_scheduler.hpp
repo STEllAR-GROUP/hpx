@@ -187,11 +187,12 @@ namespace hpx { namespace threads { namespace policies {
                 // get/set scheduler mode
                 void set_scheduler_mode(scheduler_mode mode) override
                 {
+                    // clang-format off
                     scheduler_base::set_scheduler_mode(mode);
-                    round_robin_    = mode & policies::assign_work_round_robin;
+                    round_robin_ = mode & policies::assign_work_round_robin;
                     steal_hp_first_ = mode & policies::steal_high_priority_first;
-                    core_stealing_  = mode & policies::enable_stealing;
-                    numa_stealing_  = mode & policies::enable_stealing_numa;
+                    core_stealing_ = mode & policies::enable_stealing;
+                    numa_stealing_ = mode & policies::enable_stealing_numa;
                     spq_arr.debug(debug::str<>("scheduler_mode")
                         , round_robin_ ? "round_robin" : "thread parent"
                         , ','
@@ -200,6 +201,7 @@ namespace hpx { namespace threads { namespace policies {
                         , core_stealing_ ? "stealing" : "no stealing"
                         , ','
                         , numa_stealing_ ? "numa stealing" : "no numa stealing");
+                    // clang-format on
                 }
 
                 // ------------------------------------------------------------

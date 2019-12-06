@@ -38,7 +38,7 @@ namespace hpx {
     // cppcheck-suppress ConfigurationNotChecked
     static hpx::debug::enable_print<GUIDED_POOL_EXECUTOR_DEBUG> gpx_deb(
         "GP_EXEC");
-}
+}    // namespace hpx
 
 // --------------------------------------------------------------------
 // pool_numa_hint
@@ -123,8 +123,8 @@ namespace hpx { namespace threads { namespace executors {
             if (0 && hp_sync_ &&
                 executor_.get_priority() == hpx::threads::thread_priority_high)
             {
-                p.apply("guided async", hpx::launch::sync, executor_.get_priority(),
-                    executor_.get_stacksize(),
+                p.apply("guided async", hpx::launch::sync,
+                    executor_.get_priority(), executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
@@ -132,8 +132,8 @@ namespace hpx { namespace threads { namespace executors {
             {
                 gpx_deb.debug(
                     debug::str<>("triggering apply"), "domain ", domain);
-                p.apply("guided async", hpx::launch::async, executor_.get_priority(),
-                    executor_.get_stacksize(),
+                p.apply("guided async", hpx::launch::async,
+                    executor_.get_priority(), executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
@@ -181,17 +181,15 @@ namespace hpx { namespace threads { namespace executors {
             if (0 && hp_sync_ &&
                 executor_.get_priority() == hpx::threads::thread_priority_high)
             {
-                p.apply("guided then",
-                    hpx::launch::sync, executor_.get_priority(),
-                    executor_.get_stacksize(),
+                p.apply("guided then", hpx::launch::sync,
+                    executor_.get_priority(), executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
             else
             {
-                p.apply("guided then",
-                    hpx::launch::async, executor_.get_priority(),
-                    executor_.get_stacksize(),
+                p.apply("guided then", hpx::launch::async,
+                    executor_.get_priority(), executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
@@ -429,16 +427,16 @@ namespace hpx { namespace threads { namespace executors {
                 pool_executor_.get_priority() ==
                     hpx::threads::thread_priority_high)
             {
-                p.apply("guided async",
-                    hpx::launch::sync, pool_executor_.get_priority(),
+                p.apply("guided async", hpx::launch::sync,
+                    pool_executor_.get_priority(),
                     pool_executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
             else
             {
-                p.apply("guided async",
-                    hpx::launch::async, pool_executor_.get_priority(),
+                p.apply("guided async", hpx::launch::async,
+                    pool_executor_.get_priority(),
                     pool_executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
@@ -504,9 +502,8 @@ namespace hpx { namespace threads { namespace executors {
                 lcos::local::futures_factory<result_type()> p(pool_exec_,
                     util::deferred_call(
                         std::forward<F>(f), std::forward<Ts>(ts)...));
-                p.apply("guided async",
-                    hpx::launch::async, pool_exec_.get_priority(),
-                    pool_exec_.get_stacksize(),
+                p.apply("guided async", hpx::launch::async,
+                    pool_exec_.get_priority(), pool_exec_.get_stacksize(),
                     threads::thread_schedule_hint());
                 return p.get_future();
             }

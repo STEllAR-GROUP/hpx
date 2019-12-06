@@ -95,30 +95,54 @@ int hpx_main(variables_map& vm)
 
     const int np_total = np_loop * cycles;
     //
+    struct dec_counter
+    {
+        explicit dec_counter(std::atomic<int>& counter)
+          : counter_(counter)
+        {
+        }
+        ~dec_counter()
+        {
+            --counter_;
+        }
+        //
+        std::atomic<int>& counter_;
+    };
+
     std::atomic<int> counter((np_loop + hp_loop) * cycles);
     std::atomic<int> counter1(0);
     {
+        hpx::async(NP_executor,
+            hpx::util::annotated_function(
+                [np_m]() { dummy_task("", std::size_t(np_m)); }, "NP task"));
+
         hpx::util::annotate_function annotate("launch");
         for (int i = 0; i < np_total; ++i)
         {
             // normal priority
-            auto f3 =
-                hpx::async(NP_executor, &dummy_task, "NP task", np_m)
-                    .then(hpx::launch::sync, [&](auto&&) {
-                        counter--;
-                        if (++counter1 % np_loop == 0)
-                        {
-                            hpx::util::annotate_function annotate("launch");
-                            for (int j = 0; j < hp_loop; ++j)
-                            {
-                                // high priority
-                                auto f1 = hpx::async(
-                                    HP_executor, &dummy_task, "HP task", hp_m)
-                                              .then(hpx::launch::sync,
-                                                  [&](auto&&) { counter--; });
-                            }
-                        }
-                    });
+            auto f3 = hpx::async(NP_executor,
+                hpx::util::annotated_function(
+                    [np_m, &counter]() {
+                        dec_counter dec(counter);
+                        dummy_task("NP task", std::size_t(np_m));
+                    },
+                    "NP task"))
+                          .then(hpx::launch::sync, [&](auto&&) {
+                              if (++counter1 % np_loop == 0)
+                              {
+                                  for (int j = 0; j < hp_loop; ++j)
+                                  {
+                                      auto f1 = hpx::async(HP_executor,
+                                          hpx::util::annotated_function(
+                                              [hp_m, &counter]() {
+                                                  dec_counter dec(counter);
+                                                  dummy_task("HP task",
+                                                      std::size_t(hp_m));
+                                              },
+                                              "HP task"));
+                                  }
+                              }
+                          });
         }
     }
     do
