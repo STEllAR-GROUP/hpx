@@ -90,7 +90,8 @@ namespace hpx { namespace detail
                 std::forward<F>(f), std::forward<Ts>(ts)...));
             if (hpx::detail::has_async_policy(policy))
             {
-                threads::thread_id_type tid = p.apply(pool, policy,
+                threads::thread_id_type tid = p.apply(pool,
+                    "async_launch_policy_dispatch", policy,
                     policy.priority(), threads::thread_stacksize_default, hint);
                 if (tid && policy == launch::fork)
                 {
@@ -147,8 +148,8 @@ namespace hpx { namespace detail
             lcos::local::futures_factory<result_type()> p(util::deferred_call(
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            p.apply(pool, policy, policy.priority(),
-                threads::thread_stacksize_default, hint);
+            p.apply(pool, "async_launch_policy_dispatch::call", policy,
+                policy.priority(), threads::thread_stacksize_default, hint);
             return p.get_future();
         }
 
@@ -181,8 +182,9 @@ namespace hpx { namespace detail
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
             // make sure this thread is executed last
-            threads::thread_id_type tid = p.apply(pool, policy,
-                policy.priority(), threads::thread_stacksize_default, hint);
+            threads::thread_id_type tid = p.apply(pool,
+                "async_launch_policy_dispatch::call", policy, policy.priority(),
+                threads::thread_stacksize_default, hint);
             threads::thread_id_type tid_self = threads::get_self_id();
             if (tid && tid_self &&
                 get_thread_id_data(tid)->get_scheduler_base() ==

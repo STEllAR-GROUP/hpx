@@ -376,7 +376,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             hpx::intrusive_ptr<continuation> this_(this);
-            hpx::util::thread_description desc(
+            hpx::util::thread_description desc(f_,
                 "hpx::parallel::execution::parallel_executor::post");
 
             parallel::execution::detail::post_policy_dispatch<
@@ -422,7 +422,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             hpx::intrusive_ptr<continuation> this_(this);
-            hpx::util::thread_description desc(
+            hpx::util::thread_description desc(f_,
                 "hpx::parallel::execution::parallel_executor::post");
 
             parallel::execution::detail::post_policy_dispatch<
