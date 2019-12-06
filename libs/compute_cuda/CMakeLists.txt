@@ -38,14 +38,11 @@ endif()
 
 include(HPX_AddModule)
 add_hpx_module(compute_cuda
-  COMPATIBILITY_HEADERS OFF
-  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
   CUDA
   SOURCES ${compute_cuda_sources}
   HEADERS ${compute_cuda_headers}
-  COMPAT_HEADERS ${compute_cuda_compat_headers}
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
