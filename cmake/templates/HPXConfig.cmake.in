@@ -5,6 +5,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set(HPX_FIND_PACKAGE ON)
+
 # Forward HPX_* cache variables
 include("${CMAKE_CURRENT_LIST_DIR}/HPXCacheVariables.cmake")
 
@@ -85,6 +87,15 @@ include(HPX_SetupPapi)
 
 # CUDA
 include(HPX_SetupCUDA)
+
+# APEX
+set(APEX_WITH_MSR "@APEX_WITH_MSR@")
+set(MSR_ROOT "@MSR_ROOT@")
+set(APEX_WITH_ACTIVEHARMONY "@APEX_WITH_ACTIVEHARMONY@")
+set(ACTIVEHARMONY_ROOT "@ACTIVEHARMONY_ROOT@")
+set(APEX_WITH_OTF2 "@APEX_WITH_OTF2@")
+set(OTF2_ROOT "@OTF2_ROOT@")
+include(HPX_SetupApex)
 ##################################################
 
 set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)

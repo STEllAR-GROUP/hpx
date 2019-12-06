@@ -284,11 +284,6 @@ if (TARGET hpx::apex)
   # Because libhpx_apex is a shared object library, we don't need to specify
   # the whole archive.
   target_link_libraries(hpx INTERFACE hpx::apex)
-  # System has been removed when passing at set_property for cmake < 3.11 in
-  # HPX_SetupApex.cmake so the property get is not SYSTEM_INTERFACE_INC_DIR
-  # anymore, we can put it back once we require cmake >= 3.11
-  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx INTERFACE "${_apex_inc_dir}")
 endif()
 
 if (TARGET hpx::gperftools)
