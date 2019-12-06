@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,23 +16,23 @@
 
 namespace hpx { namespace program_options {
 
-    using boost::program_options::error;
-    using boost::program_options::too_many_positional_options_error;
-    using boost::program_options::invalid_command_line_style;
-    using boost::program_options::reading_file;
-    using boost::program_options::error_with_option_name;
-    using boost::program_options::multiple_values;
-    using boost::program_options::multiple_occurrences;
-    using boost::program_options::required_option;
-    using boost::program_options::error_with_no_option_name;
-    using boost::program_options::unknown_option;
     using boost::program_options::ambiguous_option;
-    using boost::program_options::invalid_syntax;
-    using boost::program_options::invalid_config_file_syntax;
+    using boost::program_options::error;
+    using boost::program_options::error_with_no_option_name;
+    using boost::program_options::error_with_option_name;
+    using boost::program_options::invalid_command_line_style;
     using boost::program_options::invalid_command_line_syntax;
-    using boost::program_options::validation_error;
+    using boost::program_options::invalid_config_file_syntax;
     using boost::program_options::invalid_option_value;
-}}
+    using boost::program_options::invalid_syntax;
+    using boost::program_options::multiple_occurrences;
+    using boost::program_options::multiple_values;
+    using boost::program_options::reading_file;
+    using boost::program_options::required_option;
+    using boost::program_options::too_many_positional_options_error;
+    using boost::program_options::unknown_option;
+    using boost::program_options::validation_error;
+}}    // namespace hpx::program_options
 
 #else
 
@@ -230,8 +231,7 @@ namespace hpx { namespace program_options {
 
     /** Class thrown when there are several option values, but
         user called a method which cannot return them all. */
-    class HPX_ALWAYS_EXPORT multiple_values
-      : public error_with_option_name
+    class HPX_ALWAYS_EXPORT multiple_values : public error_with_option_name
     {
     public:
         multiple_values()
@@ -246,8 +246,7 @@ namespace hpx { namespace program_options {
     /** Class thrown when there are several occurrences of an
         option, but user called a method which cannot return
         them all. */
-    class HPX_ALWAYS_EXPORT multiple_occurrences
-      : public error_with_option_name
+    class HPX_ALWAYS_EXPORT multiple_occurrences : public error_with_option_name
     {
     public:
         multiple_occurrences()
@@ -260,8 +259,7 @@ namespace hpx { namespace program_options {
     };
 
     /** Class thrown when a required/mandatory option is missing */
-    class HPX_ALWAYS_EXPORT required_option
-      : public error_with_option_name
+    class HPX_ALWAYS_EXPORT required_option : public error_with_option_name
     {
     public:
         // option name is constructed by the option_descriptor and never on the fly
@@ -304,8 +302,7 @@ namespace hpx { namespace program_options {
     };
 
     /** Class thrown when option name is not recognized. */
-    class HPX_ALWAYS_EXPORT unknown_option
-      : public error_with_no_option_name
+    class HPX_ALWAYS_EXPORT unknown_option : public error_with_no_option_name
     {
     public:
         unknown_option(const std::string& original_token = "")
@@ -318,8 +315,7 @@ namespace hpx { namespace program_options {
     };
 
     /** Class thrown when there's ambiguity among several possible options. */
-    class HPX_ALWAYS_EXPORT ambiguous_option
-      : public error_with_no_option_name
+    class HPX_ALWAYS_EXPORT ambiguous_option : public error_with_no_option_name
     {
     public:
         ambiguous_option(const std::vector<std::string>& xalternatives)
@@ -390,8 +386,7 @@ namespace hpx { namespace program_options {
         kind_t m_kind;
     };
 
-    class HPX_ALWAYS_EXPORT invalid_config_file_syntax
-      : public invalid_syntax
+    class HPX_ALWAYS_EXPORT invalid_config_file_syntax : public invalid_syntax
     {
     public:
         invalid_config_file_syntax(const std::string& invalid_line, kind_t kind)
@@ -405,13 +400,17 @@ namespace hpx { namespace program_options {
         /** Convenience functions for backwards compatibility */
         std::string tokens() const override
         {
-            return m_substitutions.find("invalid_line")->second;
+            auto it = m_substitutions.find("invalid_line");
+            if (it != m_substitutions.end())
+            {
+                return it->second;
+            }
+            return "<unknown>";
         }
     };
 
     /** Class thrown when there are syntax errors in given command line */
-    class HPX_ALWAYS_EXPORT invalid_command_line_syntax
-      : public invalid_syntax
+    class HPX_ALWAYS_EXPORT invalid_command_line_syntax : public invalid_syntax
     {
     public:
         invalid_command_line_syntax(kind_t kind,
@@ -459,8 +458,7 @@ namespace hpx { namespace program_options {
     };
 
     /** Class thrown if there is an invalid option value given */
-    class HPX_ALWAYS_EXPORT invalid_option_value
-      : public validation_error
+    class HPX_ALWAYS_EXPORT invalid_option_value : public validation_error
     {
     public:
         invalid_option_value(const std::string& value);
@@ -468,8 +466,7 @@ namespace hpx { namespace program_options {
     };
 
     /** Class thrown if there is an invalid bool value given */
-    class HPX_ALWAYS_EXPORT invalid_bool_value
-      : public validation_error
+    class HPX_ALWAYS_EXPORT invalid_bool_value : public validation_error
     {
     public:
         invalid_bool_value(const std::string& value);

@@ -1,8 +1,9 @@
 ..
-   Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2019 The STE||AR-Group
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 .. _libs_cache:
 
@@ -10,3 +11,10 @@
 cache
 =====
 
+This module provides two cache data structures:
+
+* :cpp:class:`hpx::util::cache::local_cache`
+* :cpp:class:`hpx::util::cache::lru_cache`
+
+See the :ref:`API reference <libs_cache_api>` of the module for more
+details.

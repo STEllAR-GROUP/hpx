@@ -2,6 +2,7 @@
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Dylan Stark
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -21,7 +22,6 @@ set(subdirs
     quickstart
     qt
     random_mem_access
-    resource_partitioner
     spell_check
     startup_shutdown
     thread_aware_timer
@@ -29,12 +29,6 @@ set(subdirs
     tuplespace
     transpose
    )
-
-if(HPX_WITH_QUEUE_COMPATIBILITY)
-  set(subdirs ${subdirs}
-      queue
-     )
-endif()
 
 if(HPX_WITH_EXAMPLES_HDF5)
   set(subdirs ${subdirs}
@@ -46,12 +40,6 @@ endif()
 if(HPX_WITH_APEX)
   set(subdirs ${subdirs}
       apex
-     )
-endif()
-
-if(HPX_WITH_COMPUTE)
-  set(subdirs ${subdirs}
-      compute
      )
 endif()
 

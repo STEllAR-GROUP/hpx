@@ -1,6 +1,7 @@
 #  Copyright (c) 2017-2018 Thomas Heller
 #  Copyright (c) 2015 Martin Stumpf
 #
+#  SPDX-License-Identifier: BSL-1.0
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -116,6 +117,22 @@ jobs:
           path: /tmp/circular_deps.svg
           destination: /hpx/artifacts/circular_deps.svg
 
+  # Insure that the modules stay clang-formatted
+  clang_format:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check that the modules are well clang-formatted
+          command: |
+              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
+              clang-format-8 -i **/*.{cpp,hpp}
+              git diff --exit-code > /tmp/modified_format_files.txt
+      - store_artifacts:
+          path: /tmp/modified_format_files.txt
+          destination: /hpx/artifacts/modified_format_files.txt
+
   configure:
     <<: *defaults
     steps:
@@ -193,6 +210,7 @@ jobs:
                 -G "Ninja" \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_APEX=On \
+                -DHPX_WITH_APEX_TAG=develop \
                 -DHPX_WITH_TESTS=On \
                 -DHPX_WITH_EXAMPLES=On
             rm -rf *
@@ -410,32 +428,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.component
 
-  tests.unit.computeapi:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.computeapi
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.computeapi
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.computeabi
-      - store_artifacts:
-          path: tests.unit.computeabi
-
   tests.unit.diagnostics:
     <<: *defaults
     steps:
@@ -592,32 +584,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.resource
 
-  tests.unit.serialization:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.serialization
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.serialization
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.serialization
-      - store_artifacts:
-          path: tests.unit.serialization
-
   tests.unit.threads:
     <<: *defaults
     steps:
@@ -734,21 +700,35 @@ jobs:
           command: |
               ninja -j2 -k 0 tests.unit.modules.allocator_support
               ninja -j2 -k 0 tests.unit.modules.assertion
+              ninja -j2 -k 0 tests.unit.modules.basic_execution
               ninja -j2 -k 0 tests.unit.modules.cache
               ninja -j2 -k 0 tests.unit.modules.collectives
+              ninja -j2 -k 0 tests.unit.modules.compute
+              # ninja -j2 -k 0 tests.unit.modules.compute_cuda # CUDA not enabled on CircleCI
               ninja -j2 -k 0 tests.unit.modules.concepts
               ninja -j2 -k 0 tests.unit.modules.config
+              ninja -j2 -k 0 tests.unit.modules.concurrency
               ninja -j2 -k 0 tests.unit.modules.datastructures
+              ninja -j2 -k 0 tests.unit.modules.debugging
               ninja -j2 -k 0 tests.unit.modules.errors
+              ninja -j2 -k 0 tests.unit.modules.filesystem
               ninja -j2 -k 0 tests.unit.modules.format
+              ninja -j2 -k 0 tests.unit.modules.functional
               ninja -j2 -k 0 tests.unit.modules.hardware
               ninja -j2 -k 0 tests.unit.modules.hashing
               ninja -j2 -k 0 tests.unit.modules.iterator_support
               ninja -j2 -k 0 tests.unit.modules.logging
               ninja -j2 -k 0 tests.unit.modules.preprocessor
+              ninja -j2 -k 0 tests.unit.modules.program_options
+              ninja -j2 -k 0 tests.unit.modules.resiliency
+              ninja -j2 -k 0 tests.unit.modules.resource_partitioner
+              ninja -j2 -k 0 tests.unit.modules.serialization
               ninja -j2 -k 0 tests.unit.modules.statistics
               ninja -j2 -k 0 tests.unit.modules.testing
               ninja -j2 -k 0 tests.unit.modules.thread_support
+              ninja -j2 -k 0 tests.unit.modules.threadmanager
+              ninja -j2 -k 0 tests.unit.modules.timing
+              ninja -j2 -k 0 tests.unit.modules.topology
               ninja -j2 -k 0 tests.unit.modules.type_support
               ninja -j2 -k 0 tests.unit.modules.util
       - run:
@@ -758,23 +738,38 @@ jobs:
               ulimit -c unlimited
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.basic_execution
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute
+              # ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute_cuda
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concurrency
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.debugging
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.errors
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.filesystem
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.functional
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.program_options
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resiliency
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resource_partitioner
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.serialization
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.threadmanager
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.timing
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.topology
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
+
       - run:
           <<: *convert_xml
       - run:
@@ -812,7 +807,7 @@ jobs:
       - store_artifacts:
           path: tests.unit.modules.algorithms
 
-  tests.unit.modules.parallel_executors:
+  tests.unit.modules.execution:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -820,13 +815,13 @@ jobs:
       - run:
           name: Building Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.modules.parallel_executors
+              ninja -j2 -k 0 tests.unit.modules.execution
       - run:
           name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.parallel_executors
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.execution
       - run:
           <<: *convert_xml
       - run:
@@ -834,9 +829,9 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.modules.parallel_executors
+          path: tests.unit.modules.execution
       - store_artifacts:
-          path: tests.unit.modules.parallel_executors
+          path: tests.unit.modules.execution
 
   tests.unit.modules.segmented_algorithms:
     <<: *defaults
@@ -989,9 +984,26 @@ jobs:
               if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
                   docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
                   docker push ${TARGET_IMAGE_NAME}
+              else
+                  echo "Not on the master branch. The docker image will not be pushed."
+              fi
+
+  # This is the final step once everything else passes. We need a full clone
+  # here again to be able to push the new tag.
+  push_stable_tag:
+    docker:
+      - image: stellargroup/build_env:ubuntu
+    steps:
+      - checkout:
+          path: /hpx/source
+      - <<: *add_github_to_known_hosts
+      - <<: *configure_local_git
+      - run:
+          name: Push stable tag
+          command: |
+              if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
                   # Tag the commmit
                   cd /hpx/source
-                  git remote set-url origin git@github.com:STEllAR-GROUP/hpx.git
                   git tag -f stable
                   ##########################################################
                   # NOTE: Dependency on the Docker push is so that users who
@@ -1003,7 +1015,7 @@ jobs:
                   # Push the new stable commit tag
                   git push origin stable
               else
-                  echo "Not on the master branch. the image will not be pushed and the commit will not be tagged."
+                  echo "Not on the master branch. The commit will not be tagged."
               fi
 
 workflows:
@@ -1013,6 +1025,10 @@ workflows:
       - checkout_code:
           <<: *gh_pages_filter
       - check_circular_deps:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
+      - clang_format:
           requires:
             - checkout_code
           <<: *gh_pages_filter
@@ -1053,8 +1069,6 @@ workflows:
           <<: *core_dependency
       - tests.unit.component:
           <<: *core_dependency
-      - tests.unit.computeapi:
-          <<: *core_dependency
       - tests.unit.diagnostics:
           <<: *core_dependency
       - tests.unit.lcos:
@@ -1066,8 +1080,6 @@ workflows:
       - tests.unit.performance_counter:
           <<: *core_dependency
       - tests.unit.resource:
-          <<: *core_dependency
-      - tests.unit.serialization:
           <<: *core_dependency
       - tests.unit.threads:
           <<: *core_dependency
@@ -1081,7 +1093,7 @@ workflows:
           <<: *core_dependency
       - tests.unit.modules.algorithms:
           <<: *core_dependency
-      - tests.unit.modules.parallel_executors:
+      - tests.unit.modules.execution:
           <<: *core_dependency
       - tests.unit.modules.segmented_algorithms:
           <<: *core_dependency
@@ -1108,24 +1120,26 @@ workflows:
             - tests.unit.agas
             - tests.unit.build
             - tests.unit.component
-            - tests.unit.computeapi
             - tests.unit.diagnostics
             - tests.unit.lcos
             - tests.unit.parallel_block
             - tests.unit.parcelset
             - tests.unit.performance_counter
             - tests.unit.resource
-            - tests.unit.serialization
             - tests.unit.threads
             - tests.unit.topology
             - tests.unit.traits
             - tests.unit.util
             - tests.unit.modules
             - tests.unit.modules.algorithms
-            - tests.unit.modules.parallel_executors
+            - tests.unit.modules.execution
             - tests.unit.modules.segmented_algorithms
             - tests.headers
             - tests.performance
             - tests.regressions
             - examples
+          <<: *gh_pages_filter
+      - push_stable_tag:
+          requires:
+            - install
           <<: *gh_pages_filter

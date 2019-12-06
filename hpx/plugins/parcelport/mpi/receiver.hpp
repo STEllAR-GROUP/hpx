@@ -2,6 +2,7 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -39,8 +40,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef std::shared_ptr<connection_type> connection_ptr;
         typedef std::deque<connection_ptr> connection_list;
 
-        receiver(Parcelport & pp)
+        receiver(Parcelport& pp)
           : pp_(pp)
+          , hdr_request_(0)
         {}
 
         void run()

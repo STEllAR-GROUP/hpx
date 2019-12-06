@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/runtime/threads/detail/io_service_thread_pool.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/util/io_service_pool.hpp>

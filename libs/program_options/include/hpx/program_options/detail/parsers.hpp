@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,17 +16,18 @@
 
 namespace hpx { namespace program_options {
 
-    using boost::program_options::parse_command_line;
     using boost::program_options::collect_unrecognized;
+    using boost::program_options::parse_command_line;
 
 }}    // namespace hpx::program_options
 
 #else
 
-#include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/detail/convert.hpp>
+#include <hpx/program_options/parsers.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <string>
 #include <utility>
@@ -134,7 +136,7 @@ namespace hpx { namespace program_options {
         enum collect_unrecognized_mode mode)
     {
         std::vector<std::basic_string<Char>> result;
-        for (unsigned i = 0; i < options.size(); ++i)
+        for (std::size_t i = 0; i < options.size(); ++i)
         {
             if (options[i].unregistered ||
                 (mode == include_positional && options[i].position_key != -1))

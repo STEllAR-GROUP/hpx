@@ -1,10 +1,12 @@
-// Copyright Vladimir Prus 2004.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Vladimir Prus 2004.
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
 
 #include <hpx/program_options/errors.hpp>
@@ -47,12 +49,14 @@ void test_positional_options()
 void test_parsing()
 {
     options_description desc;
+    // clang-format off
     desc.add_options()
         ("first", value<int>())
         ("second", value<int>())
         ("input-file", value< vector<string> >())
         ("some-other", value<string>())
     ;
+    // clang-format on
 
     positional_options_description p;
     p.add("input-file", 2).add("some-other", 1);
@@ -78,16 +82,14 @@ void test_parsing()
     args.emplace_back("file4");
 
     // Check that excessive number of positional options is detected.
-    HPX_TEST_THROW(
-        command_line_parser(args).options(desc).positional(p).run(),
+    HPX_TEST_THROW(command_line_parser(args).options(desc).positional(p).run(),
         too_many_positional_options_error);
 }
 
-int main(int, char* [])
+int main(int, char*[])
 {
     test_positional_options();
     test_parsing();
 
     return hpx::util::report_errors();
 }
-

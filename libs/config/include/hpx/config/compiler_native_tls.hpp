@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,6 +21,7 @@
 #include <ciso646>
 #endif
 
+// clang-format off
 #if defined(__has_feature)
 #  if __has_feature(cxx_thread_local)
 #    define HPX_NATIVE_TLS thread_local
@@ -41,6 +43,7 @@
 #    error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
 #  endif
 #endif
+// clang-format on
 #endif
 
 #endif

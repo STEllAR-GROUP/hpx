@@ -2,6 +2,7 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -66,14 +67,17 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {
             // disable thread stealing to begin with
-            this->remove_scheduler_mode(policies::enable_stealing);
+            this->remove_scheduler_mode(
+                scheduler_mode(policies::enable_stealing |
+                               policies::enable_stealing_numa));
         }
 
-        scheduler_mode get_scheduler_mode(std::size_t num_thread) const override
+        void set_scheduler_mode(scheduler_mode mode) override
         {
-            return scheduler_mode(
-                this->base_type::get_scheduler_mode(num_thread) &
-                ~policies::enable_stealing);
+            // this scheduler does not support stealing or numa stealing
+            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing);
+            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing_numa);
+            scheduler_base::set_scheduler_mode(mode);
         }
 
         static std::string get_scheduler_name()

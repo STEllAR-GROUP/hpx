@@ -1,11 +1,13 @@
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // utf8_codecvt_facet.ipp
 
-// Copyright (c) 2001 Ronald Garcia, Indiana University (garcia@osl.iu.edu)
-// Andrew Lumsdaine, Indiana University (lums@osl.iu.edu).
-// Use, modification and distribution is subject to the Boost Software
-// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright (c) 2001 Ronald Garcia, Indiana University (garcia@osl.iu.edu)
+//  Andrew Lumsdaine, Indiana University (lums@osl.iu.edu).
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Use, modification and distribution is subject to the Boost Software
+//  License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
 // Please see the comments in <boost/detail/utf8_codecvt_facet.hpp> to
 // learn how this file should be used.
@@ -97,7 +99,7 @@ namespace hpx { namespace program_options { namespace detail {
             if (from == from_end && i != cont_octet_count)
             {
                 // rewind "from" to before the current character translation
-                from_next = from - (i + 1);
+                from_next = from - (static_cast<std::size_t>(i) + 1);
                 to_next = to;
                 return std::codecvt_base::partial;
             }
@@ -158,7 +160,7 @@ namespace hpx { namespace program_options { namespace detail {
             if (to == to_end && i != cont_octet_count)
             {
                 from_next = from;
-                to_next = to - (i + 1);
+                to_next = to - (static_cast<std::size_t>(i) + 1);
                 return std::codecvt_base::partial;
             }
             ++from;
@@ -186,7 +188,7 @@ namespace hpx { namespace program_options { namespace detail {
         // within the bounds so far (no greater than max_limit)
         // 3) from_next points to the octet 'last_octet_count' before the
         // last measured character.
-        int last_octet_count = 0;
+        std::size_t last_octet_count = 0;
         std::size_t char_count = 0;
         const char* from_next = from;
         // Use "<" because the buffer may represent incomplete characters
@@ -214,7 +216,7 @@ namespace hpx { namespace program_options { namespace detail {
         else if (0xe0 <= lead_octet && lead_octet <= 0xef)
             return 3;
         else if (0xf0 <= lead_octet && lead_octet <= 0xf7)
-            return 4;
+            return 4;    // -V112
         else if (0xf8 <= lead_octet && lead_octet <= 0xfb)
             return 5;
         else

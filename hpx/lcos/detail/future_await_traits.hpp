@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/traits/future_access.hpp>
 
 #if defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
@@ -17,8 +19,6 @@
 #else
 #include <experimental/coroutine>
 #endif
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -128,7 +128,7 @@ namespace hpx { namespace lcos { namespace detail
 
         hpx::lcos::future<T> get_return_object()
         {
-            boost::intrusive_ptr<base_type> shared_state(this);
+            hpx::intrusive_ptr<base_type> shared_state(this);
             return hpx::traits::future_access<hpx::lcos::future<T> >::
                 create(std::move(shared_state));
         }

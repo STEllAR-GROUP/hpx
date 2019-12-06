@@ -3,6 +3,7 @@
 //  Copyright (c) 2011-2013 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -13,7 +14,7 @@
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 
 using hpx::components::component_agas_locality_namespace;
 
@@ -69,7 +70,3 @@ HPX_REGISTER_ACTION_ID(
     locality_namespace_statistics_counter_action,
     hpx::actions::locality_namespace_statistics_counter_action_id)
 
-namespace hpx { namespace agas {
-    locality_namespace::~locality_namespace()
-    {}
-}}

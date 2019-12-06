@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -13,7 +14,7 @@
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -87,7 +88,6 @@ namespace hpx { namespace threads { namespace policies {
             init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
                 std::size_t num_high_priority_queues = std::size_t(-1),
-                std::size_t numa_sensitive = 0,
                 thread_queue_init_parameters thread_queue_init = {},
                 char const* description = "local_priority_queue_scheduler")
               : num_queues_(num_queues)
@@ -95,7 +95,6 @@ namespace hpx { namespace threads { namespace policies {
                     num_high_priority_queues == std::size_t(-1) ?
                         num_queues :
                         num_high_priority_queues)
-              , numa_sensitive_(numa_sensitive)
               , thread_queue_init_(thread_queue_init)
               , affinity_data_(affinity_data)
               , description_(description)
@@ -107,7 +106,6 @@ namespace hpx { namespace threads { namespace policies {
                 char const* description)
               : num_queues_(num_queues)
               , num_high_priority_queues_(num_queues)
-              , numa_sensitive_(false)
               , thread_queue_init_()
               , affinity_data_(affinity_data)
               , description_(description)
@@ -116,7 +114,6 @@ namespace hpx { namespace threads { namespace policies {
 
             std::size_t num_queues_;
             std::size_t num_high_priority_queues_;
-            std::size_t numa_sensitive_;
             thread_queue_init_parameters thread_queue_init_;
             detail::affinity_data const& affinity_data_;
             char const* description_;
@@ -128,7 +125,6 @@ namespace hpx { namespace threads { namespace policies {
           : scheduler_base(
                 init.num_queues_, init.description_, init.thread_queue_init_)
           , curr_queue_(0)
-          , numa_sensitive_(init.numa_sensitive_)
           , affinity_data_(init.affinity_data_)
           , num_queues_(init.num_queues_)
           , num_high_priority_queues_(init.num_high_priority_queues_)
@@ -172,11 +168,6 @@ namespace hpx { namespace threads { namespace policies {
             {
                 delete high_priority_queues_[i].data_;
             }
-        }
-
-        bool numa_sensitive() const override
-        {
-            return numa_sensitive_ != 0;
         }
 
         static std::string get_scheduler_name()
@@ -505,9 +496,8 @@ namespace hpx { namespace threads { namespace policies {
         bool cleanup_terminated(
             std::size_t num_thread, bool delete_all) override
         {
-            bool empty = true;
-
-            empty = queues_[num_thread].data_->cleanup_terminated(delete_all);
+            bool empty =
+                queues_[num_thread].data_->cleanup_terminated(delete_all);
             if (!delete_all)
                 return empty;
 
@@ -1191,7 +1181,8 @@ namespace hpx { namespace threads { namespace policies {
 
             // iterate over the number of threads again to determine where to
             // steal from
-            std::ptrdiff_t radius = std::lround(num_threads / 2.0);
+            std::ptrdiff_t radius =
+                std::lround(static_cast<double>(num_threads) / 2.0);
             victim_threads_[num_thread].data_.reserve(num_threads);
 
             std::size_t num_pu = affinity_data_.get_pu_num(num_thread);
@@ -1213,7 +1204,7 @@ namespace hpx { namespace threads { namespace policies {
                 [&](hpx::util::function_nonser<bool(std::size_t)> f) {
                     // check our neighbors in a radial fashion (left and right
                     // alternating, increasing distance each iteration)
-                    int i = 1;
+                    std::ptrdiff_t i = 1;
                     for (/**/; i < radius; ++i)
                     {
                         std::ptrdiff_t left =
@@ -1256,7 +1247,7 @@ namespace hpx { namespace threads { namespace policies {
             });
 
             // check for the rest and if we are NUMA aware
-            if (numa_sensitive_ != 2 && any(first_mask & pu_mask))
+            if (has_work_stealing_numa() && any(first_mask & pu_mask))
             {
                 iterate([&](std::size_t other_num_thread) {
                     return !any(numa_mask & numa_masks[other_num_thread]);
@@ -1298,7 +1289,6 @@ namespace hpx { namespace threads { namespace policies {
 
     protected:
         std::atomic<std::size_t> curr_queue_;
-        std::size_t numa_sensitive_;
 
         detail::affinity_data const& affinity_data_;
 

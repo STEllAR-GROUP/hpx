@@ -1,5 +1,6 @@
 //  Copyright (c) 2017-2018 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,10 +21,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         struct type_specifier
@@ -31,9 +30,15 @@ namespace hpx { namespace util
             static char const* value() noexcept;
         };
 
-#       define DECL_TYPE_SPECIFIER(Type, Spec)                                \
-        template <> struct type_specifier<Type>                               \
-        { static char const* value() noexcept { return #Spec; } }             \
+#define DECL_TYPE_SPECIFIER(Type, Spec)                                        \
+    template <>                                                                \
+    struct type_specifier<Type>                                                \
+    {                                                                          \
+        static char const* value() noexcept                                    \
+        {                                                                      \
+            return #Spec;                                                      \
+        }                                                                      \
+    }
 
         DECL_TYPE_SPECIFIER(char, c);
         DECL_TYPE_SPECIFIER(wchar_t, lc);
@@ -59,10 +64,11 @@ namespace hpx { namespace util
         DECL_TYPE_SPECIFIER(char const*, s);
         DECL_TYPE_SPECIFIER(wchar_t const*, ls);
 
-#       undef DECL_TYPE_SPECIFIER
+#undef DECL_TYPE_SPECIFIER
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, bool IsFundamental = std::is_fundamental<T>::value>
+        template <typename T,
+            bool IsFundamental = std::is_fundamental<T>::value>
         struct formatter
         {
             static void call(
@@ -75,21 +81,21 @@ namespace hpx { namespace util
 
                 // copy spec to a null terminated buffer
                 char format[16];
-                std::sprintf(format, "%%%.*s%s",
-                    (int)spec.size(), spec.data(), conv_spec);
+                std::sprintf(format, "%%%.*s%s", (int) spec.size(), spec.data(),
+                    conv_spec);
 
                 T const& value = *static_cast<T const*>(ptr);
                 std::size_t length = std::snprintf(nullptr, 0, format, value);
                 std::vector<char> buffer(length + 1);
-                length = std::snprintf(buffer.data(), length + 1, format, value);
+                length =
+                    std::snprintf(buffer.data(), length + 1, format, value);
 
                 os.write(buffer.data(), length);
             }
         };
 
         template <>
-        struct formatter<bool>
-          : formatter<int>
+        struct formatter<bool> : formatter<int>
         {
             static void call(
                 std::ostream& os, boost::string_ref spec, void const* ptr)
@@ -112,7 +118,8 @@ namespace hpx { namespace util
         template <typename T>
         struct formatter<T const*, /*IsFundamental=*/false>
           : formatter<void const*>
-        {};
+        {
+        };
 
         template <>
         struct formatter<char const*, /*IsFundamental=*/false>
@@ -126,15 +133,19 @@ namespace hpx { namespace util
                 if (spec.empty() || spec == "s")
                 {
                     os << value;
-                } else {
+                }
+                else
+                {
                     // copy spec to a null terminated buffer
                     char format[16];
-                    std::sprintf(format, "%%%.*ss",
-                        (int)spec.size(), spec.data());
+                    std::sprintf(
+                        format, "%%%.*ss", (int) spec.size(), spec.data());
 
-                    std::size_t length = std::snprintf(nullptr, 0, format, value);
+                    std::size_t length =
+                        std::snprintf(nullptr, 0, format, value);
                     std::vector<char> buffer(length + 1);
-                    length = std::snprintf(buffer.data(), length + 1, format, value);
+                    length =
+                        std::snprintf(buffer.data(), length + 1, format, value);
 
                     os.write(buffer.data(), length);
                 }
@@ -148,7 +159,8 @@ namespace hpx { namespace util
             static void call(
                 std::ostream& os, boost::string_ref spec, void const* ptr)
             {
-                std::string const& value = *static_cast<std::string const*>(ptr);
+                std::string const& value =
+                    *static_cast<std::string const*>(ptr);
 
                 if (spec.empty() || spec == "s")
                     os.write(value.data(), value.size());
@@ -158,7 +170,8 @@ namespace hpx { namespace util
         };
 
         template <typename T>
-        void format_value(std::ostream& os, boost::string_ref spec, T const& value)
+        void format_value(
+            std::ostream& os, boost::string_ref spec, T const& value)
         {
             if (!spec.empty())
                 throw std::runtime_error("Not a valid format specifier");
@@ -183,18 +196,21 @@ namespace hpx { namespace util
             format_arg(T const& arg)
               : _data(&arg)
               , _formatter(&detail::formatter<T>::call)
-            {}
+            {
+            }
 
             template <typename T>
             format_arg(T* arg)
               : _data(arg)
               , _formatter(&detail::formatter<T const*>::call)
-            {}
+            {
+            }
             template <typename T>
             format_arg(T const* arg)
               : _data(arg)
               , _formatter(&detail::formatter<T const*>::call)
-            {}
+            {
+            }
 
             void operator()(std::ostream& os, boost::string_ref spec) const
             {
@@ -202,42 +218,39 @@ namespace hpx { namespace util
             }
 
             void const* _data;
-            void (*_formatter)(std::ostream&, boost::string_ref spec, void const*);
+            void (*_formatter)(
+                std::ostream&, boost::string_ref spec, void const*);
         };
 
         ///////////////////////////////////////////////////////////////////////
         // Use dedicated macro so it may be overriden
-#       if !defined(HPX_FORMAT_EXPORT)
-#         define HPX_FORMAT_EXPORT HPX_EXPORT
-#       endif
+#if !defined(HPX_FORMAT_EXPORT)
+#define HPX_FORMAT_EXPORT HPX_EXPORT
+#endif
 
-        HPX_FORMAT_EXPORT void format_to(
-            std::ostream& os,
-            boost::string_ref format_str,
+        HPX_FORMAT_EXPORT void format_to(std::ostream& os,
+            boost::string_ref format_str, format_arg const* args,
+            std::size_t count);
+
+        HPX_FORMAT_EXPORT std::string format(boost::string_ref format_str,
             format_arg const* args, std::size_t count);
+    }    // namespace detail
 
-        HPX_FORMAT_EXPORT std::string format(
-            boost::string_ref format_str,
-            format_arg const* args, std::size_t count);
-    }
-
-    template <typename ...Args>
-    std::string format(
-        boost::string_ref format_str, Args const&... args)
+    template <typename... Args>
+    std::string format(boost::string_ref format_str, Args const&... args)
     {
-        detail::format_arg const format_args[] = { args..., 0 };
+        detail::format_arg const format_args[] = {args..., 0};
         return detail::format(format_str, format_args, sizeof...(Args));
     }
 
-    template <typename ...Args>
+    template <typename... Args>
     std::ostream& format_to(
-        std::ostream& os,
-        boost::string_ref format_str, Args const&... args)
+        std::ostream& os, boost::string_ref format_str, Args const&... args)
     {
-        detail::format_arg const format_args[] = { args..., 0 };
+        detail::format_arg const format_args[] = {args..., 0};
         detail::format_to(os, format_str, format_args, sizeof...(Args));
         return os;
     }
-}}
+}}    // namespace hpx::util
 
 #endif

@@ -1,5 +1,6 @@
 // Copyright (C) 2016 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/testing.hpp>
 //
-#include <hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <string>

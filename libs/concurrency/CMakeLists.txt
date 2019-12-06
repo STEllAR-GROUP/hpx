@@ -1,9 +1,10 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -16,7 +17,6 @@ set(concurrency_headers
   hpx/concurrency/detail/freelist.hpp
   hpx/concurrency/detail/tagged_ptr_pair.hpp
   hpx/concurrency/itt_notify.hpp
-  hpx/concurrency/register_locks.hpp
   hpx/concurrency/spinlock.hpp
   hpx/concurrency/spinlock_pool.hpp
   hpx/concurrency/thread_name.hpp
@@ -30,7 +30,6 @@ set(concurrency_compat_headers
   hpx/util/lockfree/detail/tagged_ptr_pair.hpp
   hpx/util/lockfree/freelist.hpp
   hpx/util/itt_notify.hpp
-  hpx/util/register_locks.hpp
   hpx/util/spinlock.hpp
   hpx/util/spinlock_pool.hpp
 )
@@ -39,24 +38,25 @@ set(concurrency_compat_headers
 set(concurrency_sources
   barrier.cpp
   itt_notify.cpp
-  register_locks.cpp
   thread_name.cpp
 )
 
 include(HPX_AddModule)
 add_hpx_module(concurrency
-    COMPATIBILITY_HEADERS ON
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    GLOBAL_HEADER_GEN ON
-    SOURCES ${concurrency_sources}
-    HEADERS ${concurrency_headers}
-    COMPAT_HEADERS ${concurrency_compat_headers}
-    DEPENDENCIES
-      hpx_assertion
-      hpx_config
-      hpx_errors
-      hpx_hashing
-      hpx_util
-    CMAKE_SUBDIRS examples tests
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN ON
+  SOURCES ${concurrency_sources}
+  HEADERS ${concurrency_headers}
+  COMPAT_HEADERS ${concurrency_compat_headers}
+  DEPENDENCIES
+    hpx_assertion
+    hpx_concepts
+    hpx_config
+    hpx_basic_execution
+    hpx_errors
+    hpx_hashing
+    hpx_thread_support
+  CMAKE_SUBDIRS examples tests
 )

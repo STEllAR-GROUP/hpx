@@ -1,5 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -46,7 +47,7 @@ function(add_hpx_test category name)
   endif()
 
   set(cmd "${PYTHON_EXECUTABLE}"
-          "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+          "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
           ${_exe}
           "-e" "${expected}"
           "-t" "${${name}_THREADS_PER_LOCALITY}")
@@ -61,76 +62,76 @@ function(add_hpx_test category name)
     add_test(
       NAME "${category}.${name}"
       COMMAND ${cmd} ${args})
-    else()
-      if(HPX_WITH_PARCELPORT_VERBS)
-        set(_add_test FALSE)
-        if(DEFINED ${name}_PARCELPORTS)
-          set(PP_FOUND -1)
-          list(FIND ${name}_PARCELPORTS "verbs" PP_FOUND)
-          if(NOT PP_FOUND EQUAL -1)
-            set(_add_test TRUE)
-          endif()
-        else()
+  else()
+    if(HPX_WITH_PARCELPORT_VERBS)
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "verbs" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
           set(_add_test TRUE)
         endif()
-        if(_add_test)
-          add_test(
-            NAME "${category}.distributed.verbs.${name}"
-            COMMAND ${cmd} "-p" "verbs" ${args})
-        endif()
+      else()
+        set(_add_test TRUE)
       endif()
-      if(HPX_WITH_PARCELPORT_IPC)
-        set(_add_test FALSE)
-        if(DEFINED ${name}_PARCELPORTS)
-          set(PP_FOUND -1)
-          list(FIND ${name}_PARCELPORTS "ipc" PP_FOUND)
-          if(NOT PP_FOUND EQUAL -1)
-            set(_add_test TRUE)
-          endif()
-        else()
-          set(_add_test TRUE)
-        endif()
-        if(_add_test)
-          add_test(
-            NAME "${category}.distributed.ipc.${name}"
-            COMMAND ${cmd} "-p" "ipc" ${args})
-        endif()
-      endif()
-      if(HPX_WITH_PARCELPORT_MPI)
-        set(_add_test FALSE)
-        if(DEFINED ${name}_PARCELPORTS)
-          set(PP_FOUND -1)
-          list(FIND ${name}_PARCELPORTS "mpi" PP_FOUND)
-          if(NOT PP_FOUND EQUAL -1)
-            set(_add_test TRUE)
-          endif()
-        else()
-          set(_add_test TRUE)
-        endif()
-        if(_add_test)
-          add_test(
-            NAME "${category}.distributed.mpi.${name}"
-            COMMAND ${cmd} "-p" "mpi" "-r" "mpi" ${args})
-        endif()
-      endif()
-      if(HPX_WITH_PARCELPORT_TCP)
-        set(_add_test FALSE)
-        if(DEFINED ${name}_PARCELPORTS)
-          set(PP_FOUND -1)
-          list(FIND ${name}_PARCELPORTS "tcp" PP_FOUND)
-          if(NOT PP_FOUND EQUAL -1)
-            set(_add_test TRUE)
-          endif()
-        else()
-          set(_add_test TRUE)
-        endif()
-        if(_add_test)
-          add_test(
-            NAME "${category}.distributed.tcp.${name}"
-            COMMAND ${cmd} "-p" "tcp" ${args})
-        endif()
+      if(_add_test)
+        add_test(
+          NAME "${category}.distributed.verbs.${name}"
+          COMMAND ${cmd} "-p" "verbs" ${args})
       endif()
     endif()
+    if(HPX_WITH_PARCELPORT_IPC)
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "ipc" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        add_test(
+          NAME "${category}.distributed.ipc.${name}"
+          COMMAND ${cmd} "-p" "ipc" ${args})
+      endif()
+    endif()
+    if(HPX_WITH_PARCELPORT_MPI)
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "mpi" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        add_test(
+          NAME "${category}.distributed.mpi.${name}"
+          COMMAND ${cmd} "-p" "mpi" "-r" "mpi" ${args})
+      endif()
+    endif()
+    if(HPX_WITH_PARCELPORT_TCP)
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "tcp" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        add_test(
+          NAME "${category}.distributed.tcp.${name}"
+          COMMAND ${cmd} "-p" "tcp" ${args})
+      endif()
+    endif()
+  endif()
 
 endfunction(add_hpx_test)
 
@@ -187,7 +188,7 @@ endfunction(add_hpx_example_test)
 # To create target examples.<name> when calling make examples
 # need 2 distinct rules for examples and tests.examples
 function(add_hpx_example_target_dependencies subcategory name)
-  set(option DEPS_ONLY)
+  set(options DEPS_ONLY)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
   if (NOT ${name}_DEPS_ONLY)
     # Add a custom target for this example

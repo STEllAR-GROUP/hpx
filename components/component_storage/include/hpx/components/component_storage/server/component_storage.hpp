@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #define HPX_COMPONENT_STORAGE_SERVER_FEB_04_2015_0143PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/naming/address.hpp>

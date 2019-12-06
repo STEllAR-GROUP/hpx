@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,8 +11,8 @@
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <cstdint>

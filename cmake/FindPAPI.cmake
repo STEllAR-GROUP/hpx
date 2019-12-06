@@ -3,6 +3,7 @@
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Maciej Brodowicz
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,6 +13,7 @@ pkg_check_modules(PC_PAPI QUIET papi)
 find_path(PAPI_INCLUDE_DIR papi.h
   HINTS
     ${PAPI_ROOT} ENV PAPI_ROOT
+    ${HPX_PAPI_ROOT}
     ${PC_PAPI_INCLUDEDIR}
     ${PC_PAPI_INCLUDE_DIRS}
   PATH_SUFFIXES include)
@@ -19,9 +21,18 @@ find_path(PAPI_INCLUDE_DIR papi.h
 find_library(PAPI_LIBRARY NAMES papi libpapi
   HINTS
     ${PAPI_ROOT} ENV PAPI_ROOT
+    ${HPX_PAPI_ROOT}
     ${PC_PAPI_LIBDIR}
     ${PC_PAPI_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
+
+# Set PAPI_ROOT in case the other hints are used
+if (NOT PAPI_ROOT AND "$ENV{PAPI_ROOT}")
+  set(PAPI_ROOT $ENV{PAPI_ROOT})
+elseif(NOT PAPI_ROOT)
+  string(REPLACE "/include" "" PAPI_ROOT "${PAPI_INCLUDE_DIR}")
+endif()
+
 
 set(PAPI_LIBRARIES ${PAPI_LIBRARY})
 set(PAPI_INCLUDE_DIRS ${PAPI_INCLUDE_DIR})

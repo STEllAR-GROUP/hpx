@@ -1,24 +1,24 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/bind.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -147,7 +147,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     hpx::state current_executor::get_state() const
     {
-        return scheduler_base_->get_state(hpx::get_worker_thread_num());
+        return scheduler_base_->get_state(
+            threads::detail::get_thread_num_tss());
     }
 
     void current_executor::set_scheduler_mode(
@@ -162,19 +163,19 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     // this is just a wrapper around a scheduler_base assuming the wrapped
     // scheduler outlives the wrapper
-    current_executor::current_executor() //-V730
-      : scheduled_executor(new detail::current_executor(
-            get_self_id()->get_scheduler_base()))
+    current_executor::current_executor()
+      : scheduled_executor(new detail::current_executor( //-V730
+            get_self_id_data()->get_scheduler_base()))
     {}
 
-    current_executor::current_executor(policies::scheduler_base* scheduler) //-V730
-      : scheduled_executor(new detail::current_executor(scheduler))
+    current_executor::current_executor(policies::scheduler_base* scheduler)
+      : scheduled_executor(new detail::current_executor(scheduler)) //-V730
     {}
 
     hpx::state current_executor::get_state() const
     {
-        return boost::static_pointer_cast<
-                detail::current_executor
-            >(executor::executor_data_)->get_state();
+        return hpx::static_pointer_cast<detail::current_executor>(
+            executor::executor_data_)
+            ->get_state();
     }
 }}}

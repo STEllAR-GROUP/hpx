@@ -6,6 +6,7 @@
 //
 // Copyright (C) 2007 John Torjo (see www.torjo.com for email)
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -328,12 +329,18 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
                         m_manipulator = '%';
                 }
                 else if (m_manipulator.empty())
+                {
                     ;    // ignore this char - not from a manipulator
+                }
                 else if (m_manipulator[0] == '%')
+                {
                     m_manipulator += c;
+                }
                 else
+                {
                     // manipulator should always start with %
                     HPX_ASSERT(false);
+                }
             }
 
         private:

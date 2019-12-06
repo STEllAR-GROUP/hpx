@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,20 +16,17 @@
 #endif
 
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -77,17 +75,17 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         // if we're still starting up, give this executor a chance of executing
         // its tasks
-        while (scheduler_.get_state(0) < state_running)
-        {
-            this_thread::suspend();
-        }
+        hpx::util::yield_while(
+            [this]() { return scheduler_.get_state(0) < state_running; },
+            "this_thread_executor<Scheduler>::~this_thread_executor()");
 
         // Wait for work to finish.
-        while (scheduler_.get_thread_count() >
-            scheduler_.get_background_thread_count())
-        {
-            hpx::this_thread::suspend();
-        }
+        hpx::util::yield_while(
+            [this]() {
+                return scheduler_.get_thread_count() >
+                    scheduler_.get_background_thread_count();
+            },
+            "this_thread_executor<Scheduler>::~this_thread_executor()");
 
         // Inform the resource manager that this executor is about to be
         // destroyed. This will cause it to invoke remove_processing_unit below
@@ -151,10 +149,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
 
         // create a new thread
-        thread_init_data data(util::one_shot(util::bind(
-            &this_thread_executor::thread_function_nullary,
-            this, std::move(f))), desc);
-        data.stacksize = threads::get_stack_size(stacksize);
+        thread_init_data data(
+            util::one_shot(
+                util::bind(&this_thread_executor::thread_function_nullary, this,
+                    std::move(f))),
+            desc);
+        data.stacksize =
+            this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
 
         // update statistics
         ++tasks_scheduled_;
@@ -190,10 +191,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
 
         // create a new suspended thread
-        thread_init_data data(util::one_shot(util::bind(
-            &this_thread_executor::thread_function_nullary,
-            this, std::move(f))), desc);
-        data.stacksize = threads::get_stack_size(stacksize);
+        thread_init_data data(
+            util::one_shot(
+                util::bind(&this_thread_executor::thread_function_nullary, this,
+                    std::move(f))),
+            desc);
+        data.stacksize =
+            this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread( //-V601
@@ -286,7 +290,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                     parent_thread_num_);
                 on_self_reset on_exit(self_);
 
-                this_thread::suspend();
+                hpx::basic_execution::this_thread::yield();
             }
 
             // reset state to running if current state is still suspended
@@ -434,7 +438,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(std::size_t(-1) == orig_thread_num_);
 
         thread_num_ = thread_num;
-        orig_thread_num_ = hpx::get_worker_thread_num();
+        orig_thread_num_ = threads::detail::get_thread_num_tss();
 
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_initialized;

@@ -2,6 +2,7 @@
     Copyright (C) 2007-2017 Hartmut Kaiser
                   2014 University of Oregon
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -2355,7 +2356,7 @@ system and application performance.
        events changes depending on the used architecture.
 
        For a full list of available PAPI events and their (short) description
-       use the ``--hpx:list-counters`` and ``--papi-event-info=all`` command
+       use the ``--hpx:list-counters`` and ``--hpx:papi-event-info=all`` command
        line options.
 
      * ``locality#*/total`` or

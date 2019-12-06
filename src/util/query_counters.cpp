@@ -1,11 +1,13 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -15,11 +17,10 @@
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/util/apex.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/query_counters.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/util/external_timer.hpp>
+#include <hpx/util/query_counters.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -115,7 +116,7 @@ namespace hpx { namespace util
     void query_counters::print_name_csv(Stream& out, std::string const& name)
     {
         std::string s = performance_counters::remove_counter_prefix(name);
-        if (s.find_first_of(",") != std::string::npos)
+        if (s.find_first_of(',') != std::string::npos)
             out << "\"" << s << "\"";
         else
             out << s;
@@ -130,7 +131,7 @@ namespace hpx { namespace util
 
         if(!ec) {
 #ifdef HPX_HAVE_APEX
-            apex::sample_value(name.c_str(), val);
+            external_timer::sample_value(name.c_str(), val);
 #elif HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {
@@ -200,7 +201,7 @@ namespace hpx { namespace util
 
         if(!ec) {
 #ifdef HPX_HAVE_APEX
-            apex::sample_value(name.c_str(), val);
+            external_timer::sample_value(name.c_str(), val);
 #elif HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {
@@ -424,7 +425,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     bool query_counters::print_raw_counters(bool destination_is_cout,
-        bool no_output, bool reset, char const* description,
+        bool reset, bool no_output, char const* description,
         std::vector<performance_counters::counter_info> const& infos,
         error_code& ec)
     {
@@ -478,7 +479,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     bool query_counters::print_array_counters(bool destination_is_cout,
-        bool no_output, bool reset, char const* description,
+        bool reset, bool no_output, char const* description,
         std::vector<performance_counters::counter_info> const& infos,
         error_code& ec)
     {
@@ -568,11 +569,11 @@ namespace hpx { namespace util
         std::vector<performance_counters::counter_info> infos =
             counters_.get_counter_infos();
 
-        result = print_raw_counters(destination_is_cout, no_output, reset,
+        result = print_raw_counters(destination_is_cout, reset, no_output,
             description, infos, ec);
         if (ec) return false;
 
-        result = print_array_counters(destination_is_cout, no_output, reset,
+        result = print_array_counters(destination_is_cout, reset, no_output,
             description, infos, ec) || result;
         if (ec) return false;
 

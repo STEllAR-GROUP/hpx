@@ -1,13 +1,14 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/traits/plugin_config_data.hpp>
+#include <hpx/plugin/traits/plugin_config_data.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
@@ -22,15 +23,15 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 
-#include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
 
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/sender.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
@@ -285,7 +286,8 @@ namespace hpx { namespace traits
                 "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:" HPX_HAVE_PARCELPORT_MPI_ENV "}\n"
 #else
                 "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:"
-                        "MV2_COMM_WORLD_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,ALPS_APP_PE"
+                        "MV2_COMM_WORLD_RANK,PMIX_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,"
+                        "ALPS_APP_PE"
                     "}\n"
 #endif
                 "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}\n"

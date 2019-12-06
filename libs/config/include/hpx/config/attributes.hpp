@@ -1,13 +1,14 @@
 //  Copyright (c) 2017 Marcin Copik
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef HPX_CONFIG_ATTRIBUTES_HPP
 #define HPX_CONFIG_ATTRIBUTES_HPP
 
-#include <hpx/config/defines.hpp>
 #include <hpx/config/compiler_specific.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(DOXYGEN)
 
@@ -27,6 +28,7 @@
 #else
 
 ///////////////////////////////////////////////////////////////////////////////
+// clang-format off
 #if defined(HPX_MSVC)
 #   define HPX_NOINLINE __declspec(noinline)
 #elif defined(__GNUC__)
@@ -76,7 +78,8 @@
 // handle [[fallthrough]]
 #if defined(HPX_HAVE_CXX17_FALLTHROUGH_ATTRIBUTE)
 #   define HPX_FALLTHROUGH [[fallthrough]]
-#elif defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+#elif defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000) && \
+     !defined(HPX_INTEL_VERSION)
 #   define HPX_FALLTHROUGH __attribute__((fallthrough))
 // All versions of clang supported by HPX have the [[clang::fallthrough]]
 // attribute.
@@ -85,6 +88,7 @@
 #else
 #   define HPX_FALLTHROUGH
 #endif
+// clang-format on
 
 #endif
 #endif

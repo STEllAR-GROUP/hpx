@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/iterator_support/is_range.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 
 #include <hpx/parallel/algorithms/count.hpp>
 #include <hpx/parallel/traits/projected_range.hpp>
@@ -20,8 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // count
 
@@ -74,17 +74,13 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename T,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        hpx::traits::is_range<Rng>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename std::iterator_traits<
-        typename hpx::traits::range_traits<Rng>::iterator_type
-        >::difference_type
-    >::type
-    count(ExPolicy && policy, Rng && rng, T const& value,
-        Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                traits::is_projected_range<Proj, Rng>::value&&
+                    hpx::traits::is_range<Rng>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename std::iterator_traits<typename hpx::traits::range_traits<
+            Rng>::iterator_type>::difference_type>::type
+    count(ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj())
     {
         return count(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), value, std::forward<Proj>(proj));
@@ -155,24 +151,18 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename Rng, typename F,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_range<Rng>::value &&
-        traits::is_projected_range<Proj, Rng>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, F, traits::projected_range<Proj, Rng>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, typename std::iterator_traits<
-        typename hpx::traits::range_traits<Rng>::iterator_type
-        >::difference_type
-    >::type
-    count_if(ExPolicy && policy, Rng && rng, F && f,
-        Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
+                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
+                    F, traits::projected_range<Proj, Rng>>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename std::iterator_traits<typename hpx::traits::range_traits<
+            Rng>::iterator_type>::difference_type>::type
+    count_if(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
     {
         return count_if(policy, hpx::util::begin(rng), hpx::util::end(rng),
             std::forward<F>(f), std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

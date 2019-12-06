@@ -2,6 +2,7 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,6 +14,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/util.hpp>
 
 #include <cstddef>
@@ -54,11 +56,6 @@ std::size_t hello_world_worker(std::size_t desired)
     // try again by rescheduling it.
     return std::size_t(-1);
 }
-
-// Define the boilerplate code necessary for the function 'hello_world_worker'
-// to be invoked as an HPX action (by a HPX future). This macro defines the
-// type 'hello_world_worker_action'.
-HPX_PLAIN_ACTION(hello_world_worker, hello_world_worker_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,9 +91,15 @@ void hello_world_foreman()
         {
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has
-            // completed.
-            typedef hello_world_worker_action action_type;
-            futures.push_back(hpx::async<action_type>(here, worker));
+            // completed. We give the task a hint to run on a particular worker
+            // thread, but no guarantees are given by the scheduler that the
+            // task will actually run on that worker thread.
+            hpx::parallel::execution::default_executor exec(
+                hpx::threads::thread_priority_default,
+                hpx::threads::thread_stacksize_default,
+                hpx::threads::thread_schedule_hint(
+                    hpx::threads::thread_schedule_hint_mode_thread, worker));
+            futures.push_back(hpx::async(exec, hello_world_worker, worker));
         }
 
         // Wait for all of the futures to finish. The callback version of the
@@ -127,8 +130,8 @@ HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 //[hello_world_hpx_main
-//` Here is the main entry point. By using the include 'hpx/hpx_main.hpp' HPX
-//` will invoke the plain old C-main() as its first HPX thread.
+// Here is the main entry point. By using the include 'hpx/hpx_main.hpp' HPX
+// will invoke the plain old C-main() as its first HPX thread.
 int main()
 {
     // Get a list of all available localities.

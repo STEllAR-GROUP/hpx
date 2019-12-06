@@ -4,6 +4,7 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,18 +12,22 @@
 #define HPX_PARCELSET_ENCODE_PARCEL_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
-#include <hpx/logging.hpp>
 
 #include <boost/exception/exception.hpp>
 
@@ -31,6 +36,7 @@
 #include <exception>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx
@@ -89,10 +95,9 @@ namespace hpx
 
                 // prepare chunk data for transmission, the transmission_chunks data
                 // first holds all zero-copy, then all non-zero-copy chunk infos
-                typedef typename Buffer::transmission_chunk_type
-                    transmission_chunk_type;
-                typedef typename Buffer::count_chunks_type
-                    count_chunks_type;
+                using transmission_chunk_type =
+                    typename Buffer::transmission_chunk_type;
+                using count_chunks_type = typename Buffer::count_chunks_type;
 
                 std::vector<transmission_chunk_type>& chunks =
                     buffer.transmission_chunks_;
@@ -155,7 +160,6 @@ namespace hpx
                     if (filter.get() != nullptr)
                         archive_flags |= serialization::enable_compression;
 
-
                     // preallocate data
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
                     {
@@ -178,12 +182,10 @@ namespace hpx
                             filter->set_max_length(buffer.data_.capacity());
 
                         serialization::output_archive archive(
-                            buffer.data_
-                          , archive_flags
-                          , &buffer.chunks_
-                          , filter.get());
+                            buffer.data_, archive_flags, &buffer.chunks_,
+                            filter.get());
 
-                        if(num_parcels != std::size_t(-1))
+                        if (num_parcels != std::size_t(-1))
                             archive << parcels_sent; //-V128
 
                         for(std::size_t i = 0; i != parcels_sent; ++i)
@@ -193,9 +195,18 @@ namespace hpx
                             std::int64_t serialize_time =
                                 timer.elapsed_nanoseconds();
 #endif
-
                             LPT_(debug) << ps[i];
-                            archive.set_split_gids(ps[i].split_gids());
+
+                            auto split_gids_map = ps[i].move_split_gids();
+                            if (!split_gids_map.empty())
+                            {
+                                auto& split_gids =
+                                    archive.get_extra_data<serialization::
+                                            detail::preprocess_gid_types>();
+                                split_gids.set_split_gids(
+                                    std::move(split_gids_map));
+                            }
+
                             archive << ps[i];
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
@@ -265,4 +276,5 @@ namespace hpx
     }
 }
 
+#endif
 #endif

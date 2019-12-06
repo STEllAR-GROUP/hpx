@@ -1,5 +1,6 @@
 # Copyright (c)      2017 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -31,8 +32,10 @@ find_library(PMI_LIBRARY NAMES pmi
     ${PC_PMI_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
 
-set(PMI_LIBRARIES ${PMI_LIBRARY} CACHE INTERNAL "")
-set(PMI_INCLUDE_DIRS ${PMI_INCLUDE_DIR} CACHE INTERNAL "")
+if (NOT PMI_LIBRARY OR NOT PMI_INCLUDE_DIR)
+  hpx_error("PMI_LIBRARY OR PMI_INCLUDE_DIR not found, please install PMI or set \
+  the right PMI_ROOT path")
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PMI DEFAULT_MSG

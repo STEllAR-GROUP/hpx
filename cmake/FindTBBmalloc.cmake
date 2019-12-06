@@ -3,6 +3,7 @@
 # Copyright (c) 2010-2011 Matt Anderson
 # Copyright (c) 2011      Bryce Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,6 +13,7 @@ pkg_check_modules(PC_TBBMALLOC QUIET libtbbmalloc)
 find_path(TBBMALLOC_INCLUDE_DIR tbb/scalable_allocator.h
   HINTS
     ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT
+    ${HPX_TBBMALLOC_ROOT}
     ${PC_TBBMALLOC_INCLUDEDIR}
     ${PC_TBBMALLOC_INCLUDE_DIRS}
   PATH_SUFFIXES include)
@@ -29,6 +31,7 @@ message("${TBBMALLOC_ROOT} ${TBBMALLOC_PATH_SUFFIX} ${TBBMALLOC_PLATFORM}")
 find_library(TBBMALLOC_LIBRARY NAMES tbbmalloc libtbbmalloc
   HINTS
     ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT
+    ${HPX_TBBMALLOC_ROOT}
     ${PC_TBBMALLOC_LIBDIR}
     ${PC_TBBMALLOC_LIBRARY_DIRS}
   PATH_SUFFIXES ${TBBMALLOC_PATH_SUFFIX} lib lib64)
@@ -36,9 +39,17 @@ find_library(TBBMALLOC_LIBRARY NAMES tbbmalloc libtbbmalloc
 find_library(TBBMALLOC_PROXY_LIBRARY NAMES tbbmalloc_proxy libtbbmalloc_proxy
   HINTS
     ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT
+    ${HPX_TBBMALLOC_ROOT}
     ${PC_TBBMALLOC_LIBDIR}
     ${PC_TBBMALLOC_LIBRARY_DIRS}
   PATH_SUFFIXES ${TBBMALLOC_PATH_SUFFIX} lib lib64)
+
+# Set TBBMALLOC_ROOT in case the other hints are used
+if (NOT TBBMALLOC_ROOT AND "$ENV{TBBMALLOC_ROOT}")
+  set(TBBMALLOC_ROOT $ENV{TBBMALLOC_ROOT})
+elseif(NOT TBBMALLOC_ROOT)
+  string(REPLACE "/include" "" TBBMALLOC_ROOT "${TBBMALLOC_INCLUDE_DIR}")
+endif()
 
 set(TBBMALLOC_LIBRARIES ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
 set(TBBMALLOC_INCLUDE_DIRS ${TBBMALLOC_INCLUDE_DIR})

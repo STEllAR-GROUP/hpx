@@ -1,6 +1,7 @@
 // Copyright Kevlin Henney, 2000, 2001. All rights reserved.
 // Copyright (c) 2013 Hartmut Kaiser.
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -112,7 +113,7 @@ namespace any_tests    // test definitions
     {
         const any value;
 
-        HPX_TEST_MSG(value.empty(), "empty");
+        HPX_TEST_MSG(!value.has_value(), "empty");
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
             "any_cast<int>");
         HPX_TEST_EQ_MSG(value.type(),
@@ -124,7 +125,7 @@ namespace any_tests    // test definitions
         std::string text = "test message";
         any value = any(text);
 
-        HPX_TEST_EQ_MSG(false, value.empty(), "empty");
+        HPX_TEST_EQ_MSG(true, value.has_value(), "empty");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
             "any_cast<int>");
@@ -141,7 +142,7 @@ namespace any_tests    // test definitions
         std::string text = "test message";
         any original = any(text), copy = any(original);
 
-        HPX_TEST_EQ_MSG(false, copy.empty(), "empty");
+        HPX_TEST_EQ_MSG(true, copy.has_value(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
         HPX_TEST_EQ_MSG(any_cast<std::string>(original),
             any_cast<std::string>(copy),
@@ -159,7 +160,7 @@ namespace any_tests    // test definitions
         any original = any(text), copy;
         any* assign_result = &(copy = original);
 
-        HPX_TEST_EQ_MSG(false, copy.empty(), "empty");
+        HPX_TEST_EQ_MSG(true, copy.has_value(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
         HPX_TEST_EQ_MSG(any_cast<std::string>(original),
             any_cast<std::string>(copy),
@@ -178,7 +179,7 @@ namespace any_tests    // test definitions
         any value;
         any* assign_result = &(value = text);
 
-        HPX_TEST_EQ_MSG(false, value.empty(), "type");
+        HPX_TEST_EQ_MSG(true, value.has_value(), "type");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), any_cast<int>(&value),
             "any_cast<int>");
@@ -226,8 +227,8 @@ namespace any_tests    // test definitions
         small_object* original_ptr = any_cast<small_object>(&original);
         any* swap_result = &original.swap(swapped);
 
-        HPX_TEST_MSG(original.empty(), "empty on original");
-        HPX_TEST_EQ_MSG(false, swapped.empty(), "empty on swapped");
+        HPX_TEST_MSG(!original.has_value(), "empty on original");
+        HPX_TEST_EQ_MSG(true, swapped.has_value(), "empty on swapped");
         HPX_TEST_EQ_MSG(swapped.type(), typeid(small_object), "type");
         HPX_TEST_EQ_MSG(text, any_cast<small_object>(swapped),
             "comparing swapped copy against original text");
@@ -257,8 +258,8 @@ namespace any_tests    // test definitions
         big_object* original_ptr = any_cast<big_object>(&original);
         any* swap_result = &original.swap(swapped);
 
-        HPX_TEST_MSG(original.empty(), "empty on original");
-        HPX_TEST_EQ_MSG(false, swapped.empty(), "empty on swapped");
+        HPX_TEST_MSG(!original.has_value(), "empty on original");
+        HPX_TEST_EQ_MSG(true, swapped.has_value(), "empty on swapped");
         HPX_TEST_EQ_MSG(swapped.type(), typeid(big_object), "type");
         HPX_TEST_EQ_MSG(text, any_cast<big_object>(swapped),
             "comparing swapped copy against original text");
@@ -282,9 +283,9 @@ namespace any_tests    // test definitions
         any copied = null, assigned;
         assigned = null;
 
-        HPX_TEST_MSG(null.empty(), "empty on null");
-        HPX_TEST_MSG(copied.empty(), "empty on copied");
-        HPX_TEST_MSG(assigned.empty(), "empty on copied");
+        HPX_TEST_MSG(!null.has_value(), "empty on null");
+        HPX_TEST_MSG(!copied.has_value(), "empty on copied");
+        HPX_TEST_MSG(!assigned.has_value(), "empty on copied");
     }
 
     void test_cast_to_reference()

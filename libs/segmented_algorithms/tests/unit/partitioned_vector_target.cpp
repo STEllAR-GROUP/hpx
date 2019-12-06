@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,7 +21,8 @@ HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(int, target_vector_int);
 HPX_REGISTER_PARTITIONED_VECTOR(int, target_vector_int);
 
 typedef hpx::compute::host::block_allocator<double> target_allocator_double;
-typedef hpx::compute::vector<double, target_allocator_double> target_vector_double;
+typedef hpx::compute::vector<double, target_allocator_double>
+    target_vector_double;
 HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(double, target_vector_double);
 HPX_REGISTER_PARTITIONED_VECTOR(double, target_vector_double);
 
@@ -39,31 +41,31 @@ void allocation_tests()
             hpx::compute::host::get_targets(locality).get();
 
         {
-            hpx::partitioned_vector<T, target_vector> v(length, T(42),
-                hpx::compute::host::target_layout);
+            hpx::partitioned_vector<T, target_vector> v(
+                length, T(42), hpx::compute::host::target_layout);
         }
     }
 
-//     {
-//         hpx::partitioned_vector<T> v;
-//         copy_tests(v);
-//     }
-//
-//     {
-//         hpx::partitioned_vector<T> v(length);
-//         copy_tests(v);
-//     }
-//
-//     {
-//         hpx::partitioned_vector<T> v(length, T(42));
-//         copy_tests(v);
-//     }
-//
-//     copy_tests_with_policy<T>(length, 1, hpx::container_layout);
-//     copy_tests_with_policy<T>(length, 3, hpx::container_layout(3));
-//     copy_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities));
-//     copy_tests_with_policy<T>(length, localities.size(),
-//         hpx::container_layout(localities));
+    //{
+    //    hpx::partitioned_vector<T> v;
+    //    copy_tests(v);
+    //}
+    //
+    //{
+    //    hpx::partitioned_vector<T> v(length);
+    //    copy_tests(v);
+    //}
+    //
+    //{
+    //    hpx::partitioned_vector<T> v(length, T(42));
+    //    copy_tests(v);
+    //}
+    //
+    //copy_tests_with_policy<T>(length, 1, hpx::container_layout);
+    //copy_tests_with_policy<T>(length, 3, hpx::container_layout(3));
+    //copy_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities));
+    //copy_tests_with_policy<T>(length, localities.size(),
+    //    hpx::container_layout(localities));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

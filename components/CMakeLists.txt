@@ -1,5 +1,6 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,13 +10,32 @@ include(HPX_Message)
 include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
+# Variable used to add the components to the pkgconfig
+# linking step
 set(HPX_COMPONENTS
+  component_storage
+  iostreams
+  partitioned_vector
+  process
+  unordered
+  CACHE INTERNAL "list of HPX components" FORCE
+  )
+
+if (HPX_WITH_PAPI)
+  set(HPX_COMPONENTS
+    ${HPX_COMPONENTS}
+    papi_counters
+    CACHE INTERNAL "list of HPX components" FORCE
+    )
+endif()
+
+
+set(component_dirs
   component_storage
   containers
   iostreams
   performance_counters
   process
-  CACHE INTERNAL "list of HPX components" FORCE
 )
 
 
@@ -53,11 +73,12 @@ if(HPX_WITH_TESTS)
   endif()
 endif()
 
+hpx_info("")
 hpx_info("Configuring components:")
 
 add_hpx_pseudo_target(components)
 
-foreach(component ${HPX_COMPONENTS})
+foreach(component ${component_dirs})
   hpx_info("  ${component}")
   add_hpx_pseudo_target(components.${component})
   add_subdirectory(${component})

@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,21 +9,20 @@
 #define HPX_LCOS_LOCAL_CONTINUATION_APR_17_2012_0150PM
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/post_policy_dispatch.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <exception>
 #include <functional>
@@ -143,7 +143,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // Bind an on_completed handler to this future which will transfer
             // its result to the new future.
-            boost::intrusive_ptr<Continuation> cont_(&cont);
+            hpx::intrusive_ptr<Continuation> cont_(&cont);
             ptr->execute_deferred();
             ptr->set_on_completed(
                 [HPX_CAPTURE_MOVE(inner_state),
@@ -313,8 +313,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     protected:
-        threads::thread_result_type
-        async_impl(
+        void async_impl(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
@@ -323,12 +322,9 @@ namespace hpx { namespace lcos { namespace detail
 
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, std::move(future), *this);
-            return threads::thread_result_type(threads::terminated,
-                    threads::invalid_thread_id);
         }
 
-        threads::thread_result_type
-        async_impl_nounwrap(
+        void async_impl_nounwrap(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
@@ -341,12 +337,9 @@ namespace hpx { namespace lcos { namespace detail
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation_nounwrap(
                 f_, std::move(future), *this, is_void{});
-            return threads::thread_result_type(threads::terminated,
-                    threads::invalid_thread_id);
         }
 
-        threads::thread_result_type
-        async_exec_impl(
+        void async_exec_impl(
             typename traits::detail::shared_state_ptr_for<
                 Future
             >::type && f)
@@ -359,8 +352,6 @@ namespace hpx { namespace lcos { namespace detail
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation_nounwrap(
                 f_, std::move(future), *this, is_void{});
-            return threads::thread_result_type(threads::terminated,
-                threads::invalid_thread_id);
         }
 
     public:
@@ -384,17 +375,17 @@ namespace hpx { namespace lcos { namespace detail
                 started_ = true;
             }
 
-            boost::intrusive_ptr<continuation> this_(this);
-            hpx::util::thread_description desc(
+            hpx::intrusive_ptr<continuation> this_(this);
+            hpx::util::thread_description desc(f_,
                 "hpx::parallel::execution::parallel_executor::post");
 
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
-                >::call(desc, hpx::launch::async,
+                >::call(hpx::launch::async, desc,
                     [HPX_CAPTURE_MOVE(this_),
                         HPX_CAPTURE_MOVE(f)
-                    ]() mutable -> threads::thread_result_type {
-                        return this_->async_impl(std::move(f));
+                    ]() mutable -> void {
+                        this_->async_impl(std::move(f));
                     });
 
             if (&ec != &throws)
@@ -430,17 +421,17 @@ namespace hpx { namespace lcos { namespace detail
                 started_ = true;
             }
 
-            boost::intrusive_ptr<continuation> this_(this);
-            hpx::util::thread_description desc(
+            hpx::intrusive_ptr<continuation> this_(this);
+            hpx::util::thread_description desc(f_,
                 "hpx::parallel::execution::parallel_executor::post");
 
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
-                >::call(desc, hpx::launch::async,
+                >::call(hpx::launch::async, desc,
                     [HPX_CAPTURE_MOVE(this_),
                         HPX_CAPTURE_MOVE(f)
-                    ]() mutable -> threads::thread_result_type {
-                        return this_->async_impl_nounwrap(std::move(f));
+                    ]() mutable -> void {
+                        this_->async_impl_nounwrap(std::move(f));
                     });
 
             if (&ec != &throws)
@@ -476,12 +467,12 @@ namespace hpx { namespace lcos { namespace detail
                 started_ = true;
             }
 
-            boost::intrusive_ptr<continuation> this_(this);
+            hpx::intrusive_ptr<continuation> this_(this);
             parallel::execution::post(std::forward<Executor>(exec),
                 [HPX_CAPTURE_MOVE(this_),
                     HPX_CAPTURE_MOVE(f)
-                ]() mutable -> threads::thread_result_type {
-                    return this_->async_exec_impl(std::move(f));
+                ]() mutable -> void {
+                    this_->async_exec_impl(std::move(f));
                 });
 
             if (&ec != &throws)
@@ -551,7 +542,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
-            boost::intrusive_ptr<continuation> this_(this);
+            hpx::intrusive_ptr<continuation> this_(this);
 
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
@@ -586,7 +577,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
-            boost::intrusive_ptr<continuation> this_(this);
+            hpx::intrusive_ptr<continuation> this_(this);
 
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
@@ -622,7 +613,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
-            boost::intrusive_ptr<continuation> this_(this);
+            hpx::intrusive_ptr<continuation> this_(this);
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
 
@@ -653,7 +644,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
-            boost::intrusive_ptr<continuation> this_(this);
+            hpx::intrusive_ptr<continuation> this_(this);
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
 
@@ -898,7 +889,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // Bind an on_completed handler to this future which will transfer
             // its result to the new future.
-            boost::intrusive_ptr<unwrap_continuation> this_(this);
+            hpx::intrusive_ptr<unwrap_continuation> this_(this);
             try {
                 // if we get here, this future is ready
                 Outer outer = traits::future_access<Outer>::create(
@@ -949,7 +940,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // Bind an on_completed handler to this future which will wait for
             // the inner future and will transfer its result to the new future.
-            boost::intrusive_ptr<unwrap_continuation> this_(this);
+            hpx::intrusive_ptr<unwrap_continuation> this_(this);
 
             outer_shared_state_ptr outer_state =
                 traits::detail::get_shared_state(future);
@@ -1065,29 +1056,6 @@ namespace hpx { namespace lcos { namespace detail
         return unwrap_impl_alloc(
             util::internal_allocator<>{}, std::forward<Future>(future), ec);
     }
-
-//     template <typename R>
-//     inline typename traits::detail::shared_state_ptr<
-//         typename future_unwrap_result<future<R>>::result_type>::type
-//     unwrap(future<R> && fut, error_code& ec)
-//     {
-//         if (fut.is_ready() && !fut.has_exception())
-//         {
-//             typedef typename traits::future_traits<future<R>>::type inner_type;
-//             inner_type f = fut.get();
-//
-//             // move the reference count into the returned intrusive_ptr
-//             typedef
-//                 typename traits::detail::shared_state_ptr_for<inner_type>::type
-//                     inner_shared_ptr_type;
-//             return inner_shared_ptr_type(
-//                 traits::future_access<inner_type>::detach_shared_state(
-//                     std::move(f)),
-//                 false);
-//         }
-//
-//         return unwrap_impl(std::move(fut), ec);
-//     }
 
     template <typename Allocator, typename Future>
     inline typename traits::detail::shared_state_ptr<

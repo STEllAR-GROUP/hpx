@@ -1,5 +1,6 @@
 # Copyright (c) 2016 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,12 +15,13 @@ foreach(benchmark ${benchmarks})
 
   # add example executable
   add_hpx_executable(${benchmark}_test
-                     SOURCES ${sources}
-                     ${${benchmark}_FLAGS}
-                     DEPENDENCIES iostreams_component partitioned_vector_component
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Benchmarks/Modules/SegmentedAlgorithms")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${benchmark}_FLAGS}
+    DEPENDENCIES iostreams_component partitioned_vector_component
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Benchmarks/Modules/SegmentedAlgorithms")
 
   add_hpx_performance_test("modules.segmented_algorithms" ${benchmark} ${${benchmark}_PARAMETERS})
 endforeach()

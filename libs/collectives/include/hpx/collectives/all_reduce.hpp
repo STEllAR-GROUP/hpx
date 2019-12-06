@@ -1,5 +1,6 @@
 //  Copyright (c) 2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,8 +10,9 @@
 #define HPX_COLLECTIVES_ALL_REDUCE_JUL_01_2019_0313PM
 
 #if defined(DOXYGEN)
-namespace hpx { namespace lcos
-{
+// clang-format off
+namespace hpx { namespace lcos {
+
     /// AllReduce a set of values from different call sites
     ///
     /// This function receives a set of values that are the result of applying
@@ -45,12 +47,10 @@ namespace hpx { namespace lcos
     ///             ready once the all_reduce operation has been completed.
     ///
     template <typename T, typename F>
-    hpx::future<T>
-    all_reduce(char const* basename, hpx::future<T> result, F&& op,
-        std::size_t num_sites = std::size_t(-1),
+    hpx::future<T> all_reduce(char const* basename, hpx::future<T> result,
+        F&& op, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
     /// AllReduce a set of values from different call sites
     ///
@@ -85,32 +85,30 @@ namespace hpx { namespace lcos
     ///             ready once the all_reduce operation has been completed.
     ///
     template <typename T, typename F>
-    hpx::future<std::decay_t<T>>
-    all_reduce(char const* basename, T && result, F&& op,
-        std::size_t num_sites = std::size_t(-1),
+    hpx::future<std::decay_t<T>> all_reduce(char const* basename, T&& result,
+        F&& op, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
-    /// \def HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
-    ///
-    /// \brief Declare a all_reduce object named \a name for a given data type \a type.
-    ///
-    /// The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used to declare
-    /// all facilities necessary for a (possibly remote) all_reduce operation.
-    ///
-    /// The parameter \a type specifies for which data type the all_reduce
-    /// operations should be enabled.
-    ///
-    /// The (optional) parameter \a name should be a unique C-style identifier
-    /// that will be internally used to identify a particular all_reduce operation.
-    /// If this defaults to \a \<type\>_all_reduce if not specified.
-    ///
-    /// \note The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used with 1
-    ///       or 2 arguments. The second argument is optional and defaults to
-    ///       \a \<type\>_all_reduce.
-    ///
-    #define HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
+/// \def HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
+///
+/// \brief Declare a all_reduce object named \a name for a given data type \a type.
+///
+/// The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used to declare
+/// all facilities necessary for a (possibly remote) all_reduce operation.
+///
+/// The parameter \a type specifies for which data type the all_reduce
+/// operations should be enabled.
+///
+/// The (optional) parameter \a name should be a unique C-style identifier
+/// that will be internally used to identify a particular all_reduce operation.
+/// If this defaults to \a \<type\>_all_reduce if not specified.
+///
+/// \note The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used with 1
+///       or 2 arguments. The second argument is optional and defaults to
+///       \a \<type\>_all_reduce.
+///
+#define HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
 
     /// \def HPX_REGISTER_ALLREDUCE(type, name)
     ///
@@ -131,7 +129,8 @@ namespace hpx { namespace lcos
     ///       \a \<type\>_all_reduce.
     ///
     #define HPX_REGISTER_ALLREDUCE(type, name)
-}}
+}}    // namespace hpx::lcos
+// clang-format on
 #else
 
 #include <hpx/config.hpp>
@@ -139,10 +138,12 @@ namespace hpx { namespace lcos
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/dataflow.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/and_gate.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/local_lcos/and_gate.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
@@ -154,7 +155,6 @@ namespace hpx { namespace lcos
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/util/bind_back.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -165,66 +165,65 @@ namespace hpx { namespace lcos
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos {
+
+    namespace detail {
+
         ////////////////////////////////////////////////////////////////////////
         template <typename T>
         class all_reduce_server
-          : public hpx::components::component_base<all_reduce_server<T> >
+          : public hpx::components::component_base<all_reduce_server<T>>
         {
             using mutex_type = lcos::local::spinlock;
 
         public:
-            all_reduce_server() //-V730
+            all_reduce_server()    //-V730
             {
-                HPX_ASSERT(false);  // shouldn't ever be called
+                HPX_ASSERT(false);    // shouldn't ever be called
             }
 
             all_reduce_server(std::size_t num_sites, std::string const& name,
-                    std::size_t site)
+                std::size_t site)
               : num_sites_(num_sites)
               , data_(num_sites)
               , gate_(num_sites)
               , name_(name)
               , site_(site)
-            {}
+            {
+            }
 
             template <typename F>
             hpx::future<T> get_result(std::size_t which, T t, F op)
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                auto on_ready =
-                    [this, HPX_CAPTURE_MOVE(op)](hpx::shared_future<void> f)
-                    mutable -> T
+                auto on_ready = [this, HPX_CAPTURE_MOVE(op)](
+                                    hpx::shared_future<void> f) mutable -> T {
+                    f.get();    // propagate any exceptions
+
+                    std::vector<T> data;
+                    std::string name;
+
                     {
-                        f.get();       // propagate any exceptions
+                        std::unique_lock<mutex_type> l(mtx_);
+                        util::ignore_lock(&l);
+                        data = data_;
+                        std::swap(name, name_);
+                    }
 
-                        std::vector<T> data;
-                        std::string name;
+                    // this is a one-shot object (generations counters are
+                    // not supported), unregister ourselves, but only once)
+                    if (!name.empty())
+                    {
+                        hpx::unregister_with_basename(name, site_).get();
+                    }
 
-                        {
-                            std::unique_lock<mutex_type> l(mtx_);
-                            data = data_;
-                            std::swap(name, name_);
-                        }
+                    HPX_ASSERT(!data.empty());
 
-                        // this is a one-shot object (generations counters are
-                        // not supported), unregister ourselves, but only once)
-                        if (!name.empty())
-                        {
-                            hpx::unregister_with_basename(name, site_).get();
-                        }
-
-                        HPX_ASSERT(!data.empty());
-
-                        auto it = data.begin();
-                        return hpx::parallel::reduce(
-                            hpx::parallel::execution::par, ++it,
-                            data.end(), *data.begin(), op);
-                    };
+                    auto it = data.begin();
+                    return hpx::parallel::reduce(hpx::parallel::execution::par,
+                        ++it, data.end(), *data.begin(), op);
+                };
 
                 hpx::future<T> f = gate_.get_shared_future(l).then(
                     hpx::launch::async, std::move(on_ready));
@@ -238,12 +237,12 @@ namespace hpx { namespace lcos
 
             template <typename F>
             struct get_result_action
-              : hpx::actions::make_action<
-                    hpx::future<T> (all_reduce_server::*)(std::size_t, T, F),
+              : hpx::actions::make_action<hpx::future<T> (all_reduce_server::*)(
+                                              std::size_t, T, F),
                     &all_reduce_server::template get_result<F>,
-                    get_result_action<F>
-                >::type
-            {};
+                    get_result_action<F>>::type
+            {
+            };
 
         private:
             mutex_type mtx_;
@@ -268,32 +267,33 @@ namespace hpx { namespace lcos
 
             return result.then(hpx::launch::sync,
                 [HPX_CAPTURE_MOVE(target), HPX_CAPTURE_MOVE(basename)](
-                    hpx::future<bool>&& f)
-                -> hpx::id_type
-                {
+                    hpx::future<bool>&& f) -> hpx::id_type {
                     bool result = f.get();
                     if (!result)
                     {
                         HPX_THROW_EXCEPTION(bad_parameter,
                             "hpx::lcos::detail::register_all_reduce_name",
                             "the given base name for the all_reduce operation "
-                            "was already registered: " + basename);
+                            "was already registered: " +
+                                basename);
                     }
                     return target;
                 });
         }
-    }
+    }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<hpx::id_type>
-    create_all_reduce(char const* basename,
+    hpx::future<hpx::id_type> create_all_reduce(char const* basename,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities(hpx::launch::sync);
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
@@ -304,68 +304,67 @@ namespace hpx { namespace lcos
         // create a new all_reduce_server
         using result_type = typename util::decay<T>::type;
         hpx::future<hpx::id_type> id =
-            hpx::new_<detail::all_reduce_server<result_type> >(
+            hpx::new_<detail::all_reduce_server<result_type>>(
                 hpx::find_here(), num_sites, name, this_site);
 
         // register the all_reduce's id using the given basename
-        return id.then(hpx::launch::sync, util::bind_back(
-            &detail::register_all_reduce_name, std::move(name), this_site));
+        return id.then(hpx::launch::sync,
+            util::bind_back(
+                &detail::register_all_reduce_name, std::move(name), this_site));
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // destination site needs to be handled differently
     template <typename T, typename F>
-    hpx::future<T>
-    all_reduce(hpx::future<hpx::id_type>&& f, hpx::future<T>&& local_result,
-        F&& op, std::size_t this_site = std::size_t(-1))
+    hpx::future<T> all_reduce(hpx::future<hpx::id_type>&& f,
+        hpx::future<T>&& local_result, F&& op,
+        std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         auto all_reduce_data =
-            [HPX_CAPTURE_FORWARD(op), this_site](
-                hpx::future<hpx::id_type>&& f, hpx::future<T>&& local_result
-            ) mutable -> hpx::future<T>
-            {
-                using func_type = typename std::decay<F>::type;
-                using action_type = typename detail::all_reduce_server<T>::
-                    template get_result_action<func_type>;
+            [HPX_CAPTURE_FORWARD(op), this_site](hpx::future<hpx::id_type>&& f,
+                hpx::future<T>&& local_result) mutable -> hpx::future<T> {
+            using func_type = typename std::decay<F>::type;
+            using action_type = typename detail::all_reduce_server<
+                T>::template get_result_action<func_type>;
 
-                // make sure id is kept alive as long as the returned future
-                hpx::id_type id = f.get();
-                hpx::future<T> result =
-                    async(action_type(), id, this_site, local_result.get(),
-                        std::forward<F>(op));
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            hpx::future<T> result = async(action_type(), id, this_site,
+                local_result.get(), std::forward<F>(op));
 
-                return result.then(hpx::launch::sync,
-                    [HPX_CAPTURE_MOVE(id)](hpx::future<T> && f) -> T
-                    {
-                        HPX_UNUSED(id);
-                        return f.get();
-                    });
-            };
+            return result.then(hpx::launch::sync,
+                [HPX_CAPTURE_MOVE(id)](hpx::future<T>&& f) -> T {
+                    HPX_UNUSED(id);
+                    return f.get();
+                });
+        };
 
         return dataflow(hpx::launch::sync, std::move(all_reduce_data),
             std::move(f), std::move(local_result));
     }
 
     template <typename T, typename F>
-    hpx::future<T>
-    all_reduce(char const* basename, hpx::future<T>&& local_result, F&& op,
+    hpx::future<T> all_reduce(char const* basename,
+        hpx::future<T>&& local_result, F&& op,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities(hpx::launch::sync);
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         if (this_site == 0)
         {
-            return all_reduce(
-                create_all_reduce<T>(basename, num_sites, generation, root_site),
+            return all_reduce(create_all_reduce<T>(
+                                  basename, num_sites, generation, root_site),
                 std::move(local_result), std::forward<F>(op), this_site);
         }
 
@@ -373,16 +372,15 @@ namespace hpx { namespace lcos
         if (generation != std::size_t(-1))
             name += std::to_string(generation) + "/";
 
-        return all_reduce(
-            hpx::find_from_basename(std::move(name), root_site),
+        return all_reduce(hpx::find_from_basename(std::move(name), root_site),
             std::move(local_result), std::forward<F>(op), this_site);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // all_reduce plain values
     template <typename T, typename F>
-    hpx::future<typename std::decay<T>::type>
-    all_reduce(hpx::future<hpx::id_type>&& f, T&& local_result, F&& op,
+    hpx::future<typename std::decay<T>::type> all_reduce(
+        hpx::future<hpx::id_type>&& f, T&& local_result, F&& op,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -391,50 +389,47 @@ namespace hpx { namespace lcos
         using arg_type = typename std::decay<T>::type;
         auto all_reduce_data_direct =
             [HPX_CAPTURE_FORWARD(op), HPX_CAPTURE_FORWARD(local_result),
-                this_site](hpx::future<hpx::id_type>&& f)
-            mutable -> hpx::future<arg_type>
-            {
-                using func_type = typename std::decay<F>::type;
-                using action_type =
-                    typename detail::all_reduce_server<arg_type>::
-                        template get_result_action<func_type>;
+                this_site](hpx::future<hpx::id_type>&& f) mutable
+            -> hpx::future<arg_type> {
+            using func_type = typename std::decay<F>::type;
+            using action_type = typename detail::all_reduce_server<
+                arg_type>::template get_result_action<func_type>;
 
-                // make sure id is kept alive as long as the returned future
-                hpx::id_type id = f.get();
-                hpx::future<arg_type> result =
-                    async(action_type(), id, this_site,
-                        std::forward<T>(local_result), std::forward<F>(op));
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            hpx::future<arg_type> result = async(action_type(), id, this_site,
+                std::forward<T>(local_result), std::forward<F>(op));
 
-                return result.then(hpx::launch::sync,
-                    [HPX_CAPTURE_MOVE(id)](hpx::future<arg_type>&& f)
-                    -> arg_type
-                    {
-                        HPX_UNUSED(id);
-                        return f.get();
-                    });
-            };
+            return result.then(hpx::launch::sync,
+                [HPX_CAPTURE_MOVE(id)](hpx::future<arg_type>&& f) -> arg_type {
+                    HPX_UNUSED(id);
+                    return f.get();
+                });
+        };
 
         using result_type = typename util::decay<T>::type;
-        return dataflow(hpx::launch::sync, all_reduce_data_direct, std::move(f));
+        return dataflow(
+            hpx::launch::sync, all_reduce_data_direct, std::move(f));
     }
 
     template <typename T, typename F>
-    hpx::future<typename std::decay<T>::type>
-    all_reduce(char const* basename, T&& local_result, F&& op,
-        std::size_t num_sites = std::size_t(-1),
+    hpx::future<typename std::decay<T>::type> all_reduce(char const* basename,
+        T&& local_result, F&& op, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         if (num_sites == std::size_t(-1))
-            num_sites = hpx::get_num_localities(hpx::launch::sync);
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
         if (this_site == std::size_t(-1))
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         if (this_site == root_site)
         {
-            return all_reduce(
-                create_all_reduce<T>(basename, num_sites, generation, root_site),
+            return all_reduce(create_all_reduce<T>(
+                                  basename, num_sites, generation, root_site),
                 std::forward<T>(local_result), std::forward<F>(op), this_site);
         }
 
@@ -442,45 +437,41 @@ namespace hpx { namespace lcos
         if (generation != std::size_t(-1))
             name += std::to_string(generation) + "/";
 
-        return all_reduce(
-            hpx::find_from_basename(std::move(name), root_site),
+        return all_reduce(hpx::find_from_basename(std::move(name), root_site),
             std::forward<T>(local_result), std::forward<F>(op), this_site);
     }
-}}
+}}    // namespace hpx::lcos
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    using lcos::create_all_reduce;
+namespace hpx {
     using lcos::all_reduce;
-}
+    using lcos::create_all_reduce;
+}    // namespace hpx
 
 ////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ALLREDUCE_DECLARATION(...)                                 \
-    /**/
+#define HPX_REGISTER_ALLREDUCE_DECLARATION(...) /**/
 
 ////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ALLREDUCE(...)                                             \
-    HPX_REGISTER_ALLREDUCE_(__VA_ARGS__)                                        \
+#define HPX_REGISTER_ALLREDUCE(...)                                            \
+    HPX_REGISTER_ALLREDUCE_(__VA_ARGS__)                                       \
     /**/
 
-#define HPX_REGISTER_ALLREDUCE_(...)                                            \
+#define HPX_REGISTER_ALLREDUCE_(...)                                           \
     HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_ALLREDUCE_, HPX_PP_NARGS(__VA_ARGS__)                      \
-    )(__VA_ARGS__))                                                            \
+        HPX_REGISTER_ALLREDUCE_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))      \
     /**/
 
-#define HPX_REGISTER_ALLREDUCE_1(type)                                          \
-    HPX_REGISTER_ALLREDUCE_2(type, HPX_PP_CAT(type, _all_reduce))               \
+#define HPX_REGISTER_ALLREDUCE_1(type)                                         \
+    HPX_REGISTER_ALLREDUCE_2(type, HPX_PP_CAT(type, _all_reduce))              \
     /**/
 
-#define HPX_REGISTER_ALLREDUCE_2(type, name)                                    \
+#define HPX_REGISTER_ALLREDUCE_2(type, name)                                   \
     typedef hpx::components::component<                                        \
-        hpx::lcos::detail::all_reduce_server<type>                             \
-    > HPX_PP_CAT(all_reduce_, name);                                           \
+        hpx::lcos::detail::all_reduce_server<type>>                            \
+        HPX_PP_CAT(all_reduce_, name);                                         \
     HPX_REGISTER_COMPONENT(HPX_PP_CAT(all_reduce_, name))                      \
     /**/
 
-#endif // COMPUTE_HOST_CODE
-#endif // DOXYGEN
+#endif    // COMPUTE_HOST_CODE
+#endif    // DOXYGEN
 #endif

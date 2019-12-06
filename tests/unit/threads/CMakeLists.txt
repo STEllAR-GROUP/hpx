@@ -1,5 +1,6 @@
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -33,11 +34,12 @@ endif()
 set(lockfree_fifo_FLAGS NOLIBS)
 set(lockfree_fifo_LIBRARIES
   DEPENDENCIES
-    ${Boost_LIBRARIES}
+    hpx::boost
     hpx_assertion
     hpx_config
     hpx_concurrency
     hpx_datastructures
+    hpx_functional
     hpx_program_options
     hpx_testing
     hpx_type_support)
@@ -47,6 +49,7 @@ set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
+set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE hpx::hwloc)
 
 set(thread_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -69,12 +72,13 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     ${${test}_LIBRARIES}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Threads")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    ${${test}_LIBRARIES}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER "Tests/Unit/Threads")
 
   add_hpx_unit_test("threads" ${test} ${${test}_PARAMETERS})
 

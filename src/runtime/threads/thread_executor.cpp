@@ -1,16 +1,17 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/runtime/threads/thread_executor.hpp>
 
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 
 #include <cstddef>
 #include <mutex>

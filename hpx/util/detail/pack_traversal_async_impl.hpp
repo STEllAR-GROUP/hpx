@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Denis Blank
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,17 +8,16 @@
 #define HPX_UTIL_DETAIL_PACK_TRAVERSAL_ASYNC_IMPL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/traits/future_access.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/util/detail/container_category.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/invoke_fused.hpp>
-#include <hpx/datastructures/tuple.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -165,7 +165,7 @@ namespace util {
             void async_continue(T&& value, Hierarchy&& hierarchy)
             {
                 // Create a self reference
-                boost::intrusive_ptr<async_traversal_frame> self(this);
+                hpx::intrusive_ptr<async_traversal_frame> self(this);
 
                 // Create a callable object which resumes the current
                 // traversal when it's called.
@@ -641,10 +641,10 @@ namespace util {
                     typename std::decay<Args>::type...>;
 
             /// The type of the frame pointer
-            using frame_pointer_type = boost::intrusive_ptr<frame_type>;
+            using frame_pointer_type = hpx::intrusive_ptr<frame_type>;
 
             /// The type of the demoted visitor type
-            using visitor_pointer_type = boost::intrusive_ptr<Visitor>;
+            using visitor_pointer_type = hpx::intrusive_ptr<Visitor>;
         };
 
         template <typename Visitor, typename VisitorArg, typename... Args>

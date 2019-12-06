@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,13 +9,15 @@
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_MAR_09_2014_1213PM
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply_continue_callback.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp>
 #include <hpx/runtime/applier/register_apply_colocated.hpp>
 #include <hpx/traits/action_priority.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
 
@@ -105,4 +108,5 @@ namespace hpx { namespace detail
     }
 }}
 
+#endif
 #endif

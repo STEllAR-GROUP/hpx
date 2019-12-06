@@ -1,7 +1,8 @@
-// Copyright Vladimir Prus 2002-2004.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 
@@ -39,7 +40,7 @@ namespace hpx { namespace program_options {
             std::string current;
             bool inside_quoted = false;
             bool empty_quote = false;
-            int backslash_count = 0;
+            std::size_t backslash_count = 0;
 
             for (; i != e; ++i)
             {
@@ -109,7 +110,7 @@ namespace hpx { namespace program_options {
     {
         std::vector<std::wstring> result;
         std::vector<std::string> aux = split_winmain(to_internal(cmdline));
-        for (const auto & i : aux)
+        for (const auto& i : aux)
             result.push_back(from_utf8(i));
         return result;
     }

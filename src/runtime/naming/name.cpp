@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,22 +10,24 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
-#include <hpx/runtime/serialization/intrusive_ptr.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_futures.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/state.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/util/bind.hpp>
 
 #include <boost/io/ios_state.hpp>
 
@@ -146,7 +149,7 @@ namespace hpx { namespace naming
                     std::int64_t credits = detail::get_credit_from_gid(*p);
                     HPX_ASSERT(0 != credits);
 
-                    if (get_runtime_ptr())
+                    if (get_runtime_ptr())    // -V547
                     {
                         // Fire-and-forget semantics.
                         error_code ec(lightweight);
@@ -181,11 +184,11 @@ namespace hpx { namespace naming
                     // case.
                     if (e.get_error() != invalid_status)
                     {
-                        throw;      // rethrow if not invalid_status
+                        throw;    // rethrow if not invalid_status
                     }
                     else if (!threads::threadmanager_is(hpx::state_stopping))
                     {
-                        throw;      // rethrow if not stopping
+                        throw;    // rethrow if not stopping
                     }
                 }
             }
@@ -239,16 +242,48 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
+        void handle_credit_splitting(serialization::output_archive& ar,
+            id_type_impl& gid,
+            serialization::detail::preprocess_gid_types& split_gids)
+        {
+            auto& handle_futures =
+                ar.get_extra_data<serialization::detail::preprocess_futures>();
+
+            auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
+                [&split_gids, &gid](hpx::future<gid_type>&& gid_future) {
+                    split_gids.add_gid(gid, gid_future.get());
+                });
+
+            handle_futures.await_future(
+                *traits::future_access<decltype(f)>::get_shared_state(f));
+        }
+
         void id_type_impl::preprocess_gid(serialization::output_archive& ar) const
         {
             // unmanaged gids do not require any special handling
+            // check-pointing does not require any special handling here neither
             if (unmanaged == type_)
             {
                 return;
             }
 
-            if (ar.has_gid(*this))
+            // we should not call this function during check-pointing operations
+            if (ar.try_get_extra_data<checkpointing_tag>() != nullptr)
             {
+                // this is a check-pointing operation, we do not support this
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "id_type_impl::preprocess_gid",
+                    "can't check-point managed id_type's, use a component "
+                    "client instead");
+            }
+
+            auto& split_gids = ar.get_extra_data<
+                serialization::detail::preprocess_gid_types>();
+
+            if (split_gids.has_gid(*this))
+            {
+                // the gid has been split already and we don't need to do
+                // anything further
                 return;
             }
 
@@ -258,31 +293,21 @@ namespace hpx { namespace naming
             // of the credit splitting is equal to one).
             if (managed == type_)
             {
-                ar.await_future(
-                    split_gid_if_needed(const_cast<id_type_impl&>(*this)).then(
-                        hpx::launch::sync,
-                        [&ar, this](hpx::future<gid_type> && gid_future)
-                        {
-                            ar.add_gid(*this, gid_future.get());
-                        }
-                    )
-                );
-                return;
+                handle_credit_splitting(
+                    ar, const_cast<id_type_impl&>(*this), split_gids);
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
         hpx::future<gid_type> split_gid_if_needed(gid_type& gid)
         {
-            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-            scoped_lock l(gid.get_mutex());
+            std::unique_lock<gid_type::mutex_type> l(gid.get_mutex());
             return split_gid_if_needed_locked(l, gid);
         }
 
         gid_type postprocess_incref(gid_type &gid)
         {
-            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-            scoped_lock l(gid.get_mutex());
+            std::unique_lock<gid_type::mutex_type> l(gid.get_mutex());
 
             gid_type new_gid = gid;             // strips lock-bit
             HPX_ASSERT(new_gid != invalid_gid);
@@ -417,8 +442,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type split_credits_for_gid(gid_type& id)
         {
-            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-            scoped_lock l(id.get_mutex());
+            std::unique_lock<gid_type::mutex_type> l(id.get_mutex());
             return split_credits_for_gid_locked(l, id);
         }
 
@@ -444,8 +468,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         std::int64_t replenish_credits(gid_type& gid)
         {
-            typedef std::unique_lock<gid_type::mutex_type> scoped_lock;
-            scoped_lock l(gid);
+            std::unique_lock<gid_type::mutex_type> l(gid);
             return replenish_credits_locked(l, gid);
         }
 
@@ -522,7 +545,7 @@ namespace hpx { namespace naming
         {
             // Avoid performing side effects if the archive is not saving the
             // data.
-            if(ar.is_preprocessing())
+            if (ar.is_preprocessing())
             {
                 preprocess_gid(ar);
                 gid_serialization_data data { *this, type_ };
@@ -532,12 +555,22 @@ namespace hpx { namespace naming
 
             id_type_management type = type_;
 
+            if (unmanaged != type_ &&
+                ar.try_get_extra_data<checkpointing_tag>() != nullptr)
+            {
+                // this is a check-pointing operation, we do not support this
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "id_type_impl::save",
+                    "can't check-point managed id_type's, use a component "
+                    "client instead");
+            }
+
             gid_type new_gid;
             if (unmanaged == type_)
             {
                 new_gid = *this;
             }
-            else if(managed_move_credit == type_)
+            else if (managed_move_credit == type_)
             {
                 // all credits will be moved to the returned gid
                 new_gid = move_gid(const_cast<id_type_impl&>(*this));
@@ -545,11 +578,14 @@ namespace hpx { namespace naming
             }
             else
             {
-                new_gid = ar.get_new_gid(*this);
+                auto& split_gids = ar.get_extra_data<
+                    serialization::detail::preprocess_gid_types>();
+
+                new_gid = split_gids.get_new_gid(*this);
                 HPX_ASSERT(new_gid != invalid_gid);
             }
 
-            gid_serialization_data data { new_gid, type };
+            gid_serialization_data data{new_gid, type};
             ar << data;
         }
 
@@ -568,7 +604,7 @@ namespace hpx { namespace naming
             }
         }
 
-        /// support functions for std::intrusive_ptr
+        /// support functions for hpx::intrusive_ptr
         void intrusive_ptr_add_ref(id_type_impl* p)
         {
             ++p->count_;

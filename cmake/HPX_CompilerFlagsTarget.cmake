@@ -1,5 +1,6 @@
 # Copyright (c) 2019 Mikael Simberg
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -24,3 +25,13 @@ foreach(_keyword PUBLIC;PRIVATE)
     target_compile_options(hpx_internal_flags INTERFACE ${_flag})
   endforeach()
 endforeach()
+
+include(HPX_ExportTargets)
+# Modules can't link to this if not exported
+install(TARGETS hpx_internal_flags EXPORT HPXModulesTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  COMPONENT hpx_internal_flags
+)
+hpx_export_modules_targets(hpx_internal_flags)

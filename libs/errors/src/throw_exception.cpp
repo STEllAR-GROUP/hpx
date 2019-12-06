@@ -1,13 +1,14 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/filesystem.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception.hpp>
+#include <hpx/filesystem.hpp>
 
 #include <boost/system/error_code.hpp>
 
@@ -40,7 +41,7 @@ namespace hpx { namespace detail {
             p.string(), file, line, auxinfo);
     }
 
-    std::exception_ptr get_exception(boost::system::error_code ec,
+    std::exception_ptr get_exception(boost::system::error_code const& ec,
         std::string const& msg, throwmode mode, std::string const& func,
         std::string const& file, long line, std::string const& auxinfo)
     {

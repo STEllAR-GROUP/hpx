@@ -1,6 +1,7 @@
 # Copyright (c) 2007-2013 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,13 +13,9 @@ set(example_programs
     apex_fibonacci
    )
 
-set(apex_policy_engine_periodic_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apex_policy_engine_events_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apex_policy_engine_active_thread_coutn_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apex_balance_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apex_fibonacci_PARAMETERS THREADS_PER_LOCALITY 4)
-
 foreach(example_program ${example_programs})
+  set(${example_program}_PARAMETERS THREADS_PER_LOCALITY 4)
+
   set(sources
       ${example_program}.cpp)
 
@@ -37,3 +34,4 @@ foreach(example_program ${example_programs})
   endif()
 
 endforeach()
+

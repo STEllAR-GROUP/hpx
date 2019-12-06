@@ -4,6 +4,7 @@
 # Copyright (c) 2010-2011 Matt Anderson
 # Copyright (c) 2011      Bryce Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,6 +15,7 @@ pkg_check_modules(PC_TCMALLOC QUIET libtcmalloc)
 find_path(TCMALLOC_INCLUDE_DIR google/tcmalloc.h
   HINTS
     ${TCMALLOC_ROOT} ENV TCMALLOC_ROOT
+    ${HPX_TCMALLOC_ROOT}
     ${PC_TCMALLOC_MINIMAL_INCLUDEDIR}
     ${PC_TCMALLOC_MINIMAL_INCLUDE_DIRS}
     ${PC_TCMALLOC_INCLUDEDIR}
@@ -23,11 +25,19 @@ find_path(TCMALLOC_INCLUDE_DIR google/tcmalloc.h
 find_library(TCMALLOC_LIBRARY NAMES tcmalloc_minimal libtcmalloc_minimal tcmalloc libtcmalloc
   HINTS
     ${TCMALLOC_ROOT} ENV TCMALLOC_ROOT
+    ${HPX_TCMALLOC_ROOT}
     ${PC_TCMALLOC_MINIMAL_LIBDIR}
     ${PC_TCMALLOC_MINIMAL_LIBRARY_DIRS}
     ${PC_TCMALLOC_LIBDIR}
     ${PC_TCMALLOC_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
+
+# Set TCMALLOC_ROOT in case the other hints are used
+if (NOT TCMALLOC_ROOT AND "$ENV{TCMALLOC_ROOT}")
+  set(TCMALLOC_ROOT $ENV{TCMALLOC_ROOT})
+elseif(NOT TCMALLOC_ROOT)
+  string(REPLACE "/include" "" TCMALLOC_ROOT "${TCMALLOC_INCLUDE_DIR}")
+endif()
 
 set(TCMALLOC_LIBRARIES ${TCMALLOC_LIBRARY})
 set(TCMALLOC_INCLUDE_DIRS ${TCMALLOC_INCLUDE_DIR})

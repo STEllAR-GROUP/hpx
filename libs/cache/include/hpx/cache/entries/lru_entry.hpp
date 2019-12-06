@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,8 +13,7 @@
 #include <chrono>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries
-{
+namespace hpx { namespace util { namespace cache { namespace entries {
     ///////////////////////////////////////////////////////////////////////////
     /// \class lru_entry lru_entry.hpp hpx/cache/entries/lru_entry.hpp
     ///
@@ -31,23 +31,25 @@ namespace hpx { namespace util { namespace cache { namespace entries
     ///                   less_than_comparable.
     ///
     template <typename Value>
-    class lru_entry : public entry<Value, lru_entry<Value> >
+    class lru_entry : public entry<Value, lru_entry<Value>>
     {
     private:
-        typedef entry<Value, lru_entry<Value> > base_type;
+        typedef entry<Value, lru_entry<Value>> base_type;
 
     public:
         /// \brief Any cache entry has to be default constructible
         lru_entry()
           : access_time_(std::chrono::steady_clock::now())
-        {}
+        {
+        }
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
         explicit lru_entry(Value const& val)
-          : base_type(val),
-            access_time_(std::chrono::steady_clock::now())
-        {}
+          : base_type(val)
+          , access_time_(std::chrono::steady_clock::now())
+        {
+        }
 
         /// \brief    The function \a touch is called by a cache holding this
         ///           instance whenever it has been requested (touched).
@@ -74,7 +76,7 @@ namespace hpx { namespace util { namespace cache { namespace entries
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been accessed less recently (LRU).
-        friend bool operator< (lru_entry const& lhs, lru_entry const& rhs)
+        friend bool operator<(lru_entry const& lhs, lru_entry const& rhs)
         {
             return lhs.get_access_time() > rhs.get_access_time();
         }
@@ -82,6 +84,6 @@ namespace hpx { namespace util { namespace cache { namespace entries
     private:
         std::chrono::steady_clock::time_point access_time_;
     };
-}}}}
+}}}}    // namespace hpx::util::cache::entries
 
 #endif

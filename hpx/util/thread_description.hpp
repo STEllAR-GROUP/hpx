@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,9 +11,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/traits/get_function_address.hpp>
-#include <hpx/traits/get_function_annotation.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/functional/traits/get_function_address.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/concurrency/itt_notify.hpp>
 #endif
@@ -86,7 +87,7 @@ namespace hpx { namespace util
         {
             char const* name = traits::get_function_annotation<F>::call(f);
             // If a name exists, use it, not the altname.
-            if (name != nullptr)
+            if (name != nullptr)    // -V547
             {
                 altname = name;
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)

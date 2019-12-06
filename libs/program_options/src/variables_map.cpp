@@ -1,7 +1,9 @@
-// Copyright Vladimir Prus 2002-2004.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Vladimir Prus 2002-2004.
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 
@@ -13,6 +15,7 @@
 #include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <map>
 #include <set>
 #include <string>
@@ -39,7 +42,7 @@ namespace hpx { namespace program_options {
         std::set<std::string> new_final;
 
         // Declared once, to please Intel in VC++ mode;
-        unsigned i;
+        std::size_t i;
 
         // Declared here so can be used to provide context for exceptions
         string option_name;
@@ -50,7 +53,8 @@ namespace hpx { namespace program_options {
             // First, convert/store all given options
             for (i = 0; i < options.options.size(); ++i)
             {
-                option_name = options.options[i].string_key;
+                auto const& opts = options.options[i];
+                option_name = opts.string_key;
                 // Skip positional options without name
                 if (option_name.empty())
                     continue;
@@ -60,15 +64,15 @@ namespace hpx { namespace program_options {
                 // to allow unregistered options. We can't store them
                 // to variables map (lacking any information about paring),
                 // so just ignore them.
-                if (options.options[i].unregistered)
+                if (opts.unregistered)
                     continue;
 
                 // If option has final value, skip this assignment
                 if (xm.m_final.count(option_name))
                     continue;
 
-                original_token = !options.options[i].original_tokens.empty() ?
-                    options.options[i].original_tokens[0] :
+                original_token = !opts.original_tokens.empty() ?
+                    opts.original_tokens[0] :
                     "";
                 const option_description& d =
                     desc.find(option_name, false, false, false);
@@ -80,7 +84,7 @@ namespace hpx { namespace program_options {
                     v = variable_value();
                 }
 
-                d.semantic()->parse(v.value(), options.options[i].value, utf8);
+                d.semantic()->parse(v.value(), opts.value, utf8);
 
                 v.m_value_semantic = d.semantic();
 
@@ -229,7 +233,7 @@ namespace hpx { namespace program_options {
         }
 
         // Lastly, run notify actions.
-        for (auto & k : *this)
+        for (auto& k : *this)
         {
             /* Users might wish to use variables_map to store their own values
                that are not parsed, and therefore will not have value_semantics

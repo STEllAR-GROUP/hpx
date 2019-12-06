@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,7 +13,7 @@
 
 #if defined(HPX_HAVE_COMPRESSION_BZIP2)
 
-#include <hpx/runtime/serialization/binary_filter.hpp>
+#include <hpx/serialization/binary_filter.hpp>
 
 #include <boost/iostreams/filter/bzip2.hpp>
 

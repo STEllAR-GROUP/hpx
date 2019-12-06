@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -46,6 +47,8 @@
 // included before winsock2.h
 #define _WINSOCKAPI_
 #endif
+
+// clang-format off
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the default ip/port number used by the parcel subsystem
@@ -206,7 +209,7 @@
 #  endif
 #endif
 #if !defined(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)
-#  define HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT 1000000
+#  define HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT 1073741823
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -305,14 +308,14 @@
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + n + HPX_SHARED_LIB_EXTENSION
 #  endif
 #elif defined(HPX_DEBUG)
-#  define HPX_MAKE_DLL_STRING(n)   n + "d" + HPX_SHARED_LIB_EXTENSION
+#  define HPX_MAKE_DLL_STRING(n)   (n) + "d" + HPX_SHARED_LIB_EXTENSION
 #else
-#  define HPX_MAKE_DLL_STRING(n)   n + HPX_SHARED_LIB_EXTENSION
+#  define HPX_MAKE_DLL_STRING(n)   (n) + HPX_SHARED_LIB_EXTENSION
 #endif
 
 #if defined(HPX_DEBUG)
 #  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, d)
-#  define HPX_MANGLE_STRING(n)   n + "d"
+#  define HPX_MANGLE_STRING(n)   (n) + "d"
 #else
 #  define HPX_MANGLE_NAME(n)     n
 #  define HPX_MANGLE_STRING(n)   n
@@ -421,11 +424,10 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Maximum sleep time for idle backoff in milliseconds.
-#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-#  if !defined(HPX_IDLE_BACKOFF_TIME_MAX)
-#    define HPX_IDLE_BACKOFF_TIME_MAX 1000
-#  endif
+// Maximum sleep time for idle backoff in milliseconds (used only if
+// HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF is defined).
+#if !defined(HPX_IDLE_BACKOFF_TIME_MAX)
+#  define HPX_IDLE_BACKOFF_TIME_MAX 1000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -495,5 +497,7 @@
 #define HPX_AGAS_SYMBOL_NS_LSB                       0x0000000000000003ULL
 #define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
+
+// clang-format on
 
 #endif

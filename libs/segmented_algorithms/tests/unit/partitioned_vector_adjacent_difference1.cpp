@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Ajai V George
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -33,7 +34,7 @@ void verify_values(
 }
 
 template <typename ExPolicy, typename T>
-void verify_values(ExPolicy && policy, hpx::partitioned_vector<T> const& v)
+void verify_values(ExPolicy&& policy, hpx::partitioned_vector<T> const& v)
 {
     typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
     std::size_t size = 0;

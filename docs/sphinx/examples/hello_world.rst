@@ -3,6 +3,7 @@
     Copyright (C) 2012 Vinay C Amatya
     Copyright (C) 2015 Hartmut Kaiser
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -74,7 +75,9 @@ Now that you have compiled and run the code, let's look at how the code works,
 beginning with ``main()``:
 
 .. literalinclude:: ../../examples/quickstart/hello_world_distributed.cpp
-   :lines: 130-156
+   :language: c++
+   :start-after: //[hello_world_hpx_main
+   :end-before: //]
 
 In this excerpt of the code we again see the use of futures. This time the
 futures are stored in a vector so that they can easily be accessed.
@@ -95,7 +98,9 @@ As in :ref:`examples_fibonacci` our futures are set using
 here:
 
 .. literalinclude:: ../../examples/quickstart/hello_world_distributed.cpp
-   :lines: 123-125
+   :language: c++
+   :start-after: //[hello_world_action_wrapper
+   :end-before: //]
 
 Another way of thinking about this wrapping technique is as follows: functions
 (the work to be done) are wrapped in actions, and actions can be executed
@@ -105,7 +110,9 @@ Now it is time to look at the ``hello_world_foreman()`` function which was
 wrapped in the action above:
 
 .. literalinclude:: ../../examples/quickstart/hello_world_distributed.cpp
-   :lines: 66-119
+   :language: c++
+   :start-after: //[hello_world_foreman
+   :end-before: //]
 
 Now, before we discuss ``hello_world_foreman()``, let's talk about the
 :cpp:func:`hpx::wait_each()` function.
@@ -121,7 +128,9 @@ executing on the correct OS-thread, it returns a value of -1, which causes
 ``hello_world_foreman()`` to leave the OS-thread id in ``attendance``.
 
 .. literalinclude:: ../../examples/quickstart/hello_world_distributed.cpp
-   :lines: 37-61
+   :language: c++
+   :start-after: //[hello_world_worker
+   :end-before: //]
 
 Because |hpx| features work stealing task schedulers, there is no way to
 guarantee that an action will be scheduled on a particular OS-thread. This is

@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2015 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,8 +18,8 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/util/unique_function.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -62,26 +63,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             base_type;
 
     public:
-        sender_connection(
-            sender_type * s
-          , int dst
-          , parcelset::parcelport* pp
-        )
+        sender_connection(sender_type* s, int dst, parcelset::parcelport* pp)
           : state_(initialized)
           , sender_(s)
+          , tag_(-1)
           , dst_(dst)
           , request_(MPI_REQUEST_NULL)
           , request_ptr_(nullptr)
           , chunks_idx_(0)
           , ack_(0)
           , pp_(pp)
-          , there_(
-                parcelset::locality(
-                    locality(
-                        dst_
-                    )
-                )
-            )
+          , there_(parcelset::locality(locality(dst_)))
         {
         }
 

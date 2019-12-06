@@ -3,6 +3,7 @@
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -123,6 +124,9 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx11_std_lock_guard(
     REQUIRED "HPX needs support for C++11 std::lock_guard")
 
+  hpx_check_for_cxx11_std_quick_exit(
+    DEFINITIONS HPX_HAVE_CXX11_STD_QUICK_EXIT)
+
   hpx_check_for_cxx11_std_random(
     DEFINITIONS HPX_HAVE_CXX11_STD_RANDOM)
 
@@ -137,6 +141,9 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_std_shared_ptr(
     REQUIRED "HPX needs support for C++11 std::shared_ptr")
+
+  hpx_check_for_cxx11_std_shared_ptr_lwg3018(
+    DEFINITIONS HPX_HAVE_CXX11_SHARED_PTR_LWG3018)
 
   hpx_check_for_cxx11_std_shuffle(
     DEFINITIONS HPX_HAVE_CXX11_STD_SHUFFLE)
@@ -217,5 +224,12 @@ function(hpx_perform_cxx_feature_tests)
 
     hpx_check_for_cxx17_aligned_new(
       DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
+
+    hpx_check_for_cxx17_std_in_place_type_t(
+      DEFINITIONS HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
+
+    hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments(
+      DEFINITIONS HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS)
+
   endif()
 endfunction()

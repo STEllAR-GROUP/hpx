@@ -2,6 +2,7 @@
 # Copyright (c) 2015 Andreas Schaefer
 # Copyright (c) 2019 Patrick Diehl
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -72,8 +73,8 @@ function(hpx_check_boost_compatibility)
   endif()
 
   # make sure paths are tested even if not string identical
-  get_filename_component(PATH1 ${HPX_BOOST_ROOT} ABSOLUTE)
-  get_filename_component(PATH2 ${BOOST_ROOT} ABSOLUTE)
+  get_filename_component(PATH1 "${HPX_BOOST_ROOT}" ABSOLUTE)
+  get_filename_component(PATH2 "${BOOST_ROOT}" ABSOLUTE)
 
   if(NOT PATH1 STREQUAL PATH2)
     hpx_error("The specified BOOST_ROOT differs from what has been used when"
@@ -84,17 +85,35 @@ function(hpx_check_boost_compatibility)
   endif()
 endfunction()
 
-function(hpx_setup_allocator)
-  if(HPX_DISABLE_CUSTOM_ALLOCATOR)
-    return()
+function(hpx_check_allocator_compatibility)
+  string(TOUPPER "${HPX_WITH_MALLOC}" HPX_MALLOC_UPPER)
+  string(TOUPPER "${HPX_WITH_MALLOC_DEFAULT}" HPX_MALLOC_DEFAULT_UPPER)
+  if(NOT (HPX_MALLOC_UPPER STREQUAL HPX_MALLOC_DEFAULT_UPPER))
+    hpx_error("HPX_WITH_MALLOC has been changed by this project. This project "
+      "has set HPX_WITH_MALLOC='${HPX_WITH_MALLOC}' and HPX was configured "
+      "with '${HPX_WITH_MALLOC_DEFAULT}'. HPX_WITH_MALLOC is only provided for "
+      "informational purposes to dependent projects and should not be changed.")
   endif()
-  if(DEFINED HPX_WITH_MALLOC)
-    string(TOUPPER "${HPX_WITH_MALLOC}" HPX_MALLOC_UPPER)
-    string(TOUPPER "${HPX_WITH_MALLOC_DEFAULT}" HPX_MALLOC_DEFAULT_UPPER)
-    if(NOT HPX_MALLOC_UPPER STREQUAL HPX_MALLOC_DEFAULT_UPPER)
-      hpx_error("The specified allocators do not match. This Project is configured with ${HPX_WITH_MALLOC} and HPX was configured with ${HPX_WITH_MALLOC_DEFAULT}.")
+endfunction()
+
+# Check we are using the same build type as HPX
+function(hpx_check_cmake_build_type)
+  get_property(_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+  if (NOT _GENERATOR_IS_MULTI_CONFIG AND
+      NOT "${HPX_BUILD_TYPE}" STREQUAL "${CMAKE_BUILD_TYPE}" AND
+      ("${HPX_BUILD_TYPE}" STREQUAL "Debug" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+    if(HPX_IGNORE_CMAKE_BUILD_TYPE_COMPATIBILITY)
+      hpx_warn("CMAKE_BUILD_TYPE does not match ${HPX_BUILD_TYPE}: "
+        "this project uses '${CMAKE_BUILD_TYPE}', HPX uses '${HPX_BUILD_TYPE}'. "
+        "HPX is not ABI compatible between release and debug modes and it is "
+        "recommended that you use the same build type for HPX and your project.")
+    else()
+      hpx_error("CMAKE_BUILD_TYPE does not match ${HPX_BUILD_TYPE}: "
+        "this project uses '${CMAKE_BUILD_TYPE}', HPX uses '${HPX_BUILD_TYPE}'. "
+        "Please add -DCMAKE_BUILD_TYPE=${HPX_BUILD_TYPE} to your cmake command "
+        "or add -DHPX_IGNORE_CMAKE_BUILD_TYPE_COMPATIBILITY=OFF to ignore this "
+        "check (not recommended; HPX is not ABI compatible between release and "
+        "debug modes).")
     endif()
   endif()
-  set(HPX_WITH_MALLOC ${HPX_WITH_MALLOC_DEFAULT} CACHE STRING "Define which allocator should be linked in. Options are: system, tcmalloc, jemalloc, tbbmalloc, and custom (default is: tcmalloc)")
-  include(HPX_SetupAllocator)
 endfunction()

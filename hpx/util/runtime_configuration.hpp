@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,13 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/plugin.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/static_factory_data.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/plugin/dll.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <cstddef>
 #include <cstdint>

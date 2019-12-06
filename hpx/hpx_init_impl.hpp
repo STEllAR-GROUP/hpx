@@ -2,6 +2,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,11 +16,13 @@
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/bind_back.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/util/find_prefix.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
+#include <csignal>
 #include <cstddef>
+#include <cstdlib>
 #include <string>
 #include <utility>
 #include <vector>
@@ -71,6 +74,13 @@ namespace hpx
 #if defined(__FreeBSD__)
         freebsd_environ = environ;
 #endif
+        // set a handler for std::abort
+        std::signal(SIGABRT, detail::on_abort);
+        std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+        std::at_quick_exit(detail::on_exit);
+#endif
+
         return detail::run_or_start(f, desc_cmdline, argc, argv,
             hpx_startup::user_main_config(cfg),
             std::move(startup), std::move(shutdown), mode, true);
@@ -326,6 +336,16 @@ namespace hpx
     }
 
     inline int
+        init(util::function_nonser<int(int, char**)> const& f,
+        std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
+
+        return init(f, 1, dummy_argv, cfg, mode);
+    }
+
+    inline int
     init(std::nullptr_t, std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
@@ -370,6 +390,15 @@ namespace hpx
 
         return init(main_f, desc_commandline, argc, argv, cfg,
             startup_function_type(), shutdown_function_type(), mode);
+    }
+
+    inline int
+    init(std::nullptr_t, std::vector<std::string> const& cfg,
+         hpx::runtime_mode mode)
+    {
+      char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
+
+      return init(nullptr, 1, dummy_argv, cfg, mode);
     }
 }
 

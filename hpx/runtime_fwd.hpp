@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -28,7 +29,7 @@
 #include <hpx/runtime/set_parcel_write_handler.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>
@@ -264,6 +265,16 @@ namespace hpx
         char const* binary_filter_type, bool compress,
         serialization::binary_filter* next_filter = nullptr,
         error_code& ec = throws);
+
+    namespace threads {
+        class HPX_EXPORT threadmanager;
+
+        /// \cond NOINTERNAL
+        // The function get_thread_manager returns a reference to the
+        // current thread manager.
+        HPX_API_EXPORT threadmanager& get_thread_manager();
+        /// \endcond
+    }
 }
 
 #endif

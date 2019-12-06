@@ -1,8 +1,9 @@
 ..
-   Copyright (c) 2014 Adrian Serio
+    Copyright (c) 2014 Adrian Serio
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 .. _examples_1d_stencil:
 
@@ -82,7 +83,7 @@ string dataflows together and construct an execution tree.
 
 After the values of the futures in dataflow are ready, the values must be pulled
 out of the future container to be passed to the function ``heat``. In order to
-do this, we use the |hpx| facility ``unwrapped``, which underneath calls
+do this, we use the HPX facility ``unwrapping``, which underneath calls
 ``.get()`` on each of the futures so that the function ``heat`` will be passed
 doubles and not futures to doubles.
 
@@ -151,7 +152,7 @@ it should come as no surprise that we synchronize this operation with another
 instance of dataflow (found in ``heat_part``). This dataflow receives futures
 to the data in the current and surrounding partitions by calling ``get_data()``
 on each respective partition. When these futures are ready, dataflow passes them
-to the ``unwrapped`` function, which extracts the shared_array of doubles and
+to the ``unwrapping`` function, which extracts the shared_array of doubles and
 passes them to the lambda. The lambda calls ``heat_part_data`` on the
 :term:`locality`, which the middle partition is on.
 

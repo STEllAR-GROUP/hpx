@@ -1,11 +1,12 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -14,7 +15,7 @@
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
+#include <hpx/coroutines/detail/tss.hpp>
 #endif
 
 #include <algorithm>
@@ -39,8 +40,7 @@ namespace hpx { namespace threads { namespace policies
     scheduler_base::scheduler_base(std::size_t num_threads,
         char const* description, thread_queue_init_parameters thread_queue_init,
         scheduler_mode mode)
-      : modes_(num_threads)
-      , suspend_mtxs_(num_threads)
+      : suspend_mtxs_(num_threads)
       , suspend_conds_(num_threads)
       , pu_mtxs_(num_threads)
       , states_(num_threads)
@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace policies
     void scheduler_base::idle_callback(std::size_t num_thread)
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        if (modes_[num_thread].data_.load(std::memory_order_relaxed) &
+        if (mode_.data_.load(std::memory_order_relaxed) &
                 policies::enable_idle_backoff)
         {
             // Put this thread to sleep for some time, additionally it gets
@@ -146,7 +146,7 @@ namespace hpx { namespace threads { namespace policies
         std::unique_lock<pu_mutex_type>& l, std::size_t num_thread,
         bool allow_fallback)
     {
-        if (modes_[num_thread].data_.load(std::memory_order_relaxed) &
+        if (mode_.data_.load(std::memory_order_relaxed) &
             threads::policies::enable_elasticity)
         {
             std::size_t states_size = states_.size();
@@ -160,7 +160,7 @@ namespace hpx { namespace threads { namespace policies
 
                 hpx::util::yield_while([this, states_size, &l, &num_thread,
                                            &max_allowed_state]() {
-                    int num_allowed_threads = 0;
+                    std::size_t num_allowed_threads = 0;
 
                     for (std::size_t offset = 0; offset < states_size; ++offset)
                     {
@@ -311,51 +311,39 @@ namespace hpx { namespace threads { namespace policies
     void scheduler_base::set_scheduler_mode(scheduler_mode mode)
     {
         // distribute the same value across all cores
-        for (auto && m : modes_)
-        {
-            m.data_.store(mode, std::memory_order_release);
-        }
+        mode_.data_.store(mode, std::memory_order_release);
         do_some_work(std::size_t(-1));
     }
 
     void scheduler_base::add_scheduler_mode(scheduler_mode mode)
     {
         // distribute the same value across all cores
-        mode = scheduler_mode(get_scheduler_mode(0) | mode);
-        for (auto && m : modes_)
-        {
-            m.data_.store(mode, std::memory_order_release);
-        }
-        do_some_work(std::size_t(-1));
+        mode = scheduler_mode(get_scheduler_mode() | mode);
+        set_scheduler_mode(mode);
+    }
+
+    void scheduler_base::remove_scheduler_mode(scheduler_mode mode)
+    {
+        mode = scheduler_mode(get_scheduler_mode() & ~mode);
+        set_scheduler_mode(mode);
     }
 
     void scheduler_base::add_remove_scheduler_mode(
         scheduler_mode to_add_mode, scheduler_mode to_remove_mode)
     {
-        // distribute the same value across all cores
         scheduler_mode mode = scheduler_mode(
-            (get_scheduler_mode(0) | to_add_mode) & ~to_remove_mode);
-        for (auto && m : modes_)
-        {
-            m.data_.store(mode, std::memory_order_release);
-        }
-        do_some_work(std::size_t(-1));
+            (get_scheduler_mode() | to_add_mode) & ~to_remove_mode);
+        set_scheduler_mode(mode);
     }
 
-    void scheduler_base::remove_scheduler_mode(scheduler_mode mode)
+    void scheduler_base::update_scheduler_mode(scheduler_mode mode, bool set)
     {
-        // distribute the same value across all cores
-        mode = scheduler_mode(get_scheduler_mode(0) & ~mode);
-        for (auto && m : modes_)
-        {
-            m.data_.store(mode, std::memory_order_release);
+        if (set) {
+            add_scheduler_mode(mode);
         }
-        do_some_work(std::size_t(-1));
-    }
-
-    bool scheduler_base::has_thread_stealing(std::size_t num_thread) const
-    {
-        return get_scheduler_mode(num_thread) & policies::enable_stealing;
+        else {
+            remove_scheduler_mode(mode);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

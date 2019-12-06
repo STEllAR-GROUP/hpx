@@ -1,5 +1,6 @@
 //  Copyright 2015 (c) Dominic Marcello
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -35,7 +36,7 @@ int hpx_main()
             auto now = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> dif = now - start_time;
 
-            HPX_TEST_LTE(dif.count(), 1.01);
+            HPX_TEST_LTE(dif.count(), 1.1);
             break;
         }
         else
@@ -45,7 +46,7 @@ int hpx_main()
 
         auto now = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> dif = now - start_time;
-        HPX_TEST_LT(dif.count(), 1.0);
+        HPX_TEST_LT(dif.count(), 1.1);
     }
 
     return hpx::finalize();

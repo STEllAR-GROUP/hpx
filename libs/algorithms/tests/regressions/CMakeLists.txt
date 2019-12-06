@@ -1,5 +1,6 @@
 # Copyright (c) 2014-2016 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -28,10 +29,11 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     EXCLUDE_FROM_ALL
-                     ${${test}_FLAGS}
-		     FOLDER "Tests/Regressions/Modules/Algorithms/")
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    EXCLUDE_FROM_ALL
+    ${${test}_FLAGS}
+    FOLDER "Tests/Regressions/Modules/Algorithms/")
 
   add_hpx_regression_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 

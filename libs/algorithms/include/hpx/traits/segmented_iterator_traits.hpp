@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,14 +8,13 @@
 #define HPX_SEGMENTED_ITERATOR_TRAITS_OCT_14_2014_0229PM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits
@@ -25,7 +25,8 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable>
     struct is_segmented_iterator
       : segmented_iterator_traits<Iterator>::is_segmented_iterator
-    {};
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // traits allowing to distinguish iterators which have a purely local
@@ -64,8 +65,8 @@ namespace hpx { namespace traits
     template <typename Iterator, typename Enable>
     struct is_segmented_local_iterator
       : segmented_local_iterator_traits<Iterator>::is_segmented_local_iterator
-    {};
-}}
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif
-

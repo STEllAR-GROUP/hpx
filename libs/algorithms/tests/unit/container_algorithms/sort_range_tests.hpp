@@ -1,6 +1,7 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2015 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,12 +21,12 @@
 #include <utility>
 #include <vector>
 //
-#include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
-#include <hpx/include/parallel_container_algorithm.hpp>
 #include <hpx/format.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/include/parallel_container_algorithm.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/testing.hpp>
 //
 #include "test_utils.hpp"
 
@@ -40,66 +41,71 @@
 // --------------------------------------------------------------------
 // Fill a vector with random numbers in the range [lower, upper]
 template <typename T>
-void rnd_fill(std::vector<T> &V, const T lower, const T upper, const T seed)
+void rnd_fill(std::vector<T>& V, const T lower, const T upper, const T seed)
 {
     // use the default random engine and an uniform distribution
     std::mt19937 eng(static_cast<unsigned int>(seed));
     std::uniform_real_distribution<double> distr{double(lower), double(upper)};
 
-    for (auto &elem : V) {
+    for (auto& elem : V)
+    {
         elem = static_cast<T>(distr(eng));
     }
 }
 
 // --------------------------------------------------------------------
 // generate a random string of a given length
-std::string random_string( size_t length )
+std::string random_string(size_t length)
 {
-    auto randchar = []() -> char
-    {
-        const char charset[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
+    auto randchar = []() -> char {
+        const char charset[] = "0123456789"
+                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                               "abcdefghijklmnopqrstuvwxyz";
         const size_t max_index = (sizeof(charset) - 1);
-        return charset[ rand() % max_index ];
+        return charset[rand() % max_index];
     };
-    std::string str(length,0);
-    std::generate_n( str.begin(), length, randchar );
+    std::string str(length, 0);
+    std::generate_n(str.begin(), length, randchar);
     return str;
 }
 
 // --------------------------------------------------------------------
 // fill a vector with random strings
-void rnd_strings(std::vector<std::string> &V) {
+void rnd_strings(std::vector<std::string>& V)
+{
     const std::size_t test_size = HPX_SORT_TEST_SIZE_STRINGS;
     // Fill vector with random strings
     V.clear();
     V.reserve(test_size);
     // random strings up to 128 chars long
-    for (std::size_t i=0; i<test_size; i++) {
-        V.push_back(random_string( std::rand() % 128)); //-V106
+    for (std::size_t i = 0; i < test_size; i++)
+    {
+        V.push_back(random_string(std::rand() % 128));    //-V106
     }
 }
 
 // --------------------------------------------------------------------
 // check that the array is sorted correctly
 template <class IA, typename Compare>
-int verify_(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
-    bool print)
+int verify_(
+    const std::vector<IA>& A, Compare comp, std::uint64_t elapsed, bool print)
 {
-    if (A.size()<2) {
+    if (A.size() < 2)
+    {
         // skip checks as we must be sorted
     }
-    else {
+    else
+    {
         IA temp = *(A.begin());
-        for (typename std::vector<IA>::const_iterator it=A.begin();
-            it != A.end(); ++it)
+        for (typename std::vector<IA>::const_iterator it = A.begin();
+             it != A.end(); ++it)
         {
-            if (comp((*it), temp)) {
+            if (comp((*it), temp))
+            {
                 if (print)
-                    hpx::util::format_to(std::cout, "fail {:8.6}", elapsed / 1e9)
-                      << A.size() << std::endl;
+                    hpx::util::format_to(
+                        std::cout, "fail {:8.6}", elapsed / 1e9)
+                        << A.size() << std::endl;
                 return 0;
             }
             temp = (*it);
@@ -107,20 +113,18 @@ int verify_(const std::vector <IA> &A, Compare comp, std::uint64_t elapsed,
     }
     if (print)
         hpx::util::format_to(std::cout, "OK {:8.6}", elapsed / 1e9)
-          << A.size() << std::endl;
+            << A.size() << std::endl;
     return 1;
 }
 
-#define msg(a,b,c,d,e) \
-        std::cout \
-        << std::setw(60) << a << std::setw(12) <<  b \
-        << std::setw(40) << c << std::setw(6)  << #d \
-        << std::setw(8)  << #e << "\t";
+#define msg(a, b, c, d, e)                                                     \
+    std::cout << std::setw(60) << a << std::setw(12) << b << std::setw(40)     \
+              << c << std::setw(6) << #d << std::setw(8) << #e << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
 // call sort with no comparison operator
 template <typename ExPolicy, typename T>
-void test_sort1(ExPolicy && policy, T)
+void test_sort1(ExPolicy&& policy, T)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -144,13 +148,13 @@ void test_sort1(ExPolicy && policy, T)
 ////////////////////////////////////////////////////////////////////////////////
 // call sort with a comparison operator
 template <typename ExPolicy, typename T, typename Compare = std::less<T>>
-        void test_sort1_comp(ExPolicy && policy, T, Compare comp = Compare())
+void test_sort1_comp(ExPolicy&& policy, T, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
-        sync, random);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync,
+        random);
 
     // Fill vector with random values
     std::vector<T> c(HPX_SORT_TEST_SIZE);
@@ -162,14 +166,14 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     hpx::parallel::sort(std::forward<ExPolicy>(policy), c, comp);
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // async sort
 template <typename ExPolicy, typename T, typename Compare = std::less<T>>
-        void test_sort1_async(ExPolicy && policy, T, Compare comp = Compare())
+void test_sort1_async(ExPolicy&& policy, T, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -189,13 +193,13 @@ template <typename ExPolicy, typename T, typename Compare = std::less<T>>
     f.get();
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
 // test exceptions
 template <typename ExPolicy, typename T>
-void test_sort_exception(ExPolicy && policy, T)
+void test_sort_exception(ExPolicy&& policy, T)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -210,25 +214,27 @@ void test_sort_exception(ExPolicy && policy, T)
     {
         // sort, blocking when seq, par, par_vec
         bool caught_exception = false;
-        try {
+        try
+        {
             typedef typename std::vector<T>::iterator base_iterator;
-            typedef test::decorated_iterator<
-                    base_iterator, std::random_access_iterator_tag
-                > decorated_iterator;
+            typedef test::decorated_iterator<base_iterator,
+                std::random_access_iterator_tag>
+                decorated_iterator;
 
-            hpx::parallel::sort(
-                std::forward<ExPolicy>(policy),
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
                 hpx::util::make_iterator_range(
                     decorated_iterator(
-                        c.begin(), [](){ throw std::runtime_error("test"); }),
+                        c.begin(), []() { throw std::runtime_error("test"); }),
                     decorated_iterator(c.end())));
 
             HPX_TEST(false);
         }
-        catch(hpx::exception_list const&) {
+        catch (hpx::exception_list const&)
+        {
             caught_exception = true;
         }
-        catch(...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
 
@@ -242,25 +248,27 @@ void test_sort_exception(ExPolicy && policy, T)
     {
         // sort, blocking when seq, par, par_vec
         bool caught_exception = false;
-        try {
+        try
+        {
             typedef typename std::vector<T>::iterator base_iterator;
-            typedef test::decorated_iterator<
-                    base_iterator, std::random_access_iterator_tag
-                > decorated_iterator;
+            typedef test::decorated_iterator<base_iterator,
+                std::random_access_iterator_tag>
+                decorated_iterator;
 
-            hpx::parallel::sort(
-                std::forward<ExPolicy>(policy),
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
                 hpx::util::make_iterator_range(
                     decorated_iterator(
-                        c.begin(), [](){ throw std::bad_alloc(); }),
+                        c.begin(), []() { throw std::bad_alloc(); }),
                     decorated_iterator(c.end())));
 
             HPX_TEST(false);
         }
-        catch(std::bad_alloc const&) {
+        catch (std::bad_alloc const&)
+        {
             caught_exception = true;
         }
-        catch(...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
 
@@ -273,13 +281,13 @@ void test_sort_exception(ExPolicy && policy, T)
 }
 
 template <typename ExPolicy, typename T, typename Compare>
-void test_sort_exception(ExPolicy && policy, T, Compare comp)
+void test_sort_exception(ExPolicy&& policy, T, Compare comp)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
-        sync, random);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync,
+        random);
 
     // Fill vector with random values
     std::vector<T> c(5000);
@@ -289,26 +297,28 @@ void test_sort_exception(ExPolicy && policy, T, Compare comp)
     {
         // sort, blocking when seq, par, par_vec
         bool caught_exception = false;
-        try {
+        try
+        {
             typedef typename std::vector<T>::iterator base_iterator;
-            typedef test::decorated_iterator<
-                    base_iterator, std::random_access_iterator_tag
-                > decorated_iterator;
+            typedef test::decorated_iterator<base_iterator,
+                std::random_access_iterator_tag>
+                decorated_iterator;
 
-            hpx::parallel::sort(
-                std::forward<ExPolicy>(policy),
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
                 hpx::util::make_iterator_range(
                     decorated_iterator(
-                        c.begin(), [](){ throw std::runtime_error("test"); }),
+                        c.begin(), []() { throw std::runtime_error("test"); }),
                     decorated_iterator(c.end())),
-                    comp);
+                comp);
 
             HPX_TEST(false);
         }
-        catch(hpx::exception_list const&) {
+        catch (hpx::exception_list const&)
+        {
             caught_exception = true;
         }
-        catch(...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
 
@@ -322,26 +332,28 @@ void test_sort_exception(ExPolicy && policy, T, Compare comp)
     {
         // sort, blocking when seq, par, par_vec
         bool caught_exception = false;
-        try {
+        try
+        {
             typedef typename std::vector<T>::iterator base_iterator;
-            typedef test::decorated_iterator<
-                    base_iterator, std::random_access_iterator_tag
-                > decorated_iterator;
+            typedef test::decorated_iterator<base_iterator,
+                std::random_access_iterator_tag>
+                decorated_iterator;
 
-            hpx::parallel::sort(
-                std::forward<ExPolicy>(policy),
+            hpx::parallel::sort(std::forward<ExPolicy>(policy),
                 hpx::util::make_iterator_range(
                     decorated_iterator(
-                        c.begin(), [](){ throw std::bad_alloc(); }),
+                        c.begin(), []() { throw std::bad_alloc(); }),
                     decorated_iterator(c.end())),
-                    comp);
+                comp);
 
             HPX_TEST(false);
         }
-        catch(std::bad_alloc const&) {
+        catch (std::bad_alloc const&)
+        {
             caught_exception = true;
         }
-        catch(...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
 
@@ -355,7 +367,7 @@ void test_sort_exception(ExPolicy && policy, T, Compare comp)
 
 // test exceptions
 template <typename ExPolicy, typename T>
-void test_sort_exception_async(ExPolicy && policy, T)
+void test_sort_exception_async(ExPolicy&& policy, T)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -371,18 +383,18 @@ void test_sort_exception_async(ExPolicy && policy, T)
         // sort, blocking when seq, par, par_vec
         bool caught_exception = false;
         bool returned_from_algorithm = false;
-        try {
+        try
+        {
             typedef typename std::vector<T>::iterator base_iterator;
-            typedef test::decorated_iterator<
-                    base_iterator, std::random_access_iterator_tag
-                > decorated_iterator;
+            typedef test::decorated_iterator<base_iterator,
+                std::random_access_iterator_tag>
+                decorated_iterator;
 
             hpx::future<void> f =
-                hpx::parallel::sort(
-                    std::forward<ExPolicy>(policy),
+                hpx::parallel::sort(std::forward<ExPolicy>(policy),
                     hpx::util::make_iterator_range(
-                        decorated_iterator(
-                            c.begin(), [](){ throw std::runtime_error("test"); }),
+                        decorated_iterator(c.begin(),
+                            []() { throw std::runtime_error("test"); }),
                         decorated_iterator(c.end())));
 
             returned_from_algorithm = true;
@@ -390,10 +402,12 @@ void test_sort_exception_async(ExPolicy && policy, T)
 
             HPX_TEST(false);
         }
-        catch(hpx::exception_list const&) {
+        catch (hpx::exception_list const&)
+        {
             caught_exception = true;
         }
-        catch(...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
 
@@ -409,18 +423,18 @@ void test_sort_exception_async(ExPolicy && policy, T)
         // sort, blocking when seq, par, par_vec
         bool caught_exception = false;
         bool returned_from_algorithm = false;
-        try {
+        try
+        {
             typedef typename std::vector<T>::iterator base_iterator;
-            typedef test::decorated_iterator<
-                    base_iterator, std::random_access_iterator_tag
-                > decorated_iterator;
+            typedef test::decorated_iterator<base_iterator,
+                std::random_access_iterator_tag>
+                decorated_iterator;
 
             hpx::future<void> f =
-                hpx::parallel::sort(
-                    std::forward<ExPolicy>(policy),
+                hpx::parallel::sort(std::forward<ExPolicy>(policy),
                     hpx::util::make_iterator_range(
                         decorated_iterator(
-                            c.begin(), [](){ throw std::bad_alloc(); }),
+                            c.begin(), []() { throw std::bad_alloc(); }),
                         decorated_iterator(c.end())));
 
             returned_from_algorithm = true;
@@ -428,10 +442,12 @@ void test_sort_exception_async(ExPolicy && policy, T)
 
             HPX_TEST(false);
         }
-        catch(std::bad_alloc const&) {
+        catch (std::bad_alloc const&)
+        {
             caught_exception = true;
         }
-        catch(...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
 
@@ -445,7 +461,7 @@ void test_sort_exception_async(ExPolicy && policy, T)
 }
 
 template <typename ExPolicy, typename T, typename Compare>
-void test_sort_exception_async(ExPolicy && policy, T, Compare comp)
+void test_sort_exception_async(ExPolicy&& policy, T, Compare comp)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -462,30 +478,32 @@ void test_sort_exception_async(ExPolicy && policy, T, Compare comp)
         // sort, blocking when seq, par, par_vec
         bool caught_exception = false;
         bool returned_from_algorithm = false;
-        try {
+        try
+        {
             typedef typename std::vector<T>::iterator base_iterator;
-            typedef test::decorated_iterator<
-                    base_iterator, std::random_access_iterator_tag
-                > decorated_iterator;
+            typedef test::decorated_iterator<base_iterator,
+                std::random_access_iterator_tag>
+                decorated_iterator;
 
             hpx::future<void> f =
-                hpx::parallel::sort(
-                    std::forward<ExPolicy>(policy),
+                hpx::parallel::sort(std::forward<ExPolicy>(policy),
                     hpx::util::make_iterator_range(
-                        decorated_iterator(
-                            c.begin(), [](){ throw std::runtime_error("test"); }),
+                        decorated_iterator(c.begin(),
+                            []() { throw std::runtime_error("test"); }),
                         decorated_iterator(c.end())),
-                        comp);
+                    comp);
 
             returned_from_algorithm = true;
             f.get();
 
             HPX_TEST(false);
         }
-        catch(hpx::exception_list const&) {
+        catch (hpx::exception_list const&)
+        {
             caught_exception = true;
         }
-        catch(...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
 
@@ -501,30 +519,32 @@ void test_sort_exception_async(ExPolicy && policy, T, Compare comp)
         // sort, blocking when seq, par, par_vec
         bool caught_exception = false;
         bool returned_from_algorithm = false;
-        try {
+        try
+        {
             typedef typename std::vector<T>::iterator base_iterator;
-            typedef test::decorated_iterator<
-                    base_iterator, std::random_access_iterator_tag
-                > decorated_iterator;
+            typedef test::decorated_iterator<base_iterator,
+                std::random_access_iterator_tag>
+                decorated_iterator;
 
             hpx::future<void> f =
-                hpx::parallel::sort(
-                    std::forward<ExPolicy>(policy),
+                hpx::parallel::sort(std::forward<ExPolicy>(policy),
                     hpx::util::make_iterator_range(
                         decorated_iterator(
-                            c.begin(), [](){ throw std::bad_alloc(); }),
+                            c.begin(), []() { throw std::bad_alloc(); }),
                         decorated_iterator(c.end())),
-                        comp);
+                    comp);
 
             returned_from_algorithm = true;
             f.get();
 
             HPX_TEST(false);
         }
-        catch(std::bad_alloc const&) {
+        catch (std::bad_alloc const&)
+        {
             caught_exception = true;
         }
-        catch(...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
 
@@ -540,7 +560,7 @@ void test_sort_exception_async(ExPolicy && policy, T, Compare comp)
 ////////////////////////////////////////////////////////////////////////////////
 // already sorted
 template <typename ExPolicy, typename T>
-void test_sort2(ExPolicy && policy, T)
+void test_sort2(ExPolicy&& policy, T)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -553,8 +573,7 @@ void test_sort2(ExPolicy && policy, T)
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::sort(std::forward<ExPolicy>(policy),
-            c.begin(), c.end());
+    hpx::parallel::sort(std::forward<ExPolicy>(policy), c.begin(), c.end());
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, std::less<T>(), elapsed, true) != 0);
@@ -562,14 +581,14 @@ void test_sort2(ExPolicy && policy, T)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename T, typename Compare = std::less<T> >
-void test_sort2_comp(ExPolicy && policy, T, Compare comp = Compare())
+template <typename ExPolicy, typename T, typename Compare = std::less<T>>
+void test_sort2_comp(ExPolicy&& policy, T, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(),
-        sync, sorted);
+    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync,
+        sorted);
 
     // Fill vector with increasing values
     std::vector<T> c(HPX_SORT_TEST_SIZE);
@@ -577,17 +596,17 @@ void test_sort2_comp(ExPolicy && policy, T, Compare comp = Compare())
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::sort(std::forward<ExPolicy>(policy),
-            c.begin(), c.end(), comp);
+    hpx::parallel::sort(
+        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename T, typename Compare = std::less<T> >
-void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
+template <typename ExPolicy, typename T, typename Compare = std::less<T>>
+void test_sort2_async(ExPolicy&& policy, T, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -601,12 +620,12 @@ void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking
-    hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(policy),
-            c.begin(), c.end(), comp);
+    hpx::future<void> f = hpx::parallel::sort(
+        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     f.get();
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
@@ -614,12 +633,13 @@ void test_sort2_async(ExPolicy && policy, T, Compare comp = Compare())
 // overload of test routine 1 for strings
 // call sort on a string array with no comparison operator
 template <typename ExPolicy>
-void test_sort1(ExPolicy && policy, const std::string &)
+void test_sort1(ExPolicy&& policy, const std::string&)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-    msg(typeid(ExPolicy).name(), typeid(std::string).name(), "default", sync, random);
+    msg(typeid(ExPolicy).name(), typeid(std::string).name(), "default", sync,
+        random);
 
     // Fill vector with random strings
     std::vector<std::string> c;
@@ -627,8 +647,7 @@ void test_sort1(ExPolicy && policy, const std::string &)
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::sort(std::forward<ExPolicy>(policy),
-            c.begin(), c.end());
+    hpx::parallel::sort(std::forward<ExPolicy>(policy), c.begin(), c.end());
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, std::less<std::string>(), elapsed, true) != 0);
@@ -639,14 +658,14 @@ void test_sort1(ExPolicy && policy, const std::string &)
 // overload of test routine 1 for strings
 // call sort on a string array with a comparison operator
 template <typename ExPolicy, typename Compare = std::less<std::string>>
-        void test_sort1_comp(ExPolicy && policy, const std::string &,
-        Compare comp = Compare())
+void test_sort1_comp(
+    ExPolicy&& policy, const std::string&, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-    msg(typeid(ExPolicy).name(), typeid(std::string).name(), typeid(Compare).name(),
-        sync, random);
+    msg(typeid(ExPolicy).name(), typeid(std::string).name(),
+        typeid(Compare).name(), sync, random);
 
     // Fill vector with random strings
     std::vector<std::string> c;
@@ -654,11 +673,11 @@ template <typename ExPolicy, typename Compare = std::less<std::string>>
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, blocking when seq, par, par_vec
-    hpx::parallel::sort(std::forward<ExPolicy>(policy),
-            c.begin(), c.end(), comp);
+    hpx::parallel::sort(
+        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
 
@@ -666,14 +685,14 @@ template <typename ExPolicy, typename Compare = std::less<std::string>>
 // overload of test routine 1 for strings
 // async sort
 template <typename ExPolicy, typename Compare = std::less<std::string>>
-        void test_sort1_async_string(ExPolicy && policy, const std::string &,
-        Compare comp = Compare())
+void test_sort1_async_string(
+    ExPolicy&& policy, const std::string&, Compare comp = Compare())
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-    msg(typeid(ExPolicy).name(), typeid(std::string).name(), typeid(Compare).name(),
-        async, random);
+    msg(typeid(ExPolicy).name(), typeid(std::string).name(),
+        typeid(Compare).name(), async, random);
 
     // Fill vector with random strings
     std::vector<std::string> c;
@@ -681,14 +700,13 @@ template <typename ExPolicy, typename Compare = std::less<std::string>>
 
     std::uint64_t t = hpx::util::high_resolution_clock::now();
     // sort, non blocking
-    hpx::future<void> f = hpx::parallel::sort(std::forward<ExPolicy>(policy),
-            c.begin(), c.end(), comp);
+    hpx::future<void> f = hpx::parallel::sort(
+        std::forward<ExPolicy>(policy), c.begin(), c.end(), comp);
     f.get();
     std::uint64_t elapsed = hpx::util::high_resolution_clock::now() - t;
 
-    bool is_sorted = (verify_(c, comp, elapsed, true)!=0);
+    bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
-
 
 #endif

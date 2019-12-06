@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,8 +13,8 @@
 // hpxinspect:nodeprecatedinclude:boost/program_options/parsers.hpp
 // hpxinspect:nodeprecatedinclude:boost/program_options/options_description.hpp
 
-#include <boost/program_options/parsers.hpp>
 #include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -30,11 +31,11 @@ namespace hpx { namespace program_options {
     using boost::program_options::command_line_parser;
     using boost::program_options::wcommand_line_parser;
 
+    using boost::program_options::collect_unrecognized;
+    using boost::program_options::exclude_positional;
+    using boost::program_options::include_positional;
     using boost::program_options::parse_command_line;
     using boost::program_options::parse_config_file;
-    using boost::program_options::include_positional;
-    using boost::program_options::exclude_positional;
-    using boost::program_options::collect_unrecognized;
     using boost::program_options::parse_environment;
     using boost::program_options::split_unix;
 #ifdef HPX_WINDOWS

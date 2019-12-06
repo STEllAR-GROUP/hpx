@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,6 +13,7 @@
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 
+#include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -19,11 +21,8 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
 
-#include <hpx/traits/plugin_config_data.hpp>
-
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/assign/std/vector.hpp>
 
 #include <string>
 #include <vector>
@@ -54,16 +53,16 @@ namespace hpx { namespace plugins
         ///         implemented in this module.
         bool get_plugin_info(std::vector<std::string>& fillini) override
         {
-            using namespace boost::assign;
-            fillini += std::string("[") + Section + ".plugins." +
-                unique_plugin_name<plugin_registry>::call() + "]";
-            fillini += std::string("name = ") + Name;
-            fillini += std::string("path = ") +
-                util::find_prefixes(std::string("/") + Suffix, Name);
-            fillini += "enabled = 1";
+            fillini.emplace_back(std::string("[") + Section + ".plugins." +
+                unique_plugin_name<plugin_registry>::call() + "]");
+            fillini.emplace_back(std::string("name = ") + Name);
+            fillini.emplace_back(std::string("path = ") +
+                util::find_prefixes(std::string("/") + Suffix, Name));
+            fillini.emplace_back("enabled = 1");
 
             char const* more = traits::plugin_config_data<Plugin>::call();
-            if (more) {
+            if (more != nullptr)    // -V547
+            {
                 std::vector<std::string> data;
                 boost::split(data, more, boost::is_any_of("\n"));
                 std::copy(data.begin(), data.end(), std::back_inserter(fillini));

@@ -1,12 +1,13 @@
 # Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(add_hpx_library name)
   # retrieve arguments
-  set(options EXCLUDE_FROM_ALL NOLIBS NOEXPORT AUTOGLOB STATIC PLUGIN NONAMEPREFIX)
+  set(options EXCLUDE_FROM_ALL INTERNAL_FLAGS NOLIBS NOEXPORT AUTOGLOB STATIC PLUGIN NONAMEPREFIX)
   set(one_value_args FOLDER SOURCE_ROOT HEADER_ROOT SOURCE_GLOB HEADER_GLOB OUTPUT_SUFFIX INSTALL_SUFFIX)
   set(multi_value_args SOURCES HEADERS AUXILIARY DEPENDENCIES COMPONENT_DEPENDENCIES COMPILER_FLAGS LINK_FLAGS)
   cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -163,23 +164,23 @@ function(add_hpx_library name)
   if(${name}_OUTPUT_SUFFIX)
     if(MSVC)
       set_target_properties(${name} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release/lib/${${name}_OUTPUT_SUFFIX}"
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug/lib/${${name}_OUTPUT_SUFFIX}"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/MinSizeRel/lib/${${name}_OUTPUT_SUFFIX}"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/${${name}_OUTPUT_SUFFIX}")
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release/bin/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release/lib/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/Debug/bin/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/Debug/lib/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${PROJECT_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${PROJECT_BINARY_DIR}/MinSizeRel/bin/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${PROJECT_BINARY_DIR}/MinSizeRel/lib/${${name}_OUTPUT_SUFFIX}"
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${PROJECT_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${PROJECT_BINARY_DIR}/RelWithDebInfo/bin/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${PROJECT_BINARY_DIR}/RelWithDebInfo/lib/${${name}_OUTPUT_SUFFIX}")
     else()
       set_target_properties(${name} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}"
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}")
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin/${${name}_OUTPUT_SUFFIX}"
+        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}"
+        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib/${${name}_OUTPUT_SUFFIX}")
     endif()
   endif()
 
@@ -190,6 +191,10 @@ function(add_hpx_library name)
 
   if(NOT ${${name}_NOEXPORT})
     set(_target_flags ${_target_flags} EXPORT)
+  endif()
+
+  if(${name}_INTERNAL_FLAGS)
+    set(_target_flags ${_target_flags} INTERNAL_FLAGS)
   endif()
 
   hpx_setup_target(

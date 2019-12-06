@@ -1,6 +1,7 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,24 +13,23 @@
 #include <hpx/async.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <boost/system/system_error.hpp>
@@ -96,8 +96,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     scheduled_thread_pool<Scheduler>::scheduled_thread_pool(
-        std::unique_ptr<Scheduler>
-            sched,
+        std::unique_ptr<Scheduler> sched,
         thread_pool_init_parameters const& init)
       : thread_pool_base(init)
       , sched_(std::move(sched))
@@ -119,8 +118,8 @@ namespace hpx { namespace threads { namespace detail
             if (!sched_->Scheduler::has_reached_state(state_suspended))
             {
                 // still running
-                lcos::local::no_mutex mtx;
-                std::unique_lock<lcos::local::no_mutex> l(mtx);
+                std::mutex mtx;
+                std::unique_lock<std::mutex> l(mtx);
                 stop_locked(l);
             }
             threads_.clear();
@@ -130,7 +129,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::print_pool(std::ostream& os)
     {
-        os << "[pool \"" << id_.name() << "\", #" << id_.index()
+        os << "[pool \"" << id_.name() << "\", #" << id_.index()    //-V128
            << "] with scheduler " << sched_->Scheduler::get_scheduler_name()
            << "\n"
            << "is running on PUs : \n";
@@ -1789,11 +1788,11 @@ namespace hpx { namespace threads { namespace detail
 
         switch(p) {
         case threads::detail::min_concurrency:
-//             return min_punits_;
+            //             return min_punits_;
             break;
 
         case threads::detail::max_concurrency:
-//             return max_punits_;
+            //             return max_punits_;
             break;
 
         case threads::detail::current_concurrency:

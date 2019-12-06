@@ -1,5 +1,6 @@
 # Copyright (c) 2014 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
@@ -36,7 +37,9 @@ set(CMAKE_CROSSCOMPILING ON)
 set(HPX_PLATFORM "XeonPhi")
 
 # Always disable the ibverbs parcelport as it is non-functional on the BGQ.
-set(HPX_WITH_PARCELPORT_IBVERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
+set(HPX_WITH_PARCELPORT_VERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
+
+set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "Enable the MPI based parcelport.")
 
 # We have a bunch of cores on the MIC ... increase the default
 set(HPX_WITH_MAX_CPU_COUNT "256" CACHE STRING "")

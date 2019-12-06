@@ -1,7 +1,8 @@
-// Copyright Vladimir Prus 2004.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accomphpx::util::any_nonsering file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Vladimir Prus 2004.
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accomphpx::util::any_nonsering file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 
@@ -109,7 +110,7 @@ namespace hpx { namespace program_options {
     void untyped_value::xparse(hpx::util::any_nonser& value_store,
         const std::vector<std::string>& new_tokens) const
     {
-        if (!value_store.empty())
+        if (value_store.has_value())
             throw multiple_occurrences();
         if (new_tokens.size() > 1)
             throw multiple_values();
@@ -142,7 +143,7 @@ namespace hpx { namespace program_options {
         check_first_occurrence(v);
         string s(get_single_string(xs, true));
 
-        for (char & i : s)
+        for (char& i : s)
             i = char(std::tolower(i));
 
         if (s.empty() || s == "on" || s == "yes" || s == "1" || s == "true")
@@ -164,7 +165,7 @@ namespace hpx { namespace program_options {
         check_first_occurrence(v);
         wstring s(get_single_string(xs, true));
 
-        for (wchar_t & i : s)
+        for (wchar_t& i : s)
             i = wchar_t(tolower(i));
 
         if (s.empty() || s == L"on" || s == L"yes" || s == L"1" || s == L"true")
@@ -196,7 +197,7 @@ namespace hpx { namespace program_options {
         HPX_EXPORT
         void check_first_occurrence(const hpx::util::any_nonser& value)
         {
-            if (!value.empty())
+            if (value.has_value())
                 throw multiple_occurrences();
         }
     }    // namespace validators
@@ -251,7 +252,7 @@ namespace hpx { namespace program_options {
     {
         for (;;)
         {
-            std::size_t pos = m_message.find(from.c_str(), 0, from.length());
+            std::size_t pos = m_message.find(from);
             // not found: all replaced
             if (pos == std::string::npos)
                 return;
@@ -329,7 +330,7 @@ namespace hpx { namespace program_options {
         //  replace placeholder with values
         //  placeholder are denoted by surrounding '%'
         //
-        for (auto & substitution : substitutions)
+        for (auto& substitution : substitutions)
             replace_token('%' + substitution.first + '%', substitution.second);
     }
 
@@ -358,7 +359,7 @@ namespace hpx { namespace program_options {
         // Being very cautious: should be > 1 alternative!
         if (alternatives_vec.size() > 1)
         {
-            for (unsigned i = 0; i < alternatives_vec.size() - 1; ++i)
+            for (std::size_t i = 0; i < alternatives_vec.size() - 1; ++i)
                 error_template += "'%prefix%" + alternatives_vec[i] + "', ";
             error_template += "and ";
         }

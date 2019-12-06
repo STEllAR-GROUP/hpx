@@ -3,6 +3,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,9 +52,9 @@ namespace hpx { namespace threads { namespace policies {
         {
             num_cores = cores;
             num_queues = queues;
-            scale = num_cores == 1 ?
-                0 :
-                static_cast<double>(num_queues - 1) / (num_cores - 1);
+            scale = num_cores == 1 ? 0 :
+                                     static_cast<double>(num_queues - 1) /
+                    static_cast<double>(num_cores - 1);
             //
             queues_.resize(num_queues);
             for (std::size_t i = 0; i < num_queues; ++i)
@@ -73,7 +74,7 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         inline std::size_t get_queue_index(std::size_t id) const
         {
-            return std::lround(id * scale);
+            return std::lround(static_cast<double>(id) * scale);
         }
 
         // ----------------------------------------------------------------
@@ -197,7 +198,7 @@ namespace hpx { namespace threads { namespace policies {
             typename Map::const_iterator end = tm.end();
             for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
             {
-                threads::thread_data const* thrd = it->get();
+                threads::thread_data const* thrd = get_thread_id_data(*it);
                 threads::thread_state_enum state = thrd->get_state().state();
                 threads::thread_state_enum marked_state =
                     thrd->get_marked_state();

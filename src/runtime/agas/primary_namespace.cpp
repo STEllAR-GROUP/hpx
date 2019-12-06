@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -15,7 +16,7 @@
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 
@@ -78,10 +79,12 @@ HPX_REGISTER_ACTION_ID(
     primary_namespace_unbind_gid_action,
     hpx::actions::primary_namespace_unbind_gid_action_id)
 
+#if defined(HPX_HAVE_NETWORKING)
 HPX_REGISTER_ACTION_ID(
     primary_namespace::route_action,
     primary_namespace_route_action,
     hpx::actions::primary_namespace_route_action_id)
+#endif
 
 HPX_REGISTER_ACTION_ID(
     primary_namespace::statistics_counter_action,
@@ -170,7 +173,7 @@ namespace hpx { namespace agas {
     }
 
     hpx::future<std::pair<naming::id_type, naming::address>>
-    primary_namespace::begin_migration(naming::gid_type id)
+    primary_namespace::begin_migration(naming::gid_type const& id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);
@@ -183,7 +186,7 @@ namespace hpx { namespace agas {
         server::primary_namespace::begin_migration_action action;
         return hpx::async(action, std::move(dest), id);
     }
-    bool primary_namespace::end_migration(naming::gid_type id)
+    bool primary_namespace::end_migration(naming::gid_type const& id)
     {
         HPX_ASSERT(
             naming::get_locality_from_gid(get_service_instance(id)) ==
@@ -192,8 +195,8 @@ namespace hpx { namespace agas {
         return server_->end_migration(id);
     }
 
-    bool primary_namespace::bind_gid(
-        gva g, naming::gid_type id, naming::gid_type locality)
+    bool primary_namespace::bind_gid(gva const& g, naming::gid_type const& id,
+        naming::gid_type const& locality)
     {
         return server_->bind_gid(g, id, locality);
     }
@@ -211,6 +214,7 @@ namespace hpx { namespace agas {
         return hpx::async(action, std::move(dest), g, id, locality);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     void primary_namespace::route(parcelset::parcel && p,
         util::function_nonser<void(boost::system::error_code const&,
         parcelset::parcel const&)> && f)
@@ -233,9 +237,10 @@ namespace hpx { namespace agas {
         server::primary_namespace::route_action action;
         hpx::apply_cb(action, std::move(dest), std::move(f), std::move(p));
     }
+#endif
 
     primary_namespace::resolved_type
-    primary_namespace::resolve_gid(naming::gid_type id)
+    primary_namespace::resolve_gid(naming::gid_type const& id)
     {
         return server_->resolve_gid(id);
     }
@@ -265,8 +270,8 @@ namespace hpx { namespace agas {
         return hpx::async(action, std::move(dest), id);
     }
 
-    future<naming::address>
-    primary_namespace::unbind_gid_async(std::uint64_t count, naming::gid_type id)
+    future<naming::address> primary_namespace::unbind_gid_async(
+        std::uint64_t count, naming::gid_type const& id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);
@@ -279,8 +284,8 @@ namespace hpx { namespace agas {
         return hpx::async(action, std::move(dest), count, stripped_id);
     }
 
-    naming::address
-    primary_namespace::unbind_gid(std::uint64_t count, naming::gid_type id)
+    naming::address primary_namespace::unbind_gid(
+        std::uint64_t count, naming::gid_type const& id)
     {
         naming::id_type dest = naming::id_type(get_service_instance(id),
             naming::id_type::unmanaged);

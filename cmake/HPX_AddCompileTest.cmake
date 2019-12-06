@@ -1,5 +1,6 @@
 # Copyright (c) 2015 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -31,10 +32,10 @@ function(add_hpx_compile_test category name)
 
   add_test(NAME "${category}.${name}"
     COMMAND ${CMAKE_COMMAND}
-    --build ${CMAKE_BINARY_DIR}
+    --build ${PROJECT_BINARY_DIR}
       --target ${test_name}
       --config $<CONFIGURATION>
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
   if(${name}_FAILURE_EXPECTED)
     set_tests_properties("${category}.${name}" PROPERTIES WILL_FAIL TRUE)
@@ -128,6 +129,7 @@ function(add_hpx_header_tests category)
         COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
         DEPENDENCIES ${${category}_DEPENDENCIES}
         ${_additional_flags})
+
     endif()
   endforeach()
 

@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -222,29 +223,43 @@ namespace hpx { namespace lcos
         set(launch::apply_policy, U val,
             std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return false;
+#else
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             return hpx::apply(action_type(), this->get_id(), std::move(val),
                 generation);
+#endif
         }
         template <typename U, typename U2 = T>
         typename std::enable_if<!std::is_void<U2>::value, hpx::future<void> >::type
         set(launch::async_policy, U val,
             std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return hpx::make_ready_future();
+#else
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), std::move(val),
                 generation);
+#endif
         }
         template <typename U, typename U2 = T>
         typename std::enable_if<!std::is_void<U2>::value>::type
         set(launch::sync_policy, U val,
             std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+#else
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             action_type()(this->get_id(), std::move(val), generation);
+#endif
         }
         template <typename U, typename U2 = T>
         typename std::enable_if<
@@ -260,30 +275,44 @@ namespace hpx { namespace lcos
         typename std::enable_if<std::is_void<U>::value, bool>::type
         set(launch::apply_policy, std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return hpx::make_ready_future();
+#else
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             hpx::util::unused_type unused;
             return hpx::apply(action_type(), this->get_id(), std::move(unused),
                 generation);
+#endif
         }
         template <typename U = T>
         typename std::enable_if<std::is_void<U>::value, hpx::future<void> >::type
         set(launch::async_policy, std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return hpx::make_ready_future();
+#else
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             hpx::util::unused_type unused;
             return hpx::async(action_type(), this->get_id(), std::move(unused),
                 generation);
+#endif
         }
         template <typename U = T>
         typename std::enable_if<std::is_void<U>::value>::type
         set(launch::sync_policy, std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+#else
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             hpx::util::unused_type unused;
-            return action_type()(this->get_id(), std::move(unused), generation);
+            action_type()(this->get_id(), std::move(unused), generation);
+#endif
         }
         template <typename U = T>
         typename std::enable_if<std::is_void<U>::value>::type
@@ -463,29 +492,43 @@ namespace hpx { namespace lcos
         set(launch::apply_policy, U val,
             std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return false;
+#else
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             return hpx::apply(action_type(), this->get_id(), std::move(val),
                 generation);
+#endif
         }
         template <typename U, typename U2 = T>
         typename std::enable_if<!std::is_void<U2>::value, hpx::future<void> >::type
         set(launch::async_policy, U val,
             std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return hpx::make_ready_future();
+#else
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             return hpx::async(action_type(), this->get_id(), std::move(val),
                 generation);
+#endif
         }
         template <typename U, typename U2 = T>
         typename std::enable_if<!std::is_void<U2>::value>::type
         set(launch::sync_policy, U val,
             std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+#else
             typedef typename lcos::server::channel<T>::set_generation_action
                 action_type;
             action_type()(this->get_id(), std::move(val), generation);
+#endif
         }
         template <typename U, typename U2 = T>
         typename std::enable_if<
@@ -501,30 +544,44 @@ namespace hpx { namespace lcos
         typename std::enable_if<std::is_void<U>::value, bool>::type
         set(launch::apply_policy, std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return false;
+#else
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             hpx::util::unused_type unused;
             return hpx::apply(action_type(), this->get_id(), std::move(unused),
                 generation);
+#endif
         }
         template <typename U = T>
         typename std::enable_if<std::is_void<U>::value, hpx::future<void> >::type
         set(launch::async_policy, std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+            return hpx::make_ready_future();
+#else
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             hpx::util::unused_type unused;
             return hpx::async(action_type(), this->get_id(), std::move(unused),
                 generation);
+#endif
         }
         template <typename U = T>
         typename std::enable_if<std::is_void<U>::value>::type
         set(launch::sync_policy, std::size_t generation = default_generation)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_ASSERT(false);
+#else
             typedef typename lcos::server::channel<void>::set_generation_action
                 action_type;
             hpx::util::unused_type unused;
-            return action_type()(this->get_id(), std::move(unused), generation);
+            action_type()(this->get_id(), std::move(unused), generation);
+#endif
         }
         template <typename U = T>
         typename std::enable_if<std::is_void<U>::value>::type

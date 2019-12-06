@@ -2,6 +2,7 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -18,6 +19,7 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/threadmanager.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -38,11 +40,14 @@ namespace hpx { namespace applier
 
     public:
         // constructor
-        applier(parcelset::parcelhandler &ph, threads::threadmanager& tm);
+#if defined(HPX_HAVE_NETWORKING)
+        applier(parcelset::parcelhandler &ph,threads::threadmanager& tm);
+#else
+        explicit applier(threads::threadmanager& tm);
+#endif
 
         // destructor
-        ~applier()
-        {}
+        ~applier() = default;
 
         void initialize(std::uint64_t rts, std::uint64_t mem);
 
@@ -53,12 +58,14 @@ namespace hpx { namespace applier
         /// applier instance has been created with.
         agas::addressing_service& get_agas_client();
 
+#if defined(HPX_HAVE_NETWORKING)
         /// \brief Access the \a parcelhandler instance associated with this
         ///        \a applier
         ///
         /// This function returns a reference to the parcel handler this
         /// applier instance has been created with.
         parcelset::parcelhandler& get_parcel_handler();
+#endif
 
         /// \brief Access the \a thread-manager instance associated with this
         ///        \a applier
@@ -162,7 +169,9 @@ namespace hpx { namespace applier
         }
 
     private:
+#if defined(HPX_HAVE_NETWORKING)
         parcelset::parcelhandler& parcel_handler_;
+#endif
         threads::threadmanager& thread_manager_;
         naming::id_type runtime_support_id_;
         naming::id_type memory_id_;

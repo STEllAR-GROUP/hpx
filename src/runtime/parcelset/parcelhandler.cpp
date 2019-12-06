@@ -3,15 +3,18 @@
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/lcos/local/promise.hpp>
+#include <hpx/synchronization/counting_semaphore.hpp>
+#include <hpx/local_lcos/promise.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -27,10 +30,10 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/apex.hpp>
-#include <hpx/util/bind.hpp>
-#include <hpx/util/bind_front.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/util/external_timer.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
@@ -101,7 +104,8 @@ namespace hpx { namespace parcelset
     parcelhandler::parcelhandler(util::runtime_configuration& cfg,
         threads::threadmanager* tm,
         threads::policies::callback_notifier const& notifier)
-      : tm_(tm)
+      : resolver_(nullptr)
+      , tm_(tm)
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
       , load_message_handlers_(util::get_entry_as<int>(cfg,
@@ -423,7 +427,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
             // tell APEX about the sent parcel
-            apex::send(p.parcel_id().get_lsb(), p.size(),
+            util::external_timer::send(p.parcel_id().get_lsb(), p.size(),
                 p.destination_locality_id());
 #endif
         }
@@ -1627,3 +1631,4 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif

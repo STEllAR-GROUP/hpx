@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,10 +11,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
-#include <hpx/util/tagged_pair.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_negative.hpp>
@@ -42,24 +43,20 @@
 
 #include <boost/shared_array.hpp>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     /////////////////////////////////////////////////////////////////////////////
     // remove_if
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // sequential remove_if with projection function
         template <typename FwdIter, typename Pred, typename Proj>
-        FwdIter
-        sequential_remove_if(FwdIter first, FwdIter last,
-            Pred && pred, Proj && proj)
+        FwdIter sequential_remove_if(
+            FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
             return std::remove_if(first, last,
                 util::invoke_projected<Pred, Proj>(
-                    std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)));
+                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
         }
 
         template <typename FwdIter>
@@ -67,28 +64,26 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             remove_if()
               : remove_if::algorithm("remove_if")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename Pred, typename Proj>
-            static FwdIter
-            sequential(ExPolicy, FwdIter first, FwdIter last,
-                Pred && pred, Proj && proj)
+            static FwdIter sequential(
+                ExPolicy, FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
             {
                 return sequential_remove_if(first, last,
                     std::forward<Pred>(pred), std::forward<Proj>(proj));
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
-            >::type
-            parallel(ExPolicy && policy, FwdIter first, FwdIter last,
-                Pred && pred, Proj && proj)
+            static
+                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+                parallel(ExPolicy&& policy, FwdIter first, FwdIter last,
+                    Pred&& pred, Proj&& proj)
             {
                 typedef hpx::util::zip_iterator<FwdIter, bool*> zip_iterator;
-                typedef util::detail::algorithm_result<
-                    ExPolicy, FwdIter
-                > algorithm_result;
+                typedef util::detail::algorithm_result<ExPolicy, FwdIter>
+                    algorithm_result;
                 typedef typename std::iterator_traits<FwdIter>::difference_type
                     difference_type;
 
@@ -102,33 +97,28 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
-                typedef util::scan_partitioner<
-                        ExPolicy, FwdIter, std::size_t, void,
-                        util::scan_partitioner_sequential_f3_tag
-                    > scan_partitioner_type;
+                typedef util::scan_partitioner<ExPolicy, FwdIter, std::size_t,
+                    void, util::scan_partitioner_sequential_f3_tag>
+                    scan_partitioner_type;
 
-                auto f1 =
-                    [HPX_CAPTURE_FORWARD(pred),
-                        HPX_CAPTURE_FORWARD(proj)
-                    ](zip_iterator part_begin, std::size_t part_size)
-                    ->  std::size_t
-                    {
-                        // MSVC complains if pred or proj is captured by ref below
-                        util::loop_n<ExPolicy>(
-                            part_begin, part_size,
-                            [pred, proj](zip_iterator it) mutable
-                            {
-                                bool f = hpx::util::invoke(pred,
-                                    hpx::util::invoke(proj, get<0>(*it)));
+                auto f1 = [HPX_CAPTURE_FORWARD(pred),
+                              HPX_CAPTURE_FORWARD(proj)](
+                              zip_iterator part_begin,
+                              std::size_t part_size) -> std::size_t {
+                    // MSVC complains if pred or proj is captured by ref below
+                    util::loop_n<ExPolicy>(part_begin, part_size,
+                        [pred, proj](zip_iterator it) mutable {
+                            bool f = hpx::util::invoke(
+                                pred, hpx::util::invoke(proj, get<0>(*it)));
 
-                                get<1>(*it) = f;
-                            });
+                            get<1>(*it) = f;
+                        });
 
-                        // There is no need to return the partition result.
-                        // But, the scan_partitioner doesn't support 'void' as
-                        // Result1. So, unavoidably return non-meaning value.
-                        return 0u;
-                    };
+                    // There is no need to return the partition result.
+                    // But, the scan_partitioner doesn't support 'void' as
+                    // Result1. So, unavoidably return non-meaning value.
+                    return 0u;
+                };
 
                 auto f2 = hpx::util::unwrapping(
                     [](std::size_t, std::size_t) -> std::size_t {
@@ -142,47 +132,41 @@ namespace hpx { namespace parallel { inline namespace v1
                 std::shared_ptr<FwdIter> dest_ptr =
                     std::make_shared<FwdIter>(first);
                 auto f3 =
-                    [dest_ptr, flags](
-                        zip_iterator part_begin, std::size_t part_size,
+                    [dest_ptr, flags](zip_iterator part_begin,
+                        std::size_t part_size,
                         hpx::shared_future<std::size_t> curr,
-                        hpx::shared_future<std::size_t> next
-                    ) mutable -> void
+                        hpx::shared_future<std::size_t> next) mutable -> void {
+                    HPX_UNUSED(flags);
+
+                    curr.get();    // rethrow exceptions
+                    next.get();    // rethrow exceptions
+
+                    FwdIter& dest = *dest_ptr;
+
+                    if (dest == get<0>(part_begin.get_iterator_tuple()))
                     {
-                        HPX_UNUSED(flags);
-
-                        curr.get();     // rethrow exceptions
-                        next.get();     // rethrow exceptions
-
-                        FwdIter& dest = *dest_ptr;
-
-                        if (dest == get<0>(part_begin.get_iterator_tuple()))
-                        {
-                            // Self-assignment must be detected.
-                            util::loop_n<ExPolicy>(
-                                part_begin, part_size,
-                                [&dest](zip_iterator it)
+                        // Self-assignment must be detected.
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size, [&dest](zip_iterator it) {
+                                if (!get<1>(*it))
                                 {
-                                    if(!get<1>(*it))
-                                    {
-                                        if (dest != get<0>(it.get_iterator_tuple()))
-                                            *dest++ = std::move(get<0>(*it));
-                                        else
-                                            ++dest;
-                                    }
-                                });
-                        }
-                        else
-                        {
-                            // Self-assignment can't be performed.
-                            util::loop_n<ExPolicy>(
-                                part_begin, part_size,
-                                [&dest](zip_iterator it)
-                                {
-                                    if(!get<1>(*it))
+                                    if (dest != get<0>(it.get_iterator_tuple()))
                                         *dest++ = std::move(get<0>(*it));
-                                });
-                        }
-                    };
+                                    else
+                                        ++dest;
+                                }
+                            });
+                    }
+                    else
+                    {
+                        // Self-assignment can't be performed.
+                        util::loop_n<ExPolicy>(
+                            part_begin, part_size, [&dest](zip_iterator it) {
+                                if (!get<1>(*it))
+                                    *dest++ = std::move(get<0>(*it));
+                            });
+                    }
+                };
 
                 auto f4 =
                     [dest_ptr, flags](
@@ -207,7 +191,7 @@ namespace hpx { namespace parallel { inline namespace v1
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
@@ -276,30 +260,23 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value &&
-        traits::is_projected<Proj, FwdIter>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Pred,
-            traits::projected<Proj, FwdIter>
-        >::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, FwdIter
-    >::type
-    remove_if(ExPolicy && policy, FwdIter first, FwdIter last,
-        Pred && pred, Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter>::value&&
+                    traits::is_projected<Proj, FwdIter>::value&&
+                        traits::is_indirect_callable<ExPolicy, Pred,
+                            traits::projected<Proj, FwdIter>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove_if(
+        ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
+        Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
             "Required at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::remove_if<FwdIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(),
-                first, last, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+        return detail::remove_if<FwdIter>().call(std::forward<ExPolicy>(policy),
+            is_seq(), first, last, std::forward<Pred>(pred),
+            std::forward<Proj>(proj));
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -357,27 +334,21 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename FwdIter, typename T,
         typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter>::value &&
-        traits::is_projected<Proj, FwdIter>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, FwdIter
-    >::type
-    remove(ExPolicy && policy, FwdIter first, FwdIter last,
-        T const& value, Proj && proj = Proj())
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter>::value&&
+                    traits::is_projected<Proj, FwdIter>::value)>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove(
+        ExPolicy&& policy, FwdIter first, FwdIter last, T const& value,
+        Proj&& proj = Proj())
     {
         typedef typename std::iterator_traits<FwdIter>::value_type Type;
 
         // Just utilize existing parallel remove_if.
-        return remove_if(std::forward<ExPolicy>(policy),
-                first, last,
-                [value](Type const& a) -> bool
-                {
-                    return value == a;
-                },
-                std::forward<Proj>(proj));
+        return remove_if(
+            std::forward<ExPolicy>(policy), first, last,
+            [value](Type const& a) -> bool { return value == a; },
+            std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

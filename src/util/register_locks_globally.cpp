@@ -1,13 +1,15 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/util/register_locks_globally.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/static.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/register_locks_globally.hpp>
 
 #include <map>
 #include <mutex>

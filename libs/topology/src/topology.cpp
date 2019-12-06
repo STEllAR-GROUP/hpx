@@ -2,6 +2,7 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -127,7 +128,7 @@ namespace hpx { namespace threads { namespace detail {
 #elif defined(HPX_WINDOWS)
         SYSTEM_INFO systemInfo;
         GetSystemInfo(&systemInfo);
-        return systemInfo.dwPageSize;
+        return static_cast<std::size_t>(systemInfo.dwPageSize);
 #else
         return 4096;
 #endif
@@ -202,8 +203,9 @@ namespace hpx { namespace threads {
 #endif
 
     topology::topology()
-      : topo(nullptr), machine_affinity_mask_(0)
-    { // {{{
+      : topo(nullptr)
+      , machine_affinity_mask_(0)
+    {    // {{{
         int err = hwloc_topology_init(&topo);
         if (err != 0)
         {

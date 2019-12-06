@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c) 2015 Nidhi Makhijani
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,7 @@
 #define HPX_RUNTIME_THREADS_RESOURCE_MANAGER_JAN_16_2013_0830AM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -212,8 +213,8 @@ namespace hpx { namespace  threads
             std::size_t num_cores_stolen_;
         };
 
-        typedef std::map<std::size_t, static_allocation_data>
-            allocation_data_map_type;
+        using allocation_data_map_type =
+            std::map<std::size_t, static_allocation_data>;
         allocation_data_map_type proxies_static_allocation_data_;
 
         // stores static allocation data for all schedulers

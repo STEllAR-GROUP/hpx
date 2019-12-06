@@ -1,5 +1,6 @@
 //  Copyright (c) 2005-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #define HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM
 
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/promise.hpp>
+#include <hpx/local_lcos/promise.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>

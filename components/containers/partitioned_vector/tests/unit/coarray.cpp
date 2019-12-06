@@ -1,11 +1,12 @@
 //  Copyright (c) 2017 Antoine Tran Tan
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
+#include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/coarray/coarray.hpp>
-#include <hpx/lcos/spmd_block.hpp>
 
 #include <hpx/testing.hpp>
 
@@ -33,7 +34,7 @@ void bulk_test( hpx::lcos::spmd_block block,
 
     hpx::coarray<double,3> a(block, name, {height,width,_}, elt_size);
 
-    int idx = block.this_image()*height*width;
+    int idx = block.this_image() * height * width;
 
     for (std::size_t j = 0; j<width; j++)
     for (std::size_t i = 0; i<height; i++)

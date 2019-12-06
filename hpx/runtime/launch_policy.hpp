@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,8 +10,8 @@
 #define HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -198,13 +199,15 @@ namespace hpx
         template <typename Pred>
         struct select_policy : policy_holder<select_policy<Pred> >
         {
-            template <typename F, typename U =
-                typename std::enable_if<!std::is_same<
-                    select_policy<Pred>, typename std::decay<F>::type
-                >::value>::type>
-            explicit select_policy(F && f, threads::thread_priority priority =
-                        threads::thread_priority_default)
-              : policy_holder<select_policy<Pred> >(launch_policy::async, priority)
+            template <typename F,
+                typename U =
+                    typename std::enable_if<!std::is_same<select_policy<Pred>,
+                        typename std::decay<F>::type>::value>::type>
+            explicit select_policy(F&& f,
+                threads::thread_priority priority =
+                    threads::thread_priority_default)    // NOLINT
+              : policy_holder<select_policy<Pred>>(
+                    launch_policy::async, priority)
               , pred_(std::forward<F>(f))
             {}
 

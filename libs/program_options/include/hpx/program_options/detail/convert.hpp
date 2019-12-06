@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,17 +17,18 @@
 namespace hpx { namespace program_options {
 
     using boost::from_8_bit;
-    using boost::to_8_bit;
-    using boost::from_utf8;
-    using boost::to_utf8;
-    using boost::to_local_8_bit;
     using boost::from_local_8_bit;
+    using boost::from_utf8;
+    using boost::to_8_bit;
+    using boost::to_local_8_bit;
+    using boost::to_utf8;
     using boost::program_options::to_internal;
 
 }}    // namespace hpx::program_options
 
 #else
 
+#include <cstddef>
 #include <cwchar>
 #include <locale>
 #include <stdexcept>
@@ -72,7 +74,7 @@ namespace hpx { namespace program_options {
     std::vector<std::string> to_internal(const std::vector<T>& s)
     {
         std::vector<std::string> result;
-        for (unsigned i = 0; i < s.size(); ++i)
+        for (std::size_t i = 0; i < s.size(); ++i)
             result.push_back(to_internal(s[i]));
         return result;
     }

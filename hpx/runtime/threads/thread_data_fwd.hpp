@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,49 +10,57 @@
 #define HPX_THREADS_THREAD_DATA_FWD_AUG_11_2015_0228PM
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/coroutine_fwd.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_id_type.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/util_fwd.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/util/unique_function.hpp>
-#if defined(HPX_HAVE_APEX)
-// forward declare the APEX object
-namespace apex { struct task_wrapper; }
-typedef std::shared_ptr<apex::task_wrapper> apex_task_wrapper;
-#endif
 
 #include <cstddef>
 #include <cstdint>
-#include <utility>
 #include <memory>
+#include <utility>
 
-namespace hpx
-{
+#if defined(HPX_HAVE_APEX)
+namespace hpx { namespace util { namespace external_timer {
+    struct task_wrapper;
+}}}
+#endif
+
+namespace hpx {
     /// \cond NOINTERNAL
     class HPX_EXPORT thread;
     /// \endcond
-}
+}    // namespace hpx
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
+
+    class thread_data;
+    class thread_data_stackful;
+    class thread_data_stackless;
+
     /// \cond NOINTERNAL
-    class HPX_EXPORT threadmanager;
     struct HPX_EXPORT topology;
 
     class HPX_EXPORT executor;
 
-    typedef coroutines::coroutine coroutine_type;
+    using thread_id_type = thread_id;
 
-    typedef coroutines::detail::coroutine_self thread_self;
-    typedef coroutines::detail::coroutine_impl thread_self_impl_type;
+    using coroutine_type = coroutines::coroutine;
+    using stackless_coroutine_type = coroutines::stackless_coroutine;
 
-    typedef std::pair<thread_state_enum, thread_id_type> thread_result_type;
-    typedef thread_state_ex_enum thread_arg_type;
+    using thread_self = coroutines::detail::coroutine_self;
+    using thread_self_impl_type =
+        coroutines::detail::coroutine_impl;
 
-    typedef thread_result_type thread_function_sig(thread_arg_type);
-    typedef util::unique_function_nonser<thread_function_sig> thread_function_type;
+    using thread_result_type = std::pair<thread_state_enum, thread_id_type>;
+    using thread_arg_type = thread_state_ex_enum;
+
+    using thread_function_sig = thread_result_type(thread_arg_type);
+    using thread_function_type =
+        util::unique_function_nonser<thread_function_sig>;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////
@@ -74,6 +83,11 @@ namespace hpx { namespace threads
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
     HPX_API_EXPORT thread_id_type get_self_id();
+
+    /// The function \a get_self_id_data returns the data of the HPX thread id
+    /// associated with the current thread (or nullptr if the current thread is
+    /// not a HPX thread).
+    HPX_API_EXPORT thread_data* get_self_id_data();
 
     /// The function \a get_parent_id returns the HPX thread id of the
     /// current thread's parent (or zero if the current thread is not a
@@ -113,12 +127,6 @@ namespace hpx { namespace threads
     ///       code was compiled with HPX_HAVE_THREAD_TARGET_ADDRESS
     ///       being defined.
     HPX_API_EXPORT std::uint64_t get_self_component_id();
-
-    /// \cond NOINTERNAL
-    // The function get_thread_manager returns a reference to the
-    // current thread manager.
-    HPX_API_EXPORT threadmanager& get_thread_manager();
-    /// \endcond
 
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
@@ -161,10 +169,24 @@ namespace hpx { namespace threads
         thread_state_enum state = unknown);
 
 #if defined(HPX_HAVE_APEX)
-    HPX_API_EXPORT apex_task_wrapper get_self_apex_data(void);
-    HPX_API_EXPORT void set_self_apex_data(apex_task_wrapper data);
+    HPX_API_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>
+        get_self_timer_data(void);
+    HPX_API_EXPORT void set_self_timer_data(
+        std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
 #endif
-}}
+}}    // namespace hpx::threads
+
+namespace std {
+    template <>
+    struct hash<::hpx::threads::thread_id>
+    {
+        std::size_t operator()(::hpx::threads::thread_id const& v) const
+            noexcept
+        {
+            std::hash<::hpx::threads::thread_data const*> hasher_;
+            return hasher_(static_cast<::hpx::threads::thread_data*>(v.get()));
+        }
+    };
+}    // namespace std
 
 #endif
-
