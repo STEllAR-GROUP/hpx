@@ -35,6 +35,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
@@ -245,6 +246,16 @@ namespace hpx { namespace threads { namespace coroutines {
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
                 increment_stack_recycle_count();
 #endif
+            }
+
+            // Detect remaining stack space (approximate), taken from here:
+            // https://stackoverflow.com/a/20930496/269943
+            std::ptrdiff_t get_available_stack_space()
+            {
+                MEMORY_BASIC_INFORMATION mbi;                     // page range
+                VirtualQuery((PVOID) &mbi, &mbi, sizeof(mbi));    // get range
+                return (std::ptrdiff_t) &mbi -
+                    (std::ptrdiff_t) mbi.AllocationBase;
             }
 
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)

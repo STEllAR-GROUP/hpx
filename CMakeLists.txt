@@ -1251,8 +1251,6 @@ endif()
 
 if(WIN32)
   if(MSVC)
-    enable_language(ASM_MASM)
-
     hpx_add_target_compile_option(-Ox PUBLIC CONFIGURATIONS Release)
 
     # even VS2017 has an ICE when compiling with -Ob2

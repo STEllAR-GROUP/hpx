@@ -102,7 +102,7 @@ double global_scratch = 0;
 std::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
-double null_function()
+double null_function() noexcept
 {
     if (num_iterations > 0)
     {
