@@ -71,7 +71,7 @@ namespace hpx {
     static print_on spq_arr("SPQUEUE");
 }    // namespace hpx
 
-#define SHARED_PRIORITY_QUEUE_SCHEDULER_API 2
+#define SHARED_PRIORITY_QUEUE_SCHEDULER_API 3
 
 // ------------------------------------------------------------
 namespace hpx { namespace threads { namespace policies {
@@ -188,20 +188,18 @@ namespace hpx { namespace threads { namespace policies {
                 void set_scheduler_mode(scheduler_mode mode) override
                 {
                     scheduler_base::set_scheduler_mode(mode);
-                    round_robin_ = mode & policies::assign_work_round_robin;
-                    steal_hp_first_ = mode & policies::steal_after_local;
-                    core_stealing_ = mode & policies::enable_stealing;
-                    numa_stealing_ = mode & policies::enable_stealing_numa;
-                    if (round_robin_)
-                    {
-                        spq_deb.debug(debug::str<>("set_scheduler_mode"),
-                            "assign_work_round_robin");
-                    }
-                    else
-                    {
-                        spq_deb.debug(debug::str<>("set_scheduler_mode"),
-                            "assign_work_thread_parent");
-                    }
+                    round_robin_    = mode & policies::assign_work_round_robin;
+                    steal_hp_first_ = mode & policies::steal_high_priority_first;
+                    core_stealing_  = mode & policies::enable_stealing;
+                    numa_stealing_  = mode & policies::enable_stealing_numa;
+                    spq_arr.debug(debug::str<>("scheduler_mode")
+                        , round_robin_ ? "round_robin" : "thread parent"
+                        , ','
+                        , steal_hp_first_ ? "steal_hp_first" : "steal after local"
+                        , ','
+                        , core_stealing_ ? "stealing" : "no stealing"
+                        , ','
+                        , numa_stealing_ ? "numa stealing" : "no numa stealing");
                 }
 
                 // ------------------------------------------------------------

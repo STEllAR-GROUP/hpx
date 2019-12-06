@@ -395,7 +395,7 @@ namespace hpx { namespace debug {
     template <bool enable = false>
     struct enable_print
     {
-        enable_print(const char* p) {}
+        constexpr enable_print(const char* p) {}
 
         constexpr bool is_enabled()
         {
@@ -403,39 +403,42 @@ namespace hpx { namespace debug {
         }
 
         template <typename... Args>
-        inline void debug(Args... args)
+        inline constexpr void debug(Args... args)
         {
         }
         template <typename... Args>
-        inline void warning(Args... args)
+        inline constexpr void warning(Args... args)
         {
         }
         template <typename... Args>
-        inline void error(Args... args)
+        inline constexpr void error(Args... args)
         {
         }
         template <typename... Args>
-        inline void timed(Args... args)
+        inline constexpr void timed(Args... args)
         {
         }
         template <typename T>
-        inline void array(const std::string& name, const std::vector<T>& v)
+        inline constexpr void array(
+            const std::string& name, const std::vector<T>& v)
         {
         }
 
         template <typename T, std::size_t N>
-        inline void array(const std::string& name, const std::array<T, N>& v)
+        inline constexpr void array(
+            const std::string& name, const std::array<T, N>& v)
         {
         }
 
         template <typename Iter>
-        inline void array(const std::string& name, Iter begin, Iter end)
+        inline constexpr void array(
+            const std::string& name, Iter begin, Iter end)
         {
         }
 
         // @todo, return void so that timers have zero footprint when disabled
         template <typename... Args>
-        int make_timer(double delay, const Args... args)
+        constexpr int make_timer(double delay, const Args... args)
         {
             return 0;
         }
@@ -449,7 +452,7 @@ namespace hpx { namespace debug {
         const char* prefix_;
 
     public:
-        enable_print(const char* p)
+        constexpr enable_print(const char* p)
           : prefix_(p)
         {
         }
@@ -460,17 +463,17 @@ namespace hpx { namespace debug {
         }
 
         template <typename... Args>
-        void debug(Args... args)
+        constexpr void debug(Args... args)
         {
             detail::debug(prefix_, std::forward<Args>(args)...);
         }
         template <typename... Args>
-        void warning(Args... args)
+        constexpr void warning(Args... args)
         {
             detail::warning(prefix_, std::forward<Args>(args)...);
         }
         template <typename... Args>
-        void error(Args... args)
+        constexpr void error(Args... args)
         {
             detail::error(prefix_, std::forward<Args>(args)...);
         }

@@ -44,11 +44,13 @@
 #include <utility>
 #include <vector>
 
+#if !defined(THREAD_QUEUE_MC_DEBUG)
 #ifndef NDEBUG
-#define THREAD_QUEUE_MC_DEBUG true
+#define THREAD_QUEUE_MC_DEBUG false
 #else
 #if !defined(THREAD_QUEUE_MC_DEBUG)
 #define THREAD_QUEUE_MC_DEBUG false
+#endif
 #endif
 #endif
 
