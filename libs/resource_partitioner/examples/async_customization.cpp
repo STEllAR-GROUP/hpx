@@ -28,8 +28,6 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/pack_traversal.hpp>
 //
-#include "shared_priority_queue_scheduler.hpp"
-//
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -116,7 +114,7 @@ struct test_async_executor
         lcos::local::futures_factory<result_type()> p(executor_,
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -154,7 +152,7 @@ struct test_async_executor
             util::deferred_call(std::forward<F>(f),
                 std::forward<Future>(predecessor), std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom then", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -214,7 +212,7 @@ struct test_async_executor
                     predecessor),
                 std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom then", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -262,7 +260,7 @@ struct test_async_executor
             util::deferred_call(std::forward<F>(f),
                 std::forward<util::tuple<InnerFutures...>>(predecessor)));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom async", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -474,7 +472,7 @@ int main(int argc, char** argv)
 
     // declare the high priority scheduler type we'll use
     using high_priority_sched =
-        hpx::threads::policies::example::shared_priority_queue_scheduler<>;
+        hpx::threads::policies::shared_priority_queue_scheduler<>;
     using hpx::threads::policies::scheduler_mode;
     // setup the default pool with our custom priority scheduler
     rp.create_thread_pool("custom",

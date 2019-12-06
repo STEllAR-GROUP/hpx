@@ -22,6 +22,7 @@
 #include <iterator>
 #include <string>
 #include <vector>
+#include <utility>
 #include <boost/asio/detail/shared_ptr.hpp>
 #include <boost/asio/detail/socket_ops.hpp>
 #include <boost/asio/detail/socket_types.hpp>

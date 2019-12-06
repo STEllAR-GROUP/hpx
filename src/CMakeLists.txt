@@ -48,7 +48,7 @@ add_hpx_library_sources(hpx
   APPEND)
 
 add_hpx_library_sources(hpx_generated
-  GLOB GLOBS "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+  GLOB GLOBS "${PROJECT_BINARY_DIR}/libs/modules.cpp"
   APPEND)
 
 # libhpx_wrap sources
@@ -70,7 +70,7 @@ if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
     enable_language(ASM)
     set(switch_to_fiber_source
-      "${PROJECT_SOURCE_DIR}/src/runtime/threads/coroutines/switch_to_fiber.asm")
+      "${PROJECT_SOURCE_DIR}/libs/coroutines/src/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
       GLOB GLOBS "${switch_to_fiber_source}")
     add_custom_command(
@@ -154,7 +154,7 @@ add_hpx_source_group(
 
 add_hpx_source_group(
   NAME hpx_generated CLASS "Source Files"
-  ROOT "${CMAKE_BINARY_DIR}/libs"
+  ROOT "${PROJECT_BINARY_DIR}/libs"
   TARGETS ${hpx_generated_SOURCES})
 
 add_hpx_source_group(
@@ -248,7 +248,7 @@ target_link_libraries(hpx PUBLIC hpx::boost)
 # Set the basic search paths for the HPX headers
 target_include_directories(hpx PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
   $<INSTALL_INTERFACE:include>
   )
 
@@ -278,12 +278,12 @@ if (TARGET hpx::amplifier)
 endif()
 
 if (TARGET hpx::apex)
-  target_link_libraries(hpx PRIVATE hpx::apex)
-  # System has been removed when passing at set_property for cmake < 3.11 in
-  # HPX_SetupApex.cmake so the property get is not SYSTEM_INTERFACE_INC_DIR
-  # anymore, we can put it back once we require cmake >= 3.11
-  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx INTERFACE "${_apex_inc_dir}")
+  # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER,
+  # we do want to add the APEX link commands to all executables, so
+  # we use the "INTERFACE" option for target_link_libraries.
+  # Because libhpx_apex is a shared object library, we don't need to specify
+  # the whole archive.
+  target_link_libraries(hpx INTERFACE hpx::apex)
 endif()
 
 if (TARGET hpx::gperftools)
@@ -383,7 +383,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
         ${hpx_init_SOURCES} ${hpx_init_HEADERS})
     endif()
   endif()
-  target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>)
+  target_include_directories(hpx_init PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>)
   set_target_properties(hpx_init PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
   foreach(_module ${HPX_LIBS})
@@ -396,7 +396,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
   # Set the basic search paths for the generated HPX headers
   target_include_directories(hpx_init
     PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
       $<INSTALL_INTERFACE:include>)
   target_link_libraries(hpx_init PRIVATE hpx::boost)
@@ -438,7 +438,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
     # Set the basic search paths for the generated HPX headers
     target_include_directories(hpx_wrap
       PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:include>)
     target_link_libraries(hpx_wrap PUBLIC hpx)

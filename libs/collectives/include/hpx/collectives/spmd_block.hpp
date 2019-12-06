@@ -11,6 +11,7 @@
 #include <hpx/collectives/broadcast.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/functional/first_argument.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/include/plain_actions.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/util/first_argument.hpp>
 
 #include <boost/range/irange.hpp>
 

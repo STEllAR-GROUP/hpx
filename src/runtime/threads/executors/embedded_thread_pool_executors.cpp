@@ -64,6 +64,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
       , self_(max_punits)
       , affinity_data_(affinity_data)
     {
+        scheduler_.add_scheduler_mode
+                (policies::scheduler_mode::enable_stealing_numa);
         if (max_punits < min_punits)
         {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -375,7 +377,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                         suspend_back_into_calling_context,
                     this, virt_core));
 
-            scheduler_.set_scheduler_mode(policies::fast_idle_mode);
+            scheduler_.add_scheduler_mode(policies::fast_idle_mode);
             threads::detail::scheduling_loop(
                 virt_core, scheduler_, counters, callbacks);
 

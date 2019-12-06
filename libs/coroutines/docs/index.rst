@@ -11,3 +11,8 @@
 coroutines
 ==========
 
+The coroutines module provides coroutine (user-space thread) implementations
+for different platforms.
+
+See the :ref:`API reference <libs_coroutines_api>` of the module for more
+details.

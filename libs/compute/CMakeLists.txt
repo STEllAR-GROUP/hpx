@@ -28,8 +28,6 @@ set(compute_headers
   hpx/compute/vector.hpp
 )
 
-set(compute_compat_headers)
-
 set(compute_sources
   get_host_targets.cpp
   host_target.cpp
@@ -38,14 +36,13 @@ set(compute_sources
 
 include(HPX_AddModule)
 add_hpx_module(compute
-  COMPATIBILITY_HEADERS OFF
-  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${compute_sources}
   HEADERS ${compute_headers}
   COMPAT_HEADERS ${compute_compat_headers}
   DEPENDENCIES
+    hpx_affinity
     hpx_algorithms
     hpx_config
     hpx_coroutines
@@ -56,16 +53,14 @@ add_hpx_module(compute
     hpx_program_options
     hpx_resource_partitioner
     hpx_serialization
+    hpx_synchronization
     hpx_threadmanager
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
 
-# Temporary : this module is currently depending on main headers which
-# themselves include apex. In the future, those main headers would be in a
-# module that link to apex, and we'd be able to remove this.
-if (TARGET hpx::apex)
-  target_link_libraries(hpx_compute PRIVATE hpx::apex)
-  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx_compute INTERFACE "${_apex_inc_dir}")
-endif()
+# Temporary since the module still depends on some runtime files
+target_link_libraries(hpx_compute PUBLIC
+  hpx_static_reinit
+  hpx_local_lcos
+  )

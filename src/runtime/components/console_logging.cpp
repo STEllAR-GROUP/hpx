@@ -15,7 +15,7 @@
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 

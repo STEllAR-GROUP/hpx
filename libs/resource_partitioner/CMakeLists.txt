@@ -37,6 +37,7 @@ add_hpx_module(resource_partitioner
   HEADERS ${resource_partitioner_headers}
   COMPAT_HEADERS ${resource_partitioner_compat_headers}
   DEPENDENCIES
+    hpx_affinity
     hpx_allocator_support
     hpx_assertion
     hpx_cache
@@ -50,12 +51,8 @@ add_hpx_module(resource_partitioner
     hpx_plugin
     hpx_program_options
     hpx_serialization
+    hpx_synchronization
     hpx_topology
   CMAKE_SUBDIRS examples tests
 )
 
-if (TARGET hpx::apex)
-  target_link_libraries(hpx_resource_partitioner PRIVATE hpx::apex)
-  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx_compute INTERFACE "${_apex_inc_dir}")
-endif()

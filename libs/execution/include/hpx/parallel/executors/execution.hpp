@@ -14,6 +14,7 @@
 // Necessary to avoid circular include
 #include <hpx/parallel/executors/execution_fwd.hpp>
 
+#include <hpx/assertion.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
@@ -1105,6 +1106,10 @@ namespace hpx { namespace parallel { namespace execution {
                     typename bulk_then_execute_result<F, Shape, Future,
                         Ts...>::type>::type
             {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                return make_ready_future();
+#else
                 // result_of_t<F(Shape::value_type, Future)>
                 typedef typename then_bulk_function_result<F, Shape, Future,
                     Ts...>::type func_result_type;
@@ -1145,6 +1150,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                 return hpx::traits::future_access<result_future_type>::create(
                     std::move(p));
+#endif
             }
 
             template <typename BulkExecutor, typename F, typename Shape,

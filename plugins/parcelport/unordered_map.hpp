@@ -9,7 +9,7 @@
 #if !defined(HPX_CONCURRENT_UNORDERED_MAP)
 #define HPX_CONCURRENT_UNORDERED_MAP
 
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <plugins/parcelport/readers_writers_mutex.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 //

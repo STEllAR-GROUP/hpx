@@ -7,8 +7,8 @@
 // verify #2338 is fixed (Possible race in sliding semaphore)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>

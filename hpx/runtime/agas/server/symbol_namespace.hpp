@@ -12,7 +12,7 @@
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/functional/function.hpp>

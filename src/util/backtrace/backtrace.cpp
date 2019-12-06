@@ -414,7 +414,7 @@ namespace hpx { namespace util {
             stack_trace::get_symbols, &frames_.front(), frames_.size()));
 
         error_code ec(lightweight);
-        threads::thread_id_type tid = p.apply(
+        threads::thread_id_type tid = p.apply("backtrace",
             launch::fork, threads::thread_priority_default,
             threads::thread_stacksize_medium,
             threads::thread_schedule_hint(),

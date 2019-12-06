@@ -9,6 +9,8 @@
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_MAR_09_2014_1213PM
 
 #include <hpx/config.hpp>
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply_continue_callback.hpp>
@@ -106,4 +108,5 @@ namespace hpx { namespace detail
     }
 }}
 
+#endif
 #endif

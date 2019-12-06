@@ -24,8 +24,8 @@ How to use |hpx| applications with PBS
 
 Most |hpx| applications are executed on parallel computers. These platforms
 typically provide integrated job management services that facilitate the
-allocation of computing resources for each parallel program. |hpx| includes out
-of the box support for one of the most common job management systems, the
+allocation of computing resources for each parallel program. |hpx| includes
+support for one of the most common job management systems, the
 Portable Batch System (PBS).
 
 All PBS jobs require a script to specify the resource requirements and other
@@ -35,8 +35,8 @@ the file. The remaining (not commented-out) portions of the file executes just
 like any other regular shell script. While the description of all available PBS
 options is outside the scope of this tutorial (the interested reader may refer
 to in-depth `documentation <http://www.clusterresources.com/torquedocs21/>`_ for
-more information), below is a minimal example to illustrate the approach. As a
-test application we will use the multithreaded ``hello_world_distributed``
+more information), below is a minimal example to illustrate the approach. The following
+test application will use the multithreaded ``hello_world_distributed``
 program, explained in the section :ref:`examples_hello_world`.
 
 .. code-block:: bash
@@ -53,8 +53,8 @@ program, explained in the section :ref:`examples_hello_world`.
 .. caution::
 
    If the first application specific argument (inside ``$APP_OPTIONS``) is a
-   non-option (i.e. does not start with a ``-`` or a ``--``), then those have to
-   be placed before the option :option:`--hpx:nodes`, which in this case should
+   non-option (i.e., does not start with a ``-`` or a ``--``), then the argument has to
+   be placed before the option :option:`--hpx:nodes`, which, in this case, should
    be the last option on the command line.
 
    Alternatively, use the option :option:`--hpx:endnodes` to explicitly mark the
@@ -108,8 +108,8 @@ only the PBS options and shell variables as needed for a specific application.
    job script.
 
 Another choice is for the |pbsdsh| command in your main job script to invoke
-your program via a shell, like ``sh`` or ``bash`` so that it gives an initialized
-environment for each instance. We create a small script ``runme.sh`` which is used
+your program via a shell, like ``sh`` or ``bash``, so that it gives an initialized
+environment for each instance. Users can create a small script ``runme.sh``, which is used
 to invoke the program:
 
 .. code-block:: bash
@@ -122,7 +122,7 @@ to invoke the program:
    # environment variables as usual.
    $@
 
-Now, we invoke this script using the |pbsdsh| tool:
+Now, the script is invoked using the |pbsdsh| tool:
 
 .. code-block:: bash
 
@@ -136,7 +136,7 @@ Now, we invoke this script using the |pbsdsh| tool:
    pbsdsh -u runme.sh $APP_PATH $APP_OPTIONS --hpx:nodes=`cat $PBS_NODEFILE`
 
 All that remains now is submitting the job to the queuing system. Assuming that
-the contents of the PBS script were saved in file ``pbs_hello_world.sh`` in the
+the contents of the PBS script were saved in the file ``pbs_hello_world.sh`` in the
 current directory, this is accomplished by typing:
 
 .. code-block:: bash
@@ -175,7 +175,7 @@ After the job completes, PBS will place two files, ``pbs_hello_world.sh.o42`` an
 ``pbs_hello_world.sh.e42``, in the directory where the job was submitted. The
 first contains the standard output and the second contains the standard error
 from all the nodes on which the application executed. In our example, the error
-output file should be empty and standard output file should contain something
+output file should be empty and the standard output file should contain something
 similar to:
 
 .. code-block:: text
@@ -202,21 +202,21 @@ management system which is widely used on large supercomputing systems. Any
 can be done.
 
 The easiest way to run an |hpx| application using SLURM is to utilize the
-command line tool |srun| which interacts with the SLURM batch scheduling system:
+command line tool |srun|, which interacts with the SLURM batch scheduling system:
 
 .. code-block:: bash
 
    srun -p <partition> -N <number-of-nodes> hpx-application <application-arguments>
 
 Here, ``<partition>`` is one of the node partitions existing on the target
-machine (consult the machines documentation to get a list of existing
-partitions) and ``<number-of-nodes>`` is the number of compute nodes you want to
-use. By default, the HPX application is started with one :term:`locality` per
+machine (consult the machine's documentation to get a list of existing
+partitions) and ``<number-of-nodes>`` is the number of compute nodes that should
+be used. By default, the |hpx| application is started with one :term:`locality` per
 node and uses all available cores on a node. You can change the number of
-localities started per node (for example to account for NUMA effects) by
+localities started per node (for example, to account for NUMA effects) by
 specifying the ``-n`` option of srun. The number of cores per :term:`locality`
 can be set by ``-c``. The ``<application-arguments>`` are any application
-specific arguments which need to be passed on to the application.
+specific arguments that need to be passed on to the application.
 
 .. note::
 
@@ -228,28 +228,28 @@ specific arguments which need to be passed on to the application.
 .. important::
 
    The |srun| documentation explicitly states: "If ``-c`` is specified without
-   ``-n`` as many tasks will be allocated per node as possible while satisfying
+   ``-n``, as many tasks will be allocated per node as possible while satisfying
    the ``-c`` restriction. For instance on a cluster with 8 CPUs per node, a job
    request for 4 nodes and 3 CPUs per task may be allocated 3 or 6 CPUs per node
    (1 or 2 tasks per node) depending upon resource consumption by other jobs."
-   For this reason, we suggest to always specify ``-n <number-of-instances>``,
+   For this reason, it's recommended to always specify ``-n <number-of-instances>``,
    even if ``<number-of-instances>`` is equal to one (``1``).
 
 Interactive shells
 ------------------
 
-To get an interactive development shell on one of the nodes you can issue the
+To get an interactive development shell on one of the nodes, users can issue the
 following command:
 
 .. code-block:: bash
 
    srun -p <node-type> -N <number-of-nodes> --pty /bin/bash -l
 
-After the shell has been opened, you can run your HPX application. By default,
+After the shell has been opened, users can run their |hpx| application. By default,
 it uses all available cores. Note that if you requested one node, you don't need
 to do ``srun`` again. However, if you requested more than one node, and want to
 run your distributed application, you can use ``srun`` again to start up the
-distributed HPX application. It will use the resources that have been requested
+distributed |hpx| application. It will use the resources that have been requested
 for the interactive shell.
 
 Scheduling batch jobs
@@ -257,13 +257,13 @@ Scheduling batch jobs
 
 The above mentioned method of running |hpx| applications is fine for development
 purposes. The disadvantage that comes with ``srun`` is that it only returns once
-the application is finished. This might not be appropriate for longer running
-applications (for example benchmarks or larger scale simulations). In order to
-cope with that limitation you can use the |sbatch| command.
+the application is finished. This might not be appropriate for longer-running
+applications (for example, benchmarks or larger scale simulations). In order to
+cope with that limitation, users can use the |sbatch| command.
 
 The ``sbatch`` command expects a script that it can run once the requested
-resources are available. In order to request resources you need to add
-``#SBATCH`` comments in your script or provide the necessary parameters to
+resources are available. In order to request resources, users need to add
+``#SBATCH`` comments in their script or provide the necessary parameters to
 ``sbatch`` directly. The parameters are the same as with ``run``. The commands
 you need to execute are the same you would need to start your application as if
 you were in an interactive shell.

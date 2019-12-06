@@ -35,11 +35,11 @@
 
 #if !defined(HPX_HAVE_MAX_CPU_COUNT) && defined(HPX_HAVE_MORE_THAN_64_THREADS)
 static_assert(false,
-    "The shared_priority_scheduler does not support dynamic bitsets for CPU "
+    "The shared_priority_queue_scheduler does not support dynamic bitsets for CPU "
     "masks, i.e. HPX_WITH_MAX_CPU_COUNT=\"\" and "
     "HPX_WITH_MORE_THAN_64_THREADS=ON. Reconfigure HPX with either "
     "HPX_WITH_MAX_CPU_COUNT=N, where N is an integer, or disable the "
-    "shared_priority_scheduler by setting HPX_WITH_THREAD_SCHEDULERS to not "
+    "shared_priority_queue_scheduler by setting HPX_WITH_THREAD_SCHEDULERS to not "
     "include \"all\" or \"shared-priority\"");
 #else
 
@@ -122,12 +122,6 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         virtual ~shared_priority_queue_scheduler() {}
-
-        bool numa_sensitive() const override { return true; }
-        virtual bool has_thread_stealing(std::size_t num_thread) const override
-        {
-            return true;
-        }
 
         static std::string get_scheduler_name()
         {

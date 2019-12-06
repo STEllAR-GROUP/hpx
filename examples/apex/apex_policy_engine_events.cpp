@@ -19,6 +19,9 @@
 #include <cstdint>
 #include <iostream>
 
+// our apex policy handle
+apex_policy_handle * policy_handle;
+
 ///////////////////////////////////////////////////////////////////////////////
 // forward declaration of the Fibonacci function
 std::uint64_t fibonacci(std::uint64_t n);
@@ -67,6 +70,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
+    // apex::deregister_policy(policy_handle);
+
     return hpx::finalize(); // Handles HPX shutdown
 }
 
@@ -84,7 +89,8 @@ int main(int argc, char* argv[])
         ;
 
     const apex_event_type when = APEX_START_EVENT;
-    apex::register_policy(when, [](apex_context const& context){
+    policy_handle = apex::register_policy(when,
+        [](apex_context const& context){
         std::cout << "Start event!" << std::endl;
         return APEX_NOERROR;
     });

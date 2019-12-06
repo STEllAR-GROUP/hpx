@@ -8,6 +8,7 @@
 #define HPX_PARALLEL_UTIL_PARTITIONER_WITH_CLEANUP_OCT_03_2014_0221PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
 #endif
@@ -168,6 +169,10 @@ namespace hpx { namespace parallel { namespace util {
                 Cleanup&& cleanup)
             {
                 // wait for all tasks to finish
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                return hpx::make_ready_future();
+#else
                 return hpx::dataflow(
                     [HPX_CAPTURE_MOVE(errors), HPX_CAPTURE_MOVE(scoped_params),
                         HPX_CAPTURE_FORWARD(f), HPX_CAPTURE_FORWARD(cleanup)](
@@ -179,6 +184,7 @@ namespace hpx { namespace parallel { namespace util {
                         return f(std::move(r));
                     },
                     std::move(workitems));
+#endif
             }
         };
     }    // namespace detail

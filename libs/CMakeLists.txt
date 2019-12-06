@@ -11,10 +11,12 @@ include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
 set(HPX_LIBS
+  affinity
   algorithms
   allocator_support
   assertion
   basic_execution
+  batch_environments
   cache
   checkpoint
   collectives
@@ -34,6 +36,7 @@ set(HPX_LIBS
   hardware
   hashing
   iterator_support
+  local_lcos
   logging
   memory
   plugin
@@ -43,7 +46,9 @@ set(HPX_LIBS
   resource_partitioner
   segmented_algorithms
   serialization
+  static_reinit
   statistics
+  synchronization
   testing
   thread_support
   threadmanager
@@ -90,6 +95,7 @@ if(HPX_WITH_TESTS)
 endif()
 
 
+hpx_info("")
 hpx_info("Configuring modules:")
 
 # variables needed for modules.cpp
@@ -117,14 +123,14 @@ endforeach()
 
 configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
-    "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+    "${PROJECT_BINARY_DIR}/libs/modules.cpp"
     @ONLY)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${CMAKE_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
+  "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
   @ONLY)
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
   @ONLY)

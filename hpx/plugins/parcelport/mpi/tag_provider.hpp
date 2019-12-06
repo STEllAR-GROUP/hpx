@@ -12,7 +12,7 @@
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <deque>
 #include <mutex>

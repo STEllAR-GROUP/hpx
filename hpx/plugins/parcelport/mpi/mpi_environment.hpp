@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #include <hpx/util_fwd.hpp>
 
@@ -37,8 +37,6 @@ namespace hpx { namespace util
         static MPI_Comm& communicator();
 
         static std::string get_processor_name();
-
-        static bool check_mpi_environment(runtime_configuration const& cfg);
 
         struct scoped_lock
         {

@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/lcos/local/barrier.hpp>
+#include <hpx/synchronization/barrier.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/format.hpp>
 #include <boost/lockfree/queue.hpp>
@@ -28,7 +28,7 @@ using hpx::lcos::local::barrier;
 using hpx::threads::pending;
 using hpx::threads::thread_priority_normal;
 
-using hpx::applier::register_work;
+using hpx::threads::register_work;
 
 using hpx::init;
 using hpx::finalize;

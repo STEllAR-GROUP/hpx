@@ -14,7 +14,7 @@
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize_buffer.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 
 #include <cstddef>
 #include <cstdint>

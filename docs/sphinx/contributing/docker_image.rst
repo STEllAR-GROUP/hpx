@@ -15,10 +15,10 @@ alternative to quickly get all the dependencies needed to start development of
 |hpx|. Our testing setup on |circleci|_ uses a docker image to run all tests.
 
 To get started you need to install |docker|_ using whatever means is most
-convenient on your system. Once you have |docker|_ installed you can pull or
+convenient on your system. Once you have |docker|_ installed, you can pull or
 directly run the docker image. The image is based on Debian and Clang, and can
 be found on |docker_build_env|_. To start a container using the |hpx| build
-environment run:
+environment, run:
 
 .. code-block:: bash
 
@@ -31,7 +31,7 @@ Please see the |docker_docs|_ for more information on using |docker|_.
 .. warning::
 
    All changes made within the container are lost when the container is closed.
-   If you want files to persist (e.g. the |hpx| source tree) after closing the
-   container you can bind directories from the host system into the container
+   If you want files to persist (e.g., the |hpx| source tree) after closing the
+   container, you can bind directories from the host system into the container
    (see |docker_docs_bind_mounts|_).
 

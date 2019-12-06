@@ -8,7 +8,7 @@
 #define HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/recursive_mutex.hpp>
+#include <hpx/synchronization/recursive_mutex.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>

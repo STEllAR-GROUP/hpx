@@ -28,6 +28,8 @@ set(basic_execution_sources
 
 include(HPX_AddModule)
 add_hpx_module(basic_execution
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   SOURCES ${basic_execution_sources}
   HEADERS ${basic_execution_headers}

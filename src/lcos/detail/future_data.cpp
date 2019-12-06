@@ -19,7 +19,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/annotated_function.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -59,7 +59,7 @@ namespace hpx { namespace lcos { namespace detail
             policy = launch::async;
 
         // launch a new thread executing the given function
-        threads::thread_id_type tid = p.apply(
+        threads::thread_id_type tid = p.apply("run_on_completed_on_new_thread",
             policy, threads::thread_priority_boost,
             threads::thread_stacksize_current,
             threads::thread_schedule_hint());

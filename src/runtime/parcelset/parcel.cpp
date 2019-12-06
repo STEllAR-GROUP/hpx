@@ -25,7 +25,7 @@
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 
 #include <hpx/thread_support/atomic_count.hpp>
 
@@ -458,7 +458,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
         // tell APEX about the received parcel
-        apex::recv(data_.parcel_id_.get_lsb(), size_,
+        util::external_timer::recv(data_.parcel_id_.get_lsb(), size_,
             naming::get_locality_id_from_gid(data_.source_id_),
             reinterpret_cast<std::uint64_t>(action_->get_parent_thread_id().get()));
 #endif

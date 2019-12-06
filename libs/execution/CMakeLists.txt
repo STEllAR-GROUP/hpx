@@ -77,7 +77,9 @@ add_hpx_module(execution
     hpx_datastructures
     hpx_functional
     hpx_iterator_support
+    hpx_local_lcos
     hpx_preprocessor
+    hpx_synchronization
     hpx_timing
     hpx_topology
     hpx_type_support

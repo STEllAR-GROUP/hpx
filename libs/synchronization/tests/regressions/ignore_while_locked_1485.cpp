@@ -1,0 +1,93 @@
+//  Copyright 2015 (c) Hartmut Kaiser
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// This test case demonstrates the issue described in #1485:
+// `ignore_while_locked` doesn't support all Lockable types
+
+#include <hpx/hpx.hpp>
+#include <hpx/hpx_main.hpp>
+#include <hpx/synchronization.hpp>
+#include <hpx/testing.hpp>
+
+#include <atomic>
+#include <functional>
+#include <mutex>
+
+struct wait_for_flag
+{
+    hpx::lcos::local::spinlock mutex;
+    hpx::lcos::local::condition_variable_any cond_var;
+
+    wait_for_flag()
+      : flag(false)
+      , woken(0)
+    {
+    }
+
+    void wait(hpx::lcos::local::spinlock& local_mutex,
+        hpx::lcos::local::condition_variable_any& local_cond_var, bool& running)
+    {
+        bool first = true;
+        while (!flag)
+        {
+            // signal successful initialization
+            if (first)
+            {
+                {
+                    std::lock_guard<hpx::lcos::local::spinlock> lk(local_mutex);
+                    running = true;
+                }
+
+                first = false;
+                local_cond_var.notify_all();
+            }
+
+            std::unique_lock<hpx::lcos::local::spinlock> lk(mutex);
+            cond_var.wait(mutex);
+        }
+        ++woken;
+    }
+
+    std::atomic<bool> flag;
+    std::atomic<unsigned> woken;
+};
+
+void test_condition_with_mutex()
+{
+    wait_for_flag data;
+
+    bool running = false;
+    hpx::lcos::local::spinlock local_mutex;
+    hpx::lcos::local::condition_variable_any local_cond_var;
+
+    hpx::thread thread(&wait_for_flag::wait, std::ref(data),
+        std::ref(local_mutex), std::ref(local_cond_var), std::ref(running));
+
+    // wait for the thread to run
+    {
+        std::unique_lock<hpx::lcos::local::spinlock> lk(local_mutex);
+        while (!running)
+            local_cond_var.wait(lk);
+    }
+
+    // now start actual test
+    data.flag.store(true);
+
+    {
+        std::lock_guard<hpx::lcos::local::spinlock> lock(data.mutex);
+        hpx::util::ignore_all_while_checking il;
+        data.cond_var.notify_one();
+    }
+
+    thread.join();
+    HPX_TEST_EQ(data.woken, 1u);
+}
+
+int main()
+{
+    test_condition_with_mutex();
+    return hpx::util::report_errors();
+}

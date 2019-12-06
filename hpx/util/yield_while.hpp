@@ -12,7 +12,7 @@
 #define HPX_UTIL_DETAIL_YIELD_WHILE_HPP
 
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 
 #include <cstddef>
 

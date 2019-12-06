@@ -11,7 +11,6 @@
 #define HPX_RUNTIME_GET_THREAD_NAME_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
 
 #include <string>
 

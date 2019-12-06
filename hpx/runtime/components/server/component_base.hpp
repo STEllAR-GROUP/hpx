@@ -146,7 +146,7 @@ namespace hpx { namespace components
         ~component_base() = default;
 
 #if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS) &&                    \
-    !defined(__NVCC__) && !defined(__CUDACC__)
+    !defined(__NVCC__)
     protected:
         // declare friends which are allowed to access get_base_gid()
         template <typename Component_, typename...Ts>

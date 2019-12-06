@@ -11,3 +11,11 @@
 concepts
 ========
 
+This module provides helpers for emulating concepts. It provides the following
+macros:
+
+* :c:macro:`HPX_CONCEPT_REQUIRES`
+* :c:macro:`HPX_HAS_MEMBER_XXX_TRAIT_DEF`
+* :c:macro:`HPX_HAS_XXX_TRAIT_DEF`
+
+See the :ref:`API reference <libs_concepts_api>` of the module for more details.

@@ -21,7 +21,7 @@
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/lcos/local/sliding_semaphore.hpp>
+#include <hpx/synchronization.hpp>
 #include <hpx/runtime/threads/executors/limiting_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 
@@ -102,7 +102,7 @@ double global_scratch = 0;
 std::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
-double null_function()
+double null_function() noexcept
 {
     if (num_iterations > 0)
     {

@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>

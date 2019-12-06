@@ -112,18 +112,16 @@ namespace hpx { namespace threads { namespace executors
                 util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
             if (hp_sync_ &&
-                    executor_.get_priority() == hpx::threads::thread_priority_high) {
-                p.apply(
-                    hpx::launch::sync,
-                    executor_.get_priority(),
+                executor_.get_priority() == hpx::threads::thread_priority_high)
+            {
+                p.apply("guided async", hpx::launch::sync, executor_.get_priority(),
                     executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                                 thread_schedule_hint_mode_numa, domain));
             }
-            else {
-                p.apply(
-                    hpx::launch::async,
-                    executor_.get_priority(),
+            else
+            {
+                p.apply("guided async", hpx::launch::async, executor_.get_priority(),
                     executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                                 thread_schedule_hint_mode_numa, domain));
@@ -174,18 +172,16 @@ namespace hpx { namespace threads { namespace executors
             );
 
             if (hp_sync_ &&
-                    executor_.get_priority() == hpx::threads::thread_priority_high) {
-                p.apply(
-                    hpx::launch::sync,
-                    executor_.get_priority(),
+                executor_.get_priority() == hpx::threads::thread_priority_high)
+            {
+                p.apply("guided then", hpx::launch::sync, executor_.get_priority(),
                     executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                                 thread_schedule_hint_mode_numa, domain));
             }
-            else {
-                p.apply(
-                    hpx::launch::async,
-                    executor_.get_priority(),
+            else
+            {
+                p.apply("guided then", hpx::launch::async, executor_.get_priority(),
                     executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                                 thread_schedule_hint_mode_numa, domain));
@@ -440,18 +436,17 @@ namespace hpx { namespace threads { namespace executors
             );
 
             if (hp_sync_ &&
-                    pool_executor_.get_priority() == hpx::threads::thread_priority_high) {
-                p.apply(
-                    hpx::launch::sync,
-                    pool_executor_.get_priority(),
+                pool_executor_.get_priority() ==
+                    hpx::threads::thread_priority_high)
+            {
+                p.apply("guided async", hpx::launch::sync, pool_executor_.get_priority(),
                     pool_executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                                 thread_schedule_hint_mode_numa, domain));
             }
-            else {
-                p.apply(
-                    hpx::launch::async,
-                    pool_executor_.get_priority(),
+            else
+            {
+                p.apply("guided async", hpx::launch::async, pool_executor_.get_priority(),
                     pool_executor_.get_stacksize(),
                     threads::thread_schedule_hint(
                                 thread_schedule_hint_mode_numa, domain));
@@ -503,19 +498,18 @@ namespace hpx { namespace threads { namespace executors
         future<typename util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F && f, Ts &&... ts)
         {
-            if (guided_) return guided_exec_.async_execute(
-                std::forward<F>(f), std::forward<Ts>(ts)...);
-            else {
-                typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
-                    result_type;
+            if (guided_)
+                return guided_exec_.async_execute(
+                    std::forward<F>(f), std::forward<Ts>(ts)...);
+            else
+            {
+                typedef typename util::detail::invoke_deferred_result<F,
+                    Ts...>::type result_type;
 
-                lcos::local::futures_factory<result_type()> p(
-                    pool_exec_,
-                    util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...)
-                );
-                p.apply(
-                    hpx::launch::async,
-                    pool_exec_.get_priority(),
+                lcos::local::futures_factory<result_type()> p(pool_exec_,
+                    util::deferred_call(
+                        std::forward<F>(f), std::forward<Ts>(ts)...));
+                p.apply("guided async", hpx::launch::async, pool_exec_.get_priority(),
                     pool_exec_.get_stacksize(),
                     threads::thread_schedule_hint()
                 );

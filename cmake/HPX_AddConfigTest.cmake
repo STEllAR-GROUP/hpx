@@ -760,6 +760,14 @@ function(hpx_check_for_cxx17_if_constexpr)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments)
+  add_hpx_config_test(
+    HPX_WITH_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS
+    SOURCE cmake/tests/cxx17_noexcept_function.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_mm_prefetch)
   add_hpx_config_test(HPX_WITH_MM_PREFETCH
     SOURCE cmake/tests/mm_prefetch.cpp

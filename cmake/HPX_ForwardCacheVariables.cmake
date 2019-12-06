@@ -33,11 +33,11 @@ foreach(_var IN LISTS cache_vars)
   file(APPEND ${_cache_var_file} "set(${_var} ${${_var}})\n")
 endforeach()
 file(INSTALL ${_cache_var_file}
-  DESTINATION ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY})
+  DESTINATION ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY})
 
 # Install the HPXCacheVariables.cmake in the INSTALL directory
 install(
-  FILES ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}CacheVariables.cmake
+  FILES ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}CacheVariables.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT cmake
   )

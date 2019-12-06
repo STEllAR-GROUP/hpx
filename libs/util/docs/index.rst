@@ -12,3 +12,5 @@ util
 ====
 
 The util module provides miscellaneous standalone utilities.
+
+See the :ref:`API reference <libs_util_api>` of the module for more details.

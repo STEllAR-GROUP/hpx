@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_COMPONENT_HEAP_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
 
 namespace hpx { namespace components {
     // This is a utility to ensure that there exists exactly one heap

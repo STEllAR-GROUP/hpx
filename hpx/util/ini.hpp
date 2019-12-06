@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util_fwd.hpp> // this needs to go first
 
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/functional/function.hpp>
 

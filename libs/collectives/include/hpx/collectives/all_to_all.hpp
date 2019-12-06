@@ -134,12 +134,13 @@ namespace hpx { namespace lcos {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/and_gate.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/local_lcos/and_gate.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -200,6 +201,7 @@ namespace hpx { namespace lcos {
 
                     {
                         std::unique_lock<mutex_type> l(mtx_);
+                        util::ignore_lock(&l);
                         data = data_;
                         std::swap(name, name_);
                     }

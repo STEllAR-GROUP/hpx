@@ -29,7 +29,7 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #endif
 
 #include <atomic>
@@ -39,6 +39,7 @@
 #include <stack>
 #include <string>
 #include <utility>
+#include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -242,7 +243,7 @@ namespace hpx { namespace threads {
 
     public:
         /// Return the id of the component this thread is running in
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         HPX_CXX14_CONSTEXPR
 #endif
         naming::address_type get_component_id() const noexcept
@@ -299,7 +300,7 @@ namespace hpx { namespace threads {
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
         /// Return the locality of the parent thread
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         HPX_CONSTEXPR
 #endif
         std::uint32_t get_parent_locality_id() const noexcept
@@ -308,7 +309,7 @@ namespace hpx { namespace threads {
         }
 
         /// Return the thread id of the parent thread
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         HPX_CONSTEXPR
 #endif
         thread_id_type get_parent_thread_id() const noexcept
@@ -317,7 +318,7 @@ namespace hpx { namespace threads {
         }
 
         /// Return the phase of the parent thread
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         HPX_CONSTEXPR
 #endif
         std::size_t get_parent_thread_phase() const noexcept
@@ -358,7 +359,7 @@ namespace hpx { namespace threads {
 #ifndef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         HPX_CONSTEXPR
 #endif
         char const* get_backtrace() const noexcept
@@ -370,7 +371,7 @@ namespace hpx { namespace threads {
             return nullptr;
         }
 #else
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         HPX_CONSTEXPR
 #endif
         util::backtrace const* get_backtrace() const noexcept
@@ -433,7 +434,7 @@ namespace hpx { namespace threads {
         }
 #endif
 
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION >= 70000)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         HPX_CXX14_CONSTEXPR
 #endif
         thread_priority get_priority() const noexcept
@@ -531,13 +532,15 @@ namespace hpx { namespace threads {
             thread_init_data& init_data, thread_state_enum newstate) = 0;
 
 #if defined(HPX_HAVE_APEX)
-        apex_task_wrapper get_apex_data() const noexcept
+        std::shared_ptr<util::external_timer::task_wrapper>
+            get_timer_data() const noexcept
         {
-            return apex_data_;
+            return timer_data_;
         }
-        void set_apex_data(apex_task_wrapper data) noexcept
+        void set_timer_data(
+            std::shared_ptr<util::external_timer::task_wrapper> data) noexcept
         {
-            apex_data_ = data;
+            timer_data_ = data;
         }
 #endif
 
@@ -598,12 +601,13 @@ namespace hpx { namespace threads {
 
     public:
 #if defined(HPX_HAVE_APEX)
-        apex_task_wrapper apex_data_;
+        std::shared_ptr<util::external_timer::task_wrapper> timer_data_;
 #endif
         bool is_stackless_;
     };
 
-    HPX_CONSTEXPR thread_data* get_thread_id_data(thread_id_type const& tid)
+    HPX_CXX14_CONSTEXPR inline thread_data* get_thread_id_data(
+        thread_id_type const& tid)
     {
         return static_cast<thread_data*>(tid.get());
     }

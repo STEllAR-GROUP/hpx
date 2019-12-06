@@ -7,6 +7,7 @@
 #include <hpx/util/command_line_handling.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/batch_environments.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/batch_environment.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
@@ -549,6 +549,55 @@ namespace hpx { namespace util
             check_networking_option(vm, "hpx:expect-connecting-localities");
 #endif
         }
+
+        bool detect_mpi_environment(util::runtime_configuration const& cfg,
+            char const* default_env)
+        {
+#if defined(__bgq__)
+            // If running on BG/Q, we can safely assume to always run in an
+            // MPI environment
+            return true;
+#else
+            std::string mpi_environment_strings = cfg.get_entry(
+                "hpx.parcel.mpi.env", default_env);
+
+            typedef
+                boost::tokenizer<boost::char_separator<char> >
+                tokenizer;
+            boost::char_separator<char> sep(";,: ");
+            tokenizer tokens(mpi_environment_strings, sep);
+            for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+            {
+                char *env = std::getenv(it->c_str());
+                if(env) return true;
+            }
+            return false;
+#endif
+        }
+
+        bool check_mpi_environment(runtime_configuration const& cfg)
+        {
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
+            if (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) == 0)
+                return false;
+
+            // We disable the MPI parcelport if the application is not run using
+            // mpirun and the tcp/ip parcelport is not explicitly disabled
+            //
+            // The bottom line is that we use the MPI parcelport either when the
+            // application was executed using mpirun or if the tcp/ip parcelport
+            // was disabled.
+            if (!detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV) &&
+                get_entry_as(cfg, "hpx.parcel.tcp.enable", 1))
+            {
+                return false;
+            }
+
+            return true;
+#else
+            return false;
+#endif
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -766,7 +815,10 @@ namespace hpx { namespace util
                  vm.count("hpx:ignore-batch-env")) == 0) &&
             !use_process_mask_;
 
-        util::batch_environment env(nodelist, rtcfg_, debug_clp, enable_batch_env);
+        bool have_mpi = detail::check_mpi_environment(rtcfg_);
+
+        util::batch_environment env(nodelist, have_mpi, debug_clp,
+            enable_batch_env);
 
 #if defined(HPX_HAVE_NETWORKING)
         if(!nodelist.empty())
@@ -1454,7 +1506,7 @@ namespace hpx { namespace util
 #if defined(HPX_HAVE_NETWORKING)
 #if defined(HPX_HAVE_PARCELPORT_MPI)
         // getting localities from MPI environment (support mpirun)
-        if (util::mpi_environment::check_mpi_environment(rtcfg_))
+        if (detail::check_mpi_environment(rtcfg_))
         {
             mpi_environment::init(&argc, &argv, *this);
             num_localities_ = static_cast<std::size_t>(mpi_environment::size());

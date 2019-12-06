@@ -10,8 +10,8 @@
 #define HPX_COMPUTE_TARGET_DISTRIBUTION_POLICY
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -93,7 +93,10 @@ namespace hpx { namespace compute { namespace detail {
         {
             std::lock_guard<mutex_type> l(mtx_);
             if (targets_.empty())
+            {
+                hpx::util::ignore_lock(&mtx_);
                 targets_ = Target::get_local_targets();
+            }
 
             std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
                 targets_.size() :

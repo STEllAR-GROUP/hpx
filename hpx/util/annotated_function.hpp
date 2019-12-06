@@ -19,10 +19,9 @@
 #include <hpx/util/thread_description.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
-#include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #elif defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #endif
 #endif
 
@@ -30,6 +29,7 @@
 #include <cstdint>
 #include <type_traits>
 #include <utility>
+#include <string>
 
 namespace hpx { namespace util
 {
@@ -80,9 +80,10 @@ namespace hpx { namespace util
                 nullptr)
         {
 #if defined(HPX_HAVE_APEX)
-            threads::set_self_apex_data(
-                apex_update_task(threads::get_self_apex_data(),
-                desc_));
+            /* update the task wrapper in APEX to use the specified name */
+            threads::set_self_timer_data(
+                external_timer::update_task(threads::get_self_timer_data(),
+                std::string(name)));
 #endif
         }
 
@@ -95,9 +96,8 @@ namespace hpx { namespace util
                 nullptr)
         {
 #if defined(HPX_HAVE_APEX)
-            threads::set_self_apex_data(
-                apex_update_task(threads::get_self_apex_data(),
-                desc_));
+            /* no need to update the task description in APEX, because
+             * this same description was used when the task was created. */
 #endif
         }
 

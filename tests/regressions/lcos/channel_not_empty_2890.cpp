@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/local/channel.hpp>
+#include <hpx/local_lcos/channel.hpp>
 #include <hpx/lcos/channel.hpp>
 #include <hpx/testing.hpp>
 

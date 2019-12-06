@@ -56,6 +56,9 @@ set(HPX_VERSION "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINO
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_VERSION_MAJOR})
 set(HPX_PACKAGE_NAME HPX)
+# To keep track of the hpx_root when other subprojects are declared
+set(HPX_SOURCE_DIR "${PROJECT_SOURCE_DIR}")
+set(HPX_BINARY_DIR "${PROJECT_BINARY_DIR}")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -654,7 +657,7 @@ if(HPX_WITH_APEX)
   hpx_option(HPX_WITH_APEX_NO_UPDATE BOOL
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling")
   hpx_option(HPX_WITH_APEX_TAG STRING
-    "APEX repository tag or branch" "v2.1.4" CATEGORY "Profiling")
+    "APEX repository tag or branch" "v2.1.6" CATEGORY "Profiling")
 endif()
 hpx_option(HPX_WITH_PAPI BOOL
   "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
@@ -680,7 +683,7 @@ if(HPX_WITH_HPXMP)
     hpx_option(HPX_WITH_HPXMP_NO_UPDATE BOOL
       "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP")
     hpx_option(HPX_WITH_HPXMP_TAG STRING
-      "hpxMP repository tag or branch" "v0.2.0" CATEGORY "OpenMP")
+      "hpxMP repository tag or branch" "v0.3.0" CATEGORY "OpenMP")
   else()
     hpx_warn("hpxMP can be used only when compiling with clang or gcc")
     set(HPX_WITH_HPXMP OFF)
@@ -780,7 +783,8 @@ if(HPX_WITH_NETWORKING)
   hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
     "Enable the ibverbs based parcelport. This is currently an experimental feature"
     OFF CATEGORY "Parcelport" ADVANCED)
-  if (NOT HPX_WITH_PARCELPORT_VERBS)
+  if (HPX_WITH_PARCELPORT_VERBS)
+    hpx_warn("The verbs parcelport is deprecated. Please use the MPI or libfabric parcelports instead.")
     hpx_add_config_define(HPX_HAVE_PARCELPORT_VERBS)
   endif()
 
@@ -1171,6 +1175,20 @@ if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
 endif()
 
 ################################################################################
+# Set configuration option to use Boost.Context or not. This depends on the
+# platform.
+set(__use_generic_coroutine_context OFF)
+if(APPLE)
+  set(__use_generic_coroutine_context ON)
+endif()
+if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  set(__use_generic_coroutine_context ON)
+endif()
+hpx_option(HPX_WITH_GENERIC_CONTEXT_COROUTINES BOOL
+  "Use Boost.Context as the underlying coroutines context switch implementation."
+  ${__use_generic_coroutine_context} ADVANCED)
+
+################################################################################
 # check for miscellaneous things
 ################################################################################
 
@@ -1233,8 +1251,6 @@ endif()
 
 if(WIN32)
   if(MSVC)
-    enable_language(ASM_MASM)
-
     hpx_add_target_compile_option(-Ox PUBLIC CONFIGURATIONS Release)
 
     # even VS2017 has an ICE when compiling with -Ob2
@@ -1562,20 +1578,6 @@ endif()
 # store target architecture for later use
 set(HPX_WITH_TARGET_ARCHITECTURE ${__target_arch} CACHE INTERNAL "" FORCE)
 
-################################################################################
-# Set configuration option to use Boost.Context or not. This depends on the
-# platform.
-set(__use_generic_coroutine_context OFF)
-if(APPLE)
-  set(__use_generic_coroutine_context ON)
-endif()
-if(HPX_PLATFORM_UC STREQUAL "BLUEGENEQ")
-  set(__use_generic_coroutine_context ON)
-endif()
-hpx_option(HPX_WITH_GENERIC_CONTEXT_COROUTINES BOOL
-  "Use Boost.Context as the underlying coroutines context switch implementation."
-  ${__use_generic_coroutine_context} ADVANCED)
-
 # Compatibility with using Boost.ProgramOptions, introduced in V1.4.0
 hpx_option(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
   BOOL "Enable Boost.ProgramOptions compatibility. (default: ON)"
@@ -1670,7 +1672,7 @@ if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   set(HPX_BUILD_PREFIX "lib")
 else()
   set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}")
-  set(HPX_BUILD_PREFIX "${CMAKE_BINARY_DIR}")
+  set(HPX_BUILD_PREFIX "${PROJECT_BINARY_DIR}")
 endif()
 
 
@@ -1811,14 +1813,14 @@ endif()
 
 # Configure hpxrun.py
 configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
-               "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+               "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
                @ONLY)
 
 ################################################################################
 # installation instructions
 ################################################################################
 install(
-  FILES "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+  FILES "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
   DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT core
   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
@@ -1837,7 +1839,7 @@ install( # install all hpx header files
 # Install all HPX header that have been configured using various
 # cmake options
 install(
-  DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/"
+  DIRECTORY "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/"
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
@@ -1866,21 +1868,21 @@ install( # Install HPX Python scripts
 #   if(UNIX)
 #     file(GLOB scripts "${PROJECT_SOURCE_DIR}/python/scripts/*.py")
 #     execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory
-#       "${CMAKE_BINARY_DIR}/python/scripts" )
+#       "${PROJECT_BINARY_DIR}/python/scripts" )
 #     foreach(script ${scripts})
 #       get_filename_component(script_name ${script} NAME)
 #       get_filename_component(script_name_we ${script} NAME_WE)
 #
-#       #make copy, so that we have intact symlink in CMAKE_BINARY_DIR
+#       #make copy, so that we have intact symlink in PROJECT_BINARY_DIR
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
-#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/python/scripts")
 #
 #       execute_process(
 #         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
-#   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python/scripts")
+#   WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/python/scripts")
 #
-#       install(FILES "${CMAKE_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
+#       install(FILES "${PROJECT_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
 #     endforeach()
 #   endif()
 #
@@ -1891,13 +1893,13 @@ install( # Install HPX Python scripts
 #     FILES_MATCHING PATTERN "*.py"
 #     PATTERN ".git" EXCLUDE)
 #
-#   execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/python" )
-#   #make symlink, so that we have intact hpx symlink in CMAKE_BINARY_DIR
+#   execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${PROJECT_BINARY_DIR}/python" )
+#   #make symlink, so that we have intact hpx symlink in PROJECT_BINARY_DIR
 #   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/python/hpx"
-#     "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
+#     "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/python")
 #   # create a symlink in share pointing to the latest HPX installation
-#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/python")
-#   install(DIRECTORY "${CMAKE_BINARY_DIR}/python/hpx" DESTINATION "${CMAKE_INSTALL_DATADIR}")
+#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/python")
+#   install(DIRECTORY "${PROJECT_BINARY_DIR}/python/hpx" DESTINATION "${CMAKE_INSTALL_DATADIR}")
 
 if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
@@ -1922,7 +1924,7 @@ if(HPX_WITH_DOCUMENTATION)
 
   if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     install(
-      DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/html/"
+      DIRECTORY "${PROJECT_BINARY_DIR}/share/hpx/docs/html/"
       DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/html
       COMPONENT docs
       PATTERN "*.buildinfo" EXCLUDE)
@@ -1930,7 +1932,7 @@ if(HPX_WITH_DOCUMENTATION)
 
   if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     install(
-      DIRECTORY "${CMAKE_BINARY_DIR}/share/hpx/docs/singlehtml/"
+      DIRECTORY "${PROJECT_BINARY_DIR}/share/hpx/docs/singlehtml/"
       DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/singlehtml
       COMPONENT docs
       PATTERN "*.buildinfo" EXCLUDE)
@@ -1938,23 +1940,23 @@ if(HPX_WITH_DOCUMENTATION)
 
   if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     install(
-      FILES "${CMAKE_BINARY_DIR}/share/hpx/docs/latexpdf/latex/HPX.pdf"
+      FILES "${PROJECT_BINARY_DIR}/share/hpx/docs/latexpdf/latex/HPX.pdf"
       DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/pdf/
       COMPONENT docs)
   endif()
 
   if("man" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     install(
-      FILES "${CMAKE_BINARY_DIR}/share/hpx/docs/man/hpx.1"
+      FILES "${PROJECT_BINARY_DIR}/share/hpx/docs/man/hpx.1"
       DESTINATION ${CMAKE_INSTALL_MANDIR}/
       COMPONENT docs)
   endif()
 endif()
 
 if(HPX_WITH_VIM_YCM)
-  set(build_dir_file ${CMAKE_BINARY_DIR}/.ycm_extra_conf.py)
-  set(source_dir_file ${CMAKE_SOURCE_DIR}/.ycm_extra_conf.py)
-  configure_file(${CMAKE_SOURCE_DIR}/tools/vim/.ycm_extra_conf.py
+  set(build_dir_file ${PROJECT_BINARY_DIR}/.ycm_extra_conf.py)
+  set(source_dir_file ${PROJECT_SOURCE_DIR}/.ycm_extra_conf.py)
+  configure_file(${PROJECT_SOURCE_DIR}/tools/vim/.ycm_extra_conf.py
                ${build_dir_file} @ONLY)
   add_custom_target(
     configure_ycm
@@ -1962,7 +1964,7 @@ if(HPX_WITH_VIM_YCM)
     COMMENT "Copying YCM config file to source directory"
     VERBATIM
   )
-  hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${CMAKE_SOURCE_DIR}/*']\"")
+  hpx_info("VIM YouCompleteMe: run 'make configure_ycm' to copy config file to source directory and enable support in YCM. To enable automatic loading of configure file, add to your .vimrc option: \"let g:ycm_extra_conf_globlist = ['${PROJECT_SOURCE_DIR}/*']\"")
 endif()
 
 ################################################################################
@@ -1980,12 +1982,7 @@ endif()
 ################################################################################
 # print overall configuration summary
 include(HPX_PrintSummary)
-create_configuration_summary("Configuration summary:" "hpx")
-
-foreach(_module ${HPX_LIBS})
-  create_configuration_summary(
-    "Module configuration summary (${_module}):" "${_module}")
-endforeach()
+create_configuration_summary("Configuration summary:\n--" "hpx")
 
 include(HPX_ExportTargets)
 # Modules can't link to this if not exported

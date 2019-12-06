@@ -31,7 +31,7 @@ if (HPX_WITH_PARCELPORT_VERBS)
       hpx::verbs
       hpx::boost
     INCLUDE_DIRS
-      ${CMAKE_BINARY_DIR}
+      ${PROJECT_BINARY_DIR}
       ${PROJECT_SOURCE_DIR}
     FOLDER
       "Core/Plugins/Parcelport/verbs")

@@ -25,7 +25,7 @@ using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 
-using hpx::applier::register_thread_nullary;
+using hpx::threads::register_thread_nullary;
 
 using hpx::lcos::future;
 using hpx::async;

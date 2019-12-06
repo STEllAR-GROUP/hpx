@@ -14,7 +14,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -76,11 +76,9 @@ namespace hpx { namespace threads { namespace policies {
         {
             init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
-                std::size_t numa_sensitive = 0,
                 thread_queue_init_parameters thread_queue_init = {},
                 char const* description = "local_queue_scheduler")
               : num_queues_(num_queues)
-              , numa_sensitive_(numa_sensitive)
               , thread_queue_init_(thread_queue_init)
               , affinity_data_(affinity_data)
               , description_(description)
@@ -91,7 +89,6 @@ namespace hpx { namespace threads { namespace policies {
                 detail::affinity_data const& affinity_data,
                 char const* description)
               : num_queues_(num_queues)
-              , numa_sensitive_(false)
               , thread_queue_init_()
               , affinity_data_(affinity_data)
               , description_(description)
@@ -99,7 +96,6 @@ namespace hpx { namespace threads { namespace policies {
             }
 
             std::size_t num_queues_;
-            std::size_t numa_sensitive_;
             thread_queue_init_parameters thread_queue_init_;
             detail::affinity_data const& affinity_data_;
             char const* description_;
@@ -112,7 +108,6 @@ namespace hpx { namespace threads { namespace policies {
                 init.num_queues_, init.description_, init.thread_queue_init_)
           , queues_(init.num_queues_)
           , curr_queue_(0)
-          , numa_sensitive_(init.numa_sensitive_)
           , affinity_data_(init.affinity_data_)
           ,
 #ifndef HPX_NATIVE_MIC    // we know that the MIC has one NUMA domain only
@@ -141,15 +136,6 @@ namespace hpx { namespace threads { namespace policies {
         {
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 delete queues_[i];
-        }
-
-        bool numa_sensitive() const override
-        {
-            return numa_sensitive_ != 0;
-        }
-        virtual bool has_thread_stealing(std::size_t num_thread) const override
-        {
-            return true;
         }
 
         static std::string get_scheduler_name()
@@ -370,7 +356,8 @@ namespace hpx { namespace threads { namespace policies {
                 return false;
             }
 
-            if (numa_sensitive_ != 0)
+            bool numa_stealing = has_work_stealing_numa();
+            if (!numa_stealing)
             {
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
@@ -442,7 +429,7 @@ namespace hpx { namespace threads { namespace policies {
 #endif
             }
 
-            else    // not NUMA-sensitive
+            else    // not NUMA-sensitive - numa stealing ok
             {
                 for (std::size_t i = 1; i != queues_size; ++i)
                 {
@@ -721,8 +708,9 @@ namespace hpx { namespace threads { namespace policies {
                 return true;
             }
 
-            if (numa_sensitive_ !=
-                0)    // limited or no stealing across domains
+            bool numa_stealing_ = has_work_stealing_numa();
+            // limited or no stealing across domains
+            if (!numa_stealing_)
             {
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
@@ -797,7 +785,7 @@ namespace hpx { namespace threads { namespace policies {
 #endif
             }
 
-            else    // not NUMA-sensitive
+            else    // not NUMA-sensitive : numa stealing ok
             {
                 for (std::size_t i = 1; i != queues_size; ++i)
                 {
@@ -894,7 +882,8 @@ namespace hpx { namespace threads { namespace policies {
             else
                 first_mask = core_mask;
 
-            if (numa_sensitive_ != 2 && any(first_mask & core_mask))
+            bool numa_stealing = has_work_stealing_numa();
+            if (numa_stealing && any(first_mask & core_mask))
             {
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
                 set(steals_outside_numa_domain_, num_pu);
@@ -918,7 +907,6 @@ namespace hpx { namespace threads { namespace policies {
     protected:
         std::vector<thread_queue_type*> queues_;
         std::atomic<std::size_t> curr_queue_;
-        std::size_t numa_sensitive_;
 
         detail::affinity_data const& affinity_data_;
 

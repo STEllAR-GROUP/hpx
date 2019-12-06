@@ -10,6 +10,7 @@
 #include <hpx/concurrency/thread_name.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/static_reinit/static_reinit.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -35,7 +36,6 @@
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/query_counters.hpp>
-#include <hpx/util/static_reinit.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
 

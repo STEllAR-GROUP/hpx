@@ -7,10 +7,6 @@
 
 include(HPX_AddLibrary)
 
-if (TARGET hpx::apex)
-  set(EXTRA_DEPENDENCIES hpx::apex)
-endif()
-
 ################################################################################
 # Decide whether to use the MPI based parcelport
 ################################################################################
@@ -50,7 +46,6 @@ if(HPX_WITH_PARCELPORT_MPI)
       hpx_util
       hpx::boost
       hpx::mpi
-      ${EXTRA_DEPENDENCIES}
     INCLUDE_DIRS
       ${PROJECT_SOURCE_DIR}
     FOLDER

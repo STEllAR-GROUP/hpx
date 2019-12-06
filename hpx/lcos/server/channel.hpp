@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/lcos/local/channel.hpp>
+#include <hpx/local_lcos/channel.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

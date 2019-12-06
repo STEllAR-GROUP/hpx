@@ -53,6 +53,7 @@ add_hpx_module(collectives
       hpx/collectives/detail/barrier_node.hpp
       hpx/collectives/detail/latch.hpp
     DEPENDENCIES
+      hpx_affinity
       hpx_allocator_support
       hpx_assertion
       hpx_cache
@@ -67,12 +68,13 @@ add_hpx_module(collectives
       hpx_hardware
       hpx_hashing
       hpx_iterator_support
+      hpx_local_lcos
       hpx_logging
       hpx_memory
-      hpx_plugin
       hpx_preprocessor
       hpx_program_options
       hpx_serialization
+      hpx_synchronization
       hpx_timing
       hpx_thread_support
       hpx_threadmanager
@@ -82,11 +84,7 @@ add_hpx_module(collectives
     CMAKE_SUBDIRS examples tests
 )
 
-# Temporary : this module is currently depending on main headers which
-# themselves include apex. In the future, those main headers would be in a
-# module that link to apex, and we'd be able to remove this.
-if (TARGET hpx::apex)
-  target_link_libraries(hpx_collectives PRIVATE hpx::apex)
-  get_target_property(_apex_inc_dir hpx::apex INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx_collectives INTERFACE "${_apex_inc_dir}")
-endif()
+# Temporary since the module still depends on some runtime files
+target_link_libraries(hpx_collectives PUBLIC
+  hpx_static_reinit
+  )

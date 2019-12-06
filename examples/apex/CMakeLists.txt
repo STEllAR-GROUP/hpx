@@ -13,13 +13,9 @@ set(example_programs
     apex_fibonacci
    )
 
-set(apex_policy_engine_periodic_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apex_policy_engine_events_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apex_policy_engine_active_thread_coutn_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apex_balance_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apex_fibonacci_PARAMETERS THREADS_PER_LOCALITY 4)
-
 foreach(example_program ${example_programs})
+  set(${example_program}_PARAMETERS THREADS_PER_LOCALITY 4)
+
   set(sources
       ${example_program}.cpp)
 
@@ -38,3 +34,4 @@ foreach(example_program ${example_programs})
   endif()
 
 endforeach()
+
