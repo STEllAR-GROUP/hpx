@@ -119,13 +119,13 @@ namespace hpx { namespace threads {
         hpx::traits::is_threads_executor<Executor>::value &&
         std::is_same<typename hpx::util::decay<Hint>::type,
             hpx::threads::thread_schedule_hint>::value>::type
-    post(Executor&& exec, F&& f, Hint&& hint, const char *annotation, Ts&&... ts)
+    post(
+        Executor&& exec, F&& f, Hint&& hint, const char* annotation, Ts&&... ts)
     {
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-            annotation,
-            threads::pending, true,
-            exec.get_stacksize(), std::forward<Hint>(hint), throws);
+            annotation, threads::pending, true, exec.get_stacksize(),
+            std::forward<Hint>(hint), throws);
     }
 
     ///////////////////////////////////////////////////////////////////////////
