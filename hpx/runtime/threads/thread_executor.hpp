@@ -430,23 +430,7 @@ namespace hpx { namespace threads
             return static_cast<detail::scheduled_executor_base*>
                     (executor_data_.get())->get_stacksize();
         }
-
-        /// Return a reference to the default executor for this process.
-        static scheduled_executor& default_executor();
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Returns: the default executor defined by the
-    /// active process. If set_default_executor hasn't been called then the
-    /// return value is a pointer to an executor of unspecified type.
-    HPX_EXPORT scheduled_executor default_executor();
-
-    /// Effect: the default executor of the active process is set to the given
-    /// executor instance.
-    /// Requires: executor shall not be null.
-    /// Synchronization: Changing and using the default executor is sequentially
-    /// consistent.
-    HPX_EXPORT void set_default_executor(scheduled_executor executor);
 }}
 
 #include <hpx/config/warnings_suffix.hpp>

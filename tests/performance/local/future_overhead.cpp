@@ -94,10 +94,6 @@ const char* ExecName(const hpx::parallel::execution::parallel_executor& exec)
 {
     return "parallel_executor";
 }
-const char* ExecName(const hpx::parallel::execution::default_executor& exec)
-{
-    return "default_executor";
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
@@ -493,7 +489,7 @@ void measure_function_futures_apply_hierarchical_placement(
         auto const hint =
             hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
         auto spawn_func = [&func, hint, t, count, num_threads]() {
-            auto exec = hpx::threads::executors::default_executor(hint);
+            auto exec = hpx::parallel::execution::parallel_executor(hint);
             std::uint64_t const count_start = t * count / num_threads;
             std::uint64_t const count_end = (t + 1) * count / num_threads;
 
@@ -503,14 +499,14 @@ void measure_function_futures_apply_hierarchical_placement(
             }
         };
 
-        auto exec = hpx::threads::executors::default_executor(hint);
+        auto exec = hpx::parallel::execution::parallel_executor(hint);
         hpx::apply(exec, spawn_func);
     }
     l.wait();
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("apply_hierarchical", "latch", "default_executor", count,
+    print_stats("apply_hierarchical", "latch", "parallel_executor", count,
         duration, csv);
 }
 
@@ -541,7 +537,6 @@ int hpx_main(variables_map& vm)
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        hpx::parallel::execution::default_executor def;
         hpx::parallel::execution::parallel_executor par;
 
         for (int i = 0; i < repetitions; i++)
@@ -554,13 +549,9 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_limiting_executor(count, csv, def);
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
-                measure_function_futures_wait_each(count, csv, def);
                 measure_function_futures_wait_each(count, csv, par);
-                measure_function_futures_wait_all(count, csv, def);
                 measure_function_futures_wait_all(count, csv, par);
-                measure_function_futures_thread_count(count, csv, def);
                 measure_function_futures_thread_count(count, csv, par);
-                measure_function_futures_sliding_semaphore(count, csv, def);
                 measure_function_futures_sliding_semaphore(count, csv, par);
                 measure_function_futures_for_loop(count, csv);
                 measure_function_futures_register_work(count, csv);
