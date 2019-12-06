@@ -50,6 +50,5 @@ add_hpx_module(type_support
   DEPENDENCIES
     hpx_assertion
     hpx_config
-    hpx_concepts
   CMAKE_SUBDIRS examples tests
 )
