@@ -134,17 +134,19 @@ namespace hpx { namespace threads { namespace policies {
               , num_thread_(static_cast<std::uint16_t>(-1))
               , attempt_(0)
               , state_(state::failed)
+              , stealhalf_(false)
             {
             }
 
             steal_request(std::size_t num_thread,
                 lcos::local::channel_spsc<task_data>* channel,
-                mask_cref_type victims, bool idle)
+                mask_cref_type victims, bool idle, bool stealhalf)
               : channel_(channel)
               , victims_(victims)
               , num_thread_(static_cast<std::uint16_t>(num_thread))
               , attempt_(0)
               , state_(idle ? state::idle : state::working)
+              , stealhalf_(stealhalf)
             {
             }
 
@@ -153,6 +155,7 @@ namespace hpx { namespace threads { namespace policies {
             std::uint16_t num_thread_;
             std::uint16_t attempt_;
             state state_;
+            bool stealhalf_;    // true ? attempt steal-half : attempt steal-one
         };
 
         ////////////////////////////////////////////////////////////////////////
@@ -167,7 +170,11 @@ namespace hpx { namespace threads { namespace policies {
               , victims_()
               , queue_(nullptr)
               , high_priority_queue_(nullptr)
-              , requests_(nullptr)
+              , requests_()
+              , tasks_()
+              , stealhalf_(false)
+              , num_recent_steals_(0)
+              , num_recent_tasks_executed_(0)
               , steal_requests_sent_(0)
               , steal_requests_received_(0)
               , steal_requests_discarded_(0)
@@ -175,6 +182,11 @@ namespace hpx { namespace threads { namespace policies {
             }
 
             ~scheduler_data() = default;
+
+            // interval at which we re-decide on whether we should steal just
+            // one task or half of what's available
+            constexpr static std::uint32_t const num_steal_adaptive_interval_ =
+                25;
 
             void init(std::size_t num_thread, std::size_t size,
                 thread_queue_init_parameters const& queue_init,
@@ -223,6 +235,11 @@ namespace hpx { namespace threads { namespace policies {
 
             // one channel per steal request per core
             std::unique_ptr<lcos::local::channel_spsc<task_data>> tasks_;
+
+            // adaptive stealing
+            bool stealhalf_;
+            std::uint32_t num_recent_steals_;
+            std::uint32_t num_recent_tasks_executed_;
 
             std::uint32_t steal_requests_sent_;
             std::uint32_t steal_requests_received_;
@@ -731,11 +748,15 @@ namespace hpx { namespace threads { namespace policies {
                 return false;
             }
 
-            // Send at max HPX_MAX_STOLEN_TASKS from our queue to the requesting
-            // core, but not more than half of the available tasks.
-            std::size_t max_num_to_steal =
-                d.queue_->get_pending_queue_length(std::memory_order_relaxed) /
-                2;
+            // Send tasks from our queue to the requesting core, depending on
+            // what's requested, either one of half of the available tasks
+            std::size_t max_num_to_steal = 1;
+            if (req.stealhalf_)
+            {
+                max_num_to_steal = d.queue_->get_pending_queue_length(
+                                       std::memory_order_relaxed) /
+                    2;
+            }
 
             if (max_num_to_steal != 0)
             {
@@ -787,6 +808,7 @@ namespace hpx { namespace threads { namespace policies {
                 d.high_priority_queue_->increment_num_pending_accesses();
                 if (result)
                 {
+                    ++d.num_recent_tasks_executed_;
                     return true;
                 }
                 d.high_priority_queue_->increment_num_pending_misses();
@@ -807,6 +829,8 @@ namespace hpx { namespace threads { namespace policies {
                     if (!handle_steal_request(d, req))
                         break;
                 }
+
+                ++d.num_recent_tasks_executed_;
                 return true;
             }
             d.queue_->increment_num_pending_misses();
@@ -819,7 +843,13 @@ namespace hpx { namespace threads { namespace policies {
                 return false;
             }
 
-            return low_priority_queue_.get_next_thread(thrd);
+            if (low_priority_queue_.get_next_thread(thrd))
+            {
+                ++d.num_recent_tasks_executed_;
+                return true;
+            }
+
+            return false;
         }
 
         // Schedule the passed thread
@@ -1317,8 +1347,33 @@ namespace hpx { namespace threads { namespace policies {
         {
             if (d.requested_ == 0)
             {
-                steal_request req(
-                    d.num_thread_, d.tasks_.get(), d.victims_, idle);
+                // Estimate work-stealing efficiency during the last interval;
+                // switch strategies if the value is below a threshold
+                if (d.num_recent_steals_ >= d.num_steal_adaptive_interval_)
+                {
+                    double ratio =
+                        static_cast<double>(d.num_recent_tasks_executed_) /
+                        d.num_steal_adaptive_interval_;
+
+                    if (ratio >= 2.)
+                    {
+                        d.stealhalf_ = true;
+                    }
+                    else if (d.stealhalf_)
+                    {
+                        d.stealhalf_ = false;
+                    }
+                    else if (ratio <= 1.)
+                    {
+                        d.stealhalf_ = true;
+                    }
+
+                    d.num_recent_steals_ = 0;
+                    d.num_recent_tasks_executed_ = 0;
+                }
+
+                steal_request req(d.num_thread_, d.tasks_.get(), d.victims_,
+                    idle, d.stealhalf_);
                 std::size_t victim = next_victim(d, req);
 
                 ++d.requested_;
@@ -1365,6 +1420,7 @@ namespace hpx { namespace threads { namespace policies {
                     {
                         // directly return the last thread as it should be run
                         // immediately
+                        ++d.num_recent_tasks_executed_;
                         *next_thrd = thrds.tasks_.back();
                     }
                     else
@@ -1374,6 +1430,7 @@ namespace hpx { namespace threads { namespace policies {
                         ++added;
                     }
 
+                    ++d.num_recent_steals_;
                     return true;
                 }
             }

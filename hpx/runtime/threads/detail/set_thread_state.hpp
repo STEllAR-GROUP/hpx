@@ -103,10 +103,10 @@ namespace hpx { namespace threads { namespace detail
 
         // we know that the id is actually the pointer to the thread
         if (!thrd) {
+            // this thread has already been terminated
             if (&ec != &throws)
                 ec = make_success_code();
             return thread_state(terminated, wait_unknown);
-            // this thread has already been terminated
         }
 
         thread_state previous_state;

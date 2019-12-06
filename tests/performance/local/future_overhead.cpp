@@ -279,7 +279,7 @@ void measure_function_futures_limiting_executor(
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(
-            hpx::parallel::execution::par.with(fixed), 0, std::uint64_t(count), 
+            hpx::parallel::execution::par.with(fixed), 0, std::uint64_t(count),
             [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
@@ -454,9 +454,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
             for (std::uint64_t i = count_start; i < count_end; ++i)
             {
                 hpx::threads::thread_init_data init(
-                    hpx::threads::thread_function_type(thread_func), desc,
-                    hpx::threads::thread_priority_normal, hint, stack_size,
-                    sched);
+                    hpx::threads::thread_function_type(thread_func), desc, prio,
+                    hint, stack_size, sched);
                 sched->create_thread(
                     init, nullptr, hpx::threads::pending, false, ec);
             }
@@ -467,7 +466,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
 
         hpx::threads::thread_init_data init(
             hpx::threads::thread_function_type(thread_spawn_func), desc,
-            hpx::threads::thread_priority_normal, hint, stack_size, sched);
+            prio, hint, stack_size, sched);
         sched->create_thread(init, nullptr, hpx::threads::pending, false, ec);
     }
     l.wait();

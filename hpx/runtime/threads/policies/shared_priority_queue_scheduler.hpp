@@ -183,7 +183,7 @@ namespace hpx { namespace threads { namespace policies {
                     HPX_ASSERT(num_workers_ != 0);
                 }
 
-                virtual ~shared_priority_queue_scheduler() {}
+                ~shared_priority_queue_scheduler() override = default;
 
                 static std::string get_scheduler_name()
                 {
@@ -623,7 +623,7 @@ namespace hpx { namespace threads { namespace policies {
                 }
 
                 /// Return the next thread to be executed, return false if none available
-                virtual bool get_next_thread(std::size_t thread_num,
+                bool get_next_thread(std::size_t thread_num,
                     bool running, threads::thread_data*& thrd,
                     bool enable_stealing) override
                 {
@@ -682,9 +682,10 @@ namespace hpx { namespace threads { namespace policies {
                 }
 
                 /// Return the next thread to be executed, return false if none available
-                virtual bool wait_or_add_new(std::size_t thread_num,
-                    bool running, std::int64_t& idle_loop_count,
-                    bool /*enable_stealing*/, std::size_t& added) override
+                bool wait_or_add_new(std::size_t thread_num, bool running,
+                    std::int64_t& idle_loop_count, bool /*enable_stealing*/,
+                    std::size_t& added,
+                    thread_data** next_thrd = nullptr) override
                 {
                     int this_thread = local_thread_number();
                     HPX_ASSERT(
