@@ -51,10 +51,12 @@ namespace hpx { namespace threads {
         typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
             result_type;
 
+        char const* annotation = hpx::traits::get_function_annotation<
+            typename hpx::util::decay<F>::type>::call(f);
         lcos::local::futures_factory<result_type()> p(
             std::forward<Executor>(exec),
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
-        p.apply(hpx::traits::get_function_annotation<typename hpx::util::decay<F>::type>::call(f));
+        p.apply(annotation);
         return p.get_future();
     }
 
@@ -103,11 +105,12 @@ namespace hpx { namespace threads {
         hpx::traits::is_threads_executor<Executor>::value>::type
     post(Executor&& exec, F&& f, Ts&&... ts)
     {
+        char const* annotation = hpx::traits::get_function_annotation<
+            typename hpx::util::decay<F>::type>::call(f);
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-            hpx::traits::get_function_annotation<typename hpx::util::decay<F>::type>::call(f),
-                    threads::pending, true,
-            exec.get_stacksize(), threads::thread_schedule_hint(), throws);
+            annotation, threads::pending, true, exec.get_stacksize(),
+            threads::thread_schedule_hint(), throws);
     }
     ///////////////////////////////////////////////////////////////////////////
     // post()
