@@ -235,6 +235,7 @@ namespace hpx { namespace debug {
         }
     };
 
+#ifdef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
     namespace detail {
         // ------------------------------------------------------------------
         // helper class for printing thread ID, either std:: or hpx::
@@ -332,6 +333,7 @@ namespace hpx { namespace debug {
             display("<TIM> ", std::forward<Args>(args)...);
         }
     }    // namespace detail
+#endif
 
     template <typename T>
     struct init
@@ -386,16 +388,31 @@ namespace hpx { namespace debug {
         friend std::ostream& operator<<(
             std::ostream& os, const timed_init<Args...>& ti)
         {
+#ifdef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
             detail::tuple_print(os, ti.message_);
+#endif
             return os;
         }
     };
 
+    // if fold expressions are not available, all output is disabled
+#ifndef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
+    template <bool>
+    struct enable_print;
+
+    struct disable_print
+    {
+        constexpr disable_print(const char* p) {}
+#else
+    template <bool enable>
+    struct enable_print;
+
     // when false, debug statements should produce no code
-    template <bool enable = false>
-    struct enable_print
+    template <>
+    struct enable_print<false>
     {
         constexpr enable_print(const char* p) {}
+#endif
 
         constexpr bool is_enabled()
         {
@@ -406,18 +423,22 @@ namespace hpx { namespace debug {
         inline constexpr void debug(Args... args)
         {
         }
+
         template <typename... Args>
         inline constexpr void warning(Args... args)
         {
         }
+
         template <typename... Args>
         inline constexpr void error(Args... args)
         {
         }
+
         template <typename... Args>
         inline constexpr void timed(Args... args)
         {
         }
+
         template <typename T>
         inline constexpr void array(
             const std::string& name, const std::vector<T>& v)
@@ -443,6 +464,27 @@ namespace hpx { namespace debug {
             return 0;
         }
     };
+
+#ifndef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
+
+    template <>
+    struct enable_print<false> : public disable_print
+    {
+        constexpr enable_print(const char* p)
+          : disable_print(p)
+        {
+        }
+    };
+
+    template <>
+    struct enable_print<true> : public disable_print
+    {
+        constexpr enable_print(const char* p)
+          : disable_print(p)
+        {
+        }
+    };
+#else
 
     // when true, debug statements produce valid output
     template <>
@@ -531,7 +573,7 @@ namespace hpx { namespace debug {
             return timed_init<Args...>(delay, args...);
         }
     };
-
+#endif
 }}    // namespace hpx::debug
 
 #endif
