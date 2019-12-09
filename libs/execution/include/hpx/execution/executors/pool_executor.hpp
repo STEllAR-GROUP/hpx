@@ -10,16 +10,53 @@
 #define HPX_PARALLEL_EXECUTORS_POOL_EXECUTOR_FEB_17_2018_0327PM
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution/executors/thread_execution.hpp>
-#include <hpx/execution/executors/thread_execution_information.hpp>
-#include <hpx/execution/executors/thread_timed_execution.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/parallel/executors/thread_pool_executor.hpp>
+
+// TODO: Move this file elsewhere or remove these dependencies
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/threadmanager.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
-    using pool_executor = threads::executors::pool_executor;
+    class HPX_EXPORT pool_executor : public thread_pool_executor
+    {
+    public:
+        pool_executor(std::string const& pool_name,
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default)
+          : thread_pool_executor(
+                &threads::get_thread_manager().get_pool(pool_name),
+                threads::thread_priority_default, stacksize)
+        {
+        }
+
+        pool_executor(std::string const& pool_name,
+            threads::thread_priority priority,
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default)
+          : thread_pool_executor(
+                &hpx::threads::get_thread_manager().get_pool(pool_name),
+                priority, stacksize)
+        {
+        }
+    };
+
+    /// \cond NOINTERNAL
+    template <>
+    struct is_one_way_executor<pool_executor> : std::true_type
+    {
+    };
+
+    template <>
+    struct is_two_way_executor<pool_executor> : std::true_type
+    {
+    };
+
+    template <>
+    struct is_bulk_two_way_executor<pool_executor> : std::true_type
+    {
+    };
+    /// \endcond
 }}}    // namespace hpx::parallel::execution
 
 #endif
