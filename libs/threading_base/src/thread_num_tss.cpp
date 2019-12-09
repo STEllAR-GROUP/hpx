@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 
 #include <cstddef>
@@ -55,3 +57,15 @@ namespace hpx { namespace threads { namespace detail {
     }
 
 }}}    // namespace hpx::threads::detail
+
+namespace hpx {
+    std::size_t get_worker_thread_num(error_code& ec)
+    {
+        return threads::detail::get_thread_num_tss();
+    }
+
+    std::size_t get_worker_thread_num()
+    {
+        return get_worker_thread_num(throws);
+    }
+}    // namespace hpx

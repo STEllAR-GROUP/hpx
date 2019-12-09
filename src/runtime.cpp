@@ -1256,16 +1256,6 @@ namespace hpx
             threads::detail::current_concurrency, ec);
     }
 
-    std::size_t get_worker_thread_num()
-    {
-        return get_worker_thread_num(throws);
-    }
-
-    std::size_t get_worker_thread_num(error_code& ec)
-    {
-        return threads::detail::get_thread_num_tss();
-    }
-
     std::size_t get_num_worker_threads()
     {
         runtime* rt = get_runtime_ptr();
