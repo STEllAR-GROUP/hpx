@@ -128,7 +128,8 @@ set(timed_futures_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 
-if(HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
+if((HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
+    AND HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
   set(example_programs ${example_programs}
       fractals_executor
      )
