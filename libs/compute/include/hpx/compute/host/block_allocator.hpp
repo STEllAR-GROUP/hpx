@@ -20,9 +20,9 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/execution/executors/thread_pool_attached_executors.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
-#include <hpx/runtime/threads/executors/thread_pool_attached_executors.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/functional/new.hpp>
 
@@ -50,7 +50,7 @@ namespace hpx { namespace compute { namespace host {
     ///
     template <typename T,
         typename Executor =
-            hpx::parallel::execution::local_priority_queue_attached_executor>
+            hpx::parallel::execution::restricted_thread_pool_executor>
     struct block_allocator
     {
         typedef T value_type;

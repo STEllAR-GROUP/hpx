@@ -35,9 +35,8 @@ namespace hpx { namespace compute { namespace host {
     /// It will distribute work evenly across the passed targets
     ///
     /// \tparam Executor The underlying executor to use
-    template <
-        typename Executor =
-            hpx::threads::executors::local_priority_queue_attached_executor>
+    template <typename Executor =
+                  hpx::parallel::execution::restricted_thread_pool_executor>
     struct block_executor
     {
     public:
