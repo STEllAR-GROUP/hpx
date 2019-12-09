@@ -8,5 +8,7 @@
 #define HPX_PARALLEL_EXECUTORS_MAY_11_2015_0622PM
 
 #include <hpx/execution/executors.hpp>
+// Added here to avoid a circular dependency
+#include <hpx/parallel/executors/thread_timed_execution.hpp>
 
 #endif
