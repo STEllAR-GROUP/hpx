@@ -17,8 +17,11 @@ set(tests
     suspend_thread_timed
 )
 
-set(cross_pool_injection_PARAMETERS THREADS_PER_LOCALITY all)
-set(scheduler_priority_check_PARAMETERS THREADS_PER_LOCALITY all)
+# NB. threads = -2 = threads = 'cores'
+# NB. threads = -1 = threads = 'all'
+
+set(cross_pool_injection_PARAMETERS THREADS_PER_LOCALITY -1)
+set(scheduler_priority_check_PARAMETERS THREADS_PER_LOCALITY -1)
 set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_disabled_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_pool_PARAMETERS THREADS_PER_LOCALITY 4)
