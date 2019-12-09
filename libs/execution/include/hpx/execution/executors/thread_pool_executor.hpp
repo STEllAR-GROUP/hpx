@@ -62,9 +62,24 @@ namespace hpx { namespace parallel { namespace execution {
         typedef static_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
+        thread_pool_executor()
+          : pool_(this_thread::get_pool())
+        {
+            HPX_ASSERT(pool_);
+        }
+
         explicit thread_pool_executor(threads::thread_pool_base* pool)
           : pool_(pool)
         {
+            HPX_ASSERT(pool_);
+        }
+
+        explicit thread_pool_executor(
+            threads::policies::scheduler_base* scheduler)
+        {
+            HPX_ASSERT(scheduler);
+            pool_ = scheduler->get_parent_pool();
+            HPX_ASSERT(pool_);
         }
 
         /// \cond NOINTERNAL
