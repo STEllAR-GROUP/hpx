@@ -456,7 +456,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \endcond
 }}}    // namespace hpx::parallel::execution
 
-#include <hpx/execution/executors/thread_timed_execution.hpp>
-#include <hpx/execution/executors/timed_execution.hpp>
+//#include <hpx/execution/executors/thread_timed_execution.hpp>
+//#include <hpx/execution/executors/timed_execution.hpp>
 
 #endif

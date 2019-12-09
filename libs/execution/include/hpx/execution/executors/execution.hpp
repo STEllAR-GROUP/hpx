@@ -17,16 +17,13 @@
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/range.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/lcos/dataflow.hpp>
-#endif
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -1132,19 +1129,20 @@ namespace hpx { namespace parallel { namespace execution {
                     vector_result_type>::type result_future_type;
 
                 typedef typename hpx::traits::detail::shared_state_ptr<
-                    result_future_type>::type shared_state_type;
+                    vector_result_type>::type shared_state_type;
 
                 typedef typename std::decay<Future>::type future_type;
 
                 shared_state_type p =
-                    lcos::detail::make_continuation_exec<result_future_type>(
+                    lcos::detail::make_continuation_exec<vector_result_type>(
                         std::forward<Future>(predecessor),
                         std::forward<BulkExecutor>(exec),
                         [HPX_CAPTURE_MOVE(func)](
                             future_type&& predecessor) mutable
-                        -> result_future_type {
-                            return hpx::dataflow(hpx::launch::sync,
-                                hpx::util::functional::unwrap{},
+                        -> vector_result_type {
+                            // use unwrap directly (instead of lazily) to avoid
+                            // having to pull in dataflow
+                            return hpx::util::unwrap(
                                 func(std::move(predecessor)));
                         });
 
