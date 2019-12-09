@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
 #include <hpx/runtime/threads/executors/thread_pool_os_executors.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
@@ -306,3 +309,4 @@ namespace hpx { namespace threads { namespace executors {
     }
 #endif
 }}}    // namespace hpx::threads::executors
+#endif
