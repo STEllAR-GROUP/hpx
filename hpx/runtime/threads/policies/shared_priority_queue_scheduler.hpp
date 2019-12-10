@@ -456,7 +456,6 @@ namespace hpx { namespace threads { namespace policies {
                         operation)
                 {
                     bool result;
-                    std::uint16_t dm1 = num_domains_ - 1;
 
                     // All stealing disabled
                     if (!steal_core)
@@ -478,13 +477,11 @@ namespace hpx { namespace threads { namespace policies {
                     // High priority tasks first
                     else if (steal_hp_first_)
                     {
-                        std::uint16_t dom = domain;
-                        for (std::uint16_t d = 0; d < num_domains_;
-                             ++d,    // these are executed at the end of a loop
-                             dom = fast_mod((domain + d), num_domains_),
-                                           q_index = fast_mod(
-                                               q_index, q_counts_[dom]))
+                        for (std::uint16_t d = 0; d < num_domains_; ++d)
                         {
+                            std::uint16_t dom =
+                                fast_mod((domain + d), num_domains_);
+                            q_index = fast_mod(q_index, q_counts_[dom]);
                             result = operation_HP(
                                 dom, q_index, origin, var, (d > 0), true);
                             if (result)
@@ -497,16 +494,14 @@ namespace hpx { namespace threads { namespace policies {
                                 return result;
                             }
                             // if no numa stealing, skip other domains
-                            if (!steal_numa || d == dm1)
+                            if (!steal_numa)
                                 break;
                         }
-                        dom = domain;
-                        for (std::uint16_t d = 0; d < num_domains_;
-                             ++d,    // these are executed at the end of a loop
-                             dom = fast_mod((domain + d), num_domains_),
-                                           q_index = fast_mod(
-                                               q_index, q_counts_[dom]))
+                        for (std::uint16_t d = 0; d < num_domains_; ++d)
                         {
+                            std::uint16_t dom =
+                                fast_mod((domain + d), num_domains_);
+                            q_index = fast_mod(q_index, q_counts_[dom]);
                             result = operation(
                                 dom, q_index, origin, var, (d > 0), true);
                             if (result)
@@ -519,7 +514,7 @@ namespace hpx { namespace threads { namespace policies {
                                 return result;
                             }
                             // if no numa stealing, skip other domains
-                            if (!steal_numa || d == dm1)
+                            if (!steal_numa)
                                 break;
                         }
                     }
@@ -565,14 +560,10 @@ namespace hpx { namespace threads { namespace policies {
                         else
                         {
                             // try other numa domains BP/HP
-                            std::uint16_t dstart =
-                                fast_mod((domain + 1), num_domains_);
-                            std::uint16_t dom = dstart;
-                            for (
-                                std::uint16_t d = 1; d < num_domains_;
-                                ++d,    // these are executed at the end of a loop
-                                dom = fast_mod((domain + d), num_domains_))
+                            for (std::uint16_t d = 1; d < num_domains_; ++d)
                             {
+                                std::uint16_t dom =
+                                    fast_mod((domain + d), num_domains_);
                                 q_index = fast_mod(q_index, q_counts_[dom]);
                                 result = operation_HP(
                                     dom, q_index, origin, var, true, true);
@@ -587,11 +578,10 @@ namespace hpx { namespace threads { namespace policies {
                                 }
                             }
                             // try other numa domains NP/LP
-                            dom = dstart;
-                            for (std::uint16_t d = 1; d < num_domains_; ++d,
-                                               dom = fast_mod(
-                                                   (domain + d), num_domains_))
+                            for (std::uint16_t d = 1; d < num_domains_; ++d)
                             {
+                                std::uint16_t dom =
+                                    fast_mod((domain + d), num_domains_);
                                 q_index = fast_mod(q_index, q_counts_[dom]);
                                 result = operation(
                                     dom, q_index, origin, var, true, true);
