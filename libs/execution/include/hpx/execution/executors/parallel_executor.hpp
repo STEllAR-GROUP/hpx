@@ -363,6 +363,7 @@ namespace hpx { namespace parallel { namespace execution {
 
     private:
         /// \cond NOINTERNAL
+        // TODO: Actually use these.
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;
         threads::thread_schedule_hint schedulehint_;

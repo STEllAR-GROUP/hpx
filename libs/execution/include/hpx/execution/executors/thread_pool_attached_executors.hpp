@@ -12,12 +12,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/parallel/executors/thread_pool_executor.hpp>
 
 #include <cstdint>
 
 namespace hpx { namespace parallel { namespace execution {
-    // TODO: This is like thread_pool_executor but restricted to a subset of threads.
-    // TODO: Remove duplication between this and thread_pool_executor.
     struct restricted_thread_pool_executor
     {
         /// Associate the parallel_execution_tag executor tag type as a default
@@ -77,7 +76,6 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return *this;
         }
-        /// \endcond
 
     private:
         std::int16_t get_next_thread_num()
@@ -86,114 +84,47 @@ namespace hpx { namespace parallel { namespace execution {
                 first_thread_ + (os_thread_++ % num_threads_));
         }
 
-        /// \cond NOINTERNAL
-
     public:
-        // TwoWayExecutor interface
         template <typename F, typename... Ts>
         hpx::future<
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-        async_execute(F&& f, Ts&&... ts) const
+        async_execute(F&& f, Ts&&... ts)
         {
-            return hpx::detail::async_launch_policy_dispatch<decltype(
-                hpx::launch::async)>::call(hpx::launch::async, pool_,
-                threads::thread_schedule_hint{
-                    0    // get_next_thread_num()
-                },
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::thread_pool_async_execute_helper(pool_, priority_,
+                stacksize_,
+                threads::thread_schedule_hint(get_next_thread_num()),
+                hpx::launch::async, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
-        HPX_FORCEINLINE
-            hpx::future<typename hpx::util::detail::invoke_deferred_result<F,
-                Future, Ts...>::type>
-            then_execute(F&& f, Future&& predecessor, Ts&&... ts)
+        hpx::future<typename hpx::util::detail::invoke_deferred_result<F,
+            Future, Ts...>::type>
+        then_execute(F&& f, Future&& predecessor, Ts&&... ts)
         {
-            using result_type =
-                typename hpx::util::detail::invoke_deferred_result<F, Future,
-                    Ts...>::type;
-
-            auto&& func = hpx::util::one_shot(hpx::util::bind_back(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
-
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type
-                p = lcos::detail::make_continuation_alloc_nounwrap<result_type>(
-                    hpx::util::internal_allocator<>{},
-                    std::forward<Future>(predecessor), hpx::launch::async,
-                    std::move(func));
-
-            return hpx::traits::future_access<hpx::future<result_type>>::create(
-                std::move(p));
+            return detail::thread_pool_then_execute_helper(*this, launch::async,
+                std::forward<F>(f), std::forward<Future>(predecessor),
+                std::forward<Ts>(ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename... Ts>
-        void post(F&& f, Ts&&... ts) const
+        void post(F&& f, Ts&&... ts)
         {
-            hpx::util::thread_description desc(
-                f, "hpx::parallel::execution::parallel_executor::post");
-
-            detail::post_policy_dispatch<decltype(hpx::launch::async)>::call(
-                hpx::launch::async, desc, pool_,
-                threads::thread_schedule_hint{
-                    0    // get_next_thread_num()
-                },
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::thread_pool_post_helper(pool_, priority_, stacksize_,
+                threads::thread_schedule_hint(get_next_thread_num()),
+                launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
-        // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
         std::vector<hpx::future<
             typename detail::bulk_function_result<F, S, Ts...>::type>>
         bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
-            std::size_t const os_thread_count = pool_->get_os_thread_count();
-            HPX_UNUSED(os_thread_count);
-            HPX_ASSERT((first_thread_ + num_threads_) <= os_thread_count);
-            hpx::util::thread_description const desc(f,
-                "hpx::parallel::execution::restricted_thread_pool_executor::"
-                "bulk_async_execute");
-
-            typedef std::vector<hpx::future<
-                typename detail::bulk_function_result<F, S, Ts...>::type>>
-                result_type;
-
-            result_type results;
-            std::size_t const size = hpx::util::size(shape);
-            results.resize(size);
-
-            lcos::local::latch l(num_threads_);
-            std::size_t part_begin = 0;
-            auto it = std::begin(shape);
-            for (std::size_t t = 0; t < num_threads_; ++t)
-            {
-                std::size_t const part_end = ((t + 1) * size) / num_threads_;
-                threads::thread_schedule_hint hint{
-                    static_cast<std::int16_t>(first_thread_ + t)};
-                detail::post_policy_dispatch<decltype(
-                    hpx::launch::async)>::call(hpx::launch::async, desc, pool_,
-                    hint,
-
-                    [&, this, hint, part_begin, part_end, f, it]() mutable {
-                        for (std::size_t part_i = part_begin; part_i < part_end;
-                             ++part_i)
-                        {
-                            results[part_i] =
-                                hpx::detail::async_launch_policy_dispatch<
-                                    decltype(hpx::launch::async)>::
-                                    call(hpx::launch::async, pool_, hint, f,
-                                        *it, ts...);
-                            ++it;
-                        }
-                        l.count_down(1);
-                    });
-                std::advance(it, part_end - part_begin);
-                part_begin = part_end;
-            }
-
-            l.wait();
-
-            return results;
+            return detail::thread_pool_bulk_async_execute_helper(pool_,
+                priority_, stacksize_, schedulehint_, first_thread_,
+                num_threads_, launch::async, std::forward<F>(f), shape,
+                std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -202,54 +133,16 @@ namespace hpx { namespace parallel { namespace execution {
         bulk_then_execute(
             F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
-            using func_result_type =
-                typename detail::then_bulk_function_result<F, S, Future,
-                    Ts...>::type;
-
-            // std::vector<future<func_result_type>>
-            using result_type = std::vector<hpx::future<func_result_type>>;
-
-            auto&& func =
-                detail::make_fused_bulk_async_execute_helper<result_type>(*this,
-                    std::forward<F>(f), shape,
-                    hpx::util::make_tuple(std::forward<Ts>(ts)...));
-
-            // void or std::vector<func_result_type>
-            using vector_result_type =
-                typename detail::bulk_then_execute_result<F, S, Future,
-                    Ts...>::type;
-
-            // future<vector_result_type>
-            using result_future_type = hpx::future<vector_result_type>;
-
-            using shared_state_type =
-                typename hpx::traits::detail::shared_state_ptr<
-                    vector_result_type>::type;
-
-            using future_type = typename std::decay<Future>::type;
-
-            // vector<future<func_result_type>> -> vector<func_result_type>
-            shared_state_type p =
-                lcos::detail::make_continuation_alloc<vector_result_type>(
-                    hpx::util::internal_allocator<>{},
-                    std::forward<Future>(predecessor), hpx::launch::async,
-                    [HPX_CAPTURE_MOVE(func)](future_type&& predecessor) mutable
-                    -> vector_result_type {
-                        // use unwrap directly (instead of lazily) to avoid
-                        // having to pull in dataflow
-                        return hpx::util::unwrap(func(std::move(predecessor)));
-                    });
-
-            return hpx::traits::future_access<result_future_type>::create(
-                std::move(p));
-            return hpx::make_ready_future();
+            return detail::thread_pool_bulk_then_execute_helper(launch::async,
+                std::forward<F>(f), shape, std::forward<Future>(predecessor),
+                std::forward<Ts>(ts)...);
         }
         /// \endcond
 
     private:
         threads::thread_pool_base* pool_;
 
-        //  TODO: Actually use these
+        // TODO: Actually use these
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;
         threads::thread_schedule_hint schedulehint_;
