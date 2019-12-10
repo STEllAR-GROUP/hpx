@@ -19,11 +19,11 @@ namespace hpx { namespace threads { namespace detail {
             return thread_num_tss_;
         }
 
-        thread_tuple& thread_numbers_tss()
+        thread_pool& thread_pool_tss()
         {
-            HPX_NATIVE_TLS thread_tuple thread_numbers_tss_ = {
+            HPX_NATIVE_TLS thread_pool thread_pool_tss_ = {
                 std::uint16_t(-1), std::uint16_t(-1)};
-            return thread_numbers_tss_;
+            return thread_pool_tss_;
         }
     }    // namespace
 
@@ -42,16 +42,16 @@ namespace hpx { namespace threads { namespace detail {
 
     // set the thread number and pool index associated with this
     // system thread into thread local storage
-    void set_thread_numbers_tss(const thread_tuple& tup)
+    void set_thread_pool_tss(const thread_pool& tup)
     {
-        thread_numbers_tss() = tup;
+        thread_pool_tss() = tup;
     }
 
-    // this returns a tuple of the global thread number and the pool
+    // this returns a struct of the global thread number and the pool
     // Id or index that this thread is assigned to
-    thread_tuple get_thread_numbers_tss()
+    thread_pool get_thread_pool_tss()
     {
-        return thread_numbers_tss();
+        return thread_pool_tss();
     }
 
 }}}    // namespace hpx::threads::detail

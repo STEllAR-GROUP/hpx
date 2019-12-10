@@ -215,21 +215,15 @@ namespace hpx { namespace threads { namespace policies {
                 }
 
                 // ------------------------------------------------------------
-                // just function aliases
-                static constexpr auto& get_thread_number =
-                    threads::detail::get_thread_num_tss;
-                static constexpr auto& get_thread_numbers =
-                    threads::detail::get_thread_numbers_tss;
-
-                // ------------------------------------------------------------
                 // access thread local storage to determine correct thread
                 // and pool identification
                 inline int local_thread_number()
                 {
-                    const auto& tns = get_thread_numbers();
+                    using namespace hpx::threads::detail;
+                    const auto& tns = get_thread_pool_tss();
                     // if the thread belongs to this pool return local Id
-                    if (pool_index_ == std::get<1>(tns))
-                        return std::get<0>(tns);
+                    if (pool_index_ == tns.pool_index)
+                        return tns.local_thread_num;
                     return -1;
                 }
 
@@ -244,14 +238,18 @@ namespace hpx { namespace threads { namespace policies {
                     int local_num = local_thread_number();
                     if (local_num < 0)
                     {
-                        spq_deb.debug(debug::str<>("cleanup_terminated"),
-                            "v1 aborted", "num_workers_", num_workers_,
-                            "get_thread_number", get_thread_number(), "local",
-                            std::get<0>(get_thread_numbers()), "global",
-                            std::get<1>(get_thread_numbers()), "parent offset",
-                            parent_pool_->get_thread_offset(),
-                            parent_pool_->get_pool_name());
-                        //                HPX_ASSERT(false);
+                        // clang-format off
+                        using namespace hpx::threads::detail;
+                        spq_deb.debug(debug::str<>("cleanup_terminated")
+                            , "v1 aborted"
+                            , "num_workers_", num_workers_
+                            , "thread_number"
+                            , "global", get_thread_num_tss()
+                            , "local", get_thread_pool_tss().local_thread_num
+                            , "pool", get_thread_pool_tss().pool_index
+                            , "parent offset", parent_pool_->get_thread_offset()
+                            , parent_pool_->get_pool_name());
+                        // clang-format on
                         return false;
                     }
 
@@ -320,14 +318,17 @@ namespace hpx { namespace threads { namespace policies {
                         // Create thread on this worker thread if possible
                         if (local_num < 0)
                         {
-                            spq_deb.debug(debug::str<>("create_thread"),
-                                "x-pool", "num_workers_", num_workers_,
-                                "get_thread_number", get_thread_number(),
-                                "local", std::get<0>(get_thread_numbers()),
-                                "global", std::get<1>(get_thread_numbers()),
-                                "parent offset",
-                                parent_pool_->get_thread_offset(),
-                                parent_pool_->get_pool_name());
+                            // clang-format off
+                            using namespace hpx::threads::detail;
+                            spq_deb.debug(debug::str<>("create_thread")
+                                , "x-pool", "num_workers_", num_workers_
+                                , "thread_number"
+                                , "global", get_thread_num_tss()
+                                , "local", get_thread_pool_tss().local_thread_num
+                                , "pool", get_thread_pool_tss().pool_index
+                                , "parent offset", parent_pool_->get_thread_offset()
+                                , parent_pool_->get_pool_name());
+                            // clang-format on
                             // This is a task being injected from a thread on another
                             // pool - we can schedule on any thread available
                             thread_num =
@@ -755,16 +756,19 @@ namespace hpx { namespace threads { namespace policies {
                                 numa_holder_[0].thread_queue(0)->worker_next(
                                     num_workers_);
                             q_index = 0;
-                            spq_deb.debug(debug::str<>("schedule_thread"),
-                                "x-pool thread schedule", "num_workers_",
-                                num_workers_, "get_thread_number",
-                                get_thread_number(), "local",
-                                std::get<0>(get_thread_numbers()), "global",
-                                std::get<1>(get_thread_numbers()),
-                                "parent offset",
-                                parent_pool_->get_thread_offset(),
-                                parent_pool_->get_pool_name(),
+                            // clang-format off
+                            using namespace hpx::threads::detail;
+                            spq_deb.debug(debug::str<>("schedule_thread")
+                                , "x-pool thread schedule"
+                                , "num_workers_", num_workers_
+                                , "thread_number"
+                                , "global", get_thread_num_tss()
+                                , "local", get_thread_pool_tss().local_thread_num
+                                , "pool", get_thread_pool_tss().pool_index
+                                , "parent offset", parent_pool_->get_thread_offset()
+                                , parent_pool_->get_pool_name(),
                                 debug::threadinfo<threads::thread_data*>(thrd));
+                            // clang-format on
                         }
                         else if (!round_robin_) /*assign_parent*/
                         {
@@ -1091,9 +1095,10 @@ namespace hpx { namespace threads { namespace policies {
                     }
 
                     // store local thread number and pool index in thread local storage
-                    hpx::threads::detail::set_thread_numbers_tss(
-                        std::make_tuple(
-                            local_thread, parent_pool_->get_pool_id().index()));
+                    hpx::threads::detail::set_thread_pool_tss(
+                        {std::uint16_t(local_thread),
+                            std::uint16_t(
+                                parent_pool_->get_pool_id().index())});
 
                     // one thread holder per core (shared by PUs)
                     thread_holder_type* thread_holder = nullptr;
