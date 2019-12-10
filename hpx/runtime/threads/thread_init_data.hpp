@@ -66,8 +66,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         // HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
         // and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on
-            timer_data = util::external_timer::new_task(description,
-                parent_locality_id, parent_id);
+            timer_data = rhs.timer_data;
 #endif
             return *this;
         }
