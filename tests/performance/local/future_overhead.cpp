@@ -90,9 +90,16 @@ void print_stats(const char* title, const char* wait, const char* exec,
     //hpx::util::print_cdash_timing(title, duration);
 }
 
-const char* ExecName(const hpx::parallel::execution::parallel_executor& exec)
+const char* exec_name(
+    hpx::parallel::execution::parallel_executor const& exec)
 {
     return "parallel_executor";
+}
+
+const char* exec_name(
+    hpx::parallel::execution::thread_pool_executor const& exec)
+{
+    return "thread_pool_executor";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -181,7 +188,7 @@ void measure_function_futures_wait_each(
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("async", "WaitEach", ExecName(exec), count, duration, csv);
+    print_stats("async", "WaitEach", exec_name(exec), count, duration, csv);
 }
 
 template <typename Executor>
@@ -198,7 +205,7 @@ void measure_function_futures_wait_all(
     wait_all(futures);
 
     const double duration = walltime.elapsed();
-    print_stats("async", "WaitAll", ExecName(exec), count, duration, csv);
+    print_stats("async", "WaitAll", exec_name(exec), count, duration, csv);
 }
 
 template <typename Executor>
@@ -235,7 +242,7 @@ void measure_function_futures_thread_count(
             "This test is faulty " + std::to_string(count));
     }
 
-    print_stats("apply", "ThreadCount", ExecName(exec), count, duration, csv);
+    print_stats("apply", "ThreadCount", exec_name(exec), count, duration, csv);
 }
 
 template <typename Executor>
@@ -290,7 +297,8 @@ void measure_function_futures_limiting_executor(
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("apply", "limiting-Exec", ExecName(exec), count, duration, csv);
+    print_stats(
+        "apply", "limiting-Exec", exec_name(exec), count, duration, csv);
 }
 
 template <typename Executor>
@@ -313,7 +321,7 @@ void measure_function_futures_sliding_semaphore(
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("apply", "Sliding-Sem", ExecName(exec), count, duration, csv);
+    print_stats("apply", "Sliding-Sem", exec_name(exec), count, duration, csv);
 }
 
 struct unlimited_number_of_chunks
@@ -333,18 +341,20 @@ namespace hpx { namespace parallel { namespace execution {
     };
 }}}    // namespace hpx::parallel::execution
 
-void measure_function_futures_for_loop(std::uint64_t count, bool csv)
+template <typename Executor>
+void measure_function_futures_for_loop(
+    std::uint64_t count, bool csv, Executor& exec)
 {
     // start the clock
     high_resolution_timer walltime;
-    hpx::parallel::for_loop(hpx::parallel::execution::par.with(
+    hpx::parallel::for_loop(hpx::parallel::execution::par.on(exec).with(
                                 hpx::parallel::execution::static_chunk_size(1),
                                 unlimited_number_of_chunks()),
         0, count, [](std::uint64_t) { null_function(); });
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
+    print_stats("for_loop", "par", exec_name(exec), count, duration, csv);
 }
 
 void measure_function_futures_register_work(std::uint64_t count, bool csv)
@@ -538,6 +548,7 @@ int hpx_main(variables_map& vm)
             throw std::logic_error("error: count of 0 futures specified\n");
 
         hpx::parallel::execution::parallel_executor par;
+        hpx::parallel::execution::thread_pool_executor tpe;
 
         for (int i = 0; i < repetitions; i++)
         {
@@ -546,14 +557,20 @@ int hpx_main(variables_map& vm)
                 count, csv);
             if (test_all)
             {
-                measure_function_futures_limiting_executor(count, csv, def);
+                measure_function_futures_limiting_executor(count, csv, tpe);
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
                 measure_function_futures_wait_each(count, csv, par);
+                measure_function_futures_wait_each(count, csv, tpe);
                 measure_function_futures_wait_all(count, csv, par);
+                measure_function_futures_wait_all(count, csv, tpe);
                 measure_function_futures_thread_count(count, csv, par);
+                measure_function_futures_thread_count(count, csv, tpe);
                 measure_function_futures_sliding_semaphore(count, csv, par);
-                measure_function_futures_for_loop(count, csv);
+                measure_function_futures_sliding_semaphore(count, csv, tpe);
+                measure_function_futures_for_loop(count, csv, par);
+                measure_function_futures_for_loop(count, csv, tpe);
+
                 measure_function_futures_register_work(count, csv);
                 measure_function_futures_create_thread(count, csv);
                 measure_function_futures_apply_hierarchical_placement(
