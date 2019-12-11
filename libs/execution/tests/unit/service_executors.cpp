@@ -149,7 +149,7 @@ void test_service_executor(Executor& exec)
 int hpx_main(int argc, char* argv[])
 {
     using namespace hpx::parallel;
-    using hpx::threads::executors::service_executor_type;
+    using hpx::parallel::execution::service_executor_type;
 
 #if defined(HPX_HAVE_IO_POOL)
     {
