@@ -97,6 +97,7 @@ namespace hpx { namespace threads { namespace policies {
         // thread whilst processing the Queues for that thread, this code
         // is running at the OS level in effect.
         using mutex_type = std::mutex;
+        typedef std::unique_lock<mutex_type> scoped_lock;
 
         // mutex protecting the thread map
         mutable util::cache_line_data<mutex_type> thread_map_mtx_;
@@ -363,7 +364,7 @@ namespace hpx { namespace threads { namespace policies {
                 0)
                 return true;
 
-            std::scoped_lock lk(thread_map_mtx_.data_);
+            scoped_lock lk(thread_map_mtx_.data_);
 
             if (delete_all)
             {
@@ -578,7 +579,7 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         void add_to_thread_map(threads::thread_id_type tid)
         {
-            std::unique_lock lk(thread_map_mtx_.data_);
+            scoped_lock lk(thread_map_mtx_.data_);
 
             // add a new entry in the map for this thread
             std::pair<thread_map_type::iterator, bool> p =
@@ -881,7 +882,7 @@ namespace hpx { namespace threads { namespace policies {
                         std::memory_order_relaxed);
 
             // acquire lock only if absolutely necessary
-            std::scoped_lock lk(thread_map_mtx_.data_);
+            scoped_lock lk(thread_map_mtx_.data_);
 
             std::int64_t num_threads = 0;
             thread_map_type::const_iterator end = thread_map_.end();
@@ -918,7 +919,7 @@ namespace hpx { namespace threads { namespace policies {
         // ------------------------------------------------------------
         void abort_all_suspended_threads()
         {
-            std::scoped_lock lk(thread_map_mtx_.data_);
+            scoped_lock lk(thread_map_mtx_.data_);
             thread_map_type::iterator end = thread_map_.end();
             for (thread_map_type::iterator it = thread_map_.begin(); it != end;
                  ++it)
@@ -956,7 +957,7 @@ namespace hpx { namespace threads { namespace policies {
 
             if (state == unknown)
             {
-                std::scoped_lock lk(thread_map_mtx_.data_);
+                scoped_lock lk(thread_map_mtx_.data_);
                 thread_map_type::const_iterator end = thread_map_.end();
                 for (thread_map_type::const_iterator it = thread_map_.begin();
                      it != end; ++it)
@@ -966,7 +967,7 @@ namespace hpx { namespace threads { namespace policies {
             }
             else
             {
-                std::scoped_lock lk(thread_map_mtx_.data_);
+                scoped_lock lk(thread_map_mtx_.data_);
                 thread_map_type::const_iterator end = thread_map_.end();
                 for (thread_map_type::const_iterator it = thread_map_.begin();
                      it != end; ++it)
