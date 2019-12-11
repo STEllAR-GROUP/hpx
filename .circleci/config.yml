@@ -210,7 +210,6 @@ jobs:
                 -G "Ninja" \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_APEX=On \
-                -DHPX_WITH_APEX_TAG=develop \
                 -DHPX_WITH_TESTS=On \
                 -DHPX_WITH_EXAMPLES=On
             rm -rf *
