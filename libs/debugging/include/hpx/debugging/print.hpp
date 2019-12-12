@@ -25,6 +25,12 @@
 #include <utility>
 #include <vector>
 
+#if defined(__linux) || defined(linux) || defined(__linux__)
+#include <linux/unistd.h>
+#include <sys/mman.h>
+#define DEBUGGING_PRINT_LINUX
+#endif
+
 // ------------------------------------------------------------
 // This file provides a simple to use printf style debugging
 // tool that can be used on a per file basis to enable ouput.
@@ -258,7 +264,12 @@ namespace hpx { namespace debug {
                 os << dummy << " ";
             }
             os << hex<12, std::thread::id>(std::this_thread::get_id())
+#ifdef DEBUGGING_PRINT_LINUX
                << " cpu " << dec<3, int>(sched_getcpu()) << " ";
+#else
+               << " cpu "
+               << "--- ";
+#endif
             return os;
         }
 
