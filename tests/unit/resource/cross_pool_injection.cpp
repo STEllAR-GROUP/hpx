@@ -110,7 +110,7 @@ int hpx_main(int argc, char* /*argv*/[])
         auto& exec_1 = HP_executors[random_pool_1];
         auto& exec_2 = HP_executors[random_pool_2];
         auto f1 = hpx::async(exec_1, &dummy_task, 0);
-        auto f2 = f1.then(exec_2, [=, &counter](auto&&) {
+        auto f2 = f1.then(exec_2, [=, &counter](hpx::future<void>&&) {
             dummy_task(0);
             --counter;
         });
@@ -130,7 +130,7 @@ int hpx_main(int argc, char* /*argv*/[])
         auto& exec_3 = NP_executors[random_pool_1];
         auto& exec_4 = NP_executors[random_pool_2];
         auto f3 = hpx::async(exec_3, &dummy_task, 0);
-        auto f4 = f3.then(exec_4, [=, &counter](auto&&) {
+        auto f4 = f3.then(exec_4, [=, &counter](hpx::future<void>&&) {
             dummy_task(0);
             --counter;
         });
@@ -150,7 +150,7 @@ int hpx_main(int argc, char* /*argv*/[])
         auto& exec_5 = HP_executors[random_pool_1];
         auto& exec_6 = NP_executors[random_pool_2];
         auto f5 = hpx::async(exec_5, &dummy_task, 0);
-        auto f6 = f5.then(exec_6, [=, &counter](auto&&) {
+        auto f6 = f5.then(exec_6, [=, &counter](hpx::future<void>&&) {
             dummy_task(0);
             --counter;
         });
@@ -170,7 +170,7 @@ int hpx_main(int argc, char* /*argv*/[])
         auto& exec_7 = NP_executors[random_pool_1];
         auto& exec_8 = HP_executors[random_pool_2];
         auto f7 = hpx::async(exec_7, &dummy_task, 0);
-        auto f8 = f7.then(exec_8, [=, &counter](auto&&) {
+        auto f8 = f7.then(exec_8, [=, &counter](hpx::future<void>&&) {
             dummy_task(0);
             --counter;
         });

@@ -127,7 +127,7 @@ int hpx_main(variables_map& vm)
                         dummy_task("NP task", std::size_t(np_m));
                     },
                     "NP task"))
-                          .then(hpx::launch::sync, [&](auto&&) {
+                          .then(hpx::launch::sync, [&](hpx::future<void>&&) {
                               if (++counter1 % np_loop == 0)
                               {
                                   for (int j = 0; j < hp_loop; ++j)
