@@ -40,14 +40,14 @@ namespace hpx { namespace threads { namespace detail {
         return thread_num_tss();
     }
 
-    // set the thread number and pool index associated with this
+    // set the local thread number and pool index associated with this
     // system thread into thread local storage
     void set_thread_pool_tss(const thread_pool& tup)
     {
         thread_pool_tss() = tup;
     }
 
-    // this returns a struct of the global thread number and the pool
+    // this returns a struct of the local thread number and the pool
     // Id or index that this thread is assigned to
     thread_pool get_thread_pool_tss()
     {

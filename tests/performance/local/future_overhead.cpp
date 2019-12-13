@@ -278,7 +278,7 @@ void measure_function_futures_limiting_executor(
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(
-            hpx::parallel::execution::par.with(fixed), 0, count, [&](int) {
+            hpx::parallel::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
                     sanity_check--;

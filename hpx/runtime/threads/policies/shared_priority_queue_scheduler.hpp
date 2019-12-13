@@ -63,6 +63,12 @@ static_assert(false,
 #endif
 #endif
 
+#if defined(__linux) || defined(linux) || defined(__linux__)
+#include <linux/unistd.h>
+#include <sys/mman.h>
+#define SHARED_PRIORITY_SCHEDULER_LINUX
+#endif
+
 namespace hpx {
     using print_onoff =
         hpx::debug::enable_print<SHARED_PRIORITY_SCHEDULER_DEBUG>;
@@ -1200,9 +1206,10 @@ namespace hpx { namespace threads { namespace policies {
                                 thread_holder;
                         }
 
+#ifdef SHARED_PRIORITY_SCHEDULER_LINUX
                         // for debugging
                         schedcpu_[local_thread] = sched_getcpu();
-
+#endif
                         // increment thread index counter
                         index++;
                     }
@@ -1231,8 +1238,10 @@ namespace hpx { namespace threads { namespace policies {
                             &q_counts_[num_domains_]);
                         spq_arr.array("# q_offset_  ", &q_offset_[0],
                             &q_offset_[num_domains_]);
+#ifdef SHARED_PRIORITY_SCHEDULER_LINUX
                         spq_arr.array("# schedcpu_  ", &schedcpu_[0],
                             &schedcpu_[num_workers_]);
+#endif
                         for (std::size_t d = 0; d < num_domains_; ++d)
                         {
                             numa_holder_[d].debug_info();
@@ -1321,8 +1330,10 @@ namespace hpx { namespace threads { namespace policies {
                     d_lookup_;    // numa domain
                 std::array<std::uint16_t, HPX_HAVE_MAX_CPU_COUNT>
                     q_lookup_;    // queue on domain
+#ifdef SHARED_PRIORITY_SCHEDULER_LINUX
                 std::array<std::uint16_t, HPX_HAVE_MAX_CPU_COUNT>
                     schedcpu_;    // cpu_id
+#endif
 
                 // number of cores per queue for HP, NP, LP queues
                 core_ratios cores_per_queue_;
