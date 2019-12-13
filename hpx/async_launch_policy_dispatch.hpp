@@ -74,6 +74,8 @@ namespace hpx { namespace detail
             hpx::future<typename util::detail::invoke_deferred_result<F,
                 Ts...>::type>>::type
         call(launch policy, threads::thread_pool_base* pool,
+            threads::thread_priority priority,
+            threads::thread_stacksize stacksize,
             threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
             typedef
@@ -91,9 +93,9 @@ namespace hpx { namespace detail
                 std::forward<F>(f), std::forward<Ts>(ts)...));
             if (hpx::detail::has_async_policy(policy))
             {
-                threads::thread_id_type tid = p.apply(pool,
-                    "async_launch_policy_dispatch", policy,
-                    policy.priority(), threads::thread_stacksize_default, hint);
+                threads::thread_id_type tid =
+                    p.apply(pool, "async_launch_policy_dispatch", policy,
+                        priority, stacksize, hint);
                 if (tid && policy == launch::fork)
                 {
                     // make sure this thread is executed last
@@ -110,11 +112,13 @@ namespace hpx { namespace detail
             traits::detail::is_deferred_invocable<F, Ts...>::value,
             hpx::future<typename util::detail::invoke_deferred_result<F,
                 Ts...>::type>>::type
-        call(launch policy, threads::thread_schedule_hint hint, F&& f,
-            Ts&&... ts)
+        call(launch policy, threads::thread_priority priority,
+            threads::thread_stacksize stacksize,
+            threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
             return call(policy, threads::detail::get_self_or_default_pool(),
-                hint, std::forward<F>(f), std::forward<Ts>(ts)...);
+                priority, stacksize, hint, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -125,6 +129,7 @@ namespace hpx { namespace detail
         call(launch policy, F&& f, Ts&&... ts)
         {
             return call(policy, threads::detail::get_self_or_default_pool(),
+                policy.priority(), threads::thread_stacksize_default,
                 threads::thread_schedule_hint{}, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
@@ -151,6 +156,8 @@ namespace hpx { namespace detail
             hpx::future<typename util::detail::invoke_deferred_result<F,
                 Ts...>::type>>::type
         call(hpx::detail::async_policy policy, threads::thread_pool_base* pool,
+            threads::thread_priority priority,
+            threads::thread_stacksize stacksize,
             threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
@@ -162,7 +169,7 @@ namespace hpx { namespace detail
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
             p.apply(pool, "async_launch_policy_dispatch::call", policy,
-                policy.priority(), threads::thread_stacksize_default, hint);
+                priority, stacksize, hint);
             return p.get_future();
         }
 
@@ -174,6 +181,8 @@ namespace hpx { namespace detail
         call(hpx::detail::async_policy policy, F&& f, Ts&&... ts)
         {
             return call(policy, threads::detail::get_self_or_default_pool(),
+                threads::thread_priority_default,
+                threads::thread_stacksize_default,
                 threads::thread_schedule_hint{}, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
@@ -184,6 +193,8 @@ namespace hpx { namespace detail
             hpx::future<typename util::detail::invoke_deferred_result<F,
                 Ts...>::type>>::type
         call(hpx::detail::fork_policy policy, threads::thread_pool_base* pool,
+            threads::thread_priority priority,
+            threads::thread_stacksize stacksize,
             threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
@@ -195,9 +206,9 @@ namespace hpx { namespace detail
                 std::forward<F>(f), std::forward<Ts>(ts)...));
 
             // make sure this thread is executed last
-            threads::thread_id_type tid = p.apply(pool,
-                "async_launch_policy_dispatch::call", policy, policy.priority(),
-                threads::thread_stacksize_default, hint);
+            threads::thread_id_type tid =
+                p.apply(pool, "async_launch_policy_dispatch::call", policy,
+                    priority, stacksize, hint);
             threads::thread_id_type tid_self = threads::get_self_id();
             if (tid && tid_self &&
                 get_thread_id_data(tid)->get_scheduler_base() ==
@@ -218,6 +229,8 @@ namespace hpx { namespace detail
         call(hpx::detail::fork_policy policy, F&& f, Ts&&... ts)
         {
             return call(policy, threads::detail::get_self_or_default_pool(),
+                threads::thread_priority_default,
+                threads::thread_stacksize_default,
                 threads::thread_schedule_hint{}, std::forward<F>(f),
                 std::forward<Ts>(ts)...);
         }
