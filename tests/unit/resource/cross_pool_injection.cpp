@@ -98,7 +98,7 @@ int hpx_main(int argc, char* /*argv*/[])
     // randomly create tasks that run on a random pool
     // attach continuations to them that run on different
     // random pools
-    const int loops = 10000;
+    const int loops = 1000;
     //
     std::cout << "1: Starting HP " << loops << std::endl;
     std::atomic<int> counter(loops);
