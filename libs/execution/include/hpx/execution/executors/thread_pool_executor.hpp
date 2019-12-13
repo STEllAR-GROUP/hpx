@@ -255,7 +255,9 @@ namespace hpx { namespace parallel { namespace execution {
         /// \cond NOINTERNAL
         bool operator==(thread_pool_executor const& rhs) const noexcept
         {
-            return pool_ == rhs.pool_;
+            return pool_ == rhs.pool_ && priority_ == rhs.priority_ &&
+                stacksize_ == rhs.stacksize_ &&
+                schedulehint_ == rhs.schedulehint_;
         }
 
         bool operator!=(thread_pool_executor const& rhs) const noexcept

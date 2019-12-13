@@ -63,7 +63,11 @@ namespace hpx { namespace parallel { namespace execution {
         bool operator==(restricted_thread_pool_executor const& rhs) const
             noexcept
         {
-            return pool_ == rhs.pool_;
+            return pool_ == rhs.pool_ && priority_ == rhs.priority_ &&
+                stacksize_ == rhs.stacksize_ &&
+                schedulehint_ == rhs.schedulehint_ &&
+                first_thread_ == rhs.first_thread_ &&
+                num_threads_ == rhs.num_threads_;
         }
 
         bool operator!=(restricted_thread_pool_executor const& rhs) const
@@ -133,19 +137,19 @@ namespace hpx { namespace parallel { namespace execution {
         bulk_then_execute(
             F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
-            return detail::thread_pool_bulk_then_execute_helper(launch::async,
-                std::forward<F>(f), shape, std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...);
+            return detail::thread_pool_bulk_then_execute_helper(*this,
+                launch::async, std::forward<F>(f), shape,
+                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
         /// \endcond
 
     private:
-        threads::thread_pool_base* pool_;
+        threads::thread_pool_base* pool_ = nullptr;
 
-        // TODO: Actually use these
-        threads::thread_priority priority_;
-        threads::thread_stacksize stacksize_;
-        threads::thread_schedule_hint schedulehint_;
+        threads::thread_priority priority_ = threads::thread_priority_default;
+        threads::thread_stacksize stacksize_ =
+            threads::thread_stacksize_default;
+        threads::thread_schedule_hint schedulehint_ = {};
 
         std::size_t first_thread_;
         std::size_t num_threads_;
