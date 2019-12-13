@@ -212,6 +212,16 @@ namespace hpx { namespace threads {
         {
         }
 
+        bool operator==(thread_schedule_hint const& rhs) const noexcept
+        {
+            return mode == rhs.mode && hint == rhs.hint;
+        }
+
+        bool operator!=(thread_schedule_hint const& rhs) const noexcept
+        {
+            return !(*this == rhs);
+        }
+
         thread_schedule_hint_mode mode;
         std::int16_t hint;
     };

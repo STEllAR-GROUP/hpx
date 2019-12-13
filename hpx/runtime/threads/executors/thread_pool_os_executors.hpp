@@ -9,7 +9,8 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+    defined(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>

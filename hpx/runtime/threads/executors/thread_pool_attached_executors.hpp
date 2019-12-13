@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/parallel/executors/thread_pool_attached_executors.hpp>
 
 namespace hpx { namespace threads { namespace executors {
@@ -31,4 +33,5 @@ namespace hpx { namespace threads { namespace executors {
 #endif
 }}}    // namespace hpx::threads::executors
 
+#endif
 #endif /*HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP*/

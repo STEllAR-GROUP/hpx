@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_SERVICE_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/parallel/executors/service_executors.hpp>
 
 namespace hpx { namespace threads { namespace executors {
@@ -20,4 +22,5 @@ namespace hpx { namespace threads { namespace executors {
     using parallel::execution::timer_pool_executor;
 }}}    // namespace hpx::threads::executors
 
+#endif
 #endif /* HPX_RUNTIME_THREADS_EXECUTORS_SERVICE_EXECUTOR_HPP */

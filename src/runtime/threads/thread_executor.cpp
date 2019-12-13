@@ -6,6 +6,8 @@
 
 #include <hpx/runtime/threads/thread_executor.hpp>
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
@@ -27,3 +29,4 @@ namespace hpx { namespace threads
         }
     }
 }}
+#endif

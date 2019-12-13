@@ -79,6 +79,7 @@ namespace hpx { namespace threads { namespace detail {
 
         std::size_t get_os_thread_count() const;
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         ///////////////////////////////////////////////////////////////////////
         // detail::manage_executor implementation
 
@@ -95,6 +96,7 @@ namespace hpx { namespace threads { namespace detail {
 
         // Remove the given processing unit from the scheduler.
         void remove_processing_unit(std::size_t thread_num, error_code& ec);
+#endif
 
     private:
         util::io_service_pool threads_;

@@ -15,6 +15,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+#include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>

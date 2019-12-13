@@ -9,6 +9,10 @@
 #if !defined(HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR)
 #define HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/parallel/executors/default_executor.hpp>
+#endif
 
 #endif

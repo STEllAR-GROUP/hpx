@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_THREADS_THREAD_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
@@ -435,4 +437,5 @@ namespace hpx { namespace threads
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif /*HPX_RUNTIME_THREADS_THREAD_EXECUTOR_HPP*/

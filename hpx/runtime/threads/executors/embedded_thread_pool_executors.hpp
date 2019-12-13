@@ -9,7 +9,8 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+    defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>

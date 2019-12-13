@@ -10,6 +10,8 @@
 #define HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_JAN_03_2017_1145AM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
@@ -231,4 +233,5 @@ namespace hpx { namespace threads {
     }
 }}    // namespace hpx::threads
 
+#endif
 #endif

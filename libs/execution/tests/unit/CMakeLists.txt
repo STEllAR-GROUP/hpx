@@ -20,16 +20,27 @@ set(tests
     sequenced_executor
     service_executors
     shared_parallel_executor
-    this_thread_executors
     thread_pool_attached_executors
-    thread_pool_executors
-    thread_pool_os_executors
     timed_parallel_executor
-    timed_this_thread_executors
-    timed_thread_pool_executors
-    standalone_thread_pool_os_executors
     standalone_thread_pool_executor
    )
+
+if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
+  set(tests ${tests} thread_pool_os_executors)
+
+  if(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
+    set(tests ${tests}
+      this_thread_executors
+      standalone_thread_pool_os_executors)
+  endif()
+
+  if(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
+    set(tests ${tests}
+      thread_pool_executors
+      timed_this_thread_executors
+      timed_thread_pool_executors)
+  endif()
+endif()
 
 foreach(test ${tests})
   set(sources

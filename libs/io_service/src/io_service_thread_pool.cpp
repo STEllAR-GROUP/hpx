@@ -125,6 +125,7 @@ namespace hpx { namespace threads { namespace detail {
         return threads_.size();
     }
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
     ///////////////////////////////////////////////////////////////////////////
     // detail::manage_executor implementation
     std::size_t io_service_thread_pool::get_policy_element(

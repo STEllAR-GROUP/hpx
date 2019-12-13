@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
@@ -871,4 +873,5 @@ namespace hpx { namespace threads
         return rm.get_resource_allocation();
     }
 }}
+#endif
 
