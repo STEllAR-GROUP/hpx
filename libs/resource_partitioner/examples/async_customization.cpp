@@ -460,63 +460,11 @@ int hpx_main()
         true, "default");
     test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
 
+    std::cout << "Tests done \n";
     return hpx::finalize(0);
 }
 
 int main(int argc, char** argv)
 {
-    int pool_threads = 1;
-
-    // Create the resource partitioner
-    hpx::resource::partitioner rp(argc, argv);
-
-    // declare the high priority scheduler type we'll use
-    using high_priority_sched =
-        hpx::threads::policies::shared_priority_queue_scheduler<>;
-    using hpx::threads::policies::scheduler_mode;
-    // setup the default pool with our custom priority scheduler
-    rp.create_thread_pool("custom",
-        [](hpx::threads::thread_pool_init_parameters init,
-            hpx::threads::policies::thread_queue_init_parameters
-                thread_queue_init)
-            -> std::unique_ptr<hpx::threads::thread_pool_base> {
-            high_priority_sched::init_parameter_type scheduler_init(
-                init.num_threads_, {6, 6, 64}, init.affinity_data_,
-                thread_queue_init, "shared-priority-scheduler");
-            std::unique_ptr<high_priority_sched> scheduler(
-                new high_priority_sched(scheduler_init));
-
-            init.mode_ = scheduler_mode(scheduler_mode::do_background_work |
-                scheduler_mode::delay_exit);
-
-            std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<
-                    high_priority_sched>(std::move(scheduler), init));
-            return pool;
-        });
-
-    std::cout << "[main] "
-              << "thread_pools created \n";
-
-    // add N cores to mpi pool
-    int count = 0;
-    for (const hpx::resource::numa_domain& d : rp.numa_domains())
-    {
-        for (const hpx::resource::core& c : d.cores())
-        {
-            for (const hpx::resource::pu& p : c.pus())
-            {
-                if (count < pool_threads)
-                {
-                    std::cout << "Added pu " << count++ << " to mpi pool\n";
-                    rp.add_resource(p, "custom");
-                }
-            }
-        }
-    }
-
-    // rp.add_resource(rp.numa_domains()[0].cores()[1], "mpi");
-    std::cout << "[main] "
-              << "resources added to thread_pools \n";
     return hpx::init(argc, argv);
 }

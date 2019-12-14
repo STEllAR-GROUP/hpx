@@ -93,6 +93,10 @@ namespace hpx { namespace threads {
             priority queue and will be executed before normal/low priority
             tasks are taken (some schedulers modify the behavior slightly and
             the documentation for those should be consulted). */
+        thread_priority_bound = 6,          /*!< Task goes onto a special
+            high priority queue and will never be stolen by another thread
+            after initial assignment. This should be used for thread placement
+            tasks such as OpenMP type for loops. */
 
         /// \cond NOINTERNAL
         // obsolete, kept for compatibility only

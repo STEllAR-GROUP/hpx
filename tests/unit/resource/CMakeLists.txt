@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    scheduler_priority_check
     shutdown_suspended_pus
     suspend_disabled
     suspend_pool
@@ -15,6 +16,17 @@ set(tests
     suspend_thread_timed
 )
 
+if (${HPX_CXX_STANDARD} GREATER 11)
+  set(tests ${tests}
+    cross_pool_injection
+  )
+endif()
+
+# NB. threads = -2 = threads = 'cores'
+# NB. threads = -1 = threads = 'all'
+
+set(cross_pool_injection_PARAMETERS THREADS_PER_LOCALITY -1)
+set(scheduler_priority_check_PARAMETERS THREADS_PER_LOCALITY -1)
 set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_disabled_PARAMETERS THREADS_PER_LOCALITY 4)
 set(suspend_pool_PARAMETERS THREADS_PER_LOCALITY 4)
