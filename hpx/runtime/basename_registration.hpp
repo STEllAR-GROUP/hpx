@@ -139,7 +139,7 @@ namespace hpx
         std::size_t sequence_nr)
     {
         return client.then(
-            [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
+            [sequence_nr, base_name = std::move(base_name)](
                 components::client_base<Client, Stub> && c
             ) mutable -> hpx::future<bool>
             {

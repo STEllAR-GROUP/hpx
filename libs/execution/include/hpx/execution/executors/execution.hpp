@@ -1137,7 +1137,7 @@ namespace hpx { namespace parallel { namespace execution {
                     lcos::detail::make_continuation_exec<vector_result_type>(
                         std::forward<Future>(predecessor),
                         std::forward<BulkExecutor>(exec),
-                        [HPX_CAPTURE_MOVE(func)](
+                        [func = std::move(func)](
                             future_type&& predecessor) mutable
                         -> vector_result_type {
                             // use unwrap directly (instead of lazily) to avoid

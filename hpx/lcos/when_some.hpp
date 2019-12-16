@@ -510,7 +510,7 @@ namespace hpx { namespace lcos
                 std::move(lazy_values_), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            [HPX_CAPTURE_MOVE(f)]() -> when_some_result<result_type> {
+            [f = std::move(f)]() -> when_some_result<result_type> {
                 return (*f)();
             });
 
@@ -615,7 +615,7 @@ namespace hpx { namespace lcos
                 std::move(lazy_values), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            [HPX_CAPTURE_MOVE(f)]() -> when_some_result<result_type> {
+            [f = std::move(f)]() -> when_some_result<result_type> {
                 return (*f)();
             });
 
@@ -664,7 +664,7 @@ namespace hpx { namespace lcos
                 std::move(lazy_values), n);
 
         lcos::local::futures_factory<when_some_result<result_type>()> p(
-            [HPX_CAPTURE_MOVE(f)]() -> when_some_result<result_type> {
+            [f = std::move(f)]() -> when_some_result<result_type> {
                 return (*f)();
             });
 

@@ -9,19 +9,20 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(DOXYGEN)
-/// Evaluates to ``var = std::forward<decltype(var)>(var)`` if the compiler
-/// supports C++14 Lambdas. Defaults to ``var``.
-#define HPX_CAPTURE_FORWARD(var)
-/// Evaluates to ``var = std::move(var)`` if the compiler supports C++14
-/// Lambdas. Defaults to `var`.
-#define HPX_CAPTURE_MOVE(var)
-#else
-
 #include <utility>
 
+/// Evaluates to ``var = std::forward<decltype(var)>(var)`` if the compiler
+/// supports C++14 Lambdas. Defaults to ``var``.
+///
+/// This macro is deprecated. Prefer using ``var =
+/// std::forward<decltype(var)>(var)`` directly instead.
 #define HPX_CAPTURE_FORWARD(var) var = std::forward<decltype(var)>(var)
+
+///  Evaluates to ``var = std::move(var)`` if the compiler supports C++14
+/// Lambdas. Defaults to `var`.
+///
+/// This macro is deprecated. Prefer using ``var = std::move(var)`` directly
+/// instead.
 #define HPX_CAPTURE_MOVE(var) var = std::move(var)
-#endif
 
 #endif

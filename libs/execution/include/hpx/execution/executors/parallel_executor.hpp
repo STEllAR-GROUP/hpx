@@ -242,7 +242,7 @@ namespace hpx { namespace parallel { namespace execution {
                 lcos::detail::make_continuation_alloc<vector_result_type>(
                     hpx::util::internal_allocator<>{},
                     std::forward<Future>(predecessor), policy_,
-                    [HPX_CAPTURE_MOVE(func)](future_type&& predecessor) mutable
+                    [func = std::move(func)](future_type&& predecessor) mutable
                     -> vector_result_type {
                         // use unwrap directly (instead of lazily) to avoid
                         // having to pull in dataflow

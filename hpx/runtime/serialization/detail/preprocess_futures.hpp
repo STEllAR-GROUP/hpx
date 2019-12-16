@@ -136,7 +136,7 @@ namespace hpx { namespace serialization { namespace detail {
             auto& shared_state_ =
                 hpx::traits::future_access<hpx::future<void>>::get_shared_state(
                     fut);
-            shared_state_->set_on_completed([this, HPX_CAPTURE_MOVE(f)]() {
+            shared_state_->set_on_completed([this, f = std::move(f)]() {
                 reset();
                 f();
             });

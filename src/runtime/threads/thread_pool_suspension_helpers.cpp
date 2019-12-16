@@ -52,7 +52,7 @@ namespace hpx { namespace threads {
         }
 
         auto resume_direct_wrapper = [&pool, virt_core,
-                                         HPX_CAPTURE_MOVE(callback)]() {
+                                         callback = std::move(callback)]() {
             pool.resume_processing_unit_direct(virt_core, throws);
             callback();
         };
@@ -111,7 +111,7 @@ namespace hpx { namespace threads {
         }
 
         auto suspend_direct_wrapper = [&pool, virt_core,
-                                          HPX_CAPTURE_MOVE(callback)]() {
+                                          callback = std::move(callback)]() {
             pool.suspend_processing_unit_direct(virt_core, throws);
             callback();
         };
@@ -154,7 +154,7 @@ namespace hpx { namespace threads {
         std::function<void(void)> callback, error_code& ec)
     {
         auto resume_direct_wrapper = [&pool,
-                                         HPX_CAPTURE_MOVE(callback)]() -> void {
+                                         callback = std::move(callback)]() -> void {
             pool.resume_direct(throws);
             callback();
         };
@@ -201,7 +201,7 @@ namespace hpx { namespace threads {
             return;
         }
 
-        auto suspend_direct_wrapper = [&pool, HPX_CAPTURE_MOVE(callback)]() {
+        auto suspend_direct_wrapper = [&pool, callback = std::move(callback)]() {
             pool.suspend_direct(throws);
             callback();
         };

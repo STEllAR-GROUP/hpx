@@ -196,7 +196,7 @@ namespace hpx { namespace lcos { namespace detail
             parallel::execution::parallel_policy_executor<launch::async_policy>
                 exec{policy};
             parallel::execution::post(exec,
-                [HPX_CAPTURE_MOVE(this_)](Futures&& futures) -> void {
+                [this_ = std::move(this_)](Futures&& futures) -> void {
                     return this_->done(std::move(futures));
                 }, std::move(futures));
         }
@@ -246,7 +246,7 @@ namespace hpx { namespace lcos { namespace detail
             parallel::execution::parallel_policy_executor<launch::fork_policy>
                 exec{policy};
             parallel::execution::post(exec,
-                [HPX_CAPTURE_MOVE(this_)](Futures&& futures) -> void {
+                [this_ = std::move(this_)](Futures&& futures) -> void {
                     return this_->done(std::move(futures));
                 }, std::move(futures));
         }
@@ -283,7 +283,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             hpx::intrusive_ptr<dataflow_frame> this_(this);
             parallel::execution::post(std::forward<Executor>(exec),
-                [HPX_CAPTURE_MOVE(this_)](Futures&& futures) -> void {
+                [this_ = std::move(this_)](Futures&& futures) -> void {
                     return this_->execute(is_void{}, std::move(futures));
                 }, std::move(futures));
         }

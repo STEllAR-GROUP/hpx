@@ -140,7 +140,7 @@ namespace hpx { namespace lcos {
                 hpx::intrusive_ptr<wrapping_type> node = node_;
                 hpx::when_all(f, wait(hpx::launch::async))
                     .then(hpx::launch::sync,
-                        [HPX_CAPTURE_MOVE(node)](hpx::future<void> f) {
+                        [node = std::move(node)](hpx::future<void> f) {
                             HPX_UNUSED(node);
                             f.get();
                         })

@@ -146,8 +146,8 @@ namespace hpx { namespace lcos { namespace detail
             hpx::intrusive_ptr<Continuation> cont_(&cont);
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [HPX_CAPTURE_MOVE(inner_state),
-                    HPX_CAPTURE_MOVE(cont_)
+                [inner_state = std::move(inner_state),
+                    cont_ = std::move(cont_)
                 ]() mutable -> void {
                     return transfer_result<inner_future>(
                         std::move(inner_state), std::move(cont_));
@@ -382,8 +382,8 @@ namespace hpx { namespace lcos { namespace detail
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
                 >::call(hpx::launch::async, desc,
-                    [HPX_CAPTURE_MOVE(this_),
-                        HPX_CAPTURE_MOVE(f)
+                    [this_ = std::move(this_),
+                        f = std::move(f)
                     ]() mutable -> void {
                         this_->async_impl(std::move(f));
                     });
@@ -428,8 +428,8 @@ namespace hpx { namespace lcos { namespace detail
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
                 >::call(hpx::launch::async, desc,
-                    [HPX_CAPTURE_MOVE(this_),
-                        HPX_CAPTURE_MOVE(f)
+                    [this_ = std::move(this_),
+                        f = std::move(f)
                     ]() mutable -> void {
                         this_->async_impl_nounwrap(std::move(f));
                     });
@@ -469,8 +469,8 @@ namespace hpx { namespace lcos { namespace detail
 
             hpx::intrusive_ptr<continuation> this_(this);
             parallel::execution::post(std::forward<Executor>(exec),
-                [HPX_CAPTURE_MOVE(this_),
-                    HPX_CAPTURE_MOVE(f)
+                [this_ = std::move(this_),
+                    f = std::move(f)
                 ]() mutable -> void {
                     this_->async_exec_impl(std::move(f));
                 });
@@ -556,8 +556,8 @@ namespace hpx { namespace lcos { namespace detail
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [HPX_CAPTURE_MOVE(this_),
-                    HPX_CAPTURE_MOVE(state),
+                [this_ = std::move(this_),
+                    state = std::move(state),
                     HPX_CAPTURE_FORWARD(policy)
                 ]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
@@ -591,8 +591,8 @@ namespace hpx { namespace lcos { namespace detail
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [HPX_CAPTURE_MOVE(this_),
-                    HPX_CAPTURE_MOVE(state),
+                [this_ = std::move(this_),
+                    state = std::move(state),
                     HPX_CAPTURE_FORWARD(policy)
                 ]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
@@ -626,8 +626,8 @@ namespace hpx { namespace lcos { namespace detail
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [HPX_CAPTURE_MOVE(this_),
-                    HPX_CAPTURE_MOVE(state),
+                [this_ = std::move(this_),
+                    state = std::move(state),
                     &exec
                 ]() mutable -> void {
                     this_->async_exec(std::move(state), exec);
@@ -657,9 +657,9 @@ namespace hpx { namespace lcos { namespace detail
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [HPX_CAPTURE_MOVE(this_),
-                    HPX_CAPTURE_MOVE(state),
-                    HPX_CAPTURE_MOVE(exec)
+                [this_ = std::move(this_),
+                    state = std::move(state),
+                    exec = std::move(exec)
                 ]() mutable -> void {
                     return this_->async_exec(std::move(state), std::move(exec));
                 });
@@ -910,8 +910,8 @@ namespace hpx { namespace lcos { namespace detail
 
                 ptr->execute_deferred();
                 ptr->set_on_completed(
-                    [HPX_CAPTURE_MOVE(this_),
-                        HPX_CAPTURE_MOVE(inner_state)
+                    [this_ = std::move(this_),
+                        inner_state = std::move(inner_state)
                     ]() mutable -> void {
                         return this_->template on_inner_ready<inner_future>(
                             std::move(inner_state));
@@ -956,8 +956,8 @@ namespace hpx { namespace lcos { namespace detail
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [HPX_CAPTURE_MOVE(this_),
-                    HPX_CAPTURE_MOVE(outer_state)
+                [this_ = std::move(this_),
+                    outer_state = std::move(outer_state)
                 ]() mutable -> void {
                     return this_->template on_outer_ready<Future>(std::move(outer_state));
                 });

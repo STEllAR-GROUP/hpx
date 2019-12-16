@@ -241,8 +241,8 @@ namespace hpx { namespace lcos
                             // (if any).
                             hpx::intrusive_ptr<when_each_frame> this_(this);
                             next_future_data->set_on_completed(
-                                [HPX_CAPTURE_MOVE(this_),
-                                    HPX_CAPTURE_MOVE(next), HPX_CAPTURE_MOVE(end)
+                                [this_ = std::move(this_),
+                                    next = std::move(next), end = std::move(end)
                                 ]() mutable -> void {
                                     return this_->template await_range<I>(
                                         std::move(next), std::move(end));
@@ -310,7 +310,7 @@ namespace hpx { namespace lcos
                         // (if any).
                         hpx::intrusive_ptr<when_each_frame> this_(this);
                         next_future_data->set_on_completed(
-                            [HPX_CAPTURE_MOVE(this_)]() -> void {
+                            [this_ = std::move(this_)]() -> void {
                                 return this_->template await_next<I>(
                                     std::true_type(), std::false_type());
                             });
@@ -422,7 +422,7 @@ namespace hpx { namespace lcos
 
         return lcos::when_each(std::forward<F>(f), lazy_values_)
             .then(hpx::launch::sync, [
-                HPX_CAPTURE_MOVE(end)
+                end = std::move(end)
             ](lcos::future<void> fut) -> Iterator {
                 fut.get();      // rethrow exceptions, if any
                 return end;
@@ -446,7 +446,7 @@ namespace hpx { namespace lcos
 
         return lcos::when_each(std::forward<F>(f), lazy_values_)
             .then(hpx::launch::sync, [
-                HPX_CAPTURE_MOVE(begin)
+                begin = std::move(begin)
             ](lcos::future<void> fut) -> Iterator {
                 fut.get();      // rethrow exceptions, if any
                 return begin;

@@ -197,7 +197,7 @@ namespace hpx { namespace lcos {
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                auto on_ready = [this, HPX_CAPTURE_MOVE(op)](
+                auto on_ready = [this, op = std::move(op)](
                                     hpx::shared_future<void> f) mutable -> T {
                     f.get();    // propagate any exceptions
 
@@ -268,7 +268,7 @@ namespace hpx { namespace lcos {
                 basename, hpx::unmanaged(target), site);
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(target), HPX_CAPTURE_MOVE(basename)](
+                [target = std::move(target), basename = std::move(basename)](
                     hpx::future<bool>&& f) -> hpx::id_type {
                     bool result = f.get();
                     if (!result)
@@ -338,7 +338,7 @@ namespace hpx { namespace lcos {
                 local_result.get(), std::forward<F>(op));
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(id)](hpx::future<T>&& f) -> T {
+                [id = std::move(id)](hpx::future<T>&& f) -> T {
                     HPX_UNUSED(id);
                     return f.get();
                 });
@@ -403,7 +403,7 @@ namespace hpx { namespace lcos {
                 std::forward<T>(local_result), std::forward<F>(op));
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(id)](hpx::future<arg_type>&& f) -> arg_type {
+                [id = std::move(id)](hpx::future<arg_type>&& f) -> arg_type {
                     HPX_UNUSED(id);
                     return f.get();
                 });

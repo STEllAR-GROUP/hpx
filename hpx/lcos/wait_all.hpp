@@ -260,7 +260,7 @@ namespace hpx { namespace lcos
                             // in the sequence (if any).
                             next_future_data->set_on_completed(
                                 [this,
-                                    HPX_CAPTURE_MOVE(next), HPX_CAPTURE_MOVE(end)
+                                    next = std::move(next), end = std::move(end)
                                 ]() mutable -> void {
                                     return await_range<I>(
                                         std::move(next), std::move(end));

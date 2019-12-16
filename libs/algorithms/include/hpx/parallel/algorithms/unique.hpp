@@ -167,7 +167,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 auto f4 =
-                    [HPX_CAPTURE_MOVE(dest_ptr), first, count, flags](
+                    [dest_ptr = std::move(dest_ptr), first, count, flags](
                         std::vector<hpx::shared_future<std::size_t>>&&,
                         std::vector<hpx::future<void>>&&) mutable -> FwdIter {
                     if (!flags[count - 1])

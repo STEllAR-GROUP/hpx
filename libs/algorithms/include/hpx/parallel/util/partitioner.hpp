@@ -407,7 +407,7 @@ namespace hpx { namespace parallel { namespace util {
 #else
                 // wait for all tasks to finish
                 return hpx::dataflow(
-                    [HPX_CAPTURE_MOVE(errors), HPX_CAPTURE_MOVE(scoped_params),
+                    [errors = std::move(errors), scoped_params = std::move(scoped_params),
                         HPX_CAPTURE_FORWARD(f)](
                         std::vector<hpx::future<Result>>&& r) mutable -> R {
                         HPX_UNUSED(scoped_params);

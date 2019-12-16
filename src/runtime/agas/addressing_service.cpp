@@ -3018,7 +3018,7 @@ namespace hpx
     {
         return f.then(
             hpx::launch::sync,
-            [sequence_nr, HPX_CAPTURE_MOVE(base_name)](
+            [sequence_nr, base_name = std::move(base_name)](
                 hpx::future<hpx::id_type> && f
             ) mutable -> hpx::future<bool>
             {

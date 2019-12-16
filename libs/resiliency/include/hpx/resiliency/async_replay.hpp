@@ -97,7 +97,7 @@ namespace hpx { namespace resiliency {
                 // necessary
                 auto this_ = this->shared_from_this();
                 return f.then(hpx::launch::sync,
-                    [HPX_CAPTURE_MOVE(this_), n](hpx::future<Result>&& f) {
+                    [this_ = std::move(this_), n](hpx::future<Result>&& f) {
                         if (f.has_exception())
                         {
                             // rethrow abort_replay_exception, if caught
