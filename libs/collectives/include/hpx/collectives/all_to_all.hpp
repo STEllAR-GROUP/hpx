@@ -373,9 +373,9 @@ namespace hpx { namespace lcos {
 
         using arg_type = typename util::decay<T>::type;
 
-        auto all_to_all_data_direct = [HPX_CAPTURE_FORWARD(local_result),
-                                          this_site](
-                                          hpx::future<hpx::id_type>&& f)
+        auto all_to_all_data_direct =
+            [local_result = std::forward<T>(local_result),
+                this_site](hpx::future<hpx::id_type>&& f)
             -> hpx::future<std::vector<arg_type>> {
             using action_type =
                 typename detail::all_to_all_server<arg_type>::get_result_action;

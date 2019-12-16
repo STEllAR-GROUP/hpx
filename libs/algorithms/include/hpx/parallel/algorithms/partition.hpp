@@ -66,8 +66,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (chunks < 2)
                 {
                     return execution::async_execute(policy.executor(),
-                        [first, last, HPX_CAPTURE_FORWARD(f),
-                            HPX_CAPTURE_FORWARD(proj)]() -> RandIter {
+                        [first, last, f = std::forward<F>(f),
+                            proj = std::forward<Proj>(
+                                proj)]() -> RandIter {
                             return std::stable_partition(first, last,
                                 util::invoke_projected<F, Proj>(f, proj));
                         });
@@ -1154,8 +1155,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3>,
                     output_iterator_offset>;
 
-                auto f1 = [HPX_CAPTURE_FORWARD(pred),
-                              HPX_CAPTURE_FORWARD(proj)](
+                auto f1 = [pred = std::forward<Pred>(pred),
+                              proj = std::forward<Proj>(proj)](
                               zip_iterator part_begin,
                               std::size_t part_size) -> output_iterator_offset {
                     std::size_t true_count = 0;

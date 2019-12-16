@@ -86,17 +86,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<difference_type> tok(count);
 
-                auto f1 = [diff, count, tok, s_first, HPX_CAPTURE_FORWARD(op),
-                              HPX_CAPTURE_FORWARD(proj1),
-                              HPX_CAPTURE_FORWARD(proj2)](FwdIter it,
+                auto f1 = [diff, count, tok, s_first,
+                              op = std::forward<Pred>(op),
+                              proj1 = std::forward<Proj1>(proj1),
+                              proj2 = std::forward<Proj2>(proj2)](FwdIter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     FwdIter curr = it;
 
                     util::loop_idx_n(base_idx, it, part_size, tok,
                         [diff, count, s_first, &tok, &curr,
-                            HPX_CAPTURE_FORWARD(op), HPX_CAPTURE_FORWARD(proj1),
-                            HPX_CAPTURE_FORWARD(proj2)](
+                            op = std::forward<Pred>(op),
+                            proj1 = std::forward<Proj1>(proj1),
+                            proj2 = std::forward<Proj2>(proj2)](
                             reference v, std::size_t i) -> void {
                             ++curr;
                             if (hpx::util::invoke(op,
@@ -305,17 +307,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<difference_type> tok(count);
 
-                auto f1 = [count, diff, tok, s_first, HPX_CAPTURE_FORWARD(op),
-                              HPX_CAPTURE_FORWARD(proj1),
-                              HPX_CAPTURE_FORWARD(proj2)](FwdIter it,
+                auto f1 = [count, diff, tok, s_first,
+                              op = std::forward<Pred>(op),
+                              proj1 = std::forward<Proj1>(proj1),
+                              proj2 = std::forward<Proj2>(proj2)](FwdIter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     FwdIter curr = it;
 
                     util::loop_idx_n(base_idx, it, part_size, tok,
                         [count, diff, s_first, &tok, &curr,
-                            HPX_CAPTURE_FORWARD(op), HPX_CAPTURE_FORWARD(proj1),
-                            HPX_CAPTURE_FORWARD(proj2)](
+                            op = std::forward<Pred>(op),
+                            proj1 = std::forward<Proj1>(proj1),
+                            proj2 = std::forward<Proj2>(proj2)](
                             reference v, std::size_t i) -> void {
                             ++curr;
                             if (hpx::util::invoke(op,

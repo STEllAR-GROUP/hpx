@@ -74,7 +74,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<ExPolicy>(policy), first,
                     detail::distance(first, last), std::move(f1),
                     hpx::util::unwrapping(
-                        [HPX_CAPTURE_FORWARD(init), HPX_CAPTURE_FORWARD(r)](
+                        [init = std::forward<T_>(init),
+                            r = std::forward<Reduce>(r)](
                             std::vector<T>&& results) -> T {
                             return util::accumulate_n(hpx::util::begin(results),
                                 hpx::util::size(results), init, r);

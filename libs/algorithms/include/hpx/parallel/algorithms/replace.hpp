@@ -80,7 +80,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return for_each_n<FwdIter>().call(
                     std::forward<ExPolicy>(policy), std::false_type(), first,
                     std::distance(first, last),
-                    [old_value, new_value, HPX_CAPTURE_FORWARD(proj)](
+                    [old_value, new_value,
+                        proj = std::forward<Proj>(proj)](
                         type& t) -> void {
                         if (hpx::util::invoke(proj, t) == old_value)
                         {
@@ -216,8 +217,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return for_each_n<FwdIter>().call(
                     std::forward<ExPolicy>(policy), std::false_type(), first,
                     std::distance(first, last),
-                    [new_value, HPX_CAPTURE_FORWARD(f),
-                        HPX_CAPTURE_FORWARD(proj)](type& t) -> void {
+                    [new_value, f = std::forward<F>(f),
+                        proj = std::forward<Proj>(proj)](
+                        type& t) -> void {
                         using hpx::util::invoke;
                         if (invoke(f, invoke(proj, t)))
                             t = new_value;
@@ -375,7 +377,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<ExPolicy>(policy), std::false_type(),
                     hpx::util::make_zip_iterator(first, dest),
                     std::distance(first, last),
-                    [old_value, new_value, HPX_CAPTURE_FORWARD(proj)](
+                    [old_value, new_value,
+                        proj = std::forward<Proj>(proj)](
                         reference t) -> void {
                         using hpx::util::get;
                         if (hpx::util::invoke(proj, get<0>(t)) == old_value)
@@ -538,8 +541,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<ExPolicy>(policy), std::false_type(),
                     hpx::util::make_zip_iterator(first, dest),
                     std::distance(first, last),
-                    [new_value, HPX_CAPTURE_FORWARD(f),
-                        HPX_CAPTURE_FORWARD(proj)](reference t) -> void {
+                    [new_value, f = std::forward<F>(f),
+                        proj = std::forward<Proj>(proj)](
+                        reference t) -> void {
                         using hpx::util::get;
                         using hpx::util::invoke;
                         if (invoke(f, invoke(proj, get<0>(t))))

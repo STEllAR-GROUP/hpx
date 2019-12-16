@@ -228,9 +228,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return copy_if<IterPair>().call(
                     std::forward<ExPolicy>(policy), std::false_type(), first,
                     last, dest,
-                    [HPX_CAPTURE_FORWARD(f)](value_type const& a) -> bool {
-                        return !hpx::util::invoke(f, a);
-                    },
+                    [f = std::forward<F>(f)](value_type const& a)
+                        -> bool { return !hpx::util::invoke(f, a); },
                     std::forward<Proj>(proj));
             }
         };

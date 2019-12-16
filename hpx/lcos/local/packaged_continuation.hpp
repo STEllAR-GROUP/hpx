@@ -558,7 +558,7 @@ namespace hpx { namespace lcos { namespace detail
             ptr->set_on_completed(
                 [this_ = std::move(this_),
                     state = std::move(state),
-                    HPX_CAPTURE_FORWARD(policy)
+                    policy = std::forward<Policy>(policy)
                 ]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
                         this_->async(std::move(state), policy.priority());
@@ -593,7 +593,7 @@ namespace hpx { namespace lcos { namespace detail
             ptr->set_on_completed(
                 [this_ = std::move(this_),
                     state = std::move(state),
-                    HPX_CAPTURE_FORWARD(policy)
+                    policy = std::forward<Policy>(policy)
                 ]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
                         this_->async_nounwrap(std::move(state), policy.priority());
