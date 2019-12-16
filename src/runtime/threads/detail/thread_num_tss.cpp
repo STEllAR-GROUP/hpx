@@ -15,13 +15,13 @@ namespace hpx { namespace threads { namespace detail {
     namespace {
         std::size_t& thread_num_tss()
         {
-            HPX_NATIVE_TLS std::size_t thread_num_tss_ = std::size_t(-1);
+            thread_local std::size_t thread_num_tss_ = std::size_t(-1);
             return thread_num_tss_;
         }
 
         thread_pool& thread_pool_tss()
         {
-            HPX_NATIVE_TLS thread_pool thread_pool_tss_ = {
+            thread_local thread_pool thread_pool_tss_ = {
                 std::uint16_t(-1), std::uint16_t(-1)};
             return thread_pool_tss_;
         }

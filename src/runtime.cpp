@@ -312,7 +312,7 @@ namespace hpx
     namespace {
         std::uint64_t& runtime_uptime()
         {
-            static HPX_NATIVE_TLS std::uint64_t uptime;
+            static thread_local std::uint64_t uptime;
             return uptime;
         }
     }
@@ -871,7 +871,7 @@ namespace hpx
 
     runtime*& get_runtime_ptr()
     {
-        static HPX_NATIVE_TLS runtime* runtime_;
+        static thread_local runtime* runtime_;
         return runtime_;
     }
 

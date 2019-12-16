@@ -205,7 +205,7 @@ namespace hpx { namespace threads {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    static HPX_NATIVE_TLS std::size_t continuation_recursion_count(0);
+    static thread_local std::size_t continuation_recursion_count(0);
 
     std::size_t& get_continuation_recursion_count()
     {

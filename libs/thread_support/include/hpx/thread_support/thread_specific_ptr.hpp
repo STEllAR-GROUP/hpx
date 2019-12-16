@@ -57,11 +57,11 @@ namespace hpx { namespace util {
         }
 
     private:
-        static HPX_NATIVE_TLS T* ptr_;
+        static thread_local T* ptr_;
     };
 
     template <typename T, typename Tag>
-    HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = nullptr;
+    thread_local T* thread_specific_ptr<T, Tag>::ptr_ = nullptr;
 }}    // namespace hpx::util
 
 #else

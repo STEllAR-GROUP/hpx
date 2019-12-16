@@ -1313,7 +1313,7 @@ namespace hpx { namespace threads {
     namespace {
         hpx_hwloc_bitmap_wrapper& bitmap_storage()
         {
-            HPX_NATIVE_TLS hpx_hwloc_bitmap_wrapper bitmap_storage_(nullptr);
+            thread_local hpx_hwloc_bitmap_wrapper bitmap_storage_(nullptr);
 
             return bitmap_storage_;
         }
