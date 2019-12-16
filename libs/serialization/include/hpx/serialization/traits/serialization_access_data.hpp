@@ -30,8 +30,8 @@ namespace hpx { namespace traits {
         }
 
         // functions related to output operations
-        constexpr static void write(Container& cont,
-            std::size_t count, std::size_t current, void const* address)
+        constexpr static void write(Container& cont, std::size_t count,
+            std::size_t current, void const* address)
         {
         }
 
@@ -43,8 +43,8 @@ namespace hpx { namespace traits {
         }
 
         // functions related to input operations
-        constexpr static void read(Container const& cont,
-            std::size_t count, std::size_t current, void* address)
+        constexpr static void read(Container const& cont, std::size_t count,
+            std::size_t current, void* address)
         {
         }
 
