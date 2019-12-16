@@ -30,13 +30,13 @@ namespace hpx { namespace util { namespace detail {
         }
         void* (*copy)(void*, std::size_t, void const*, bool);
 
-        HPX_CONSTEXPR copyable_vtable(std::nullptr_t) noexcept
+        constexpr copyable_vtable(std::nullptr_t) noexcept
           : copy(nullptr)
         {
         }
 
         template <typename T>
-        HPX_CONSTEXPR copyable_vtable(construct_vtable<T>) noexcept
+        constexpr copyable_vtable(construct_vtable<T>) noexcept
           : copy(&copyable_vtable::template _copy<T>)
         {
         }

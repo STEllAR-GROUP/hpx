@@ -37,7 +37,7 @@ namespace hpx { namespace util { namespace detail {
 // we explicitly use the fallback.
 #if !defined(HPX_HAVE_CUDA)
             template <typename Sig>
-            HPX_CONSTEXPR function_vtable<Sig, true> const*
+            constexpr function_vtable<Sig, true> const*
             get_empty_function_vtable() noexcept
             {
                 return &vtables<function_vtable<Sig, true>,

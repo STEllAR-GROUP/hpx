@@ -300,7 +300,7 @@ namespace hpx { namespace threads {
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
         /// Return the locality of the parent thread
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        HPX_CONSTEXPR
+        constexpr
 #endif
         std::uint32_t get_parent_locality_id() const noexcept
         {
@@ -309,7 +309,7 @@ namespace hpx { namespace threads {
 
         /// Return the thread id of the parent thread
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        HPX_CONSTEXPR
+        constexpr
 #endif
         thread_id_type get_parent_thread_id() const noexcept
         {
@@ -318,7 +318,7 @@ namespace hpx { namespace threads {
 
         /// Return the phase of the parent thread
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        HPX_CONSTEXPR
+        constexpr
 #endif
         std::size_t get_parent_thread_phase() const noexcept
         {
@@ -359,7 +359,7 @@ namespace hpx { namespace threads {
 
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        HPX_CONSTEXPR
+        constexpr
 #endif
         char const* get_backtrace() const noexcept
         {
@@ -371,7 +371,7 @@ namespace hpx { namespace threads {
         }
 #else
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        HPX_CONSTEXPR
+        constexpr
 #endif
         util::backtrace const* get_backtrace() const noexcept
         {

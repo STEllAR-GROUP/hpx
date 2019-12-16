@@ -57,7 +57,7 @@ namespace hpx { namespace util {
         struct bind_eval_placeholder
         {
             template <typename T, typename... Us>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE
+            static constexpr HPX_HOST_DEVICE
                 typename util::tuple_element<I, util::tuple<Us&&...>>::type&&
                 call(T&& /*t*/, Us&&... vs)
             {
@@ -71,7 +71,7 @@ namespace hpx { namespace util {
         struct bind_eval
         {
             template <typename... Us>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE T&& call(T&& t, Us&&... /*vs*/)
+            static constexpr HPX_HOST_DEVICE T&& call(T&& t, Us&&... /*vs*/)
             {
                 return std::forward<T>(t);
             }
@@ -92,7 +92,7 @@ namespace hpx { namespace util {
                 traits::is_bind_expression<TD>::value>::type>
         {
             template <typename... Us>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE
+            static constexpr HPX_HOST_DEVICE
                 typename util::invoke_result<T, Us...>::type
                 call(T&& t, Us&&... vs)
             {
@@ -125,7 +125,7 @@ namespace hpx { namespace util {
             template <typename F_, typename... Ts_,
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
-            HPX_CONSTEXPR explicit bound(F_&& f, Ts_&&... vs)
+            constexpr explicit bound(F_&& f, Ts_&&... vs)
               : _f(std::forward<F_>(f))
               , _args(std::forward<Ts_>(vs)...)
             {
@@ -135,13 +135,13 @@ namespace hpx { namespace util {
             bound(bound const&) = default;
             bound(bound&&) = default;
 #else
-            HPX_CONSTEXPR HPX_HOST_DEVICE bound(bound const& other)
+            constexpr HPX_HOST_DEVICE bound(bound const& other)
               : _f(other._f)
               , _args(other._args)
             {
             }
 
-            HPX_CONSTEXPR HPX_HOST_DEVICE bound(bound&& other)
+            constexpr HPX_HOST_DEVICE bound(bound&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {
@@ -161,7 +161,7 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            HPX_CONSTEXPR HPX_HOST_DEVICE typename invoke_bound_result<F const&,
+            constexpr HPX_HOST_DEVICE typename invoke_bound_result<F const&,
                 util::pack<Ts const&...>, Us&&...>::type
             operator()(Us&&... vs) const&
             {
@@ -181,7 +181,7 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            HPX_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename invoke_bound_result<F const&&,
                     util::pack<Ts const&&...>, Us&&...>::type
                 operator()(Us&&... vs) const&&
@@ -235,7 +235,7 @@ namespace hpx { namespace util {
     template <typename F, typename... Ts,
         typename Enable = typename std::enable_if<
             !traits::is_action<typename std::decay<F>::type>::value>::type>
-    HPX_CONSTEXPR detail::bound<typename std::decay<F>::type,
+    constexpr detail::bound<typename std::decay<F>::type,
         typename util::make_index_pack<sizeof...(Ts)>::type,
         typename util::decay_unwrap<Ts>::type...>
     bind(F&& f, Ts&&... vs)

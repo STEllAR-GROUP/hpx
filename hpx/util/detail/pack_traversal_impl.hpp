@@ -37,7 +37,7 @@ namespace util {
                 tuple<T...> boxed_;
 
             public:
-                explicit HPX_CONSTEXPR spread_box(tuple<T...> boxed)
+                explicit constexpr spread_box(tuple<T...> boxed)
                   : boxed_(std::move(boxed))
                 {
                 }
@@ -51,14 +51,14 @@ namespace util {
             class spread_box<>
             {
             public:
-                explicit HPX_CONSTEXPR spread_box() noexcept
+                explicit constexpr spread_box() noexcept
                 {
                 }
-                explicit HPX_CONSTEXPR spread_box(tuple<> const&) noexcept
+                explicit constexpr spread_box(tuple<> const&) noexcept
                 {
                 }
 
-                HPX_CONSTEXPR tuple<> unbox() const noexcept
+                constexpr tuple<> unbox() const noexcept
                 {
                     return tuple<>{};
                 }
@@ -66,7 +66,7 @@ namespace util {
 
             /// Returns an empty spread box which represents an empty
             /// mapped object.
-            HPX_CONSTEXPR inline spread_box<> empty_spread() noexcept
+            constexpr inline spread_box<> empty_spread() noexcept
             {
                 return spread_box<>{};
             }
@@ -95,12 +95,12 @@ namespace util {
             /// Converts types to the type and spread_box objects to its
             /// underlying tuple.
             template <typename T>
-            HPX_CONSTEXPR T unpack(T&& type)
+            constexpr T unpack(T&& type)
             {
                 return std::forward<T>(type);
             }
             template <typename... T>
-            HPX_CONSTEXPR auto unpack(spread_box<T...> type)
+            constexpr auto unpack(spread_box<T...> type)
                 -> decltype(type.unbox())
             {
                 return type.unbox();
@@ -115,7 +115,7 @@ namespace util {
             /// underlying tuple. If the type is mapped to zero elements,
             /// the return type will be void.
             template <typename T>
-            HPX_CONSTEXPR auto unpack_or_void(T&& type)
+            constexpr auto unpack_or_void(T&& type)
                 -> decltype(unpack(std::forward<T>(type)))
             {
                 return unpack(std::forward<T>(type));
@@ -127,12 +127,12 @@ namespace util {
             /// Converts types to the a tuple carrying the single type and
             /// spread_box objects to its underlying tuple.
             template <typename T>
-            HPX_CONSTEXPR tuple<T> undecorate(T&& type)
+            constexpr tuple<T> undecorate(T&& type)
             {
                 return tuple<T>{std::forward<T>(type)};
             }
             template <typename... T>
-            HPX_CONSTEXPR auto undecorate(spread_box<T...> type)
+            constexpr auto undecorate(spread_box<T...> type)
                 -> decltype(type.unbox())
             {
                 return type.unbox();
@@ -146,7 +146,7 @@ namespace util {
                 // We overload with one argument here so Clang and GCC don't
                 // have any issues with overloading against zero arguments.
                 template <typename First, typename... T>
-                HPX_CONSTEXPR Type<First, T...> operator()(
+                constexpr Type<First, T...> operator()(
                     First&& first, T&&... args) const
                 {
                     return Type<First, T...>{
@@ -155,7 +155,7 @@ namespace util {
 
                 // Specifically return the empty object which can be different
                 // from a tuple.
-                HPX_CONSTEXPR EmptyType operator()() const
+                constexpr EmptyType operator()() const
                     noexcept(noexcept(EmptyType{}))
                 {
                     return EmptyType{};
@@ -189,14 +189,14 @@ namespace util {
                 // We overload with one argument here so Clang and GCC don't
                 // have any issues with overloading against zero arguments.
                 template <typename First, typename... T>
-                HPX_CONSTEXPR auto operator()(First&& first, T&&... args) const
+                constexpr auto operator()(First&& first, T&&... args) const
                     -> array_type_of_t<First, T...>
                 {
                     return array_type_of_t<First, T...>{
                         {std::forward<First>(first), std::forward<T>(args)...}};
                 }
 
-                HPX_CONSTEXPR auto operator()() const noexcept
+                constexpr auto operator()() const noexcept
                     -> decltype(empty_spread())
                 {
                     return empty_spread();
@@ -206,7 +206,7 @@ namespace util {
             /// Use the recursive instantiation for a variadic pack which
             /// may contain spread types
             template <typename C, typename... T>
-            HPX_CONSTEXPR auto apply_spread_impl(std::true_type, C&& callable,
+            constexpr auto apply_spread_impl(std::true_type, C&& callable,
                 T&&... args) -> decltype(invoke_fused(std::forward<C>(callable),
                 util::tuple_cat(undecorate(std::forward<T>(args))...)))
             {
@@ -217,7 +217,7 @@ namespace util {
             /// Use the linear instantiation for variadic packs which don't
             /// contain spread types.
             template <typename C, typename... T>
-            HPX_CONSTEXPR auto apply_spread_impl(std::false_type, C&& callable,
+            constexpr auto apply_spread_impl(std::false_type, C&& callable,
                 T&&... args) -> typename invoke_result<C, T...>::type
             {
                 return hpx::util::invoke(
@@ -230,7 +230,7 @@ namespace util {
             using is_any_spread_t = util::any_of<is_spread<T>...>;
 
             template <typename C, typename... T>
-            HPX_CONSTEXPR auto map_spread(C&& callable, T&&... args)
+            constexpr auto map_spread(C&& callable, T&&... args)
                 -> decltype(apply_spread_impl(is_any_spread_t<T...>{},
                     std::forward<C>(callable), std::forward<T>(args)...))
             {
@@ -244,7 +244,7 @@ namespace util {
             /// Converts the given variadic arguments into a tuple in a way
             /// that spread return values are inserted into the current pack.
             template <typename... T>
-            HPX_CONSTEXPR auto tupelize(T&&... args) -> decltype(
+            constexpr auto tupelize(T&&... args) -> decltype(
                 map_spread(tupelizer_of_t<>{}, std::forward<T>(args)...))
             {
                 return map_spread(tupelizer_of_t<>{}, std::forward<T>(args)...);
@@ -255,7 +255,7 @@ namespace util {
             /// If the arguments were mapped to zero arguments, the empty
             /// mapping is propagated backwards to the caller.
             template <template <typename...> class Type, typename... T>
-            HPX_CONSTEXPR auto flat_tupelize_to(T&&... args)
+            constexpr auto flat_tupelize_to(T&&... args)
                 -> decltype(map_spread(
                     flat_tupelizer_of_t<Type>{}, std::forward<T>(args)...))
             {
@@ -270,7 +270,7 @@ namespace util {
             /// mapping is propagated backwards to the caller.
             template <template <typename, std::size_t> class Type,
                 typename... T>
-            HPX_CONSTEXPR auto flat_arraylize_to(T&&... args) -> decltype(
+            constexpr auto flat_arraylize_to(T&&... args) -> decltype(
                 map_spread(flat_arraylizer<Type>{}, std::forward<T>(args)...))
             {
                 return map_spread(
@@ -279,7 +279,7 @@ namespace util {
 
             /// Converts an empty tuple to void
             template <typename First, typename... Rest>
-            HPX_CONSTEXPR tuple<First, Rest...> voidify_empty_tuple(
+            constexpr tuple<First, Rest...> voidify_empty_tuple(
                 tuple<First, Rest...> val)
             {
                 return val;
@@ -293,7 +293,7 @@ namespace util {
             ///
             /// If the returned tuple is empty, voidis returned instead.
             template <typename... T>
-            HPX_CONSTEXPR auto tupelize_or_void(T&&... args) -> decltype(
+            constexpr auto tupelize_or_void(T&&... args) -> decltype(
                 voidify_empty_tuple(tupelize(std::forward<T>(args)...)))
             {
                 return voidify_empty_tuple(tupelize(std::forward<T>(args)...));

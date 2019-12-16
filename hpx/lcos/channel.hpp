@@ -162,8 +162,7 @@ namespace hpx { namespace lcos
                 channel<T>, lcos::server::channel<T>
             > base_type;
 
-        HPX_CONSTEXPR_OR_CONST
-        static std::size_t default_generation = std::size_t(-1);
+        static constexpr std::size_t default_generation = std::size_t(-1);
 
     public:
         // FIXME: this typedef is currently needed for traits::is_future_range
@@ -373,8 +372,7 @@ namespace hpx { namespace lcos
                 receive_channel<T>, lcos::server::channel<T>
             > base_type;
 
-        HPX_CONSTEXPR_OR_CONST
-        static std::size_t default_generation = std::size_t(-1);
+        static constexpr std::size_t default_generation = std::size_t(-1);
 
     public:
         // FIXME: this typedef is currently needed for traits::is_future_range
@@ -457,7 +455,7 @@ namespace hpx { namespace lcos
                 send_channel<T>, lcos::server::channel<T>
             > base_type;
 
-        HPX_CONSTEXPR_OR_CONST
+        constexpr
         static std::size_t default_generation = std::size_t(-1);
 
     public:

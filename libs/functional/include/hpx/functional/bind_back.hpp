@@ -46,7 +46,7 @@ namespace hpx { namespace util {
             template <typename F_, typename... Ts_,
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
-            HPX_CONSTEXPR explicit bound_back(F_&& f, Ts_&&... vs)
+            constexpr explicit bound_back(F_&& f, Ts_&&... vs)
               : _f(std::forward<F_>(f))
               , _args(std::forward<Ts_>(vs)...)
             {
@@ -56,13 +56,13 @@ namespace hpx { namespace util {
             bound_back(bound_back const&) = default;
             bound_back(bound_back&&) = default;
 #else
-            HPX_CONSTEXPR HPX_HOST_DEVICE bound_back(bound_back const& other)
+            constexpr HPX_HOST_DEVICE bound_back(bound_back const& other)
               : _f(other._f)
               , _args(other._args)
             {
             }
 
-            HPX_CONSTEXPR HPX_HOST_DEVICE bound_back(bound_back&& other)
+            constexpr HPX_HOST_DEVICE bound_back(bound_back&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {
@@ -81,7 +81,7 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            HPX_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename invoke_bound_back_result<F const&,
                     util::pack<Ts const&...>, Us&&...>::type
                 operator()(Us&&... vs) const&
@@ -100,7 +100,7 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            HPX_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename invoke_bound_back_result<F const&&,
                     util::pack<Ts const&&...>, Us&&...>::type
                 operator()(Us&&... vs) const&&
@@ -149,7 +149,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename F, typename... Ts>
-    HPX_CONSTEXPR detail::bound_back<typename std::decay<F>::type,
+    constexpr detail::bound_back<typename std::decay<F>::type,
         typename util::make_index_pack<sizeof...(Ts)>::type,
         typename util::decay_unwrap<Ts>::type...>
     bind_back(F&& f, Ts&&... vs)
@@ -164,7 +164,7 @@ namespace hpx { namespace util {
 
     // nullary functions do not need to be bound again
     template <typename F>
-    HPX_CONSTEXPR typename std::decay<F>::type bind_back(F&& f)
+    constexpr typename std::decay<F>::type bind_back(F&& f)
     {
         return std::forward<F>(f);
     }

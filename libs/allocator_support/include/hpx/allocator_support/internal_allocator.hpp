@@ -95,14 +95,14 @@ namespace hpx { namespace util {
     };
 
     template <typename T>
-    HPX_CONSTEXPR bool operator==(
+    constexpr bool operator==(
         internal_allocator<T> const&, internal_allocator<T> const&)
     {
         return true;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator!=(
+    constexpr bool operator!=(
         internal_allocator<T> const&, internal_allocator<T> const&)
     {
         return false;

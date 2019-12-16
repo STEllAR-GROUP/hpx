@@ -39,7 +39,7 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     template <typename ExPolicy, typename Iter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE HPX_CONSTEXPR typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         !execution::is_vectorpack_execution_policy<ExPolicy>::value, bool>::type
         loop_optimization(Iter, Iter)
     {

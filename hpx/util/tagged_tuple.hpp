@@ -52,7 +52,7 @@ namespace hpx { namespace util
     }
 
     template <typename ...Tags, typename ...Ts>
-    HPX_CONSTEXPR HPX_FORCEINLINE
+    constexpr HPX_FORCEINLINE
     tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>
     make_tagged_tuple(Ts && ...ts)
     {
@@ -64,7 +64,7 @@ namespace hpx { namespace util
     }
 
     template <typename ...Tags, typename ...Ts>
-    HPX_CONSTEXPR HPX_FORCEINLINE
+    constexpr HPX_FORCEINLINE
     tagged_tuple<typename detail::tagged_type<Tags, Ts>::type...>
     make_tagged_tuple(tuple<Ts...> && t)
     {

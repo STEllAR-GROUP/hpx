@@ -17,7 +17,7 @@ namespace hpx { namespace naming {
     using component_type = std::int32_t;
     using address_type = std::uint64_t;
 
-    HPX_CONSTEXPR_OR_CONST std::uint32_t invalid_locality_id =
+    constexpr std::uint32_t invalid_locality_id =
         ~static_cast<std::uint32_t>(0);
 
 }}    // namespace hpx::naming

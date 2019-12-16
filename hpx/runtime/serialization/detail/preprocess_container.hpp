@@ -21,7 +21,7 @@ namespace hpx { namespace serialization { namespace detail {
     class preprocess_container
     {
     public:
-        HPX_CONSTEXPR preprocess_container()
+        constexpr preprocess_container()
           : size_(0)
         {
         }
@@ -40,7 +40,7 @@ namespace hpx { namespace serialization { namespace detail {
             size_ = 0;
         }
 
-        HPX_CONSTEXPR static bool is_preprocessing()
+        static constexpr bool is_preprocessing()
         {
             return true;
         }
@@ -60,7 +60,7 @@ namespace hpx { namespace traits {
     {
         using preprocessing_only = std::true_type;
 
-        HPX_CONSTEXPR static bool is_preprocessing()
+        static constexpr bool is_preprocessing()
         {
             return true;
         }

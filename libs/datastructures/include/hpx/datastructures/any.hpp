@@ -530,7 +530,7 @@ namespace hpx { namespace util {
 
             template <typename IArch, typename OArch, typename Char,
                 typename Copyable>
-            HPX_CONSTEXPR static fxn_ptr_table<IArch, OArch, Char, Copyable>*
+            static constexpr fxn_ptr_table<IArch, OArch, Char, Copyable>*
             get()
             {
                 using fxn_type = typename fxns<is_small,
@@ -602,7 +602,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::template get<void,
                 void, void, std::true_type>())
           , object(nullptr)
@@ -822,7 +822,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::template get<void,
                 void, Char, std::true_type>())
           , object(nullptr)
@@ -1044,7 +1044,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::template get<void,
                 void, void, std::false_type>())
           , object(nullptr)
@@ -1231,7 +1231,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::template get<void,
                 void, Char, std::false_type>())
           , object(nullptr)

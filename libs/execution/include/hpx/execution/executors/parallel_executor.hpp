@@ -47,7 +47,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Policy>
         struct get_default_policy
         {
-            static HPX_CONSTEXPR Policy call()
+            static constexpr Policy call()
             {
                 return Policy{};
             }
@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <>
         struct get_default_policy<hpx::launch>
         {
-            static HPX_CONSTEXPR hpx::launch::async_policy call()
+            static constexpr hpx::launch::async_policy call()
             {
                 return hpx::launch::async_policy{};
             }
@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { namespace execution {
         typedef static_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
-        HPX_CONSTEXPR explicit parallel_policy_executor(
+        constexpr explicit parallel_policy_executor(
             Policy l = detail::get_default_policy<Policy>::call(),
             std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
           : policy_(l)

@@ -335,7 +335,7 @@ namespace hpx { namespace threads
 
 #if defined(HPX_DEBUG)
                 // epsilon allows forgiveness of reasonable round-off errors
-                HPX_CONSTEXPR_OR_CONST double epsilon = 1e-7;
+                constexpr double epsilon = 1e-7;
 #endif
                 allocation_data_map_type scaled_static_allocation_data;
                 scaled_static_allocation_data[new_allocation] =

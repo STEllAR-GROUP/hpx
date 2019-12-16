@@ -126,7 +126,7 @@ namespace hpx { namespace threads {
         thread_id_repr thrd_;
     };
 
-    HPX_CONSTEXPR_OR_CONST thread_id invalid_thread_id;
+    constexpr thread_id invalid_thread_id;
 
 }}    // namespace hpx::threads
 

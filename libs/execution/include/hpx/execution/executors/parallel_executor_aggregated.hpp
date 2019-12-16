@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { namespace execution {
         using executor_parameters_type = static_chunk_size;
 
         /// Create a new parallel executor
-        HPX_CONSTEXPR explicit parallel_policy_executor_aggregated(
+        constexpr explicit parallel_policy_executor_aggregated(
             std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
           : num_spread_(spread)
           , num_tasks_(tasks)
@@ -251,7 +251,7 @@ namespace hpx { namespace parallel { namespace execution {
         using executor_parameters_type = static_chunk_size;
 
         /// Create a new parallel executor
-        HPX_CONSTEXPR explicit parallel_policy_executor_aggregated(
+        constexpr explicit parallel_policy_executor_aggregated(
             hpx::launch l = hpx::launch::async_policy{}, std::size_t spread = 4,
             std::size_t tasks = std::size_t(-1))
           : policy_(l)

@@ -884,7 +884,7 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CONSTEXPR std::size_t all_threads = std::size_t(-1);
+    constexpr std::size_t all_threads = std::size_t(-1);
 
     std::int64_t threadmanager::get_queue_length(bool reset)
     {

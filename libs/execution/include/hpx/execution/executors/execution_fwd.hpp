@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     struct task_policy_tag
     {
-        HPX_CONSTEXPR task_policy_tag() {}
+        constexpr task_policy_tag() {}
     };
     /// \endcond
 

@@ -43,7 +43,7 @@ namespace hpx { namespace util {
     // This function calculates the hash based on a multiplicative Fibonacci
     // scheme
     template <std::uint64_t N>
-    HPX_CONSTEXPR std::uint64_t fibhash(std::uint64_t i)
+    constexpr std::uint64_t fibhash(std::uint64_t i)
     {
         using helper = detail::hash_helper<N>;
         static_assert(N != 0, "This algorithm only works with N != 0");

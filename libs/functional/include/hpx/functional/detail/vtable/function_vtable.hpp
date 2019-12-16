@@ -23,7 +23,7 @@ namespace hpx { namespace util { namespace detail {
       , callable_info_vtable
     {
         template <typename T>
-        HPX_CONSTEXPR function_base_vtable(
+        constexpr function_base_vtable(
             construct_vtable<T>, std::integral_constant<bool, true>) noexcept
           : vtable(construct_vtable<T>())
           , copyable_vtable(construct_vtable<T>())
@@ -32,7 +32,7 @@ namespace hpx { namespace util { namespace detail {
         }
 
         template <typename T>
-        HPX_CONSTEXPR function_base_vtable(
+        constexpr function_base_vtable(
             construct_vtable<T>, std::integral_constant<bool, false>) noexcept
           : vtable(construct_vtable<T>())
           , copyable_vtable(nullptr)
@@ -53,14 +53,14 @@ namespace hpx { namespace util { namespace detail {
         using copyable_tag = std::integral_constant<bool, false>;
 
         template <typename T>
-        HPX_CONSTEXPR function_vtable(construct_vtable<T>) noexcept
+        constexpr function_vtable(construct_vtable<T>) noexcept
           : function_base_vtable(construct_vtable<T>(), copyable_tag{})
           , callable_vtable<Sig>(construct_vtable<T>())
         {
         }
 
         template <typename T, typename CopyableTag>
-        HPX_CONSTEXPR function_vtable(construct_vtable<T>, CopyableTag) noexcept
+        constexpr function_vtable(construct_vtable<T>, CopyableTag) noexcept
           : function_base_vtable(construct_vtable<T>(), CopyableTag{})
           , callable_vtable<Sig>(construct_vtable<T>())
         {
@@ -73,7 +73,7 @@ namespace hpx { namespace util { namespace detail {
         using copyable_tag = std::integral_constant<bool, true>;
 
         template <typename T>
-        HPX_CONSTEXPR function_vtable(construct_vtable<T>) noexcept
+        constexpr function_vtable(construct_vtable<T>) noexcept
           : function_vtable<Sig, false>(construct_vtable<T>(), copyable_tag{})
         {
         }

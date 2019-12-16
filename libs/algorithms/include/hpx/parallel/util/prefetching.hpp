@@ -222,7 +222,7 @@ namespace hpx { namespace parallel { namespace util {
             std::size_t chunk_size_;
             std::size_t range_size_;
 
-            static HPX_CONSTEXPR_OR_CONST std::size_t sizeof_first_value_type =
+            static constexpr std::size_t sizeof_first_value_type =
                 sizeof(typename hpx::util::tuple_element<0,
                     ranges_type>::type::type);
 

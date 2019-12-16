@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR dataseq_task_policy() {}
+        constexpr dataseq_task_policy() {}
         /// \endcond
 
         /// Create a new dataseq_task_policy from itself
@@ -69,7 +69,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new sequenced_task_policy
         ///
-        HPX_CONSTEXPR dataseq_task_policy operator()(task_policy_tag tag) const
+        constexpr dataseq_task_policy operator()(task_policy_tag tag) const
         {
             return *this;
         }
@@ -138,7 +138,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return exec_;
         }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const
+        constexpr executor_type const& executor() const
         {
             return exec_;
         }
@@ -149,7 +149,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return params_;
         }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR executor_parameters_type const& parameters() const
+        constexpr executor_parameters_type const& parameters() const
         {
             return params_;
         }
@@ -209,7 +209,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new sequenced_task_policy
         ///
-        HPX_CONSTEXPR dataseq_task_policy_shim const& operator()(
+        constexpr dataseq_task_policy_shim const& operator()(
             task_policy_tag tag) const
         {
             return *this;
@@ -278,7 +278,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return exec_;
         }
         /// Return the associated executor object.
-        HPX_CONSTEXPR Executor const& executor() const
+        constexpr Executor const& executor() const
         {
             return exec_;
         }
@@ -289,16 +289,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return params_;
         }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR Parameters const& parameters() const
+        constexpr Parameters const& parameters() const
         {
             return params_;
         }
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR dataseq_task_policy_shim() {}
+        constexpr dataseq_task_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
-        HPX_CONSTEXPR dataseq_task_policy_shim(
+        constexpr dataseq_task_policy_shim(
             Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
@@ -349,7 +349,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR dataseq_policy()
+        constexpr dataseq_policy()
           : exec_{}
           , params_{}
         {
@@ -363,7 +363,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new dataseq_task_policy
         ///
-        HPX_CONSTEXPR dataseq_task_policy operator()(task_policy_tag tag) const
+        constexpr dataseq_task_policy operator()(task_policy_tag tag) const
         {
             return dataseq_task_policy();
         }
@@ -433,7 +433,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return exec_;
         }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const
+        constexpr executor_type const& executor() const
         {
             return exec_;
         }
@@ -444,7 +444,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return params_;
         }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR executor_parameters_type const& parameters() const
+        constexpr executor_parameters_type const& parameters() const
         {
             return params_;
         }
@@ -500,7 +500,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new dataseq_task_policy_shim
         ///
-        HPX_CONSTEXPR dataseq_task_policy_shim<Executor, Parameters> operator()(
+        constexpr dataseq_task_policy_shim<Executor, Parameters> operator()(
             task_policy_tag tag) const
         {
             return dataseq_task_policy_shim<Executor, Parameters>(
@@ -570,7 +570,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return exec_;
         }
         /// Return the associated executor object.
-        HPX_CONSTEXPR Executor const& executor() const
+        constexpr Executor const& executor() const
         {
             return exec_;
         }
@@ -581,16 +581,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return params_;
         }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR Parameters const& parameters() const
+        constexpr Parameters const& parameters() const
         {
             return params_;
         }
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR dataseq_policy_shim() {}
+        constexpr dataseq_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
-        HPX_CONSTEXPR dataseq_policy_shim(
+        constexpr dataseq_policy_shim(
             Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
@@ -645,7 +645,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR datapar_task_policy() {}
+        constexpr datapar_task_policy() {}
         /// \endcond
 
         /// Create a new datapar_task_policy from itself
@@ -655,7 +655,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new datapar_task_policy
         ///
-        HPX_CONSTEXPR datapar_task_policy operator()(task_policy_tag tag) const
+        constexpr datapar_task_policy operator()(task_policy_tag tag) const
         {
             return *this;
         }
@@ -723,7 +723,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return exec_;
         }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const
+        constexpr executor_type const& executor() const
         {
             return exec_;
         }
@@ -734,7 +734,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return params_;
         }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR executor_parameters_type const& parameters() const
+        constexpr executor_parameters_type const& parameters() const
         {
             return params_;
         }
@@ -781,7 +781,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         };
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR datapar_policy()
+        constexpr datapar_policy()
           : exec_{}
           , params_{}
         {
@@ -795,7 +795,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new datapar_task_policy
         ///
-        HPX_CONSTEXPR datapar_task_policy operator()(task_policy_tag tag) const
+        constexpr datapar_task_policy operator()(task_policy_tag tag) const
         {
             return datapar_task_policy();
         }
@@ -858,7 +858,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return exec_;
         }
         /// Return the associated executor object.
-        HPX_CONSTEXPR executor_type const& executor() const
+        constexpr executor_type const& executor() const
         {
             return exec_;
         }
@@ -869,7 +869,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return params_;
         }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR executor_parameters_type const& parameters() const
+        constexpr executor_parameters_type const& parameters() const
         {
             return params_;
         }
@@ -925,7 +925,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new datapar_task_policy_shim
         ///
-        HPX_CONSTEXPR datapar_task_policy_shim<Executor, Parameters> operator()(
+        constexpr datapar_task_policy_shim<Executor, Parameters> operator()(
             task_policy_tag tag) const
         {
             return datapar_task_policy_shim<Executor, Parameters>(
@@ -994,7 +994,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return exec_;
         }
         /// Return the associated executor object.
-        HPX_CONSTEXPR Executor const& executor() const
+        constexpr Executor const& executor() const
         {
             return exec_;
         }
@@ -1005,16 +1005,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return params_;
         }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR Parameters const& parameters() const
+        constexpr Parameters const& parameters() const
         {
             return params_;
         }
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR datapar_policy_shim() {}
+        constexpr datapar_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
-        HPX_CONSTEXPR datapar_policy_shim(
+        constexpr datapar_policy_shim(
             Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
@@ -1073,7 +1073,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new sequenced_task_policy
         ///
-        HPX_CONSTEXPR datapar_task_policy_shim operator()(
+        constexpr datapar_task_policy_shim operator()(
             task_policy_tag tag) const
         {
             return *this;
@@ -1142,7 +1142,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return exec_;
         }
         /// Return the associated executor object.
-        HPX_CONSTEXPR Executor const& executor() const
+        constexpr Executor const& executor() const
         {
             return exec_;
         }
@@ -1153,16 +1153,16 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
             return params_;
         }
         /// Return the associated executor parameters object.
-        HPX_CONSTEXPR Parameters const& parameters() const
+        constexpr Parameters const& parameters() const
         {
             return params_;
         }
 
         /// \cond NOINTERNAL
-        HPX_CONSTEXPR datapar_task_policy_shim() {}
+        constexpr datapar_task_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
-        HPX_CONSTEXPR datapar_task_policy_shim(
+        constexpr datapar_task_policy_shim(
             Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))

@@ -426,7 +426,7 @@ namespace hpx { namespace debug {
 
     struct disable_print
     {
-        HPX_CONSTEXPR disable_print(const char* p) {}
+        disable_print(const char* p) {}
 #else
     template <bool enable>
     struct enable_print;
@@ -435,10 +435,10 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<false>
     {
-        HPX_CONSTEXPR enable_print(const char* p) {}
+        enable_print(const char* p) {}
 #endif
 
-        HPX_CONSTEXPR bool is_enabled() const
+        bool is_enabled() const
         {
             return false;
         }
@@ -483,7 +483,7 @@ namespace hpx { namespace debug {
 
         // @todo, return void so that timers have zero footprint when disabled
         template <typename... Args>
-        HPX_CONSTEXPR int make_timer(double delay, const Args... args) const
+        int make_timer(double delay, const Args... args) const
         {
             return 0;
         }
@@ -494,7 +494,7 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<false> : public disable_print
     {
-        HPX_CONSTEXPR enable_print(const char* p)
+        enable_print(const char* p)
           : disable_print(p)
         {
         }
@@ -503,7 +503,7 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<true> : public disable_print
     {
-        HPX_CONSTEXPR enable_print(const char* p)
+        enable_print(const char* p)
           : disable_print(p)
         {
         }
@@ -518,12 +518,12 @@ namespace hpx { namespace debug {
         const char* prefix_;
 
     public:
-        HPX_CONSTEXPR enable_print(const char* p)
+        enable_print(const char* p)
           : prefix_(p)
         {
         }
 
-        HPX_CONSTEXPR bool is_enabled() const
+        bool is_enabled() const
         {
             return true;
         }

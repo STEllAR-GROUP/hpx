@@ -80,7 +80,6 @@ set(doxygen_definition_list
     "HPX_ALWAYS_EXPORT="
     "extern="
     "HPX_NOEXCEPT="
-    "HPX_CONSTEXPR="
     "HPX_FORCEINLINE="
     "HPX_INLINE_NAMESPACE(x)=namespace x"
     "HPX_CONCEPT_REQUIRES_(...)=")

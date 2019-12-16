@@ -24,13 +24,13 @@ namespace hpx { namespace traits {
     {
         using preprocessing_only = std::false_type;
 
-        HPX_CONSTEXPR static bool is_preprocessing()
+        static constexpr bool is_preprocessing()
         {
             return false;
         }
 
         // functions related to output operations
-        constexpr static void write(Container& cont, std::size_t count,
+        static constexpr void write(Container& cont, std::size_t count,
             std::size_t current, void const* address)
         {
         }
@@ -43,19 +43,19 @@ namespace hpx { namespace traits {
         }
 
         // functions related to input operations
-        constexpr static void read(Container const& cont, std::size_t count,
+        static constexpr void read(Container const& cont, std::size_t count,
             std::size_t current, void* address)
         {
         }
 
-        HPX_CONSTEXPR static std::size_t init_data(Container const& cont,
+        static constexpr std::size_t init_data(Container const& cont,
             serialization::binary_filter* filter, std::size_t current,
             std::size_t decompressed_size)
         {
             return decompressed_size;
         }
 
-        constexpr static void reset(Container& cont) {}
+        static constexpr void reset(Container& cont) {}
     };
 
     ///////////////////////////////////////////////////////////////////////

@@ -432,14 +432,14 @@ namespace hpx { namespace parallel { namespace execution {
         template <>
         struct parameters_type_counter<>
         {
-            static HPX_CONSTEXPR_OR_CONST int value = 0;
+            static constexpr int value = 0;
         };
 
         /// Return the number of parameters which are true
         template <bool Flag1, bool... Flags>
         struct parameters_type_counter<Flag1, Flags...>
         {
-            static HPX_CONSTEXPR_OR_CONST int value =
+            static constexpr int value =
                 Flag1 + parameters_type_counter<Flags...>::value;
         };
 

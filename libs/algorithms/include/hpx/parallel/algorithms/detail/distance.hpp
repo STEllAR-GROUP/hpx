@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     template <typename RanIterB, typename RanIterE>
-    HPX_CONSTEXPR inline
+    constexpr inline
         typename std::iterator_traits<RanIterB>::difference_type
         distance(RanIterB first, RanIterE last, std::random_access_iterator_tag)
     {
@@ -34,7 +34,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     template <typename InIterB, typename InIterE>
-    HPX_CONSTEXPR inline typename std::iterator_traits<InIterB>::difference_type
+    constexpr inline typename std::iterator_traits<InIterB>::difference_type
     distance(InIterB first, InIterE last)
     {
         return distance(first, last,

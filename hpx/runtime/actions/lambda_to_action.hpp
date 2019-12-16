@@ -81,7 +81,7 @@ namespace hpx { namespace actions
         struct action_maker
         {
             template<typename F>
-            HPX_CONSTEXPR typename hpx::actions::detail::action_from_lambda<F>::type
+            constexpr typename hpx::actions::detail::action_from_lambda<F>::type
             operator += (F*) const
             {
                 static_assert(

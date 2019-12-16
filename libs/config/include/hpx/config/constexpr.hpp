@@ -10,28 +10,24 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(DOXYGEN)
 /// This macro evaluates to ``constexpr`` if the compiler supports it.
-#define HPX_CONSTEXPR
-/// This macro evaluates to ``constexpr`` if the compiler supports it, ``const``
+///
+/// This macro is deprecated. It is always replaced with the ``constexpr``
+/// keyword. Prefer using ``constexpr`` directly instead.
+#define HPX_CONSTEXPR constexpr
+
+///  This macro evaluates to ``constexpr`` if the compiler supports it, ``const``
 /// otherwise.
-#define HPX_CONSTEXPR_OR_CONST
-/// This macro evaluates to ``constexpr`` if the compiler supports C++14
-/// constexpr.
-#define HPX_STATIC_CONSTEXPR
-#else
+///
+/// This macro is deprecated. It is always replaced with the ``constexpr``
+/// keyword. Prefer using ``constexpr`` directly instead.
+#define HPX_CONSTEXPR_OR_CONST constexpr
 
-// clang-format off
-#if !defined(HPX_MSVC_NVCC) && !(defined(__NVCC__) && defined(__clang__))
-#   define HPX_CONSTEXPR constexpr
-#   define HPX_CONSTEXPR_OR_CONST constexpr
-#else
-#   define HPX_CONSTEXPR
-#   define HPX_CONSTEXPR_OR_CONST const
-#endif
-// clang-format on
-
-#define HPX_STATIC_CONSTEXPR static HPX_CONSTEXPR_OR_CONST
-#endif
+///  This macro evaluates to ``static constexpr`` if the compiler supports it,
+/// ``static const`` otherwise.
+///
+/// This macro is deprecated. It is always replaced with the ``static
+/// constexpr`` keyword. Prefer using ``static constexpr`` directly instead.
+#define HPX_STATIC_CONSTEXPR static constexpr
 
 #endif

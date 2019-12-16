@@ -25,7 +25,7 @@ namespace hpx { namespace resource {
     ///////////////////////////////////////////////////////////////////////////
     class pu
     {
-        HPX_CONSTEXPR static const std::size_t invalid_pu_id = std::size_t(-1);
+        static constexpr const std::size_t invalid_pu_id = std::size_t(-1);
 
     public:
         explicit pu(std::size_t id = invalid_pu_id, core* core = nullptr,
@@ -65,7 +65,7 @@ namespace hpx { namespace resource {
 
     class core
     {
-        HPX_CONSTEXPR static const std::size_t invalid_core_id =
+        static constexpr const std::size_t invalid_core_id =
             std::size_t(-1);
 
     public:
@@ -99,7 +99,7 @@ namespace hpx { namespace resource {
 
     class numa_domain
     {
-        HPX_CONSTEXPR static const std::size_t invalid_numa_domain_id =
+        static constexpr const std::size_t invalid_numa_domain_id =
             std::size_t(-1);
 
     public:

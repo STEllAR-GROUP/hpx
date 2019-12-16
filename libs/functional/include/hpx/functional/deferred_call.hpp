@@ -87,7 +87,7 @@ namespace hpx { namespace util {
 #if !defined(__NVCC__) && !defined(__CUDACC__)
             deferred(deferred&&) = default;
 #else
-            HPX_CONSTEXPR HPX_HOST_DEVICE deferred(deferred&& other)
+            constexpr HPX_HOST_DEVICE deferred(deferred&& other)
               : _f(std::move(other._f))
               , _args(std::move(other._args))
             {

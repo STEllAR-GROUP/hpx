@@ -50,22 +50,22 @@ namespace hpx { namespace util {
     namespace adl_barrier {
 
         template <std::size_t I, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type&
             get(Tuple& t) noexcept;
 
         template <std::size_t I, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type const&
             get(Tuple const& t) noexcept;
 
         template <std::size_t I, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type&&
             get(Tuple&& t) noexcept;
 
         template <std::size_t I, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type const&&
             get(Tuple const&& t) noexcept;
     }    // namespace adl_barrier
@@ -105,7 +105,7 @@ namespace hpx { namespace util {
             template <typename U = T,
                 typename EnableDefault = typename std::enable_if<
                     std::is_constructible<U>::value>::type>
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member()
+            constexpr HPX_HOST_DEVICE tuple_member()
               : _value()
             {
             }
@@ -113,7 +113,7 @@ namespace hpx { namespace util {
             template <typename U,
                 typename = typename std::enable_if<!std::is_same<tuple_member,
                     typename std::decay<U>::type>::value>::type>
-            explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member(U&& value)
+            explicit constexpr HPX_HOST_DEVICE tuple_member(U&& value)
               : _value(std::forward<U>(value))
             {
             }
@@ -122,13 +122,13 @@ namespace hpx { namespace util {
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member(
+            constexpr HPX_HOST_DEVICE tuple_member(
                 tuple_member const& other)
               : _value(other.value())
             {
             }
 
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member(tuple_member&& other)
+            constexpr HPX_HOST_DEVICE tuple_member(tuple_member&& other)
               : _value(std::forward<T>(other.value()))
             {
             }
@@ -153,7 +153,7 @@ namespace hpx { namespace util {
                 !std::is_final<T>::value>::type> : T
         {
         public:
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member()
+            constexpr HPX_HOST_DEVICE tuple_member()
               : T()
             {
             }
@@ -161,7 +161,7 @@ namespace hpx { namespace util {
             template <typename U,
                 typename = typename std::enable_if<!std::is_same<tuple_member,
                     typename std::decay<U>::type>::value>::type>
-            explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member(U&& value)
+            explicit constexpr HPX_HOST_DEVICE tuple_member(U&& value)
               : T(std::forward<U>(value))
             {
             }
@@ -170,13 +170,13 @@ namespace hpx { namespace util {
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member(
+            constexpr HPX_HOST_DEVICE tuple_member(
                 tuple_member const& other)
               : T(other.value())
             {
             }
 
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_member(tuple_member&& other)
+            constexpr HPX_HOST_DEVICE tuple_member(tuple_member&& other)
               : T(std::forward<T>(other.value()))
             {
             }
@@ -234,7 +234,7 @@ namespace hpx { namespace util {
                 typename Enable = typename std::enable_if<
                     util::all_of<std::is_constructible<Ts>...>::value,
                     Dependent>::type>
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl()
+            constexpr HPX_HOST_DEVICE tuple_impl()
               : tuple_member<Is, Ts>()...
             {
             }
@@ -242,7 +242,7 @@ namespace hpx { namespace util {
             template <typename... Us,
                 typename Enable = typename std::enable_if<
                     util::pack<Us...>::size == util::pack<Ts...>::size>::type>
-            explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl(
+            explicit constexpr HPX_HOST_DEVICE tuple_impl(
                 std::piecewise_construct_t, Us&&... vs)
               : tuple_member<Is, Ts>(std::forward<Us>(vs))...
             {
@@ -252,13 +252,13 @@ namespace hpx { namespace util {
             tuple_impl(tuple_impl const&) = default;
             tuple_impl(tuple_impl&&) = default;
 #else
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl(tuple_impl const& other)
+            constexpr HPX_HOST_DEVICE tuple_impl(tuple_impl const& other)
               : tuple_member<Is, Ts>(
                     static_cast<tuple_member<Is, Ts> const&>(other))...
             {
             }
 
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl(tuple_impl&& other)
+            constexpr HPX_HOST_DEVICE tuple_impl(tuple_impl&& other)
               : tuple_member<Is, Ts>(
                     static_cast<tuple_member<Is, Ts>&&>(other))...
             {
@@ -271,7 +271,7 @@ namespace hpx { namespace util {
                         typename std::decay<UTuple>::type>::value>::type,
                 typename EnableCompatible = typename std::enable_if<
                     are_tuples_compatible<tuple<Ts...>, UTuple>::value>::type>
-            HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl(UTuple&& other)
+            constexpr HPX_HOST_DEVICE tuple_impl(UTuple&& other)
               : tuple_member<Is, Ts>(
                     util::get<Is>(std::forward<UTuple>(other)))...
             {
@@ -377,17 +377,17 @@ namespace hpx { namespace util {
 
         // constexpr tuple();
         // Value initializes each element.
-        HPX_CONSTEXPR HPX_HOST_DEVICE tuple() {}
+        constexpr HPX_HOST_DEVICE tuple() {}
 
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.
-        HPX_CONSTEXPR HPX_HOST_DEVICE tuple(tuple const& /*other*/) = default;
+        constexpr HPX_HOST_DEVICE tuple(tuple const& /*other*/) = default;
 
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
-        HPX_CONSTEXPR HPX_HOST_DEVICE tuple(tuple&& /*other*/) = default;
+        constexpr HPX_HOST_DEVICE tuple(tuple&& /*other*/) = default;
 
         // 20.4.2.2, tuple assignment
 
@@ -437,7 +437,7 @@ namespace hpx { namespace util {
             typename Enable = typename std::enable_if<
                 util::all_of<std::is_constructible<Ts>...>::value,
                 Dependent>::type>
-        HPX_CONSTEXPR HPX_HOST_DEVICE tuple()
+        constexpr HPX_HOST_DEVICE tuple()
           : _impl()
         {
         }
@@ -445,7 +445,7 @@ namespace hpx { namespace util {
         // explicit constexpr tuple(const Types&...);
         // Initializes each element with the value of the corresponding
         // parameter.
-        explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple(Ts const&... vs)
+        explicit constexpr HPX_HOST_DEVICE tuple(Ts const&... vs)
           : _impl(std::piecewise_construct, vs...)
         {
         }
@@ -463,7 +463,7 @@ namespace hpx { namespace util {
                 util::pack<Us...>::size != 0>::type,
             typename EnableCompatible = typename std::enable_if<detail::
                     are_tuples_compatible<tuple, tuple<U, Us...>>::value>::type>
-        explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple(U&& v, Us&&... vs)
+        explicit constexpr HPX_HOST_DEVICE tuple(U&& v, Us&&... vs)
           : _impl(std::piecewise_construct, std::forward<U>(v),
                 std::forward<Us>(vs)...)
         {
@@ -483,7 +483,7 @@ namespace hpx { namespace util {
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.
-        HPX_CONSTEXPR HPX_HOST_DEVICE tuple(tuple const& other)
+        constexpr HPX_HOST_DEVICE tuple(tuple const& other)
           : _impl(other._impl)
         {
         }
@@ -491,7 +491,7 @@ namespace hpx { namespace util {
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
-        HPX_CONSTEXPR HPX_HOST_DEVICE tuple(tuple&& other)
+        constexpr HPX_HOST_DEVICE tuple(tuple&& other)
           : _impl(std::move(other._impl))
         {
         }
@@ -509,7 +509,7 @@ namespace hpx { namespace util {
                 typename std::decay<UTuple>::type>::value>::type,
             typename EnableCompatible = typename std::enable_if<
                 detail::are_tuples_compatible<tuple, UTuple>::value>::type>
-        HPX_CONSTEXPR HPX_HOST_DEVICE tuple(UTuple&& other)
+        constexpr HPX_HOST_DEVICE tuple(UTuple&& other)
           : _impl(std::forward<UTuple>(other))
         {
         }
@@ -664,13 +664,13 @@ namespace hpx { namespace util {
     {
         using type = typename util::at_index<I, Ts...>::type;
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
             tuple<Ts...>& tuple) noexcept
         {
             return tuple._impl.template get<I>();
         }
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
             tuple<Ts...> const& tuple) noexcept
         {
             return tuple._impl.template get<I>();
@@ -682,13 +682,13 @@ namespace hpx { namespace util {
     {
         using type = T0;
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
             std::pair<T0, T1>& tuple) noexcept
         {
             return tuple.first;
         }
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
             std::pair<T0, T1> const& tuple) noexcept
         {
             return tuple.first;
@@ -700,13 +700,13 @@ namespace hpx { namespace util {
     {
         using type = T1;
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
             std::pair<T0, T1>& tuple) noexcept
         {
             return tuple.second;
         }
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
             std::pair<T0, T1> const& tuple) noexcept
         {
             return tuple.second;
@@ -718,13 +718,13 @@ namespace hpx { namespace util {
     {
         using type = Type;
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
             boost::array<Type, Size>& tuple) noexcept
         {
             return tuple[I];
         }
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
             boost::array<Type, Size> const& tuple) noexcept
         {
             return tuple[I];
@@ -736,13 +736,13 @@ namespace hpx { namespace util {
     {
         using type = Type;
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
             std::array<Type, Size>& tuple) noexcept
         {
             return tuple[I];
         }
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
             std::array<Type, Size> const& tuple) noexcept
         {
             return tuple[I];
@@ -755,25 +755,25 @@ namespace hpx { namespace util {
     {
         using type = typename std::tuple_element<I, std::tuple<Ts...>>::type;
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
             std::tuple<Ts...>& tuple) noexcept
         {
             return std::get<I>(tuple);
         }
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
             std::tuple<Ts...> const& tuple) noexcept
         {
             return std::get<I>(tuple);
         }
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type&& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type&& get(
             std::tuple<Ts...>&& tuple) noexcept
         {
             return std::get<I>(std::move(tuple));
         }
 
-        static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type const&& get(
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const&& get(
             std::tuple<Ts...> const&& tuple) noexcept
         {
             return std::get<I>(std::move(tuple));
@@ -788,7 +788,7 @@ namespace hpx { namespace util {
         // constexpr typename tuple_element<I, tuple<Types...> >::type&
         // get(tuple<Types...>& t) noexcept;
         template <std::size_t I, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type&
             get(Tuple& t) noexcept
         {
@@ -799,7 +799,7 @@ namespace hpx { namespace util {
         // constexpr typename tuple_element<I, tuple<Types...> >::type const&
         // get(const tuple<Types...>& t) noexcept;
         template <std::size_t I, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type const&
             get(Tuple const& t) noexcept
         {
@@ -810,7 +810,7 @@ namespace hpx { namespace util {
         // constexpr typename tuple_element<I, tuple<Types...> >::type&&
         // get(tuple<Types...>&& t) noexcept;
         template <std::size_t I, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type&&
             get(Tuple&& t) noexcept
         {
@@ -822,7 +822,7 @@ namespace hpx { namespace util {
         // constexpr typename tuple_element<I, tuple<Types...> >::type const&&
         // get(const tuple<Types...>&& t) noexcept;
         template <std::size_t I, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type const&&
             get(Tuple const&& t) noexcept
         {
@@ -837,7 +837,7 @@ namespace hpx { namespace util {
     // template<class... Types>
     // constexpr tuple<VTypes...> make_tuple(Types&&... t);
     template <typename... Ts>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         tuple<typename decay_unwrap<Ts>::type...>
         make_tuple(Ts&&... vs)
     {
@@ -902,7 +902,7 @@ namespace hpx { namespace util {
           : tuple_element<I, Head>
         {
             template <typename THead, typename... TTail>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
+            static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
                 THead&& head, TTail&&... /*tail*/) noexcept
                 -> decltype(hpx::util::get<I>(std::forward<THead>(head)))
             {
@@ -919,7 +919,7 @@ namespace hpx { namespace util {
                 util::pack<Tail...>>;
 
             template <typename THead, typename... TTail>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
+            static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
                 THead&& /*head*/, TTail&&... tail) noexcept
                 -> decltype(base_type::get(std::forward<TTail>(tail)...))
             {
@@ -943,7 +943,7 @@ namespace hpx { namespace util {
             typename tuple_cat_result_impl<Indices, Tuples>::type;
 
         template <std::size_t... Is, typename... Tuples, typename... Tuples_>
-        HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat_impl(
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat_impl(
             index_pack<Is...> is_pack, pack<Tuples...> tuple_pack,
             Tuples_&&... tuples)
             -> tuple_cat_result_of_t<decltype(is_pack), decltype(tuple_pack)>
@@ -956,7 +956,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename... Tuples>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(
         Tuples&&... tuples)
         -> decltype(detail::tuple_cat_impl(
             typename util::make_index_pack<detail::tuple_cat_size<
@@ -984,7 +984,7 @@ namespace hpx { namespace util {
         struct tuple_equal_to
         {
             template <typename TTuple, typename UTuple>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
+            static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
                 TTuple const& t, UTuple const& u)
             {
                 return util::get<I>(t) == util::get<I>(u) &&
@@ -996,7 +996,7 @@ namespace hpx { namespace util {
         struct tuple_equal_to<Size, Size>
         {
             template <typename TTuple, typename UTuple>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
+            static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
                 TTuple const& t, UTuple const& u)
             {
                 return true;
@@ -1005,7 +1005,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename... Ts, typename... Us>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<sizeof...(Ts) == sizeof...(Us), bool>::type
         operator==(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
@@ -1016,7 +1016,7 @@ namespace hpx { namespace util {
     // constexpr bool operator!=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     template <typename... Ts, typename... Us>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<sizeof...(Ts) == sizeof...(Us), bool>::type
         operator!=(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
@@ -1035,7 +1035,7 @@ namespace hpx { namespace util {
         struct tuple_less_than
         {
             template <typename TTuple, typename UTuple>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
+            static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
                 TTuple const& t, UTuple const& u)
             {
                 return util::get<I>(t) < util::get<I>(u) ||
@@ -1048,7 +1048,7 @@ namespace hpx { namespace util {
         struct tuple_less_than<Size, Size>
         {
             template <typename TTuple, typename UTuple>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
+            static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
                 TTuple const& t, UTuple const& u)
             {
                 return false;
@@ -1057,7 +1057,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename... Ts, typename... Us>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<sizeof...(Ts) == sizeof...(Us), bool>::type
         operator<(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
@@ -1068,7 +1068,7 @@ namespace hpx { namespace util {
     // constexpr bool operator>
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     template <typename... Ts, typename... Us>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<sizeof...(Ts) == sizeof...(Us), bool>::type
         operator>(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
@@ -1079,7 +1079,7 @@ namespace hpx { namespace util {
     // constexpr bool operator<=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     template <typename... Ts, typename... Us>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<sizeof...(Ts) == sizeof...(Us), bool>::type
         operator<=(tuple<Ts...> const& t, tuple<Us...> const& u)
     {
@@ -1090,7 +1090,7 @@ namespace hpx { namespace util {
     // constexpr bool operator>=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     template <typename... Ts, typename... Us>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<sizeof...(Ts) == sizeof...(Us), bool>::type
         operator>=(tuple<Ts...> const& t, tuple<Us...> const& u)
     {

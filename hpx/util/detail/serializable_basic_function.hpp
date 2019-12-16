@@ -34,7 +34,7 @@ namespace hpx { namespace util { namespace detail
         using base_type = basic_function<R(Ts...), Copyable, false>;
 
     public:
-        HPX_CONSTEXPR basic_function() noexcept
+        constexpr basic_function() noexcept
           : base_type()
           , serializable_vptr(nullptr)
         {}

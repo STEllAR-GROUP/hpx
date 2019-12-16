@@ -36,7 +36,7 @@ namespace hpx { namespace util {
           , callable_info_vtable
         {
             template <typename T>
-            HPX_CONSTEXPR function_ref_vtable(construct_vtable<T>) noexcept
+            constexpr function_ref_vtable(construct_vtable<T>) noexcept
               : callable_vtable<Sig>(construct_vtable<T>())
               , callable_info_vtable(construct_vtable<T>())
             {
@@ -45,19 +45,19 @@ namespace hpx { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F>
-        HPX_CONSTEXPR bool is_empty_function_ptr(F* fp) noexcept
+        constexpr bool is_empty_function_ptr(F* fp) noexcept
         {
             return fp == nullptr;
         }
 
         template <typename T, typename C>
-        HPX_CONSTEXPR bool is_empty_function_ptr(T C::*mp) noexcept
+        constexpr bool is_empty_function_ptr(T C::*mp) noexcept
         {
             return mp == nullptr;
         }
 
         template <typename F>
-        HPX_CONSTEXPR bool is_empty_function_ptr(F const& f) noexcept
+        constexpr bool is_empty_function_ptr(F const& f) noexcept
         {
             return false;
         }
