@@ -41,10 +41,10 @@ milestone_id_from_version() {
 
 VERSION_MILESTONE_ID=$(milestone_id_from_version "${VERSION_FULL_NOTAG}")
 
-# echo "Closed issues"
-# echo "============="
+echo "Closed issues"
+echo "============="
 
-# hub issue --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
+hub issue --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
 
 echo ""
 echo "Closed pull requests"
