@@ -243,6 +243,20 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx11_std_shared_ptr_lwg3018)
+  add_hpx_config_test(HPX_WITH_CXX11_SHARED_PTR_LWG3018
+    SOURCE cmake/tests/cxx11_std_shared_ptr_lwg3018.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx11_std_quick_exit)
+  add_hpx_config_test(HPX_WITH_CXX11_STD_QUICK_EXIT
+    SOURCE cmake/tests/cxx11_std_quick_exit.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx17_aligned_new)
   add_hpx_config_test(HPX_WITH_CXX17_ALIGNED_NEW
     SOURCE cmake/tests/cxx17_aligned_new.cpp
