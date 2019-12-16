@@ -1,4 +1,5 @@
-//  Copyright (c) 2018 Mikael Simberg
+//  Copyright (c) 2018=2019 Mikael Simberg
+//  Copyright (c) 2018-2019 John Biddiscombe
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,14 +22,16 @@
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/synchronization.hpp>
 #include <hpx/runtime/threads/executors/limiting_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/synchronization.hpp>
 
 #include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -64,25 +67,25 @@ static std::string info_string = "";
 void print_stats(const char* title, const char* wait, const char* exec,
     std::int64_t count, double duration, bool csv)
 {
+    std::ostringstream temp;
     double us = 1e6 * duration / count;
     if (csv)
     {
-        hpx::util::format_to(cout,
+        hpx::util::format_to(temp,
             "{1}, {:27}, {:15}, {:18}, {:8}, {:8}, {:20}, {:4}, {:4}, "
             "{:20}\n",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
-            num_threads, info_string)
-            << flush;
+            num_threads, info_string);
     }
     else
     {
-        hpx::util::format_to(cout,
+        hpx::util::format_to(temp,
             "invoked {:1}, futures {:27} {:15} {:18} in {:8} seconds : {:8} "
             "us/future, queue {:20}, numa {:4}, threads {:4}, info {:20}\n",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
-            num_threads, info_string)
-            << flush;
+            num_threads, info_string);
     }
+    std::cout << temp.str() << std::endl;
     // CDash graph plotting
     //hpx::util::print_cdash_timing(title, duration);
 }
@@ -248,13 +251,34 @@ void measure_function_futures_limiting_executor(
     std::uint64_t const tasks = num_threads * 2000;
     std::atomic<std::uint64_t> sanity_check(count);
 
+    auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+    if (std::string("core-shared_priority_queue_scheduler") ==
+        sched->get_description())
+    {
+        sched->add_remove_scheduler_mode(
+            // add these flags
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::enable_stealing |
+                hpx::threads::policies::assign_work_round_robin |
+                hpx::threads::policies::steal_after_local),
+            // remove these flags
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::enable_stealing_numa |
+                hpx::threads::policies::assign_work_thread_parent |
+                hpx::threads::policies::steal_high_priority_first));
+    }
+
+    // test a parallel algorithm on custom pool with high priority
+    auto const chunk_size = count / (num_threads * 2);
+    hpx::parallel::execution::static_chunk_size fixed(chunk_size);
+
     // start the clock
     high_resolution_timer walltime;
     {
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(
-            hpx::parallel::execution::par, 0, count, [&](int) {
+            hpx::parallel::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
@@ -300,7 +324,7 @@ struct unlimited_number_of_chunks
 {
     template <typename Executor>
     std::size_t maximal_number_of_chunks(
-        Executor&& executor, std::size_t cores, std::size_t num_tasks)
+        Executor&& /*executor*/, std::size_t /*cores*/, std::size_t num_tasks)
     {
         return num_tasks;
     }
@@ -320,9 +344,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv)
     hpx::parallel::for_loop(hpx::parallel::execution::par.with(
                                 hpx::parallel::execution::static_chunk_size(1),
                                 unlimited_number_of_chunks()),
-        0, count, [](std::uint64_t) {
-            null_function();
-        });
+        0, count, [](std::uint64_t) { null_function(); });
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -389,6 +411,20 @@ void measure_function_futures_create_thread_hierarchical_placement(
     hpx::lcos::local::latch l(count);
 
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+
+    if (std::string("core-shared_priority_queue_scheduler") ==
+        sched->get_description())
+    {
+        sched->add_remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::assign_work_thread_parent),
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::enable_stealing |
+                hpx::threads::policies::enable_stealing_numa |
+                hpx::threads::policies::assign_work_round_robin |
+                hpx::threads::policies::steal_after_local |
+                hpx::threads::policies::steal_high_priority_first));
+    }
     auto const func = [&l]() {
         null_function();
         l.count_down(1);
@@ -508,10 +544,12 @@ int hpx_main(variables_map& vm)
 
         for (int i = 0; i < repetitions; i++)
         {
-            measure_function_futures_limiting_executor(count, csv, def);
             measure_function_futures_limiting_executor(count, csv, par);
+            measure_function_futures_create_thread_hierarchical_placement(
+                count, csv);
             if (test_all)
             {
+                measure_function_futures_limiting_executor(count, csv, def);
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
                 measure_function_futures_wait_each(count, csv, def);
@@ -525,8 +563,6 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_for_loop(count, csv);
                 measure_function_futures_register_work(count, csv);
                 measure_function_futures_create_thread(count, csv);
-                measure_function_futures_create_thread_hierarchical_placement(
-                    count, csv);
                 measure_function_futures_apply_hierarchical_placement(
                     count, csv);
             }
@@ -555,7 +591,7 @@ int main(int argc, char* argv[])
         ("repetitions", value<int>()->default_value(1),
          "number of repetitions of the full benchmark")
 
-        ("info", value<std::string>()->default_value("none"),
+        ("info", value<std::string>()->default_value("no-info"),
          "extra info for plot output (e.g. branch name)");
     // clang-format on
 

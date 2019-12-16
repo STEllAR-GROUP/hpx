@@ -8,11 +8,13 @@
 #if !defined(HPX_SCHEDULED_THREAD_POOL_IMPL_HPP)
 #define HPX_SCHEDULED_THREAD_POOL_IMPL_HPP
 
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
@@ -20,16 +22,14 @@
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
-#include <hpx/functional/deferred_call.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <boost/system/system_error.hpp>
@@ -50,8 +50,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     struct manage_active_thread_count
     {
@@ -84,8 +83,8 @@ namespace hpx { namespace threads { namespace detail
         ~init_tss_helper()
         {
             pool_.sched_->Scheduler::on_stop_thread(local_thread_num_);
-            pool_.notifier_.on_stop_thread(local_thread_num_, global_thread_num_,
-                pool_.get_pool_id().name().c_str(), "");
+            pool_.notifier_.on_stop_thread(local_thread_num_,
+                global_thread_num_, pool_.get_pool_id().name().c_str(), "");
         }
 
         scheduled_thread_pool<Scheduler>& pool_;
@@ -134,8 +133,13 @@ namespace hpx { namespace threads { namespace detail
            << "\n"
            << "is running on PUs : \n";
         os << std::hex << HPX_CPU_MASK_PREFIX << get_used_processing_units()
+#ifdef HPX_HAVE_MAX_CPU_COUNT
+           << " "
+           << std::bitset<HPX_HAVE_MAX_CPU_COUNT>(get_used_processing_units())
+#endif
            << '\n';
         os << "on numa domains : \n" << get_numa_domain_bitmap() << '\n';
+        os << "pool offset : \n" << std::dec << this->thread_offset_ << "\n";
     }
 
     template <typename Scheduler>
@@ -265,7 +269,8 @@ namespace hpx { namespace threads { namespace detail
 
             for (/**/; thread_num != pool_threads; ++thread_num)
             {
-                std::size_t global_thread_num = this->thread_offset_ + thread_num;
+                std::size_t global_thread_num =
+                    this->thread_offset_ + thread_num;
                 threads::mask_cref_type mask =
                     affinity_data_.get_pu_mask(topo, global_thread_num);
 
@@ -312,8 +317,8 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::resume_internal(bool blocking,
-        error_code& ec)
+    void scheduled_thread_pool<Scheduler>::resume_internal(
+        bool blocking, error_code& ec)
     {
         for (std::size_t virt_core = 0; virt_core != threads_.size();
              ++virt_core)
@@ -324,7 +329,7 @@ namespace hpx { namespace threads { namespace detail
         if (blocking)
         {
             for (std::size_t virt_core = 0; virt_core != threads_.size();
-                ++virt_core)
+                 ++virt_core)
             {
                 if (threads_[virt_core].joinable())
                 {
@@ -343,18 +348,18 @@ namespace hpx { namespace threads { namespace detail
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::suspend_internal(error_code& ec)
     {
-        util::yield_while([this]()
-            {
+        util::yield_while(
+            [this]() {
                 return this->sched_->Scheduler::get_thread_count() >
                     this->get_background_thread_count();
-            }, "scheduled_thread_pool::suspend_internal",
-            hpx::threads::pending);
+            },
+            "scheduled_thread_pool::suspend_internal", hpx::threads::pending);
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
         {
             hpx::state expected = state_running;
-            sched_->Scheduler::get_state(i).compare_exchange_strong(expected,
-                 state_pre_sleep);
+            sched_->Scheduler::get_state(i).compare_exchange_strong(
+                expected, state_pre_sleep);
         }
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
@@ -466,18 +471,18 @@ namespace hpx { namespace threads { namespace detail
                 detail::scheduling_counters counters(
                     counter_data.executed_threads_,
                     counter_data.executed_thread_phases_,
-                    counter_data.tfunc_times_,
-                    counter_data.exec_times_,
+                    counter_data.tfunc_times_, counter_data.exec_times_,
                     counter_data.idle_loop_counts_,
                     counter_data.busy_loop_counts_,
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
                     counter_data.tasks_active_,
                     counter_data.background_duration_,
                     counter_data.background_send_duration_,
                     counter_data.background_receive_duration_);
 #else
                     counter_data.tasks_active_);
-#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
                 detail::scheduling_callbacks callbacks(
                     util::deferred_call(    //-V107
@@ -489,16 +494,15 @@ namespace hpx { namespace threads { namespace detail
                 if ((mode_ & policies::do_background_work) &&
                     network_background_callback_)
                 {
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
                     callbacks.background_ = util::deferred_call(    //-V107
-                        network_background_callback_,
-                        global_thread_num,
+                        network_background_callback_, global_thread_num,
                         std::ref(counter_data.background_send_duration_),
                         std::ref(counter_data.background_receive_duration_));
 #else
                     callbacks.background_ = util::deferred_call(    //-V107
-                        network_background_callback_,
-                        global_thread_num);
+                        network_background_callback_, global_thread_num);
 #endif
                 }
 
@@ -510,8 +514,8 @@ namespace hpx { namespace threads { namespace detail
                 // threads exist or if some other thread has terminated
                 HPX_ASSERT(
                     (sched_->Scheduler::get_thread_count(
-                        suspended, thread_priority_default, thread_num) == 0 &&
-                     sched_->Scheduler::get_queue_length(thread_num) == 0) ||
+                         suspended, thread_priority_default, thread_num) == 0 &&
+                        sched_->Scheduler::get_queue_length(thread_num) == 0) ||
                     sched_->Scheduler::get_state(thread_num) > state_stopping);
             }
             catch (hpx::exception const& e)
@@ -549,7 +553,7 @@ namespace hpx { namespace threads { namespace detail
                 << "thread_func: " << id_.name()
                 << " thread_num:" << global_thread_num    //-V128
                 << " : caught unexpected "                //-V128
-                    "exception, aborted thread execution";
+                   "exception, aborted thread execution";
 
             report_error(global_thread_num, std::current_exception());
             return;
@@ -565,9 +569,9 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::create_thread(
-        thread_init_data& data, thread_id_type& id,
-        thread_state_enum initial_state, bool run_now, error_code& ec)
+    void scheduled_thread_pool<Scheduler>::create_thread(thread_init_data& data,
+        thread_id_type& id, thread_state_enum initial_state, bool run_now,
+        error_code& ec)
     {
         // verify state
         if (thread_count_ == 0 && !sched_->Scheduler::is_state(state_running))
@@ -648,7 +652,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     template <typename InIter, typename T, typename Proj>
-    T accumulate_projected(InIter first, InIter last, T init, Proj && proj)
+    T accumulate_projected(InIter first, InIter last, T init, Proj&& proj)
     {
         while (first != last)
         {
@@ -785,9 +789,9 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            exec_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::exec_times_);
+            exec_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::exec_times_);
             num_phases = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::executed_thread_phases_);
@@ -804,7 +808,8 @@ namespace hpx { namespace threads { namespace detail
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::exec_times_,
-                    &scheduling_counter_data::reset_thread_phase_duration_times_);
+                    &scheduling_counter_data::
+                        reset_thread_phase_duration_times_);
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::executed_thread_phases_,
@@ -819,8 +824,7 @@ namespace hpx { namespace threads { namespace detail
         num_phases -= reset_num_phases;
 
         return std::int64_t(
-                (double(exec_total) * timestamp_scale_) / double(num_phases)
-            );
+            (double(exec_total) * timestamp_scale_) / double(num_phases));
     }
 
     template <typename Scheduler>
@@ -848,9 +852,9 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            exec_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::exec_times_);
+            exec_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::exec_times_);
             num_threads = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::executed_threads_);
@@ -920,12 +924,12 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            exec_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::exec_times_);
-            tfunc_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::tfunc_times_);
+            exec_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::exec_times_);
+            tfunc_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::tfunc_times_);
             num_phases = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::executed_thread_phases_);
@@ -1011,12 +1015,12 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            exec_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::exec_times_);
-            tfunc_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::tfunc_times_);
+            exec_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::exec_times_);
+            tfunc_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::tfunc_times_);
             num_threads = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::executed_threads_);
@@ -1089,9 +1093,9 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            exec_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::exec_times_);
+            exec_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::exec_times_);
             reset_exec_total = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_cumulative_thread_duration_);
@@ -1101,7 +1105,8 @@ namespace hpx { namespace threads { namespace detail
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::exec_times_,
-                    &scheduling_counter_data::reset_cumulative_thread_duration_);
+                    &scheduling_counter_data::
+                        reset_cumulative_thread_duration_);
             }
         }
 
@@ -1142,16 +1147,16 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            exec_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::exec_times_);
+            exec_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::exec_times_);
             reset_exec_total = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_cumulative_thread_overhead_);
 
-            tfunc_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::tfunc_times_);
+            tfunc_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::tfunc_times_);
             reset_tfunc_total = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::
@@ -1162,7 +1167,8 @@ namespace hpx { namespace threads { namespace detail
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::exec_times_,
-                    &scheduling_counter_data::reset_cumulative_thread_overhead_);
+                    &scheduling_counter_data::
+                        reset_cumulative_thread_overhead_);
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::tfunc_times_,
@@ -1180,10 +1186,11 @@ namespace hpx { namespace threads { namespace detail
         return std::int64_t(
             (double(tfunc_total) - double(exec_total)) * timestamp_scale_);
     }
-#endif // HPX_HAVE_THREAD_IDLE_RATES
-#endif // HPX_HAVE_THREAD_CUMULATIVE_COUNTS
+#endif    // HPX_HAVE_THREAD_IDLE_RATES
+#endif    // HPX_HAVE_THREAD_CUMULATIVE_COUNTS
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
     ////////////////////////////////////////////////////////////
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_background_overhead(
@@ -1197,7 +1204,8 @@ namespace hpx { namespace threads { namespace detail
         if (num != std::size_t(-1))
         {
             tfunc_total = counter_data_[num].tfunc_times_;
-            reset_tfunc_total = counter_data_[num].reset_background_tfunc_times_;
+            reset_tfunc_total =
+                counter_data_[num].reset_background_tfunc_times_;
 
             bg_total = counter_data_[num].background_duration_;
             reset_bg_total = counter_data_[num].reset_background_overhead_;
@@ -1210,9 +1218,9 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            tfunc_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::tfunc_times_);
+            tfunc_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::tfunc_times_);
             reset_tfunc_total = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_background_tfunc_times_);
@@ -1303,7 +1311,8 @@ namespace hpx { namespace threads { namespace detail
         if (num != std::size_t(-1))
         {
             tfunc_total = counter_data_[num].tfunc_times_;
-            reset_tfunc_total = counter_data_[num].reset_background_send_tfunc_times_;
+            reset_tfunc_total =
+                counter_data_[num].reset_background_send_tfunc_times_;
 
             bg_total = counter_data_[num].background_send_duration_;
             reset_bg_total = counter_data_[num].reset_background_send_overhead_;
@@ -1311,14 +1320,15 @@ namespace hpx { namespace threads { namespace detail
             if (reset)
             {
                 counter_data_[num].reset_background_send_overhead_ = bg_total;
-                counter_data_[num].reset_background_send_tfunc_times_ = tfunc_total;
+                counter_data_[num].reset_background_send_tfunc_times_ =
+                    tfunc_total;
             }
         }
         else
         {
-            tfunc_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::tfunc_times_);
+            tfunc_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::tfunc_times_);
             reset_tfunc_total = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_background_send_tfunc_times_);
@@ -1335,7 +1345,8 @@ namespace hpx { namespace threads { namespace detail
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::tfunc_times_,
-                    &scheduling_counter_data::reset_background_send_tfunc_times_);
+                    &scheduling_counter_data::
+                        reset_background_send_tfunc_times_);
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::background_send_duration_,
@@ -1427,12 +1438,13 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            tfunc_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::tfunc_times_);
+            tfunc_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::tfunc_times_);
             reset_tfunc_total = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::reset_background_receive_tfunc_times_);
+                &scheduling_counter_data::
+                    reset_background_receive_tfunc_times_);
 
             bg_total = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
@@ -1446,11 +1458,13 @@ namespace hpx { namespace threads { namespace detail
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::tfunc_times_,
-                    &scheduling_counter_data::reset_background_receive_tfunc_times_);
+                    &scheduling_counter_data::
+                        reset_background_receive_tfunc_times_);
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::background_receive_duration_,
-                    &scheduling_counter_data::reset_background_receive_overhead_);
+                    &scheduling_counter_data::
+                        reset_background_receive_overhead_);
             }
         }
 
@@ -1478,11 +1492,13 @@ namespace hpx { namespace threads { namespace detail
         if (num != std::size_t(-1))
         {
             bg_total = counter_data_[num].background_receive_duration_;
-            reset_bg_total = counter_data_[num].reset_background_receive_duration_;
+            reset_bg_total =
+                counter_data_[num].reset_background_receive_duration_;
 
             if (reset)
             {
-                counter_data_[num].reset_background_receive_duration_ = bg_total;
+                counter_data_[num].reset_background_receive_duration_ =
+                    bg_total;
             }
         }
         else
@@ -1499,7 +1515,8 @@ namespace hpx { namespace threads { namespace detail
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
                     &scheduling_counter_data::background_receive_duration_,
-                    &scheduling_counter_data::reset_background_receive_duration_);
+                    &scheduling_counter_data::
+                        reset_background_receive_duration_);
             }
         }
 
@@ -1527,9 +1544,9 @@ namespace hpx { namespace threads { namespace detail
         }
         else
         {
-            tfunc_total = accumulate_projected(counter_data_.begin(),
-                counter_data_.end(), std::int64_t(0),
-                &scheduling_counter_data::tfunc_times_);
+            tfunc_total =
+                accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                    std::int64_t(0), &scheduling_counter_data::tfunc_times_);
             reset_tfunc_total = accumulate_projected(counter_data_.begin(),
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_tfunc_times_);
@@ -1559,12 +1576,12 @@ namespace hpx { namespace threads { namespace detail
         double const creation_total =
             static_cast<double>(sched_->Scheduler::get_creation_time(reset));
 
-        std::int64_t exec_total = accumulate_projected(counter_data_.begin(),
-            counter_data_.end(), std::int64_t(0),
-            &scheduling_counter_data::exec_times_);
-        std::int64_t tfunc_total = accumulate_projected(counter_data_.begin(),
-            counter_data_.end(), std::int64_t(0),
-            &scheduling_counter_data::tfunc_times_);
+        std::int64_t exec_total =
+            accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                std::int64_t(0), &scheduling_counter_data::exec_times_);
+        std::int64_t tfunc_total =
+            accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                std::int64_t(0), &scheduling_counter_data::tfunc_times_);
 
         std::int64_t reset_exec_total = accumulate_projected(
             counter_data_.begin(), counter_data_.end(), std::int64_t(0),
@@ -1576,12 +1593,10 @@ namespace hpx { namespace threads { namespace detail
         if (reset)
         {
             copy_projected(counter_data_.begin(), counter_data_.end(),
-                counter_data_.begin(),
-                &scheduling_counter_data::exec_times_,
+                counter_data_.begin(), &scheduling_counter_data::exec_times_,
                 &scheduling_counter_data::reset_creation_idle_rate_time_);
             copy_projected(counter_data_.begin(), counter_data_.end(),
-                counter_data_.begin(),
-                &scheduling_counter_data::tfunc_times_,
+                counter_data_.begin(), &scheduling_counter_data::tfunc_times_,
                 &scheduling_counter_data::reset_creation_idle_rate_time_);
         }
 
@@ -1608,12 +1623,12 @@ namespace hpx { namespace threads { namespace detail
         double const cleanup_total =
             static_cast<double>(sched_->Scheduler::get_cleanup_time(reset));
 
-        std::int64_t exec_total = accumulate_projected(counter_data_.begin(),
-            counter_data_.end(), std::int64_t(0),
-            &scheduling_counter_data::exec_times_);
-        std::int64_t tfunc_total = accumulate_projected(counter_data_.begin(),
-            counter_data_.end(), std::int64_t(0),
-            &scheduling_counter_data::tfunc_times_);
+        std::int64_t exec_total =
+            accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                std::int64_t(0), &scheduling_counter_data::exec_times_);
+        std::int64_t tfunc_total =
+            accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                std::int64_t(0), &scheduling_counter_data::tfunc_times_);
 
         std::int64_t reset_exec_total = accumulate_projected(
             counter_data_.begin(), counter_data_.end(), std::int64_t(0),
@@ -1625,12 +1640,10 @@ namespace hpx { namespace threads { namespace detail
         if (reset)
         {
             copy_projected(counter_data_.begin(), counter_data_.end(),
-                counter_data_.begin(),
-                &scheduling_counter_data::exec_times_,
+                counter_data_.begin(), &scheduling_counter_data::exec_times_,
                 &scheduling_counter_data::reset_cleanup_idle_rate_time_);
             copy_projected(counter_data_.begin(), counter_data_.end(),
-                counter_data_.begin(),
-                &scheduling_counter_data::tfunc_times_,
+                counter_data_.begin(), &scheduling_counter_data::tfunc_times_,
                 &scheduling_counter_data::reset_cleanup_idle_rate_time_);
         }
 
@@ -1649,17 +1662,17 @@ namespace hpx { namespace threads { namespace detail
             (cleanup_total / double(tfunc_total - exec_total));
         return std::int64_t(10000. * percent);    // 0.01 percent
     }
-#endif // HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+#endif    // HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::avg_idle_rate_all(bool reset)
     {
-        std::int64_t exec_total = accumulate_projected(counter_data_.begin(),
-            counter_data_.end(), std::int64_t(0),
-            &scheduling_counter_data::exec_times_);
-        std::int64_t tfunc_total = accumulate_projected(counter_data_.begin(),
-            counter_data_.end(), std::int64_t(0),
-            &scheduling_counter_data::tfunc_times_);
+        std::int64_t exec_total =
+            accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                std::int64_t(0), &scheduling_counter_data::exec_times_);
+        std::int64_t tfunc_total =
+            accumulate_projected(counter_data_.begin(), counter_data_.end(),
+                std::int64_t(0), &scheduling_counter_data::tfunc_times_);
 
         std::int64_t reset_exec_total = accumulate_projected(
             counter_data_.begin(), counter_data_.end(), std::int64_t(0),
@@ -1671,12 +1684,10 @@ namespace hpx { namespace threads { namespace detail
         if (reset)
         {
             copy_projected(counter_data_.begin(), counter_data_.end(),
-                counter_data_.begin(),
-                &scheduling_counter_data::exec_times_,
+                counter_data_.begin(), &scheduling_counter_data::exec_times_,
                 &scheduling_counter_data::reset_idle_rate_time_);
             copy_projected(counter_data_.begin(), counter_data_.end(),
-                counter_data_.begin(),
-                &scheduling_counter_data::tfunc_times_,
+                counter_data_.begin(), &scheduling_counter_data::tfunc_times_,
                 &scheduling_counter_data::reset_idle_rate_time_total_);
         }
 
@@ -1691,8 +1702,7 @@ namespace hpx { namespace threads { namespace detail
 
         HPX_ASSERT(tfunc_total >= exec_total);
 
-        double const percent =
-            1. - (double(exec_total) / double(tfunc_total));
+        double const percent = 1. - (double(exec_total) / double(tfunc_total));
         return std::int64_t(10000. * percent);    // 0.01 percent
     }
 
@@ -1705,8 +1715,7 @@ namespace hpx { namespace threads { namespace detail
 
         std::int64_t exec_time = counter_data_[num].exec_times_;
         std::int64_t tfunc_time = counter_data_[num].tfunc_times_;
-        std::int64_t reset_exec_time =
-            counter_data_[num].reset_idle_rate_time_;
+        std::int64_t reset_exec_time = counter_data_[num].reset_idle_rate_time_;
         std::int64_t reset_tfunc_time =
             counter_data_[num].reset_idle_rate_time_total_;
 
@@ -1727,11 +1736,10 @@ namespace hpx { namespace threads { namespace detail
 
         HPX_ASSERT(tfunc_time > exec_time);
 
-        double const percent =
-            1. - (double(exec_time) / double(tfunc_time));
+        double const percent = 1. - (double(exec_time) / double(tfunc_time));
         return std::int64_t(10000. * percent);    // 0.01 percent
     }
-#endif // HPX_HAVE_THREAD_IDLE_RATES
+#endif    // HPX_HAVE_THREAD_IDLE_RATES
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::get_idle_loop_count(
@@ -1779,14 +1787,14 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    std::size_t
-    scheduled_thread_pool<Scheduler>::get_policy_element(executor_parameter p,
-        error_code& ec) const
+    std::size_t scheduled_thread_pool<Scheduler>::get_policy_element(
+        executor_parameter p, error_code& ec) const
     {
         if (&ec != &throws)
             ec = make_success_code();
 
-        switch(p) {
+        switch (p)
+        {
         case threads::detail::min_concurrency:
             //             return min_punits_;
             break;
@@ -1825,8 +1833,8 @@ namespace hpx { namespace threads { namespace detail
         std::size_t virt_core, std::size_t thread_num,
         std::shared_ptr<util::barrier> startup, error_code& ec)
     {
-        std::unique_lock<typename Scheduler::pu_mutex_type>
-            l(sched_->Scheduler::get_pu_mutex(virt_core));
+        std::unique_lock<typename Scheduler::pu_mutex_type> l(
+            sched_->Scheduler::get_pu_mutex(virt_core));
 
         if (threads_.size() <= virt_core)
             threads_.resize(virt_core + 1);
@@ -1847,9 +1855,8 @@ namespace hpx { namespace threads { namespace detail
         HPX_ASSERT(oldstate == state_stopped || oldstate == state_initialized);
         HPX_UNUSED(oldstate);
 
-        threads_[virt_core] =
-            std::thread(&scheduled_thread_pool::thread_func, this,
-                virt_core, thread_num, std::move(startup));
+        threads_[virt_core] = std::thread(&scheduled_thread_pool::thread_func,
+            this, virt_core, thread_num, std::move(startup));
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1894,8 +1901,8 @@ namespace hpx { namespace threads { namespace detail
     void scheduled_thread_pool<Scheduler>::remove_processing_unit_internal(
         std::size_t virt_core, error_code& ec)
     {
-        std::unique_lock<typename Scheduler::pu_mutex_type>
-            l(sched_->Scheduler::get_pu_mutex(virt_core));
+        std::unique_lock<typename Scheduler::pu_mutex_type> l(
+            sched_->Scheduler::get_pu_mutex(virt_core));
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
@@ -1920,9 +1927,9 @@ namespace hpx { namespace threads { namespace detail
             state.store(oldstate);
         }
 
-        HPX_ASSERT(oldstate == state_starting ||
-            oldstate == state_running || oldstate == state_stopping ||
-            oldstate == state_stopped || oldstate == state_terminating);
+        HPX_ASSERT(oldstate == state_starting || oldstate == state_running ||
+            oldstate == state_stopping || oldstate == state_stopped ||
+            oldstate == state_terminating);
 
         std::thread t;
         std::swap(threads_[virt_core], t);
@@ -1933,10 +1940,11 @@ namespace hpx { namespace threads { namespace detail
         {
             std::size_t thread_num = thread_offset_ + virt_core;
 
-            util::yield_while([thread_num]()
-                {
+            util::yield_while(
+                [thread_num]() {
                     return thread_num == hpx::get_worker_thread_num();
-                }, "scheduled_thread_pool::remove_processing_unit_internal",
+                },
+                "scheduled_thread_pool::remove_processing_unit_internal",
                 hpx::threads::pending);
         }
 
@@ -1949,14 +1957,11 @@ namespace hpx { namespace threads { namespace detail
     {
         // Yield to other HPX threads if lock is not available to avoid
         // deadlocks when multiple HPX threads try to resume or suspend pus.
-        std::unique_lock<typename Scheduler::pu_mutex_type>
-            l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
+        std::unique_lock<typename Scheduler::pu_mutex_type> l(
+            sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
 
-        util::yield_while(
-            [&l]()
-            {
-                return !l.try_lock();
-            }, "scheduled_thread_pool::suspend_processing_unit_direct",
+        util::yield_while([&l]() { return !l.try_lock(); },
+            "scheduled_thread_pool::suspend_processing_unit_direct",
             hpx::threads::pending);
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
@@ -1982,10 +1987,9 @@ namespace hpx { namespace threads { namespace detail
         HPX_ASSERT(expected == state_running || expected == state_pre_sleep ||
             expected == state_sleeping);
 
-        util::yield_while([&state]()
-            {
-                return state.load() == state_pre_sleep;
-            }, "scheduled_thread_pool::suspend_processing_unit_direct",
+        util::yield_while(
+            [&state]() { return state.load() == state_pre_sleep; },
+            "scheduled_thread_pool::suspend_processing_unit_direct",
             hpx::threads::pending);
     }
     template <typename Scheduler>
@@ -1994,12 +1998,10 @@ namespace hpx { namespace threads { namespace detail
     {
         // Yield to other HPX threads if lock is not available to avoid
         // deadlocks when multiple HPX threads try to resume or suspend pus.
-        std::unique_lock<typename Scheduler::pu_mutex_type>
-            l(sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
-        util::yield_while([&l]()
-            {
-                return !l.try_lock();
-            }, "scheduled_thread_pool::resume_processing_unit_direct",
+        std::unique_lock<typename Scheduler::pu_mutex_type> l(
+            sched_->Scheduler::get_pu_mutex(virt_core), std::defer_lock);
+        util::yield_while([&l]() { return !l.try_lock(); },
+            "scheduled_thread_pool::resume_processing_unit_direct",
             hpx::threads::pending);
 
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
@@ -2017,13 +2019,14 @@ namespace hpx { namespace threads { namespace detail
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
 
-        util::yield_while([this, &state, virt_core]()
-            {
+        util::yield_while(
+            [this, &state, virt_core]() {
                 this->sched_->Scheduler::resume(virt_core);
                 return state.load() == state_sleeping;
-            }, "scheduled_thread_pool::resume_processing_unit_direct",
+            },
+            "scheduled_thread_pool::resume_processing_unit_direct",
             hpx::threads::pending);
     }
-}}}
+}}}    // namespace hpx::threads::detail
 
 #endif
