@@ -42,6 +42,7 @@ All modules
    /libs/local_lcos/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
+   /libs/mpi/docs/index.rst
    /libs/naming_base/docs/index.rst
    /libs/plugin/docs/index.rst
    /libs/preprocessor/docs/index.rst

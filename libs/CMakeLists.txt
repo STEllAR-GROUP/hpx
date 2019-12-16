@@ -39,6 +39,7 @@ set(HPX_LIBS
   local_lcos
   logging
   memory
+  mpi
   naming_base
   plugin
   preprocessor
