@@ -108,6 +108,16 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Auriane Reverdell (|cscs|_), for her work on refactoring our CMake setup and
+  modularizing |hpx|.
+* Christopher Hinz, for his work on refactoring our CMake setup.
+* Weile Wei, for fixing |hpx| builds with CUDA on Summit.
+* Severin Strobl, for fixing our CMake setup related to linking and adding new
+  entry points to the |hpx| runtime.
+* Rebecca Stobaugh, for her proofreading of and improvements our documentation
+  as part of Google Season of Docs.
+* Tapasweni Pathak, for correcting and improving our documentation.
+* Alex Myczko, for correcting our documentation.
 * Jan Mełech, for adding automatic serialization of simple structs.
 * Austin McCartney, for adding concept emulation of the Ranges TS bidirectional
   and random access iterator concepts.
@@ -238,12 +248,11 @@ the project through discussions, pull requests, documentation patches, etc.
   Bryant Lam, and Alex Hirsch who improved our CMake.
 * Praveen Velliengiri, Jean-Loup Tastet, Michael Levine, Aalekh Nigam,
   HadrienG2, Prayag Verma, and Avyav Kumar who improved the documentation.
-* Jayesh Badwaik, J. F. Bastien, Christoph Garth, Christopher Hinz, Brandon
-  Kohn, Mario Lang, Maikel Nadolski, pierrele, hendrx, Dekken, woodmeister123,
-  xaguilar, Andrew Kemp, Dylan Stark, Matthew Anderson, Jeremy Wilke, Jiazheng
-  Yuan, CyberDrudge, david8dixon, Maxwell Reeser, Raffaele Solcà, Marco
-  Ippolito, Jules Pénuchot, and yurivict who contributed to the general
-  improvement of |hpx|.
+* Jayesh Badwaik, J. F. Bastien, Christoph Garth, Brandon Kohn, Mario Lang,
+  Maikel Nadolski, pierrele, hendrx, Dekken, woodmeister123, xaguilar, Andrew
+  Kemp, Dylan Stark, Matthew Anderson, Jeremy Wilke, Jiazheng Yuan, CyberDrudge,
+  david8dixon, Maxwell Reeser, Raffaele Solcà, Marco Ippolito, Jules Pénuchot,
+  and yurivict who contributed to the general improvement of |hpx|.
 
 In addition to the people who worked directly with |hpx| development we would
 like to acknowledge the NSF, DoE, DARPA, |cct|_, |inf3|_, and |cscs|_ who fund

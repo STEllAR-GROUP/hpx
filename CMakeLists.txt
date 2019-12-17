@@ -494,7 +494,7 @@ hpx_add_config_define(HPX_HAVE_MAX_NUMA_DOMAIN_COUNT ${HPX_WITH_MAX_NUMA_DOMAIN_
 
 # Deprecated in 1.4.0
 hpx_option(HPX_WITH_MORE_THAN_64_THREADS BOOL
-  "HPX applications will be able to run on more than 64 cores (This variable is deprecated. The value is derived from HPX_MAX_CPU_COUNT instead.)"
+  "HPX applications will be able to run on more than 64 cores (This variable is deprecated. The value is derived from HPX_WITH_MAX_CPU_COUNT instead.)"
   "" CATEGORY "Thread Manager" ADVANCED)
 if(HPX_WITH_MORE_THAN_64_THREADS)
   hpx_warn("HPX_WITH_MORE_THAN_64_THREADS is deprecated. Instead use HPX_WITH_MAX_CPU_COUNT directly. If HPX_WITH_MAX_CPU_COUNT is greater than 64, or empty, HPX_HAVE_MORE_THAN_64_THREADS will be automatically set.")
