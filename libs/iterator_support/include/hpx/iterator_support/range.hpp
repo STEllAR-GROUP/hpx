@@ -163,8 +163,8 @@ namespace hpx { namespace util {
     namespace range_adl {
         template <typename C,
             typename Iterator = typename detail::iterator<C>::type>
-        HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Iterator begin(
-            C& c) noexcept(noexcept(detail::begin_impl(c, 0L)))
+        HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Iterator begin(C& c) noexcept(
+            noexcept(detail::begin_impl(c, 0L)))
         {
             return detail::begin_impl(c, 0L);
         }
@@ -179,8 +179,8 @@ namespace hpx { namespace util {
 
         template <typename C,
             typename Sentinel = typename detail::sentinel<C>::type>
-        HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Sentinel end(
-            C& c) noexcept(noexcept(detail::end_impl(c, 0L)))
+        HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Sentinel end(C& c) noexcept(
+            noexcept(detail::end_impl(c, 0L)))
         {
             return detail::end_impl(c, 0L);
         }

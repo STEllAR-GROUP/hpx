@@ -590,8 +590,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         constexpr dataseq_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
-        constexpr dataseq_policy_shim(
-            Executor_&& exec, Parameters_&& params)
+        constexpr dataseq_policy_shim(Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
         {
@@ -1014,8 +1013,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         constexpr datapar_policy_shim() {}
 
         template <typename Executor_, typename Parameters_>
-        constexpr datapar_policy_shim(
-            Executor_&& exec, Parameters_&& params)
+        constexpr datapar_policy_shim(Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
         {
@@ -1073,8 +1071,7 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
         ///
         /// \returns The new sequenced_task_policy
         ///
-        constexpr datapar_task_policy_shim operator()(
-            task_policy_tag tag) const
+        constexpr datapar_task_policy_shim operator()(task_policy_tag tag) const
         {
             return *this;
         }

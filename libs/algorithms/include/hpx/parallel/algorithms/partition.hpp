@@ -67,8 +67,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     return execution::async_execute(policy.executor(),
                         [first, last, f = std::forward<F>(f),
-                            proj = std::forward<Proj>(
-                                proj)]() -> RandIter {
+                            proj = std::forward<Proj>(proj)]() -> RandIter {
                             return std::stable_partition(first, last,
                                 util::invoke_projected<F, Proj>(f, proj));
                         });

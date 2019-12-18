@@ -464,20 +464,17 @@ namespace hpx { namespace debug {
         }
 
         template <typename T>
-        void array(
-            const std::string& name, const std::vector<T>& v) const
+        void array(const std::string& name, const std::vector<T>& v) const
         {
         }
 
         template <typename T, std::size_t N>
-        void array(
-            const std::string& name, const std::array<T, N>& v) const
+        void array(const std::string& name, const std::array<T, N>& v) const
         {
         }
 
         template <typename Iter>
-        void array(
-            const std::string& name, Iter begin, Iter end) const
+        void array(const std::string& name, Iter begin, Iter end) const
         {
         }
 

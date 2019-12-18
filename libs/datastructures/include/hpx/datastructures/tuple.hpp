@@ -122,8 +122,7 @@ namespace hpx { namespace util {
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
-            constexpr HPX_HOST_DEVICE tuple_member(
-                tuple_member const& other)
+            constexpr HPX_HOST_DEVICE tuple_member(tuple_member const& other)
               : _value(other.value())
             {
             }
@@ -170,8 +169,7 @@ namespace hpx { namespace util {
             tuple_member(tuple_member const&) = default;
             tuple_member(tuple_member&&) = default;
 #else
-            constexpr HPX_HOST_DEVICE tuple_member(
-                tuple_member const& other)
+            constexpr HPX_HOST_DEVICE tuple_member(tuple_member const& other)
               : T(other.value())
             {
             }
@@ -956,8 +954,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename... Tuples>
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(
-        Tuples&&... tuples)
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Tuples&&... tuples)
         -> decltype(detail::tuple_cat_impl(
             typename util::make_index_pack<detail::tuple_cat_size<
                 typename std::decay<Tuples>::type...>::value>::type{},

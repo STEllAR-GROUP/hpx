@@ -621,10 +621,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             Proj&& proj)
         {
             return execution::async_execute(policy.executor(),
-                [policy, first, middle, last,
-                    comp = std::forward<Comp>(comp),
-                    proj = std::forward<Proj>(
-                        proj)]() mutable -> RandIter {
+                [policy, first, middle, last, comp = std::forward<Comp>(comp),
+                    proj = std::forward<Proj>(proj)]() mutable -> RandIter {
                     try
                     {
                         parallel_inplace_merge_helper(policy, first, middle,

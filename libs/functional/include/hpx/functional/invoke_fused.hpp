@@ -67,9 +67,8 @@ namespace hpx { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t... Is, typename F, typename Tuple>
-        constexpr HPX_HOST_DEVICE
-            typename invoke_fused_result<F, Tuple>::type
-            invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t)
+        constexpr HPX_HOST_DEVICE typename invoke_fused_result<F, Tuple>::type
+        invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t)
         {
             return HPX_INVOKE(
                 std::forward<F>(f), util::get<Is>(std::forward<Tuple>(t))...);

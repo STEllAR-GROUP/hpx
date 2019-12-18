@@ -181,10 +181,9 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us>
-            constexpr HPX_HOST_DEVICE
-                typename invoke_bound_result<F const&&,
-                    util::pack<Ts const&&...>, Us&&...>::type
-                operator()(Us&&... vs) const&&
+            constexpr HPX_HOST_DEVICE typename invoke_bound_result<F const&&,
+                util::pack<Ts const&&...>, Us&&...>::type
+            operator()(Us&&... vs) const&&
             {
                 return HPX_INVOKE(std::move(_f),
                     detail::bind_eval<Ts const>::call(

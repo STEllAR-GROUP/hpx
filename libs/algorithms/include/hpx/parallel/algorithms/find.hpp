@@ -544,8 +544,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 auto f1 = [count, diff, tok, first2,
                               op = std::forward<Pred>(op),
-                              proj = std::forward<Proj>(proj)](
-                              FwdIter it, std::size_t part_size,
+                              proj = std::forward<Proj>(proj)](FwdIter it,
+                              std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     FwdIter curr = it;
 
@@ -770,8 +770,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<difference_type> tok(count);
 
-                auto f1 = [s_first, s_last, tok,
-                              op = std::forward<Pred>(op),
+                auto f1 = [s_first, s_last, tok, op = std::forward<Pred>(op),
                               proj1 = std::forward<Proj1>(proj1),
                               proj2 = std::forward<Proj2>(proj2)](FwdIter it,
                               std::size_t part_size,
