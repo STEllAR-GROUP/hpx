@@ -108,8 +108,8 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
-* Auriane Reverdell for her tireless work cleaing up the code base.
-* Rebecca Stobaugh for her major documentation review and contributions 
+* Auriane Reverdell, for her tireless work cleaing up the code base.
+* Rebecca Stobaugh, for her major documentation review and contributions 
   during and after the 2019 Google Season of Documentation.
 * Jan Melech, for adding automatic serialization of simple structs.
 * Austin McCartney, for adding concept emulation of the Ranges TS bidirectional
