@@ -264,11 +264,21 @@ library. Note that these definitions should be ``PRIVATE`` to make sure these
 definitions are not propagated transitively to dependent targets.
 
 In addition to making your library a component you can make it a plugin. To do
-so link to the ``HPX::plugin`` target. Similarly to ``HPX::component`` this
-will set ``HPX_PLUGIN_NAME`` to ``hpx_<target_name>``. This definition should
-also be ``PRIVATE``. Creating an |hpx| plugin requires some additional setup.
-
-TODO: Describe the requirements of a plugin (output directory!).
+so link to the ``HPX::plugin`` target. Similarly to ``HPX::component`` this will
+set ``HPX_PLUGIN_NAME`` to ``hpx_<target_name>``. This definition should also be
+``PRIVATE``. Unlike regular shared libraries, plugins are loaded at runtime from
+certain directories and will not be found without additional configuration.
+Plugins should be installed into a directory containing only plugins. For
+example, the plugins created by |hpx| itself are installed into the ``hpx``
+subdirectory in the library install directory (typically ``lib`` or ``lib64``).
+When using the ``HPX::plugin`` target you need to install your plugins into an
+appropriate directory. You may also want to set the location of your plugin in
+the build directory with the ``*_OUTPUT_DIRECTORY*`` CMake target properties to
+be able to load the plugins in the build directory. Once you've set the install
+or output directory of your plugin you need to tell your executable where to
+find it at runtime. You can do this either by setting the environment variable
+``HPX_COMPONENT_PATHS`` or the ini setting ``hpx.component_paths`` (see
+:option:`--hpx:ini`) to the directory containing your plugin.
 
 Using macros to create new targets
 ----------------------------------
