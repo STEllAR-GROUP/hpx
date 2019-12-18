@@ -28,7 +28,9 @@ General changes
 * The ``shared_priority_queue_scheduler`` has been improved. It now has lower
   overheads than the default scheduler in many situations. Unlike the default
   scheduler it fully supports NUMA scheduling hints. Enable it with the command
-  line option :option:`--hpx:queuing`\ ``=shared-priority``.
+  line option :option:`--hpx:queuing`\ ``=shared-priority``. This scheduler
+  should still be considered experimental, but its use is encouraged in real
+  applications to help us make it production ready.
 * We have added the performance counters ``background-receive-duration`` and
   ``background-receive-overhead`` for inspecting the time and overhead spent on
   receiving parcels in the background.
