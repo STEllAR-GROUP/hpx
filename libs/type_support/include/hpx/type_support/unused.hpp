@@ -31,16 +31,19 @@ namespace hpx { namespace util {
             unused_type const&)
         {
         }
-        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(unused_type&&) {}
-
-        template <typename T>
-        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(T const&) noexcept
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(unused_type&&)
         {
         }
 
         template <typename T>
-        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const& operator=(
-            T const&) const noexcept
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(
+            T const&) noexcept
+        {
+        }
+
+        template <typename T>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const&
+        operator=(T const&) const noexcept
         {
             return *this;
         }
@@ -52,8 +55,8 @@ namespace hpx { namespace util {
             return *this;
         }
 
-        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const& operator=(
-            unused_type const&) const noexcept
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const&
+        operator=(unused_type const&) const noexcept
         {
             return *this;
         }
@@ -64,8 +67,8 @@ namespace hpx { namespace util {
             return *this;
         }
 
-        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const& operator=(
-            unused_type&&) const noexcept
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type const&
+        operator=(unused_type&&) const noexcept
         {
             return *this;
         }

@@ -530,7 +530,8 @@ namespace hpx { namespace util {
 
             template <typename IArch, typename OArch, typename Char,
                 typename Copyable>
-            static constexpr fxn_ptr_table<IArch, OArch, Char, Copyable>* get()
+            static constexpr fxn_ptr_table<IArch, OArch, Char, Copyable>*
+            get()
             {
                 using fxn_type = typename fxns<is_small,
                     Copyable>::template type<T, IArch, OArch, Char>;

@@ -126,8 +126,8 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename F>
-    constexpr detail::one_shot_wrapper<typename std::decay<F>::type> one_shot(
-        F&& f)
+    constexpr detail::one_shot_wrapper<typename std::decay<F>::type>
+    one_shot(F&& f)
     {
         typedef detail::one_shot_wrapper<typename std::decay<F>::type>
             result_type;

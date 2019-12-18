@@ -100,8 +100,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count1);
 
-                auto f1 = [tok, f = std::forward<F>(f)](zip_iterator it,
-                              std::size_t part_count,
+                auto f1 = [tok, f = std::forward<F>(f)](
+                              zip_iterator it, std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_count, tok,
                         [&f, &tok](reference t, std::size_t i) {
@@ -278,8 +278,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                auto f1 = [tok, f = std::forward<F>(f)](zip_iterator it,
-                              std::size_t part_count,
+                auto f1 = [tok, f = std::forward<F>(f)](
+                              zip_iterator it, std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_count, tok,
                         [&f, &tok](reference t, std::size_t i) {

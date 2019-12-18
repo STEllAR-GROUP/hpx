@@ -153,231 +153,269 @@ namespace hpx { namespace traits {
     };
 }}    // namespace hpx::traits
 
-namespace hpx { namespace parallel { namespace util { namespace detail {
-    template <typename Dummy>
-    struct copy_helper<hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, InIter last, OutIter dest)
-        {
+namespace hpx {
+    namespace parallel {
+        namespace util {
+            namespace detail {
+                template <typename Dummy>
+                struct copy_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_HOST_DEVICE
+                        HPX_FORCEINLINE static std::pair<InIter, OutIter>
+                        call(InIter first, InIter last, OutIter dest)
+                    {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            return copy_helper<hpx::traits::general_pointer_tag>::call(
-                first, last, dest);
+                        return copy_helper<
+                            hpx::traits::general_pointer_tag>::call(first, last,
+                            dest);
 #else
-            std::size_t count = std::distance(first, last);
-            std::size_t bytes = count *
-                sizeof(typename std::iterator_traits<InIter>::value_type);
+                        std::size_t count = std::distance(first, last);
+                        std::size_t bytes = count *
+                            sizeof(typename std::iterator_traits<
+                                InIter>::value_type);
 
-            cudaMemcpyAsync(&(*dest), &(*first), bytes,
-                cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().get_stream());
+                        cudaMemcpyAsync(&(*dest), &(*first), bytes,
+                            cudaMemcpyDeviceToDevice,
+                            dest.target().native_handle().get_stream());
 
-            std::advance(dest, count);
-            return std::make_pair(last, dest);
+                        std::advance(dest, count);
+                        return std::make_pair(last, dest);
 #endif
-        }
-    };
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_helper<hpx::traits::trivially_cuda_copyable_pointer_tag_to_host,
-        Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, InIter last, OutIter dest)
-        {
+                template <typename Dummy>
+                struct copy_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag_to_host,
+                    Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_HOST_DEVICE
+                        HPX_FORCEINLINE static std::pair<InIter, OutIter>
+                        call(InIter first, InIter last, OutIter dest)
+                    {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            return copy_helper<hpx::traits::general_pointer_tag>::call(
-                first, last, dest);
+                        return copy_helper<
+                            hpx::traits::general_pointer_tag>::call(first, last,
+                            dest);
 #else
-            std::size_t count = std::distance(first, last);
-            std::size_t bytes = count *
-                sizeof(typename std::iterator_traits<InIter>::value_type);
+                        std::size_t count = std::distance(first, last);
+                        std::size_t bytes = count *
+                            sizeof(typename std::iterator_traits<
+                                InIter>::value_type);
 
-            cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
-                cudaMemcpyDeviceToHost,
-                first.target().native_handle().get_stream());
+                        cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
+                            cudaMemcpyDeviceToHost,
+                            first.target().native_handle().get_stream());
 
-            std::advance(dest, count);
-            return std::make_pair(last, dest);
+                        std::advance(dest, count);
+                        return std::make_pair(last, dest);
 #endif
-        }
-    };
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, InIter last, OutIter dest)
-        {
+                template <typename Dummy>
+                struct copy_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag_to_device,
+                    Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_HOST_DEVICE
+                        HPX_FORCEINLINE static std::pair<InIter, OutIter>
+                        call(InIter first, InIter last, OutIter dest)
+                    {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            return copy_helper<hpx::traits::general_pointer_tag>::call(
-                first, last, dest);
+                        return copy_helper<
+                            hpx::traits::general_pointer_tag>::call(first, last,
+                            dest);
 #else
-            std::size_t count = std::distance(first, last);
-            std::size_t bytes = count *
-                sizeof(typename std::iterator_traits<InIter>::value_type);
+                        std::size_t count = std::distance(first, last);
+                        std::size_t bytes = count *
+                            sizeof(typename std::iterator_traits<
+                                InIter>::value_type);
 
-            cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
-                cudaMemcpyHostToDevice,
-                dest.target().native_handle().get_stream());
+                        cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
+                            cudaMemcpyHostToDevice,
+                            dest.target().native_handle().get_stream());
 
-            std::advance(dest, count);
-            return std::make_pair(last, dest);
+                        std::advance(dest, count);
+                        return std::make_pair(last, dest);
 #endif
-        }
-    };
+                    }
+                };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Dummy>
-    struct copy_n_helper<hpx::traits::trivially_cuda_copyable_pointer_tag,
-        Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, std::size_t count, OutIter dest)
-        {
+                ///////////////////////////////////////////////////////////////////////////
+                template <typename Dummy>
+                struct copy_n_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_HOST_DEVICE
+                        HPX_FORCEINLINE static std::pair<InIter, OutIter>
+                        call(InIter first, std::size_t count, OutIter dest)
+                    {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            return copy_n_helper<hpx::traits::general_pointer_tag>::call(
-                first, count, dest);
+                        return copy_n_helper<
+                            hpx::traits::general_pointer_tag>::call(first,
+                            count, dest);
 #else
-            std::size_t bytes = count *
-                sizeof(typename std::iterator_traits<InIter>::value_type);
+                        std::size_t bytes = count *
+                            sizeof(typename std::iterator_traits<
+                                InIter>::value_type);
 
-            cudaMemcpyAsync((*dest).device_ptr(), (*first).device_ptr(), bytes,
-                cudaMemcpyDeviceToDevice,
-                dest.target().native_handle().get_stream());
+                        cudaMemcpyAsync((*dest).device_ptr(),
+                            (*first).device_ptr(), bytes,
+                            cudaMemcpyDeviceToDevice,
+                            dest.target().native_handle().get_stream());
 
-            std::advance(first, count);
-            std::advance(dest, count);
-            return std::make_pair(first, dest);
+                        std::advance(first, count);
+                        std::advance(dest, count);
+                        return std::make_pair(first, dest);
 #endif
-        }
-    };
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_n_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, std::size_t count, OutIter dest)
-        {
+                template <typename Dummy>
+                struct copy_n_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag_to_host,
+                    Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_HOST_DEVICE
+                        HPX_FORCEINLINE static std::pair<InIter, OutIter>
+                        call(InIter first, std::size_t count, OutIter dest)
+                    {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            return copy_n_helper<hpx::traits::general_pointer_tag>::call(
-                first, count, dest);
+                        return copy_n_helper<
+                            hpx::traits::general_pointer_tag>::call(first,
+                            count, dest);
 #else
-            std::size_t bytes = count *
-                sizeof(typename std::iterator_traits<InIter>::value_type);
+                        std::size_t bytes = count *
+                            sizeof(typename std::iterator_traits<
+                                InIter>::value_type);
 
-            cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
-                cudaMemcpyDeviceToHost,
-                first.target().native_handle().get_stream());
+                        cudaMemcpyAsync(&(*dest), (*first).device_ptr(), bytes,
+                            cudaMemcpyDeviceToHost,
+                            first.target().native_handle().get_stream());
 
-            std::advance(first, count);
-            std::advance(dest, count);
-            return std::make_pair(first, dest);
+                        std::advance(first, count);
+                        std::advance(dest, count);
+                        return std::make_pair(first, dest);
 #endif
-        }
-    };
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_n_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, std::size_t count, OutIter dest)
-        {
+                template <typename Dummy>
+                struct copy_n_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag_to_device,
+                    Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_HOST_DEVICE
+                        HPX_FORCEINLINE static std::pair<InIter, OutIter>
+                        call(InIter first, std::size_t count, OutIter dest)
+                    {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            return copy_n_helper<hpx::traits::general_pointer_tag>::call(
-                first, count, dest);
+                        return copy_n_helper<
+                            hpx::traits::general_pointer_tag>::call(first,
+                            count, dest);
 #else
-            std::size_t bytes = count *
-                sizeof(typename std::iterator_traits<InIter>::value_type);
+                        std::size_t bytes = count *
+                            sizeof(typename std::iterator_traits<
+                                InIter>::value_type);
 
-            cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
-                cudaMemcpyHostToDevice,
-                dest.target().native_handle().get_stream());
+                        cudaMemcpyAsync((*dest).device_ptr(), &(*first), bytes,
+                            cudaMemcpyHostToDevice,
+                            dest.target().native_handle().get_stream());
 
-            std::advance(first, count);
-            std::advance(dest, count);
-            return std::make_pair(first, dest);
+                        std::advance(first, count);
+                        std::advance(dest, count);
+                        return std::make_pair(first, dest);
 #endif
-        }
-    };
+                    }
+                };
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Customization point for copy-synchronize operations
-    template <typename Dummy>
-    struct copy_synchronize_helper<hpx::traits::cuda_copyable_pointer_tag,
-        Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static void call(InIter const&, OutIter const& dest)
-        {
-            dest.target().synchronize();
-        }
-    };
+                ///////////////////////////////////////////////////////////////////////////
+                // Customization point for copy-synchronize operations
+                template <typename Dummy>
+                struct copy_synchronize_helper<
+                    hpx::traits::cuda_copyable_pointer_tag, Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_FORCEINLINE static void call(
+                        InIter const&, OutIter const& dest)
+                    {
+                        dest.target().synchronize();
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_synchronize_helper<
-        hpx::traits::cuda_copyable_pointer_tag_to_host, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static void call(InIter const& first, OutIter const&)
-        {
-            first.target().synchronize();
-        }
-    };
+                template <typename Dummy>
+                struct copy_synchronize_helper<
+                    hpx::traits::cuda_copyable_pointer_tag_to_host, Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_FORCEINLINE static void call(
+                        InIter const& first, OutIter const&)
+                    {
+                        first.target().synchronize();
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_synchronize_helper<
-        hpx::traits::cuda_copyable_pointer_tag_to_device, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static void call(InIter const&, OutIter const& dest)
-        {
-            dest.target().synchronize();
-        }
-    };
+                template <typename Dummy>
+                struct copy_synchronize_helper<
+                    hpx::traits::cuda_copyable_pointer_tag_to_device, Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_FORCEINLINE static void call(
+                        InIter const&, OutIter const& dest)
+                    {
+                        dest.target().synchronize();
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_synchronize_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static void call(InIter const&, OutIter const& dest)
-        {
-            dest.target().synchronize();
-        }
-    };
+                template <typename Dummy>
+                struct copy_synchronize_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_FORCEINLINE static void call(
+                        InIter const&, OutIter const& dest)
+                    {
+                        dest.target().synchronize();
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_synchronize_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_host, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static void call(InIter const& first, OutIter const&)
-        {
-            first.target().synchronize();
-        }
-    };
+                template <typename Dummy>
+                struct copy_synchronize_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag_to_host,
+                    Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_FORCEINLINE static void call(
+                        InIter const& first, OutIter const&)
+                    {
+                        first.target().synchronize();
+                    }
+                };
 
-    template <typename Dummy>
-    struct copy_synchronize_helper<
-        hpx::traits::trivially_cuda_copyable_pointer_tag_to_device, Dummy>
-    {
-        template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static void call(InIter const&, OutIter const& dest)
-        {
-            dest.target().synchronize();
+                template <typename Dummy>
+                struct copy_synchronize_helper<
+                    hpx::traits::trivially_cuda_copyable_pointer_tag_to_device,
+                    Dummy>
+                {
+                    template <typename InIter, typename OutIter>
+                    HPX_FORCEINLINE static void call(
+                        InIter const&, OutIter const& dest)
+                    {
+                        dest.target().synchronize();
+                    }
+                };
+            }
         }
-    };
-}}}}    // namespace hpx::parallel::util::detail
+    }
+}
 
 #endif
 #endif

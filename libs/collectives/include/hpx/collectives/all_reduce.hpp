@@ -326,7 +326,8 @@ namespace hpx { namespace lcos {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         auto all_reduce_data =
-            [op = std::forward<F>(op), this_site](hpx::future<hpx::id_type>&& f,
+            [op = std::forward<F>(op), this_site](
+                hpx::future<hpx::id_type>&& f,
                 hpx::future<T>&& local_result) mutable -> hpx::future<T> {
             using func_type = typename std::decay<F>::type;
             using action_type = typename detail::all_reduce_server<
@@ -391,7 +392,8 @@ namespace hpx { namespace lcos {
         using arg_type = typename std::decay<T>::type;
         auto all_reduce_data_direct =
             [op = std::forward<F>(op),
-                local_result = std::forward<T>(local_result),
+                local_result =
+                    std::forward<T>(local_result),
                 this_site](hpx::future<hpx::id_type>&& f) mutable
             -> hpx::future<arg_type> {
             using func_type = typename std::decay<F>::type;

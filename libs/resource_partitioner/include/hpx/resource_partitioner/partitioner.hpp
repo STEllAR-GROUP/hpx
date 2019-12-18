@@ -65,7 +65,8 @@ namespace hpx { namespace resource {
 
     class core
     {
-        static constexpr const std::size_t invalid_core_id = std::size_t(-1);
+        static constexpr const std::size_t invalid_core_id =
+            std::size_t(-1);
 
     public:
         explicit core(

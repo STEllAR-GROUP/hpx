@@ -84,6 +84,15 @@ namespace
     "BOOST_HAS_CHAR32_T",
     nullptr
     };
+
+  const char * hpx_1_5_0_macros [] = {
+    "HPX_CONSTEXPR",
+    "HPX_CXX14_CONSTEXPR",
+    "HPX_CAPTURE_MOVE",
+    "HPX_CAPTURE_FORWARD",
+    "HPX_NATIVE_TLS",
+    nullptr
+    };
 } // unnamed namespace
 
 
@@ -140,6 +149,15 @@ namespace boost
           ++errors;
           error( library_name, full_path, loclink(full_path,
               string("Boost macro deprecated in 1.53: ") + *ptr));
+          }
+      }
+
+      for ( ptr = hpx_1_5_0_macros; *ptr != nullptr; ++ptr )
+      {
+        if ( contents.find( *ptr ) != string::npos ) {
+          ++errors;
+          error( library_name, full_path, loclink(full_path,
+              string("HPX macro deprecated in 1.5.0: ") + *ptr));
           }
       }
 

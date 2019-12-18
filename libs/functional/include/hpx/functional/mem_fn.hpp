@@ -30,8 +30,9 @@ namespace hpx { namespace util {
             }
 
             template <typename... Ts>
-            constexpr typename util::invoke_result<MemberPointer, Ts...>::type
-            operator()(Ts&&... vs) const
+            constexpr
+                typename util::invoke_result<MemberPointer, Ts...>::type
+                operator()(Ts&&... vs) const
             {
                 return util::invoke(_pm, std::forward<Ts>(vs)...);
             }

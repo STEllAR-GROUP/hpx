@@ -80,9 +80,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 --count;
                 util::cancellation_token<std::size_t> tok(count);
 
-                auto f1 = [tok, first, comp = std::forward<Comp>(comp),
-                              proj = std::forward<Proj>(proj)](RandIter it,
-                              std::size_t part_size,
+                auto f1 = [tok, first,
+                              comp = std::forward<Comp>(comp),
+                              proj = std::forward<Proj>(proj)](
+                              RandIter it, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_size, tok,
                         [&tok, first, &comp, &proj](
@@ -265,9 +266,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 --count;
                 util::cancellation_token<std::size_t> tok(count);
 
-                auto f1 = [tok, first, comp = std::forward<Comp>(comp),
-                              proj = std::forward<Proj>(proj)](RandIter it,
-                              std::size_t part_size,
+                auto f1 = [tok, first,
+                              comp = std::forward<Comp>(comp),
+                              proj = std::forward<Proj>(proj)](
+                              RandIter it, std::size_t part_size,
                               std::size_t base_idx) mutable {
                     util::loop_idx_n(base_idx, it, part_size, tok,
                         [&tok, first, &comp, &proj](
