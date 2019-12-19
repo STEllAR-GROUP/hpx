@@ -11,7 +11,10 @@
 mpi
 ===
 
-TODO: High-level description of the library.
+The MPI library is intended to simplify the process of integrating MPI based
+codes with the HPX runtime. The library is intended to be used with the
+asynchronous API of MPI using requests.
+
 
 See the :ref:`API reference <libs_mpi_api>` of this module for more
 details.
