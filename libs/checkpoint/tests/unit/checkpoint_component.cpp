@@ -108,7 +108,8 @@ struct data_client : hpx::components::client_base<data_client, data_server>
 int main()
 {
     // Test 1
-    //  test checkpoint a component using a shared_ptr
+    //[shared_ptr_example
+    // test checkpoint a component using a shared_ptr
     std::vector<int> vec{1, 2, 3, 4, 5};
     data_client A(hpx::find_here(), std::move(vec));
 
@@ -124,6 +125,7 @@ int main()
     // Create a new server instance
     std::shared_ptr<data_server> b_server;
     restore_checkpoint(f.get(), b_server);
+    //]
 
     HPX_TEST(A.get_data().get() == b_server->get_data());
 
@@ -133,6 +135,7 @@ int main()
     HPX_TEST(A.get_data().get() == B.get_data().get());
 
     // Test 2
+    //[client_example
     // Try to checkpoint and restore a component with a client
     std::vector<int> vec3{10, 10, 10, 10, 10};
 
@@ -145,6 +148,7 @@ int main()
 
     // Restore server inside client instance
     restore_checkpoint(f3.get(), E);
+    //]
 
     HPX_TEST(D.get_data().get() == E.get_data().get());
 

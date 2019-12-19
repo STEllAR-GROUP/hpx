@@ -20,14 +20,18 @@ which hold a serialized version of an object or set of objects at a particular
 moment in time. This representation can be stored in memory for later use or it
 can be written to disk for storage and/or recovery at a later point. In order to
 create and fill this object with data we use a function called
-``save_checkpoint``. In code the function looks like this::
+``save_checkpoint``. In code the function looks like this:
+
+.. code-block:: c++
 
     hpx::future<hpx::util::checkpoint> hpx::util::save_checkpoint(a, b, c, ...);
 
 ``save_checkpoint`` takes arbitrary data containers such as int, double, float,
 vector, and future and serializes them into a newly created ``checkpoint``
 object. This function returns a ``future`` to a ``checkpoint`` containing the
-data. Let us look a simple use case below::
+data. Let us look a simple use case below:
+
+.. code-block:: c++
 
     using hpx::util::checkpoint;
     using hpx::util::save_checkpoint;
@@ -51,9 +55,10 @@ function as long as they are the first container passing into the function (In
 the case where a launch policy is used, the ``checkpoint`` will immediately
 follow the launch policy). An example of these features can be found below:
 
-.. literalinclude:: ../../../../libs/tests/unit/checkpoint.cpp
+.. literalinclude:: ../../../../libs/checkpoint/tests/unit/checkpoint.cpp
    :language: c++
-   :lines: 27-38
+   :start-after: //[check_test_1
+   :end-before: //]
 
 Now that we can create ``checkpoint`` s we now must be able to restore the
 objects they contain into memory. This is accomplished by the function
@@ -62,23 +67,24 @@ into the containers it is provided. It is important to remember that the
 containers must be ordered in the same way they were placed into the
 ``checkpoint``. For clarity see the example below:
 
-.. literalinclude:: ../../../../libs/tests/unit/checkpoint.cpp
+.. literalinclude:: ../../../../libs/checkpoint/tests/unit/checkpoint.cpp
    :language: c++
-   :lines: 41-49
+   :start-after: //[check_test_2
+   :end-before: //]
 
 The core utility of ``checkpoint`` is in its ability to make certain data
 persistent. Often this means that the data is needed to be stored in an object,
 such as a file, for later use. For these cases we have provided two solutions:
 stream operator overloads and access iterators.
 
-We have created the two stream overloads
-``operator<<`` and ``operator>>`` to stream data
-out of and into ``checkpoint``. You can see an
-example of the overloads in use below:
+We have created the two stream overloads ``operator<<`` and ``operator>>`` to
+stream data out of and into ``checkpoint``. You can see an example of the
+overloads in use below:
 
-.. literalinclude:: ../../../../libs/tests/unit/checkpoint.cpp
+.. literalinclude:: ../../../../libs/checkpoint/tests/unit/checkpoint.cpp
    :language: c++
-   :lines: 176-186
+   :start-after: //[check_test_3
+   :end-before: //]
 
 This is the primary way to move data into and out of a ``checkpoint``. It is
 important to note, however, that users should be cautious when using a stream
@@ -94,7 +100,7 @@ read the size of the stored data before reading the data into new instance of
 .. important::
 
    Be careful when mixing ``operator<<`` and ``operator>>`` with other
-   facilities to read and write to a ``checkpoint``. ``operator<<`` writes and
+   facilities to read and write to a ``checkpoint``. ``operator<<`` writes an
    extra variable and ``operator>>`` reads this variable back separately. Used
    together the user will not encounter any issues and can safely ignore this
    detail.
@@ -103,34 +109,35 @@ Users may also move the data into and out of a ``checkpoint`` using the exposed
 ``.begin()`` and ``.end()`` iterators. An example of this use case is
 illustrated below.
 
-.. literalinclude:: ../../../../libs/tests/unit/checkpoint.cpp
+.. literalinclude:: ../../../../libs/checkpoint/tests/unit/checkpoint.cpp
    :language: c++
-   :lines: 129-150
+   :start-after: //[check_test_4
+   :end-before: //]
 
-Checkpointing Components
+Checkpointing components
 ------------------------
 
 ``save_checkpoint`` and ``restore_checkpoint`` are also able to store components
-inside ``checkpoint``s. This can be done in one of two ways. First a client of
+inside ``checkpoint``\ s. This can be done in one of two ways. First a client of
 the component can be passed to ``save_checkpoint``. When the user wishes to
-resurrect the component she can pass a client instance to ``restore_checkpoint``.
+resurrect the component she can pass a client instance to
+``restore_checkpoint``.
 
 This technique is demonstrated below:
 
-.. literalinclude:: ../../../../libs/tests/unit/checkpoint.cpp
+.. literalinclude:: ../../../../libs/checkpoint/tests/unit/checkpoint_component.cpp
    :language: c++
-   :lines: 143-144
+   :start-after: //[client_example
+   :end-before: //]
 
 The second way a user can save a component is by passing a ``shared_ptr`` to the
 component to ``save_checkpoint``. This component can be resurrected by creating
 a new instance of the component type and passing a ``shared_ptr`` to the new
-instance to ``restore_checkpoint``. An example can be found below:
+instance to ``restore_checkpoint``.
 
 This technique is demonstrated below:
 
-.. literalinclude:: ../../../../libs/tests/unit/checkpoint.cpp
+.. literalinclude:: ../../../../libs/checkpoint/tests/unit/checkpoint_component.cpp
    :language: c++
-   :lines: 113-126
-
-
-
+   :start-after: //[shared_ptr_example
+   :end-before: //]
