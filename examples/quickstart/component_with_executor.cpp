@@ -16,10 +16,10 @@
 // Define a base component which exposes the required interface
 struct hello_world_server
   : hpx::components::executor_component<
-        hpx::parallel::execution::local_priority_queue_executor,
+        hpx::parallel::execution::parallel_executor,
         hpx::components::component_base<hello_world_server> >
 {
-    typedef hpx::parallel::execution::local_priority_queue_executor executor_type;
+    typedef hpx::parallel::execution::parallel_executor executor_type;
     typedef hpx::components::executor_component<
             executor_type, hpx::components::component_base<hello_world_server>
         > base_type;

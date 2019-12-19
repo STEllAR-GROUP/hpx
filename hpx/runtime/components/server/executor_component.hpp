@@ -64,10 +64,11 @@ namespace hpx { namespace components
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             desc = data.description;
 #endif
-            hpx::get_lva<executor_component>::call(lva)->exec_.add(
-                hpx::util::deferred_call(&executor_component::execute,
-                    std::move(data.func)),
-                desc, initial_state);
+            hpx::parallel::execution::post(
+                hpx::get_lva<executor_component>::call(lva)->exec_,
+                hpx::util::annotated_function(
+                    &executor_component::execute, desc.get_description()),
+                std::move(data.func));
         }
 
         template <typename Executor_ = Executor>
