@@ -930,7 +930,11 @@ namespace hpx { namespace threads { namespace detail
 #endif
                 // call back into invoking context
                 if (!params.inner_.empty())
+                {
                     params.inner_();
+                    context_storage = hpx::basic_execution::this_thread::
+                        detail::get_agent_storage();
+                }
             }
 
             // something went badly wrong, give up
@@ -980,7 +984,11 @@ namespace hpx { namespace threads { namespace detail
 
                 // call back into invoking context
                 if (!params.outer_.empty())
+                {
                     params.outer_();
+                    context_storage = hpx::basic_execution::this_thread::
+                        detail::get_agent_storage();
+                }
 
                 // break if we were idling after 'may_exit'
                 if (may_exit)
