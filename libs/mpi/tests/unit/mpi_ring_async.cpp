@@ -51,6 +51,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+    if (size<2) {
+        std::cout << "This test requires N>1 ranks" << std::endl;
+        return hpx::finalize();
+    }
     //
     // tell the scheduler that we want to handle mpi in the background
     // here we use the provided hpx::mpi::poll function but a user
