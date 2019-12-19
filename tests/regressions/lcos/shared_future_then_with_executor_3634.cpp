@@ -12,7 +12,7 @@
 #include <hpx/lcos/future.hpp>
 
 #include <hpx/execution/executors.hpp> // Workaround for a missing header file
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/parallel/executors/pool_executor.hpp>
 
 int main()
 {

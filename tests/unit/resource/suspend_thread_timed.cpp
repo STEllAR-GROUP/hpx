@@ -11,7 +11,6 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/schedulers.hpp>
 #include <hpx/testing.hpp>
@@ -47,7 +46,7 @@ int hpx_main(int argc, char* argv[])
         bool up = true;
         std::vector<hpx::future<void>> fs;
 
-        hpx::threads::executors::pool_executor exec("default");
+        hpx::parallel::execution::pool_executor exec("default");
 
         std::random_device rd;
         std::mt19937 gen(rd());
