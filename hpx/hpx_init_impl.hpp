@@ -45,10 +45,7 @@ namespace hpx
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string>&& ini_config,
             startup_function_type startup, shutdown_function_type shutdown,
-            hpx::runtime_mode mode, bool blocking);
-
-        HPX_EXPORT int run_or_start(resource::partitioner& rp,
-            startup_function_type startup, shutdown_function_type shutdown,
+            hpx::runtime_mode mode, hpx::resource::partitioner_mode rp_mode,
             bool blocking);
 
 #if defined(HPX_WINDOWS)
@@ -82,7 +79,7 @@ namespace hpx
         return detail::run_or_start(params.f, (*params.desc_cmdline_ptr),
             params.argc, params.argv, hpx_startup::user_main_config(params.cfg),
             std::move(params.startup), std::move(params.shutdown), params.mode,
-            true);
+            params.rp_mode, true);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -537,27 +534,6 @@ namespace hpx
         return init(iparams);
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    inline int init(resource::partitioner& rp, startup_function_type startup,
-        shutdown_function_type shutdown)
-    {
-#if defined(HPX_WINDOWS)
-        detail::init_winsocket();
-#endif
-        util::set_hpx_prefix(HPX_PREFIX);
-#if defined(__FreeBSD__)
-        freebsd_environ = environ;
-#endif
-        // set a handler for std::abort
-        std::signal(SIGABRT, detail::on_abort);
-        std::atexit(detail::on_exit);
-#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
-        std::at_quick_exit(detail::on_exit);
-#endif
-
-        return detail::run_or_start(
-            rp, std::move(startup), std::move(shutdown), true);
-    }
 }
 
 #endif /*HPX_HPX_INIT_IMPL_HPP*/

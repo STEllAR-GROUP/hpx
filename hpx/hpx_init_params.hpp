@@ -17,6 +17,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -72,6 +73,7 @@ namespace hpx
         startup_function_type startup = startup_function_type();
         shutdown_function_type shutdown = shutdown_function_type();
         hpx::runtime_mode mode = ::hpx::runtime_mode_default;
+        hpx::resource::partitioner_mode rp_mode = ::hpx::resource::mode_default;
     };
 }
 
