@@ -13,9 +13,7 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/lcos/dataflow.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/parallel/executors/pool_executor.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
 #include <hpx/util/pack_traversal.hpp>
 #include <hpx/threading_base/thread_description.hpp>
@@ -90,6 +88,13 @@ namespace hpx { namespace threads { namespace executors {
     };
 
     // --------------------------------------------------------------------
+    template <typename H>
+    struct HPX_EXPORT guided_pool_executor;
+
+    template <typename H>
+    struct HPX_EXPORT guided_pool_executor_shim;
+
+    // --------------------------------------------------------------------
     // helper : numa domain scheduling for async() execution
     // --------------------------------------------------------------------
     template <typename Executor, typename NumaFunction>
@@ -115,16 +120,14 @@ namespace hpx { namespace threads { namespace executors {
                 typename util::detail::invoke_deferred_result<F, Ts...>::type
                     result_type;
 
-            lcos::local::futures_factory<result_type()> p(
-                const_cast<Executor&>(executor_),
-                util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...));
+            lcos::local::futures_factory<result_type()> p(util::deferred_call(
+                std::forward<F>(f), std::forward<Ts>(ts)...));
 
-            if (0 && hp_sync_ &&
-                executor_.get_priority() == hpx::threads::thread_priority_high)
+            if (hp_sync_ &&
+                executor_.priority_ == hpx::threads::thread_priority_high)
             {
-                p.apply("guided async", hpx::launch::sync,
-                    executor_.get_priority(), executor_.get_stacksize(),
+                p.apply(executor_.pool_, "guided async", hpx::launch::sync,
+                    executor_.priority_, executor_.stacksize_,
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
@@ -132,8 +135,8 @@ namespace hpx { namespace threads { namespace executors {
             {
                 gpx_deb.debug(
                     debug::str<>("triggering apply"), "domain ", domain);
-                p.apply("guided async", hpx::launch::async,
-                    executor_.get_priority(), executor_.get_stacksize(),
+                p.apply(executor_.pool_, "guided async", hpx::launch::async,
+                    executor_.priority_, executor_.stacksize_,
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
@@ -172,36 +175,28 @@ namespace hpx { namespace threads { namespace executors {
             typedef typename util::detail::invoke_deferred_result<F, Future,
                 Ts...>::type result_type;
 
-            lcos::local::futures_factory<result_type()> p(
-                const_cast<Executor&>(executor_),
-                util::deferred_call(std::forward<F>(f),
-                    std::forward<Future>(predecessor),
-                    std::forward<Ts>(ts)...));
+            lcos::local::futures_factory<result_type()> p(util::deferred_call(
+                std::forward<F>(f), std::forward<Future>(predecessor),
+                std::forward<Ts>(ts)...));
 
-            if (0 && hp_sync_ &&
-                executor_.get_priority() == hpx::threads::thread_priority_high)
+            if (hp_sync_ &&
+                executor_.priority_ == hpx::threads::thread_priority_high)
             {
-                p.apply("guided then", hpx::launch::sync,
-                    executor_.get_priority(), executor_.get_stacksize(),
+                p.apply(executor_.pool_, "guided then", hpx::launch::sync,
+                    executor_.priority_, executor_.stacksize_,
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
             else
             {
-                p.apply("guided then", hpx::launch::async,
-                    executor_.get_priority(), executor_.get_stacksize(),
+                p.apply(executor_.pool_, "guided then", hpx::launch::async,
+                    executor_.priority_, executor_.stacksize_,
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
 
             return p.get_future();
         }
-    };
-
-    // --------------------------------------------------------------------
-    template <typename H>
-    struct guided_pool_executor
-    {
     };
 
     // --------------------------------------------------------------------
@@ -212,16 +207,29 @@ namespace hpx { namespace threads { namespace executors {
     template <typename Tag>
     struct guided_pool_executor<pool_numa_hint<Tag>>
     {
+        template <typename Executor, typename NumaFunction>
+        friend struct pre_execution_async_domain_schedule;
+
+        template <typename Executor, typename NumaFunction>
+        friend struct pre_execution_then_domain_schedule;
+
+        template <typename H>
+        friend struct guided_pool_executor_shim;
+
     public:
         guided_pool_executor(const std::string& pool_name, bool hp_sync = false)
-          : pool_executor_(pool_name)
+          : pool_(&resource::get_thread_pool(pool_name))
+          , priority_(threads::thread_priority_default)
+          , stacksize_(threads::thread_stacksize_default)
           , hp_sync_(hp_sync)
         {
         }
 
         guided_pool_executor(const std::string& pool_name,
             thread_stacksize stacksize, bool hp_sync = false)
-          : pool_executor_(pool_name, stacksize)
+          : pool_(resource::get_thread_pool(pool_name))
+          , priority_(threads::thread_priority_default)
+          , stacksize_(stacksize)
           , hp_sync_(hp_sync)
         {
         }
@@ -230,7 +238,9 @@ namespace hpx { namespace threads { namespace executors {
             thread_priority priority,
             thread_stacksize stacksize = thread_stacksize_default,
             bool hp_sync = false)
-          : pool_executor_(pool_name, priority, stacksize)
+          : pool_(resource::get_thread_pool(pool_name))
+          , priority_(priority)
+          , stacksize_(stacksize)
           , hp_sync_(hp_sync)
         {
         }
@@ -259,8 +269,8 @@ namespace hpx { namespace threads { namespace executors {
             // before passing the task onwards to the real executor
             return dataflow(launch::sync,
                 util::unwrapping(
-                    pre_execution_async_domain_schedule<pool_executor,
-                        pool_numa_hint<Tag>>{pool_executor_, hint_, hp_sync_}),
+                    pre_execution_async_domain_schedule<decltype(*this),
+                        pool_numa_hint<Tag>>{*this, hint_, hp_sync_}),
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
@@ -303,9 +313,9 @@ namespace hpx { namespace threads { namespace executors {
                 launch::sync,
                 [f = std::forward<F>(f), this](
                     Future&& predecessor, Ts&&... ts) {
-                    pre_execution_then_domain_schedule<pool_executor,
+                    pre_execution_then_domain_schedule<decltype(*this),
                         pool_numa_hint<Tag>>
-                        pre_exec{pool_executor_, hint_, hp_sync_};
+                        pre_exec{*this, hint_, hp_sync_};
 
                     return pre_exec(
                         std::move(f), std::forward<Future>(predecessor));
@@ -354,7 +364,6 @@ namespace hpx { namespace threads { namespace executors {
                 , util::debug::print_type<result_type>() , "\n"
             );
             // clang-format on
-#endif
 
             // Please see notes for previous then_execute function above
             return dataflow(
@@ -362,9 +371,9 @@ namespace hpx { namespace threads { namespace executors {
                 [f = std::forward<F>(f), this](
                     OuterFuture<util::tuple<InnerFutures...>>&& predecessor,
                     Ts&&... ts) {
-                    pre_execution_then_domain_schedule<pool_executor,
+                    pre_execution_then_domain_schedule<decltype(*this),
                         pool_numa_hint<Tag>>
-                        pre_exec{pool_executor_, hint_, hp_sync_};
+                        pre_exec{*this, hint_, hp_sync_};
 
                     return pre_exec(std::move(f),
                         std::forward<OuterFuture<util::tuple<InnerFutures...>>>(
@@ -408,9 +417,9 @@ namespace hpx { namespace threads { namespace executors {
                       , "dataflow      : unwrapped   : "
                       , util::debug::print_type<
 #ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
-                    int>(" | ")
+                             int>(" | ")
 #else
-                    decltype(unwrapped_futures_tuple)>(" | ")
+                             decltype(unwrapped_futures_tuple)>(" | ")
 #endif
                       , "\n");
 
@@ -419,25 +428,21 @@ namespace hpx { namespace threads { namespace executors {
 #endif
 
             // forward the task execution on to the real internal executor
-            lcos::local::futures_factory<result_type()> p(pool_executor_,
+            lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(std::forward<F>(f),
                     std::forward<util::tuple<InnerFutures...>>(predecessor)));
 
-            if (hp_sync_ &&
-                pool_executor_.get_priority() ==
-                    hpx::threads::thread_priority_high)
+            if (hp_sync_ && priority_ == hpx::threads::thread_priority_high)
             {
-                p.apply("guided async", hpx::launch::sync,
-                    pool_executor_.get_priority(),
-                    pool_executor_.get_stacksize(),
+                p.apply(pool_, "guided async", hpx::launch::sync, priority_,
+                    stacksize_,
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
             else
             {
-                p.apply("guided async", hpx::launch::async,
-                    pool_executor_.get_priority(),
-                    pool_executor_.get_stacksize(),
+                p.apply(pool_, "guided async", hpx::launch::async, priority_,
+                    stacksize_,
                     threads::thread_schedule_hint(
                         thread_schedule_hint_mode_numa, domain));
             }
@@ -445,7 +450,9 @@ namespace hpx { namespace threads { namespace executors {
         }
 
     private:
-        pool_executor pool_executor_;
+        threads::thread_pool_base* pool_;
+        threads::thread_priority priority_;
+        threads::thread_stacksize stacksize_;
         pool_numa_hint<Tag> hint_;
         bool hp_sync_;
     };
@@ -462,7 +469,6 @@ namespace hpx { namespace threads { namespace executors {
             bool guided, const std::string& pool_name, bool hp_sync = false)
           : guided_(guided)
           , guided_exec_(pool_name, hp_sync)
-          , pool_exec_(pool_name)
         {
         }
 
@@ -470,7 +476,6 @@ namespace hpx { namespace threads { namespace executors {
             thread_stacksize stacksize, bool hp_sync = false)
           : guided_(guided)
           , guided_exec_(pool_name, hp_sync, stacksize)
-          , pool_exec_(pool_name, stacksize)
         {
         }
 
@@ -480,7 +485,6 @@ namespace hpx { namespace threads { namespace executors {
             bool hp_sync = false)
           : guided_(guided)
           , guided_exec_(pool_name, priority, stacksize, hp_sync)
-          , pool_exec_(pool_name, priority, stacksize)
         {
         }
 
@@ -499,11 +503,11 @@ namespace hpx { namespace threads { namespace executors {
                 typedef typename util::detail::invoke_deferred_result<F,
                     Ts...>::type result_type;
 
-                lcos::local::futures_factory<result_type()> p(pool_exec_,
+                lcos::local::futures_factory<result_type()> p(
                     util::deferred_call(
                         std::forward<F>(f), std::forward<Ts>(ts)...));
-                p.apply("guided async", hpx::launch::async,
-                    pool_exec_.get_priority(), pool_exec_.get_stacksize(),
+                p.apply(guided_exec_.pool_, "guided async", hpx::launch::async,
+                    guided_exec_.priority_, guided_exec_.stacksize_,
                     threads::thread_schedule_hint());
                 return p.get_future();
             }
@@ -533,7 +537,7 @@ namespace hpx { namespace threads { namespace executors {
                 typename hpx::traits::detail::shared_state_ptr<
                     result_type>::type p =
                     hpx::lcos::detail::make_continuation_exec<result_type>(
-                        std::forward<Future>(predecessor), pool_exec_,
+                        std::forward<Future>(predecessor), *this,
                         std::move(func));
 
                 return hpx::traits::future_access<
@@ -545,7 +549,6 @@ namespace hpx { namespace threads { namespace executors {
 
         bool guided_;
         guided_pool_executor<H> guided_exec_;
-        pool_executor pool_exec_;
     };
 }}}    // namespace hpx::threads::executors
 
