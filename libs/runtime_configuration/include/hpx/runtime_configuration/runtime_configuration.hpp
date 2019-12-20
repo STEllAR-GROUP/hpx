@@ -152,6 +152,7 @@ namespace hpx { namespace util {
         void pre_initialize_ini();
         void post_initialize_ini(std::string& hpx_ini_file,
             std::vector<std::string> const& cmdline_ini_defs);
+        void pre_initialize_logging_ini();
 
         void reconfigure();
 

@@ -327,7 +327,42 @@ namespace hpx { namespace util {
             "name = hpx",
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1"
+            // clang-format on
+        };
 
+#if defined(HPX_HAVE_NETWORKING)
+        std::vector<std::string> lines_pp =
+            hpx::parcelset::load_runtime_configuration();
+
+        lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
+#endif
+
+        // don't overload user overrides
+        this->parse("<static defaults>", lines, false, false, false);
+
+        need_to_call_pre_initialize = false;
+    }
+
+    void runtime_configuration::post_initialize_ini(std::string& hpx_ini_file_,
+        std::vector<std::string> const& cmdline_ini_defs_)
+    {
+        util::init_ini_data_base(*this, hpx_ini_file_);
+        need_to_call_pre_initialize = true;
+
+        // let the command line override the config file.
+        if (!cmdline_ini_defs_.empty())
+        {
+            // do not weed out comments
+            this->parse(
+                "<command line definitions>", cmdline_ini_defs_, true, false);
+            need_to_call_pre_initialize = true;
+        }
+    }
+
+    void runtime_configuration::pre_initialize_logging_ini()
+    {
+        std::vector<std::string> lines = {
+        // clang-format off
 #if defined(HPX_HAVE_LOGGING)
 #define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
             // general logging
@@ -456,33 +491,8 @@ namespace hpx { namespace util {
             // clang-format on
         };
 
-#if defined(HPX_HAVE_NETWORKING)
-        std::vector<std::string> lines_pp =
-            hpx::parcelset::load_runtime_configuration();
-
-        lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
-#endif
-
         // don't overload user overrides
-        this->parse("<static defaults>", lines, false, false, false);
-
-        need_to_call_pre_initialize = false;
-    }
-
-    void runtime_configuration::post_initialize_ini(std::string& hpx_ini_file_,
-        std::vector<std::string> const& cmdline_ini_defs_)
-    {
-        util::init_ini_data_base(*this, hpx_ini_file_);
-        need_to_call_pre_initialize = true;
-
-        // let the command line override the config file.
-        if (!cmdline_ini_defs_.empty())
-        {
-            // do not weed out comments
-            this->parse(
-                "<command line definitions>", cmdline_ini_defs_, true, false);
-            need_to_call_pre_initialize = true;
-        }
+        this->parse("<static logging defaults>", lines, false, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -705,6 +715,7 @@ namespace hpx { namespace util {
     void runtime_configuration::reconfigure()
     {
         pre_initialize_ini();
+        pre_initialize_logging_ini();
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
