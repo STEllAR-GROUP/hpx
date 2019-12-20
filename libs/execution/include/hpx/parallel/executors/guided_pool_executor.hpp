@@ -42,37 +42,148 @@ namespace hpx {
 // pool_numa_hint
 // --------------------------------------------------------------------
 namespace hpx { namespace parallel { namespace execution {
-    // --------------------------------------------------------------------
-    // helper struct for tuple of futures future<tuple<f1, f2, f3, ...>>>
-    // --------------------------------------------------------------------
-    template <typename Future>
-    struct is_future_of_tuple_of_futures
-      : std::integral_constant<bool,
-            traits::is_future<Future>::value &&
-                traits::is_future_tuple<
-                    typename traits::future_traits<Future>::result_type>::value>
-    {
-    };
-
-    // --------------------------------------------------------------------
-    // function that returns a const ref to the contents of a future
-    // without calling .get() on the future so that we can use the value
-    // and then pass the original future on to the intended destination.
-    // --------------------------------------------------------------------
-    struct future_extract_value
-    {
-        template <typename T, template <typename> class Future>
-        const T& operator()(const Future<T>& el) const
+    namespace detail {
+        // --------------------------------------------------------------------
+        // helper struct for tuple of futures future<tuple<f1, f2, f3, ...>>>
+        // --------------------------------------------------------------------
+        template <typename Future>
+        struct is_future_of_tuple_of_futures
+          : std::integral_constant<bool,
+                traits::is_future<Future>::value &&
+                    traits::is_future_tuple<typename traits::future_traits<
+                        Future>::result_type>::value>
         {
-            const auto& state = traits::detail::get_shared_state(el);
-            return *state->get_result();
-        }
-    };
+        };
 
-    // --------------------------------------------------------------------
-    // For C++11 compatibility
-    template <bool B, typename T = void>
-    using enable_if_t = typename std::enable_if<B, T>::type;
+        // --------------------------------------------------------------------
+        // function that returns a const ref to the contents of a future
+        // without calling .get() on the future so that we can use the value
+        // and then pass the original future on to the intended destination.
+        // --------------------------------------------------------------------
+        struct future_extract_value
+        {
+            template <typename T, template <typename> class Future>
+            const T& operator()(const Future<T>& el) const
+            {
+                const auto& state = traits::detail::get_shared_state(el);
+                return *state->get_result();
+            }
+        };
+
+        // --------------------------------------------------------------------
+        // For C++11 compatibility
+        template <bool B, typename T = void>
+        using enable_if_t = typename std::enable_if<B, T>::type;
+
+        // --------------------------------------------------------------------
+        // helper : numa domain scheduling for async() execution
+        // --------------------------------------------------------------------
+        template <typename Executor, typename NumaFunction>
+        struct pre_execution_async_domain_schedule
+        {
+            Executor& executor_;
+            NumaFunction& numa_function_;
+            bool hp_sync_;
+            //
+            template <typename F, typename... Ts>
+            auto operator()(F&& f, Ts&&... ts) const
+            {
+                // call the numa hint function
+#ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
+                int domain = -1;
+#else
+                int domain = numa_function_(ts...);
+#endif
+
+                gpx_deb.debug(
+                    debug::str<>("async_schedule"), "domain ", domain);
+
+                // now we must forward the task+hint on to the correct dispatch function
+                typedef typename util::detail::invoke_deferred_result<F,
+                    Ts...>::type result_type;
+
+                lcos::local::futures_factory<result_type()> p(
+                    util::deferred_call(
+                        std::forward<F>(f), std::forward<Ts>(ts)...));
+
+                gpx_deb.debug(
+                    debug::str<>("triggering apply"), "domain ", domain);
+                if (hp_sync_ &&
+                    executor_.priority_ == hpx::threads::thread_priority_high)
+                {
+                    p.apply(executor_.pool_, "guided async", hpx::launch::sync,
+                        executor_.priority_, executor_.stacksize_,
+                        threads::thread_schedule_hint(
+                            thread_schedule_hint_mode_numa, domain));
+                }
+                else
+                {
+                    p.apply(executor_.pool_, "guided async", hpx::launch::async,
+                        executor_.priority_, executor_.stacksize_,
+                        threads::thread_schedule_hint(
+                            thread_schedule_hint_mode_numa, domain));
+                }
+
+                return p.get_future();
+            }
+        };
+
+        // --------------------------------------------------------------------
+        // helper : numa domain scheduling for .then() execution
+        // this differs from the above because a future is unwrapped before
+        // calling the numa_hint
+        // --------------------------------------------------------------------
+        template <typename Executor, typename NumaFunction>
+        struct pre_execution_then_domain_schedule
+        {
+            Executor& executor_;
+            NumaFunction& numa_function_;
+            bool hp_sync_;
+            //
+            template <typename F, typename Future, typename... Ts>
+            auto operator()(F&& f, Future&& predecessor, Ts&&... ts) const
+            {
+                // call the numa hint function
+#ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
+                int domain = -1;
+#else
+                // get the argument for the numa hint function from the predecessor future
+                const auto& predecessor_value =
+                    detail::future_extract_value()(predecessor);
+                int domain = numa_function_(predecessor_value, ts...);
+#endif
+
+                gpx_deb.debug(debug::str<>("then_schedule"), "domain ", domain);
+
+                // now we must forward the task+hint on to the correct dispatch function
+                typedef typename util::detail::invoke_deferred_result<F, Future,
+                    Ts...>::type result_type;
+
+                lcos::local::futures_factory<result_type()> p(
+                    util::deferred_call(std::forward<F>(f),
+                        std::forward<Future>(predecessor),
+                        std::forward<Ts>(ts)...));
+
+                if (hp_sync_ &&
+                    executor_.priority_ == hpx::threads::thread_priority_high)
+                {
+                    p.apply(executor_.pool_, "guided then", hpx::launch::sync,
+                        executor_.priority_, executor_.stacksize_,
+                        threads::thread_schedule_hint(
+                            thread_schedule_hint_mode_numa, domain));
+                }
+                else
+                {
+                    p.apply(executor_.pool_, "guided then", hpx::launch::async,
+                        executor_.priority_, executor_.stacksize_,
+                        threads::thread_schedule_hint(
+                            thread_schedule_hint_mode_numa, domain));
+                }
+
+                return p.get_future();
+            }
+        };
+    }    // namespace detail
 
     // --------------------------------------------------------------------
     // Template type for a numa domain scheduling hint
@@ -95,112 +206,6 @@ namespace hpx { namespace parallel { namespace execution {
     struct HPX_EXPORT guided_pool_executor_shim;
 
     // --------------------------------------------------------------------
-    // helper : numa domain scheduling for async() execution
-    // --------------------------------------------------------------------
-    template <typename Executor, typename NumaFunction>
-    struct pre_execution_async_domain_schedule
-    {
-        Executor& executor_;
-        NumaFunction& numa_function_;
-        bool hp_sync_;
-        //
-        template <typename F, typename... Ts>
-        auto operator()(F&& f, Ts&&... ts) const
-        {
-            // call the numa hint function
-#ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
-            int domain = -1;
-#else
-            int domain = numa_function_(ts...);
-#endif
-
-            gpx_deb.debug(debug::str<>("async_schedule"), "domain ", domain);
-
-            // now we must forward the task+hint on to the correct dispatch function
-            typedef
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-                    result_type;
-
-            lcos::local::futures_factory<result_type()> p(util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
-
-            if (hp_sync_ &&
-                executor_.priority_ == hpx::threads::thread_priority_high)
-            {
-                p.apply(executor_.pool_, "guided async", hpx::launch::sync,
-                    executor_.priority_, executor_.stacksize_,
-                    threads::thread_schedule_hint(
-                        thread_schedule_hint_mode_numa, domain));
-            }
-            else
-            {
-                gpx_deb.debug(
-                    debug::str<>("triggering apply"), "domain ", domain);
-                p.apply(executor_.pool_, "guided async", hpx::launch::async,
-                    executor_.priority_, executor_.stacksize_,
-                    threads::thread_schedule_hint(
-                        thread_schedule_hint_mode_numa, domain));
-            }
-
-            return p.get_future();
-        }
-    };
-
-    // --------------------------------------------------------------------
-    // helper : numa domain scheduling for .then() execution
-    // this differs from the above because a future is unwrapped before
-    // calling the numa_hint
-    // --------------------------------------------------------------------
-    template <typename Executor, typename NumaFunction>
-    struct pre_execution_then_domain_schedule
-    {
-        Executor& executor_;
-        NumaFunction& numa_function_;
-        bool hp_sync_;
-        //
-        template <typename F, typename Future, typename... Ts>
-        auto operator()(F&& f, Future&& predecessor, Ts&&... ts) const
-        {
-            // call the numa hint function
-#ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
-            int domain = -1;
-#else
-            // get the argument for the numa hint function from the predecessor future
-            const auto& predecessor_value = future_extract_value()(predecessor);
-            int domain = numa_function_(predecessor_value, ts...);
-#endif
-
-            gpx_deb.debug(debug::str<>("then_schedule"), "domain ", domain);
-
-            // now we must forward the task+hint on to the correct dispatch function
-            typedef typename util::detail::invoke_deferred_result<F, Future,
-                Ts...>::type result_type;
-
-            lcos::local::futures_factory<result_type()> p(util::deferred_call(
-                std::forward<F>(f), std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...));
-
-            if (hp_sync_ &&
-                executor_.priority_ == hpx::threads::thread_priority_high)
-            {
-                p.apply(executor_.pool_, "guided then", hpx::launch::sync,
-                    executor_.priority_, executor_.stacksize_,
-                    threads::thread_schedule_hint(
-                        thread_schedule_hint_mode_numa, domain));
-            }
-            else
-            {
-                p.apply(executor_.pool_, "guided then", hpx::launch::async,
-                    executor_.priority_, executor_.stacksize_,
-                    threads::thread_schedule_hint(
-                        thread_schedule_hint_mode_numa, domain));
-            }
-
-            return p.get_future();
-        }
-    };
-
-    // --------------------------------------------------------------------
     // this is a guided pool executor templated over args only
     // the args should be the same as those that would be called
     // for an async function or continuation. This makes it possible to
@@ -209,10 +214,10 @@ namespace hpx { namespace parallel { namespace execution {
     struct HPX_EXPORT guided_pool_executor<pool_numa_hint<Tag>>
     {
         template <typename Executor, typename NumaFunction>
-        friend struct pre_execution_async_domain_schedule;
+        friend struct detail::pre_execution_async_domain_schedule;
 
         template <typename Executor, typename NumaFunction>
-        friend struct pre_execution_then_domain_schedule;
+        friend struct detail::pre_execution_then_domain_schedule;
 
         template <typename H>
         friend struct guided_pool_executor_shim;
@@ -265,13 +270,12 @@ namespace hpx { namespace parallel { namespace execution {
                 "\n\t", "Numa Hint   : ",
                 util::debug::print_type<pool_numa_hint<Tag>>());
 
-
             // hold onto the function until all futures have become ready
             // by using a dataflow operation, then call the scheduling hint
             // before passing the task onwards to the real executor
             return dataflow(launch::sync,
                 util::unwrapping(
-                    pre_execution_async_domain_schedule<decltype(*this),
+                    detail::pre_execution_async_domain_schedule<decltype(*this),
                         pool_numa_hint<Tag>>{*this, hint_, hp_sync_}),
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
@@ -281,7 +285,7 @@ namespace hpx { namespace parallel { namespace execution {
         // note that future<> and shared_future<> are both supported
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename = enable_if_t<traits::is_future<Future>::value>>
+            typename = detail::enable_if_t<traits::is_future<Future>::value>>
         auto then_execute(F&& f, Future&& predecessor, Ts&&... ts)
             -> future<typename util::detail::invoke_deferred_result<F, Future,
                 Ts...>::type>
@@ -315,7 +319,7 @@ namespace hpx { namespace parallel { namespace execution {
                 launch::sync,
                 [HPX_CAPTURE_FORWARD(f), this](
                     Future&& predecessor, Ts&&... ts) {
-                    pre_execution_then_domain_schedule<decltype(*this),
+                    detail::pre_execution_then_domain_schedule<decltype(*this),
                         pool_numa_hint<Tag>>
                         pre_exec{*this, hint_, hp_sync_};
 
@@ -331,9 +335,10 @@ namespace hpx { namespace parallel { namespace execution {
         // --------------------------------------------------------------------
         template <typename F, template <typename> class OuterFuture,
             typename... InnerFutures, typename... Ts,
-            typename = enable_if_t<is_future_of_tuple_of_futures<
-                OuterFuture<util::tuple<InnerFutures...>>>::value>,
-            typename = enable_if_t<
+            typename =
+                detail::enable_if_t<detail::is_future_of_tuple_of_futures<
+                    OuterFuture<util::tuple<InnerFutures...>>>::value>,
+            typename = detail::enable_if_t<
                 traits::is_future_tuple<util::tuple<InnerFutures...>>::value>>
         auto then_execute(F&& f,
             OuterFuture<util::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
@@ -342,11 +347,12 @@ namespace hpx { namespace parallel { namespace execution {
         {
 #ifdef GUIDED_EXECUTOR_DEBUG
             // get the tuple of futures from the predecessor future <tuple of futures>
-            const auto& predecessor_value = future_extract_value()(predecessor);
+            const auto& predecessor_value =
+                detail::future_extract_value()(predecessor);
 
             // create a tuple of the unwrapped future values
-            auto unwrapped_futures_tuple =
-                util::map_pack(future_extract_value{}, predecessor_value);
+            auto unwrapped_futures_tuple = util::map_pack(
+                detail::future_extract_value{}, predecessor_value);
 
             typedef typename util::detail::invoke_deferred_result<F,
                 OuterFuture<util::tuple<InnerFutures...>>, Ts...>::type
@@ -375,7 +381,7 @@ namespace hpx { namespace parallel { namespace execution {
                 [HPX_CAPTURE_FORWARD(f), this](
                     OuterFuture<util::tuple<InnerFutures...>>&& predecessor,
                     Ts&&... ts) {
-                    pre_execution_then_domain_schedule<decltype(*this),
+                    detail::pre_execution_then_domain_schedule<decltype(*this),
                         pool_numa_hint<Tag>>
                         pre_exec{*this, hint_, hp_sync_};
 
@@ -394,7 +400,7 @@ namespace hpx { namespace parallel { namespace execution {
         // function type, result type and tuple of futures as arguments
         // --------------------------------------------------------------------
         template <typename F, typename... InnerFutures,
-            typename = enable_if_t<
+            typename = detail::enable_if_t<
                 traits::is_future_tuple<util::tuple<InnerFutures...>>::value>>
         auto async_execute(F&& f, util::tuple<InnerFutures...>&& predecessor)
             -> future<typename util::detail::invoke_deferred_result<F,
@@ -408,7 +414,7 @@ namespace hpx { namespace parallel { namespace execution {
             int domain = -1;
 #else
             auto unwrapped_futures_tuple =
-                util::map_pack(future_extract_value{}, predecessor);
+                util::map_pack(detail::future_extract_value{}, predecessor);
 
             int domain = util::invoke_fused(hint_, unwrapped_futures_tuple);
 #endif
@@ -521,7 +527,7 @@ namespace hpx { namespace parallel { namespace execution {
         // Continuation
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename = enable_if_t<traits::is_future<Future>::value>>
+            typename = detail::enable_if_t<traits::is_future<Future>::value>>
         auto then_execute(F&& f, Future&& predecessor, Ts&&... ts)
             -> future<typename util::detail::invoke_deferred_result<F, Future,
                 Ts...>::type>
