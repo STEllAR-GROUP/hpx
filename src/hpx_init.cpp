@@ -20,6 +20,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/lexical_cast.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -43,7 +44,6 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -703,13 +703,9 @@ namespace hpx
         get_option(std::string const& config, T default_ = T())
         {
             if (!config.empty()) {
-                try {
-                    return boost::lexical_cast<T>(
-                        get_runtime().get_config().get_entry(config, default_));
-                }
-                catch (boost::bad_lexical_cast const&) {
-                    ;   // do nothing
-                }
+                return hpx::util::safe_lexical_cast<T>(
+                    get_runtime().get_config().get_entry(config, default_),
+                    default_);
             }
             return default_;
         }

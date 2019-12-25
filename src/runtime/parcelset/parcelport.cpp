@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/errors.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/external_timer.hpp>

@@ -14,7 +14,7 @@
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 

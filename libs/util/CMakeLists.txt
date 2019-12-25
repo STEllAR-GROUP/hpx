@@ -12,8 +12,6 @@ set(util_headers
   hpx/util/calculate_fanout.hpp
   hpx/util/get_and_reset_value.hpp
   hpx/util/insert_checked.hpp
-  hpx/util/manage_config.hpp
-  hpx/util/safe_lexical_cast.hpp
 )
 
 set(util_compat_headers
@@ -21,7 +19,6 @@ set(util_compat_headers
 )
 
 set(util_sources
-  manage_config.cpp
 )
 
 include(HPX_AddModule)

@@ -8,12 +8,12 @@
 
 #include "template_accumulator.hpp"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -65,10 +65,10 @@ void run_template_accumulator(char const* type)
             else if (cmd[0] == "add") {
                 if (cmd.size() == 2) {
                     try {
-                        double val = boost::lexical_cast<double>(cmd[1]);
+                        double val = std::stod(cmd[1]);
                         accu.add(argument_type(val));
                     }
-                    catch (boost::bad_lexical_cast const&) {
+                    catch (std::invalid_argument const&) {
                         std::cout << "error: invalid argument for add: '"
                                     << cmd[1] << "'" << std::endl;
                     }

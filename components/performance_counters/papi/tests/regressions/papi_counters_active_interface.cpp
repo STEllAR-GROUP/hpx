@@ -14,7 +14,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
 
-#include <boost/lexical_cast.hpp>
 #include <hpx/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,7 +89,7 @@ int check_(int fd)
                     }
                     else
                     {
-                        cnt.push_back(boost::lexical_cast<double>(value));
+                        cnt.push_back(std::stod(value));
                     }
                     if (cnt.size() == 5) break;
                     out.erase(0, pos+1);

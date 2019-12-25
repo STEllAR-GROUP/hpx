@@ -14,7 +14,6 @@
 
 #include "include_check.hpp"
 #include "boost/regex.hpp"
-#include "boost/lexical_cast.hpp"
 #include "function_hyper.hpp"
 
 namespace boost
@@ -358,7 +357,7 @@ namespace boost
                   + m.format(d.data->include)
                   + ") for symbol "
                   + m.format(d.data->name) + " on line "
-                  + linelink(full_path, boost::lexical_cast<string>(line_number)));
+                  + linelink(full_path, std::to_string(line_number)));
             }
             checked_includes.insert(m.format(d.data->include));
           }

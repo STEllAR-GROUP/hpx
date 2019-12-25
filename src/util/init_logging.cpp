@@ -23,7 +23,6 @@
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -1097,10 +1096,10 @@ namespace hpx { namespace util { namespace detail
 
 #else  // HPX_HAVE_LOGGING
 
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <iostream>
 #include <string>

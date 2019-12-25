@@ -14,13 +14,13 @@
 #include <hpx/logging/format/named_write.hpp>
 
 #include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/version.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -55,7 +55,7 @@ namespace hpx { namespace util {
         {
             try
             {
-                int env_val = boost::lexical_cast<int>(env);
+                int env_val = std::stoi(env);
                 if (env_val < 0)
                     return hpx::util::logging::level::disable_all;
 
@@ -78,7 +78,7 @@ namespace hpx { namespace util {
                 }
                 return hpx::util::logging::level::debug;
             }
-            catch (boost::bad_lexical_cast const&)
+            catch (std::invalid_argument const&)
             {
                 return hpx::util::logging::level::disable_all;
             }

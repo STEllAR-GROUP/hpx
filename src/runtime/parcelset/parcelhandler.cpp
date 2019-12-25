@@ -13,7 +13,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/synchronization/counting_semaphore.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -29,6 +29,7 @@
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/external_timer.hpp>
 #include <hpx/functional/bind.hpp>
@@ -39,7 +40,6 @@
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>

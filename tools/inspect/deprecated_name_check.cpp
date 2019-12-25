@@ -15,7 +15,6 @@
 
 #include "deprecated_name_check.hpp"
 #include "boost/regex.hpp"
-#include "boost/lexical_cast.hpp"
 #include "function_hyper.hpp"
 
 #include <set>
@@ -186,7 +185,7 @@ namespace boost
                   + " deprecated name ("
                   + found_name
                   + ") on line "
-                  + linelink(full_path, boost::lexical_cast<string>(line_number))
+                  + linelink(full_path, std::to_string(line_number))
                   + ", use " + m.format(d.data->use_instead)
                   + " instead");
             }

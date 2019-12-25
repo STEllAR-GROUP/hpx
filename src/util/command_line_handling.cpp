@@ -11,6 +11,8 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
+#include <hpx/lexical_cast.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -26,7 +28,6 @@
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/version.hpp>
 
@@ -734,7 +735,7 @@ namespace hpx { namespace util
                 rtcfg_.get_entry("hpx.agas.address", ""));
         std::uint16_t agas_port =
             cfgmap.get_value<std::uint16_t>("hpx.agas.port",
-                boost::lexical_cast<std::uint16_t>(
+                hpx::util::lexical_cast<std::uint16_t>(
                     rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)
                 ));
 
@@ -870,7 +871,7 @@ namespace hpx { namespace util
         if (num_localities_ != 1 || expect_connections)
         {
             initial_hpx_port =
-                boost::lexical_cast<std::uint16_t>(
+                hpx::util::lexical_cast<std::uint16_t>(
                     rtcfg_.get_entry("hpx.parcel.port", HPX_INITIAL_IP_PORT));
         }
 
@@ -930,7 +931,7 @@ namespace hpx { namespace util
         if (rtcfg_.mode_ == hpx::runtime_mode_connect) {
             // when connecting we need to select a unique port
             hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
-                boost::lexical_cast<std::uint16_t>(
+                hpx::util::lexical_cast<std::uint16_t>(
                     rtcfg_.get_entry("hpx.parcel.port", HPX_CONNECTING_IP_PORT)
                 ));
 

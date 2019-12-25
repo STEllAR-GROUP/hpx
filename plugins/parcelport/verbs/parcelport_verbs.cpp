@@ -155,7 +155,7 @@ namespace verbs
                 util::section const * sec = ini.get_section("hpx.parcel.verbs");
                 if (nullptr != sec) {
                     std::string ibverbs_enabled(sec->get_entry("enable", "0"));
-                    if (boost::lexical_cast<int>(ibverbs_enabled)) {
+                    if (std::stoi(ibverbs_enabled)) {
                         _ibverbs_device    =
                             sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
                         _ibverbs_interface =

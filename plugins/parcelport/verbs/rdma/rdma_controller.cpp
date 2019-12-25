@@ -21,8 +21,6 @@
 #include <plugins/parcelport/verbs/rdma/verbs_completion_queue.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_device.hpp>
 //
-#include <boost/lexical_cast.hpp>
-//
 #include <poll.h>
 #include <errno.h>
 #include <iomanip>

@@ -14,6 +14,7 @@
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -32,7 +33,6 @@
 #include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/util/external_timer.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/yield_while.hpp>
 

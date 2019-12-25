@@ -14,7 +14,6 @@
 
 #include "minmax_check.hpp"
 #include "boost/regex.hpp"
-#include "boost/lexical_cast.hpp"
 #include "function_hyper.hpp"
 
 namespace
@@ -94,7 +93,7 @@ namespace boost
           ++m_errors;
           error( library_name, full_path, string(name())
               + " violation of Boost min/max guidelines on line "
-              + linelink(full_path, boost::lexical_cast<string>(line_number)));
+              + linelink(full_path, std::to_string(line_number)));
         }
 
       }

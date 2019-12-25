@@ -8,6 +8,7 @@
 #define PROGRAM_OPTIONS_VALUE_SEMANTIC_HPP_VP_2004_02_24
 
 #include <hpx/program_options/config.hpp>
+#include <hpx/lexical_cast.hpp>
 
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/value_semantic.hpp
@@ -50,8 +51,6 @@ namespace hpx { namespace program_options {
 
 #include <hpx/datastructures/any.hpp>
 #include <hpx/program_options/errors.hpp>
-
-#include <boost/lexical_cast.hpp>
 
 #include <functional>
 #include <limits>
@@ -251,7 +250,7 @@ namespace hpx { namespace program_options {
         typed_value* default_value(const T& v)
         {
             m_default_value = hpx::util::any_nonser(v);
-            m_default_value_as_text = boost::lexical_cast<std::string>(v);
+            m_default_value_as_text = hpx::util::lexical_cast<std::string>(v);
             return this;
         }
 
@@ -275,7 +274,7 @@ namespace hpx { namespace program_options {
         typed_value* implicit_value(const T& v)
         {
             m_implicit_value = hpx::util::any_nonser(v);
-            m_implicit_value_as_text = boost::lexical_cast<std::string>(v);
+            m_implicit_value_as_text = hpx::util::lexical_cast<std::string>(v);
             return this;
         }
 

@@ -10,6 +10,8 @@
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
 //
+#include <hpx/lexical_cast.hpp>
+//
 #include <inttypes.h>
 #include <infiniband/verbs.h>
 #include <string>
@@ -185,7 +187,7 @@ namespace verbs
                 str = "IBV_WC_RECV_RDMA_WITH_IMM";
                 break;
             default:
-                str = "Got an unknown opcode " + boost::lexical_cast
+                str = "Got an unknown opcode " + hpx::util::lexical_cast
                 < std::string > (opcode);
             }
 

@@ -12,8 +12,8 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
 

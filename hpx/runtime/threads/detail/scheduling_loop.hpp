@@ -13,6 +13,7 @@
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/logging.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/external_timer.hpp>

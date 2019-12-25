@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/datastructures.hpp>
+#include <hpx/lexical_cast.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
@@ -20,8 +21,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/lexical_cast.hpp>
 
 std::size_t const kStringsCount = 100;
 std::string const kStringValue = "shgfkghsdfjhgsfjhfgjhfgjsffghgsfdhgsfdfkdjh"
@@ -231,7 +230,7 @@ int main(int argc, char** argv)
     std::size_t iterations;
     try
     {
-        iterations = boost::lexical_cast<size_t>(argv[1]);
+        iterations = hpx::util::lexical_cast<size_t>(argv[1]);
     }
     catch (std::exception& exc)
     {

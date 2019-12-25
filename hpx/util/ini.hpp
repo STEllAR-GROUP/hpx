@@ -12,11 +12,10 @@
 #include <hpx/config.hpp>
 #include <hpx/util_fwd.hpp> // this needs to go first
 
+#include <hpx/functional/function.hpp>
+#include <hpx/lexical_cast.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/functional/function.hpp>
-
-#include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <map>
@@ -204,7 +203,7 @@ namespace hpx { namespace util
         std::string get_entry(std::string const& key, T dflt) const
         {
             std::unique_lock<mutex_type> l(mtx_);
-            return get_entry(l, key, boost::lexical_cast<std::string>(dflt));
+            return get_entry(l, key, hpx::util::lexical_cast<std::string>(dflt));
         }
 
         void add_notification_callback(std::string const& key,

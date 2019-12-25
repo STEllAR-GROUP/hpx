@@ -101,6 +101,7 @@ add_hpx_module(logging
     hpx_assertion
     hpx_config
     hpx_filesystem
+    hpx_lexical_cast
     hpx_timing
   CMAKE_SUBDIRS examples tests
 )

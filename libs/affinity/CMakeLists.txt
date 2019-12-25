@@ -40,6 +40,7 @@ add_hpx_module(affinity
     hpx_datastructures
     hpx_errors
     hpx_format
+    hpx_lexical_cast
     hpx_topology
     hpx_util
   CMAKE_SUBDIRS tests

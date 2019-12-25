@@ -154,6 +154,7 @@ add_hpx_module(serialization
     hpx_debugging
     hpx_errors
     hpx_hashing
+    hpx_lexical_cast
     hpx_preprocessor
     hpx_type_support
   CMAKE_SUBDIRS examples tests

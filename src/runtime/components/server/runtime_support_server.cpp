@@ -54,7 +54,6 @@
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -1136,7 +1135,7 @@ namespace hpx { namespace components { namespace server
                     get_runtime_mode_from_name(runtime_mode));
 
                 if (vm.count("hpx:print-bind")) {
-                    std::size_t num_threads = boost::lexical_cast<std::size_t>(
+                    std::size_t num_threads = std::stoll(
                         ini.get_entry("hpx.os_threads", 1));
                     detail::handle_print_bind(vm, num_threads);
                 }

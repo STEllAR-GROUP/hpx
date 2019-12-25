@@ -18,6 +18,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
@@ -28,7 +29,6 @@
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <boost/predef/other/endian.h>

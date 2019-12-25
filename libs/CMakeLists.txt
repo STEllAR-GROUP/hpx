@@ -36,6 +36,7 @@ set(HPX_LIBS
   hardware
   hashing
   iterator_support
+  lexical_cast
   local_lcos
   logging
   memory

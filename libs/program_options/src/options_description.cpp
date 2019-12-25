@@ -14,7 +14,6 @@
 // should move that to a separate headers.
 #include <hpx/program_options/parsers.hpp>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <climits>

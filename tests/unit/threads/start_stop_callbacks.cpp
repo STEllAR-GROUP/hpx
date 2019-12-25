@@ -14,8 +14,6 @@
 #include <mutex>
 #include <string>
 
-#include <boost/lexical_cast.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 std::mutex mtx;
 std::multimap<std::string, std::size_t> threads;
@@ -77,7 +75,7 @@ int hpx_main(int argc, char* argv[])
 
     p = threads.equal_range("timer-thread");
     auto cfg = hpx::get_config_entry("hpx.threadpools.timer_pool_size", "0");
-    HPX_TEST(std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
+    HPX_TEST(std::distance(p.first, p.second) == std::stoi(cfg));
 
 #if defined(HPX_HAVE_NETWORKING)
     if (hpx::is_networking_enabled())
@@ -85,13 +83,13 @@ int hpx_main(int argc, char* argv[])
         p = threads.equal_range("parcel-thread");
         cfg = hpx::get_config_entry("hpx.threadpools.parcel_pool_size", "0");
         HPX_TEST(
-            std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
+            std::distance(p.first, p.second) == std::stoi(cfg));
     }
 #endif
 
     p = threads.equal_range("io-thread");
     cfg = hpx::get_config_entry("hpx.threadpools.io_pool_size", "0");
-    HPX_TEST(std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
+    HPX_TEST(std::distance(p.first, p.second) == std::stoi(cfg));
 
     return hpx::finalize();
 }

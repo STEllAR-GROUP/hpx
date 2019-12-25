@@ -8,7 +8,7 @@
 #define HPX_UTIL_MANAGE_CONFIG_APR_11_2012_0519PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 
 #include <map>
 #include <string>

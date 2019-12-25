@@ -12,6 +12,7 @@
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/register_locks_globally.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/predef/other/endian.h>

@@ -12,6 +12,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -40,7 +41,6 @@
 #include <hpx/format.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>

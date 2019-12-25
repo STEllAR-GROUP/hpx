@@ -15,11 +15,11 @@ void test_get_entry()
 {
     std::string val = hpx::get_config_entry("hpx.localities", "42");
     HPX_TEST(!val.empty());
-    HPX_TEST_EQ(boost::lexical_cast<int>(val), 1);
+    HPX_TEST_EQ(std::stoi(val), 1);
 
     val = hpx::get_config_entry("hpx.localities", 42);
     HPX_TEST(!val.empty());
-    HPX_TEST_EQ(boost::lexical_cast<int>(val), 1);
+    HPX_TEST_EQ(std::stoi(val), 1);
 }
 
 std::atomic<bool> invoked_callback(false);

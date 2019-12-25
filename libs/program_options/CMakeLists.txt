@@ -58,6 +58,7 @@ add_hpx_module(program_options
     hpx_config
     hpx_datastructures
     hpx_iterator_support
+    hpx_lexical_cast
     ${__boost_program_options}
   CMAKE_SUBDIRS examples tests
 )

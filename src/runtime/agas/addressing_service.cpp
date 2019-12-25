@@ -21,6 +21,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -51,7 +52,6 @@
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>

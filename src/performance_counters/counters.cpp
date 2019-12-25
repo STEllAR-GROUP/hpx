@@ -8,6 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counter_parser.hpp>
@@ -25,7 +26,6 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>

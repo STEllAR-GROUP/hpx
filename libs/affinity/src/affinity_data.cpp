@@ -9,9 +9,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
+#include <hpx/lexical_cast/safe_lexical_cast.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <algorithm>
 #include <atomic>
