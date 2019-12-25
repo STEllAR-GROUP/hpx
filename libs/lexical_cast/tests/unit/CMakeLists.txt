@@ -17,7 +17,6 @@ set(tests
     lexical_cast_noncopyable_test
     lexical_cast_pointers_test
     lexical_cast_stream_detection_test
-    lexical_cast_stream_traits_test
     lexical_cast_test
     lexical_cast_try_lexical_convert
     lexical_cast_vc8_bug_test

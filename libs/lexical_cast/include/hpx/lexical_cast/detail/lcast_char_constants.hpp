@@ -25,17 +25,16 @@
 namespace hpx { namespace util { namespace detail {
 
     // '0', '-', '+', 'e', 'E' and '.' constants
-    template <typename Char>
     struct lcast_char_constants
     {
         // We check in tests assumption that static casted character is
         // equal to correctly written C++ literal: U'0' == static_cast<char32_t>('0')
-        HPX_STATIC_CONSTEXPR Char zero = static_cast<Char>('0');
-        HPX_STATIC_CONSTEXPR Char minus = static_cast<Char>('-');
-        HPX_STATIC_CONSTEXPR Char plus = static_cast<Char>('+');
-        HPX_STATIC_CONSTEXPR Char lowercase_e = static_cast<Char>('e');
-        HPX_STATIC_CONSTEXPR Char capital_e = static_cast<Char>('E');
-        HPX_STATIC_CONSTEXPR Char c_decimal_separator = static_cast<Char>('.');
+        HPX_STATIC_CONSTEXPR char zero = static_cast<char>('0');
+        HPX_STATIC_CONSTEXPR char minus = static_cast<char>('-');
+        HPX_STATIC_CONSTEXPR char plus = static_cast<char>('+');
+        HPX_STATIC_CONSTEXPR char lowercase_e = static_cast<char>('e');
+        HPX_STATIC_CONSTEXPR char capital_e = static_cast<char>('E');
+        HPX_STATIC_CONSTEXPR char c_decimal_separator = static_cast<char>('.');
     };
 
 }}}    // namespace hpx::util::detail

@@ -17,39 +17,16 @@
 //        Cheng Yang, Matthew Bradbury, David W. Birdsall, Pavel Korzh and other Boosters
 // when:  November 2000, March 2003, June 2005, June 2006, March 2011 - 2014
 
-#ifndef HPX_LEXICAL_CAST_LEXICAL_CAST_INCLUDED
-#define HPX_LEXICAL_CAST_LEXICAL_CAST_INCLUDED
-
-#include <hpx/config.hpp>
-
-#include <cstddef>
-
 #include <hpx/lexical_cast/bad_lexical_cast.hpp>
-#include <hpx/lexical_cast/detail/cstring_wrapper.hpp>
-#include <hpx/lexical_cast/try_lexical_convert.hpp>
 
 namespace hpx { namespace util {
 
-    template <typename Target, typename Source>
-    inline Target lexical_cast(const Source& arg)
+    const char* bad_lexical_cast::what() const noexcept
     {
-        Target result = Target();
-
-        if (!detail::try_lexical_convert(arg, result))
-        {
-            detail::throw_bad_cast<Source, Target>();
-        }
-
-        return result;
+        return "bad lexical cast: "
+               "source type value could not be interpreted as target";
     }
 
-    template <typename Target>
-    inline Target lexical_cast(const char* chars, std::size_t count)
-    {
-        return util::lexical_cast<Target>(
-            detail::cstring_wrapper{chars, count});
-    }
+    bad_lexical_cast::~bad_lexical_cast() = default;
 
 }}    // namespace hpx::util
-
-#endif    // HPX_LEXICAL_CAST_LEXICAL_CAST_INCLUDED

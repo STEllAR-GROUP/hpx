@@ -47,11 +47,11 @@ namespace hpx { namespace util {
     {
         // acts as a stream buffer which wraps around a pair of pointers
         // and gives acces to internals
-        template <class BufferType, class CharT>
-        class basic_unlockedbuf : public basic_pointerbuf<CharT, BufferType>
+        template <class BufferType>
+        class basic_unlockedbuf : public basic_pointerbuf<char, BufferType>
         {
         public:
-            typedef basic_pointerbuf<CharT, BufferType> base_type;
+            typedef basic_pointerbuf<char, BufferType> base_type;
             typedef typename base_type::streamsize streamsize;
 
             using base_type::pbase;
@@ -60,48 +60,24 @@ namespace hpx { namespace util {
         };
     }    // namespace detail
 
-    namespace detail {
-        struct do_not_construct_out_buffer_t
-        {
-        };
-        struct do_not_construct_out_stream_t
-        {
-            do_not_construct_out_stream_t(do_not_construct_out_buffer_t*) {}
-        };
-
-        template <class CharT, class Traits>
-        struct out_stream_helper_trait
-        {
-            typedef std::ostream out_stream_t;
-            typedef basic_unlockedbuf<std::stringbuf, char> stringbuffer_t;
-            typedef basic_unlockedbuf<std::streambuf, char> buffer_t;
-        };
-    }    // namespace detail
-
     namespace detail    // optimized stream wrappers
     {
-        template <class CharT, class Traits, bool RequiresStringbuffer,
-            std::size_t CharacterBufferSize>
+        template <class Traits, std::size_t CharacterBufferSize>
         class lexical_istream_limited_src
         {
             HPX_NON_COPYABLE(lexical_istream_limited_src);
 
-            typedef typename std::conditional<RequiresStringbuffer,
-                typename out_stream_helper_trait<CharT, Traits>::out_stream_t,
-                do_not_construct_out_stream_t>::type deduced_out_stream_t;
+            typedef std::ostream out_stream_t;
+            typedef basic_unlockedbuf<std::stringbuf> stringbuffer_t;
 
-            typedef typename std::conditional<RequiresStringbuffer,
-                typename out_stream_helper_trait<CharT, Traits>::stringbuffer_t,
-                do_not_construct_out_buffer_t>::type deduced_out_buffer_t;
-
-            deduced_out_buffer_t out_buffer;
-            deduced_out_stream_t out_stream;
-            CharT buffer[CharacterBufferSize];
+            stringbuffer_t out_buffer;
+            out_stream_t out_stream;
+            char buffer[CharacterBufferSize];
 
             // After the `operator <<`  finishes, `[start, finish)` is
             // the range to output by `operator >>`
-            const CharT* start;
-            const CharT* finish;
+            const char* start;
+            const char* finish;
 
         public:
             lexical_istream_limited_src() noexcept
@@ -112,26 +88,26 @@ namespace hpx { namespace util {
             {
             }
 
-            const CharT* cbegin() const noexcept
+            const char* cbegin() const noexcept
             {
                 return start;
             }
 
-            const CharT* cend() const noexcept
+            const char* cend() const noexcept
             {
                 return finish;
             }
 
         private:
             /* HELPER FUNCTIONS FOR OPERATORS << ( ... ) */
-            bool shl_char(CharT ch) noexcept
+            bool shl_char(char ch) noexcept
             {
                 Traits::assign(buffer[0], ch);
                 finish = start + 1;
                 return true;
             }
 
-            bool shl_char_array(CharT const* str_value) noexcept
+            bool shl_char_array(char const* str_value) noexcept
             {
                 start = str_value;
                 finish = start + Traits::length(str_value);
@@ -141,7 +117,7 @@ namespace hpx { namespace util {
             template <class T>
             bool shl_char_array(T const* str_value)
             {
-                static_assert(sizeof(T) <= sizeof(CharT),
+                static_assert(sizeof(T) <= sizeof(char),
                     "hpx::util::lexical_cast does not support narrowing of "
                     "character types."
                     "Use boost::locale instead");
@@ -149,7 +125,7 @@ namespace hpx { namespace util {
             }
 
             bool shl_char_array_limited(
-                CharT const* str, std::size_t max_size) noexcept
+                char const* str, std::size_t max_size) noexcept
             {
                 start = str;
                 finish =
@@ -160,15 +136,12 @@ namespace hpx { namespace util {
             template <typename InputStreamable>
             bool shl_input_streamable(InputStreamable& input)
             {
-                static_assert(std::is_same<char, CharT>::value,
-                    "hpx::util::lexical_cast can not convert.");
-
                 out_stream.exceptions(std::ios::badbit);
                 try
                 {
                     bool const result = !(out_stream << input).fail();
-                    const deduced_out_buffer_t* const p =
-                        static_cast<deduced_out_buffer_t*>(out_stream.rdbuf());
+                    const stringbuffer_t* const p =
+                        static_cast<stringbuffer_t*>(out_stream.rdbuf());
                     start = p->pbase();
                     finish = p->pptr();
                     return result;
@@ -182,8 +155,8 @@ namespace hpx { namespace util {
             template <class T>
             inline bool shl_unsigned(const T n)
             {
-                CharT* tmp_finish = buffer + CharacterBufferSize;
-                start = lcast_put_unsigned<Traits, T, CharT>(n, tmp_finish)
+                char* tmp_finish = buffer + CharacterBufferSize;
+                start = lcast_put_unsigned<Traits, T>(n, tmp_finish)
                             .convert();
                 finish = tmp_finish;
                 return true;
@@ -192,15 +165,15 @@ namespace hpx { namespace util {
             template <class T>
             inline bool shl_signed(const T n)
             {
-                CharT* tmp_finish = buffer + CharacterBufferSize;
+                char* tmp_finish = buffer + CharacterBufferSize;
                 typedef typename std::make_unsigned<T>::type utype;
-                CharT* tmp_start = lcast_put_unsigned<Traits, utype, CharT>(
+                char* tmp_start = lcast_put_unsigned<Traits, utype>(
                     lcast_to_unsigned(n), tmp_finish)
-                                       .convert();
+                                      .convert();
                 if (n < 0)
                 {
                     --tmp_start;
-                    CharT const minus = lcast_char_constants<CharT>::minus;
+                    char const minus = lcast_char_constants::minus;
                     Traits::assign(*tmp_start, minus);
                 }
                 start = tmp_start;
@@ -218,15 +191,9 @@ namespace hpx { namespace util {
             bool shl_real_type(float val, char* begin)
             {
                 using namespace std;
-                const double val_as_double = val;
+                const double val_as_double = static_cast<double>(val);
                 finish = start +
-#if defined(_MSC_VER) && (_MSC_VER >= 1400) && !defined(__SGI_STL_PORT) &&     \
-    !defined(_STLPORT_VERSION)
-                    sprintf_s(begin, CharacterBufferSize,
-#else
-                    sprintf(begin,
-#endif
-                        "%.*g",
+                    snprintf(begin, CharacterBufferSize, "%.*g",
                         static_cast<int>(detail::lcast_get_precision<float>()),
                         val_as_double);
                 return finish > start;
@@ -236,13 +203,7 @@ namespace hpx { namespace util {
             {
                 using namespace std;
                 finish = start +
-#if defined(_MSC_VER) && (_MSC_VER >= 1400) && !defined(__SGI_STL_PORT) &&     \
-    !defined(_STLPORT_VERSION)
-                    sprintf_s(begin, CharacterBufferSize,
-#else
-                    sprintf(begin,
-#endif
-                        "%.*g",
+                    snprintf(begin, CharacterBufferSize, "%.*g",
                         static_cast<int>(detail::lcast_get_precision<double>()),
                         val);
                 return finish > start;
@@ -253,13 +214,7 @@ namespace hpx { namespace util {
             {
                 using namespace std;
                 finish = start +
-#if defined(_MSC_VER) && (_MSC_VER >= 1400) && !defined(__SGI_STL_PORT) &&     \
-    !defined(_STLPORT_VERSION)
-                    sprintf_s(begin, CharacterBufferSize,
-#else
-                    sprintf(begin,
-#endif
-                        "%.*Lg",
+                    snprintf(begin, CharacterBufferSize, "%.*Lg",
                         static_cast<int>(
                             detail::lcast_get_precision<long double>()),
                         val);
@@ -270,21 +225,21 @@ namespace hpx { namespace util {
             template <class T>
             bool shl_real(T val)
             {
-                CharT* tmp_finish = buffer + CharacterBufferSize;
+                char* tmp_finish = buffer + CharacterBufferSize;
                 if (put_inf_nan(buffer, tmp_finish, val))
                 {
                     finish = tmp_finish;
                     return true;
                 }
 
-                return shl_real_type(val, static_cast<CharT*>(buffer));
+                return shl_real_type(val, static_cast<char*>(buffer));
             }
 
             /* OPERATORS << ( ... ) */
         public:
             template <class Alloc>
             bool operator<<(
-                std::basic_string<CharT, Traits, Alloc> const& str) noexcept
+                std::basic_string<char, Traits, Alloc> const& str) noexcept
             {
                 start = str.data();
                 finish = start + str.length();
@@ -293,13 +248,13 @@ namespace hpx { namespace util {
 
             bool operator<<(bool value) noexcept
             {
-                CharT const czero = lcast_char_constants<CharT>::zero;
+                char const czero = lcast_char_constants::zero;
                 Traits::assign(buffer[0], Traits::to_char_type(czero + value));
                 finish = start + 1;
                 return true;
             }
 
-            bool operator<<(const cstring_wrapper<CharT>& rng) noexcept
+            bool operator<<(const cstring_wrapper& rng) noexcept
             {
                 start = rng.data;
                 finish = start + rng.length;
@@ -402,18 +357,18 @@ namespace hpx { namespace util {
             }
         };
 
-        template <class CharT, class Traits>
+        template <class Traits>
         class lexical_ostream_limited_src
         {
             HPX_NON_COPYABLE(lexical_ostream_limited_src);
 
             //`[start, finish)` is the range to output by `operator >>`
-            const CharT* start;
-            const CharT* const finish;
+            const char* start;
+            const char* const finish;
 
         public:
             lexical_ostream_limited_src(
-                const CharT* begin, const CharT* end) noexcept
+                const char* begin, const char* end) noexcept
               : start(begin)
               , finish(end)
             {
@@ -426,8 +381,8 @@ namespace hpx { namespace util {
             {
                 if (start == finish)
                     return false;
-                CharT const minus = lcast_char_constants<CharT>::minus;
-                CharT const plus = lcast_char_constants<CharT>::plus;
+                char const minus = lcast_char_constants::minus;
+                char const plus = lcast_char_constants::plus;
                 bool const has_minus = Traits::eq(minus, *start);
 
                 // We won`t use `start' any more, so no need in decrementing it after
@@ -436,7 +391,7 @@ namespace hpx { namespace util {
                     ++start;
                 }
 
-                bool const succeed = lcast_ret_unsigned<Traits, Type, CharT>(
+                bool const succeed = lcast_ret_unsigned<Traits, Type>(
                     output, start, finish)
                                          .convert();
 
@@ -453,8 +408,8 @@ namespace hpx { namespace util {
             {
                 if (start == finish)
                     return false;
-                CharT const minus = lcast_char_constants<CharT>::minus;
-                CharT const plus = lcast_char_constants<CharT>::plus;
+                char const minus = lcast_char_constants::minus;
+                char const plus = lcast_char_constants::plus;
                 typedef typename std::make_unsigned<Type>::type utype;
                 utype out_tmp = 0;
                 bool const has_minus = Traits::eq(minus, *start);
@@ -465,7 +420,7 @@ namespace hpx { namespace util {
                     ++start;
                 }
 
-                bool succeed = lcast_ret_unsigned<Traits, utype, CharT>(
+                bool succeed = lcast_ret_unsigned<Traits, utype>(
                     out_tmp, start, finish)
                                    .convert();
                 if (has_minus)
@@ -491,17 +446,11 @@ namespace hpx { namespace util {
                 static_assert(!std::is_pointer<InputStreamable>::value,
                     "hpx::util::lexical_cast can not convert to pointers");
 
-                static_assert(std::is_same<char, CharT>::value,
-                    "hpx::util::lexical_cast can not convert.");
-
-                typedef
-                    typename out_stream_helper_trait<CharT, Traits>::buffer_t
-                        buffer_t;
-                buffer_t buf;
+                basic_unlockedbuf<std::streambuf> buf;
                 // Usually `istream` and `basic_istream` do not modify
                 // content of buffer; `buffer_t` assures that this is true
-                buf.setbuf(const_cast<CharT*>(start),
-                    static_cast<typename buffer_t::streamsize>(finish - start));
+                buf.setbuf(const_cast<char*>(start),
+                    static_cast<typename std::streamsize>(finish - start));
                 std::istream stream(&buf);
 
                 stream.exceptions(std::ios::badbit);
@@ -523,14 +472,14 @@ namespace hpx { namespace util {
             template <class T>
             inline bool shr_xchar(T& output) noexcept
             {
-                static_assert(sizeof(CharT) == sizeof(T),
+                static_assert(sizeof(char) == sizeof(T),
                     "hpx::util::lexical_cast does not support narrowing of "
                     "character types."
                     "Use boost::locale instead");
                 bool const ok = (finish - start == 1);
                 if (ok)
                 {
-                    CharT out;
+                    char out;
                     Traits::assign(out, *start);
                     output = static_cast<T>(out);
                 }
@@ -548,7 +497,7 @@ namespace hpx { namespace util {
                     return false;
                 }
 
-                memcpy(&output[0], start, size * sizeof(CharT));
+                memcpy(&output[0], start, size * sizeof(char));
                 output[size] = Traits::to_char_type(0);
                 return true;
             }
@@ -600,7 +549,7 @@ namespace hpx { namespace util {
                 return shr_xchar(output);
             }
             template <class Alloc>
-            bool operator>>(std::basic_string<CharT, Traits, Alloc>& str)
+            bool operator>>(std::basic_string<char, Traits, Alloc>& str)
             {
                 str.assign(start, finish);
                 return true;
@@ -617,11 +566,11 @@ namespace hpx { namespace util {
 
                 if (start == finish)
                     return false;
-                CharT const zero = lcast_char_constants<CharT>::zero;
-                CharT const plus = lcast_char_constants<CharT>::plus;
-                CharT const minus = lcast_char_constants<CharT>::minus;
+                char const zero = lcast_char_constants::zero;
+                char const plus = lcast_char_constants::plus;
+                char const minus = lcast_char_constants::minus;
 
-                const CharT* const dec_finish = finish - 1;
+                const char* const dec_finish = finish - 1;
                 output = Traits::eq(*dec_finish, zero + 1);
                 if (!output && !Traits::eq(*dec_finish, zero))
                 {
@@ -667,11 +616,10 @@ namespace hpx { namespace util {
                  * so we just forbid such conversions (as some
                  * of the most popular compilers/libraries do)
                  * */
-                CharT const minus = lcast_char_constants<CharT>::minus;
-                CharT const plus = lcast_char_constants<CharT>::plus;
-                CharT const capital_e = lcast_char_constants<CharT>::capital_e;
-                CharT const lowercase_e =
-                    lcast_char_constants<CharT>::lowercase_e;
+                char const minus = lcast_char_constants::minus;
+                char const plus = lcast_char_constants::plus;
+                char const capital_e = lcast_char_constants::capital_e;
+                char const lowercase_e = lcast_char_constants::lowercase_e;
                 if (return_value &&
                     (Traits::eq(*(finish - 1), lowercase_e)        // 1.0e
                         || Traits::eq(*(finish - 1), capital_e)    // 1.0E

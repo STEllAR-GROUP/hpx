@@ -24,8 +24,8 @@
 #include <hpx/lexical_cast.hpp>
 #include <hpx/testing.hpp>
 
-#include <string>
 #include <ostream>
+#include <string>
 
 using namespace hpx::util;
 

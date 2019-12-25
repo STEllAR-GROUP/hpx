@@ -62,7 +62,7 @@ namespace examples { namespace server
         {
             // Atomically add value_ to arg, and store the result in value_.
             std::lock_guard<mutex_type> l(mtx_);
-            value_ += std::stod(arg);
+            value_ += arg;
         }
 
         /// Return the current value to the caller.

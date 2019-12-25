@@ -35,9 +35,8 @@ struct class_with_user_defined_sream_operators
     }
 };
 
-template <class CharT>
-inline std::basic_istream<CharT>& operator>>(std::basic_istream<CharT>& istr,
-    class_with_user_defined_sream_operators& rhs)
+inline std::istream& operator>>(
+    std::istream& istr, class_with_user_defined_sream_operators& rhs)
 {
     return istr >> rhs.i;
 }
@@ -72,29 +71,23 @@ void do_test_cstring_wrapper_impl(const RngT& rng)
         (lexical_cast<class_with_user_defined_sream_operators>(rng)), 1);
 }
 
-template <class CharT>
-void test_it_range_using_any_chars(CharT* one, CharT* eleven)
+void test_it_range_using_any_chars(char* one, char* eleven)
 {
-    typedef CharT test_char_type;
-
     // Zero terminated
-    cstring_wrapper<test_char_type> rng1(one, 1);
+    cstring_wrapper rng1(one, 1);
     do_test_cstring_wrapper_impl(rng1);
 
     // Non zero terminated
-    cstring_wrapper<test_char_type> rng2(eleven, 1);
+    cstring_wrapper rng2(eleven, 1);
     do_test_cstring_wrapper_impl(rng2);
 }
 
-template <class CharT>
-void test_it_range_using_char(CharT* one, CharT* eleven)
+void test_it_range_using_char(char* one, char* eleven)
 {
-    typedef CharT test_char_type;
-
-    cstring_wrapper<test_char_type> rng1(one, 1);
+    cstring_wrapper rng1(one, 1);
     HPX_TEST_EQ(lexical_cast<std::string>(rng1), "1");
 
-    cstring_wrapper<test_char_type> rng2(eleven, 1);
+    cstring_wrapper rng2(eleven, 1);
     HPX_TEST_EQ(lexical_cast<std::string>(rng2), "1");
 
     HPX_TEST_EQ(lexical_cast<float>(rng2), 1.0f);
@@ -105,9 +98,8 @@ void test_it_range_using_char(CharT* one, CharT* eleven)
 
 void test_char_cstring_wrappers()
 {
-    typedef char test_char_type;
-    test_char_type data1[] = "1";
-    test_char_type data2[] = "11";
+    char data1[] = "1";
+    char data2[] = "11";
     test_it_range_using_any_chars(data1, data2);
     test_it_range_using_char(data1, data2);
 }

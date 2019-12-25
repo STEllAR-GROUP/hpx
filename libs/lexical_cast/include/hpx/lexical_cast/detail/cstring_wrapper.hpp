@@ -15,10 +15,9 @@
 namespace hpx { namespace util { namespace detail {
 
     // returns true, if T is one of the character types
-    template <typename Char>
     struct cstring_wrapper
     {
-        Char const* data;
+        char const* data;
         std::size_t length;
 
         cstring_wrapper()
@@ -27,7 +26,7 @@ namespace hpx { namespace util { namespace detail {
         {
         }
 
-        cstring_wrapper(Char const* data, std::size_t length)
+        cstring_wrapper(char const* data, std::size_t length)
           : data(data)
           , length(length)
         {

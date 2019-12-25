@@ -16,19 +16,17 @@
 
 namespace hpx { namespace util {
 
-    template <typename DestType, typename SrcType>
-    DestType safe_lexical_cast(
-        SrcType const& value, DestType const& dflt = DestType())
+    template <typename Target, typename Source>
+    Target safe_lexical_cast(Source const& arg, Target const& dflt = Target())
     {
-        try
+        Target result = Target();
+
+        if (!detail::try_lexical_convert(arg, result))
         {
-            return hpx::util::lexical_cast<DestType>(value);
+            return dflt;
         }
-        catch (hpx::util::bad_lexical_cast const&)
-        {
-            ;
-        }
-        return dflt;
+
+        return result;
     }
 
     template <typename DestType, typename Config>

@@ -44,7 +44,7 @@ namespace hpx { namespace util { namespace detail {
             static_cast<result_type>(value);
     }
 
-    template <class Traits, class T, class CharT>
+    template <class Traits, class T>
     class lcast_put_unsigned
     {
         HPX_NON_COPYABLE(lcast_put_unsigned);
@@ -52,21 +52,21 @@ namespace hpx { namespace util { namespace detail {
         typedef typename Traits::int_type int_type;
         typename std::conditional<(sizeof(unsigned) > sizeof(T)), unsigned,
             T>::type m_value;
-        CharT* m_finish;
-        CharT const m_czero;
+        char* m_finish;
+        char const m_czero;
         int_type const m_zero;
 
     public:
-        lcast_put_unsigned(const T n_param, CharT* finish) noexcept
+        lcast_put_unsigned(const T n_param, char* finish) noexcept
           : m_value(n_param)
           , m_finish(finish)
-          , m_czero(lcast_char_constants<CharT>::zero)
+          , m_czero(lcast_char_constants::zero)
           , m_zero(Traits::to_int_type(m_czero))
         {
             static_assert(!std::numeric_limits<T>::is_signed, "");
         }
 
-        CharT* convert()
+        char* convert()
         {
             return main_convert_loop();
         }
@@ -81,7 +81,7 @@ namespace hpx { namespace util { namespace detail {
             return !!m_value;    // suppressing warnings
         }
 
-        inline CharT* main_convert_loop() noexcept
+        inline char* main_convert_loop() noexcept
         {
             while (main_convert_iteration())
                 ;
@@ -89,7 +89,7 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 
-    template <class Traits, class T, class CharT>
+    template <class Traits, class T>
     class lcast_ret_unsigned
     {
         HPX_NON_COPYABLE(lcast_ret_unsigned);
@@ -97,12 +97,12 @@ namespace hpx { namespace util { namespace detail {
         bool m_multiplier_overflowed;
         T m_multiplier;
         T& m_value;
-        const CharT* const m_begin;
-        const CharT* m_end;
+        const char* const m_begin;
+        const char* m_end;
 
     public:
         lcast_ret_unsigned(
-            T& value, const CharT* const begin, const CharT* end) noexcept
+            T& value, const char* const begin, const char* end) noexcept
           : m_multiplier_overflowed(false)
           , m_multiplier(1)
           , m_value(value)
@@ -114,7 +114,7 @@ namespace hpx { namespace util { namespace detail {
 
         inline bool convert()
         {
-            CharT const czero = lcast_char_constants<CharT>::zero;
+            char const czero = lcast_char_constants::zero;
             --m_end;
             m_value = static_cast<T>(0);
 
@@ -131,7 +131,7 @@ namespace hpx { namespace util { namespace detail {
         // input characters are digits
         inline bool main_convert_iteration() noexcept
         {
-            CharT const czero = lcast_char_constants<CharT>::zero;
+            char const czero = lcast_char_constants::zero;
             T const maxv = (std::numeric_limits<T>::max)();
 
             m_multiplier_overflowed =

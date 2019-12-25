@@ -19,42 +19,33 @@
 #endif
 
 #include <hpx/lexical_cast.hpp>
-
 #include <hpx/testing.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/math/special_functions/sign.hpp>
+#include <cmath>
 
 using namespace hpx::util;
 
 template <class T>
 bool is_pos_inf(T value)
 {
-    return (boost::math::isinf)(value) && !(boost::math::signbit)(value);
+    return std::isinf(value) && !std::signbit(value);
 }
 
 template <class T>
 bool is_neg_inf(T value)
 {
-    return (boost::math::isinf)(value) && (boost::math::signbit)(value);
+    return std::isinf(value) && std::signbit(value);
 }
 
 template <class T>
 bool is_pos_nan(T value)
 {
-    return (boost::math::isnan)(value) && !(boost::math::signbit)(value);
+    return std::isnan(value) && !std::signbit(value);
 }
 
 template <class T>
 bool is_neg_nan(T value)
 {
-    /* There is some strange behaviour on Itanium platform with -nan nuber for
-    * long double. It is a IA64 feature, not a lexical_cast bug */
-#if defined(__ia64__) || defined(_M_IA64)
-    return (boost::math::isnan)(value) &&
-        (std::is_same<T, long double>::value || (boost::math::signbit)(value));
-#else
-    return (boost::math::isnan)(value) && (boost::math::signbit)(value);
-#endif
+    return std::isnan(value) && std::signbit(value);
 }
 
 template <class T>
@@ -108,15 +99,17 @@ void test_inf_nan_templated()
     HPX_TEST(is_pos_nan(lexical_cast<test_t>("NAN(some string)")));
     HPX_TEST_THROW(lexical_cast<test_t>("NAN(some string"), bad_lexical_cast);
 
-    HPX_TEST(lexical_cast<std::string>((boost::math::changesign)(
-                 std::numeric_limits<test_t>::infinity())) == "-inf");
+    HPX_TEST(
+        lexical_cast<std::string>(std::copysign(
+            std::numeric_limits<test_t>::infinity(), test_t(-1))) == "-inf");
     HPX_TEST(lexical_cast<std::string>(
                  std::numeric_limits<test_t>::infinity()) == "inf");
     HPX_TEST(lexical_cast<std::string>(
                  std::numeric_limits<test_t>::quiet_NaN()) == "nan");
 #if !defined(__ia64__) && !defined(_M_IA64)
-    HPX_TEST(lexical_cast<std::string>((boost::math::changesign)(
-                 std::numeric_limits<test_t>::quiet_NaN())) == "-nan");
+    HPX_TEST(
+        lexical_cast<std::string>(std::copysign(
+            std::numeric_limits<test_t>::quiet_NaN(), test_t(-1))) == "-nan");
 #endif
 }
 

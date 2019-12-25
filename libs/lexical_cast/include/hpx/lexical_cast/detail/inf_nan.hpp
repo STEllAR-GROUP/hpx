@@ -22,8 +22,7 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/math/special_functions/sign.hpp>
+#include <cmath>
 #include <cstddef>
 #include <cstring>
 #include <limits>
@@ -31,8 +30,8 @@
 #include <hpx/lexical_cast/detail/lcast_char_constants.hpp>
 
 namespace hpx { namespace util { namespace detail {
-    template <class CharT>
-    bool lc_iequal(const CharT* val, const CharT* lcase, const CharT* ucase,
+
+    inline bool lc_iequal(const char* val, const char* lcase, const char* ucase,
         unsigned int len) noexcept
     {
         for (unsigned int i = 0; i < len; ++i)
@@ -45,17 +44,17 @@ namespace hpx { namespace util { namespace detail {
     }
 
     /* Returns true and sets the correct value if found NaN or Inf. */
-    template <class CharT, class T>
-    inline bool parse_inf_nan_impl(const CharT* begin, const CharT* end,
-        T& value, const CharT* lc_NAN, const CharT* lc_nan,
-        const CharT* lc_INFINITY, const CharT* lc_infinity,
-        const CharT opening_brace, const CharT closing_brace) noexcept
+    template <class T>
+    inline bool parse_inf_nan_impl(const char* begin, const char* end, T& value,
+        const char* lc_NAN, const char* lc_nan, const char* lc_INFINITY,
+        const char* lc_infinity, const char opening_brace,
+        const char closing_brace) noexcept
     {
         using namespace std;
         if (begin == end)
             return false;
-        const CharT minus = lcast_char_constants<CharT>::minus;
-        const CharT plus = lcast_char_constants<CharT>::plus;
+        const char minus = lcast_char_constants::minus;
+        const char plus = lcast_char_constants::plus;
         const int inifinity_size = 8;    // == sizeof("infinity") - 1
 
         /* Parsing +/- */
@@ -84,8 +83,8 @@ namespace hpx { namespace util { namespace detail {
             if (!has_minus)
                 value = std::numeric_limits<T>::quiet_NaN();
             else
-                value = (boost::math::changesign)(
-                    std::numeric_limits<T>::quiet_NaN());
+                value =
+                    std::copysign(std::numeric_limits<T>::quiet_NaN(), T(-1));
             return true;
         }
         else if ((                       /* 'INF' or 'inf' */
@@ -98,41 +97,41 @@ namespace hpx { namespace util { namespace detail {
             if (!has_minus)
                 value = std::numeric_limits<T>::infinity();
             else
-                value = (boost::math::changesign)(
-                    std::numeric_limits<T>::infinity());
+                value =
+                    std::copysign(std::numeric_limits<T>::infinity(), T(-1));
             return true;
         }
 
         return false;
     }
 
-    template <class CharT, class T>
-    bool put_inf_nan_impl(CharT* begin, CharT*& end, const T& value,
-        const CharT* lc_nan, const CharT* lc_infinity) noexcept
+    template <class T>
+    bool put_inf_nan_impl(char* begin, char*& end, const T& value,
+        const char* lc_nan, const char* lc_infinity) noexcept
     {
         using namespace std;
-        const CharT minus = lcast_char_constants<CharT>::minus;
-        if ((boost::math::isnan)(value))
+        const char minus = lcast_char_constants::minus;
+        if (std::isnan(value))
         {
-            if ((boost::math::signbit)(value))
+            if (std::signbit(value))
             {
                 *begin = minus;
                 ++begin;
             }
 
-            memcpy(begin, lc_nan, 3 * sizeof(CharT));
+            memcpy(begin, lc_nan, 3 * sizeof(char));
             end = begin + 3;
             return true;
         }
-        else if ((boost::math::isinf)(value))
+        else if (std::isinf(value))
         {
-            if ((boost::math::signbit)(value))
+            if (std::signbit(value))
             {
                 *begin = minus;
                 ++begin;
             }
 
-            memcpy(begin, lc_infinity, 3 * sizeof(CharT));
+            memcpy(begin, lc_infinity, 3 * sizeof(char));
             end = begin + 3;
             return true;
         }
@@ -140,19 +139,19 @@ namespace hpx { namespace util { namespace detail {
         return false;
     }
 
-    template <class CharT, class T>
-    bool parse_inf_nan(
-        const CharT* begin, const CharT* end, T& value) noexcept
+    template <class T>
+    bool parse_inf_nan(const char* begin, const char* end, T& value) noexcept
     {
         return parse_inf_nan_impl(
             begin, end, value, "NAN", "nan", "INFINITY", "infinity", '(', ')');
     }
 
-    template <class CharT, class T>
-    bool put_inf_nan(CharT* begin, CharT*& end, const T& value) noexcept
+    template <class T>
+    bool put_inf_nan(char* begin, char*& end, const T& value) noexcept
     {
         return put_inf_nan_impl(begin, end, value, "nan", "infinity");
     }
+
 }}}    // namespace hpx::util::detail
 
 #endif    // HPX_LEXICAL_CAST_DETAIL_INF_NAN_HPP

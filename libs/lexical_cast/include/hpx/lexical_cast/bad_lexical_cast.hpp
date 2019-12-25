@@ -26,9 +26,12 @@
 #include <exception>
 #include <typeinfo>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace util {
+
     // exception used to indicate runtime lexical_cast failure
-    class bad_lexical_cast : public std::bad_cast
+    class HPX_EXCEPTION_EXPORT bad_lexical_cast : public std::bad_cast
     {
     public:
         bad_lexical_cast() noexcept
@@ -37,13 +40,9 @@ namespace hpx { namespace util {
         {
         }
 
-        virtual const char* what() const noexcept
-        {
-            return "bad lexical cast: "
-                   "source type value could not be interpreted as target";
-        }
+        const char* what() const noexcept override;
 
-        virtual ~bad_lexical_cast() noexcept {}
+        virtual ~bad_lexical_cast();
 
         bad_lexical_cast(const std::type_info& source_type_arg,
             const std::type_info& target_type_arg) noexcept
@@ -76,5 +75,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
 }}    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif    // HPX_LEXICAL_CAST_BAD_LEXICAL_CAST_HPP

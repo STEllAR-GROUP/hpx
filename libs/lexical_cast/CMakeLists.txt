@@ -31,6 +31,7 @@ set(lexical_cast_compat_headers
 
 # Default location is $HPX_ROOT/libs/lexical_cast/src
 set(lexical_cast_sources
+  bad_lexical_cast.cpp
 )
 
 include(HPX_AddModule)

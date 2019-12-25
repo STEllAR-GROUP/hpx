@@ -69,7 +69,7 @@ namespace hpx { namespace util { namespace detail {
     };
 
     template <class T>
-    inline std::streamsize lcast_get_precision(T* = 0)
+    inline std::streamsize lcast_get_precision(T* = nullptr)
     {
         return lcast_precision<T>::value;
     }

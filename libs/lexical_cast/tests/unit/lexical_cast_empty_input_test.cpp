@@ -42,14 +42,14 @@ void do_test_on_empty_input(T& v)
 
 void test_empty_cstring_wrapper()
 {
-    detail::cstring_wrapper<char> v;
+    detail::cstring_wrapper v;
     do_test_on_empty_input(v);
     HPX_TEST_EQ(lexical_cast<std::string>(v), std::string());
     HPX_TEST_THROW(lexical_cast<char>(v), bad_lexical_cast);
     HPX_TEST_THROW(lexical_cast<unsigned char>(v), bad_lexical_cast);
     HPX_TEST_THROW(lexical_cast<signed char>(v), bad_lexical_cast);
 
-    const detail::cstring_wrapper<char> cv;
+    const detail::cstring_wrapper cv;
     do_test_on_empty_input(cv);
     HPX_TEST_EQ(lexical_cast<std::string>(cv), std::string());
     HPX_TEST_THROW(lexical_cast<char>(cv), bad_lexical_cast);
@@ -96,7 +96,6 @@ namespace std {
     {
         std::ostream_iterator<long> it(out);
         std::copy(v.begin(), v.end(), it);
-        assert(out);
         return out;
     }
 }    // namespace std

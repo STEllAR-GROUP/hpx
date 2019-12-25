@@ -32,10 +32,10 @@
 
 using namespace hpx::util;
 
-template <class CharT, class T>
-std::basic_string<CharT> to_str(T t)
+template <class T>
+std::string to_str(T t)
 {
-    std::basic_ostringstream<CharT> o;
+    std::ostringstream o;
     o << t;
     return o.str();
 }
@@ -313,54 +313,54 @@ void test_converion_from_to_float_types()
 #undef TEST_TO_FROM_CAST_AROUND
 #undef TEST_TO_FROM_CAST_AROUND_TYPED
 
-template <class T, class CharT>
-void test_conversion_from_float_to_char(CharT zero)
+template <class T>
+void test_conversion_from_float_to_char(char zero)
 {
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(0)) == zero + 0);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(1)) == zero + 1);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(2)) == zero + 2);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(3)) == zero + 3);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(4)) == zero + 4);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(5)) == zero + 5);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(6)) == zero + 6);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(7)) == zero + 7);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(8)) == zero + 8);
-    HPX_TEST(lexical_cast<CharT>(static_cast<T>(9)) == zero + 9);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(0)) == zero + 0);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(1)) == zero + 1);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(2)) == zero + 2);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(3)) == zero + 3);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(4)) == zero + 4);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(5)) == zero + 5);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(6)) == zero + 6);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(7)) == zero + 7);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(8)) == zero + 8);
+    HPX_TEST(lexical_cast<char>(static_cast<T>(9)) == zero + 9);
 
-    HPX_TEST_THROW(lexical_cast<CharT>(static_cast<T>(10)), bad_lexical_cast);
+    HPX_TEST_THROW(lexical_cast<char>(static_cast<T>(10)), bad_lexical_cast);
 
     T t = (std::numeric_limits<T>::max)();
-    HPX_TEST_THROW(lexical_cast<CharT>(t), bad_lexical_cast);
+    HPX_TEST_THROW(lexical_cast<char>(t), bad_lexical_cast);
 }
 
-template <class T, class CharT>
-void test_conversion_from_char_to_float(CharT zero)
+template <class T>
+void test_conversion_from_char_to_float(char zero)
 {
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 0)), static_cast<T>(0));
+        lexical_cast<T>(static_cast<char>(zero + 0)), static_cast<T>(0));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 1)), static_cast<T>(1));
+        lexical_cast<T>(static_cast<char>(zero + 1)), static_cast<T>(1));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 2)), static_cast<T>(2));
+        lexical_cast<T>(static_cast<char>(zero + 2)), static_cast<T>(2));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 3)), static_cast<T>(3));
+        lexical_cast<T>(static_cast<char>(zero + 3)), static_cast<T>(3));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 4)), static_cast<T>(4));
+        lexical_cast<T>(static_cast<char>(zero + 4)), static_cast<T>(4));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 5)), static_cast<T>(5));
+        lexical_cast<T>(static_cast<char>(zero + 5)), static_cast<T>(5));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 6)), static_cast<T>(6));
+        lexical_cast<T>(static_cast<char>(zero + 6)), static_cast<T>(6));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 7)), static_cast<T>(7));
+        lexical_cast<T>(static_cast<char>(zero + 7)), static_cast<T>(7));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 8)), static_cast<T>(8));
+        lexical_cast<T>(static_cast<char>(zero + 8)), static_cast<T>(8));
     HPX_TEST_CLOSE_FRACTION(
-        lexical_cast<T>(static_cast<CharT>(zero + 9)), static_cast<T>(9));
+        lexical_cast<T>(static_cast<char>(zero + 9)), static_cast<T>(9));
 
     HPX_TEST_THROW(
-        lexical_cast<T>(static_cast<CharT>(zero + 10)), bad_lexical_cast);
+        lexical_cast<T>(static_cast<char>(zero + 10)), bad_lexical_cast);
     HPX_TEST_THROW(
-        lexical_cast<T>(static_cast<CharT>(zero - 1)), bad_lexical_cast);
+        lexical_cast<T>(static_cast<char>(zero - 1)), bad_lexical_cast);
 }
 
 template <class T>

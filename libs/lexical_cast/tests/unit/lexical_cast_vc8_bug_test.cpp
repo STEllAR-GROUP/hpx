@@ -26,29 +26,29 @@
 
 using namespace hpx::util;
 
-// See also test_conversion_from_string_to_integral(CharT)
+// See also test_conversion_from_string_to_integral(char)
 // in libs/conversion/lexical_cast_test.cpp
-template <class T, class CharT>
-void test_too_long_number(CharT zero)
+template <class T>
+void test_too_long_number(char zero)
 {
     typedef std::numeric_limits<T> limits;
 
-    std::basic_string<CharT> s;
+    std::basic_string<char> s;
 
-    std::basic_ostringstream<CharT> o;
+    std::basic_ostringstream<char> o;
     o << (limits::max)() << zero;
     s = o.str();
     HPX_TEST_THROW(lexical_cast<T>(s), bad_lexical_cast);
-    s[s.size() - 1] += static_cast<CharT>(9);    // '0' -> '9'
+    s[s.size() - 1] += static_cast<char>(9);    // '0' -> '9'
     HPX_TEST_THROW(lexical_cast<T>(s), bad_lexical_cast);
 
     if (limits::is_signed)
     {
-        std::basic_ostringstream<CharT> o2;
+        std::basic_ostringstream<char> o2;
         o2 << (limits::min)() << zero;
         s = o2.str();
         HPX_TEST_THROW(lexical_cast<T>(s), bad_lexical_cast);
-        s[s.size() - 1] += static_cast<CharT>(9);    // '0' -> '9'
+        s[s.size() - 1] += static_cast<char>(9);    // '0' -> '9'
         HPX_TEST_THROW(lexical_cast<T>(s), bad_lexical_cast);
     }
 }

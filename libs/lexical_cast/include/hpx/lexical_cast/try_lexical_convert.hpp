@@ -84,13 +84,13 @@ namespace hpx { namespace util {
 
         template <typename CharT, typename Traits, typename Alloc>
         struct is_char_array_to_stdstring<
-            std::basic_string<CharT, Traits, Alloc>, CharT*> : std::true_type
+            std::basic_string<CharT, Traits, Alloc>, char*> : std::true_type
         {
         };
 
         template <typename CharT, typename Traits, typename Alloc>
         struct is_char_array_to_stdstring<
-            std::basic_string<CharT, Traits, Alloc>, const CharT*>
+            std::basic_string<CharT, Traits, Alloc>, const char*>
           : std::true_type
         {
         };
@@ -138,15 +138,12 @@ namespace hpx { namespace util {
             return caster_type::try_convert(arg, result);
         }
 
-        template <typename Target, typename CharacterT>
+        template <typename Target>
         inline bool try_lexical_convert(
-            const CharacterT* chars, std::size_t count, Target& result)
+            const char* chars, std::size_t count, Target& result)
         {
-            static_assert(detail::is_character<CharacterT>::value,
-                "This overload of try_lexical_convert is meant to be used "
-                "only with arrays of characters.");
             return detail::try_lexical_convert(
-                detail::cstring_wrapper<CharacterT>(chars, count), result);
+                detail::cstring_wrapper(chars, count), result);
         }
 
     }    // namespace detail
