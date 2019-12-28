@@ -85,7 +85,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         int rank_to = (rank + 1) % size;
 
         // all ranks pre-post a receive
-        hpx::future<void> f_recv = hpx::mpi::async(
+        hpx::future<int> f_recv = hpx::mpi::async(
             MPI_Irecv, &tokens[i], 1, MPI_INT, rank_from, i, MPI_COMM_WORLD);
 
         // when the recv completes,
