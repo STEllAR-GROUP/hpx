@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LIBS_MPI_FUTURE_HPP
-#define HPX_LIBS_MPI_FUTURE_HPP
+#ifndef HPX_MPI_FUTURE_HPP
+#define HPX_MPI_FUTURE_HPP
 
 #include <mpi.h>
 //
@@ -27,7 +27,7 @@
 namespace hpx { namespace mpi {
 
     using  print_on = hpx::debug::enable_print<false>;
-    static print_on mpi_debug("MPI_FUTURE");
+    static print_on mpi_debug("MPI_FUT");
 
     namespace detail {
         // mutex needed to protect mpi request list
@@ -36,23 +36,23 @@ namespace hpx { namespace mpi {
         // -----------------------------------------------------------------
         // An implementation of future_data for MPI
         // -----------------------------------------------------------------
-        struct future_data : hpx::lcos::detail::future_data<void>
+        struct future_data : hpx::lcos::detail::future_data<int>
         {
             HPX_NON_COPYABLE(future_data);
 
-            using init_no_addref = hpx::lcos::detail::future_data<void>::init_no_addref;
+            using init_no_addref = typename hpx::lcos::detail::future_data<int>::init_no_addref;
 
             // default empty constructor
             future_data() = default;
 
             // constructor that takes a request
             future_data(init_no_addref no_addref, MPI_Request request)
-                : hpx::lcos::detail::future_data<void>(no_addref), request_(request)
+                : hpx::lcos::detail::future_data<int>(no_addref), request_(request)
             {}
 
             // constructor used for creation directly by invoke
             future_data(init_no_addref no_addref)
-                : hpx::lcos::detail::future_data<void>(no_addref)
+                : hpx::lcos::detail::future_data<int>(no_addref)
             {}
 
             // The native MPI request handle owned by this future data
@@ -67,7 +67,7 @@ namespace hpx { namespace mpi {
 
         // we track requests and future data in two vectors even though
         // we have the request stored in the future data already
-        // the reason for this is becaue we can use MPI_Testany
+        // the reason for this is because we can use MPI_Testany
         // with a vector of requests to save overheads compared
         // to testing one by one every item in our list/vector
         using  future_data_ptr = memory::intrusive_ptr<future_data>;
@@ -95,7 +95,7 @@ namespace hpx { namespace mpi {
             active_futures_.push_back(data);
 #ifdef HPX_MPI_VECTOR_STORAGE
             active_requests_.push_back(data->request_);
-            mpi_debug.debug(hpx::debug::str<>("request ptr")
+            mpi_debug.debug(hpx::debug::str<>("push_back req_ptr")
                 , hpx::debug::ptr(active_requests_.data()));
 #endif
             // for debugging only
@@ -106,6 +106,20 @@ namespace hpx { namespace mpi {
                     , "list size", hpx::debug::dec<3>(active_futures_.size()));
             }
         }
+
+        static MPI_Errhandler hpx_mpi_errhandler;
+
+        void hpx_MPI_Handler (MPI_Comm *, int *, ...)
+        {
+            mpi_debug.debug(hpx::debug::str<>("hpx_MPI_Handler"));
+            throw std::runtime_error("MPI error");
+        }
+    }
+
+    void set_error_handler() {
+        mpi_debug.debug(hpx::debug::str<>("set_error_handler"));
+        MPI_Comm_create_errhandler(detail::hpx_MPI_Handler, &detail::hpx_mpi_errhandler);
+        MPI_Comm_set_errhandler(MPI_COMM_WORLD, detail::hpx_mpi_errhandler);
     }
 
     // -----------------------------------------------------------------
@@ -130,21 +144,21 @@ namespace hpx { namespace mpi {
 
     // -----------------------------------------------------------------
     // return a future from an async call to MPI_Ixxx function
-    template <typename F, typename ...Ts>
-    hpx::future<void> async(F f, Ts &&...ts)
+    template <typename F, typename... Ts>
+    hpx::future<int> async(F f, Ts &&...ts)
     {
         detail::future_data_ptr data =
             new detail::future_data(detail::future_data::init_no_addref{});
 
-        // invoke the call to MPI_Ixxx
-        f(std::forward<Ts>(ts)..., &data->request_);
+        // invoke the call to MPI_Ixxx, ignore the returned result for now
+        /*int result =*/ f(std::forward<Ts>(ts)..., &data->request_);
 
         // add the new shared state to the list for tracking
         detail::add_to_request_list(data);
 
         // return a new future with the mpi::future_data shared state
         using traits::future_access;
-        return future_access<hpx::future<void>>::create(std::move(data));
+        return future_access<hpx::future<int>>::create(std::move(data));
     }
 
     // -----------------------------------------------------------------
@@ -208,7 +222,7 @@ namespace hpx { namespace mpi {
                 , "S", hpx::debug::dec<>(detail::mpi_info_.size_));
 
             if (result == MPI_SUCCESS && index!=MPI_UNDEFINED) {
-                mpi_debug.debug(poll_deb
+                mpi_debug.timed(poll_deb
                     , hpx::debug::str<>("Success")
                     , "index", hpx::debug::dec<>(index)
                     , "flag", hpx::debug::dec<>(flag)
@@ -216,12 +230,12 @@ namespace hpx { namespace mpi {
                 keep_trying = flag;
                 if (keep_trying) {
                     auto req = detail::active_requests_[unsigned(index)];
-                    mpi_debug.debug(hpx::debug::str<>("MPI_Testany set_data")
-                                   , "request", hpx::debug::hex<8>(req)
-                                   , "list size", detail::active_futures_.size());
+                    mpi_debug.debug(hpx::debug::str<>("MPI_Testany(set)")
+                                    , "request", hpx::debug::hex<8>(req)
+                                    , "list size", detail::active_futures_.size());
 
                     // mark the future as ready by setting the shared_state
-                    detail::active_futures_[unsigned(index)]->set_data(hpx::util::unused);
+                    detail::active_futures_[unsigned(index)]->set_data(MPI_SUCCESS /*hpx::util::unused*/);
                     // remove the request from our list to prevent retesting
                     detail::active_requests_[unsigned(index)] = MPI_REQUEST_NULL;
                     detail::active_futures_[unsigned(index)]  = nullptr;
