@@ -25,7 +25,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -321,7 +321,7 @@ namespace hpx { namespace performance_counters
             else if (!elements.instance_.parent_.index_.empty())
             {
                 path.parentinstanceindex_ =
-                    hpx::util::safe_lexical_cast<std::int64_t>(
+                    hpx::util::from_string<std::int64_t>(
                         elements.instance_.parent_.index_);
             }
 
@@ -342,7 +342,7 @@ namespace hpx { namespace performance_counters
                 else
                 {
                     path.instanceindex_ =
-                        hpx::util::safe_lexical_cast<std::int64_t>(
+                        hpx::util::from_string<std::int64_t>(
                             elements.instance_.child_.index_, std::int64_t(-2));
                     if (path.instanceindex_ == std::int64_t(-2))
                     {
@@ -362,7 +362,7 @@ namespace hpx { namespace performance_counters
             else if (!elements.instance_.subchild_.index_.empty())
             {
                 path.subinstanceindex_ =
-                    hpx::util::safe_lexical_cast<std::uint64_t>(
+                    hpx::util::from_string<std::uint64_t>(
                         elements.instance_.subchild_.index_);
             }
         }

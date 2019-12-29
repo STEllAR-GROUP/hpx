@@ -16,10 +16,10 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/register_locks_globally.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/predef/other/endian.h>
@@ -840,7 +840,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "use_caching", "1") != 0;
+                    *sec, "use_caching", 1) != 0;
             }
         }
         return false;
@@ -852,7 +852,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "use_range_caching", "1") != 0;
+                    *sec, "use_range_caching", 1) != 0;
             }
         }
         return false;
@@ -879,7 +879,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "use_itt_notify", "0") != 0;
+                    *sec, "use_itt_notify", 0) != 0;
             }
         }
 #endif
@@ -894,7 +894,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "lock_detection", "0") != 0;
+                    *sec, "lock_detection", 0) != 0;
             }
         }
 #endif
@@ -909,7 +909,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "global_lock_detection", "0") != 0;
+                    *sec, "global_lock_detection", 0) != 0;
             }
         }
 #endif
@@ -925,10 +925,10 @@ namespace hpx { namespace util
             if (nullptr != sec) {
 #ifdef HPX_DEBUG
                 return hpx::util::get_entry_as<int>(
-                    *sec, "minimal_deadlock_detection", "1") != 0;
+                    *sec, "minimal_deadlock_detection", 1) != 0;
 #else
                 return hpx::util::get_entry_as<int>(
-                    *sec, "minimal_deadlock_detection", "0") != 0;
+                    *sec, "minimal_deadlock_detection", 0) != 0;
 #endif
             }
         }
@@ -953,10 +953,10 @@ namespace hpx { namespace util
             if (nullptr != sec) {
 #ifdef HPX_DEBUG
                 return hpx::util::get_entry_as<int>(
-                    *sec, "spinlock_deadlock_detection", "1") != 0;
+                    *sec, "spinlock_deadlock_detection", 1) != 0;
 #else
                 return hpx::util::get_entry_as<int>(
-                    *sec, "spinlock_deadlock_detection", "0") != 0;
+                    *sec, "spinlock_deadlock_detection", 0) != 0;
 #endif
             }
         }
@@ -981,8 +981,7 @@ namespace hpx { namespace util
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(*sec,
                     "spinlock_deadlock_detection_limit",
-                    HPX_PP_STRINGIZE(
-                        HPX_PP_EXPAND(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)));
+                    HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT);
             }
         }
         return HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
@@ -1021,7 +1020,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.threadpools");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<std::size_t>(
-                    *sec, std::string(poolname) + "_size", "2");
+                    *sec, std::string(poolname) + "_size", 2);
             }
         }
         return 2;     // the default size for all pools is 2
@@ -1074,7 +1073,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.stacks");
             if (nullptr != sec) {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "use_guard_pages", "1") != 0;
+                    *sec, "use_guard_pages", 1) != 0;
             }
         }
         return true;    // default is true

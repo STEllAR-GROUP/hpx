@@ -10,6 +10,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/util/lexical_cast.hpp>
 #include <hpx/version.hpp>
 #include <type_traits>
 
@@ -20,8 +21,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/lexical_cast.hpp>
 
 std::size_t const kStringsCount = 100;
 std::string const kStringValue = "shgfkghsdfjhgsfjhfgjhfgjsffghgsfdhgsfdfkdjh"
@@ -231,7 +230,7 @@ int main(int argc, char** argv)
     std::size_t iterations;
     try
     {
-        iterations = boost::lexical_cast<size_t>(argv[1]);
+        iterations = hpx::util::from_string<size_t>(argv[1]);
     }
     catch (std::exception& exc)
     {

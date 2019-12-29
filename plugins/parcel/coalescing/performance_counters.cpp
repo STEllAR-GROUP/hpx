@@ -7,14 +7,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
+#include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
@@ -468,11 +468,11 @@ namespace hpx { namespace plugins { namespace parcel
                 }
 
                 if (params.size() > 1 && !params[1].empty())
-                    min_boundary = util::safe_lexical_cast<std::int64_t>(params[1]);
+                    min_boundary = util::from_string<std::int64_t>(params[1]);
                 if (params.size() > 2 && !params[2].empty())
-                    max_boundary = util::safe_lexical_cast<std::int64_t>(params[2]);
+                    max_boundary = util::from_string<std::int64_t>(params[2]);
                 if (params.size() > 3 && !params[3].empty())
-                    num_buckets = util::safe_lexical_cast<std::int64_t>(params[3]);
+                    num_buckets = util::from_string<std::int64_t>(params[3]);
 
                 // ask registry
                 hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f =

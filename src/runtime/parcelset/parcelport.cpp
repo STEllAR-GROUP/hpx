@@ -14,9 +14,9 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/errors.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/external_timer.hpp>
@@ -43,14 +43,14 @@ namespace hpx { namespace parcelset
         allow_zero_copy_optimizations_(true),
         async_serialization_(false),
         priority_(hpx::util::get_entry_as<int>(ini,
-            "hpx.parcel." + type + ".priority", "0")),
+            "hpx.parcel." + type + ".priority", 0)),
         type_(type)
     {
         std::string key("hpx.parcel.");
         key += type;
 
         if (hpx::util::get_entry_as<int>(
-                ini, key + ".array_optimization", "1") == 0)
+                ini, key + ".array_optimization", 1) == 0)
         {
             allow_array_optimizations_ = false;
             allow_zero_copy_optimizations_ = false;
@@ -58,14 +58,14 @@ namespace hpx { namespace parcelset
         else
         {
             if (hpx::util::get_entry_as<int>(
-                    ini, key + ".zero_copy_optimization", "1") == 0)
+                    ini, key + ".zero_copy_optimization", 1) == 0)
             {
                 allow_zero_copy_optimizations_ = false;
             }
         }
 
         if (hpx::util::get_entry_as<int>(
-                ini, key + ".async_serialization", "0") != 0)
+                ini, key + ".async_serialization", 0) != 0)
         {
             async_serialization_ = true;
         }

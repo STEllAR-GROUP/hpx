@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
@@ -41,7 +41,7 @@ namespace hpx { namespace util { namespace batch_environments {
         if (valid_)
         {
             // Initialize our node number
-            node_num_ = safe_lexical_cast<std::size_t>(node_num);
+            node_num_ = from_string<std::size_t>(node_num);
 
             // Retrieve number of localities
             retrieve_number_of_localities(debug);
@@ -65,7 +65,7 @@ namespace hpx { namespace util { namespace batch_environments {
         char* total_num_tasks = std::getenv("SLURM_STEP_NUM_TASKS");
         if (total_num_tasks)
         {
-            num_localities_ = safe_lexical_cast<std::size_t>(total_num_tasks);
+            num_localities_ = from_string<std::size_t>(total_num_tasks);
         }
         else
         {
@@ -93,8 +93,7 @@ namespace hpx { namespace util { namespace batch_environments {
             HPX_ASSERT(slurm_node_id != nullptr);
             if (slurm_node_id)
             {
-                std::size_t node_id =
-                    safe_lexical_cast<std::size_t>(slurm_node_id);
+                std::size_t node_id = from_string<std::size_t>(slurm_node_id);
                 std::size_t task_count = 0;
                 for (auto& token : tokens)
                 {
@@ -105,7 +104,7 @@ namespace hpx { namespace util { namespace batch_environments {
                         HPX_ASSERT(token[token.size() - 1] == ')');
                         std::size_t begin = paren_pos + 2;
                         std::size_t end = token.size() - 1;
-                        task_count += safe_lexical_cast<std::size_t>(
+                        task_count += from_string<std::size_t>(
                             token.substr(paren_pos + 2, end - begin));
                     }
                     else
@@ -115,7 +114,7 @@ namespace hpx { namespace util { namespace batch_environments {
 
                     if (task_count > node_id)
                     {
-                        num_tasks_ = safe_lexical_cast<std::size_t>(
+                        num_tasks_ = from_string<std::size_t>(
                             token.substr(0, paren_pos));
                         break;
                     }
@@ -180,11 +179,10 @@ namespace hpx { namespace util { namespace batch_environments {
                         }
                         else
                         {
-                            using hpx::util::safe_lexical_cast;
                             std::size_t begin =
-                                safe_lexical_cast<std::size_t>(range[0]);
+                                from_string<std::size_t>(range[0]);
                             std::size_t end =
-                                safe_lexical_cast<std::size_t>(range[1]);
+                                from_string<std::size_t>(range[1]);
                             if (begin > end)
                                 std::swap(begin, end);
 
@@ -310,7 +308,7 @@ namespace hpx { namespace util { namespace batch_environments {
     {
         char* slurm_cpus_per_task = std::getenv("SLURM_CPUS_PER_TASK");
         if (slurm_cpus_per_task)
-            num_threads_ = safe_lexical_cast<std::size_t>(slurm_cpus_per_task);
+            num_threads_ = from_string<std::size_t>(slurm_cpus_per_task);
         else
         {
             char* slurm_job_cpus_on_node =
@@ -327,7 +325,7 @@ namespace hpx { namespace util { namespace batch_environments {
                 if (slurm_node_id)
                 {
                     std::size_t node_id =
-                        safe_lexical_cast<std::size_t>(slurm_node_id);
+                        from_string<std::size_t>(slurm_node_id);
                     std::size_t task_count = 0;
                     for (auto& token : tokens)
                     {
@@ -338,7 +336,7 @@ namespace hpx { namespace util { namespace batch_environments {
                             HPX_ASSERT(token[token.size() - 1] == ')');
                             std::size_t begin = paren_pos + 2;
                             std::size_t end = token.size() - 1;
-                            task_count += safe_lexical_cast<std::size_t>(
+                            task_count += from_string<std::size_t>(
                                 token.substr(paren_pos + 2, end - begin));
                         }
                         else
@@ -347,7 +345,7 @@ namespace hpx { namespace util { namespace batch_environments {
                         }
                         if (task_count > node_id)
                         {
-                            num_threads_ = safe_lexical_cast<std::size_t>(
+                            num_threads_ = from_string<std::size_t>(
                                                token.substr(0, paren_pos)) /
                                 num_tasks_;
                             break;

@@ -32,8 +32,8 @@
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
 #include <hpx/synchronization/detail/yield_k.hpp>
+#include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/archive/basic_archive.hpp>
 

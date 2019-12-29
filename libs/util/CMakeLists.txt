@@ -13,7 +13,6 @@ set(util_headers
   hpx/util/get_and_reset_value.hpp
   hpx/util/insert_checked.hpp
   hpx/util/manage_config.hpp
-  hpx/util/safe_lexical_cast.hpp
 )
 
 set(util_compat_headers
@@ -38,6 +37,7 @@ add_hpx_module(util
   DEPENDENCIES
     hpx_config
     hpx_concepts
+    hpx_format
     hpx_iterator_support
   CMAKE_SUBDIRS examples tests
 )

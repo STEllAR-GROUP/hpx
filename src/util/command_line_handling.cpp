@@ -22,11 +22,11 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/debugging.hpp>
+#include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/version.hpp>
 
@@ -405,7 +405,7 @@ namespace hpx { namespace util
             else
             {
                 default_threads =
-                    hpx::util::safe_lexical_cast<std::size_t>(threads_str);
+                    hpx::util::from_string<std::size_t>(threads_str);
             }
 
             std::size_t threads = cfgmap.get_value<std::size_t>(
@@ -433,7 +433,7 @@ namespace hpx { namespace util
                 else
                 {
                     threads =
-                        hpx::util::safe_lexical_cast<std::size_t>(threads_str);
+                        hpx::util::from_string<std::size_t>(threads_str);
                 }
 
                 if (threads == 0)
@@ -510,7 +510,7 @@ namespace hpx { namespace util
                 else
                 {
                     num_cores =
-                        hpx::util::safe_lexical_cast<std::size_t>(cores_str);
+                        hpx::util::from_string<std::size_t>(cores_str);
                 }
             }
 
@@ -734,7 +734,7 @@ namespace hpx { namespace util
                 rtcfg_.get_entry("hpx.agas.address", ""));
         std::uint16_t agas_port =
             cfgmap.get_value<std::uint16_t>("hpx.agas.port",
-                boost::lexical_cast<std::uint16_t>(
+                hpx::util::from_string<std::uint16_t>(
                     rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)
                 ));
 
@@ -870,7 +870,7 @@ namespace hpx { namespace util
         if (num_localities_ != 1 || expect_connections)
         {
             initial_hpx_port =
-                boost::lexical_cast<std::uint16_t>(
+                hpx::util::from_string<std::uint16_t>(
                     rtcfg_.get_entry("hpx.parcel.port", HPX_INITIAL_IP_PORT));
         }
 
@@ -930,7 +930,7 @@ namespace hpx { namespace util
         if (rtcfg_.mode_ == hpx::runtime_mode_connect) {
             // when connecting we need to select a unique port
             hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
-                boost::lexical_cast<std::uint16_t>(
+                hpx::util::from_string<std::uint16_t>(
                     rtcfg_.get_entry("hpx.parcel.port", HPX_CONNECTING_IP_PORT)
                 ));
 

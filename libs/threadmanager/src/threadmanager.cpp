@@ -249,52 +249,51 @@ namespace hpx { namespace threads {
         std::size_t thread_offset = 0;
 
         std::size_t max_background_threads =
-            hpx::util::safe_lexical_cast<std::size_t>(
+            hpx::util::from_string<std::size_t>(
                 hpx::get_config_entry("hpx.max_background_threads",
                     (std::numeric_limits<std::size_t>::max)()));
         std::size_t const max_idle_loop_count =
-            hpx::util::safe_lexical_cast<std::int64_t>(hpx::get_config_entry(
+            hpx::util::from_string<std::int64_t>(hpx::get_config_entry(
                 "hpx.max_idle_loop_count", HPX_IDLE_LOOP_COUNT_MAX));
         std::size_t const max_busy_loop_count =
-            hpx::util::safe_lexical_cast<std::int64_t>(hpx::get_config_entry(
+            hpx::util::from_string<std::int64_t>(hpx::get_config_entry(
                 "hpx.max_busy_loop_count", HPX_BUSY_LOOP_COUNT_MAX));
 
         std::int64_t const max_thread_count =
-            hpx::util::safe_lexical_cast<std::int64_t>(
+            hpx::util::from_string<std::int64_t>(
                 hpx::get_config_entry("hpx.thread_queue.max_thread_count",
                     std::to_string(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)));
         std::int64_t const min_tasks_to_steal_pending =
-            hpx::util::safe_lexical_cast<std::int64_t>(hpx::get_config_entry(
+            hpx::util::from_string<std::int64_t>(hpx::get_config_entry(
                 "hpx.thread_queue.min_tasks_to_steal_pending",
                 std::to_string(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING)));
         std::int64_t const min_tasks_to_steal_staged =
-            hpx::util::safe_lexical_cast<std::int64_t>(hpx::get_config_entry(
+            hpx::util::from_string<std::int64_t>(hpx::get_config_entry(
                 "hpx.thread_queue.min_tasks_to_steal_staged",
                 std::to_string(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED)));
         std::int64_t const min_add_new_count =
-            hpx::util::safe_lexical_cast<std::int64_t>(
+            hpx::util::from_string<std::int64_t>(
                 hpx::get_config_entry("hpx.thread_queue.min_add_new_count",
                     std::to_string(HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT)));
         std::int64_t const max_add_new_count =
-            hpx::util::safe_lexical_cast<std::int64_t>(
+            hpx::util::from_string<std::int64_t>(
                 hpx::get_config_entry("hpx.thread_queue.max_add_new_count",
                     std::to_string(HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT)));
         std::int64_t const min_delete_count =
-            hpx::util::safe_lexical_cast<std::int64_t>(
+            hpx::util::from_string<std::int64_t>(
                 hpx::get_config_entry("hpx.thread_queue.min_delete_count",
                     std::to_string(HPX_THREAD_QUEUE_MIN_DELETE_COUNT)));
         std::int64_t const max_delete_count =
-            hpx::util::safe_lexical_cast<std::int64_t>(
+            hpx::util::from_string<std::int64_t>(
                 hpx::get_config_entry("hpx.thread_queue.max_delete_count",
                     std::to_string(HPX_THREAD_QUEUE_MAX_DELETE_COUNT)));
         std::int64_t const max_terminated_threads =
-            hpx::util::safe_lexical_cast<std::int64_t>(
+            hpx::util::from_string<std::int64_t>(
                 hpx::get_config_entry("hpx.thread_queue.max_terminated_threads",
                     std::to_string(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)));
-        double const max_idle_backoff_time =
-            hpx::util::safe_lexical_cast<double>(
-                hpx::get_config_entry("hpx.max_idle_backoff_time",
-                    std::to_string(HPX_IDLE_BACKOFF_TIME_MAX)));
+        double const max_idle_backoff_time = hpx::util::from_string<double>(
+            hpx::get_config_entry("hpx.max_idle_backoff_time",
+                std::to_string(HPX_IDLE_BACKOFF_TIME_MAX)));
 
         std::ptrdiff_t small_stacksize = get_stack_size(thread_stacksize_small);
         std::ptrdiff_t medium_stacksize =

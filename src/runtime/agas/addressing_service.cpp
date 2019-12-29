@@ -49,9 +49,9 @@
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>

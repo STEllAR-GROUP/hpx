@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
 #include "template_accumulator.hpp"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -65,10 +65,10 @@ void run_template_accumulator(char const* type)
             else if (cmd[0] == "add") {
                 if (cmd.size() == 2) {
                     try {
-                        double val = boost::lexical_cast<double>(cmd[1]);
+                        double val = hpx::util::from_string<double>(cmd[1]);
                         accu.add(argument_type(val));
                     }
-                    catch (boost::bad_lexical_cast const&) {
+                    catch (hpx::util::bad_lexical_cast const&) {
                         std::cout << "error: invalid argument for add: '"
                                     << cmd[1] << "'" << std::endl;
                     }

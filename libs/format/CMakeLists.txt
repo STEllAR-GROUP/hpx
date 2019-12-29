@@ -11,6 +11,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Default location is $HPX_ROOT/libs/format/include
 set(format_headers
   hpx/format.hpp
+  hpx/util/bad_lexical_cast.hpp
+  hpx/util/lexical_cast.hpp
 )
 
 # Default location is $HPX_ROOT/libs/format/include_compatibility
@@ -21,6 +23,7 @@ set(format_compat_headers
 # Default location is $HPX_ROOT/libs/format/src
 set(format_sources
   format.cpp
+  util/bad_lexical_cast.cpp
 )
 
 include(HPX_AddModule)

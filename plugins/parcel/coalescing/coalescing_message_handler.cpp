@@ -17,12 +17,12 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 #include <hpx/plugins/parcel/coalescing_counter_registry.hpp>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
 #include <chrono>
@@ -69,14 +69,14 @@ namespace hpx { namespace plugins { namespace parcel
     {
         std::size_t get_num_messages(std::size_t num_messages)
         {
-            return boost::lexical_cast<std::size_t>(hpx::get_config_entry(
+            return hpx::util::from_string<std::size_t>(hpx::get_config_entry(
                 "hpx.plugins.coalescing_message_handler.num_messages",
                 num_messages));
         }
 
         std::size_t get_interval(std::size_t interval)
         {
-            return boost::lexical_cast<std::size_t>(hpx::get_config_entry(
+            return hpx::util::from_string<std::size_t>(hpx::get_config_entry(
                 "hpx.plugins.coalescing_message_handler.interval", interval));
         }
 

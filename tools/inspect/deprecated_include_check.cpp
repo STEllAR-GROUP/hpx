@@ -10,12 +10,12 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
 #include <algorithm>
 
 #include "deprecated_include_check.hpp"
 #include "boost/regex.hpp"
-#include "boost/lexical_cast.hpp"
 #include "function_hyper.hpp"
 
 namespace boost
@@ -153,7 +153,7 @@ namespace boost
                   + " deprecated #include ("
                   + found_include
                   + ") on line "
-                  + linelink(full_path, boost::lexical_cast<string>(line_number))
+                  + linelink(full_path, hpx::util::to_string(line_number))
                   + " use " + m.format(d.data->use_instead) + " instead");
             }
           }

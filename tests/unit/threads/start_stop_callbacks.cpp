@@ -6,6 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/util/lexical_cast.hpp>
 #include <hpx/testing.hpp>
 
 #include <algorithm>
@@ -13,8 +14,6 @@
 #include <map>
 #include <mutex>
 #include <string>
-
-#include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 std::mutex mtx;
@@ -77,7 +76,7 @@ int hpx_main(int argc, char* argv[])
 
     p = threads.equal_range("timer-thread");
     auto cfg = hpx::get_config_entry("hpx.threadpools.timer_pool_size", "0");
-    HPX_TEST(std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
+    HPX_TEST(std::distance(p.first, p.second) == hpx::util::from_string<int>(cfg));
 
 #if defined(HPX_HAVE_NETWORKING)
     if (hpx::is_networking_enabled())
@@ -85,13 +84,13 @@ int hpx_main(int argc, char* argv[])
         p = threads.equal_range("parcel-thread");
         cfg = hpx::get_config_entry("hpx.threadpools.parcel_pool_size", "0");
         HPX_TEST(
-            std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
+            std::distance(p.first, p.second) == hpx::util::from_string<int>(cfg));
     }
 #endif
 
     p = threads.equal_range("io-thread");
     cfg = hpx::get_config_entry("hpx.threadpools.io_pool_size", "0");
-    HPX_TEST(std::distance(p.first, p.second) == boost::lexical_cast<int>(cfg));
+    HPX_TEST(std::distance(p.first, p.second) == hpx::util::from_string<int>(cfg));
 
     return hpx::finalize();
 }

@@ -7,10 +7,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
 #include "accumulator.hpp"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -59,7 +59,7 @@ int hpx_main()
                 }
                 else if (cmd[0] == "add") {
                     if (cmd.size() == 2) {
-                        accu.add(boost::lexical_cast<argument_type>(cmd[1]));
+                        accu.add(hpx::util::from_string<argument_type>(cmd[1]));
                     }
                     else {
                         std::cout << "error: invalid command '"

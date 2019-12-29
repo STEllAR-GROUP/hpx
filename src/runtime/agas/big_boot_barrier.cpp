@@ -39,8 +39,8 @@
 #include <hpx/synchronization/detail/yield_k.hpp>
 #include <hpx/format.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/util/lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -775,7 +775,7 @@ void big_boot_barrier::wait_hosted(
     if(locality_str != "-1")
     {
         suggested_prefix = naming::get_gid_from_locality_id(
-            util::safe_lexical_cast<std::uint32_t>(locality_str, -1));
+            util::from_string<std::uint32_t>(locality_str, -1));
     }
 
     // pre-load all unassigned ids

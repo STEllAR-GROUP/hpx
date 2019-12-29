@@ -32,7 +32,7 @@
 #include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/util/external_timer.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/lexical_cast.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/yield_while.hpp>
 
@@ -488,7 +488,7 @@ namespace hpx
     {
         std::string localities = cfg.get_entry("hpx.localities", "1");
         std::size_t num_localities =
-            util::safe_lexical_cast<std::size_t>(localities, 1);
+            util::from_string<std::size_t>(localities, 1);
         if (num_localities > 1)
         {
             std::string locality = cfg.get_entry("hpx.locality", "");

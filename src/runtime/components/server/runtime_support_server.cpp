@@ -43,6 +43,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/lexical_cast.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/yield_while.hpp>
 
@@ -54,7 +55,6 @@
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -1136,7 +1136,7 @@ namespace hpx { namespace components { namespace server
                     get_runtime_mode_from_name(runtime_mode));
 
                 if (vm.count("hpx:print-bind")) {
-                    std::size_t num_threads = boost::lexical_cast<std::size_t>(
+                    std::size_t num_threads = hpx::util::from_string<std::size_t>(
                         ini.get_entry("hpx.os_threads", 1));
                     detail::handle_print_bind(vm, num_threads);
                 }

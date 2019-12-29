@@ -235,7 +235,7 @@ namespace hpx { namespace resource { namespace detail {
         if (!default_scheduler_mode_str.empty())
         {
             default_scheduler_mode_ = threads::policies::scheduler_mode(
-                hpx::util::safe_lexical_cast<std::size_t>(
+                hpx::util::from_string<std::size_t>(
                     default_scheduler_mode_str));
             HPX_ASSERT_MSG(
                 (default_scheduler_mode_ &
@@ -896,7 +896,7 @@ namespace hpx { namespace resource { namespace detail {
         get_affinity_description(cfg_, affinity_description);
 
         pus_needed_ = affinity_data_.init(cfg_.num_threads_,
-            hpx::util::safe_lexical_cast<std::size_t>(
+            hpx::util::from_string<std::size_t>(
                 get_config_entry("hpx.cores", 0), 0),
             get_pu_offset(cfg_), get_pu_step(cfg_),
             static_cast<std::size_t>(cfg_.rtcfg_.get_first_used_core()),

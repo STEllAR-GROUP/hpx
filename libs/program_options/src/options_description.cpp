@@ -13,8 +13,8 @@
 // FIXME: this is only to get multiple_occurrences class
 // should move that to a separate headers.
 #include <hpx/program_options/parsers.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <climits>

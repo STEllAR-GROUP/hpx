@@ -51,9 +51,10 @@ namespace hpx { namespace lcos { namespace detail {
       , base_name_(base_name)
       , rank_(rank)
       , num_(num)
-      , arity_(std::stol(get_config_entry("hpx.lcos.collectives.arity", 32)))
-      , cut_off_(
-            std::stol(get_config_entry("hpx.lcos.collectives.cut_off", -1)))
+      , arity_(hpx::util::from_string<std::size_t>(
+            get_config_entry("hpx.lcos.collectives.arity", 32)))
+      , cut_off_(hpx::util::from_string<std::size_t>(
+            get_config_entry("hpx.lcos.collectives.cut_off", -1)))
       , local_barrier_(num)
     {
         if (num_ >= cut_off_)

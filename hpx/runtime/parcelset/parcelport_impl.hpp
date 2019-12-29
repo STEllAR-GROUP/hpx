@@ -26,9 +26,10 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <boost/predef/other/endian.h>
@@ -71,7 +72,7 @@ namespace hpx { namespace parcelset
             key += connection_handler_type();
 
             return hpx::util::get_entry_as<std::size_t>(
-                ini, key + ".io_pool_size", "2");
+                ini, key + ".io_pool_size", 2);
         }
 
         static const char *pool_name()
@@ -117,7 +118,7 @@ namespace hpx { namespace parcelset
           , archive_flags_(0)
           , operations_in_flight_(0)
           , num_thread_(0)
-          , max_background_thread_(hpx::util::safe_lexical_cast<std::size_t>(
+          , max_background_thread_(hpx::util::from_string<std::size_t>(
                 hpx::get_config_entry("hpx.max_background_threads",
                     (std::numeric_limits<std::size_t>::max)())))
         {

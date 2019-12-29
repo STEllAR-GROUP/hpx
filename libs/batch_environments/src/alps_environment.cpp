@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/batch_environments/alps_environment.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/lexical_cast.hpp>
 
 #include <cstddef>
 #include <string>
@@ -25,7 +25,7 @@ namespace hpx { namespace util { namespace batch_environments {
         if (valid_)
         {
             // Initialize our node number
-            node_num_ = safe_lexical_cast<std::size_t>(node_num);
+            node_num_ = from_string<std::size_t>(node_num);
 
             // Get the number of threads
             char* num_threads = std::getenv("ALPS_APP_DEPTH");
@@ -34,7 +34,7 @@ namespace hpx { namespace util { namespace batch_environments {
                 valid_ = false;
                 return;
             }
-            num_threads_ = safe_lexical_cast<std::size_t>(num_threads);
+            num_threads_ = from_string<std::size_t>(num_threads);
 
             // Get the number of localities
             char* total_num_threads = std::getenv("PBS_NP");
@@ -44,8 +44,7 @@ namespace hpx { namespace util { namespace batch_environments {
                 return;
             }
             num_localities_ =
-                safe_lexical_cast<std::size_t>(total_num_threads) /
-                num_threads_;
+                from_string<std::size_t>(total_num_threads) / num_threads_;
         }
     }
 }}}    // namespace hpx::util::batch_environments

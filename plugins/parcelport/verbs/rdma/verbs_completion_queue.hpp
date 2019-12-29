@@ -185,8 +185,7 @@ namespace verbs
                 str = "IBV_WC_RECV_RDMA_WITH_IMM";
                 break;
             default:
-                str = "Got an unknown opcode " + boost::lexical_cast
-                < std::string > (opcode);
+                str = "Got an unknown opcode " + hpx::util::to_string(opcode);
             }
 
             return str;
