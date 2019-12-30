@@ -15,7 +15,7 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>

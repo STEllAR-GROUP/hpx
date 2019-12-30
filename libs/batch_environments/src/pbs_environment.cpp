@@ -8,7 +8,7 @@
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <fstream>

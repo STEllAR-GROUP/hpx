@@ -25,7 +25,6 @@
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/lexical_cast.hpp>
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/external_timer.hpp>

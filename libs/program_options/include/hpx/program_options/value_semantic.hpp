@@ -50,7 +50,7 @@ namespace hpx { namespace program_options {
 
 #include <hpx/datastructures/any.hpp>
 #include <hpx/program_options/errors.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <functional>
 #include <limits>

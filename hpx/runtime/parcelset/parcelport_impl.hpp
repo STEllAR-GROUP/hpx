@@ -26,9 +26,9 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/connection_cache.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/yield_while.hpp>
 

@@ -7,7 +7,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <atomic>
 #include <string>

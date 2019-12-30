@@ -9,7 +9,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <algorithm>
 

@@ -9,7 +9,7 @@
 #define HPX_UTIL_GET_ENTRY_AS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <string>
 #include <type_traits>

@@ -11,10 +11,15 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/synchronization/counting_semaphore.hpp>
+#include <hpx/format.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/local_lcos/promise.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -30,17 +35,13 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/external_timer.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/io_service_pool.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/util/external_timer.hpp>
+#include <hpx/util/from_string.hpp>
+#include <hpx/util/get_entry_as.hpp>
+#include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 

@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_LEXICAL_CAST
-#define HPX_UTIL_LEXICAL_CAST
+#ifndef HPX_UTIL_FROM_STRING_HPP
+#define HPX_UTIL_FROM_STRING_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/format.hpp>
 #include <hpx/util/bad_lexical_cast.hpp>
 
 #include <limits>
@@ -20,43 +19,6 @@
 
 namespace hpx { namespace util {
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-        template <typename T, typename Enable = void>
-        struct to_string
-        {
-            static std::string call(T const& value)
-            {
-                return util::format("{}", value);
-            }
-        };
-
-        template <typename T>
-        struct to_string<T,
-            typename std::enable_if<std::is_integral<T>::value ||
-                std::is_floating_point<T>::value>::type>
-        {
-            static std::string call(T const& value)
-            {
-                return std::to_string(value);
-            }
-        };
-    }    // namespace detail
-
-    template <typename T>
-    std::string to_string(T const& v)
-    {
-        try
-        {
-            return detail::to_string<T>::call(v);
-        }
-        catch (...)
-        {
-            detail::throw_bad_lexical_cast<T, std::string>();
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename T, typename Enable = void>
         struct from_string
@@ -176,4 +138,4 @@ namespace hpx { namespace util {
 
 }}    // namespace hpx::util
 
-#endif /*HPX_UTIL_LEXICAL_CAST*/
+#endif /*HPX_UTIL_FROM_STRING_HPP*/

@@ -31,6 +31,7 @@
 #include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <cstddef>

@@ -13,7 +13,7 @@
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
 

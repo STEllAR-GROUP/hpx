@@ -14,7 +14,6 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/util/lexical_cast.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_holder_thread.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>

@@ -14,6 +14,7 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/ini.hpp>
 
 #include <hpx/lcos/wait_all.hpp>
@@ -43,7 +44,6 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/util/lexical_cast.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/yield_while.hpp>
 

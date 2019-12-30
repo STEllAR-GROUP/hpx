@@ -10,7 +10,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_container.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <boost/predef/other/endian.h>
 

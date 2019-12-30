@@ -10,9 +10,8 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
-#include <type_traits>
 
 #include <chrono>
 #include <cstddef>
@@ -20,6 +19,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 std::size_t const kStringsCount = 100;

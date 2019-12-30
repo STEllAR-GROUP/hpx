@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include "assert_macro_check.hpp"
 #include "function_hyper.hpp"

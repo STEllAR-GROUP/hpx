@@ -23,7 +23,7 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/util/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <iostream>
 #include <regex>

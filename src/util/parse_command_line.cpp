@@ -7,8 +7,8 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/ini.hpp>
-#include <hpx/util/lexical_cast.hpp>
 #include <hpx/util/parse_command_line.hpp>
 
 #include <cctype>

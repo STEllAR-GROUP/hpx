@@ -22,6 +22,7 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/debugging.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>

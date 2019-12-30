@@ -16,8 +16,8 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/lexical_cast.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>

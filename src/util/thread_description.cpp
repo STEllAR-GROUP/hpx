@@ -7,8 +7,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/lexical_cast.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <iostream>
 #include <sstream>

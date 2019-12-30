@@ -11,11 +11,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util_fwd.hpp> // this needs to go first
+#include <hpx/util/to_string.hpp>
 
 #include <hpx/functional/function.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/util/lexical_cast.hpp>
 
 #include <iostream>
 #include <map>

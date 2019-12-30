@@ -10,6 +10,8 @@
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
 //
+#include <hpx/util/to_string.hpp>
+//
 #include <inttypes.h>
 #include <infiniband/verbs.h>
 #include <string>

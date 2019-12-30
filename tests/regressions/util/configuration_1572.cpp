@@ -6,8 +6,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/lexical_cast.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>
