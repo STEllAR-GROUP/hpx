@@ -8,6 +8,7 @@
 #define HPX_UTIL_LEXICAL_CAST
 
 #include <hpx/config.hpp>
+#include <hpx/format.hpp>
 #include <hpx/util/bad_lexical_cast.hpp>
 
 #include <limits>
@@ -26,10 +27,7 @@ namespace hpx { namespace util {
         {
             static std::string call(T const& value)
             {
-                std::ostringstream stream;
-                stream.exceptions(std::ios_base::failbit);
-                stream << value;
-                return std::move(stream).str();
+                return util::format("{}", value);
             }
         };
 
