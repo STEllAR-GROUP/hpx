@@ -55,6 +55,7 @@ namespace boost
       { "boost/regex.hpp", "regex" },
       { "boost/program_options([^\\s]*)\\.hpp", "hpx/program_options\\2.hpp" },
       { "boost/filesystem([^\\s]*)\\.hpp", "hpx/filesystem.hpp" },
+      { "boost/lexical_cast\\.hpp", "hpx/util/((from_string)|(to_string)).hpp" },
       { nullptr, nullptr }
     };
 

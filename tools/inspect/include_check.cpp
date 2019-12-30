@@ -223,6 +223,10 @@ namespace boost
         // boost
         {"(\\bhpx\\s*::\\s*intrusive_ptr\\b)", "hpx::intrusive_ptr",
             "hpx/memory/intrusive_ptr.hpp"},
+        {"(\\bhpx\\s*::\\s*util\\s*::\\s*from_string\\b)",
+            "hpx::util::from_string", "hpx/util/from_string.hpp"},
+        {"(\\bhpx\\s*::\\s*util\\s*::\\s*to_string\\b)",
+            "hpx::util::to_string", "hpx/util/to_string.hpp"},
         // macros
         {"(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT", "hpx/preprocessor/cat.hpp"},
         {"(\\bHPX_PP_EXPAND\\b)", "HPX_PP_EXPAND",

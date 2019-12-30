@@ -80,6 +80,7 @@ namespace boost
       { "(\\bboost\\s*::\\s*random\\s*::\\s*([^\\s]*)\\b)", "std::\\2" },
       { "(\\bboost\\s*::\\s*format\\b)", "hpx::util::format[_to]" },
       { "(\\bboost\\s*::\\s*(regex[^\\s]*)\\b)", "std::\\2" },
+      { "(\\bboost\\s*::\\s*lexical_cast\\b)", "hpx::util::((from_string)|(to_string))" },
       /////////////////////////////////////////////////////////////////////////
       { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
       { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },
