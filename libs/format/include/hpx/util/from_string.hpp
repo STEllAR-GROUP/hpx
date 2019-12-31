@@ -116,7 +116,7 @@ namespace hpx { namespace util {
         }
         catch (...)
         {
-            detail::throw_bad_lexical_cast<std::string, T>();
+            return detail::throw_bad_lexical_cast<std::string, T>();
         }
         return target;
     }

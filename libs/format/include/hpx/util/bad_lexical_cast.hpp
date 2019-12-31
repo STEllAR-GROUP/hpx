@@ -57,10 +57,9 @@ namespace hpx { namespace util {
             std::type_info const& target_type);
 
         template <typename Source, typename Target>
-        inline void throw_bad_lexical_cast()
+        HPX_NORETURN inline Target throw_bad_lexical_cast()
         {
-            return detail::throw_bad_lexical_cast(
-                typeid(Source), typeid(Target));
+            detail::throw_bad_lexical_cast(typeid(Source), typeid(Target));
         }
     }    // namespace detail
 
