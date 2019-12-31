@@ -210,9 +210,10 @@ namespace hpx { namespace threads { namespace policies {
           , queue_index_(queue)
           , thread_num_(thread_num)
           , owner_mask_(owner)
-          , min_delete_count_(init.min_delete_count_)
-          , max_delete_count_(init.max_delete_count_)
-          , max_terminated_threads_(init.max_terminated_threads_)
+          , min_delete_count_(static_cast<int>(init.min_delete_count_))
+          , max_delete_count_(static_cast<int>(init.max_delete_count_))
+          , max_terminated_threads_(
+                static_cast<int>(init.max_terminated_threads_))
           , terminated_items_(max_thread_count)
         {
             rollover_counters_.data_ =
