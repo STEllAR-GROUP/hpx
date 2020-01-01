@@ -196,47 +196,31 @@ namespace hpx { namespace util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Indices, typename TTuple, typename UTuple>
-        struct are_tuples_compatible_impl;
+        template <typename Indices, typename TTuple, typename UTuple,
+            typename Enable = void>
+        struct are_tuples_compatible_impl : std::false_type
+        {
+        };
 
         template <std::size_t... Is, typename... Ts, typename UTuple>
         struct are_tuples_compatible_impl<detail::pack_c<std::size_t, Is...>,
-            tuple<Ts...>, UTuple>
-        {
-            using no_type = char (&)[1];
-            using yes_type = char (&)[2];
-
-            static no_type call(...);
-            static yes_type call(Ts...);
-
-            static bool const value =
-                sizeof(call(util::get<Is>(std::declval<UTuple>())...)    //-V510
-                    ) == sizeof(yes_type);
-
-            using type = std::integral_constant<bool, value>;
-        };
-
-        template <typename TTuple, typename UTuple, typename Enable = void>
-        struct are_tuples_compatible : std::false_type
-        {
-        };
-
-        template <typename... Ts, typename UTuple>
-        struct are_tuples_compatible<tuple<Ts...>, UTuple,
+            tuple<Ts...>, UTuple,
             typename std::enable_if<tuple_size<typename std::remove_reference<
                                         UTuple>::type>::value ==
                 detail::pack<Ts...>::size>::type>
-          : are_tuples_compatible_impl<
-                typename detail::make_index_pack<sizeof...(Ts)>::type,
-                tuple<Ts...>, UTuple>
+          : hpx::util::detail::all_of<std::is_convertible<
+                decltype(util::get<Is>(std::declval<UTuple>())), Ts>...>
         {
         };
 
         template <typename TTuple, typename UTuple>
-        struct are_tuples_compatible_not_same
-          : std::conditional<std::is_same<typename std::decay<TTuple>::type,
-                                 typename std::decay<UTuple>::type>::value,
-                std::false_type, are_tuples_compatible<TTuple, UTuple>>::type
+        struct are_tuples_compatible;
+
+        template <typename... Ts, typename UTuple>
+        struct are_tuples_compatible<tuple<Ts...>, UTuple>
+          : are_tuples_compatible_impl<
+                typename detail::make_index_pack<sizeof...(Ts)>::type,
+                tuple<Ts...>, UTuple>
         {
         };
 
@@ -263,7 +247,8 @@ namespace hpx { namespace util {
                 typename Enable =
                     typename std::enable_if<detail::pack<Us...>::size ==
                         detail::pack<Ts...>::size>::type>
-            explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl(Us&&... vs)
+            explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl(
+                std::piecewise_construct_t, Us&&... vs)
               : tuple_member<Is, Ts>(std::forward<Us>(vs))...
             {
             }
@@ -287,8 +272,10 @@ namespace hpx { namespace util {
 
             template <typename UTuple,
                 typename Enable =
-                    typename std::enable_if<are_tuples_compatible_not_same<
-                        tuple<Ts...>, UTuple&&>::value>::type>
+                    typename std::enable_if<!std::is_same<tuple_impl,
+                        typename std::decay<UTuple>::type>::value>::type,
+                typename EnableCompatible = typename std::enable_if<
+                    are_tuples_compatible<tuple<Ts...>, UTuple>::value>::type>
             HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl(UTuple&& other)
               : tuple_member<Is, Ts>(
                     util::get<Is>(std::forward<UTuple>(other)))...
@@ -463,7 +450,7 @@ namespace hpx { namespace util {
         // Initializes each element with the value of the corresponding
         // parameter.
         explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple(Ts const&... vs)
-          : _impl(vs...)
+          : _impl(std::piecewise_construct, vs...)
         {
         }
 
@@ -476,18 +463,13 @@ namespace hpx { namespace util {
         // corresponding type in Types.
         template <typename U, typename... Us,
             typename Enable = typename std::enable_if<
-                detail::pack<U, Us...>::size == detail::pack<Ts...>::size &&
-                std::conditional<detail::pack<Us...>::size == 0,
-                    typename std::enable_if<
-                        !std::is_same<tuple,
-                            typename std::decay<U>::type>::value &&
-                            !detail::are_tuples_compatible_not_same<tuple,
-                                U&&>::value,
-                        detail::are_tuples_compatible<tuple, tuple<U>&&>>::type,
-                    detail::are_tuples_compatible<tuple,
-                        tuple<U, Us...>&&>>::type::value>::type>
+                !std::is_same<tuple, typename std::decay<U>::type>::value ||
+                detail::pack<Us...>::size != 0>::type,
+            typename EnableCompatible = typename std::enable_if<detail::
+                    are_tuples_compatible<tuple, tuple<U, Us...>>::value>::type>
         explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple(U&& v, Us&&... vs)
-          : _impl(std::forward<U>(v), std::forward<Us>(vs)...)
+          : _impl(std::piecewise_construct, std::forward<U>(v),
+                std::forward<Us>(vs)...)
         {
         }
 
@@ -527,9 +509,10 @@ namespace hpx { namespace util {
         // unless each type in UTypes is implicitly convertible to its
         // corresponding type in Types
         template <typename UTuple,
-            typename Enable =
-                typename std::enable_if<detail::are_tuples_compatible_not_same<
-                    tuple, UTuple&&>::value>::type>
+            typename Enable = typename std::enable_if<!std::is_same<tuple,
+                typename std::decay<UTuple>::type>::value>::type,
+            typename EnableCompatible = typename std::enable_if<
+                detail::are_tuples_compatible<tuple, UTuple>::value>::type>
         HPX_CONSTEXPR HPX_HOST_DEVICE tuple(UTuple&& other)
           : _impl(std::forward<UTuple>(other))
         {

@@ -408,8 +408,7 @@ namespace hpx { namespace util {
 
         template <typename... Ts_>
         HPX_HOST_DEVICE typename std::enable_if<
-            detail::are_tuples_compatible_not_same<
-                typename zip_iterator::iterator_tuple_type,
+            std::is_assignable<typename zip_iterator::iterator_tuple_type&,
                 typename zip_iterator<Ts_...>::iterator_tuple_type&&>::value,
             zip_iterator&>::type
         operator=(zip_iterator<Ts_...> const& other)
@@ -419,8 +418,7 @@ namespace hpx { namespace util {
         }
         template <typename... Ts_>
         HPX_HOST_DEVICE typename std::enable_if<
-            detail::are_tuples_compatible_not_same<
-                typename zip_iterator::iterator_tuple_type,
+            std::is_assignable<typename zip_iterator::iterator_tuple_type&,
                 typename zip_iterator<Ts_...>::iterator_tuple_type&&>::value,
             zip_iterator&>::type
         operator=(zip_iterator<Ts_...>&& other)
@@ -482,8 +480,7 @@ namespace hpx { namespace util {
 
         template <typename... Ts_>
         HPX_HOST_DEVICE typename std::enable_if<
-            detail::are_tuples_compatible_not_same<
-                typename zip_iterator::iterator_tuple_type,
+            std::is_assignable<typename zip_iterator::iterator_tuple_type&,
                 typename zip_iterator<Ts_...>::iterator_tuple_type&&>::value,
             zip_iterator&>::type
         operator=(zip_iterator<Ts_...> const& other)
@@ -493,8 +490,7 @@ namespace hpx { namespace util {
         }
         template <typename... Ts_>
         HPX_HOST_DEVICE typename std::enable_if<
-            detail::are_tuples_compatible_not_same<
-                typename zip_iterator::iterator_tuple_type,
+            std::is_assignable<typename zip_iterator::iterator_tuple_type&,
                 typename zip_iterator<Ts_...>::iterator_tuple_type&&>::value,
             zip_iterator&>::type
         operator=(zip_iterator<Ts_...>&& other)
