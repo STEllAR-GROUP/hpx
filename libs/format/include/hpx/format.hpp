@@ -14,6 +14,7 @@
 #include <cctype>
 #include <cstddef>
 #include <cstdio>
+#include <ctime>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -166,6 +167,36 @@ namespace hpx { namespace util {
                     os.write(value.data(), value.size());
                 else
                     formatter<char const*>::call(os, spec, value.c_str());
+            }
+        };
+
+        template <>
+        struct formatter<std::tm, /*IsFundamental=*/false>
+        {
+            static void call(
+                std::ostream& os, boost::string_ref spec, void const* ptr)
+            {
+                std::tm const& value = *static_cast<std::tm const*>(ptr);
+
+                // conversion specifier
+                if (spec.empty())
+                    spec = "%c";    // standard date and time string
+
+                // copy spec to a null terminated buffer
+                std::string format(spec.to_string());
+
+                std::size_t length = 0;
+                std::vector<char> buffer(1);
+                buffer.resize(buffer.capacity());
+                do
+                {
+                    length = std::strftime(
+                        buffer.data(), buffer.size(), format.c_str(), &value);
+                    if (length == 0)
+                        buffer.resize(buffer.capacity() * 2);
+                } while (length == 0);
+
+                os.write(buffer.data(), length);
             }
         };
 
