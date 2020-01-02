@@ -19,7 +19,6 @@
 
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>    // is_generic
-#include <hpx/logging/format/formatter/convert_format.hpp>
 
 #include <cstddef>
 #include <string>
@@ -29,49 +28,17 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 
     namespace detail {
 
-        template <class original_formatter>
-        inline void spacer_write_with_convert(
-            optimize::cache_string_one_str& msg, const original_formatter& fmt,
-            const std::string& prefix, const std::string& suffix,
-            const do_convert_format::prepend*)
-        {
-            // prepend
-            do_convert_format::prepend::write(suffix, msg);
-            fmt(msg);
-            do_convert_format::prepend::write(prefix, msg);
-        }
-        template <class original_formatter>
-        inline void spacer_write_with_convert(
-            optimize::cache_string_one_str& msg, const original_formatter& fmt,
-            const std::string& prefix, const std::string& suffix,
-            const do_convert_format::append*)
-        {
-            // append
-            do_convert_format::append::write(prefix, msg);
-            fmt(msg);
-            do_convert_format::append::write(suffix, msg);
-        }
-        template <class original_formatter, class convert>
-        inline void spacer_write_with_convert(
-            optimize::cache_string_one_str& msg, const original_formatter& fmt,
-            const std::string& prefix, const std::string& suffix,
-            const convert*)
-        {
-            // custom conversion - prefix before suffix
-            convert::write(prefix, msg);
-            fmt(msg);
-            convert::write(suffix, msg);
-        }
-
         // note: pass original_formatter here
         // - so that original_formatter::operator() gets called,
         // not the spacer_t's operator()
-        template <class original_formatter, class convert>
+        template <class original_formatter>
         inline void spacer_write(optimize::cache_string_one_str& msg,
-            const original_formatter& fmt, const std::string& prefix,
-            const std::string& suffix)
+            const original_formatter& fmt, std::string const& prefix,
+            std::string const& suffix)
         {
-            spacer_write_with_convert(msg, fmt, prefix, suffix, 0);
+            msg.prepend_string(suffix);
+            fmt(msg);
+            msg.prepend_string(prefix);
         }
     }    // namespace detail
 
@@ -109,7 +76,7 @@ g_l()->writer().add_formatter( formatter::idx(), "[%] " );
 
 
 */
-    template <class convert, class original_formatter,
+    template <class original_formatter,
         bool is_generic_formatter>
     struct spacer_t : original_formatter
     {
@@ -125,12 +92,11 @@ g_l()->writer().add_formatter( formatter::idx(), "[%] " );
 
         void operator()(param msg) const
         {
-            detail::spacer_write<spacer_base, convert>(
-                msg, *this, m_prefix, m_suffix);
+            detail::spacer_write<spacer_base>(msg, *this, m_prefix, m_suffix);
         }
 
     private:
-        void parse_format(const std::string& format_str)
+        void parse_format(std::string const& format_str)
         {
             typedef std::size_t size_type;
             size_type msg_idx = format_str.find('%');
@@ -149,8 +115,8 @@ g_l()->writer().add_formatter( formatter::idx(), "[%] " );
     };
 
     // specialize for generic formatters
-    template <class convert, class original_formatter>
-    struct spacer_t<convert, original_formatter, true> : original_formatter
+    template <class original_formatter>
+    struct spacer_t<original_formatter, true> : original_formatter
     {
         // generic formatter
         typedef original_formatter spacer_base;
@@ -163,12 +129,11 @@ g_l()->writer().add_formatter( formatter::idx(), "[%] " );
 
         void operator()(msg_type& msg) const
         {
-            detail::spacer_write<spacer_base, convert>(
-                msg, *this, m_prefix, m_suffix);
+            detail::spacer_write<spacer_base>(msg, *this, m_prefix, m_suffix);
         }
 
     private:
-        void parse_format(const std::string& format_str)
+        void parse_format(std::string const& format_str)
         {
             typedef std::size_t size_type;
             size_type msg_idx = format_str.find('%');

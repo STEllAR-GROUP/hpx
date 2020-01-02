@@ -18,10 +18,11 @@
 #define JT28092007_formatter_thread_id_HPP_DEFINED
 
 #include <hpx/config.hpp>
+#include <hpx/format.hpp>
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>    // is_generic
-#include <hpx/logging/format/formatter/convert_format.hpp>
-#include <sstream>
+
+#include <string>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
@@ -33,36 +34,26 @@ std::(w)string and the string that holds your logged message. See convert_format
 For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-    template <class convert = do_convert_format::prepend>
-    struct thread_id_t : is_generic
+    struct thread_id : is_generic
     {
-        typedef convert convert_type;
-
         void operator()(msg_type& msg) const
         {
-            std::ostringstream out;
-            out
+            std::string out = hpx::util::format("{}",
 #if defined(HPX_WINDOWS)
-                << ::GetCurrentThreadId()
+                ::GetCurrentThreadId()
 #else
-                << pthread_self()
+                pthread_self()
 #endif
-                ;
+            );
 
-            convert::write(out.str(), msg);
+            msg.prepend_string(out);
         }
 
-        bool operator==(const thread_id_t&) const
+        bool operator==(const thread_id&) const
         {
             return true;
         }
     };
-
-    /** @brief thread_id_t with default values. See thread_id_t
-
-@copydoc thread_id_t
-*/
-    typedef thread_id_t<> thread_id;
 
 }}}}    // namespace hpx::util::logging::formatter
 

@@ -26,7 +26,6 @@
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/format/optimize.hpp>
 
-#include <hpx/logging/format/op_equal.hpp>
 #include <memory>
 #include <string>
 
@@ -157,7 +156,6 @@ After this, you'll add formatter and/or destination classes to your logger(s):
 // add formatters : [idx] [time] message [enter]
 g_l()->writer().add_formatter( formatter::idx() );
 g_l()->writer().add_formatter( formatter::time() );
-g_l()->writer().add_formatter( formatter::append_newline() );
 
 // write to cout and file
 g_l()->writer().add_destination( destination::cout() );
@@ -183,9 +181,6 @@ a message similar to this would appear on both the console, and the file:
 You can use the formatter and/or destination classes that come with the library:
 - formatters: in the formatter namespace. Here are a few examples:
   - formatter::idx - prepends an index
-  - formatter::append_newline - appends an enter after the message
-  - formatter::append_newline_if_needed - appends an enter after the message,
-  if not already there
   - formatter::time - prepends the time
   - formatter::thread_id - prepends the current thread id
 - destinations: in the destination namespace
@@ -238,7 +233,7 @@ struct to_hwnd
 
     bool operator==(const to_hwnd& other) { return h == other.h; }
 
-    // param = const std::string&
+    // param = std::string const&
     // (in other words, it's the arg_type from your destination base class)
     void operator()(param msg) const {
         ::SetWindowText(h, msg.c_str());
@@ -385,7 +380,7 @@ LERR_ << "third error " << i++;
     Don't use directly. Use formatter::base<> or destination::base<> instead.
 */
         template <class raw_param_type, class param_type>
-        struct base : hpx::util::logging::op_equal::same_type_op_equal_base
+        struct base
         {
             typedef base<raw_param_type, param_type> self_type;
 
@@ -402,7 +397,7 @@ LERR_ << "third error " << i++;
     That is, this allows configuration of your manipulator (formatter/destination)
     at run-time.
     */
-            virtual void configure(const std::string&) {}
+            virtual void configure(std::string const&) {}
 
         protected:
             // signify that we're only a base class - not to be used directly
@@ -415,16 +410,14 @@ LERR_ << "third error " << i++;
     Don't use this directly. Use formatter::class_ or destination::class_
 */
         template <class type, class base_type>
-        struct class_
-          : base_type
-          , hpx::util::logging::op_equal::same_type_op_equal<type>
+        struct class_ : base_type
         {
             /** @brief Override this if you want to allow configuration through scripting
 
     That is, this allows configuration of your manipulator
     (formatter/destination) at run-time.
     */
-            virtual void configure(const std::string&) {}
+            virtual void configure(std::string const&) {}
 
             bool operator==(const class_&) const
             {
@@ -527,7 +520,7 @@ Example:
 @code
 struct cout {
     void operator()(const msg_type & msg) const {
-        do_convert_destination::write(msg, std::cout);
+        std::cout << msg;
     }
 };
 @endcode
@@ -563,7 +556,7 @@ g_l().add_formatter( my_cool_formatter() );
     That is, this allows configuration of your manipulator
     (formatter/destination) at run-time.
     */
-            virtual void configure(const std::string&) {}
+            virtual void configure(std::string const&) {}
         };
 
         namespace detail {
@@ -592,7 +585,7 @@ g_l().add_formatter( my_cool_formatter() );
                     m_val.operator()(val);
                 }
 
-                virtual void configure(const std::string& str)
+                virtual void configure(std::string const& str)
                 {
                     m_val.configure(str);
                 }

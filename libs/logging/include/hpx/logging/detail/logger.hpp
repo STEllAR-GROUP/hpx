@@ -21,8 +21,8 @@
 
 #include <hpx/logging/detail/cache_before_init.hpp>
 #include <hpx/logging/detail/fwd.hpp>
-#include <hpx/logging/detail/level.hpp>
 #include <hpx/logging/format/named_write.hpp>
+#include <hpx/logging/level.hpp>
 
 #include <sstream>
 #include <type_traits>
@@ -109,7 +109,7 @@ namespace hpx { namespace util { namespace logging {
             std::ostringstream m_out;
         };
 
-        logger(level::type default_level = level::enable_all)
+        logger(level default_level = level::enable_all)
           : m_level(default_level)
         {
         }
@@ -138,12 +138,12 @@ namespace hpx { namespace util { namespace logging {
             return m_writer;
         }
 
-        bool is_enabled(level::type level) const
+        bool is_enabled(level level) const
         {
             return level >= m_level;
         }
 
-        void set_enabled(level::type level)
+        void set_enabled(level level)
         {
             m_level = level;
         }
@@ -187,7 +187,7 @@ namespace hpx { namespace util { namespace logging {
     private:
         mutable detail::cache_before_init m_cache;
         write_type m_writer;
-        level::type m_level;
+        level m_level;
     };
 }}}    // namespace hpx::util::logging
 

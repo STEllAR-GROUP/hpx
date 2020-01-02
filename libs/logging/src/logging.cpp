@@ -47,7 +47,7 @@ namespace hpx { namespace util {
     HPX_DEFINE_LOG(timing_console, disable_all)
 
     namespace detail {
-        hpx::util::logging::level::type get_log_level(
+        hpx::util::logging::level get_log_level(
             std::string const& env, bool allow_always)
         {
             try
@@ -81,32 +81,6 @@ namespace hpx { namespace util {
             }
         }
     }    // namespace detail
-
-    std::string levelname(int level)
-    {
-        switch (level)
-        {
-        case hpx::util::logging::level::enable_all:
-            return "     <all>";
-        case hpx::util::logging::level::debug:
-            return "   <debug>";
-        case hpx::util::logging::level::info:
-            return "    <info>";
-        case hpx::util::logging::level::warning:
-            return " <warning>";
-        case hpx::util::logging::level::error:
-            return "   <error>";
-        case hpx::util::logging::level::fatal:
-            return "   <fatal>";
-        case hpx::util::logging::level::always:
-            return "  <always>";
-        }
-
-        std::string unknown = std::to_string(level);
-        return std::string(
-                   (std::max)(7 - unknown.size(), std::size_t(0)), ' ') +
-            "<" + unknown + ">";
-    }
 }}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,6 +144,25 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
     namespace detail {
+        static std::string unescape(std::string escaped)
+        {
+            typedef std::size_t size_type;
+            size_type idx_start = 0;
+            while (true)
+            {
+                size_type found = escaped.find("%%", idx_start);
+                if (found != std::string::npos)
+                {
+                    escaped.erase(
+                        escaped.begin() + static_cast<std::ptrdiff_t>(found));
+                    ++idx_start;
+                }
+                else
+                    break;
+            }
+            return escaped;
+        }
+
         void base_named_spacer_context::compute_write_steps()
         {
             typedef std::size_t size_type;

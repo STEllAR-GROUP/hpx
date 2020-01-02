@@ -20,7 +20,6 @@
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/format/array.hpp>                       // array
-#include <hpx/logging/format/formatter/convert_format.hpp>    // do_convert_format
 
 #include <cstddef>
 #include <map>
@@ -33,25 +32,6 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 
     namespace detail {
 
-        inline std::string unescape(std::string escaped)
-        {
-            typedef std::size_t size_type;
-            size_type idx_start = 0;
-            while (true)
-            {
-                size_type found = escaped.find("%%", idx_start);
-                if (found != std::string::npos)
-                {
-                    escaped.erase(
-                        escaped.begin() + static_cast<std::ptrdiff_t>(found));
-                    ++idx_start;
-                }
-                else
-                    break;
-            }
-            return escaped;
-        }
-
         struct base_named_spacer_context
         {
             typedef base format_base_type;
@@ -60,7 +40,7 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 
             struct write_step
             {
-                write_step(const std::string& prefix_, format_base_type* fmt_)
+                write_step(std::string const& prefix_, format_base_type* fmt_)
                   : prefix(prefix_)
                   , fmt(fmt_)
                 {
@@ -85,17 +65,17 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
             };
             write_info m_info;
 
-            template <class formatter, class converter>
-            void add(const std::string& name, formatter fmt)
+            template <class formatter>
+            void add(std::string const& name, formatter fmt)
             {
                 // care about if generic or not
                 typedef hpx::util::logging::manipulator::is_generic is_generic;
-                add_impl<converter, formatter>(
+                add_impl<formatter>(
                     name, fmt, std::is_base_of<is_generic, formatter>());
                 compute_write_steps();
             }
 
-            void del(const std::string& name)
+            void del(std::string const& name)
             {
                 {
                     format_base_type* p = m_info.name_to_formatter[name];
@@ -106,14 +86,14 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
             }
 
             void configure(
-                const std::string& name, const std::string& configure_str)
+                std::string const& name, std::string const& configure_str)
             {
                 format_base_type* p = m_info.name_to_formatter[name];
                 if (p)
                     p->configure(configure_str);
             }
 
-            void format_string(const std::string& str)
+            void format_string(std::string const& str)
             {
                 {
                     m_info.format_string = str;
@@ -122,12 +102,43 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
             }
 
         protected:
-            template <class converter>
-            void write_with_convert(msg_type& msg,
-                ::hpx::util::logging::formatter::do_convert_format::prepend*)
-                const
+            // recomputes the write steps - note that this takes place after
+            // each operation for instance, the user might have first set the
+            // string and later added the formatters
+            void HPX_EXPORT compute_write_steps();
+
+        private:
+            // non-generic
+            template <class formatter>
+            void add_impl(
+                std::string const& name, formatter fmt, const std::false_type&)
             {
-                // prepend
+                format_base_type* p = m_info.formatters.append(fmt);
+                m_info.name_to_formatter[name] = p;
+            }
+            // generic manipulator
+            template <class formatter>
+            void add_impl(
+                std::string const& name, formatter fmt, const std::true_type&)
+            {
+                typedef hpx::util::logging::manipulator::detail::generic_holder<
+                    formatter, format_base_type>
+                    holder;
+
+                add_impl(name, holder(fmt), std::false_type());
+            }
+        };
+
+        struct named_spacer_context : base_named_spacer_context
+        {
+            template <class formatter>
+            void add(std::string const& name, formatter fmt)
+            {
+                base_named_spacer_context::add<formatter>(name, fmt);
+            }
+
+            void write(msg_type& msg) const
+            {
                 typedef typename write_info::write_step_array array_;
                 for (typename array_::const_reverse_iterator
                          b = m_info.write_steps.rbegin(),
@@ -136,75 +147,8 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
                 {
                     if (b->fmt)
                         (*(b->fmt))(msg);
-                    converter::write(b->prefix, msg);
+                    msg.prepend_string(b->prefix);
                 }
-            }
-            template <class converter>
-            void write_with_convert(msg_type& msg, ...) const
-            {
-                // append
-                typedef typename write_info::write_step_array array_;
-                for (typename array_::const_iterator
-                         b = m_info.write_steps.begin(),
-                         e = m_info.write_steps.end();
-                     b != e; ++b)
-                {
-                    converter::write(b->prefix, msg);
-                    if (b->fmt)
-                        (*(b->fmt))(msg);
-                }
-            }
-
-            // recomputes the write steps - note that this takes place after
-            // each operation for instance, the user might have first set the
-            // string and later added the formatters
-            void HPX_EXPORT compute_write_steps();
-
-        private:
-            // non-generic
-            template <class convert, class formatter>
-            void add_impl(
-                const std::string& name, formatter fmt, const std::false_type&)
-            {
-                format_base_type* p = m_info.formatters.append(fmt);
-                m_info.name_to_formatter[name] = p;
-            }
-            // generic manipulator
-            template <class convert, class formatter>
-            void add_impl(
-                const std::string& name, formatter fmt, const std::true_type&)
-            {
-                typedef hpx::util::logging::manipulator::detail::generic_holder<
-                    formatter, format_base_type>
-                    holder;
-
-                typedef typename formatter::convert_type formatter_convert_type;
-                // they must share the same type of conversion - otherwise when
-                // trying to prepend we could end up appending or vice versa
-                static_assert(
-                    (std::is_same<formatter_convert_type, convert>::value),
-                    "std::is_same<formatter_convert_type, "
-                    "convert_type>::value");
-
-                add_impl<convert>(name, holder(fmt), std::false_type());
-            }
-        };
-
-        template <class convert>
-        struct named_spacer_context : base_named_spacer_context
-        {
-            typedef convert convert_type;
-
-            template <class formatter>
-            void add(const std::string& name, formatter fmt)
-            {
-                base_named_spacer_context::add<formatter, convert>(name, fmt);
-            }
-
-            void write(msg_type& msg) const
-            {
-                base_named_spacer_context::write_with_convert<convert>(
-                    msg, nullptr);
             }
         };
     }    // namespace detail
@@ -253,40 +197,38 @@ You could have an output like this:
 @endcode
 
 */
-    template <class convert>
     struct named_spacer_t
       : is_generic
-      , non_const_context<detail::named_spacer_context<convert>>
+      , non_const_context<detail::named_spacer_context>
     {
-        typedef non_const_context<detail::named_spacer_context<convert>>
-            context_base;
+        typedef non_const_context<detail::named_spacer_context> context_base;
 
-        named_spacer_t(const std::string& str = std::string())
+        named_spacer_t(std::string const& str = std::string())
         {
             if (!str.empty())
                 context_base::context().format_string(str);
         }
 
-        named_spacer_t& string(const std::string& str)
+        named_spacer_t& string(std::string const& str)
         {
             context_base::context().format_string(str);
             return *this;
         }
 
         template <class formatter>
-        named_spacer_t& add(const std::string& name, formatter fmt)
+        named_spacer_t& add(std::string const& name, formatter fmt)
         {
             context_base::context().add(name, fmt);
             return *this;
         }
 
-        void del(const std::string& name)
+        void del(std::string const& name)
         {
             context_base::context().del(name);
         }
 
         void configure_inner(
-            const std::string& name, const std::string& configure_str)
+            std::string const& name, std::string const& configure_str)
         {
             context_base::context().configure(name, configure_str);
         }

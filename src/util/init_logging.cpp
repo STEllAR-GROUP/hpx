@@ -9,12 +9,14 @@
 
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/logging.hpp>
-#include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/format/destination/defaults.hpp>
+#include <hpx/logging/format/named_write.hpp>
 #include <hpx/naming_base.hpp>
+#include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/components/console_logging.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
@@ -22,8 +24,8 @@
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/version.hpp>
 #include <boost/config.hpp>
+#include <boost/version.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -43,8 +45,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     typedef logging::writer::named_write logger_writer_type;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -52,8 +53,7 @@ namespace hpx { namespace util
     struct shepherd_thread_id
       : hpx::util::logging::formatter::class_<shepherd_thread_id>
     {
-        shepherd_thread_id()
-        {}
+        shepherd_thread_id() {}
 
         void operator()(param str) const
         {
@@ -62,15 +62,12 @@ namespace hpx { namespace util
 
             if (std::size_t(-1) != thread_num)
             {
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::size_t)*2)
-                    << std::setfill('0')
-                    << thread_num;
-                str.prepend_string(out.str());
+                std::string out = format("{:016x}", thread_num);
+                str.prepend_string(out);
             }
             else
             {
-                str.prepend_string(std::string(sizeof(std::size_t)*2, '-'));
+                str.prepend_string(std::string(16, '-'));
             }
         }
     };
@@ -80,74 +77,72 @@ namespace hpx { namespace util
     struct locality_prefix
       : hpx::util::logging::formatter::class_<locality_prefix>
     {
-        locality_prefix()
-        {}
+        locality_prefix() {}
 
         void operator()(param str) const
         {
             std::uint32_t locality_id = hpx::get_locality_id();
 
-            if (naming::invalid_locality_id != locality_id) {
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::uint32_t)*2)
-                    << std::setfill('0') << locality_id;
-                str.prepend_string(out.str());
+            if (naming::invalid_locality_id != locality_id)
+            {
+                std::string out = format("{:08x}", locality_id);
+                str.prepend_string(out);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(std::uint32_t)*2, '-'));
+                str.prepend_string(std::string(8, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread id
-    struct thread_id
-      : hpx::util::logging::formatter::class_<thread_id>
+    struct thread_id : hpx::util::logging::formatter::class_<thread_id>
     {
         void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (nullptr != self) {
+            if (nullptr != self)
+            {
                 // called from inside a HPX thread
                 threads::thread_id_type id = threads::get_self_id();
-                if (id != threads::invalid_thread_id) {
-                    std::stringstream out;
-                    out << std::hex << std::setw(sizeof(void*)*2)
-                        << std::setfill('0')
-                        << reinterpret_cast<std::ptrdiff_t>(id.get());
-                    str.prepend_string(out.str());
+                if (id != threads::invalid_thread_id)
+                {
+                    std::ptrdiff_t value =
+                        reinterpret_cast<std::ptrdiff_t>(id.get());
+                    std::string out = format("{:016x}", value);
+                    str.prepend_string(out);
                     return;
                 }
             }
 
             // called from outside a HPX thread or invalid thread id
-            str.prepend_string(std::string(sizeof(void*)*2, '-'));
+            str.prepend_string(std::string(16, '-'));
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread phase
-    struct thread_phase
-      : hpx::util::logging::formatter::class_<thread_phase>
+    struct thread_phase : hpx::util::logging::formatter::class_<thread_phase>
     {
         void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (nullptr != self) {
+            if (nullptr != self)
+            {
                 // called from inside a HPX thread
                 std::size_t phase = self->get_thread_phase();
-                if (0 != phase) {
-                    std::stringstream out;
-                    out << std::hex << std::setw(sizeof(std::uint32_t))
-                        << std::setfill('0') << self->get_thread_phase();
-                    str.prepend_string(out.str());
+                if (0 != phase)
+                {
+                    std::string out = format("{:04x}", self->get_thread_phase());
+                    str.prepend_string(out);
                     return;
                 }
             }
 
             // called from outside a HPX thread or no phase given
-            str.prepend_string(std::string(sizeof(std::uint32_t), '-'));
+            str.prepend_string(std::string(4, '-'));
         }
     };
 
@@ -158,17 +153,18 @@ namespace hpx { namespace util
     {
         void operator()(param str) const
         {
-            std::uint32_t parent_locality_id = threads::get_parent_locality_id();
-            if (naming::invalid_locality_id != parent_locality_id) {
+            std::uint32_t parent_locality_id =
+                threads::get_parent_locality_id();
+            if (naming::invalid_locality_id != parent_locality_id)
+            {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::uint32_t)*2)
-                    << std::setfill('0') << parent_locality_id;
-                str.prepend_string(out.str());
+                std::string out = format("{:08x}", parent_locality_id);
+                str.prepend_string(out);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(std::uint32_t)*2, '-'));
+                str.prepend_string(std::string(8, '-'));
             }
         }
     };
@@ -181,17 +177,18 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             threads::thread_id_type parent_id = threads::get_parent_id();
-            if (nullptr != parent_id && threads::invalid_thread_id != parent_id) {
+            if (nullptr != parent_id && threads::invalid_thread_id != parent_id)
+            {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(void*)*2)
-                    << std::setfill('0')
-                    << reinterpret_cast<std::ptrdiff_t>(parent_id.get());
-                str.prepend_string(out.str());
+                std::ptrdiff_t value =
+                    reinterpret_cast<std::ptrdiff_t>(parent_id.get());
+                std::string out = format("{:016x}", value);
+                str.prepend_string(out);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(void*)*2, '-'));
+                str.prepend_string(std::string(16, '-'));
             }
         }
     };
@@ -204,16 +201,16 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             std::size_t parent_phase = threads::get_parent_phase();
-            if (0 != parent_phase) {
+            if (0 != parent_phase)
+            {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::uint32_t))
-                    << std::setfill('0') << parent_phase;
-                str.prepend_string(out.str());
+                std::string out = format("{:04x}", parent_phase);
+                str.prepend_string(out);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(std::uint32_t), '-'));
+                str.prepend_string(std::string(4, '-'));
             }
         }
     };
@@ -226,17 +223,16 @@ namespace hpx { namespace util
         void operator()(param str) const
         {
             std::uint64_t component_id = threads::get_self_component_id();
-            if (0 != component_id) {
+            if (0 != component_id)
+            {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::uint64_t)*2)
-                    << std::setfill('0')
-                    << component_id;
-                str.prepend_string(out.str());
+                std::string out = format("{:016x}", component_id);
+                str.prepend_string(out);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(std::uint64_t)*2, '-'));
+                str.prepend_string(std::string(16, '-'));
             }
         }
     };
@@ -245,14 +241,17 @@ namespace hpx { namespace util
     // custom log destination: send generated strings to console
     struct console : hpx::util::logging::destination::is_generic
     {
-        console(std::size_t level, logging_destination dest)
-          : level_(level), dest_(dest)
-        {}
+        console(logging::level level, logging_destination dest)
+          : level_(level)
+          , dest_(dest)
+        {
+        }
 
-        template<typename MsgType>
+        template <typename MsgType>
         void operator()(MsgType const& msg) const
         {
-            components::console_logging(dest_, level_, msg);
+            components::console_logging(
+                dest_, static_cast<std::size_t>(level_), msg);
         }
 
         bool operator==(console const& rhs) const
@@ -260,7 +259,7 @@ namespace hpx { namespace util
             return dest_ == rhs.dest_;
         }
 
-        std::size_t level_;
+        logging::level level_;
         logging_destination dest_;
     };
 
@@ -270,9 +269,10 @@ namespace hpx { namespace util
     {
         android_log(char const* tag_)
           : tag(tag_)
-        {}
+        {
+        }
 
-        template<typename MsgType>
+        template <typename MsgType>
         void operator()(MsgType const& msg) const
         {
             __android_log_write(ANDROID_LOG_DEBUG, tag.c_str(), msg.c_str());
@@ -287,47 +287,50 @@ namespace hpx { namespace util
     };
 #endif
 
-    namespace detail
-    {
+    namespace detail {
         // unescape config entry
-        std::string unescape(std::string const &value)
+        static std::string unescape(std::string const& value)
         {
             std::string result;
             std::string::size_type pos = 0;
-            std::string::size_type pos1 = value.find_first_of ('\\', 0);
-            if (std::string::npos != pos1) {
-                do {
-                    switch (value[pos1+1]) {
+            std::string::size_type pos1 = value.find_first_of('\\', 0);
+            if (std::string::npos != pos1)
+            {
+                do
+                {
+                    switch (value[pos1 + 1])
+                    {
                     case '\\':
                     case '\"':
                     case '?':
-                        result = result + value.substr(pos, pos1-pos);
-                        pos1 = value.find_first_of ('\\', (pos = pos1+1)+1);
+                        result = result + value.substr(pos, pos1 - pos);
+                        pos1 = value.find_first_of('\\', (pos = pos1 + 1) + 1);
                         break;
 
                     case 'n':
-                        result = result + value.substr(pos, pos1-pos) + "\n";
-                        pos1 = value.find_first_of ('\\', pos = pos1+1);
+                        result = result + value.substr(pos, pos1 - pos) + "\n";
+                        pos1 = value.find_first_of('\\', pos = pos1 + 1);
                         ++pos;
                         break;
 
                     default:
-                        result = result + value.substr(pos, pos1-pos+1);
-                        pos1 = value.find_first_of ('\\', pos = pos1+1);
+                        result = result + value.substr(pos, pos1 - pos + 1);
+                        pos1 = value.find_first_of('\\', pos = pos1 + 1);
                     }
 
                 } while (pos1 != std::string::npos);
                 result = result + value.substr(pos);
             }
-            else {
-            // the string doesn't contain any escaped character sequences
+            else
+            {
+                // the string doesn't contain any escaped character sequences
                 result = value;
             }
             return result;
         }
 
         template <typename Writer>
-        void define_formatters(Writer& writer)
+        static void define_formatters(Writer& writer)
         {
             writer.replace_formatter("osthread", shepherd_thread_id());
             writer.replace_formatter("locality", locality_prefix());
@@ -338,7 +341,7 @@ namespace hpx { namespace util
             writer.replace_formatter("parentloc", parent_thread_locality());
             writer.replace_formatter("hpxcomponent", thread_component_id());
         }
-    }
+    }    // namespace detail
 
     // initialize logging for AGAS
     void init_agas_log(util::section const& ini, bool isconsole)
@@ -357,11 +360,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
            logger_writer_type& writer = agas_logger()->writer();
 
@@ -403,11 +406,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
            logger_writer_type& writer = parcel_logger()->writer();
 
@@ -450,11 +453,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
            logger_writer_type& writer = timing_logger()->writer();
 
@@ -496,7 +499,7 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
@@ -516,7 +519,7 @@ namespace hpx { namespace util
         if (logformat.empty())
             logformat = "|\\n";
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             writer.add_destination("console", console(lvl, destination_hpx)); //-V106
             writer.write(logformat, logdest);
@@ -575,11 +578,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = app_logger()->writer();
 
@@ -620,11 +623,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = debuglog_logger()->writer();
 
@@ -666,11 +669,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = agas_console_logger()->writer();
 
@@ -710,11 +713,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = parcel_console_logger()->writer();
 
@@ -753,11 +756,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = timing_console_logger()->writer();
 
@@ -796,11 +799,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = hpx_console_logger()->writer();
 
@@ -840,11 +843,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = app_console_logger()->writer();
 
@@ -884,11 +887,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = debuglog_console_logger()->writer();
 

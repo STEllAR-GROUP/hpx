@@ -25,11 +25,8 @@
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/format/array.hpp>    // array
-#include <hpx/logging/format/destination/convert_destination.hpp>
 
 #include <map>
-#include <memory>
-#include <sstream>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -57,7 +54,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
             write_info m_info;
 
             template <class destination_type>
-            void add(const std::string& name, destination_type dest)
+            void add(std::string const& name, destination_type dest)
             {
                 // care about if generic or not
                 typedef hpx::util::logging::manipulator::is_generic is_generic;
@@ -66,7 +63,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
                 compute_write_steps();
             }
 
-            void del(const std::string& name)
+            void del(std::string const& name)
             {
                 {
                     destination_base_type* p = m_info.name_to_destination[name];
@@ -77,14 +74,14 @@ namespace hpx { namespace util { namespace logging { namespace destination {
             }
 
             void configure(
-                const std::string& name, const std::string& configure_str)
+                std::string const& name, std::string const& configure_str)
             {
                 destination_base_type* p = m_info.name_to_destination[name];
                 if (p)
                     p->configure(configure_str);
             }
 
-            void format_string(const std::string& str)
+            void format_string(std::string const& str)
             {
                 {
                     m_info.format_string = str;
@@ -104,7 +101,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         private:
             // non-generic
             template <class destination_type>
-            void add_impl(const std::string& name, destination_type dest,
+            void add_impl(std::string const& name, destination_type dest,
                 const std::false_type&)
             {
                 destination_base_type* p = m_info.destinations.append(dest);
@@ -112,7 +109,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
             }
             // generic manipulator
             template <class destination_type>
-            void add_impl(const std::string& name, destination_type dest,
+            void add_impl(std::string const& name, destination_type dest,
                 const std::true_type&)
             {
                 typedef hpx::util::logging::manipulator::detail ::
@@ -198,7 +195,7 @@ In the above example, I know that the available destinations are @c out_file,
         @param set [optional] named settings - see named_settings class,
         and @ref dealing_with_flags
     */
-        named(const std::string& format_string = std::string())
+        named(std::string const& format_string = std::string())
         {
             non_const_context_base::context().format_string(format_string);
         }
@@ -207,26 +204,26 @@ In the above example, I know that the available destinations are @c out_file,
             non_const_context_base::context().write(msg);
         }
 
-        named& string(const std::string& str)
+        named& string(std::string const& str)
         {
             non_const_context_base::context().format_string(str);
             return *this;
         }
 
         template <class destination>
-        named& add(const std::string& name, destination dest)
+        named& add(std::string const& name, destination dest)
         {
             non_const_context_base::context().add(name, dest);
             return *this;
         }
 
-        void del(const std::string& name)
+        void del(std::string const& name)
         {
             non_const_context_base::context().del(name);
         }
 
         void configure_inner(
-            const std::string& name, const std::string& configure_str)
+            std::string const& name, std::string const& configure_str)
         {
             non_const_context_base::context().configure(name, configure_str);
         }

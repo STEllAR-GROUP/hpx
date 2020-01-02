@@ -153,6 +153,13 @@ HPX_DEFINE_LOG(g_l, logger_type)
     else                                                                       \
         NAME##_logger()->gather().out()
 
+#define HPX_LOG_FORMAT(NAME, LEVEL, FORMAT, ...)                               \
+    if (!(NAME##_logger()->is_enabled(LEVEL)))                                 \
+        ;                                                                      \
+    else                                                                       \
+        ::hpx::util::format_to(                                                \
+            NAME##_logger()->gather().out(), FORMAT, __VA_ARGS__)
+
 }}}    // namespace hpx::util::logging
 
 #endif

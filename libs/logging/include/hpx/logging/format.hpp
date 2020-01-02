@@ -22,14 +22,8 @@
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/format/array.hpp>
-#include <hpx/logging/format/op_equal.hpp>
-#include <hpx/logging/format_fwd.hpp>
 
 #include <algorithm>
-#include <memory>
-#include <set>
-#include <string>
-#include <type_traits>
 #include <vector>
 
 namespace hpx { namespace util { namespace logging {
@@ -184,7 +178,6 @@ HPX_DEFINE_LOG(g_l, logger_type)
 // add formatters : [idx] [time] message [enter]
 g_l()->writer().add_formatter( write_idx() );
 g_l()->writer().add_formatter( write_time() );
-g_l()->writer().add_formatter( append_newline() );
 
 // write to cout and file
 g_l()->writer().add_destination( write_to_cout() );
@@ -196,8 +189,7 @@ L_ << "testing " << i << i+1 << i+2;
 @endcode
 
 In the above case:
-- First, the formatters are called: @c write_idx() is called, then @c write_time(),
-then @c append_newline().
+- First, the formatters are called: @c write_idx() is called, then @c write_time().
 - Then, the destinations are called: @c write_to_cout(), and then @c write_to_file().
 
 

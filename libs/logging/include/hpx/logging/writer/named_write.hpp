@@ -33,9 +33,6 @@
 
 namespace hpx { namespace util { namespace logging { namespace detail {
     typedef formatter::high_precision_time formatter_time_type;
-    typedef formatter::high_precision_time_t<
-        formatter::do_convert_format::append>
-        formatter_time_type_append;
 }}}}    // namespace hpx::util::logging::detail
 
 namespace hpx { namespace util { namespace logging { namespace writer {
@@ -130,7 +127,6 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         named_write()
         {
             m_writer.add_formatter(m_format_before);
-            m_writer.add_formatter(m_format_after);
             m_writer.add_destination(m_destination);
 
             init();
@@ -145,7 +141,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 
     If "|" is not present, the whole message is prepended to the message
     */
-        void format(const std::string& format_str)
+        void format(std::string const& format_str)
         {
             m_format_str = format_str;
 
@@ -165,22 +161,19 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         /** @brief sets the format strings (what should be before,
     and what after the original message)
     */
-        void format(const std::string& format_before_str,
-            const std::string& format_after_str)
+        void format(std::string const& format_before_str,
+            std::string const& format_after_str)
         {
             m_format_before_str = format_before_str;
-            m_format_after_str = format_after_str;
 
             set_and_configure(
                 m_format_before, format_before_str, parse_formatter());
-            set_and_configure(
-                m_format_after, format_after_str, parse_formatter());
         };
 
         /** @brief sets the destinations string - where should logged messages
          * be outputted
     */
-        void destination(const std::string& destination_str)
+        void destination(std::string const& destination_str)
         {
             m_destination_str = destination_str;
             set_and_configure(
@@ -190,17 +183,17 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         /** @brief Specifies the formats and destinations in one step
     */
         void write(
-            const std::string& format_str, const std::string& destination_str)
+            std::string const& format_str, std::string const& destination_str)
         {
             format(format_str);
             destination(destination_str);
         }
 
-        const std::string& format() const
+        std::string const& format() const
         {
             return m_format_str;
         }
-        const std::string& destination() const
+        std::string const& destination() const
         {
             return m_destination_str;
         }
@@ -216,7 +209,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
     destination between multiple named writers.
     */
         template <class destination>
-        void replace_destination(const std::string& name, destination d)
+        void replace_destination(std::string const& name, destination d)
         {
             m_destination.del(name);
             m_destination.add(name, d);
@@ -228,19 +221,13 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
     a formatter between multiple named writers.
     */
         template <class formatter>
-        void replace_formatter(const std::string& name, formatter d)
+        void replace_formatter(std::string const& name, formatter d)
         {
             if (m_format_before_str.find(name) != std::string::npos)
             {
                 m_format_before.del(name);
             }
             m_format_before.add(name, d);
-
-            if (m_format_after_str.find(name) != std::string::npos)
-            {
-                m_format_after.del(name);
-            }
-            m_format_after.add(name, d);
         }
 
         template <class formatter>
@@ -250,7 +237,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         }
 
         template <class destination>
-        void add_destination(const std::string& name, destination d)
+        void add_destination(std::string const& name, destination d)
         {
             m_destination.add(name, d);
         }
@@ -350,7 +337,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 
         template <class manipulator, class parser_type>
         void set_and_configure(
-            manipulator& manip, const std::string& name, parser_type parser)
+            manipulator& manip, std::string const& name, parser_type parser)
         {
             // need to parse string
             bool parsing_params = false;
@@ -403,16 +390,6 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
                         "$hh:$mm:$ss"))
                 .add("thread_id", formatter::thread_id());
 
-            m_format_after
-                .add("idx",
-                    formatter::idx_t<formatter::do_convert_format::append>())
-                .add("time",
-                    ::hpx::util::logging::detail::formatter_time_type_append(
-                        "$hh:$mm:$ss"))
-                .add("thread_id",
-                    formatter::thread_id_t<
-                        formatter::do_convert_format::append>());
-
             m_destination.add("file", destination::file(""))
                 .add("cout", destination::cout())
                 .add("cerr", destination::cerr())
@@ -420,15 +397,12 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         }
 
     private:
-        formatter::named_spacer_t<formatter::do_convert_format::prepend>
-            m_format_before;
-        formatter::named_spacer_t<formatter::do_convert_format::append>
-            m_format_after;
+        formatter::named_spacer_t m_format_before;
         destination::named m_destination;
         format_write m_writer;
 
         std::string m_format_str;
-        std::string m_format_before_str, m_format_after_str;
+        std::string m_format_before_str;
         std::string m_destination_str;
     };
 

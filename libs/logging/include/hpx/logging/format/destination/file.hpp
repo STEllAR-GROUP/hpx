@@ -24,7 +24,6 @@
 
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
-#include <hpx/logging/format/destination/convert_destination.hpp>
 
 #include <boost/config.hpp>
 #include <boost/smart_ptr/detail/spinlock.hpp>
@@ -77,7 +76,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
         struct file_info
         {
-            file_info(const std::string& name_, file_settings const& settings_)
+            file_info(std::string const& name_, file_settings const& settings_)
               : name(name_)
               ,
               //               out( new std::ofstream
@@ -120,7 +119,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         @param set [optional] file settings - see file_settings class,
         and @ref dealing_with_flags
     */
-        file(const std::string& file_name, file_settings set = file_settings())
+        file(std::string const& file_name, file_settings set = file_settings())
           : non_const_context_base(file_name, set)
         {
         }
@@ -132,7 +131,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
             if (!non_const_context_base::context().out)
                 non_const_context_base::context()
                     .open();    // make sure file is opened
-            convert::write(msg, *(non_const_context_base::context().out));
+            *(non_const_context_base::context().out) << msg.full_string();
             if (non_const_context_base::context().settings.flush_each_time())
                 non_const_context_base::context().out->flush();
         }
@@ -146,7 +145,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         /** configure through script
         right now, you can only specify the file name
     */
-        void configure(const std::string& str)
+        void configure(std::string const& str)
         {
             // configure - the file name, for now
             non_const_context_base::context().close();

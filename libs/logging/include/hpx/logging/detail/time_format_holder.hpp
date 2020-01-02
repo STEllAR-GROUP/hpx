@@ -17,15 +17,10 @@
 #ifndef JT28092007_time_format_holder_HPP_DEFINED
 #define JT28092007_time_format_holder_HPP_DEFINED
 
-#include <hpx/assertion.hpp>
-#include <hpx/logging/detail/fwd.hpp>
+#include <hpx/format.hpp>
 
-#include <algorithm>
 #include <cstddef>
-#include <cstdio>
-#include <sstream>
 #include <string>
-#include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 
@@ -34,31 +29,6 @@ namespace hpx { namespace util { namespace logging { namespace detail {
 */
     struct time_format_holder
     {
-    private:
-        struct index_info
-        {
-            typedef std::size_t uint;
-
-            index_info(uint src_idx_, int* format_idx_, int advance_size_ = 2,
-                int size_ = 2)
-              : src_idx(src_idx_)
-              , format_idx(format_idx_)
-              , advance_size(advance_size_)
-              , size(size_)
-            {
-            }
-            uint src_idx;
-            int* format_idx;
-            int advance_size;
-            int size;
-
-            static bool by_index(
-                const index_info& first, const index_info& second)
-            {
-                return first.src_idx < second.src_idx;
-            }
-        };
-
     public:
         bool operator==(const time_format_holder& other) const
         {
@@ -69,146 +39,43 @@ namespace hpx { namespace util { namespace logging { namespace detail {
         constructs a time format holder object
     */
         time_format_holder(const std::string& format)
-          : m_day(-1)
-          , m_month(-1)
-          , m_yy(-1)
-          , m_yyyy(-1)
-          , m_hour(-1)
-          , m_min(-1)
-          , m_sec(-1)
-          , m_millisec(-1)
-          , m_microsec(-1)
-          , m_nanosec(-1)
         {
             set_format(format);
         }
 
         void set_format(const std::string& format)
         {
-            // format too big
-            HPX_ASSERT(format.size() < 64);
-            m_format.clear();
-
-            m_day = -1;
-            m_month = -1;
-            m_yy = -1;
-            m_yyyy = -1;
-            m_hour = -1;
-            m_min = -1;
-            m_sec = -1;
-            m_millisec = -1;
-            m_microsec = -1;
-            m_nanosec = -1;
-
-            typedef std::size_t uint;
-            uint day_idx = format.find("$dd");
-            uint month_idx = format.find("$MM");
-            uint yy_idx = format.find("$yy");
-            uint yyyy_idx = format.find("$yyyy");
-            uint hour_idx = format.find("$hh");
-            uint min_idx = format.find("$mm");
-            uint sec_idx = format.find("$ss");
-            uint millisec_idx = format.find("$mili");
-            uint microsec_idx = format.find("$micro");
-            uint nanosec_idx = format.find("$nano");
-
-            typedef std::vector<index_info> array;
-            array indexes;
-            if (day_idx != std::string::npos)
-                indexes.emplace_back(day_idx, &m_day);
-            if (month_idx != std::string::npos)
-                indexes.emplace_back(month_idx, &m_month);
-
-            if (yy_idx != std::string::npos || yyyy_idx != std::string::npos)
-            {
-                if (yyyy_idx != std::string::npos)
-                    indexes.emplace_back(yyyy_idx, &m_yyyy, 4);    //-V112
-                else
-                    indexes.emplace_back(yy_idx, &m_yy);
-            }
-
-            if (hour_idx != std::string::npos)
-                indexes.emplace_back(hour_idx, &m_hour);
-            if (min_idx != std::string::npos)
-                indexes.emplace_back(min_idx, &m_min);
-            if (sec_idx != std::string::npos)
-                indexes.emplace_back(sec_idx, &m_sec);
-            if (millisec_idx != std::string::npos)
-                indexes.emplace_back(
-                    millisec_idx, &m_millisec, 4, 3);    // -V112
-            if (microsec_idx != std::string::npos)
-                indexes.emplace_back(microsec_idx, &m_microsec, 5, 6);
-            if (nanosec_idx != std::string::npos)
-                indexes.emplace_back(nanosec_idx, &m_nanosec, 4, 9);    //-V112
-
-            std::sort(indexes.begin(), indexes.end(), index_info::by_index);
-
-            // create the format string, that we can actually pass to sprintf
-            uint prev_idx = 0;
-            int idx = 0;
-            for (array::iterator begin = indexes.begin(), end = indexes.end();
-                 begin != end; ++begin)
-            {
-                m_format += format.substr(prev_idx, begin->src_idx - prev_idx);
-                *begin->format_idx = idx;
-                std::ostringstream cur_sprintf_format;
-                cur_sprintf_format << "%0" << begin->size << "d";
-                m_format += cur_sprintf_format.str();
-                prev_idx = static_cast<hpx::util::logging::detail ::
-                        time_format_holder::index_info::uint>(begin->src_idx +
-                    static_cast<hpx::util::logging::detail::
-                            time_format_holder ::index_info::uint>(
-                        begin->advance_size) +
-                    1ul);
-                ++idx;
-            }
-
-            m_format += format.substr(prev_idx);
+            m_format = format;
+            replace_format("$dd", "{1:02d}");
+            replace_format("$MM", "{2:02d}");
+            replace_format("$yyyy", "{3:04d}");
+            replace_format("$yy", "{4:02d}");
+            replace_format("$hh", "{5:02d}");
+            replace_format("$mm", "{6:02d}");
+            replace_format("$ss", "{7:02d}");
+            replace_format("$mili", "{8:03d}");
+            replace_format("$micro", "{9:06d}");
+            replace_format("$nano", "{10:09d}");
         }
 
-        void write_time(char buffer[], int day, int month, int year, int hour,
-            int min, int sec, int millisec, int microsec, int nanosec) const
+        std::string write_time(int day, int month, int year, int hour, int min,
+            int sec, int millisec = 0, int microsec = 0, int nanosec = 0) const
         {
-            int vals[11];
-            vals[m_day + 1] = day;
-            vals[m_month + 1] = month;
-            vals[m_yy + 1] = year % 100;
-            vals[m_yyyy + 1] = year;
-            vals[m_hour + 1] = hour;
-            vals[m_min + 1] = min;
-            vals[m_sec + 1] = sec;
-            vals[m_millisec + 1] = millisec;
-            vals[m_microsec + 1] = microsec;
-            vals[m_nanosec + 1] = nanosec;
-
-            // ignore value at index 0
-            // - it's there so that I don't have to test for an index being -1
-            sprintf(buffer, m_format.c_str(), vals[1], vals[2], vals[3],
-                vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10]);
-        }
-
-        void write_time(char buffer[], int day, int month, int year, int hour,
-            int min, int sec) const
-        {
-            int vals[8];
-            vals[m_day + 1] = day;
-            vals[m_month + 1] = month;
-            vals[m_yy + 1] = year % 100;
-            vals[m_yyyy + 1] = year;
-            vals[m_hour + 1] = hour;
-            vals[m_min + 1] = min;
-            vals[m_sec + 1] = sec;
-
-            // ignore value at index 0
-            // - it's there so that I don't have to test for an index being -1
-            sprintf(buffer, m_format.c_str(), vals[1], vals[2], vals[3],
-                vals[4], vals[5], vals[6], vals[7]);
+            return hpx::util::format(m_format, day, month, year, year % 100,
+                hour, min, sec, millisec, microsec, nanosec);
         }
 
     private:
+        bool replace_format(char const* from, char const* to)
+        {
+            size_t start_pos = m_format.find(from);
+            if (start_pos == std::string::npos)
+                return false;
+            m_format.replace(start_pos, std::strlen(from), to);
+            return true;
+        }
+
         // the indexes of each escape sequence within the format string
-        int m_day, m_month, m_yy, m_yyyy, m_hour, m_min, m_sec, m_millisec,
-            m_microsec, m_nanosec;
         std::string m_format;
     };
 

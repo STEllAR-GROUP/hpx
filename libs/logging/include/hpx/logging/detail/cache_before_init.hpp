@@ -20,12 +20,15 @@
 #include <hpx/config.hpp>
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/format/optimize.hpp>
-#include <hpx/logging/writer/named_write.hpp>
 
 #include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+namespace hpx { namespace util { namespace logging { namespace writer {
+    struct named_write;
+}}}}    // namespace hpx::util::logging::writer
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 

@@ -4,19 +4,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM)
-#define HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM
+#ifndef HPX_LOGGING_HPP
+#define HPX_LOGGING_HPP
 
 #include <hpx/config.hpp>
-
-#include <string>
-#include <vector>
 
 #if defined(HPX_HAVE_LOGGING)
 
 #include <hpx/assertion/current_function.hpp>
-#include <hpx/logging/format_fwd.hpp>
+#include <hpx/format.hpp>
+#include <hpx/logging/level.hpp>
 #include <hpx/logging/logging.hpp>
+
+#include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
 // specific logging
@@ -32,10 +32,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
     ////////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT std::string levelname(int level);
-
     namespace detail {
-        HPX_API_EXPORT hpx::util::logging::level::type get_log_level(
+        HPX_API_EXPORT hpx::util::logging::level get_log_level(
             std::string const& env, bool allow_always = false);
     }
 
@@ -43,8 +41,8 @@ namespace hpx { namespace util {
     HPX_EXPORT HPX_DECLARE_LOG(agas)
 
 #define LAGAS_(lvl)                                                            \
-    HPX_LOG_USE_LOG(hpx::util::agas, ::hpx::util::logging::level::lvl)         \
-        << hpx::util::levelname(::hpx::util::logging::level::lvl) << " " /**/
+    HPX_LOG_FORMAT(hpx::util::agas, ::hpx::util::logging::level::lvl, "{} ",   \
+        ::hpx::util::logging::level::lvl) /**/
 
 #define LAGAS_ENABLED(lvl)                                                     \
     hpx::util::agas_logger()->is_enabled(::hpx::util::logging::level::lvl) /**/
@@ -53,8 +51,8 @@ namespace hpx { namespace util {
         HPX_EXPORT HPX_DECLARE_LOG(parcel)
 
 #define LPT_(lvl)                                                              \
-    HPX_LOG_USE_LOG(hpx::util::parcel, ::hpx::util::logging::level::lvl)       \
-        << hpx::util::levelname(::hpx::util::logging::level::lvl) << " " /**/
+    HPX_LOG_FORMAT(hpx::util::parcel, ::hpx::util::logging::level::lvl, "{} ", \
+        ::hpx::util::logging::level::lvl) /**/
 
 #define LPT_ENABLED(lvl)                                                       \
     hpx::util::parcel_logger()->is_enabled(                                    \
@@ -64,12 +62,11 @@ namespace hpx { namespace util {
         HPX_EXPORT HPX_DECLARE_LOG(timing)
 
 #define LTIM_(lvl)                                                             \
-    HPX_LOG_USE_LOG(hpx::util::timing, ::hpx::util::logging::level::lvl)       \
-        << hpx::util::levelname(::hpx::util::logging::level::lvl) << " " /**/
+    HPX_LOG_FORMAT(hpx::util::timing, ::hpx::util::logging::level::lvl, "{} ", \
+        ::hpx::util::logging::level::lvl) /**/
 #define LPROGRESS_                                                             \
-    HPX_LOG_USE_LOG(hpx::util::timing, ::hpx::util::logging::level::fatal)     \
-        << " " << __FILE__ << ":" << __LINE__ << " "                           \
-        << HPX_ASSERT_CURRENT_FUNCTION << " " /**/
+    HPX_LOG_FORMAT(hpx::util::timing, ::hpx::util::logging::level::fatal,      \
+        " {}:{} {} ", __FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION) /**/
 
 #define LTIM_ENABLED(lvl)                                                      \
     hpx::util::timing_logger()->is_enabled(                                    \
@@ -79,9 +76,8 @@ namespace hpx { namespace util {
         HPX_EXPORT HPX_DECLARE_LOG(hpx)
 
 #define LHPX_(lvl, cat)                                                        \
-    HPX_LOG_USE_LOG(hpx::util::hpx, ::hpx::util::logging::level::lvl)          \
-        << hpx::util::levelname(::hpx::util::logging::level::lvl)              \
-        << (cat) /**/
+    HPX_LOG_FORMAT(hpx::util::hpx, ::hpx::util::logging::level::lvl, "{}{}",   \
+        ::hpx::util::logging::level::lvl, (cat)) /**/
 
 #define LHPX_ENABLED(lvl)                                                      \
     hpx::util::hpx_logger()->is_enabled(::hpx::util::logging::level::lvl) /**/
@@ -90,8 +86,8 @@ namespace hpx { namespace util {
         HPX_EXPORT HPX_DECLARE_LOG(app)
 
 #define LAPP_(lvl)                                                             \
-    HPX_LOG_USE_LOG(hpx::util::app, ::hpx::util::logging::level::lvl)          \
-        << hpx::util::levelname(::hpx::util::logging::level::lvl) << " " /**/
+    HPX_LOG_FORMAT(hpx::util::app, ::hpx::util::logging::level::lvl, "{} ",    \
+        ::hpx::util::logging::level::lvl) /**/
 
 #define LAPP_ENABLED(lvl)                                                      \
     hpx::util::app_logger()->is_enabled(::hpx::util::logging::level::lvl) /**/
@@ -101,9 +97,8 @@ namespace hpx { namespace util {
         HPX_EXPORT HPX_DECLARE_LOG(debuglog)
 
 #define LDEB_                                                                  \
-    HPX_LOG_USE_LOG(hpx::util::debuglog, ::hpx::util::logging::level::error)   \
-        << hpx::util::levelname(::hpx::util::logging::level::error)            \
-        << " " /**/
+    HPX_LOG_FORMAT(hpx::util::debuglog, ::hpx::util::logging::level::error,    \
+        "{} ", ::hpx::util::logging::level::error) /**/
 
 #define LDEB_ENABLED                                                           \
     hpx::util::debuglog_logger()->is_enabled(                                  \
@@ -115,9 +110,8 @@ namespace hpx { namespace util {
         HPX_EXPORT HPX_DECLARE_LOG(hpx_error)
 
 #define LFATAL_                                                                \
-    HPX_LOG_USE_LOG(hpx::util::hpx_error, ::hpx::util::logging::level::fatal)  \
-        << hpx::util::levelname(::hpx::util::logging::level::fatal)            \
-        << (" [ERR] ") /**/
+    HPX_LOG_FORMAT(hpx::util::hpx_error, ::hpx::util::logging::level::fatal,   \
+        "{} [ERR] ", ::hpx::util::logging::level::fatal) /**/
 
             HPX_EXPORT HPX_DECLARE_LOG(agas_console) HPX_EXPORT
         HPX_DECLARE_LOG(parcel_console) HPX_EXPORT
@@ -131,27 +125,27 @@ namespace hpx { namespace util {
 ///////////////////////////////////////////////////////////////////////////////
 #define LAGAS_CONSOLE_(lvl)                                                    \
     HPX_LOG_USE_LOG(hpx::util::agas_console,                                   \
-        static_cast<::hpx::util::logging::level::type>(lvl))                   \
+        static_cast<::hpx::util::logging::level>(lvl))                         \
     /**/
 
 #define LPT_CONSOLE_(lvl)                                                      \
     HPX_LOG_USE_LOG(hpx::util::parcel_console,                                 \
-        static_cast<::hpx::util::logging::level::type>(lvl))                   \
+        static_cast<::hpx::util::logging::level>(lvl))                         \
     /**/
 
 #define LTIM_CONSOLE_(lvl)                                                     \
     HPX_LOG_USE_LOG(hpx::util::timing_console,                                 \
-        static_cast<::hpx::util::logging::level::type>(lvl))                   \
+        static_cast<::hpx::util::logging::level>(lvl))                         \
     /**/
 
 #define LHPX_CONSOLE_(lvl)                                                     \
-    HPX_LOG_USE_LOG(hpx::util::hpx_console,                                    \
-        static_cast<::hpx::util::logging::level::type>(lvl))                   \
+    HPX_LOG_USE_LOG(                                                           \
+        hpx::util::hpx_console, static_cast<::hpx::util::logging::level>(lvl)) \
     /**/
 
 #define LAPP_CONSOLE_(lvl)                                                     \
-    HPX_LOG_USE_LOG(hpx::util::app_console,                                    \
-        static_cast<::hpx::util::logging::level::type>(lvl))                   \
+    HPX_LOG_USE_LOG(                                                           \
+        hpx::util::app_console, static_cast<::hpx::util::logging::level>(lvl)) \
     /**/
 
 #define LDEB_CONSOLE_                                                          \
@@ -245,4 +239,5 @@ bootstrap_logging const& operator<<(bootstrap_logging const& l, T&&)
 }
 
 #endif
-#endif
+
+#endif /*HPX_LOGGING_HPP*/

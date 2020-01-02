@@ -20,7 +20,6 @@
 #include <hpx/config.hpp>
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
-#include <hpx/logging/format/destination/convert_destination.hpp>
 #include <hpx/logging/format/destination/file.hpp>
 #include <iostream>
 
@@ -33,7 +32,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     {
         void operator()(const msg_type& msg) const
         {
-            convert::write(msg, std::cout);
+            std::cout << msg.full_string();
         }
 
         bool operator==(const cout&) const
@@ -49,7 +48,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     {
         void operator()(const msg_type& msg) const
         {
-            convert::write(msg, std::cerr);
+            std::cerr << msg.full_string();
         }
 
         bool operator==(const cerr&) const
@@ -84,7 +83,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         void operator()(const msg_type& msg) const
         {
             if (non_const_context_base::context())
-                convert::write(msg, *non_const_context_base::context());
+                *non_const_context_base::context() << msg.full_string();
         }
 
         bool operator==(const stream& other) const
@@ -120,10 +119,10 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         void operator()(const msg_type& msg) const
         {
 #ifdef HPX_WINDOWS
-            ::OutputDebugStringA(convert::do_convert(msg, into<const char*>()));
+            ::OutputDebugStringA(msg.full_string().c_str());
 #else
             // non windows - dump to console
-            std::cout << msg;
+            std::cout << msg.full_string();
 #endif
         }
 

@@ -84,7 +84,7 @@ namespace hpx { namespace util { namespace logging {
                            grow this much in addition to the added string
                            - in the needed direction
          */
-            cache_string_one_str(const std::string& msg,
+            cache_string_one_str(std::string const& msg,
                 std::size_t reserve_prepend_ = 10,
                 std::size_t reserve_append_ = 10, std::size_t grow_size_ = 10)
               : m_reserve_prepend(reserve_prepend_)
@@ -117,7 +117,7 @@ namespace hpx { namespace util { namespace logging {
             {
             }
 
-            void set_string(const std::string& str)
+            void set_string(std::string const& str)
             {
                 m_str.resize(str.size() + m_reserve_prepend + m_reserve_append);
                 std::copy(str.begin(), str.end(),
@@ -183,29 +183,11 @@ namespace hpx { namespace util { namespace logging {
                 std::copy(str, str + len, m_str.begin() + start_idx);
                 m_full_msg_computed = false;
             }
-            void append_string(const char* str)
-            {
-                std::size_t len = str_len(str);
-                if (m_reserve_append < len)
-                {
-                    std::size_t new_reserve_append = len + m_grow_size;
-                    resize_string(m_reserve_prepend, new_reserve_append);
-                }
-
-                HPX_ASSERT(m_reserve_append >= len);
-
-                std::ptrdiff_t start_idx = static_cast<std::ptrdiff_t>(
-                    m_str.size() - m_reserve_append);
-
-                std::copy(str, str + len, m_str.begin() + start_idx);
-                m_reserve_append -= len;
-                m_full_msg_computed = false;
-            }
 
             /**
             @brief pre-pends a string (inserts it at the beginning)
         */
-            void prepend_string(const std::string& str)
+            void prepend_string(std::string const& str)
             {
                 if (m_reserve_prepend < str.size())
                 {
@@ -224,27 +206,6 @@ namespace hpx { namespace util { namespace logging {
             }
 
             /**
-            @brief appends a string (inserts it at the end)
-        */
-            void append_string(const std::string& str)
-            {
-                if (m_reserve_append < str.size())
-                {
-                    std::size_t new_reserve_append = str.size() + m_grow_size;
-                    resize_string(m_reserve_prepend, new_reserve_append);
-                }
-
-                HPX_ASSERT(m_reserve_append >= str.size());
-
-                std::ptrdiff_t start_idx = static_cast<std::ptrdiff_t>(
-                    m_str.size() - m_reserve_append);
-
-                std::copy(str.begin(), str.end(), m_str.begin() + start_idx);
-                m_reserve_append -= str.size();
-                m_full_msg_computed = false;
-            }
-
-            /**
             writes the current cached contents to a stream
         */
             template <class stream_type>
@@ -257,7 +218,7 @@ namespace hpx { namespace util { namespace logging {
             /**
             returns the full string
         */
-            const std::string& full_string() const
+            std::string const& full_string() const
             {
                 if (!m_full_msg_computed)
                 {
@@ -268,7 +229,7 @@ namespace hpx { namespace util { namespace logging {
                 return m_full_msg;
             }
 
-            operator const std::string&() const
+            operator std::string const&() const
             {
                 return full_string();
             }
@@ -322,13 +283,6 @@ namespace hpx { namespace util { namespace logging {
             mutable bool m_full_msg_computed;
             mutable std::string m_full_msg;
         };
-
-        template <class stream>
-        inline stream& operator<<(stream& out, const cache_string_one_str& val)
-        {
-            out << val.full_string();
-            return out;
-        }
 
     }    // namespace optimize
 }}}      // namespace hpx::util::logging

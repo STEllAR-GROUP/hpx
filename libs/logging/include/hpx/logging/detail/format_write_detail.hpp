@@ -72,7 +72,6 @@ HPX_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
 // add formatters : [idx] [time] message [enter]
 g_l()->writer().add_formatter( formatter::idx() );
 g_l()->writer().add_formatter( formatter::time("$hh:$mm.$ss ") );
-g_l()->writer().add_formatter( formatter::append_newline() );
 
 // write to cout and file
 g_l()->writer().add_destination( destination::cout() );
@@ -83,9 +82,9 @@ int i = 1;
 L_ << "testing " << i << i+1 << i+2;
 @endcode
 
-In the above case, @c formatter::idx() is called, then @c formatter::time(),
-then @c formatter::append_newline(). Now, the destinations are called:
-@c destination::cout(), and then @c destination::file().
+In the above case, @c formatter::idx() is called, then @c formatter::time().
+Now, the destinations are called: @c destination::cout(), and then
+@c destination::file().
 
 
 

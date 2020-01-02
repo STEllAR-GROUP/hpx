@@ -18,9 +18,9 @@
 #define JT28092007_logging_HPP_DEFINED
 
 #include <hpx/logging/detail/fwd.hpp>
-#include <hpx/logging/detail/level.hpp>
 #include <hpx/logging/detail/logger.hpp>
 #include <hpx/logging/detail/macros.hpp>
+#include <hpx/logging/level.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -33,7 +33,7 @@ If you want to use @ref manipulator "formatters and destinations",
 then you can include this one instead:
 
 @code
-#include <hpx/logging/format_fwd.hpp>
+#include <hpx/logging/format.hpp>
 @endcode
 
 */

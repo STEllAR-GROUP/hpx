@@ -17,19 +17,12 @@
 #ifndef JT28092007_formatter_defaults_HPP_DEFINED
 #define JT28092007_formatter_defaults_HPP_DEFINED
 
+#include <hpx/format.hpp>
 #include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
-#include <hpx/logging/format/formatter/convert_format.hpp>
-#include <hpx/logging/format/formatter/spacer.hpp>
-#include <hpx/logging/format/formatter/thread_id.hpp>
-#include <hpx/logging/format/formatter/time.hpp>
-#include <hpx/logging/format/formatter/time_strf.hpp>
+
 #include <cstdint>
-#include <iomanip>
-#include <ios>
-#include <sstream>
-#include <stdio.h>
-#include <time.h>
+#include <string>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
@@ -55,106 +48,28 @@ std::(w)string and the string that holds your logged message. See convert_format
 For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
 "a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
-    template <class convert = do_convert_format::prepend>
-    struct idx_t
+    struct idx
       : is_generic
       , formatter::non_const_context<std::uint64_t>
     {
         typedef formatter::non_const_context<std::uint64_t>
             non_const_context_base;
-        typedef convert convert_type;
 
-        idx_t()
+        idx()
           : non_const_context_base(0ull)
         {
         }
         void operator()(msg_type& str) const
         {
-            std::ostringstream idx;
-            idx << std::hex << std::setw(sizeof(std::uint64_t) * 2)
-                << std::setfill('0') << ++context();
-
-            convert::write(idx.str(), str);
+            std::string idx = hpx::util::format("{:016x}", ++context());
+            str.prepend_string(idx);
         }
 
-        bool operator==(const idx_t&) const
+        bool operator==(const idx&) const
         {
             return true;
         }
     };
-
-    /**
-@brief Appends a new line
-
-@param convert [optional] In case there needs to be a conversion between
-std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
-"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
-*/
-    template <class convert = do_convert_format::append>
-    struct append_newline_t : is_generic
-    {
-        typedef convert convert_type;
-
-        void operator()(msg_type& str) const
-        {
-            convert::write("\n", str);
-        }
-
-        bool operator==(const append_newline_t&) const
-        {
-            return true;
-        }
-    };
-
-    /**
-@brief Appends a new line, if not already there
-
-@param convert [optional] In case there needs to be a conversion between
-std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
-"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
-*/
-    template <class convert = do_convert_format::append>
-    struct append_newline_if_needed_t : is_generic
-    {
-        typedef convert convert_type;
-
-        void operator()(msg_type& str) const
-        {
-            bool is_needed = true;
-            if (!convert::get_underlying_string(str).empty())
-                if (*(convert::get_underlying_string(str).rbegin()) == '\n')
-                    is_needed = false;
-
-            if (is_needed)
-                convert::write("\n", str);
-        }
-
-        bool operator==(const append_newline_if_needed_t&) const
-        {
-            return true;
-        }
-    };
-
-    /** @brief idx_t with default values. See idx_t
-
-@copydoc idx_t
-*/
-    typedef idx_t<> idx;
-
-    /** @brief append_newline_t with default values. See append_newline_t
-
-@copydoc append_newline_t
-*/
-    typedef append_newline_t<> append_newline;
-
-    /** @brief append_newline_if_needed_t with default values. See
-     * append_newline_if_needed_t
-
-@copydoc append_newline_if_needed_t
-*/
-    typedef append_newline_if_needed_t<> append_newline_if_needed;
 
 }}}}    // namespace hpx::util::logging::formatter
 
