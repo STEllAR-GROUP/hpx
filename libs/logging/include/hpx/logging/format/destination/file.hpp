@@ -22,8 +22,8 @@
 #pragma warning(disable : 4355)
 #endif
 
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
+#include <hpx/logging/message.hpp>
 
 #include <boost/config.hpp>
 #include <boost/smart_ptr/detail/spinlock.hpp>
@@ -41,35 +41,32 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct file_settings
     {
-        typedef ::hpx::util::logging::detail::flag<file_settings> flag;
-
         file_settings()
-          : flush_each_time(this, true)
-          , initial_overwrite(this, false)
-          , do_append(this, true)
-          , extra_flags(this, std::ios_base::out)
+          : flush_each_time(true)
+          , initial_overwrite(false)
+          , do_append(true)
+          , extra_flags(std::ios_base::out)
         {
         }
 
         /// if true (default), flushes after each write
-        flag::t<bool> flush_each_time;
+        bool flush_each_time : 1;
         // if true it initially overwrites the file; default = false
-        flag::t<bool> initial_overwrite;
+        bool initial_overwrite : 1;
         // if true (default), opens the file for appending
-        flag::t<bool> do_append;
-
+        bool do_append : 1;
         /// just in case you have some extra flags to pass, when opening the file
-        flag::t<std::ios_base::openmode> extra_flags;
+        std::ios_base::openmode extra_flags;
     };
 
     namespace detail {
         inline std::ios_base::openmode open_flags(file_settings fs)
         {
             std::ios_base::openmode flags = std::ios_base::out;
-            flags |= fs.extra_flags();
-            if (fs.do_append() && !fs.initial_overwrite())
+            flags |= fs.extra_flags;
+            if (fs.do_append && !fs.initial_overwrite)
                 flags |= std::ios_base::app;
-            if (fs.initial_overwrite())
+            if (fs.initial_overwrite)
                 flags |= std::ios_base::trunc;
             return flags;
         }
@@ -124,7 +121,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         {
         }
 
-        void operator()(const msg_type& msg) const
+        void operator()(const message& msg) const
         {
             std::lock_guard<mutex_type> l(mtx_);
 
@@ -132,7 +129,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
                 non_const_context_base::context()
                     .open();    // make sure file is opened
             *(non_const_context_base::context().out) << msg.full_string();
-            if (non_const_context_base::context().settings.flush_each_time())
+            if (non_const_context_base::context().settings.flush_each_time)
                 non_const_context_base::context().out->flush();
         }
 

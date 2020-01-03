@@ -18,8 +18,7 @@
 #define JT28092007_cache_before_init_HPP_DEFINED
 
 #include <hpx/config.hpp>
-#include <hpx/logging/detail/fwd.hpp>
-#include <hpx/logging/format/optimize.hpp>
+#include <hpx/logging/message.hpp>
 
 #include <utility>
 #include <vector>
@@ -49,7 +48,7 @@ namespace hpx { namespace util { namespace logging { namespace detail {
         HPX_NON_COPYABLE(cache_before_init);
 
     private:
-        typedef std::vector<msg_type> message_array;
+        typedef std::vector<message> message_array;
 
     public:
         cache_before_init()
@@ -64,7 +63,7 @@ namespace hpx { namespace util { namespace logging { namespace detail {
 
         void turn_cache_off(writer::named_write const& writer_);
 
-        void add_msg(msg_type&& msg)
+        void add_msg(message&& msg)
         {
             m_cache.push_back(std::move(msg));
         }

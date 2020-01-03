@@ -18,7 +18,6 @@
 #define JT28092007_formatter_defaults_HPP_DEFINED
 
 #include <hpx/format.hpp>
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
 
 #include <cstdint>
@@ -41,12 +40,6 @@ This will output something similar to:
 [1] my message
 [2] my 2nd message
 @endcode
-
-
-@param convert [optional] In case there needs to be a conversion between
-std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
-"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
     struct idx
       : is_generic
@@ -59,7 +52,7 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
           : non_const_context_base(0ull)
         {
         }
-        void operator()(msg_type& str) const
+        void operator()(message& str) const
         {
             std::string idx = hpx::util::format("{:016x}", ++context());
             str.prepend_string(idx);

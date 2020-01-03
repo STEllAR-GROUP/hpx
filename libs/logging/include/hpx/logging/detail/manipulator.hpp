@@ -23,8 +23,7 @@
 #pragma warning(disable : 4250)
 #endif
 
-#include <hpx/logging/detail/fwd.hpp>
-#include <hpx/logging/format/optimize.hpp>
+#include <hpx/logging/message.hpp>
 
 #include <memory>
 #include <string>
@@ -101,7 +100,7 @@ even an @ref customize_optimize "optimization string class".
 So, it's not uncommon to do something like this:
 
 @code
-typedef optimize::cache_string_one_str cache_string;
+typedef message cache_string;
 
 // formatter - needs to modify the message - use an optimizer while formatting
 typedef formatter::base< cache_string&> formatter_base;
@@ -386,7 +385,7 @@ LERR_ << "third error " << i++;
 
             typedef self_type* ptr_type;
 
-            // used as msg_type in format_and_write classes
+            // used as message in format_and_write classes
             typedef raw_param_type raw_param;
             typedef param_type param;
 
@@ -519,13 +518,13 @@ and do the best to convert what's in, to what they need.
 Example:
 @code
 struct cout {
-    void operator()(const msg_type & msg) const {
+    void operator()(const message & msg) const {
         std::cout << msg;
     }
 };
 @endcode
 
-As long as exists a conversion function from your @c msg_type to what
+As long as exists a conversion function from your @c message to what
 the manipulator needs, it all works.
 Thus, no matter what your %formatter @ref manipulator_base_class "base class" or
 %destination @ref manipulator_base_class "base class"
@@ -613,8 +612,7 @@ See:
         namespace detail {
             struct format_base_finder
             {
-                typedef ::hpx::util::logging::optimize::cache_string_one_str
-                    arg_type;
+                typedef ::hpx::util::logging::message arg_type;
                 typedef hpx::util::logging::manipulator::base<arg_type,
                     arg_type&>
                     type;
@@ -672,7 +670,7 @@ See:
         namespace detail {
             struct destination_base_finder
             {
-                typedef std::string arg_type;
+                typedef ::hpx::util::logging::message arg_type;
                 typedef hpx::util::logging::manipulator::base<arg_type,
                     const arg_type&>
                     type;

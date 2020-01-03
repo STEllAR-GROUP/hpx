@@ -19,7 +19,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/format.hpp>
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>    // is_generic
 
 #include <string>
@@ -31,12 +30,10 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 
 @param convert [optional] In case there needs to be a conversion between
 std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
-"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
     struct thread_id : is_generic
     {
-        void operator()(msg_type& msg) const
+        void operator()(message& msg) const
         {
             std::string out = hpx::util::format("{}",
 #if defined(HPX_WINDOWS)

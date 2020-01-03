@@ -18,7 +18,6 @@
 #define JT28092007_destination_defaults_HPP_DEFINED
 
 #include <hpx/config.hpp>
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/format/destination/file.hpp>
 #include <iostream>
@@ -30,7 +29,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct cout : is_generic
     {
-        void operator()(const msg_type& msg) const
+        void operator()(const message& msg) const
         {
             std::cout << msg.full_string();
         }
@@ -46,7 +45,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct cerr : is_generic
     {
-        void operator()(const msg_type& msg) const
+        void operator()(const message& msg) const
         {
             std::cerr << msg.full_string();
         }
@@ -80,7 +79,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         {
         }
 
-        void operator()(const msg_type& msg) const
+        void operator()(const message& msg) const
         {
             if (non_const_context_base::context())
                 *non_const_context_base::context() << msg.full_string();
@@ -116,7 +115,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct dbg_window : is_generic
     {
-        void operator()(const msg_type& msg) const
+        void operator()(const message& msg) const
         {
 #ifdef HPX_WINDOWS
             ::OutputDebugStringA(msg.full_string().c_str());

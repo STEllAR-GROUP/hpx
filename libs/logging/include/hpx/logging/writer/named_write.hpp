@@ -198,7 +198,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
             return m_destination_str;
         }
 
-        void operator()(msg_type& msg) const
+        void operator()(message& msg) const
         {
             m_writer(msg);
         }

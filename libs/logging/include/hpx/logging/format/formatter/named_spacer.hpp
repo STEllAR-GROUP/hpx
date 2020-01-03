@@ -17,7 +17,6 @@
 #ifndef JT28092007_named_spacer_HPP_DEFINED
 #define JT28092007_named_spacer_HPP_DEFINED
 
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/format/array.hpp>                       // array
 
@@ -137,7 +136,7 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
                 base_named_spacer_context::add<formatter>(name, fmt);
             }
 
-            void write(msg_type& msg) const
+            void write(message& msg) const
             {
                 typedef typename write_info::write_step_array array_;
                 for (typename array_::const_reverse_iterator
@@ -233,7 +232,7 @@ You could have an output like this:
             context_base::context().configure(name, configure_str);
         }
 
-        void operator()(msg_type& msg) const
+        void operator()(message& msg) const
         {
             context_base::context().write(msg);
         }

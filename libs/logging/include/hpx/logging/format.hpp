@@ -19,11 +19,11 @@
 #define JT28092007_format_HPP_DEFINED
 
 #include <hpx/assertion.hpp>
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/format/array.hpp>
 
 #include <algorithm>
+#include <string>
 #include <vector>
 
 namespace hpx { namespace util { namespace logging {
@@ -36,88 +36,6 @@ and you want to define the logger classes, in a source file
 (using HPX_DEFINE_LOG)
 
 */
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Format and write
-    //
-
-    /**
-        @brief The @c %format_and_write classes know how to call
-        the formatter and destination @c objects.
-
-        Usually you'll be happy with the
-        format_and_write::simple class - which simply calls @c
-        operator() on the formatters , and @c operator() on the destinations.
-
-        Note that usually the formatter and destination class just have an @c operator(),
-        which when called, formats the message
-        or writes it to a destination. In case your formatters/destinations are
-        more complex than that (for instance, more than
-        a member function needs to be called),
-        you'll have to implement your own %format_and_write class.
-    */
-    namespace format_and_write {
-
-        /**
-        @brief Formats the message, and writes it to destinations
-        - calls @c operator() on the formatters , and @c operator() on the destinations.
-        Ignores @c clear_format() commands.
-
-        @param msg_type The message to pass to the formatter. This is the
-        type that is passed to the formatter objects and to the destination objects.
-        Thus, it needs to be convertible to the argument to be sent to the
-        formatter objects and to the argument to be sent to the destination objects.
-        Usually, it's the argument you pass on to your destination classes.
-
-        If you derive from @c destination::base, this type can be
-        @c destination::base::raw_param (see below).
-
-        Example:
-
-        @code
-        typedef destination::base<const std::string &> dest_base;
-        // in this case : msg_type = std::string = dest_base::raw_param
-        struct write_to_cout : dest_base {
-            void operator()(param msg) const {
-                std::cout << msg ;
-            }
-        };
-
-
-        typedef destination::base<const std::string &> dest_base;
-        // in this case : msg_type = cache_string = dest_base::raw_param
-        struct write_to_file : dest_base, ... {
-            void operator()(param msg) const {
-                context() << msg ;
-            }
-        };
-
-        @endcode
-    */
-        struct simple
-        {
-            simple(msg_type& msg)
-              : m_msg(msg)
-            {
-            }
-
-            template <class formatter_ptr>
-            void format(const formatter_ptr& fmt)
-            {
-                (*fmt)(m_msg);
-            }
-            template <class destination_ptr>
-            void write(const destination_ptr& dest)
-            {
-                (*dest)(m_msg);
-            }
-            void clear_format() {}
-
-        protected:
-            msg_type& m_msg;
-        };
-
-    }    // namespace format_and_write
 
     ///////////////////////////////////////////////////////////////////////////
     // Message routing
@@ -244,22 +162,19 @@ See manipulator.
                     del, m_to_write.destinations.end());
             }
 
-            template <class format_and_write>
-            void write(msg_type& msg) const
+            void write(message& msg) const
             {
-                format_and_write m(msg);
-
                 for (typename f_array::const_iterator
                          b_f = m_to_write.formats.begin(),
                          e_f = m_to_write.formats.end();
                      b_f != e_f; ++b_f)
-                    m.format(*b_f);
+                    (**b_f)(msg);
 
                 for (typename d_array::const_iterator
                          b_d = m_to_write.destinations.begin(),
                          e_d = m_to_write.destinations.end();
                      b_d != e_d; ++b_d)
-                    m.write(*b_d);
+                    (**b_d)(msg);
             }
 
         private:

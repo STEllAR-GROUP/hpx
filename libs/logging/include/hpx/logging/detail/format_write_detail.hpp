@@ -18,16 +18,10 @@
 #ifndef JT28092007_format_write_detail_HPP_DEFINED
 #define JT28092007_format_write_detail_HPP_DEFINED
 
-#include <hpx/logging/detail/fwd.hpp>
-
 #include <memory>
 #include <type_traits>
 
 namespace hpx { namespace util { namespace logging {
-
-    namespace format_and_write {
-        struct simple;
-    }
 
     /**
 @brief Classes that write the message, once it's been @ref gather "gathered".
@@ -95,13 +89,6 @@ Once the formatters and destinations are added, and you know the route, you have
 extra object - the format_and_write - which
 contains the logic for calling the formatters and destinations.
 The format_and_write class knows how to call the formatters and destinations @em objects.
-Usually you'll be happy with the
-format_and_write::simple class - which simply calls @c operator() on the formatters,
-and @c operator() on the destinations.
-Otherwise, take a look at format_and_write namespace.
-
-An object of this type (apply_format_and_write) is created for each new logged message.
-
 
 \n\n
 @note This class is not thread-safe. If you want thread-safety,
@@ -115,9 +102,6 @@ See manipulator.
 
 @param destination_base The base class for all destination classes from your application.
 See manipulator.
-
-@param apply_format_and_write [optional] The class that knows how to call
-the formatters and destinations. See @ref apply_format_and_write_object
 
 @param router_type [optional] The class that knows when to call the formatters,
 and when to call the destinations. See @ref object_router.
@@ -147,9 +131,6 @@ if we were to keep smart pointers within the router itself.
 
             typedef typename formatter_base::ptr_type formatter_ptr;
             typedef typename destination_base::ptr_type destination_ptr;
-
-            typedef ::hpx::util::logging::format_and_write::simple
-                apply_format_and_write_type;
 
             format_write()
               : m_router(m_formatters, m_destinations)
@@ -313,9 +294,9 @@ if we were to keep smart pointers within the router itself.
             /**
         does the actual write
     */
-            void operator()(msg_type& msg) const
+            void operator()(message& msg) const
             {
-                router().template write<apply_format_and_write_type>(msg);
+                router().write(msg);
             }
 
         private:

@@ -17,7 +17,7 @@
 #ifndef HPX_LOGGING_LEVEL_HPP
 #define HPX_LOGGING_LEVEL_HPP
 
-#include <hpx/logging/detail/fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
@@ -57,7 +57,7 @@ namespace hpx { namespace util { namespace logging {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT void format_value(
+    void HPX_EXPORT format_value(
         std::ostream& os, boost::string_ref spec, level value);
 
 }}}    // namespace hpx::util::logging

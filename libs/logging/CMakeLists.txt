@@ -12,10 +12,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(logging_headers
   hpx/logging.hpp
   hpx/logging/detail/time_format_holder.hpp
-  hpx/logging/detail/template.hpp
-  hpx/logging/detail/error.hpp
   hpx/logging/detail/macros.hpp
-  hpx/logging/detail/fwd.hpp
   hpx/logging/detail/manipulator.hpp
   hpx/logging/detail/logger.hpp
   hpx/logging/detail/format_write_detail.hpp
@@ -24,17 +21,15 @@ set(logging_headers
   hpx/logging/format/array.hpp
   hpx/logging/format/formatter/named_spacer.hpp
   hpx/logging/format/formatter/high_precision_time.hpp
-  hpx/logging/format/formatter/spacer.hpp
   hpx/logging/format/formatter/defaults.hpp
   hpx/logging/format/formatter/thread_id.hpp
   hpx/logging/format/named_write.hpp
   hpx/logging/format/destination/named.hpp
   hpx/logging/format/destination/defaults.hpp
   hpx/logging/format/destination/file.hpp
-  hpx/logging/format/optimize.hpp
-  hpx/logging/format/named_write_fwd.hpp
   hpx/logging/level.hpp
   hpx/logging/logging.hpp
+  hpx/logging/message.hpp
   hpx/logging/writer/format_write.hpp
   hpx/logging/writer/named_write.hpp
 )
@@ -47,20 +42,15 @@ set(logging_compat_headers
   hpx/util/logging/writer/format_write.hpp
   hpx/util/logging/writer/named_write.hpp
   hpx/util/logging/detail/time_format_holder.hpp
-  hpx/util/logging/detail/template.hpp
-  hpx/util/logging/detail/error.hpp
   hpx/util/logging/detail/macros.hpp
   hpx/util/logging/detail/level.hpp
-  hpx/util/logging/detail/fwd.hpp
   hpx/util/logging/detail/manipulator.hpp
   hpx/util/logging/detail/logger.hpp
   hpx/util/logging/detail/format_write_detail.hpp
   hpx/util/logging/detail/cache_before_init.hpp
-  hpx/util/logging/format_fwd.hpp
   hpx/util/logging/logging.hpp
   hpx/util/logging/format/formatter/named_spacer.hpp
   hpx/util/logging/format/formatter/high_precision_time.hpp
-  hpx/util/logging/format/formatter/spacer.hpp
   hpx/util/logging/format/formatter/defaults.hpp
   hpx/util/logging/format/formatter/thread_id.hpp
   hpx/util/logging/format/array.hpp
@@ -70,13 +60,13 @@ set(logging_compat_headers
   hpx/util/logging/format/destination/file.hpp
   hpx/util/logging/format/op_equal.hpp
   hpx/util/logging/format/optimize.hpp
-  hpx/util/logging/format/named_write_fwd.hpp
 )
 
 # Default location is $HPX_ROOT/libs/logging/src
 set(logging_sources
   level.cpp
   logging.cpp
+  message.cpp
 )
 
 include(HPX_AddModule)

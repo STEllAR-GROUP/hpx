@@ -17,7 +17,6 @@
 #ifndef JT28092007_array_holder_HPP_DEFINED
 #define JT28092007_array_holder_HPP_DEFINED
 
-#include <hpx/logging/detail/fwd.hpp>
 #include <memory>
 #include <vector>
 

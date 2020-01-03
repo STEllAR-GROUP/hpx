@@ -17,8 +17,6 @@
 #ifndef JT28092007_high_precision_time_HPP_DEFINED
 #define JT28092007_high_precision_time_HPP_DEFINED
 
-#include <hpx/logging/detail/fwd.hpp>
-
 #include <hpx/logging/detail/manipulator.hpp>    // is_generic
 #include <hpx/logging/detail/time_format_holder.hpp>
 
@@ -67,8 +65,6 @@ high_precision_time("$mm:$ss:$micro");
 
 @param convert [optional] In case there needs to be a conversion between
 std::(w)string and the string that holds your logged message. See convert_format.
-For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_str
-"a cached_string class" (see @ref hpx::util::logging::optimize "optimize namespace").
 */
     struct high_precision_time
       : is_generic
@@ -86,7 +82,7 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
         {
         }
 
-        void write_high_precision_time(msg_type& msg,
+        void write_high_precision_time(message& msg,
             std::chrono::time_point<std::chrono::system_clock> val) const
         {
             std::time_t tt = std::chrono::system_clock::to_time_t(val);
@@ -127,7 +123,7 @@ For instance, you might use @ref hpx::util::logging::optimize::cache_string_one_
             msg.prepend_string(time_str);
         }
 
-        void operator()(msg_type& msg) const
+        void operator()(message& msg) const
         {
             write_high_precision_time(msg, std::chrono::system_clock::now());
         }

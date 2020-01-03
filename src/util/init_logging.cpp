@@ -55,7 +55,7 @@ namespace hpx { namespace util {
     {
         shepherd_thread_id() {}
 
-        void operator()(param str) const
+        void operator()(logging::message& str) const
         {
             error_code ec(lightweight);
             std::size_t thread_num = hpx::get_worker_thread_num(ec);
@@ -79,7 +79,7 @@ namespace hpx { namespace util {
     {
         locality_prefix() {}
 
-        void operator()(param str) const
+        void operator()(logging::message& str) const
         {
             std::uint32_t locality_id = hpx::get_locality_id();
 
@@ -100,7 +100,7 @@ namespace hpx { namespace util {
     // custom formatter: HPX thread id
     struct thread_id : hpx::util::logging::formatter::class_<thread_id>
     {
-        void operator()(param str) const
+        void operator()(logging::message& str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (nullptr != self)
@@ -126,7 +126,7 @@ namespace hpx { namespace util {
     // custom formatter: HPX thread phase
     struct thread_phase : hpx::util::logging::formatter::class_<thread_phase>
     {
-        void operator()(param str) const
+        void operator()(logging::message& str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (nullptr != self)
@@ -151,7 +151,7 @@ namespace hpx { namespace util {
     struct parent_thread_locality
       : hpx::util::logging::formatter::class_<parent_thread_locality>
     {
-        void operator()(param str) const
+        void operator()(logging::message& str) const
         {
             std::uint32_t parent_locality_id =
                 threads::get_parent_locality_id();
@@ -174,7 +174,7 @@ namespace hpx { namespace util {
     struct parent_thread_id
       : hpx::util::logging::formatter::class_<parent_thread_id>
     {
-        void operator()(param str) const
+        void operator()(logging::message& str) const
         {
             threads::thread_id_type parent_id = threads::get_parent_id();
             if (nullptr != parent_id && threads::invalid_thread_id != parent_id)
@@ -198,7 +198,7 @@ namespace hpx { namespace util {
     struct parent_thread_phase
       : hpx::util::logging::formatter::class_<parent_thread_phase>
     {
-        void operator()(param str) const
+        void operator()(logging::message& str) const
         {
             std::size_t parent_phase = threads::get_parent_phase();
             if (0 != parent_phase)
@@ -220,7 +220,7 @@ namespace hpx { namespace util {
     struct thread_component_id
       : hpx::util::logging::formatter::class_<thread_component_id>
     {
-        void operator()(param str) const
+        void operator()(logging::message& str) const
         {
             std::uint64_t component_id = threads::get_self_component_id();
             if (0 != component_id)
@@ -247,11 +247,10 @@ namespace hpx { namespace util {
         {
         }
 
-        template <typename MsgType>
-        void operator()(MsgType const& msg) const
+        void operator()(logging::message const& msg) const
         {
             components::console_logging(
-                dest_, static_cast<std::size_t>(level_), msg);
+                dest_, static_cast<std::size_t>(level_), msg.full_string());
         }
 
         bool operator==(console const& rhs) const
@@ -272,10 +271,10 @@ namespace hpx { namespace util {
         {
         }
 
-        template <typename MsgType>
-        void operator()(MsgType const& msg) const
+        void operator()(logging::message const& msg) const
         {
-            __android_log_write(ANDROID_LOG_DEBUG, tag.c_str(), msg.c_str());
+            __android_log_write(
+                ANDROID_LOG_DEBUG, tag.c_str(), msg.full_string().c_str());
         }
 
         bool operator==(android_log const& rhs) const

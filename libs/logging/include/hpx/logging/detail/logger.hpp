@@ -20,7 +20,6 @@
 #define JT28092007_logger_HPP_DEFINED
 
 #include <hpx/logging/detail/cache_before_init.hpp>
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/level.hpp>
 
@@ -176,7 +175,7 @@ namespace hpx { namespace util { namespace logging {
         }
 
         // called after all data has been gathered
-        void do_write(msg_type msg) const
+        void do_write(message msg) const
         {
             if (m_cache.is_cache_turned_off())
                 m_writer(msg);

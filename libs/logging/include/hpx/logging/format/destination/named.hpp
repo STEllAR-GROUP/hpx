@@ -22,7 +22,6 @@
 #pragma warning(disable : 4355)
 #endif
 
-#include <hpx/logging/detail/fwd.hpp>
 #include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/format/array.hpp>    // array
 
@@ -89,7 +88,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
                 compute_write_steps();
             }
 
-            void write(const msg_type& msg) const
+            void write(const message& msg) const
             {
                 for (typename write_info::step_array::const_iterator
                          b = m_info.write_steps.begin(),
@@ -199,7 +198,7 @@ In the above example, I know that the available destinations are @c out_file,
         {
             non_const_context_base::context().format_string(format_string);
         }
-        void operator()(const msg_type& msg) const
+        void operator()(const message& msg) const
         {    //-V659
             non_const_context_base::context().write(msg);
         }
