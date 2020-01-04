@@ -17,12 +17,8 @@
 #ifndef JT28092007_destination_file_HPP_DEFINED
 #define JT28092007_destination_file_HPP_DEFINED
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4355)
-#endif
-
-#include <hpx/logging/detail/manipulator.hpp>
+#include <hpx/config.hpp>
+#include <hpx/logging/manipulator.hpp>
 #include <hpx/logging/message.hpp>
 
 #include <boost/config.hpp>
@@ -70,43 +66,15 @@ namespace hpx { namespace util { namespace logging { namespace destination {
                 flags |= std::ios_base::trunc;
             return flags;
         }
-
-        struct file_info
-        {
-            file_info(std::string const& name_, file_settings const& settings_)
-              : name(name_)
-              ,
-              //               out( new std::ofstream
-              //                   ( name_.c_str(), open_flags(settings_) )),
-              settings(settings_)
-            {
-            }
-
-            void open()
-            {
-                out.reset(
-                    new std::ofstream(name.c_str(), open_flags(settings)));
-            }
-
-            void close()
-            {
-                out.reset();
-            }
-
-            std::string name;
-            std::shared_ptr<std::ofstream> out;
-            file_settings settings;
-        };
     }    // namespace detail
 
     /**
     @brief Writes the string to a file
 */
-    struct file
-      : is_generic
-      , non_const_context<detail::file_info>
+    struct file : manipulator
     {
-        typedef non_const_context<detail::file_info> non_const_context_base;
+        HPX_NON_COPYABLE(file);
+
         typedef boost::detail::spinlock mutex_type;
 
         /**
@@ -117,46 +85,49 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         and @ref dealing_with_flags
     */
         file(std::string const& file_name, file_settings set = file_settings())
-          : non_const_context_base(file_name, set)
+          : name(file_name)
+          , settings(set)
         {
         }
 
-        void operator()(const message& msg) const
+        void operator()(const message& msg) override
         {
             std::lock_guard<mutex_type> l(mtx_);
 
-            if (!non_const_context_base::context().out)
-                non_const_context_base::context()
-                    .open();    // make sure file is opened
-            *(non_const_context_base::context().out) << msg.full_string();
-            if (non_const_context_base::context().settings.flush_each_time)
-                non_const_context_base::context().out->flush();
-        }
-
-        bool operator==(const file& other) const
-        {
-            return non_const_context_base::context().name ==
-                other.context().name;
+            open();    // make sure file is opened
+            out << msg.full_string();
+            if (settings.flush_each_time)
+                out.flush();
         }
 
         /** configure through script
         right now, you can only specify the file name
     */
-        void configure(std::string const& str)
+        void configure(std::string const& str) override
         {
             // configure - the file name, for now
-            non_const_context_base::context().close();
-            non_const_context_base::context().name.assign(
-                str.begin(), str.end());
+            close();
+            name = str;
         }
 
-        static mutex_type mtx_;
+    private:
+        void open()
+        {
+            if (!out.is_open())
+                out.open(name.c_str(), detail::open_flags(settings));
+        }
+
+        void close()
+        {
+            out.close();
+        }
+
+        std::string name;
+        file_settings settings;
+        mutable mutex_type mtx_ = BOOST_DETAIL_SPINLOCK_INIT;
+        std::ofstream out;
     };
 
 }}}}    // namespace hpx::util::logging::destination
-
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
 
 #endif

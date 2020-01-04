@@ -19,12 +19,13 @@
 #ifndef JT28092007_logger_HPP_DEFINED
 #define JT28092007_logger_HPP_DEFINED
 
+#include <hpx/config.hpp>
 #include <hpx/logging/detail/cache_before_init.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/level.hpp>
 
 #include <sstream>
-#include <type_traits>
+#include <string>
 #include <utility>
 
 namespace hpx { namespace util { namespace logging {
@@ -95,7 +96,9 @@ namespace hpx { namespace util { namespace logging {
 
             ~gather_holder()
             {
-                m_this.do_write(m_out.str());
+                std::string msg = m_out.str();
+                if (!msg.empty())
+                    m_this.do_write(std::move(msg));
             }
 
             std::ostringstream& out()

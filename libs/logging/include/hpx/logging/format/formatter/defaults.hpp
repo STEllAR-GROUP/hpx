@@ -17,8 +17,9 @@
 #ifndef JT28092007_formatter_defaults_HPP_DEFINED
 #define JT28092007_formatter_defaults_HPP_DEFINED
 
+#include <hpx/config.hpp>
 #include <hpx/format.hpp>
-#include <hpx/logging/detail/manipulator.hpp>
+#include <hpx/logging/manipulator.hpp>
 
 #include <cstdint>
 #include <string>
@@ -41,27 +42,21 @@ This will output something similar to:
 [2] my 2nd message
 @endcode
 */
-    struct idx
-      : is_generic
-      , formatter::non_const_context<std::uint64_t>
+    struct idx : formatter::manipulator
     {
-        typedef formatter::non_const_context<std::uint64_t>
-            non_const_context_base;
-
         idx()
-          : non_const_context_base(0ull)
+          : value(0ull)
         {
         }
-        void operator()(message& str) const
+
+        void operator()(message& str) override
         {
-            std::string idx = hpx::util::format("{:016x}", ++context());
+            std::string idx = hpx::util::format("{:016x}", ++value);
             str.prepend_string(idx);
         }
 
-        bool operator==(const idx&) const
-        {
-            return true;
-        }
+    private:
+        std::uint64_t value;
     };
 
 }}}}    // namespace hpx::util::logging::formatter

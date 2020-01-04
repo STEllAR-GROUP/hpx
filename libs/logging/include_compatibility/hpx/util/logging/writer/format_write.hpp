@@ -6,15 +6,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging/config/defines.hpp>
-#include <hpx/logging/writer/format_write.hpp>
+#include <hpx/logging/format.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/logging/writer/format_write.hpp is deprecated, \
-    please include hpx/logging/writer/format_write.hpp instead")
+    please include hpx/logging/format.hpp instead")
 #else
 #warning "The header hpx/util/logging/writer/format_write.hpp is deprecated, \
-    please include hpx/logging/writer/format_write.hpp instead"
+    please include hpx/logging/format.hpp instead"
 #endif
 #endif

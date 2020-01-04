@@ -19,7 +19,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/format.hpp>
-#include <hpx/logging/detail/manipulator.hpp>    // is_generic
+#include <hpx/logging/manipulator.hpp>
 
 #include <string>
 
@@ -31,9 +31,9 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 @param convert [optional] In case there needs to be a conversion between
 std::(w)string and the string that holds your logged message. See convert_format.
 */
-    struct thread_id : is_generic
+    struct thread_id : manipulator
     {
-        void operator()(message& msg) const
+        void operator()(message& msg) override
         {
             std::string out = hpx::util::format("{}",
 #if defined(HPX_WINDOWS)
@@ -44,11 +44,6 @@ std::(w)string and the string that holds your logged message. See convert_format
             );
 
             msg.prepend_string(out);
-        }
-
-        bool operator==(const thread_id&) const
-        {
-            return true;
         }
     };
 

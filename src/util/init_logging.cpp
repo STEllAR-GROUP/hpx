@@ -50,12 +50,11 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: shepherd
-    struct shepherd_thread_id
-      : hpx::util::logging::formatter::class_<shepherd_thread_id>
+    struct shepherd_thread_id : logging::formatter::manipulator
     {
         shepherd_thread_id() {}
 
-        void operator()(logging::message& str) const
+        void operator()(logging::message& msg) override
         {
             error_code ec(lightweight);
             std::size_t thread_num = hpx::get_worker_thread_num(ec);
@@ -63,44 +62,43 @@ namespace hpx { namespace util {
             if (std::size_t(-1) != thread_num)
             {
                 std::string out = format("{:016x}", thread_num);
-                str.prepend_string(out);
+                msg.prepend_string(out);
             }
             else
             {
-                str.prepend_string(std::string(16, '-'));
+                msg.prepend_string(std::string(16, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix
-    struct locality_prefix
-      : hpx::util::logging::formatter::class_<locality_prefix>
+    struct locality_prefix : logging::formatter::manipulator
     {
         locality_prefix() {}
 
-        void operator()(logging::message& str) const
+        void operator()(logging::message& msg) override
         {
             std::uint32_t locality_id = hpx::get_locality_id();
 
             if (naming::invalid_locality_id != locality_id)
             {
                 std::string out = format("{:08x}", locality_id);
-                str.prepend_string(out);
+                msg.prepend_string(out);
             }
             else
             {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(8, '-'));
+                msg.prepend_string(std::string(8, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread id
-    struct thread_id : hpx::util::logging::formatter::class_<thread_id>
+    struct thread_id : logging::formatter::manipulator
     {
-        void operator()(logging::message& str) const
+        void operator()(logging::message& msg) override
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (nullptr != self)
@@ -112,21 +110,21 @@ namespace hpx { namespace util {
                     std::ptrdiff_t value =
                         reinterpret_cast<std::ptrdiff_t>(id.get());
                     std::string out = format("{:016x}", value);
-                    str.prepend_string(out);
+                    msg.prepend_string(out);
                     return;
                 }
             }
 
             // called from outside a HPX thread or invalid thread id
-            str.prepend_string(std::string(16, '-'));
+            msg.prepend_string(std::string(16, '-'));
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread phase
-    struct thread_phase : hpx::util::logging::formatter::class_<thread_phase>
+    struct thread_phase : logging::formatter::manipulator
     {
-        void operator()(logging::message& str) const
+        void operator()(logging::message& msg) override
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (nullptr != self)
@@ -135,23 +133,23 @@ namespace hpx { namespace util {
                 std::size_t phase = self->get_thread_phase();
                 if (0 != phase)
                 {
-                    std::string out = format("{:04x}", self->get_thread_phase());
-                    str.prepend_string(out);
+                    std::string out =
+                        format("{:04x}", self->get_thread_phase());
+                    msg.prepend_string(out);
                     return;
                 }
             }
 
             // called from outside a HPX thread or no phase given
-            str.prepend_string(std::string(4, '-'));
+            msg.prepend_string(std::string(4, '-'));
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix of parent thread
-    struct parent_thread_locality
-      : hpx::util::logging::formatter::class_<parent_thread_locality>
+    struct parent_thread_locality : logging::formatter::manipulator
     {
-        void operator()(logging::message& str) const
+        void operator()(logging::message& msg) override
         {
             std::uint32_t parent_locality_id =
                 threads::get_parent_locality_id();
@@ -159,22 +157,21 @@ namespace hpx { namespace util {
             {
                 // called from inside a HPX thread
                 std::string out = format("{:08x}", parent_locality_id);
-                str.prepend_string(out);
+                msg.prepend_string(out);
             }
             else
             {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(8, '-'));
+                msg.prepend_string(std::string(8, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread id
-    struct parent_thread_id
-      : hpx::util::logging::formatter::class_<parent_thread_id>
+    struct parent_thread_id : logging::formatter::manipulator
     {
-        void operator()(logging::message& str) const
+        void operator()(logging::message& msg) override
         {
             threads::thread_id_type parent_id = threads::get_parent_id();
             if (nullptr != parent_id && threads::invalid_thread_id != parent_id)
@@ -183,63 +180,61 @@ namespace hpx { namespace util {
                 std::ptrdiff_t value =
                     reinterpret_cast<std::ptrdiff_t>(parent_id.get());
                 std::string out = format("{:016x}", value);
-                str.prepend_string(out);
+                msg.prepend_string(out);
             }
             else
             {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(16, '-'));
+                msg.prepend_string(std::string(16, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread phase
-    struct parent_thread_phase
-      : hpx::util::logging::formatter::class_<parent_thread_phase>
+    struct parent_thread_phase : logging::formatter::manipulator
     {
-        void operator()(logging::message& str) const
+        void operator()(logging::message& msg) override
         {
             std::size_t parent_phase = threads::get_parent_phase();
             if (0 != parent_phase)
             {
                 // called from inside a HPX thread
                 std::string out = format("{:04x}", parent_phase);
-                str.prepend_string(out);
+                msg.prepend_string(out);
             }
             else
             {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(4, '-'));
+                msg.prepend_string(std::string(4, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX component id of current thread
-    struct thread_component_id
-      : hpx::util::logging::formatter::class_<thread_component_id>
+    struct thread_component_id : logging::formatter::manipulator
     {
-        void operator()(logging::message& str) const
+        void operator()(logging::message& msg) override
         {
             std::uint64_t component_id = threads::get_self_component_id();
             if (0 != component_id)
             {
                 // called from inside a HPX thread
                 std::string out = format("{:016x}", component_id);
-                str.prepend_string(out);
+                msg.prepend_string(out);
             }
             else
             {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(16, '-'));
+                msg.prepend_string(std::string(16, '-'));
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom log destination: send generated strings to console
-    struct console : hpx::util::logging::destination::is_generic
+    struct console : logging::destination::manipulator
     {
         console(logging::level level, logging_destination dest)
           : level_(level)
@@ -247,7 +242,7 @@ namespace hpx { namespace util {
         {
         }
 
-        void operator()(logging::message const& msg) const
+        void operator()(logging::message const& msg) override
         {
             components::console_logging(
                 dest_, static_cast<std::size_t>(level_), msg.full_string());
@@ -264,14 +259,14 @@ namespace hpx { namespace util {
 
 #if defined(ANDROID) || defined(__ANDROID__)
     // default log destination for Android
-    struct android_log : hpx::util::logging::destination::is_generic
+    struct android_log : logging::destination::manipulator
     {
         android_log(char const* tag_)
           : tag(tag_)
         {
         }
 
-        void operator()(logging::message const& msg) const
+        void operator()(logging::message const& msg) override
         {
             __android_log_write(
                 ANDROID_LOG_DEBUG, tag.c_str(), msg.full_string().c_str());
@@ -328,17 +323,16 @@ namespace hpx { namespace util {
             return result;
         }
 
-        template <typename Writer>
-        static void define_formatters(Writer& writer)
+        static void define_formatters(logger_writer_type& writer)
         {
-            writer.replace_formatter("osthread", shepherd_thread_id());
-            writer.replace_formatter("locality", locality_prefix());
-            writer.replace_formatter("hpxthread", thread_id());
-            writer.replace_formatter("hpxphase", thread_phase());
-            writer.replace_formatter("hpxparent", parent_thread_id());
-            writer.replace_formatter("hpxparentphase", parent_thread_phase());
-            writer.replace_formatter("parentloc", parent_thread_locality());
-            writer.replace_formatter("hpxcomponent", thread_component_id());
+            writer.set_formatter("osthread", shepherd_thread_id());
+            writer.set_formatter("locality", locality_prefix());
+            writer.set_formatter("hpxthread", thread_id());
+            writer.set_formatter("hpxphase", thread_phase());
+            writer.set_formatter("hpxparent", parent_thread_id());
+            writer.set_formatter("hpxparentphase", parent_thread_phase());
+            writer.set_formatter("parentloc", parent_thread_locality());
+            writer.set_formatter("hpxcomponent", thread_component_id());
         }
     }    // namespace detail
 
@@ -347,15 +341,18 @@ namespace hpx { namespace util {
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.agas")) {
+        if (ini.has_section("hpx.logging.agas"))
+        {
             util::section const* logini = ini.get_section("hpx.logging.agas");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
@@ -365,21 +362,19 @@ namespace hpx { namespace util {
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
-           logger_writer_type& writer = agas_logger()->writer();
+            logger_writer_type& writer = agas_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            agas_logger()->writer().add_destination("android_log",
+            agas_logger()->writer().set_destination("android_log",
                 android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
-            writer.add_destination("console", console(lvl, destination_agas)); //-V106
+            writer.set_destination("console", console(lvl, destination_agas)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -416,16 +411,14 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            parcel_logger()->writer().add_destination("android_log",
+            parcel_logger()->writer().set_destination("android_log",
                 android_log("hpx.parcel"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
-            writer.add_destination("console",
+            writer.set_destination("console",
                 console(lvl, destination_parcel)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
@@ -464,16 +457,14 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
 
-            writer.add_destination("android_log",
+            writer.set_destination("android_log",
                 android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
-            writer.add_destination("console", console(lvl, destination_timing)); //-V106
+            writer.set_destination("console", console(lvl, destination_timing)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -509,18 +500,16 @@ namespace hpx { namespace util {
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "android_log" : "console";
 
-        writer.add_destination("android_log", android_log("hpx"));
-        error_writer.add_destination("android_log", android_log("hpx"));
+        writer.set_destination("android_log", android_log("hpx"));
+        error_writer.set_destination("android_log", android_log("hpx"));
 #else
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
 #endif
-        if (logformat.empty())
-            logformat = "|\\n";
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
-            writer.add_destination("console", console(lvl, destination_hpx)); //-V106
+            writer.set_destination("console", console(lvl, destination_hpx)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -528,7 +517,7 @@ namespace hpx { namespace util {
             hpx_logger()->set_enabled(lvl);
 
             // errors are logged to the given destination and to cerr
-            error_writer.add_destination("console",
+            error_writer.set_destination("console",
                 console(lvl, destination_hpx)); //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
             if (logdest != "cerr")
@@ -542,7 +531,7 @@ namespace hpx { namespace util {
         else {
             // errors are always logged to cerr
             if (!isconsole) {
-                error_writer.add_destination("console",
+                error_writer.set_destination("console",
                     console(lvl, destination_hpx)); //-V106
                 error_writer.write(logformat, "console");
             }
@@ -588,15 +577,13 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            writer.add_destination("android_log", android_log("hpx.application"));
+            writer.set_destination("android_log", android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
-            writer.add_destination("console", console(lvl, destination_app)); //-V106
+            writer.set_destination("console", console(lvl, destination_app)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -633,15 +620,13 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            writer.add_destination("android_log", android_log("hpx.debuglog"));
+            writer.set_destination("android_log", android_log("hpx.debuglog"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
-            writer.add_destination("console",
+            writer.set_destination("console",
                 console(lvl, destination_debuglog)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
@@ -679,13 +664,11 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.agas"));
+            writer.set_destination("android_log", android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -723,13 +706,11 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.parcel"));
+            writer.set_destination("android_log", android_log("hpx.parcel"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -766,13 +747,11 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.timing"));
+            writer.set_destination("android_log", android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -809,13 +788,11 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx"));
+            writer.set_destination("android_log", android_log("hpx"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -853,13 +830,11 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.application"));
+            writer.set_destination("android_log", android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -897,13 +872,11 @@ namespace hpx { namespace util {
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.debuglog"));
+            writer.set_destination("android_log", android_log("hpx.debuglog"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
-            if (logformat.empty())
-                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -940,7 +913,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%]|\\n}",
+                    HPX_TIMEFORMAT ") [%idx%]}",
 
                 // general console logging
                 "[hpx.logging.console]",
@@ -951,7 +924,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_LOGDESTINATION:"
                     "file(hpx.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_LOGFORMAT:|}",
+                "format = ${HPX_CONSOLE_LOGFORMAT:}",
 
                 // logging related to timing
                 "[hpx.logging.timing]",
@@ -960,7 +933,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_TIMING_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
+                    HPX_TIMEFORMAT ") [%idx%] [TIM]}",
 
                 // console logging related to timing
                 "[hpx.logging.console.timing]",
@@ -971,7 +944,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:"
                     "file(hpx.timing.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
+                "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:}",
 
                 // logging related to AGAS
                 "[hpx.logging.agas]",
@@ -982,7 +955,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_AGAS_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
+                    HPX_TIMEFORMAT ") [%idx%][AGAS]}",
 
                 // console logging related to AGAS
                 "[hpx.logging.console.agas]",
@@ -993,7 +966,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:"
                     "file(hpx.agas.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
+                "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:}",
 
                 // logging related to the parcel transport
                 "[hpx.logging.parcel]",
@@ -1003,7 +976,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_PARCEL_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%][  PT] |\\n}",
+                    HPX_TIMEFORMAT ") [%idx%][  PT]}",
 
                 // console logging related to the parcel transport
                 "[hpx.logging.console.parcel]",
@@ -1014,7 +987,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:"
                     "file(hpx.parcel.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
+                "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:}",
 
                 // logging related to applications
                 "[hpx.logging.application]",
@@ -1023,7 +996,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_APP_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
+                    HPX_TIMEFORMAT ") [%idx%] [APP]}",
 
                 // console logging related to applications
                 "[hpx.logging.console.application]",
@@ -1034,7 +1007,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:"
                     "file(hpx.application.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
+                "format = ${HPX_CONSOLE_APP_LOGFORMAT:}",
 
                 // logging of debug channel
                 "[hpx.logging.debuglog]",
@@ -1043,7 +1016,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_DEB_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [DEB] |\\n}",
+                    HPX_TIMEFORMAT ") [%idx%] [DEB]}",
 
                 "[hpx.logging.console.debuglog]",
                 "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",

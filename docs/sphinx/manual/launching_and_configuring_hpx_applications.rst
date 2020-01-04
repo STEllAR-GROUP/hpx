@@ -1209,7 +1209,7 @@ general logging category are shown here (the syntax is described in the section
     [hpx.logging]
     level = ${HPX_LOGLEVEL:0}
     destination = ${HPX_LOGDESTINATION:console}
-    format = ${HPX_LOGFORMAT:(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) P%parentloc%/%hpxparent%.%hpxparentphase% %time%($hh:$mm.$ss.$mili) [%idx%]|\\n}
+    format = ${HPX_LOGFORMAT:(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) P%parentloc%/%hpxparent%.%hpxparentphase% %time%($hh:$mm.$ss.$mili) [%idx%]}
 
 The logging level is taken from the environment variable ``HPX_LOGLEVEL`` and
 defaults to zero, e.g. no logging. The default logging destination is read from
@@ -1243,9 +1243,7 @@ it defaults to a complex format description. This format consists of several
 placeholder fields (for instance ``%locality%`` which will be replaced by
 concrete values when the logging output is generated. All other information is
 transferred verbatim to the output. The table below describes the available
-field placeholders. The separator character ``|`` separates the logging message
-prefix formatted as shown and the actual log message which will replace the
-separator.
+field placeholders.
 
 .. list-table:: Available field placeholders
 
@@ -1304,7 +1302,7 @@ here:
    [hpx.logging.console]
    level = ${HPX_LOGLEVEL:$[hpx.logging.level]}
    destination = ${HPX_CONSOLE_LOGDESTINATION:file(hpx.$[system.pid].log)}
-   format = ${HPX_CONSOLE_LOGFORMAT:|}
+   format = ${HPX_CONSOLE_LOGFORMAT:}
 
 These settings define how the logging is customized once the logging output is
 received by the console instance of an application. The logging level is read

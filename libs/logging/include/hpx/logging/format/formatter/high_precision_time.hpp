@@ -17,11 +17,13 @@
 #ifndef JT28092007_high_precision_time_HPP_DEFINED
 #define JT28092007_high_precision_time_HPP_DEFINED
 
-#include <hpx/logging/detail/manipulator.hpp>    // is_generic
-#include <hpx/logging/detail/time_format_holder.hpp>
+#include <hpx/config.hpp>
+#include <hpx/format.hpp>
+#include <hpx/logging/manipulator.hpp>
 
 #include <chrono>
 #include <cstdint>
+#include <cstring>
 #include <ctime>
 #include <string>
 
@@ -66,20 +68,29 @@ high_precision_time("$mm:$ss:$micro");
 @param convert [optional] In case there needs to be a conversion between
 std::(w)string and the string that holds your logged message. See convert_format.
 */
-    struct high_precision_time
-      : is_generic
-      , non_const_context<hpx::util::logging::detail::time_format_holder>
+    struct high_precision_time : manipulator
     {
-        typedef non_const_context<
-            hpx::util::logging::detail::time_format_holder>
-            non_const_context_base;
-
         /**
         constructs a high_precision_time object
     */
-        high_precision_time(std::string const& format)
-          : non_const_context_base(format)
+        explicit high_precision_time(std::string const& format)
         {
+            set_format(format);
+        }
+
+        void set_format(const std::string& format)
+        {
+            m_format = format;
+            replace_format("$dd", "{1:02d}");
+            replace_format("$MM", "{2:02d}");
+            replace_format("$yyyy", "{3:04d}");
+            replace_format("$yy", "{4:02d}");
+            replace_format("$hh", "{5:02d}");
+            replace_format("$mm", "{6:02d}");
+            replace_format("$ss", "{7:02d}");
+            replace_format("$mili", "{8:03d}");
+            replace_format("$micro", "{9:06d}");
+            replace_format("$nano", "{10:09d}");
         }
 
         void write_high_precision_time(message& msg,
@@ -115,33 +126,39 @@ std::(w)string and the string that holds your logged message. See convert_format
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     val.time_since_epoch());
 
-            std::string time_str = non_const_context_base::context().write_time(
-                local_tm.tm_mday, local_tm.tm_mon + 1, local_tm.tm_year + 1900,
-                local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec,
-                millisecs.count() % 1000, microsecs.count() % 1000,
-                nanosecs.count() % 1000);
+            std::string time_str = hpx::util::format(m_format, local_tm.tm_mday,
+                local_tm.tm_mon + 1, local_tm.tm_year + 1900,
+                local_tm.tm_year % 100, local_tm.tm_hour, local_tm.tm_min,
+                local_tm.tm_sec, millisecs.count() % 1000,
+                microsecs.count() % 1000, nanosecs.count() % 1000);
             msg.prepend_string(time_str);
         }
 
-        void operator()(message& msg) const
+        void operator()(message& msg) override
         {
             write_high_precision_time(msg, std::chrono::system_clock::now());
-        }
-
-        bool operator==(const high_precision_time& other) const
-        {
-            return non_const_context_base::context() ==
-                other.non_const_context_base::context();
         }
 
         /** @brief configure through script
 
         the string = the time format
     */
-        void configure(std::string const& str)
+        void configure(std::string const& str) override
         {
-            non_const_context_base::context().set_format(str);
+            set_format(str);
         }
+
+    private:
+        bool replace_format(char const* from, char const* to)
+        {
+            size_t start_pos = m_format.find(from);
+            if (start_pos == std::string::npos)
+                return false;
+            m_format.replace(start_pos, std::strlen(from), to);
+            return true;
+        }
+
+        std::string m_format;
     };
 
 }}}}    // namespace hpx::util::logging::formatter

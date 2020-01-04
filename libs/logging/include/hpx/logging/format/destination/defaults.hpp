@@ -18,8 +18,9 @@
 #define JT28092007_destination_defaults_HPP_DEFINED
 
 #include <hpx/config.hpp>
-#include <hpx/logging/detail/manipulator.hpp>
 #include <hpx/logging/format/destination/file.hpp>
+#include <hpx/logging/manipulator.hpp>
+
 #include <iostream>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
@@ -27,32 +28,22 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     /**
     @brief Writes the string to console
 */
-    struct cout : is_generic
+    struct cout : manipulator
     {
-        void operator()(const message& msg) const
+        void operator()(const message& msg) override
         {
             std::cout << msg.full_string();
-        }
-
-        bool operator==(const cout&) const
-        {
-            return true;
         }
     };
 
     /**
     @brief Writes the string to cerr
 */
-    struct cerr : is_generic
+    struct cerr : manipulator
     {
-        void operator()(const message& msg) const
+        void operator()(const message& msg) override
         {
             std::cerr << msg.full_string();
-        }
-
-        bool operator==(const cerr&) const
-        {
-            return true;
         }
     };
 
@@ -63,32 +54,15 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     The stream must outlive this object! Or, clear() the stream,
     before the stream is deleted.
 */
-    struct stream
-      : is_generic
-      , non_const_context<std::ostream*>
+    struct stream : manipulator
     {
+        HPX_NON_COPYABLE(stream);
+
         typedef std::ostream stream_type;
-        typedef non_const_context<stream_type*> non_const_context_base;
 
-        stream(stream_type* s)
-          : non_const_context_base(s)
+        explicit stream(stream_type* p)
         {
-        }
-        stream(stream_type& s)
-          : non_const_context_base(&s)
-        {
-        }
-
-        void operator()(const message& msg) const
-        {
-            if (non_const_context_base::context())
-                *non_const_context_base::context() << msg.full_string();
-        }
-
-        bool operator==(const stream& other) const
-        {
-            return non_const_context_base::context() !=
-                other.non_const_context_base::context();
+            set_stream(p);
         }
 
         /**
@@ -96,7 +70,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     */
         void set_stream(stream_type* p)
         {
-            non_const_context_base::context() = p;
+            ptr = p;
         }
 
         /**
@@ -106,6 +80,15 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         {
             set_stream(nullptr);
         }
+
+        void operator()(const message& msg) override
+        {
+            if (ptr)
+                *ptr << msg.full_string();
+        }
+
+    private:
+        std::ostream* ptr;
     };
 
     /**
@@ -113,9 +96,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
     For non-Windows systems, this is the console.
 */
-    struct dbg_window : is_generic
+    struct dbg_window : manipulator
     {
-        void operator()(const message& msg) const
+        void operator()(const message& msg) override
         {
 #ifdef HPX_WINDOWS
             ::OutputDebugStringA(msg.full_string().c_str());
@@ -123,11 +106,6 @@ namespace hpx { namespace util { namespace logging { namespace destination {
             // non windows - dump to console
             std::cout << msg.full_string();
 #endif
-        }
-
-        bool operator==(const dbg_window&) const
-        {
-            return true;
         }
     };
 

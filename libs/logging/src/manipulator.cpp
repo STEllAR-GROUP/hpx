@@ -1,4 +1,4 @@
-// format_write.hpp
+// manipulator.cpp
 
 // Boost Logging library
 //
@@ -14,10 +14,20 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-// this is fixed!
-#ifndef JT28092007_format_write_HPP_DEFINED
-#define JT28092007_format_write_HPP_DEFINED
+#include <hpx/logging/manipulator.hpp>
 
-#include <hpx/logging/format.hpp>
+namespace hpx { namespace util { namespace logging {
 
-#endif
+    namespace formatter {
+
+        manipulator::~manipulator() = default;
+
+    }    // namespace formatter
+
+    namespace destination {
+
+        manipulator::~manipulator() = default;
+
+    }    // namespace destination
+
+}}}    // namespace hpx::util::logging

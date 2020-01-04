@@ -23,8 +23,6 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
-
 namespace hpx { namespace util { namespace logging { namespace writer {
     struct named_write;
 }}}}    // namespace hpx::util::logging::writer
@@ -43,7 +41,7 @@ namespace hpx { namespace util { namespace logging { namespace detail {
     - before logs are initialized
     - cache can be turned off ONLY ONCE
 */
-    struct HPX_EXPORT cache_before_init
+    struct cache_before_init
     {
         HPX_NON_COPYABLE(cache_before_init);
 
@@ -61,7 +59,7 @@ namespace hpx { namespace util { namespace logging { namespace detail {
             return m_is_caching_off;    // cache has been turned off
         }
 
-        void turn_cache_off(writer::named_write const& writer_);
+        void HPX_EXPORT turn_cache_off(writer::named_write const& writer_);
 
         void add_msg(message&& msg)
         {
@@ -74,7 +72,5 @@ namespace hpx { namespace util { namespace logging { namespace detail {
     };
 
 }}}}    // namespace hpx::util::logging::detail
-
-#include <hpx/config/warnings_suffix.hpp>
 
 #endif
