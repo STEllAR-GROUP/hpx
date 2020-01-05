@@ -120,9 +120,9 @@ You could have an output like this:
         {
             for (auto const& step : write_steps)
             {
+                msg << step.prefix;
                 if (step.fmt)
                     (*step.fmt)(msg);
-                msg.prepend_string(step.prefix);
             }
         }
 
@@ -394,11 +394,11 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 
         void operator()(message const& msg) const
         {
-            message formatted_msg("\n");
-            formatted_msg.prepend_string(msg.full_string());
-            m_format(formatted_msg);
+            message formatted_message;
+            m_format(formatted_message);
+            formatted_message << msg.full_string() << '\n';
 
-            m_destination(formatted_msg);
+            m_destination(formatted_message);
         }
 
         /** @brief Replaces a formatter from the named formatter.

@@ -80,12 +80,11 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     val.time_since_epoch());
 
-            std::string time_str = hpx::util::format(m_format, local_tm.tm_mday,
-                local_tm.tm_mon + 1, local_tm.tm_year + 1900,
-                local_tm.tm_year % 100, local_tm.tm_hour, local_tm.tm_min,
-                local_tm.tm_sec, millisecs.count() % 1000,
-                microsecs.count() % 1000, nanosecs.count() % 1000);
-            msg.prepend_string(time_str);
+            msg.format(m_format, local_tm.tm_mday, local_tm.tm_mon + 1,
+                local_tm.tm_year + 1900, local_tm.tm_year % 100,
+                local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec,
+                millisecs.count() % 1000, microsecs.count() % 1000,
+                nanosecs.count() % 1000);
         }
 
         /** @brief configure through script

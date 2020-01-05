@@ -17,7 +17,6 @@
 #include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/format.hpp>
 #include <hpx/logging/message.hpp>
 
 #include <memory>
@@ -37,15 +36,13 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
     {
         void operator()(message& msg) override
         {
-            std::string out = hpx::util::format("{}",
+            msg.format("{}",
 #if defined(HPX_WINDOWS)
                 ::GetCurrentThreadId()
 #else
                 pthread_self()
 #endif
             );
-
-            msg.prepend_string(out);
         }
     };
 

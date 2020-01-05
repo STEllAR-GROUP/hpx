@@ -18,10 +18,12 @@
 #define HPX_LOGGING_MESSAGE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/format.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
 #include <cstddef>
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -44,54 +46,38 @@ namespace hpx { namespace util { namespace logging {
     {
     public:
         /**
-        @param reserve - how many chars to have space to prepend by default
-         */
-        message(std::size_t reserve_)
-          : m_reserve(reserve_)
-          , m_full_msg_computed(false)
-        {
-        }
-
-        /**
         @param msg - the message that is originally cached
-        @param reserve - how many chars to have space to prepend by default
          */
-        message(std::string const& msg, std::size_t reserve_ = 10)
-          : m_reserve(reserve_)
+        message(std::string const& msg = "")
+          : m_str(msg)
           , m_full_msg_computed(false)
         {
-            set_string(msg);
         }
 
-        message(message&& other)
-          : m_reserve(other.m_reserve)
-          , m_str(std::move(other.m_str))
+        message(message&& other) noexcept
+          : m_str(std::move(other.m_str))
           , m_full_msg_computed(other.m_full_msg_computed)
           , m_full_msg(std::move(other.m_full_msg))
         {
-            other.m_reserve = 10;
             other.m_full_msg_computed = false;
         }
 
-        message()
-          : m_reserve(10)
-          , m_full_msg_computed(false)
+        template <typename T>
+        message& operator<<(T&& v)
         {
+            m_str << std::forward<T>(v);
+            m_full_msg_computed = false;
+            return *this;
         }
 
-        void HPX_EXPORT set_string(std::string const& str);
-
-        std::size_t reserve() const
+        template <typename... Args>
+        message& format(
+            boost::string_ref format_str, Args const&... args) noexcept
         {
-            return m_reserve;
+            util::format_to(m_str, format_str, args...);
+            m_full_msg_computed = false;
+            return *this;
         }
-
-        void reserve(std::size_t new_size)
-        {
-            resize_string(new_size);
-        }
-
-        void HPX_EXPORT prepend_string(boost::string_ref str);
 
         /**
             returns the full string
@@ -101,23 +87,18 @@ namespace hpx { namespace util { namespace logging {
             if (!m_full_msg_computed)
             {
                 m_full_msg_computed = true;
-                m_full_msg = m_str.substr(m_reserve, m_str.size() - m_reserve);
+                m_full_msg = m_str.str();
             }
             return m_full_msg;
         }
 
-    private:
-        void HPX_EXPORT resize_string(std::size_t reserve_);
-
-        // if true, string was already set
-        bool is_string_set() const
+        bool empty() const
         {
-            return !m_str.empty();
+            return full_string().empty();
         }
 
     private:
-        std::size_t m_reserve;
-        std::string m_str;
+        std::ostringstream m_str;
 
         // caching
         mutable bool m_full_msg_computed;

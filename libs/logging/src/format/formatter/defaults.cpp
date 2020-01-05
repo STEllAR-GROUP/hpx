@@ -17,7 +17,6 @@
 #include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/format.hpp>
 #include <hpx/logging/message.hpp>
 
 #include <cstdint>
@@ -35,10 +34,9 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         {
         }
 
-        void operator()(message& str) override
+        void operator()(message& msg) override
         {
-            std::string idx = hpx::util::format("{:016x}", ++value);
-            str.prepend_string(idx);
+            msg.format("{:016x}", ++value);
         }
 
     private:

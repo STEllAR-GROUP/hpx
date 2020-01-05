@@ -46,7 +46,6 @@ set(logging_sources
   level.cpp
   logging.cpp
   manipulator.cpp
-  message.cpp
   format/named_write.cpp
   format/destination/defaults.cpp
   format/destination/file.cpp

@@ -21,7 +21,6 @@
 #include <hpx/logging/format/destinations.hpp>
 #include <hpx/logging/format/formatters.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <sstream>
@@ -92,7 +91,6 @@ namespace hpx { namespace util { namespace logging { namespace detail {
                 remaining.clear();
             }
         }
-        std::reverse(write_steps.begin(), write_steps.end());
     }
 
     void named_destinations::compute_write_steps()

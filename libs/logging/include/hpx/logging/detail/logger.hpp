@@ -22,8 +22,6 @@
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/level.hpp>
 
-#include <sstream>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -84,31 +82,23 @@ namespace hpx { namespace util { namespace logging {
     {
         HPX_NON_COPYABLE(logger);
 
-        struct gather_holder : std::ostringstream
+        struct gather_holder : message
         {    //-V690
             HPX_NON_COPYABLE(gather_holder);
 
-            gather_holder(logger const& p_this)
+            gather_holder(logger& p_this)
               : m_this(p_this)
             {
             }
 
             ~gather_holder()
             {
-                std::string msg = std::move(*this).str();
-                if (!msg.empty())
-                    m_this.do_write(std::move(msg));
-            }
-
-            template <typename... Args>
-            gather_holder& format(char const* format_str, Args const&... args)
-            {
-                util::format_to(*this, format_str, args...);
-                return *this;
+                if (!empty())
+                    m_this.write(std::move(*this));
             }
 
         private:
-            logger const& m_this;
+            logger& m_this;
         };
 
     public:
@@ -131,7 +121,7 @@ namespace hpx { namespace util { namespace logging {
         /**
             reads all data about a log message (gathers all the data about it)
         */
-        gather_holder gather() const
+        gather_holder gather()
         {
             return {*this};
         }
@@ -180,7 +170,7 @@ namespace hpx { namespace util { namespace logging {
         void HPX_EXPORT turn_cache_off();
 
         // called after all data has been gathered
-        void do_write(message msg) const
+        void write(message msg)
         {
             if (m_is_caching_off)
                 m_writer(msg);
