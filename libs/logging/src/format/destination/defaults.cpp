@@ -14,21 +14,23 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef JT28092007_destination_defaults_HPP_DEFINED
-#define JT28092007_destination_defaults_HPP_DEFINED
+#include <hpx/logging/format/destinations.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/logging/format/destination/file.hpp>
-#include <hpx/logging/manipulator.hpp>
+#include <hpx/logging/message.hpp>
 
 #include <iostream>
+#include <memory>
+
+#ifdef HPX_WINDOWS
+#include <windows.h>
+#endif
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 
-    /**
-    @brief Writes the string to console
-*/
-    struct cout : manipulator
+    cout::~cout() = default;
+
+    struct cout_impl : cout
     {
         void operator()(const message& msg) override
         {
@@ -36,10 +38,14 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         }
     };
 
-    /**
-    @brief Writes the string to cerr
-*/
-    struct cerr : manipulator
+    std::shared_ptr<cout> cout::make()
+    {
+        return std::make_shared<cout_impl>();
+    }
+
+    cerr::~cerr() = default;
+
+    struct cerr_impl : cerr
     {
         void operator()(const message& msg) override
         {
@@ -47,38 +53,18 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         }
     };
 
-    /**
-    @brief writes to stream.
-
-    @note:
-    The stream must outlive this object! Or, clear() the stream,
-    before the stream is deleted.
-*/
-    struct stream : manipulator
+    std::shared_ptr<cerr> cerr::make()
     {
-        HPX_NON_COPYABLE(stream);
+        return std::make_shared<cerr_impl>();
+    }
 
-        typedef std::ostream stream_type;
+    stream::~stream() = default;
 
-        explicit stream(stream_type* p)
+    struct stream_impl : stream
+    {
+        explicit stream_impl(std::ostream* stream_ptr)
+          : stream(stream_ptr)
         {
-            set_stream(p);
-        }
-
-        /**
-        @brief resets the stream. Further output will be written to this stream
-    */
-        void set_stream(stream_type* p)
-        {
-            ptr = p;
-        }
-
-        /**
-        @brief clears the stream. Further output will be ignored
-    */
-        void clear()
-        {
-            set_stream(nullptr);
         }
 
         void operator()(const message& msg) override
@@ -86,17 +72,16 @@ namespace hpx { namespace util { namespace logging { namespace destination {
             if (ptr)
                 *ptr << msg.full_string();
         }
-
-    private:
-        std::ostream* ptr;
     };
 
-    /**
-    @brief Writes the string to output debug window
+    std::shared_ptr<stream> stream::make(std::ostream* stream_ptr)
+    {
+        return std::make_shared<stream_impl>(stream_ptr);
+    }
 
-    For non-Windows systems, this is the console.
-*/
-    struct dbg_window : manipulator
+    dbg_window::~dbg_window() = default;
+
+    struct dbg_window_impl : dbg_window
     {
         void operator()(const message& msg) override
         {
@@ -109,6 +94,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         }
     };
 
-}}}}    // namespace hpx::util::logging::destination
+    std::shared_ptr<dbg_window> dbg_window::make()
+    {
+        return std::make_shared<dbg_window_impl>();
+    }
 
-#endif
+}}}}    // namespace hpx::util::logging::destination

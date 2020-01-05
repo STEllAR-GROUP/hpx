@@ -14,17 +14,17 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef JT28092007_high_precision_time_HPP_DEFINED
-#define JT28092007_high_precision_time_HPP_DEFINED
+#include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/format.hpp>
-#include <hpx/logging/manipulator.hpp>
+#include <hpx/logging/message.hpp>
 
 #include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <memory>
 #include <string>
 
 #if !(defined(__linux) || defined(linux) || defined(__linux__) ||              \
@@ -35,67 +35,21 @@
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
-    /**
-@brief Prefixes the message with a high-precision time (.
-You pass the format string at construction.
+    high_precision_time::~high_precision_time() = default;
 
-@code
-#include <hpx/logging/format/formatter/high_precision_time.hpp>
-@endcode
-
-Internally, it uses hpx::util::date_time::microsec_time_clock.
-So, our precision matches this class.
-
-The format can contain escape sequences:
-$dd - day, 2 digits
-$MM - month, 2 digits
-$yy - year, 2 digits
-$yyyy - year, 4 digits
-$hh - hour, 2 digits
-$mm - minute, 2 digits
-$ss - second, 2 digits
-$mili - milliseconds
-$micro - microseconds (if the high precision clock allows; otherwise, it pads zeros)
-$nano - nanoseconds (if the high precision clock allows; otherwise, it pads zeros)
-
-
-Example:
-
-@code
-high_precision_time("$mm:$ss:$micro");
-@endcode
-
-@param convert [optional] In case there needs to be a conversion between
-std::(w)string and the string that holds your logged message. See convert_format.
-*/
-    struct high_precision_time : manipulator
+    struct high_precision_time_impl : high_precision_time
     {
         /**
         constructs a high_precision_time object
     */
-        explicit high_precision_time(std::string const& format)
+        explicit high_precision_time_impl(std::string const& format)
+          : high_precision_time(format)
         {
-            set_format(format);
         }
 
-        void set_format(const std::string& format)
+        void operator()(message& msg) override
         {
-            m_format = format;
-            replace_format("$dd", "{1:02d}");
-            replace_format("$MM", "{2:02d}");
-            replace_format("$yyyy", "{3:04d}");
-            replace_format("$yy", "{4:02d}");
-            replace_format("$hh", "{5:02d}");
-            replace_format("$mm", "{6:02d}");
-            replace_format("$ss", "{7:02d}");
-            replace_format("$mili", "{8:03d}");
-            replace_format("$micro", "{9:06d}");
-            replace_format("$nano", "{10:09d}");
-        }
-
-        void write_high_precision_time(message& msg,
-            std::chrono::time_point<std::chrono::system_clock> val) const
-        {
+            auto const val = std::chrono::system_clock::now();
             std::time_t tt = std::chrono::system_clock::to_time_t(val);
 
 #if defined(__linux) || defined(linux) || defined(__linux__) ||                \
@@ -134,18 +88,23 @@ std::(w)string and the string that holds your logged message. See convert_format
             msg.prepend_string(time_str);
         }
 
-        void operator()(message& msg) override
-        {
-            write_high_precision_time(msg, std::chrono::system_clock::now());
-        }
-
         /** @brief configure through script
 
         the string = the time format
     */
         void configure(std::string const& str) override
         {
-            set_format(str);
+            m_format = str;
+            replace_format("$dd", "{1:02d}");
+            replace_format("$MM", "{2:02d}");
+            replace_format("$yyyy", "{3:04d}");
+            replace_format("$yy", "{4:02d}");
+            replace_format("$hh", "{5:02d}");
+            replace_format("$mm", "{6:02d}");
+            replace_format("$ss", "{7:02d}");
+            replace_format("$mili", "{8:03d}");
+            replace_format("$micro", "{9:06d}");
+            replace_format("$nano", "{10:09d}");
         }
 
     private:
@@ -161,6 +120,10 @@ std::(w)string and the string that holds your logged message. See convert_format
         std::string m_format;
     };
 
-}}}}    // namespace hpx::util::logging::formatter
+    std::shared_ptr<high_precision_time> high_precision_time::make(
+        std::string const& format)
+    {
+        return std::make_shared<high_precision_time_impl>(format);
+    }
 
-#endif
+}}}}    // namespace hpx::util::logging::formatter

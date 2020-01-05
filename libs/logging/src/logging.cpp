@@ -10,8 +10,6 @@
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/filesystem.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/logging/format/destination/defaults.hpp>
-#include <hpx/logging/format/named_write.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>

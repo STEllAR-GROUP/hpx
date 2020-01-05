@@ -14,13 +14,9 @@ set(logging_headers
   hpx/logging/detail/macros.hpp
   hpx/logging/detail/logger.hpp
   hpx/logging/detail/cache_before_init.hpp
-  hpx/logging/format.hpp
-  hpx/logging/format/formatter/high_precision_time.hpp
-  hpx/logging/format/formatter/defaults.hpp
-  hpx/logging/format/formatter/thread_id.hpp
+  hpx/logging/format/destinations.hpp
+  hpx/logging/format/formatters.hpp
   hpx/logging/format/named_write.hpp
-  hpx/logging/format/destination/defaults.hpp
-  hpx/logging/format/destination/file.hpp
   hpx/logging/level.hpp
   hpx/logging/logging.hpp
   hpx/logging/manipulator.hpp
@@ -30,7 +26,6 @@ set(logging_headers
 # Default location is $HPX_ROOT/libs/logging/include_compatibility
 set(logging_compat_headers
   hpx/util/logging.hpp
-  hpx/util/logging/format.hpp
   hpx/util/logging/writer/format_write.hpp
   hpx/util/logging/writer/named_write.hpp
   hpx/util/logging/detail/macros.hpp
@@ -54,6 +49,12 @@ set(logging_sources
   logging.cpp
   manipulator.cpp
   message.cpp
+  format/named_write.cpp
+  format/destination/defaults.cpp
+  format/destination/file.cpp
+  format/formatter/high_precision_time.cpp
+  format/formatter/defaults.cpp
+  format/formatter/thread_id.cpp
   format/named_write.cpp
 )
 

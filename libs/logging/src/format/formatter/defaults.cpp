@@ -1,4 +1,4 @@
-// formatter_defaults.hpp
+// defaults.cpp
 
 // Boost Logging library
 //
@@ -14,37 +14,23 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef JT28092007_formatter_defaults_HPP_DEFINED
-#define JT28092007_formatter_defaults_HPP_DEFINED
+#include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/format.hpp>
-#include <hpx/logging/manipulator.hpp>
+#include <hpx/logging/message.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
-    /**
-@brief prefixes each message with an index.
+    idx::~idx() = default;
 
-Example:
-@code
-L_ << "my message";
-L_ << "my 2nd message";
-@endcode
-
-This will output something similar to:
-
-@code
-[1] my message
-[2] my 2nd message
-@endcode
-*/
-    struct idx : formatter::manipulator
+    struct idx_impl : idx
     {
-        idx()
+        idx_impl()
           : value(0ull)
         {
         }
@@ -59,6 +45,9 @@ This will output something similar to:
         std::uint64_t value;
     };
 
-}}}}    // namespace hpx::util::logging::formatter
+    std::shared_ptr<idx> idx::make()
+    {
+        return std::make_shared<idx_impl>();
+    }
 
-#endif
+}}}}    // namespace hpx::util::logging::formatter

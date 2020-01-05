@@ -6,16 +6,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging/config/defines.hpp>
-#include <hpx/logging/format/destination/file.hpp>
+#include <hpx/logging/format/destinations.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/logging/format/destination/file.hpp is deprecated,    \
-    please include hpx/logging/format/destination/file.hpp instead")
+    please include hpx/logging/format/destinations.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/util/logging/format/destination/file.hpp is deprecated,    \
-    please include hpx/logging/format/destination/file.hpp instead"
+    please include hpx/logging/format/destinations.hpp instead"
 #endif
 #endif

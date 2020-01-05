@@ -1,4 +1,4 @@
-// formatter_thread_id.hpp
+// thread_id.cpp
 
 // Boost Logging library
 //
@@ -14,24 +14,26 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef JT28092007_formatter_thread_id_HPP_DEFINED
-#define JT28092007_formatter_thread_id_HPP_DEFINED
+#include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/format.hpp>
-#include <hpx/logging/manipulator.hpp>
+#include <hpx/logging/message.hpp>
 
+#include <memory>
 #include <string>
+
+#if defined(HPX_WINDOWS)
+#include <windows.h>
+#else
+#include <pthread.h>
+#endif
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
-    /**
-@brief Writes the thread_id to the log
+    thread_id::~thread_id() = default;
 
-@param convert [optional] In case there needs to be a conversion between
-std::(w)string and the string that holds your logged message. See convert_format.
-*/
-    struct thread_id : manipulator
+    struct thread_id_impl : thread_id
     {
         void operator()(message& msg) override
         {
@@ -47,6 +49,9 @@ std::(w)string and the string that holds your logged message. See convert_format
         }
     };
 
-}}}}    // namespace hpx::util::logging::formatter
+    std::shared_ptr<thread_id> thread_id::make()
+    {
+        return std::make_shared<thread_id_impl>();
+    }
 
-#endif
+}}}}    // namespace hpx::util::logging::formatter

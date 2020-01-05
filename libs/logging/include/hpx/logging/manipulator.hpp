@@ -46,8 +46,7 @@ namespace hpx { namespace util { namespace logging {
 
         protected:
             // signify that we're only a base class - not to be used directly
-            manipulator() = default;
-            virtual ~manipulator();
+            HPX_EXPORT virtual ~manipulator();
         };
 
     }    // namespace formatter
@@ -72,8 +71,7 @@ namespace hpx { namespace util { namespace logging {
 
         protected:
             // signify that we're only a base class - not to be used directly
-            manipulator() = default;
-            virtual ~manipulator();
+            HPX_EXPORT virtual ~manipulator();
         };
 
     }    // namespace destination

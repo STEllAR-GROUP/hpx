@@ -6,16 +6,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging/config/defines.hpp>
-#include <hpx/logging/format/formatter/defaults.hpp>
+#include <hpx/logging/format/formatters.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/logging/format/formatter/defaults.hpp is deprecated, \
-    please include hpx/logging/format/formatter/defaults.hpp instead")
+    please include hpx/logging/format/formatters.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/util/logging/format/formatter/defaults.hpp is deprecated, \
-    please include hpx/logging/format/formatter/defaults.hpp instead"
+    please include hpx/logging/format/formatters.hpp instead"
 #endif
 #endif

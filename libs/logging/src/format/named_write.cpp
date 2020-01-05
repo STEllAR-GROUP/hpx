@@ -18,22 +18,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/logging/format.hpp>
+#include <hpx/logging/format/destinations.hpp>
+#include <hpx/logging/format/formatters.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <sstream>
 #include <string>
-
-// all destinations
-#include <hpx/logging/format/destination/defaults.hpp>
-#include <hpx/logging/format/destination/file.hpp>
-
-// all formats
-#include <hpx/logging/format/formatter/defaults.hpp>
-#include <hpx/logging/format/formatter/high_precision_time.hpp>
-#include <hpx/logging/format/formatter/thread_id.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 

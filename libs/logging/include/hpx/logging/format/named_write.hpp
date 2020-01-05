@@ -18,7 +18,8 @@
 #define HPX_LOGGING_FORMAT_NAMED_WRITER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/logging/format.hpp>
+#include <hpx/logging/format/destinations.hpp>
+#include <hpx/logging/format/formatters.hpp>
 
 #include <cstddef>
 #include <map>
@@ -414,8 +415,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         template <typename Formatter, typename... Args>
         void set_formatter(std::string const& name, Args&&... args)
         {
-            m_format.add(
-                name, std::make_shared<Formatter>(std::forward<Args>(args)...));
+            m_format.add(name, Formatter::make(std::forward<Args>(args)...));
         }
 
         /** @brief Replaces a destination from the named destination.
@@ -432,8 +432,8 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         template <typename Destination, typename... Args>
         void set_destination(std::string const& name, Args&&... args)
         {
-            m_destination.add(name,
-                std::make_shared<Destination>(std::forward<Args>(args)...));
+            m_destination.add(
+                name, Destination::make(std::forward<Args>(args)...));
         }
 
     private:

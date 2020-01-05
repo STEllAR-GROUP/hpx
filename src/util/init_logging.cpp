@@ -9,7 +9,7 @@
 
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/logging.hpp>
-#include <hpx/logging/format/destination/defaults.hpp>
+#include <hpx/logging/manipulator.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/naming_base.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
