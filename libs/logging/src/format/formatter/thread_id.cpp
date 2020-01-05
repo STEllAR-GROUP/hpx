@@ -17,10 +17,10 @@
 #include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/logging/message.hpp>
+#include <hpx/format.hpp>
 
 #include <memory>
-#include <string>
+#include <ostream>
 
 #if defined(HPX_WINDOWS)
 #include <windows.h>
@@ -34,9 +34,9 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
 
     struct thread_id_impl : thread_id
     {
-        void operator()(message& msg) override
+        void operator()(std::ostream& to) const override
         {
-            msg.format("{}",
+            util::format_to(to, "{}",
 #if defined(HPX_WINDOWS)
                 ::GetCurrentThreadId()
 #else

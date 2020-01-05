@@ -18,13 +18,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/format.hpp>
-#include <hpx/logging/message.hpp>
 
 #include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <memory>
+#include <ostream>
 #include <string>
 
 #if !(defined(__linux) || defined(linux) || defined(__linux__) ||              \
@@ -47,7 +47,7 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         {
         }
 
-        void operator()(message& msg) override
+        void operator()(std::ostream& to) const override
         {
             auto const val = std::chrono::system_clock::now();
             std::time_t tt = std::chrono::system_clock::to_time_t(val);
@@ -80,7 +80,7 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     val.time_since_epoch());
 
-            msg.format(m_format, local_tm.tm_mday, local_tm.tm_mon + 1,
+            util::format_to(to, m_format, local_tm.tm_mday, local_tm.tm_mon + 1,
                 local_tm.tm_year + 1900, local_tm.tm_year % 100,
                 local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec,
                 millisecs.count() % 1000, microsecs.count() % 1000,

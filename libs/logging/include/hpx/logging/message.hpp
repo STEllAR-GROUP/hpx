@@ -45,11 +45,16 @@ namespace hpx { namespace util { namespace logging {
     class message
     {
     public:
+        message()
+          : m_full_msg_computed(false)
+        {
+        }
+
         /**
         @param msg - the message that is originally cached
          */
-        message(std::string const& msg = "")
-          : m_str(msg)
+        explicit message(std::stringstream msg)
+          : m_str(std::move(msg))
           , m_full_msg_computed(false)
         {
         }
@@ -97,8 +102,13 @@ namespace hpx { namespace util { namespace logging {
             return full_string().empty();
         }
 
+        friend std::ostream& operator<<(std::ostream& os, message const& value)
+        {
+            return os << value.m_str.rdbuf();
+        }
+
     private:
-        std::ostringstream m_str;
+        std::stringstream m_str;
 
         // caching
         mutable bool m_full_msg_computed;

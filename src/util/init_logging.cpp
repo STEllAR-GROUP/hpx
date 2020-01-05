@@ -30,8 +30,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <iomanip>
-#include <sstream>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -54,18 +53,18 @@ namespace hpx { namespace util {
     {
         shepherd_thread_id() {}
 
-        void operator()(logging::message& msg) override
+        void operator()(std::ostream& to) const override
         {
             error_code ec(lightweight);
             std::size_t thread_num = hpx::get_worker_thread_num(ec);
 
             if (std::size_t(-1) != thread_num)
             {
-                msg.format("{:016x}", thread_num);
+                util::format_to(to, "{:016x}", thread_num);
             }
             else
             {
-                msg << std::string(16, '-');
+                to << std::string(16, '-');
             }
         }
     };
@@ -76,18 +75,18 @@ namespace hpx { namespace util {
     {
         locality_prefix() {}
 
-        void operator()(logging::message& msg) override
+        void operator()(std::ostream& to) const override
         {
             std::uint32_t locality_id = hpx::get_locality_id();
 
             if (naming::invalid_locality_id != locality_id)
             {
-                msg.format("{:08x}", locality_id);
+                util::format_to(to, "{:08x}", locality_id);
             }
             else
             {
                 // called from outside a HPX thread
-                msg << std::string(8, '-');
+                to << std::string(8, '-');
             }
         }
     };
@@ -96,7 +95,7 @@ namespace hpx { namespace util {
     // custom formatter: HPX thread id
     struct thread_id : logging::formatter::manipulator
     {
-        void operator()(logging::message& msg) override
+        void operator()(std::ostream& to) const override
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (nullptr != self)
@@ -107,13 +106,13 @@ namespace hpx { namespace util {
                 {
                     std::ptrdiff_t value =
                         reinterpret_cast<std::ptrdiff_t>(id.get());
-                    msg.format("{:016x}", value);
+                    util::format_to(to, "{:016x}", value);
                     return;
                 }
             }
 
             // called from outside a HPX thread or invalid thread id
-            msg << std::string(16, '-');
+            to << std::string(16, '-');
         }
     };
 
@@ -121,7 +120,7 @@ namespace hpx { namespace util {
     // custom formatter: HPX thread phase
     struct thread_phase : logging::formatter::manipulator
     {
-        void operator()(logging::message& msg) override
+        void operator()(std::ostream& to) const override
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (nullptr != self)
@@ -130,13 +129,13 @@ namespace hpx { namespace util {
                 std::size_t phase = self->get_thread_phase();
                 if (0 != phase)
                 {
-                    msg.format("{:04x}", self->get_thread_phase());
+                    util::format_to(to, "{:04x}", self->get_thread_phase());
                     return;
                 }
             }
 
             // called from outside a HPX thread or no phase given
-            msg << std::string(4, '-');
+            to << std::string(4, '-');
         }
     };
 
@@ -144,19 +143,19 @@ namespace hpx { namespace util {
     // custom formatter: locality prefix of parent thread
     struct parent_thread_locality : logging::formatter::manipulator
     {
-        void operator()(logging::message& msg) override
+        void operator()(std::ostream& to) const override
         {
             std::uint32_t parent_locality_id =
                 threads::get_parent_locality_id();
             if (naming::invalid_locality_id != parent_locality_id)
             {
                 // called from inside a HPX thread
-                msg.format("{:08x}", parent_locality_id);
+                util::format_to(to, "{:08x}", parent_locality_id);
             }
             else
             {
                 // called from outside a HPX thread
-                msg << std::string(8, '-');
+                to << std::string(8, '-');
             }
         }
     };
@@ -165,7 +164,7 @@ namespace hpx { namespace util {
     // custom formatter: HPX parent thread id
     struct parent_thread_id : logging::formatter::manipulator
     {
-        void operator()(logging::message& msg) override
+        void operator()(std::ostream& to) const override
         {
             threads::thread_id_type parent_id = threads::get_parent_id();
             if (nullptr != parent_id && threads::invalid_thread_id != parent_id)
@@ -173,12 +172,12 @@ namespace hpx { namespace util {
                 // called from inside a HPX thread
                 std::ptrdiff_t value =
                     reinterpret_cast<std::ptrdiff_t>(parent_id.get());
-                msg.format("{:016x}", value);
+                util::format_to(to, "{:016x}", value);
             }
             else
             {
                 // called from outside a HPX thread
-                msg << std::string(16, '-');
+                to << std::string(16, '-');
             }
         }
     };
@@ -187,18 +186,18 @@ namespace hpx { namespace util {
     // custom formatter: HPX parent thread phase
     struct parent_thread_phase : logging::formatter::manipulator
     {
-        void operator()(logging::message& msg) override
+        void operator()(std::ostream& to) const override
         {
             std::size_t parent_phase = threads::get_parent_phase();
             if (0 != parent_phase)
             {
                 // called from inside a HPX thread
-                msg.format("{:04x}", parent_phase);
+                util::format_to(to, "{:04x}", parent_phase);
             }
             else
             {
                 // called from outside a HPX thread
-                msg << std::string(4, '-');
+                to << std::string(4, '-');
             }
         }
     };
@@ -207,18 +206,18 @@ namespace hpx { namespace util {
     // custom formatter: HPX component id of current thread
     struct thread_component_id : logging::formatter::manipulator
     {
-        void operator()(logging::message& msg) override
+        void operator()(std::ostream& to) const override
         {
             std::uint64_t component_id = threads::get_self_component_id();
             if (0 != component_id)
             {
                 // called from inside a HPX thread
-                msg.format("{:016x}", component_id);
+                util::format_to(to, "{:016x}", component_id);
             }
             else
             {
                 // called from outside a HPX thread
-                msg << std::string(16, '-');
+                to << std::string(16, '-');
             }
         }
     };

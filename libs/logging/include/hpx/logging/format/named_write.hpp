@@ -22,13 +22,31 @@
 #include <hpx/logging/format/formatters.hpp>
 
 #include <cstddef>
-#include <map>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
+
+    template <typename T>
+    struct named
+    {
+        std::string name;
+        T value;
+    };
+
+    template <typename C, typename S>
+    typename C::iterator find_named(C& c, S const& name)
+    {
+        for (auto iter = c.begin(), end = c.end(); iter != end; ++iter)
+        {
+            if (iter->name == name)
+                return iter;
+        }
+        return c.end();
+    }
 
     /**
 @brief Allows you to contain multiple formatters,
@@ -80,11 +98,7 @@ You could have an output like this:
 
         using ptr_type = std::shared_ptr<formatter::manipulator>;
 
-        explicit named_formatters(std::string const& str = "")
-        {
-            if (!str.empty())
-                string(str);
-        }
+        named_formatters() = default;
 
         named_formatters& string(std::string const& str)
         {
@@ -95,35 +109,31 @@ You could have an output like this:
 
         void add(std::string const& name, ptr_type p)
         {
-            formatters[name] = std::move(p);
-            compute_write_steps();
-        }
-
-        void del(std::string const& name)
-        {
-            {
-                ptr_type p = formatters[name];
-                formatters.erase(name);
-            }
+            auto iter = find_named(formatters, name);
+            if (iter != formatters.end())
+                iter->value = std::move(p);
+            else
+                formatters.push_back(named<ptr_type>{name, std::move(p)});
             compute_write_steps();
         }
 
         void configure(
             std::string const& name, std::string const& configure_str)
         {
-            ptr_type p = formatters[name];
-            if (p)
-                p->configure(configure_str);
+            auto iter = find_named(formatters, name);
+            if (iter != formatters.end())
+                iter->value->configure(configure_str);
         }
 
-        void operator()(message& msg) const
+        void operator()(std::stringstream& out, message const& msg) const
         {
             for (auto const& step : write_steps)
             {
-                msg << step.prefix;
+                out << step.prefix;
                 if (step.fmt)
-                    (*step.fmt)(msg);
+                    (*step.fmt)(out);
             }
+            out << msg << '\n';
         }
 
     private:
@@ -146,9 +156,9 @@ You could have an output like this:
             ptr_type fmt;
         };
 
-        std::map<std::string, ptr_type> formatters;
-        std::string format_string;
+        std::vector<named<ptr_type>> formatters;
         std::vector<write_step> write_steps;
+        std::string format_string;
     };
 
     /**
@@ -209,15 +219,7 @@ In the above example, I know that the available destinations are @c out_file,
 
         using ptr_type = std::shared_ptr<destination::manipulator>;
 
-        /**
-        @brief constructs the named_destinations destination
-
-        @param named_destinations_name name of the named_destinations
-    */
-        explicit named_destinations(std::string const& format_string = "")
-        {
-            string(format_string);
-        }
+        named_destinations() = default;
 
         named_destinations& string(std::string const& str)
         {
@@ -228,30 +230,26 @@ In the above example, I know that the available destinations are @c out_file,
 
         void add(std::string const& name, ptr_type p)
         {
-            destinations[name] = std::move(p);
+            auto iter = find_named(destinations, name);
+            if (iter != destinations.end())
+                iter->value = std::move(p);
+            else
+                destinations.push_back(named<ptr_type>{name, std::move(p)});
             compute_write_steps();
-        }
-
-        void del(std::string const& name)
-        {
-            ptr_type p = destinations[name];
-            destinations.erase(name);
         }
 
         void configure(
             std::string const& name, std::string const& configure_str)
         {
-            ptr_type p = destinations[name];
-            if (p)
-                p->configure(configure_str);
+            auto iter = find_named(destinations, name);
+            if (iter != destinations.end())
+                iter->value->configure(configure_str);
         }
 
         void operator()(const message& msg) const
         {
             for (auto const& step : write_steps)
-            {
                 (*step)(msg);
-            }
         }
 
     private:
@@ -261,7 +259,7 @@ In the above example, I know that the available destinations are @c out_file,
         void compute_write_steps();
 
     private:
-        std::map<std::string, ptr_type> destinations;
+        std::vector<named<ptr_type>> destinations;
         std::vector<ptr_type> write_steps;
         std::string format_string;
     };
@@ -394,11 +392,11 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 
         void operator()(message const& msg) const
         {
-            message formatted_message;
-            m_format(formatted_message);
-            formatted_message << msg.full_string() << '\n';
+            std::stringstream out;
+            m_format(out, msg);
 
-            m_destination(formatted_message);
+            message formatted(std::move(out));
+            m_destination(formatted);
         }
 
         /** @brief Replaces a formatter from the named formatter.

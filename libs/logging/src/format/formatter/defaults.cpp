@@ -17,11 +17,11 @@
 #include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/logging/message.hpp>
+#include <hpx/format.hpp>
 
 #include <cstdint>
 #include <memory>
-#include <string>
+#include <ostream>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
@@ -34,13 +34,13 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         {
         }
 
-        void operator()(message& msg) override
+        void operator()(std::ostream& to) const override
         {
-            msg.format("{:016x}", ++value);
+            util::format_to(to, "{:016x}", ++value);
         }
 
     private:
-        std::uint64_t value;
+        mutable std::uint64_t value;
     };
 
     std::shared_ptr<idx> idx::make()

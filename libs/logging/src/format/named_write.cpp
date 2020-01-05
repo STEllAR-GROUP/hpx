@@ -78,7 +78,9 @@ namespace hpx { namespace util { namespace logging { namespace detail {
                 {
                     std::string name = remaining.substr(0, idx);
                     remaining = remaining.substr(idx + 1);
-                    fmt = formatters[name];
+                    auto iter = find_named(formatters, name);
+                    if (iter != formatters.end())
+                        fmt = iter->value;
                 }
                 // note: fmt could be null, in case
                 write_steps.push_back(write_step(spacer, fmt));
@@ -107,25 +109,10 @@ namespace hpx { namespace util { namespace logging { namespace detail {
                 // ignore this word
                 continue;
 
-            if (destinations.find(word) != destinations.end())
-                write_steps.push_back(destinations.find(word)->second);
+            auto iter = find_named(destinations, word);
+            if (iter != destinations.cend())
+                write_steps.push_back(iter->value);
         }
-    }
-
-}}}}    // namespace hpx::util::logging::detail
-
-namespace hpx { namespace util { namespace logging { namespace writer {
-
-    named_write::named_write()
-    {
-        set_formatter<formatter::idx>("idx");
-        set_formatter<formatter::high_precision_time>("time", "$hh:$mm:$ss");
-        set_formatter<formatter::thread_id>("thread_id");
-
-        set_destination<destination::file>("file", "");
-        set_destination<destination::cout>("cout");
-        set_destination<destination::cerr>("cerr");
-        set_destination<destination::dbg_window>("debug");
     }
 
     namespace {
@@ -223,9 +210,9 @@ namespace hpx { namespace util { namespace logging { namespace writer {
             std::string m_manipulator;
         };
 
-        template <typename Manipulator, typename ParserType>
+        template <typename Named, typename ParserType>
         void set_and_configure(
-            Manipulator& manip, std::string const& name, ParserType parser)
+            Named& named, std::string const& name, ParserType parser)
         {
             // need to parse string
             bool parsing_params = false;
@@ -249,7 +236,7 @@ namespace hpx { namespace util { namespace logging { namespace writer {
                 else if (c == ')' && parsing_params)
                 {
                     HPX_ASSERT(parser.has_manipulator_name());
-                    manip.configure(parser.get_manipulator_name(), params);
+                    named.configure(parser.get_manipulator_name(), params);
                     parser.clear();
                     parsing_params = false;
                 }
@@ -264,18 +251,35 @@ namespace hpx { namespace util { namespace logging { namespace writer {
                     }
                 }
             }
-            manip.string(stripped_str);
+            named.string(stripped_str);
         }
     }    // namespace
 
+}}}}    // namespace hpx::util::logging::detail
+
+namespace hpx { namespace util { namespace logging { namespace writer {
+
+    named_write::named_write()
+    {
+        set_formatter<formatter::idx>("idx");
+        set_formatter<formatter::high_precision_time>("time", "$hh:$mm:$ss");
+        set_formatter<formatter::thread_id>("thread_id");
+
+        set_destination<destination::file>("file", "");
+        set_destination<destination::cout>("cout");
+        set_destination<destination::cerr>("cerr");
+        set_destination<destination::dbg_window>("debug");
+    }
+
     void named_write::set_and_configure_formatter(std::string const& name)
     {
-        set_and_configure(m_format, name, parse_formatter{});
+        detail::set_and_configure(m_format, name, detail::parse_formatter{});
     }
 
     void named_write::set_and_configure_destination(std::string const& name)
     {
-        set_and_configure(m_destination, name, parse_destination{});
+        detail::set_and_configure(
+            m_destination, name, detail::parse_destination{});
     }
 
 }}}}    // namespace hpx::util::logging::writer

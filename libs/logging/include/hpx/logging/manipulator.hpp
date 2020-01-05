@@ -18,8 +18,12 @@
 #define HPX_LOGGING_MANIPULATOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/format.hpp>
 #include <hpx/logging/message.hpp>
 
+#include <boost/utility/string_ref.hpp>
+
+#include <iosfwd>
 #include <string>
 
 namespace hpx { namespace util { namespace logging {
@@ -36,7 +40,13 @@ namespace hpx { namespace util { namespace logging {
         /// @brief What to use as base class, for your formatter classes
         struct manipulator
         {
-            virtual void operator()(message& val) = 0;
+            virtual void operator()(std::ostream& to) const = 0;
+
+            friend void format_value(std::ostream& os,
+                boost::string_ref /*spec*/, manipulator const& value)
+            {
+                value(os);
+            }
 
             /// @brief Override this if you want to allow configuration through
             /// scripting.
