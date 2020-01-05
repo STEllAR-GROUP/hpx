@@ -131,9 +131,13 @@ You could have an output like this:
             {
                 out << step.prefix;
                 if (step.fmt)
-                    (*step.fmt)(out);
+                {
+                    if (step.fmt == (formatter::manipulator*) -1)
+                        out << msg;
+                    else
+                        (*step.fmt)(out);
+                }
             }
-            out << msg << '\n';
         }
 
     private:

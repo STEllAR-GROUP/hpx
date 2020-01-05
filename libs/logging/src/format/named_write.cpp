@@ -56,8 +56,21 @@ namespace hpx { namespace util { namespace logging { namespace detail {
         size_type start_search_idx = 0;
         while (!remaining.empty())
         {
-            size_type idx = remaining.find('%', start_search_idx);
-            if (idx != std::string::npos)
+            size_type idx = remaining.find_first_of("%|", start_search_idx);
+            switch (idx != std::string::npos ? remaining[idx] : '\0')
+            {
+            case '|':
+            {
+                // up to here, this is a spacer string
+                start_search_idx = 0;
+                std::string spacer = detail::unescape(remaining.substr(0, idx));
+                remaining.erase(0, idx + 1);
+
+                formatter::manipulator* fmt = (formatter::manipulator*) -1;
+                write_steps.push_back(write_step(spacer, fmt));
+                break;
+            }
+            case '%':
             {
                 // see if just escaped
                 if ((idx < remaining.size() - 1) && remaining[idx + 1] == '%')
@@ -70,27 +83,30 @@ namespace hpx { namespace util { namespace logging { namespace detail {
                 // up to here, this is a spacer string
                 start_search_idx = 0;
                 std::string spacer = detail::unescape(remaining.substr(0, idx));
-                remaining = remaining.substr(idx + 1);
+                remaining.erase(0, idx + 1);
                 // find end of formatter name
                 idx = remaining.find('%');
                 formatter::manipulator* fmt = nullptr;
                 if (idx != std::string::npos)
                 {
                     std::string name = remaining.substr(0, idx);
-                    remaining = remaining.substr(idx + 1);
+                    remaining.erase(0, idx + 1);
                     auto iter = find_named(formatters, name);
                     if (iter != formatters.end())
                         fmt = iter->value.get();
                 }
                 // note: fmt could be null, in case
                 write_steps.push_back(write_step(spacer, fmt));
+                break;
             }
-            else
+            case '\0':
             {
                 // last part
                 write_steps.push_back(
                     write_step(detail::unescape(remaining), nullptr));
                 remaining.clear();
+                break;
+            }
             }
         }
     }

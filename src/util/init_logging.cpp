@@ -363,6 +363,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.set_destination("console", console(lvl, destination_agas)); //-V106
             writer.write(logformat, logdest);
@@ -407,6 +409,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.set_destination("console",
                 console(lvl, destination_parcel)); //-V106
@@ -453,6 +457,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.set_destination("console", console(lvl, destination_timing)); //-V106
             writer.write(logformat, logdest);
@@ -496,6 +502,8 @@ namespace hpx { namespace util {
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
 #endif
+        if (logformat.empty())
+            logformat = "|\\n";
 
         if (hpx::util::logging::level::disable_all != lvl)
         {
@@ -572,6 +580,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.set_destination("console", console(lvl, destination_app)); //-V106
             writer.write(logformat, logdest);
@@ -615,6 +625,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.set_destination("console",
                 console(lvl, destination_debuglog)); //-V106
@@ -659,6 +671,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -701,6 +715,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -742,6 +758,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -783,6 +801,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -825,6 +845,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -867,6 +889,8 @@ namespace hpx { namespace util {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
@@ -903,7 +927,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%]}",
+                    HPX_TIMEFORMAT ") [%idx%]|\\n}",
 
                 // general console logging
                 "[hpx.logging.console]",
@@ -914,7 +938,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_LOGDESTINATION:"
                     "file(hpx.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_LOGFORMAT:}",
+                "format = ${HPX_CONSOLE_LOGFORMAT:|}",
 
                 // logging related to timing
                 "[hpx.logging.timing]",
@@ -923,7 +947,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_TIMING_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [TIM]}",
+                    HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
 
                 // console logging related to timing
                 "[hpx.logging.console.timing]",
@@ -934,7 +958,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:"
                     "file(hpx.timing.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:}",
+                "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
 
                 // logging related to AGAS
                 "[hpx.logging.agas]",
@@ -945,7 +969,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_AGAS_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%][AGAS]}",
+                    HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
 
                 // console logging related to AGAS
                 "[hpx.logging.console.agas]",
@@ -956,7 +980,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:"
                     "file(hpx.agas.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:}",
+                "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
 
                 // logging related to the parcel transport
                 "[hpx.logging.parcel]",
@@ -966,7 +990,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_PARCEL_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%][  PT]}",
+                    HPX_TIMEFORMAT ") [%idx%][  PT] |\\n}",
 
                 // console logging related to the parcel transport
                 "[hpx.logging.console.parcel]",
@@ -977,7 +1001,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:"
                     "file(hpx.parcel.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:}",
+                "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
 
                 // logging related to applications
                 "[hpx.logging.application]",
@@ -986,7 +1010,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_APP_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [APP]}",
+                    HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
 
                 // console logging related to applications
                 "[hpx.logging.console.application]",
@@ -997,7 +1021,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:"
                     "file(hpx.application.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_APP_LOGFORMAT:}",
+                "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
 
                 // logging of debug channel
                 "[hpx.logging.debuglog]",
@@ -1006,7 +1030,7 @@ namespace hpx { namespace util { namespace detail
                 "format = ${HPX_DEB_LOGFORMAT:"
                     "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
                     "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [DEB]}",
+                    HPX_TIMEFORMAT ") [%idx%] [DEB] |\\n}",
 
                 "[hpx.logging.console.debuglog]",
                 "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",
