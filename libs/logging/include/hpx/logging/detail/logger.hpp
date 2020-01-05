@@ -18,6 +18,7 @@
 #define HPX_LOGGING_DETAIL_LOGGER_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/format.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/level.hpp>
 
@@ -83,7 +84,7 @@ namespace hpx { namespace util { namespace logging {
     {
         HPX_NON_COPYABLE(logger);
 
-        struct gather_holder
+        struct gather_holder : std::ostringstream
         {    //-V690
             HPX_NON_COPYABLE(gather_holder);
 
@@ -94,19 +95,20 @@ namespace hpx { namespace util { namespace logging {
 
             ~gather_holder()
             {
-                std::string msg = m_out.str();
+                std::string msg = std::move(*this).str();
                 if (!msg.empty())
                     m_this.do_write(std::move(msg));
             }
 
-            std::ostringstream& out()
+            template <typename... Args>
+            gather_holder& format(char const* format_str, Args const&... args)
             {
-                return m_out;
+                util::format_to(*this, format_str, args...);
+                return *this;
             }
 
         private:
             logger const& m_this;
-            std::ostringstream m_out;
         };
 
     public:

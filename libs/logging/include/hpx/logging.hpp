@@ -176,7 +176,14 @@ namespace hpx { namespace util {
     namespace detail {
         struct dummy_log_impl
         {
-            constexpr dummy_log_impl() {}
+            constexpr dummy_log_impl() noexcept {}
+
+            template <typename... Args>
+            dummy_log_impl const& format(char const*, Args const&...) const
+                noexcept
+            {
+                return *this;
+            }
         };
         constexpr dummy_log_impl dummy_log;
 
