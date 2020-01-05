@@ -167,7 +167,7 @@ namespace hpx { namespace util { namespace logging {
         }
 
     public:
-        void HPX_EXPORT turn_cache_off();
+        HPX_EXPORT void turn_cache_off();
 
         // called after all data has been gathered
         void write(message msg)

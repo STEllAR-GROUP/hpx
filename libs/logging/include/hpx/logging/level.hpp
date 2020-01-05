@@ -57,7 +57,7 @@ namespace hpx { namespace util { namespace logging {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    void HPX_EXPORT format_value(
+    HPX_EXPORT void format_value(
         std::ostream& os, boost::string_ref spec, level value);
 
 }}}    // namespace hpx::util::logging

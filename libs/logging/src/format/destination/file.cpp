@@ -87,10 +87,10 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         mutable mutex_type mtx_ = BOOST_DETAIL_SPINLOCK_INIT;
     };
 
-    std::shared_ptr<file> file::make(
+    std::unique_ptr<file> file::make(
         std::string const& file_name, file_settings set)
     {
-        return std::make_shared<file_impl>(file_name, set);
+        return std::unique_ptr<file>(new file_impl(file_name, set));
     }
 
 }}}}    // namespace hpx::util::logging::destination

@@ -96,7 +96,7 @@ You could have an output like this:
     {
         HPX_NON_COPYABLE(named_formatters);
 
-        using ptr_type = std::shared_ptr<formatter::manipulator>;
+        using ptr_type = std::unique_ptr<formatter::manipulator>;
 
         named_formatters() = default;
 
@@ -145,7 +145,7 @@ You could have an output like this:
     private:
         struct write_step
         {
-            write_step(std::string const& prefix_, ptr_type fmt_)
+            write_step(std::string const& prefix_, formatter::manipulator* fmt_)
               : prefix(prefix_)
               , fmt(fmt_)
             {
@@ -153,7 +153,7 @@ You could have an output like this:
             std::string prefix;
             // could be null - in case formatter not found by name, or it's
             // the last step
-            ptr_type fmt;
+            formatter::manipulator* fmt;
         };
 
         std::vector<named<ptr_type>> formatters;
@@ -217,7 +217,7 @@ In the above example, I know that the available destinations are @c out_file,
     {
         HPX_NON_COPYABLE(named_destinations);
 
-        using ptr_type = std::shared_ptr<destination::manipulator>;
+        using ptr_type = std::unique_ptr<destination::manipulator>;
 
         named_destinations() = default;
 
@@ -260,7 +260,7 @@ In the above example, I know that the available destinations are @c out_file,
 
     private:
         std::vector<named<ptr_type>> destinations;
-        std::vector<ptr_type> write_steps;
+        std::vector<destination::manipulator*> write_steps;
         std::string format_string;
     };
 
@@ -369,7 +369,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         void format(std::string const& format_str)
         {
             m_format_str = format_str;
-            set_and_configure_formatter(format_str);
+            configure_formatter(format_str);
         };
 
         /** @brief sets the destinations string - where should logged messages
@@ -378,7 +378,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         void destination(std::string const& destination_str)
         {
             m_destination_str = destination_str;
-            set_and_configure_destination(destination_str);
+            configure_destination(destination_str);
         }
 
         /** @brief Specifies the formats and destinations in one step
@@ -407,7 +407,8 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         template <typename Formatter>
         void set_formatter(std::string const& name, Formatter fmt)
         {
-            m_format.add(name, std::make_shared<Formatter>(fmt));
+            m_format.add(
+                name, detail::named_formatters::ptr_type(new Formatter(fmt)));
         }
 
         template <typename Formatter, typename... Args>
@@ -424,7 +425,8 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         template <typename Destination>
         void set_destination(std::string const& name, Destination dest)
         {
-            m_destination.add(name, std::make_shared<Destination>(dest));
+            m_destination.add(name,
+                detail::named_destinations::ptr_type(new Destination(dest)));
         }
 
         template <typename Destination, typename... Args>
@@ -435,8 +437,8 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         }
 
     private:
-        void HPX_EXPORT set_and_configure_formatter(std::string const& name);
-        void HPX_EXPORT set_and_configure_destination(std::string const& name);
+        HPX_EXPORT void configure_formatter(std::string const& format);
+        HPX_EXPORT void configure_destination(std::string const& format);
 
     private:
         detail::named_formatters m_format;

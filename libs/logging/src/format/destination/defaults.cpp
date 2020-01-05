@@ -38,9 +38,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         }
     };
 
-    std::shared_ptr<cout> cout::make()
+    std::unique_ptr<cout> cout::make()
     {
-        return std::make_shared<cout_impl>();
+        return std::unique_ptr<cout>(new cout_impl());
     }
 
     cerr::~cerr() = default;
@@ -53,9 +53,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         }
     };
 
-    std::shared_ptr<cerr> cerr::make()
+    std::unique_ptr<cerr> cerr::make()
     {
-        return std::make_shared<cerr_impl>();
+        return std::unique_ptr<cerr>(new cerr_impl());
     }
 
     stream::~stream() = default;
@@ -74,9 +74,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         }
     };
 
-    std::shared_ptr<stream> stream::make(std::ostream* stream_ptr)
+    std::unique_ptr<stream> stream::make(std::ostream* stream_ptr)
     {
-        return std::make_shared<stream_impl>(stream_ptr);
+        return std::unique_ptr<stream>(new stream_impl(stream_ptr));
     }
 
     dbg_window::~dbg_window() = default;
@@ -94,9 +94,9 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         }
     };
 
-    std::shared_ptr<dbg_window> dbg_window::make()
+    std::unique_ptr<dbg_window> dbg_window::make()
     {
-        return std::make_shared<dbg_window_impl>();
+        return std::unique_ptr<dbg_window>(new dbg_window_impl());
     }
 
 }}}}    // namespace hpx::util::logging::destination

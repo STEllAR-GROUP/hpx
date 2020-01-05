@@ -33,12 +33,12 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct cout : manipulator
     {
-        static std::shared_ptr<cout> HPX_EXPORT make();
+        HPX_EXPORT static std::unique_ptr<cout> make();
+
+        HPX_EXPORT ~cout();
 
     protected:
         cout() = default;
-
-        HPX_EXPORT ~cout();
     };
 
     /**
@@ -46,12 +46,12 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct cerr : manipulator
     {
-        static std::shared_ptr<cerr> HPX_EXPORT make();
+        HPX_EXPORT static std::unique_ptr<cerr> make();
+
+        HPX_EXPORT ~cerr();
 
     protected:
         cerr() = default;
-
-        HPX_EXPORT ~cerr();
     };
 
     /**
@@ -63,8 +63,10 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct stream : manipulator
     {
-        static std::shared_ptr<stream> HPX_EXPORT make(
+        HPX_EXPORT static std::unique_ptr<stream> make(
             std::ostream* stream_ptr);
+
+        HPX_EXPORT ~stream();
 
         /**
         @brief resets the stream. Further output will be written to this stream
@@ -88,8 +90,6 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         {
         }
 
-        HPX_EXPORT ~stream();
-
     protected:
         std::ostream* ptr;
     };
@@ -101,12 +101,12 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 */
     struct dbg_window : manipulator
     {
-        static std::shared_ptr<dbg_window> HPX_EXPORT make();
+        HPX_EXPORT static std::unique_ptr<dbg_window> make();
+
+        HPX_EXPORT ~dbg_window();
 
     protected:
         dbg_window() = default;
-
-        HPX_EXPORT ~dbg_window();
     };
 
     /**
@@ -145,8 +145,10 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         @param set [optional] file settings - see file_settings class,
         and @ref dealing_with_flags
     */
-        static std::shared_ptr<file> HPX_EXPORT make(
+        HPX_EXPORT static std::unique_ptr<file> make(
             std::string const& file_name, file_settings set = {});
+
+        HPX_EXPORT ~file();
 
     protected:
         file(std::string const& file_name, file_settings set)
@@ -154,8 +156,6 @@ namespace hpx { namespace util { namespace logging { namespace destination {
           , settings(set)
         {
         }
-
-        HPX_EXPORT ~file();
 
         std::string name;
         file_settings settings;

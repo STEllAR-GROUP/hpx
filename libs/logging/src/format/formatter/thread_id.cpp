@@ -46,9 +46,9 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         }
     };
 
-    std::shared_ptr<thread_id> thread_id::make()
+    std::unique_ptr<thread_id> thread_id::make()
     {
-        return std::make_shared<thread_id_impl>();
+        return std::unique_ptr<thread_id>(new thread_id_impl());
     }
 
 }}}}    // namespace hpx::util::logging::formatter

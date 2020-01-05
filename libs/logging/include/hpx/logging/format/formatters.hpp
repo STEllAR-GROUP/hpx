@@ -43,12 +43,12 @@ This will output something similar to:
 */
     struct idx : manipulator
     {
-        static std::shared_ptr<idx> HPX_EXPORT make();
+        HPX_EXPORT static std::unique_ptr<idx> make();
+
+        HPX_EXPORT ~idx();
 
     protected:
         idx() = default;
-
-        HPX_EXPORT ~idx();
     };
 
     /**
@@ -86,16 +86,16 @@ std::(w)string and the string that holds your logged message. See convert_format
 */
     struct high_precision_time : manipulator
     {
-        static std::shared_ptr<high_precision_time> HPX_EXPORT make(
+        HPX_EXPORT static std::unique_ptr<high_precision_time> make(
             std::string const& format);
+
+        HPX_EXPORT ~high_precision_time();
 
     protected:
         explicit high_precision_time(std::string const& format)
         {
             configure(format);
         }
-
-        HPX_EXPORT ~high_precision_time();
     };
 
     /**
@@ -106,12 +106,12 @@ std::(w)string and the string that holds your logged message. See convert_format
 */
     struct thread_id : manipulator
     {
-        static std::shared_ptr<thread_id> HPX_EXPORT make();
+        HPX_EXPORT static std::unique_ptr<thread_id> make();
+
+        HPX_EXPORT ~thread_id();
 
     protected:
         thread_id() = default;
-
-        HPX_EXPORT ~thread_id();
     };
 
 }}}}    // namespace hpx::util::logging::formatter

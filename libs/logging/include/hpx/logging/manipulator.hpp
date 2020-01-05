@@ -54,9 +54,11 @@ namespace hpx { namespace util { namespace logging {
             /// That is, this allows configuration of your manipulator at run-time.
             virtual void configure(std::string const&) {}
 
+            HPX_EXPORT virtual ~manipulator();
+
         protected:
             // signify that we're only a base class - not to be used directly
-            HPX_EXPORT virtual ~manipulator();
+            manipulator() = default;
         };
 
     }    // namespace formatter
@@ -79,9 +81,11 @@ namespace hpx { namespace util { namespace logging {
             /// That is, this allows configuration of your manipulator at run-time.
             virtual void configure(std::string const&) {}
 
+            HPX_EXPORT virtual ~manipulator();
+
         protected:
             // signify that we're only a base class - not to be used directly
-            HPX_EXPORT virtual ~manipulator();
+            manipulator() = default;
         };
 
     }    // namespace destination

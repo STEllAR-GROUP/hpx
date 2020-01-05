@@ -119,10 +119,11 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         std::string m_format;
     };
 
-    std::shared_ptr<high_precision_time> high_precision_time::make(
+    std::unique_ptr<high_precision_time> high_precision_time::make(
         std::string const& format)
     {
-        return std::make_shared<high_precision_time_impl>(format);
+        return std::unique_ptr<high_precision_time>(
+            new high_precision_time_impl(format));
     }
 
 }}}}    // namespace hpx::util::logging::formatter

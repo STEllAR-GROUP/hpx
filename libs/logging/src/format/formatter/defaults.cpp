@@ -43,9 +43,9 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         mutable std::uint64_t value;
     };
 
-    std::shared_ptr<idx> idx::make()
+    std::unique_ptr<idx> idx::make()
     {
-        return std::make_shared<idx_impl>();
+        return std::unique_ptr<idx>(new idx_impl());
     }
 
 }}}}    // namespace hpx::util::logging::formatter
