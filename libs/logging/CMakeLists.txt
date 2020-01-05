@@ -13,7 +13,6 @@ set(logging_headers
   hpx/logging.hpp
   hpx/logging/detail/macros.hpp
   hpx/logging/detail/logger.hpp
-  hpx/logging/detail/cache_before_init.hpp
   hpx/logging/format/destinations.hpp
   hpx/logging/format/formatters.hpp
   hpx/logging/format/named_write.hpp
@@ -32,7 +31,6 @@ set(logging_compat_headers
   hpx/util/logging/detail/level.hpp
   hpx/util/logging/detail/manipulator.hpp
   hpx/util/logging/detail/logger.hpp
-  hpx/util/logging/detail/cache_before_init.hpp
   hpx/util/logging/logging.hpp
   hpx/util/logging/format/formatter/high_precision_time.hpp
   hpx/util/logging/format/formatter/defaults.hpp

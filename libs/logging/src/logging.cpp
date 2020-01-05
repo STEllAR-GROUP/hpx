@@ -76,10 +76,11 @@ namespace hpx { namespace util {
 }}       // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-#include <hpx/logging/detail/cache_before_init.hpp>
+#include <hpx/logging/detail/logger.hpp>
 
-namespace hpx { namespace util { namespace logging { namespace detail {
-    void cache_before_init::turn_cache_off(writer::named_write const& writer_)
+namespace hpx { namespace util { namespace logging {
+
+    void logger::turn_cache_off()
     {
         if (m_is_caching_off)
             return;    // already turned off
@@ -87,14 +88,13 @@ namespace hpx { namespace util { namespace logging { namespace detail {
         m_is_caching_off = true;
 
         // dump messages
-        message_array msgs;
+        std::vector<message> msgs;
         std::swap(m_cache, msgs);
 
         for (auto& msg : msgs)
-        {
-            writer_(msg);
-        }
+            m_writer(msg);
     }
-}}}}    // namespace hpx::util::logging::detail
+
+}}}    // namespace hpx::util::logging
 
 #endif    // HPX_HAVE_LOGGING

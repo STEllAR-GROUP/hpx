@@ -14,19 +14,17 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-// IMPORTANT : the JT28092007_logger_HPP_DEFINED needs to remain constant
-// - don't change the macro name!
-#ifndef JT28092007_logger_HPP_DEFINED
-#define JT28092007_logger_HPP_DEFINED
+#ifndef HPX_LOGGING_DETAIL_LOGGER_HPP
+#define HPX_LOGGING_DETAIL_LOGGER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/logging/detail/cache_before_init.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/level.hpp>
 
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -81,9 +79,9 @@ namespace hpx { namespace util { namespace logging {
     - check out the writer namespace
 
     */
-    struct logger
+    class logger
     {
-        typedef writer::named_write write_type;
+        HPX_NON_COPYABLE(logger);
 
         struct gather_holder
         {    //-V690
@@ -111,7 +109,12 @@ namespace hpx { namespace util { namespace logging {
             std::ostringstream m_out;
         };
 
-        logger(level default_level = level::enable_all)
+    public:
+        logger() noexcept
+          : m_level(level::enable_all)
+        {
+        }
+        explicit logger(level default_level) noexcept
           : m_level(default_level)
         {
         }
@@ -131,21 +134,21 @@ namespace hpx { namespace util { namespace logging {
             return {*this};
         }
 
-        write_type& writer()
+        writer::named_write& writer() noexcept
         {
             return m_writer;
         }
-        const write_type& writer() const
+        writer::named_write const& writer() const noexcept
         {
             return m_writer;
         }
 
-        bool is_enabled(level level) const
+        bool is_enabled(level level) const noexcept
         {
             return level >= m_level;
         }
 
-        void set_enabled(level level)
+        void set_enabled(level level) noexcept
         {
             m_level = level;
         }
@@ -172,25 +175,23 @@ namespace hpx { namespace util { namespace logging {
         }
 
     public:
-        void turn_cache_off()
-        {
-            m_cache.turn_cache_off(m_writer);
-        }
+        void HPX_EXPORT turn_cache_off();
 
         // called after all data has been gathered
         void do_write(message msg) const
         {
-            if (m_cache.is_cache_turned_off())
+            if (m_is_caching_off)
                 m_writer(msg);
             else
-                m_cache.add_msg(std::move(msg));
+                m_cache.push_back(std::move(msg));
         }
 
     private:
-        mutable detail::cache_before_init m_cache;
-        write_type m_writer;
+        mutable std::vector<message> m_cache;
+        mutable bool m_is_caching_off;
+        writer::named_write m_writer;
         level m_level;
     };
 }}}    // namespace hpx::util::logging
 
-#endif
+#endif /*HPX_LOGGING_DETAIL_LOGGER_HPP*/
