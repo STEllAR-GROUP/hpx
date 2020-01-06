@@ -16,7 +16,7 @@ set(tests
     suspend_thread_timed
 )
 
-if (${HPX_CXX_STANDARD} GREATER 11)
+if (HPX_CXX_STANDARD GREATER 11)
   set(tests ${tests}
     cross_pool_injection
   )

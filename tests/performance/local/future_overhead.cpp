@@ -234,7 +234,7 @@ void measure_function_futures_thread_count(
 
     if (sanity_check != 0)
     {
-        int count = this_pool->get_thread_count_unknown(std::size_t(-1), false);
+        auto count = this_pool->get_thread_count_unknown(std::size_t(-1), false);
         throw std::runtime_error(
             "This test is faulty " + std::to_string(count));
     }
@@ -432,7 +432,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
     auto const desc = hpx::util::thread_description();
-    auto const prio = hpx::threads::thread_priority_normal;
+    auto prio = hpx::threads::thread_priority_normal;
     auto const stack_size =
         hpx::threads::get_stack_size(hpx::threads::thread_stacksize_small);
     auto const num_threads = hpx::get_num_worker_threads();
@@ -442,9 +442,10 @@ void measure_function_futures_create_thread_hierarchical_placement(
     high_resolution_timer walltime;
     for (std::size_t t = 0; t < num_threads; ++t)
     {
-        auto const hint = hpx::threads::thread_schedule_hint(t);
+        auto const hint =
+            hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
         auto spawn_func = [&thread_func, sched, hint, t, count, num_threads,
-                              desc, stack_size]() {
+                              desc, stack_size, prio]() {
             std::uint64_t const count_start = t * count / num_threads;
             std::uint64_t const count_end = (t + 1) * count / num_threads;
             hpx::error_code ec;
@@ -489,7 +490,8 @@ void measure_function_futures_apply_hierarchical_placement(
     high_resolution_timer walltime;
     for (std::size_t t = 0; t < num_threads; ++t)
     {
-        auto const hint = hpx::threads::thread_schedule_hint(t);
+        auto const hint =
+            hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
         auto spawn_func = [&func, hint, t, count, num_threads]() {
             auto exec = hpx::threads::executors::default_executor(hint);
             std::uint64_t const count_start = t * count / num_threads;
