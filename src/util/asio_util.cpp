@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstdint>
 #include <string>
@@ -15,7 +16,6 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
