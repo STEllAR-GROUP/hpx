@@ -124,29 +124,47 @@ namespace hpx { namespace parallel { namespace execution {
             std::size_t const size = hpx::util::size(shape);
             results.resize(size);
 
-            lcos::local::latch l(num_threads);
+            lcos::local::latch l(size);
             std::size_t part_begin = 0;
             auto it = std::begin(shape);
             for (std::size_t t = 0; t < num_threads; ++t)
             {
                 std::size_t const part_end = ((t + 1) * size) / num_threads;
+                std::size_t const part_size = part_end - part_begin;
+
                 threads::thread_schedule_hint hint{
                     static_cast<std::int16_t>(first_thread + t)};
-                detail::post_policy_dispatch<decltype(policy)>::call(policy,
-                    desc, pool, priority, threads::thread_stacksize_small, hint,
-                    [&, hint, part_begin, part_end, f, it]() mutable {
-                        for (std::size_t part_i = part_begin; part_i < part_end;
-                             ++part_i)
-                        {
-                            results[part_i] =
-                                hpx::detail::async_launch_policy_dispatch<
-                                    decltype(policy)>::call(policy, pool,
-                                    priority, stacksize, hint, f, *it, ts...);
-                            ++it;
-                        }
-                        l.count_down(1);
-                    });
-                std::advance(it, part_end - part_begin);
+
+                if (part_size > 1)
+                {
+                    detail::post_policy_dispatch<decltype(policy)>::call(policy,
+                        desc, pool, priority, threads::thread_stacksize_small,
+                        hint,
+                        [&, hint, part_begin, part_end, part_size, f,
+                            it]() mutable {
+                            for (std::size_t part_i = part_begin;
+                                 part_i < part_end; ++part_i)
+                            {
+                                results[part_i] =
+                                    hpx::detail::async_launch_policy_dispatch<
+                                        decltype(policy)>::call(policy, pool,
+                                        priority, stacksize, hint, f, *it,
+                                        ts...);
+                                ++it;
+                            }
+                            l.count_down(part_size);
+                        });
+                }
+                else if (part_size == 1)
+                {
+                    results[part_begin] =
+                        hpx::detail::async_launch_policy_dispatch<decltype(
+                            policy)>::call(policy, pool, priority, stacksize,
+                            hint, f, *it, ts...);
+                    l.count_down(1);
+                }
+
+                std::advance(it, part_size);
                 part_begin = part_end;
             }
 
