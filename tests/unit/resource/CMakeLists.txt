@@ -16,9 +16,8 @@ set(tests
     suspend_thread_timed
 )
 
-# TODO: Enable on all platforms and standards when C++14 is required and test is
-# fully fixed.
-if (NOT MSVC AND "${HPX_CXX_STANDARD}" GREATER 11)
+# TODO: Enable unconditionally when C++14 is required.
+if (HPX_CXX_STANDARD GREATER 11)
   set(tests ${tests}
     cross_pool_injection
   )
