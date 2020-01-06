@@ -115,13 +115,9 @@ struct test_async_executor
                   << print_type<result_type>() << "\n";
 
         // forward the task execution on to the real internal executor
-        lcos::local::futures_factory<result_type()> p(executor_,
-            util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
-
-        p.apply("custom", launch::async, threads::thread_priority_default,
-            threads::thread_stacksize_default);
-
-        return p.get_future();
+        return hpx::parallel::execution::async_execute(executor_,
+            util::annotated_function(std::forward<F>(f), "custom"),
+            std::forward<Ts>(ts)...);
     }
 
     // --------------------------------------------------------------------
@@ -151,15 +147,9 @@ struct test_async_executor
         std::cout << "then_execute : Result       : "
                   << print_type<result_type>() << "\n";
 
-        auto&& func = hpx::util::one_shot(
-            hpx::util::bind_back(std::forward<F>(f), std::forward<Ts>(ts)...));
-
-        typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-            lcos::detail::make_continuation_exec<result_type>(
-                std::forward<Future>(predecessor), executor_, std::move(func));
-
-        return hpx::traits::future_access<hpx::future<result_type>>::create(
-            std::move(p));
+        return hpx::parallel::execution::then_execute(executor_,
+            std::forward<F>(f), std::forward<Future>(predecessor),
+            std::forward<Ts>(ts)...);
     }
 
     // --------------------------------------------------------------------
@@ -210,16 +200,11 @@ struct test_async_executor
             unwrapped_futures_tuple);
 
         // forward the task execution on to the real internal executor
-        lcos::local::futures_factory<result_type()> p(executor_,
-            util::deferred_call(std::forward<F>(f),
-                std::forward<OuterFuture<util::tuple<InnerFutures...>>>(
-                    predecessor),
-                std::forward<Ts>(ts)...));
-
-        p.apply("custom then", launch::async, threads::thread_priority_default,
-            threads::thread_stacksize_default);
-
-        return p.get_future();
+        return hpx::parallel::execution::then_execute(executor_,
+            util::annotated_function(std::forward<F>(f), "custom then"),
+            std::forward<OuterFuture<util::tuple<InnerFutures...>>>(
+                predecessor),
+            std::forward<Ts>(ts)...);
     }
 
     // --------------------------------------------------------------------
@@ -259,19 +244,13 @@ struct test_async_executor
             unwrapped_futures_tuple);
 
         // forward the task execution on to the real internal executor
-        // forward the task execution on to the real internal executor
-        lcos::local::futures_factory<result_type()> p(
-            util::deferred_call(std::forward<F>(f),
-                std::forward<util::tuple<InnerFutures...>>(predecessor)));
-
-        p.apply("custom async", launch::async, threads::thread_priority_default,
-            threads::thread_stacksize_default);
-
-        return p.get_future();
+        return hpx::parallel::execution::async_execute(executor_,
+            util::annotated_function(std::forward<F>(f), "custom async"),
+            std::forward<util::tuple<InnerFutures...>>(predecessor));
     }
 
 private:
-    threads::executors::default_executor executor_;
+    parallel::execution::default_executor executor_;
 };
 
 // --------------------------------------------------------------------
@@ -466,10 +445,15 @@ struct dummy_tag
 {
 };
 
-namespace hpx { namespace threads { namespace executors {
+namespace hpx { namespace parallel { namespace execution {
     template <>
     struct pool_numa_hint<dummy_tag>
     {
+        int operator()() const
+        {
+            std::cout << "Hint 0 \n";
+            return 0;
+        }
         int operator()(const int, const double, const char*) const
         {
             std::cout << "Hint 1 \n";
@@ -503,7 +487,7 @@ namespace hpx { namespace threads { namespace executors {
             return 4;
         }
     };
-}}}    // namespace hpx::threads::executors
+}}}    // namespace hpx::parallel::execution
 
 int hpx_main()
 {
@@ -519,10 +503,10 @@ int hpx_main()
         ok = false;
     }
 
-    typedef hpx::threads::executors::pool_numa_hint<dummy_tag> dummy_hint;
+    typedef hpx::parallel::execution::pool_numa_hint<dummy_tag> dummy_hint;
     try
     {
-        hpx::threads::executors::guided_pool_executor<dummy_hint> exec2(
+        hpx::parallel::execution::guided_pool_executor<dummy_hint> exec2(
             "default");
         test("Testing guided_pool_executor<dummy_hint>", exec2);
     }
@@ -534,7 +518,7 @@ int hpx_main()
 
     try
     {
-        hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec3(
+        hpx::parallel::execution::guided_pool_executor_shim<dummy_hint> exec3(
             true, "default");
         test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
     }

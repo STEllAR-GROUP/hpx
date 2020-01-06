@@ -16,7 +16,7 @@
 
 int main()
 {
-    hpx::threads::executors::pool_executor executor("default");
+    hpx::parallel::execution::pool_executor executor("default");
 
     auto future = hpx::make_ready_future().share();
 
