@@ -120,7 +120,7 @@ namespace boost
       const path & full_path,   // example: c:/foo/boost/filesystem/path.hpp
       const string & contents )     // contents of file to be inspected
     {
-      if (contents.find( "boostinspect:" "ndprecated_macros" ) != string::npos)
+      if (contents.find( "hpxinspect:" "nodeprecated_macros" ) != string::npos)
         return;
 
       const char **ptr;
