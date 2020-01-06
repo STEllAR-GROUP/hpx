@@ -241,15 +241,29 @@ namespace hpx { namespace parallel { namespace execution {
         typedef static_chunk_size executor_parameters_type;
 
         /// Create a new parallel executor
-        // TODO: Add constexpr constructor to replace parallel_executor
-        thread_pool_executor()
+        explicit thread_pool_executor(threads::thread_priority priority =
+                                          threads::thread_priority_default,
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
+            threads::thread_schedule_hint schedulehint = {})
           : pool_(this_thread::get_pool())
+          , priority_(priority)
+          , stacksize_(stacksize)
+          , schedulehint_(schedulehint)
         {
             HPX_ASSERT(pool_);
         }
 
         explicit thread_pool_executor(
-            threads::policies::scheduler_base* scheduler)
+            threads::policies::scheduler_base* scheduler,
+            threads::thread_priority priority =
+                threads::thread_priority_default,
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
+            threads::thread_schedule_hint schedulehint = {})
+          : priority_(priority)
+          , stacksize_(stacksize)
+          , schedulehint_(schedulehint)
         {
             HPX_ASSERT(scheduler);
             pool_ = scheduler->get_parent_pool();
