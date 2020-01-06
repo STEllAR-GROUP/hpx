@@ -1,4 +1,4 @@
-//  Copyright (c) 2018=2019 Mikael Simberg
+//  Copyright (c) 2018-2020 Mikael Simberg
 //  Copyright (c) 2018-2019 John Biddiscombe
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
@@ -73,7 +73,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     {
         hpx::util::format_to(temp,
             "{1}, {:27}, {:15}, {:18}, {:8}, {:8}, {:20}, {:4}, {:4}, "
-            "{:20}\n",
+            "{:20}",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
             num_threads, info_string);
     }
@@ -81,7 +81,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     {
         hpx::util::format_to(temp,
             "invoked {:1}, futures {:27} {:15} {:18} in {:8} seconds : {:8} "
-            "us/future, queue {:20}, numa {:4}, threads {:4}, info {:20}\n",
+            "us/future, queue {:20}, numa {:4}, threads {:4}, info {:20}",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
             num_threads, info_string);
     }
@@ -90,10 +90,15 @@ void print_stats(const char* title, const char* wait, const char* exec,
     //hpx::util::print_cdash_timing(title, duration);
 }
 
-const char* exec_name(
-    hpx::parallel::execution::parallel_executor const& exec)
+const char* exec_name(hpx::parallel::execution::parallel_executor const& exec)
 {
     return "parallel_executor";
+}
+
+const char* exec_name(
+    hpx::parallel::execution::parallel_executor_aggregated const& exec)
+{
+    return "parallel_executor_aggregated";
 }
 
 const char* exec_name(
@@ -280,8 +285,8 @@ void measure_function_futures_limiting_executor(
     {
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
-        hpx::parallel::for_loop(
-            hpx::parallel::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
+        hpx::parallel::for_loop(hpx::parallel::execution::par.with(fixed), 0,
+            count, [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
@@ -342,8 +347,8 @@ namespace hpx { namespace parallel { namespace execution {
 }}}    // namespace hpx::parallel::execution
 
 template <typename Executor>
-void measure_function_futures_for_loop(
-    std::uint64_t count, bool csv, Executor& exec)
+void measure_function_futures_for_loop(std::uint64_t count, bool csv,
+    Executor& exec, char const* executor_name = nullptr)
 {
     // start the clock
     high_resolution_timer walltime;
@@ -354,7 +359,8 @@ void measure_function_futures_for_loop(
 
     // stop the clock
     const double duration = walltime.elapsed();
-    print_stats("for_loop", "par", exec_name(exec), count, duration, csv);
+    print_stats("for_loop", "par",
+        executor_name ? executor_name : exec_name(exec), count, duration, csv);
 }
 
 void measure_function_futures_register_work(std::uint64_t count, bool csv)
@@ -548,7 +554,11 @@ int hpx_main(variables_map& vm)
             throw std::logic_error("error: count of 0 futures specified\n");
 
         hpx::parallel::execution::parallel_executor par;
+        hpx::parallel::execution::parallel_executor_aggregated par_agg;
         hpx::parallel::execution::thread_pool_executor tpe;
+        hpx::parallel::execution::thread_pool_executor tpe_nostack(
+            hpx::threads::thread_priority_default,
+            hpx::threads::thread_stacksize_nostack);
 
         for (int i = 0; i < repetitions; i++)
         {
@@ -569,8 +579,10 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_sliding_semaphore(count, csv, par);
                 measure_function_futures_sliding_semaphore(count, csv, tpe);
                 measure_function_futures_for_loop(count, csv, par);
+                measure_function_futures_for_loop(count, csv, par_agg);
                 measure_function_futures_for_loop(count, csv, tpe);
-
+                measure_function_futures_for_loop(
+                    count, csv, tpe_nostack, "thread_pool_executor_nostack");
                 measure_function_futures_register_work(count, csv);
                 measure_function_futures_create_thread(count, csv);
                 measure_function_futures_apply_hierarchical_placement(
