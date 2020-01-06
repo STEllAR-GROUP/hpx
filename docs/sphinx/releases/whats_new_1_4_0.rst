@@ -166,6 +166,8 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`4293` - Applying two small changes fixing carious MSVC/Windows
+  problems
 * :hpx-pr:`4285` - Delete ``apex.hpp``
 * :hpx-pr:`4276` - Disable doxygen generation for ``hpx/debugging/print.hpp``
   file
