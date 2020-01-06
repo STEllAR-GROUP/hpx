@@ -90,11 +90,20 @@ Breaking changes
 Closed issues
 =============
 
+* :hpx-issue:`4273` - Clients of HPX 1.4.0-rc2 with APEX ar not linked to
+  libhpx-apex
+* :hpx-issue:`4269` - Building HPX 1.4.0-rc2 with support for APEX fails
 * :hpx-issue:`4263` - Compilation fail on latest master
 * :hpx-issue:`4232` - Configure of HPX project using CMake FetchContent fails
+* :hpx-issue:`4223` - "Re-using the main() function as the main HPX entry point"
+  doesn't work
+* :hpx-issue:`4220` - HPX won't compile - error building
+  ``resource_partitioner``
 * :hpx-issue:`4215` - HPX 1.4.0rc1 does not link on s390x
 * :hpx-issue:`4204` - Trouble compiling HPX with Intel compiler
+* :hpx-issue:`4199` - Refactor APEX to eliminate circular dependency
 * :hpx-issue:`4187` - HPX can't build on OSX
+* :hpx-issue:`4185` - Simple debug output for development
 * :hpx-issue:`4182` - ``@HPX_CONF_PREFIX@`` is the empty string
 * :hpx-issue:`4169` - HPX won't build with APEX
 * :hpx-issue:`4163` - Add back ``HPX_LIBRARIES`` and ``HPX_INCLUDE_DIRS``
@@ -115,6 +124,7 @@ Closed issues
 * :hpx-issue:`4107` - Initializing runtime without entry point function and
   command line arguments
 * :hpx-issue:`4105` - Bug in ``hpx:bind=numa-balanced``
+* :hpx-issue:`4101` - Bound tasks
 * :hpx-issue:`4100` - Add SPDX identifier to all files
 * :hpx-issue:`4085` - ``hpx_topology`` library should depend on hwloc
 * :hpx-issue:`4067` - HPX fails to build on macOS
@@ -156,6 +166,7 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`4285` - Delete ``apex.hpp``
 * :hpx-pr:`4276` - Disable doxygen generation for ``hpx/debugging/print.hpp``
   file
 * :hpx-pr:`4275` - Make sure APEX is linked to even when not explicitly
@@ -195,6 +206,7 @@ Closed pull requests
 * :hpx-pr:`4234` - Add basic overview sentence to all modules
 * :hpx-pr:`4230` - Add OS X builds to Travis CI
 * :hpx-pr:`4229` - Remove leftover queue compatibility checks
+* :hpx-pr:`4226` - Fixing APEX shutdown by explicitly shutting down throttling
 * :hpx-pr:`4225` - Allow ``CMAKE_INSTALL_PREFIX`` to be a relative path
 * :hpx-pr:`4224` - Deprecate verbs parcelport
 * :hpx-pr:`4222` - Update ``register_{thread,work}`` namespaces
@@ -205,6 +217,7 @@ Closed pull requests
 * :hpx-pr:`4217` - Google Season of Docs updates to documentation; grammar
   edits.
 * :hpx-pr:`4216` - Fixing gcc warning on 32bit platforms (integer truncation)
+* :hpx-pr:`4214` - Apex callback refactoring
 * :hpx-pr:`4213` - Clean up allocator checks for dependent projects
 * :hpx-pr:`4212` - Google Season of Docs updates to documentation; grammar
   edits.
@@ -303,6 +316,8 @@ Closed pull requests
 * :hpx-pr:`4109` - Overload for start without entry point/argv.
 * :hpx-pr:`4108` - Making sure C++ standard is properly detected and propagated
 * :hpx-pr:`4106` - use ``std::round`` for guaranteed rounding without errors
+* :hpx-pr:`4104` - Extend ``scheduler_mode`` with new ``work_stealing`` and task
+  assignment modes
 * :hpx-pr:`4103` - Add this to lambda capture list
 * :hpx-pr:`4102` - Add spdx license and check
 * :hpx-pr:`4099` - Module coroutines
