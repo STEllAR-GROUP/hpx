@@ -19,6 +19,7 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/parallel/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

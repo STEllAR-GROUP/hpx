@@ -20,13 +20,14 @@ set(tests
     sequenced_executor
     service_executors
     shared_parallel_executor
-    thread_pool_attached_executors
     timed_parallel_executor
     standalone_thread_pool_executor
    )
 
 if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
-  set(tests ${tests} thread_pool_os_executors)
+  set(tests ${tests}
+    thread_pool_attached_executors
+    thread_pool_os_executors)
 
   if(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
     set(tests ${tests}

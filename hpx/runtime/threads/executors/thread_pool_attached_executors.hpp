@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/parallel/executors/thread_pool_attached_executors.hpp>
+#include <hpx/parallel/executors/restricted_thread_pool_executors.hpp>
 
 namespace hpx { namespace threads { namespace executors {
     ///////////////////////////////////////////////////////////////////////////
