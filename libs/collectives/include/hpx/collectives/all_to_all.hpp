@@ -201,7 +201,9 @@ namespace hpx { namespace lcos {
 
                     {
                         std::unique_lock<mutex_type> l(mtx_);
-                        util::ignore_lock(&l);
+                        util::ignore_while_checking<
+                            std::unique_lock<mutex_type>>
+                            il(&l);
                         data = data_;
                         std::swap(name, name_);
                     }
