@@ -96,6 +96,41 @@ namespace hpx { namespace actions
         }
     };
 
+#if defined(HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS)
+    template <
+        typename R, typename ...Ps,
+        R (*F)(Ps...) noexcept, typename Derived>
+    struct action<R (*)(Ps...) noexcept, F, Derived>
+      : public basic_action<detail::plain_function, R(Ps...),
+            typename detail::action_type<
+                action<R (*)(Ps...) noexcept, F, Derived>,
+                Derived
+            >::type
+        >
+    {
+    public:
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
+        static std::string get_action_name(naming::address::address_type /*lva*/)
+        {
+            return detail::make_plain_action_name(
+                detail::get_action_name<derived_type>());
+        }
+
+        template <typename ...Ts>
+        static R invoke(
+            naming::address::address_type /*lva*/,
+            naming::address::component_type comptype, Ts&&... vs)
+        {
+            basic_action<detail::plain_function, R(Ps...),
+                derived_type>::increment_invocation_count();
+            return F(std::forward<Ts>(vs)...);
+        }
+    };
+#endif
+
     /// \endcond
 }}
 

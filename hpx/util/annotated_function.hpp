@@ -29,6 +29,7 @@
 #include <cstdint>
 #include <type_traits>
 #include <utility>
+#include <string>
 
 namespace hpx { namespace util
 {
@@ -82,7 +83,7 @@ namespace hpx { namespace util
             /* update the task wrapper in APEX to use the specified name */
             threads::set_self_timer_data(
                 external_timer::update_task(threads::get_self_timer_data(),
-                desc_));
+                std::string(name)));
 #endif
         }
 

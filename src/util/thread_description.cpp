@@ -49,10 +49,15 @@ namespace hpx { namespace util
 #endif
     }
 
-    /* The priority of description is id::name, altname, id::address */
+    /* The priority of description is altname, id::name, id::address */
     void thread_description::init_from_alternative_name(char const* altname)
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION) && !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
+        if (altname != nullptr) {
+            type_ = data_type_description;
+            data_.desc_ = altname;
+            return;
+        }
         hpx::threads::thread_id_type id = hpx::threads::get_self_id();
         if (id)
         {
@@ -66,19 +71,10 @@ namespace hpx { namespace util
             }
             else
             {
-                // if there is an alternate name passed in, use it.
-                if (altname != nullptr) {
-                    type_ = data_type_description;
-                    data_.desc_ = altname;
-                } else {
-                    // otherwise, use the address of the task.
-                    HPX_ASSERT(type_ == data_type_address);
-                    data_.addr_ = desc.get_address();
-                }
+                // otherwise, use the address of the task.
+                HPX_ASSERT(type_ == data_type_address);
+                data_.addr_ = desc.get_address();
             }
-        } else {
-            type_ = data_type_description;
-            data_.desc_ = altname;
         }
 #endif
     }

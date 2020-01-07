@@ -10,10 +10,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(affinity_headers
   hpx/affinity/affinity_data.hpp
+  hpx/affinity/detail/partlit.hpp
   hpx/affinity/parse_affinity_options.hpp
 )
 
 set(affinity_compat_headers
+  hpx/runtime/threads/detail/partlit.hpp
   hpx/runtime/threads/policies/affinity_data.hpp
   hpx/runtime/threads/policies/parse_affinity_options.hpp
 )

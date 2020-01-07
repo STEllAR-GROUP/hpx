@@ -23,8 +23,6 @@ set(memory_sources
 
 include(HPX_AddModule)
 add_hpx_module(memory
-  COMPATIBILITY_HEADERS OFF
-  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
@@ -32,7 +30,6 @@ add_hpx_module(memory
     "hpx/memory/serialization/intrusive_ptr.hpp"
   SOURCES ${memory_sources}
   HEADERS ${memory_headers}
-  COMPAT_HEADERS ${memory_compat_headers}
   DEPENDENCIES
     hpx_config
     hpx_assertion

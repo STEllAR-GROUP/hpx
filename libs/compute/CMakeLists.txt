@@ -28,8 +28,6 @@ set(compute_headers
   hpx/compute/vector.hpp
 )
 
-set(compute_compat_headers)
-
 set(compute_sources
   get_host_targets.cpp
   host_target.cpp
@@ -38,8 +36,6 @@ set(compute_sources
 
 include(HPX_AddModule)
 add_hpx_module(compute
-  COMPATIBILITY_HEADERS OFF
-  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${compute_sources}

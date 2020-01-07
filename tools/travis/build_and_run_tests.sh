@@ -13,8 +13,8 @@ if [ "$TRAVIS_OS_NAME" = "windows" ]; then
         --target core \
         -- -verbosity:minimal -maxcpucount:4 -nologo
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    cmake --build build --target core
-    cmake --build build --target examples
+    cmake --build build --target core || exit 1
+    cmake --build build --target examples || exit 1
     ctest --output-on-failure -R tests.examples
 else
     echo "no scripts set up for \"$TRAVIS_OS_NAME\""

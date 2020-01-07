@@ -6,8 +6,8 @@
 
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/affinity/parse_affinity_options.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/runtime/threads/policies/parse_affinity_options.hpp>
 #include <hpx/testing.hpp>
 
 #include <algorithm>

@@ -48,19 +48,21 @@ function(add_hpx_module name)
       NAMESPACE ${name_upper})
   endif()
 
-  set(_compatibility_headers_default OFF)
-  if(${name}_COMPATIBILITY_HEADERS)
-    set(_compatibility_headers_default ON)
-  endif()
-  hpx_option(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
-    BOOL
-    "Enable compatibility headers for old headers. (default: ${_compatibility_headers_default})"
-    ${_compatibility_headers_default} ADVANCED
-    CATEGORY "Modules")
-  if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
-    hpx_add_config_define_namespace(
-      DEFINE HPX_${name_upper}_HAVE_COMPATIBILITY_HEADERS
-      NAMESPACE ${name_upper})
+  if(NOT "${${name}_COMPATIBILITY_HEADERS}" STREQUAL "")
+    set(_compatibility_headers_default OFF)
+    if(${name}_COMPATIBILITY_HEADERS)
+      set(_compatibility_headers_default ON)
+    endif()
+    hpx_option(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
+      BOOL
+      "Enable compatibility headers for old headers. (default: ${_compatibility_headers_default})"
+      ${_compatibility_headers_default} ADVANCED
+      CATEGORY "Modules")
+    if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
+      hpx_add_config_define_namespace(
+        DEFINE HPX_${name_upper}_HAVE_COMPATIBILITY_HEADERS
+        NAMESPACE ${name_upper})
+    endif()
   endif()
 
   # Main directories of the module

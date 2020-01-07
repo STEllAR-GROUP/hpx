@@ -169,6 +169,94 @@ namespace hpx { namespace actions
         }
     };
 
+#if defined(HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS)
+    ///////////////////////////////////////////////////////////////////////////
+    //  Specialized generic non-const noexcept component action types allowing
+    //  to hold a different number of arguments
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, typename R, typename ...Ps,
+        R (Component::*F)(Ps...) noexcept, typename Derived>
+    struct action<R (Component::*)(Ps...) noexcept, F, Derived>
+      : public basic_action<Component, R(Ps...),
+            typename detail::action_type<
+                action<R (Component::*)(Ps...) noexcept, F, Derived>,
+                Derived
+            >::type
+        >
+    {
+    public:
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
+        static std::string get_action_name(naming::address::address_type lva)
+        {
+            return detail::make_component_action_name(
+                detail::get_action_name<derived_type>(),
+                get_lva<Component>::call(lva));
+        }
+
+        template <typename ...Ts>
+        static R invoke(
+            naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
+        {
+            basic_action<Component, R(Ps...), derived_type>::
+                increment_invocation_count();
+
+            using is_future = typename traits::is_future<R>::type;
+            return detail::component_invoke<Component, R>(is_future{},
+                lva, comptype, F, std::forward<Ts>(vs)...);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    //  Specialized generic const noexcept component action types allowing to
+    //  hold a different number of arguments
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Component, typename R, typename ...Ps,
+        R (Component::*F)(Ps...) const noexcept, typename Derived>
+    struct action<R (Component::*)(Ps...) const noexcept, F, Derived>
+      : public basic_action<Component const, R(Ps...),
+            typename detail::action_type<
+                action<R (Component::*)(Ps...) const noexcept, F, Derived>,
+                Derived
+            >::type
+        >
+    {
+    public:
+        typedef typename detail::action_type<
+            action, Derived
+        >::type derived_type;
+
+        static std::string get_action_name(naming::address::address_type lva)
+        {
+            return detail::make_component_action_name(
+                detail::get_action_name<derived_type>(),
+                get_lva<Component>::call(lva));
+        }
+
+        template <typename ...Ts>
+        static R invoke(
+            naming::address::address_type lva,
+            naming::address::component_type comptype, Ts&&... vs)
+        {
+            basic_action<Component const, R(Ps...), derived_type>::
+                increment_invocation_count();
+
+            using is_future_or_client = typename std::integral_constant<bool,
+                traits::is_future<R>::value ||
+                    traits::is_client<R>::value>::type;
+
+            return detail::component_invoke<Component const, R>(
+                is_future_or_client{}, lva, comptype, F,
+                std::forward<Ts>(vs)...);
+        }
+    };
+#endif
+
     /// \endcond
 }}
 

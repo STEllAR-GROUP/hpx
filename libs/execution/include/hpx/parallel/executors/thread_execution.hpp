@@ -51,10 +51,12 @@ namespace hpx { namespace threads {
         typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
             result_type;
 
+        char const* annotation = hpx::traits::get_function_annotation<
+            typename hpx::util::decay<F>::type>::call(f);
         lcos::local::futures_factory<result_type()> p(
             std::forward<Executor>(exec),
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
-        p.apply();
+        p.apply(annotation);
         return p.get_future();
     }
 
@@ -103,10 +105,12 @@ namespace hpx { namespace threads {
         hpx::traits::is_threads_executor<Executor>::value>::type
     post(Executor&& exec, F&& f, Ts&&... ts)
     {
+        char const* annotation = hpx::traits::get_function_annotation<
+            typename hpx::util::decay<F>::type>::call(f);
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-            "hpx::parallel::execution::post", threads::pending, true,
-            exec.get_stacksize(), threads::thread_schedule_hint(), throws);
+            annotation, threads::pending, true, exec.get_stacksize(),
+            threads::thread_schedule_hint(), throws);
     }
     ///////////////////////////////////////////////////////////////////////////
     // post()
@@ -115,12 +119,13 @@ namespace hpx { namespace threads {
         hpx::traits::is_threads_executor<Executor>::value &&
         std::is_same<typename hpx::util::decay<Hint>::type,
             hpx::threads::thread_schedule_hint>::value>::type
-    post(Executor&& exec, F&& f, Hint&& hint, Ts&&... ts)
+    post(
+        Executor&& exec, F&& f, Hint&& hint, const char* annotation, Ts&&... ts)
     {
         exec.add(
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...),
-            "hpx::parallel::execution::post", threads::pending, true,
-            exec.get_stacksize(), std::forward<Hint>(hint), throws);
+            annotation, threads::pending, true, exec.get_stacksize(),
+            std::forward<Hint>(hint), throws);
     }
 
     ///////////////////////////////////////////////////////////////////////////

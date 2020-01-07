@@ -57,12 +57,12 @@ namespace hpx { namespace assertion {
 #else
 /// \cond NOINTERNAL
 #define HPX_ASSERT_(expr, msg)                                                 \
-    ::hpx::assertion::detail::evaluate_assert(                                 \
-        [&]() -> bool { return !!(expr); },                                    \
-        ::hpx::assertion::source_location{__FILE__,                            \
-            static_cast<unsigned>(__LINE__), HPX_ASSERT_CURRENT_FUNCTION},     \
-        HPX_PP_STRINGIZE(expr), [&]() { return msg; });                        \
-    /**/
+    (!!(expr) ? void() :                                                       \
+                ::hpx::assertion::detail::handle_assert(                       \
+                    ::hpx::assertion::source_location{__FILE__,                \
+                        static_cast<unsigned>(__LINE__),                       \
+                        HPX_ASSERT_CURRENT_FUNCTION},                          \
+                    HPX_PP_STRINGIZE(expr), msg)) /**/
 
 #if defined(HPX_DEBUG)
 #if defined(HPX_COMPUTE_DEVICE_CODE)

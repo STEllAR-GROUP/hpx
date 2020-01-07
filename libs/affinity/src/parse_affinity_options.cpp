@@ -27,7 +27,7 @@
 #include <boost/spirit/include/qi_parse.hpp>
 #include <boost/spirit/include/qi_string.hpp>
 
-#include <hpx/runtime/threads/detail/partlit.hpp>
+#include <hpx/affinity/detail/partlit.hpp>
 
 #include <algorithm>
 #include <cstddef>

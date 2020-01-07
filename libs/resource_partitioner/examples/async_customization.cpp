@@ -8,6 +8,7 @@
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #define GUIDED_EXECUTOR_DEBUG 1
+#include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
 //#include <hpx/topology/cpu_mask.hpp>
@@ -28,6 +29,7 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/pack_traversal.hpp>
 //
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -35,6 +37,8 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+
+#include <hpx/testing.hpp>
 
 // --------------------------------------------------------------------
 // custom executor async/then/when/dataflow specialization example
@@ -114,7 +118,7 @@ struct test_async_executor
         lcos::local::futures_factory<result_type()> p(executor_,
             util::deferred_call(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -147,15 +151,15 @@ struct test_async_executor
         std::cout << "then_execute : Result       : "
                   << print_type<result_type>() << "\n";
 
-        // forward the task on to the 'real' underlying executor
-        lcos::local::futures_factory<result_type()> p(executor_,
-            util::deferred_call(std::forward<F>(f),
-                std::forward<Future>(predecessor), std::forward<Ts>(ts)...));
+        auto&& func = hpx::util::one_shot(
+            hpx::util::bind_back(std::forward<F>(f), std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
-            threads::thread_stacksize_default);
+        typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
+            lcos::detail::make_continuation_exec<result_type>(
+                std::forward<Future>(predecessor), executor_, std::move(func));
 
-        return p.get_future();
+        return hpx::traits::future_access<hpx::future<result_type>>::create(
+            std::move(p));
     }
 
     // --------------------------------------------------------------------
@@ -212,7 +216,7 @@ struct test_async_executor
                     predecessor),
                 std::forward<Ts>(ts)...));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom then", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -260,7 +264,7 @@ struct test_async_executor
             util::deferred_call(std::forward<F>(f),
                 std::forward<util::tuple<InnerFutures...>>(predecessor)));
 
-        p.apply(launch::async, threads::thread_priority_default,
+        p.apply("custom async", launch::async, threads::thread_priority_default,
             threads::thread_stacksize_default);
 
         return p.get_future();
@@ -280,6 +284,13 @@ namespace hpx { namespace parallel { namespace execution {
     };
 }}}    // namespace hpx::parallel::execution
 
+template <typename T>
+T dummy_task(T val)
+{
+    // using std::thread here is intentional
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    return val;
+}
 // --------------------------------------------------------------------
 // test various execution modes
 // --------------------------------------------------------------------
@@ -295,108 +306,155 @@ int test(const std::string& message, Executor& exec)
         exec,
         [](int a, double b, const char* c) {
             std::cout << "Inside async " << c << std::endl;
-            return float(a * b) + 2.1415f;
+            HPX_TEST_EQ(a == 1 && b == 2.2 && std::string(c) == "Hello", true);
+            return "async";
         },
         1, 2.2, "Hello");
-    fa.get();
+    HPX_TEST_EQ(fa.get(), "async");
     std::cout << std::endl;
 
     // test 2a
     std::cout << "============================" << std::endl;
     std::cout << "Test 2a : .then()" << std::endl;
-    future<int> f = make_ready_future(5);
+    int testval = 5;
+    future<decltype(testval)> f =
+        hpx::async(&dummy_task<decltype(testval)>, testval);
     //
-    future<std::string> ft = f.then(exec, [](future<int>&& /*f*/) {
-        std::cout << "Inside .then()" << std::endl;
+    future<std::string> ft = f.then(exec, [testval](auto&& f) {
+        std::cout << "Inside .then() " << std::endl;
+        HPX_TEST_EQ_MSG(
+            f.is_ready(), true, "Continuation run before future ready");
+        decltype(testval) r = f.get();
+        std::cout << "expected " << testval << " got " << r << std::endl;
+        HPX_TEST_EQ(r, testval);
         return std::string("then");
     });
-    ft.get();
+    HPX_TEST_EQ(ft.get(), "then");
     std::cout << std::endl;
 
     // test 2b
     std::cout << "============================" << std::endl;
     std::cout << "Test 2b : .then(shared)" << std::endl;
-    auto fs = make_ready_future(5).share();
+    auto fs = hpx::async(&dummy_task<decltype(testval)>, testval).share();
     //
-    future<std::string> fts = fs.then(exec, [](shared_future<int>&& /*f*/) {
+    future<std::string> fts = fs.then(exec, [testval](auto&& f) {
         std::cout << "Inside .then(shared)" << std::endl;
+        HPX_TEST_EQ_MSG(
+            f.is_ready(), true, "Continuation run before future ready");
+        decltype(testval) r = f.get();
+        std::cout << "expected " << testval << " got " << r << std::endl;
+        HPX_TEST_EQ(r, testval);
         return std::string("then(shared)");
     });
-    fts.get();
+    HPX_TEST_EQ(fts.get(), "then(shared)");
     std::cout << std::endl;
 
     // test 3a
     std::cout << "============================" << std::endl;
     std::cout << "Test 3a : when_all()" << std::endl;
-    future<int> fw1 = make_ready_future(123);
-    future<double> fw2 = make_ready_future(4.567);
+    int testval2 = 123;
+    double testval3 = 4.567;
+    auto fw1 = hpx::async(&dummy_task<decltype(testval2)>, testval2);
+    auto fw2 = hpx::async(&dummy_task<decltype(testval3)>, testval3);
     //
-    auto fw = when_all(fw1, fw2).then(
-        exec, [](future<util::tuple<future<int>, future<double>>>&& f) {
+    auto fw = when_all(fw1, fw2).then(exec,
+        [testval2, testval3](
+            future<util::tuple<future<int>, future<double>>>&& f) {
+            std::cout << "Inside when_all : " << std::endl;
+            HPX_TEST_EQ_MSG(
+                f.is_ready(), true, "Continuation run before future ready");
             auto tup = f.get();
             auto cmplx = std::complex<double>(
                 double(util::get<0>(tup).get()), util::get<1>(tup).get());
-            std::cout << "Inside when_all : " << cmplx << std::endl;
+            auto cmplxe = std::complex<double>(double(testval2), testval3);
+            std::cout << "expected " << cmplxe << " got " << cmplx << std::endl;
+            HPX_TEST_EQ(cmplx, cmplxe);
             return std::string("when_all");
         });
-    fw.get();
+    HPX_TEST_EQ(fw.get(), "when_all");
     std::cout << std::endl;
 
     // test 3b
     std::cout << "============================" << std::endl;
     std::cout << "Test 3b : when_all(shared)" << std::endl;
-    future<std::uint64_t> fws1 = make_ready_future(std::uint64_t(42));
-    shared_future<float> fws2 = make_ready_future(3.1415f).share();
+    std::uint64_t testval4 = 666;
+    float testval5 = 876.5;
+    auto fws1 = hpx::async(&dummy_task<decltype(testval4)>, testval4);
+    auto fws2 = hpx::async(&dummy_task<decltype(testval5)>, testval5).share();
     //
-    auto fws = when_all(fws1, fws2)
-                   .then(exec,
-                       [](future<util::tuple<future<std::uint64_t>,
-                               shared_future<float>>>&& f) {
-                           auto tup = f.get();
-                           auto cmplx = std::complex<double>(
-                               double(util::get<0>(tup).get()),
-                               double(util::get<1>(tup).get()));
-                           std::cout << "Inside when_all(shared) : " << cmplx
-                                     << std::endl;
-                           return cmplx;
-                       });
-    fws.get();
+    auto fws =
+        when_all(fws1, fws2)
+            .then(exec,
+                [testval4, testval5](future<util::tuple<future<std::uint64_t>,
+                        shared_future<float>>>&& f) {
+                    std::cout << "Inside when_all(shared) : " << std::endl;
+                    HPX_TEST_EQ_MSG(f.is_ready(), true,
+                        "Continuation run before future ready");
+                    auto tup = f.get();
+                    auto cmplx =
+                        std::complex<double>(double(util::get<0>(tup).get()),
+                            util::get<1>(tup).get());
+                    auto cmplxe =
+                        std::complex<double>(double(testval4), testval5);
+                    std::cout << "expected " << cmplxe << " got " << cmplx
+                              << std::endl;
+                    HPX_TEST_EQ(cmplx, cmplxe);
+                    return std::string("when_all(shared)");
+                });
+    HPX_TEST_EQ(fws.get(), "when_all(shared)");
     std::cout << std::endl;
 
     // test 4a
     std::cout << "============================" << std::endl;
     std::cout << "Test 4a : dataflow()" << std::endl;
-    future<std::uint16_t> f1 = make_ready_future(std::uint16_t(255));
-    future<double> f2 = make_ready_future(127.890);
+    std::uint16_t testval6 = 333;
+    double testval7 = 777.777;
+    auto f1 = hpx::async(&dummy_task<decltype(testval6)>, testval6);
+    auto f2 = hpx::async(&dummy_task<decltype(testval7)>, testval7);
     //
     auto fd = dataflow(
         exec,
-        [](future<std::uint16_t>&& f1, future<double>&& f2) {
-            auto cmplx = std::complex<std::uint64_t>(
-                f1.get(), static_cast<std::uint64_t>(f2.get()));
-            std::cout << "Inside dataflow : " << cmplx << std::endl;
-            return cmplx;
+        [testval6, testval7](future<std::uint16_t>&& f1, future<double>&& f2) {
+            std::cout << "Inside dataflow : " << std::endl;
+            HPX_TEST_EQ_MSG(f1.is_ready() && f2.is_ready(), true,
+                "Continuation run before future ready");
+            double r1 = f1.get();
+            double r2 = f2.get();
+            auto cmplx = std::complex<double>(r1, r2);
+            auto cmplxe = std::complex<double>(double(testval6), testval7);
+            std::cout << "expected " << cmplxe << " got " << cmplx << std::endl;
+            HPX_TEST_EQ(cmplx, cmplxe);
+            return std::string("dataflow");
         },
         f1, f2);
-    fd.get();
+    HPX_TEST_EQ(fd.get(), "dataflow");
     std::cout << std::endl;
 
     // test 4b
     std::cout << "============================" << std::endl;
     std::cout << "Test 4b : dataflow(shared)" << std::endl;
-    future<std::uint32_t> fs1 = make_ready_future(std::uint32_t(65535));
-    shared_future<double> fs2 = make_ready_future(2.178).share();
+    std::uint32_t testval8 = 987;
+    double testval9 = 654.321;
+    auto fs1 = hpx::async(&dummy_task<decltype(testval8)>, testval8);
+    auto fs2 = hpx::async(&dummy_task<decltype(testval9)>, testval9);
     //
     auto fds = dataflow(
         exec,
-        [](future<std::uint32_t>&& f1, shared_future<double>&& f2) {
-            auto cmplx = std::complex<std::uint64_t>(
-                std::uint64_t(f1.get()), std::uint64_t(f2.get()));
-            std::cout << "Inside dataflow(shared) : " << cmplx << std::endl;
-            return cmplx;
+        [testval8, testval9](
+            future<std::uint32_t>&& f1, shared_future<double>&& f2) {
+            std::cout << "Inside dataflow(shared) : " << std::endl;
+            HPX_TEST_EQ_MSG(f1.is_ready() && f2.is_ready(), true,
+                "Continuation run before future ready");
+            double r1 = f1.get();
+            double r2 = f2.get();
+            auto cmplx = std::complex<double>(r1, r2);
+            auto cmplxe = std::complex<double>(double(testval8), testval9);
+            std::cout << "expected " << cmplxe << " got " << cmplx << std::endl;
+            HPX_TEST_EQ(cmplx, cmplxe);
+            return std::string("dataflow(shared)");
         },
         fs1, fs2);
-    fds.get();
+    HPX_TEST_EQ(fds.get(), "dataflow(shared)");
 
     std::cout << "============================" << std::endl;
     std::cout << "Complete" << std::endl;
@@ -449,74 +507,52 @@ namespace hpx { namespace threads { namespace executors {
 
 int hpx_main()
 {
-    test_async_executor exec;
-    test("Testing async custom executor", exec);
-
-    typedef hpx::threads::executors::pool_numa_hint<dummy_tag> dummy_hint;
-    hpx::threads::executors::guided_pool_executor<dummy_hint> exec2("default");
-    test("Testing guided_pool_executor<dummy_hint>", exec2);
-
-    hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec3(
-        true, "default");
-    test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
-
-    return hpx::finalize(0);
-}
-
-int main(int argc, char** argv)
-{
-    int pool_threads = 1;
-
-    // Create the resource partitioner
-    hpx::resource::partitioner rp(argc, argv);
-
-    // declare the high priority scheduler type we'll use
-    using high_priority_sched =
-        hpx::threads::policies::shared_priority_queue_scheduler<>;
-    using hpx::threads::policies::scheduler_mode;
-    // setup the default pool with our custom priority scheduler
-    rp.create_thread_pool("custom",
-        [](hpx::threads::thread_pool_init_parameters init,
-            hpx::threads::policies::thread_queue_init_parameters
-                thread_queue_init)
-            -> std::unique_ptr<hpx::threads::thread_pool_base> {
-            high_priority_sched::init_parameter_type scheduler_init(
-                init.num_threads_, {6, 6, 64}, init.affinity_data_,
-                thread_queue_init, "shared-priority-scheduler");
-            std::unique_ptr<high_priority_sched> scheduler(
-                new high_priority_sched(scheduler_init));
-
-            init.mode_ = scheduler_mode(scheduler_mode::do_background_work |
-                scheduler_mode::delay_exit);
-
-            std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<
-                    high_priority_sched>(std::move(scheduler), init));
-            return pool;
-        });
-
-    std::cout << "[main] "
-              << "thread_pools created \n";
-
-    // add N cores to mpi pool
-    int count = 0;
-    for (const hpx::resource::numa_domain& d : rp.numa_domains())
+    bool ok = true;
+    try
     {
-        for (const hpx::resource::core& c : d.cores())
-        {
-            for (const hpx::resource::pu& p : c.pus())
-            {
-                if (count < pool_threads)
-                {
-                    std::cout << "Added pu " << count++ << " to mpi pool\n";
-                    rp.add_resource(p, "custom");
-                }
-            }
-        }
+        test_async_executor exec;
+        test("Testing async custom executor", exec);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Exception " << e.what() << std::endl;
+        ok = false;
     }
 
-    // rp.add_resource(rp.numa_domains()[0].cores()[1], "mpi");
-    std::cout << "[main] "
-              << "resources added to thread_pools \n";
-    return hpx::init(argc, argv);
+    typedef hpx::threads::executors::pool_numa_hint<dummy_tag> dummy_hint;
+    try
+    {
+        hpx::threads::executors::guided_pool_executor<dummy_hint> exec2(
+            "default");
+        test("Testing guided_pool_executor<dummy_hint>", exec2);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Exception " << e.what() << std::endl;
+        ok = false;
+    }
+
+    try
+    {
+        hpx::threads::executors::guided_pool_executor_shim<dummy_hint> exec3(
+            true, "default");
+        test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Exception " << e.what() << std::endl;
+        ok = false;
+    }
+
+    std::cout << "Tests done \n";
+    return hpx::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    // Initialize and run HPX
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }
