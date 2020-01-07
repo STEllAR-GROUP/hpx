@@ -226,12 +226,12 @@ include(HPX_Message)
 include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
-set(HPX_LIBS
+set(HPX_CANDIDATE_LIBS
 '''
 for lib in libs:
     if not lib.startswith('_'):
         libs_cmakelists += f'  {lib}\n'
-libs_cmakelists += '  CACHE INTERNAL "list of HPX modules" FORCE\n)\n\n'
+libs_cmakelists += ')\n\n'
 
 libs_cmakelists += '''
 # add example pseudo targets needed for modules
@@ -282,19 +282,25 @@ set(MODULE_FORCE_LINKING_CALLS)
 set(CONFIG_STRINGS_MODULES_INCLUDES)
 set(CONFIG_STRINGS_MODULES_ENTRIES)
 
-foreach(lib ${HPX_LIBS})
+foreach(lib ${HPX_CANDIDATE_LIBS})
+  # if the module is successfully added, xxx_LIBRARY_ENABLED will be ON
   add_subdirectory(${lib})
 
-  set(MODULE_FORCE_LINKING_INCLUDES
-    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\\n")
+  get_property(HPX_${lib}_LIBRARY_ENABLED GLOBAL PROPERTY HPX_${lib}_LIBRARY_ENABLED)
+  if (HPX_${lib}_LIBRARY_ENABLED)
+    set(HPX_LIBS ${HPX_LIBS} ${lib} CACHE INTERNAL "list of Enabled HPX modules" FORCE)
 
-  set(MODULE_FORCE_LINKING_CALLS
-    "${MODULE_FORCE_LINKING_CALLS}\\n        ${lib}::force_linking();")
+    set(MODULE_FORCE_LINKING_INCLUDES
+      "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\\n")
 
-  set(CONFIG_STRINGS_MODULES_INCLUDES
-    "${CONFIG_STRINGS_MODULES_INCLUDES}#include <hpx/${lib}/config/config_strings.hpp>\\n")
-  set(CONFIG_STRINGS_MODULES_ENTRIES
-    "${CONFIG_STRINGS_MODULES_ENTRIES}\\n        { \\"${lib}\\", ${lib}::config_strings },")
+    set(MODULE_FORCE_LINKING_CALLS
+      "${MODULE_FORCE_LINKING_CALLS}\\n        ${lib}::force_linking();")
+
+    set(CONFIG_STRINGS_MODULES_INCLUDES
+      "${CONFIG_STRINGS_MODULES_INCLUDES}#include <hpx/${lib}/config/config_strings.hpp>\\n")
+    set(CONFIG_STRINGS_MODULES_ENTRIES
+      "${CONFIG_STRINGS_MODULES_ENTRIES}\\n        { \\"${lib}\\", ${lib}::config_strings },")
+  endif()
 endforeach()
 
 configure_file(
