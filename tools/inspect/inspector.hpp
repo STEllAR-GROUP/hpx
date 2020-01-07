@@ -66,7 +66,9 @@ namespace boost
       // callback used by constructor to register leaf() signature.
       // Signature can be a full file name (Jamfile) or partial (.cpp)
       void register_signature( const string & signature );
+      void register_skip_signature( const string & signature );
       const string_set & signatures() const { return m_signatures; }
+      const string_set & skip_signatures() const { return m_skip_signatures; }
 
       // report error callback (from inspect(), close() ):
       void error(
@@ -77,6 +79,7 @@ namespace boost
 
     private:
       string_set m_signatures;
+      string_set m_skip_signatures;
     };
 
     // for inspection of source code of one form or other
