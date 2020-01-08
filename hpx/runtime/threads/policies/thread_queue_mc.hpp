@@ -62,10 +62,9 @@ namespace hpx {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
-    template <typename Mutex = std::mutex,
-        typename PendingQueuing = lockfree_fifo,
-        typename StagedQueuing = lockfree_lifo,
-        typename TerminatedQueuing = lockfree_fifo>
+
+    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
+        typename TerminatedQueuing>
     class thread_queue_mc
     {
     public:
@@ -144,7 +143,7 @@ namespace hpx { namespace threads { namespace policies {
         explicit thread_queue_mc(const thread_queue_init_parameters& parameters,
             std::size_t queue_num = std::size_t(-1))
           : parameters_(parameters)
-          , queue_index_(queue_num)
+          , queue_index_(static_cast<int>(queue_num))
           , holder_(nullptr)
           , new_task_items_(1024)
           , work_items_(1024)
