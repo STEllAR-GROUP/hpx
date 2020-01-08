@@ -137,7 +137,6 @@ namespace hpx { namespace util
                 typename util::decay_unwrap<F>::type, Ts...>::type
             operator()(Ts && ... ts)
             {
-                annotate_function func(name_);
                 return util::invoke(f_, std::forward<Ts>(ts)...);
             }
 
