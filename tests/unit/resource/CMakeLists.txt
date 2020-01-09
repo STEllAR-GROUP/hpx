@@ -5,7 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    cross_pool_injection
     scheduler_priority_check
     shutdown_suspended_pus
     suspend_disabled
@@ -16,6 +15,12 @@ set(tests
     suspend_thread_external
     suspend_thread_timed
 )
+
+if (HPX_CXX_STANDARD GREATER 11)
+  set(tests ${tests}
+    cross_pool_injection
+  )
+endif()
 
 # NB. threads = -2 = threads = 'cores'
 # NB. threads = -1 = threads = 'all'
