@@ -110,6 +110,7 @@ namespace
   //const int max_offenders = 5;  // maximum "worst offenders" to display
 
   boost::inspect::string_set content_signatures;
+  boost::inspect::string_set skip_content_signatures;
 
   struct error_msg
   {
@@ -306,6 +307,7 @@ namespace
   {
     target = "";
 
+    if ( find_signature( file_path, skip_content_signatures ) ) return;
     if ( !find_signature( file_path, content_signatures ) ) return;
 
     std::ifstream fin( file_path.string(),
@@ -325,7 +327,8 @@ namespace
       itr != insp_list.end(); ++itr )
     {
       itr->inspector->inspect( lib, pth ); // always call two-argument form
-      if ( find_signature( pth, itr->inspector->signatures() ) )
+      if ( find_signature( pth, itr->inspector->signatures() ) &&
+          !find_signature( pth, itr->inspector->skip_signatures() ) )
       {
           itr->inspector->inspect( lib, pth, content );
       }
@@ -677,6 +680,12 @@ namespace boost
       content_signatures.insert( signature );
     }
 
+    void inspector::register_skip_signature( const string & signature )
+    {
+      m_skip_signatures.insert( signature );
+      skip_content_signatures.insert( signature );
+    }
+
 //  error  -------------------------------------------------------------------//
 
     void inspector::error( const string & library_name,
@@ -750,6 +759,8 @@ namespace boost
       register_signature( ".xsd" );
       register_signature( ".xsl" );
       register_signature( ".qbk" );
+
+      register_skip_signature( "LICENSE_1_0.txt" );
     }
 
     hypertext_inspector::hypertext_inspector()

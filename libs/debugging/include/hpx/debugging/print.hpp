@@ -71,21 +71,33 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     // format as zero padded int
     // ------------------------------------------------------------------
-    template <int N = 2, typename T = int>
-    struct dec
+    namespace detail {
+
+        template <int N, typename T>
+        struct dec
+        {
+            dec(T const& v)
+              : data(v)
+            {
+            }
+
+            T const& data;
+
+            friend std::ostream& operator<<(
+                std::ostream& os, dec<N, T> const& d)
+            {
+                os << std::right << std::setfill('0') << std::setw(N)
+                   << std::noshowbase << std::dec << d.data;
+                return os;
+            }
+        };
+    }    // namespace detail
+
+    template <int N = 2, typename T>
+    detail::dec<N, T> dec(T const& v)
     {
-        dec(const T& v)
-          : data(v)
-        {
-        }
-        const T& data;
-        friend std::ostream& operator<<(std::ostream& os, const dec<N, T>& d)
-        {
-            os << std::right << std::setfill('0') << std::setw(N)
-               << std::noshowbase << std::dec << d.data;
-            return os;
-        }
-    };
+        return detail::dec<N, T>(v);
+    }
 
     // ------------------------------------------------------------------
     // format as pointer
@@ -266,7 +278,7 @@ namespace hpx { namespace debug {
             }
             os << hex<12, std::thread::id>(std::this_thread::get_id())
 #ifdef DEBUGGING_PRINT_LINUX
-               << " cpu " << dec<3, int>(sched_getcpu()) << " ";
+               << " cpu " << debug::dec<3, int>(sched_getcpu()) << " ";
 #else
                << " cpu "
                << "--- ";
@@ -291,7 +303,7 @@ namespace hpx { namespace debug {
             auto now = high_resolution_clock::now();
             auto nowt = duration_cast<microseconds>(now - log_t_start).count();
             //
-            os << dec<10>(nowt) << " ";
+            os << debug::dec<10>(nowt) << " ";
             return os;
         }
 
@@ -544,8 +556,8 @@ namespace hpx { namespace debug {
         template <typename T>
         void array(const std::string& name, const std::vector<T>& v)
         {
-            std::cout << str<20>(name.c_str()) << ": {" << dec<4>(v.size())
-                      << "} : ";
+            std::cout << str<20>(name.c_str()) << ": {"
+                      << debug::dec<4>(v.size()) << "} : ";
             std::copy(std::begin(v), std::end(v),
                 std::ostream_iterator<T>(std::cout, ", "));
             std::cout << "\n";
@@ -554,8 +566,8 @@ namespace hpx { namespace debug {
         template <typename T, std::size_t N>
         void array(const std::string& name, const std::array<T, N>& v)
         {
-            std::cout << str<20>(name.c_str()) << ": {" << dec<4>(v.size())
-                      << "} : ";
+            std::cout << str<20>(name.c_str()) << ": {"
+                      << debug::dec<4>(v.size()) << "} : ";
             std::copy(std::begin(v), std::end(v),
                 std::ostream_iterator<T>(std::cout, ", "));
             std::cout << "\n";
@@ -565,7 +577,7 @@ namespace hpx { namespace debug {
         void array(const std::string& name, Iter begin, Iter end)
         {
             std::cout << str<20>(name.c_str()) << ": {"
-                      << dec<4>(std::distance(begin, end)) << "} : ";
+                      << debug::dec<4>(std::distance(begin, end)) << "} : ";
             std::copy(begin, end,
                 std::ostream_iterator<
                     typename std::iterator_traits<Iter>::value_type>(

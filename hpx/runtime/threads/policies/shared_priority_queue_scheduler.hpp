@@ -88,7 +88,7 @@ namespace hpx { namespace threads { namespace policies {
                 lockfree_lifo;
 #else
             using default_shared_priority_queue_scheduler_terminated_queue =
-                lockfree_lifo;
+                lockfree_fifo;
 #endif
 
             // Holds core/queue ratios used by schedulers.
@@ -267,7 +267,7 @@ namespace hpx { namespace threads { namespace policies {
                         "thread_num", debug::dec<3>(local_num));
 
                     return numa_holder_[domain_num]
-                        .thread_queue(q_index)
+                        .thread_queue(static_cast<std::uint16_t>(q_index))
                         ->cleanup_terminated(local_num, delete_all);
                 }
 
@@ -290,7 +290,7 @@ namespace hpx { namespace threads { namespace policies {
 
                     // cleanup the queues assigned to this thread
                     return numa_holder_[domain_num]
-                        .thread_queue(q_index)
+                        .thread_queue(static_cast<std::uint16_t>(q_index))
                         ->cleanup_terminated(local_num, delete_all);
                 }
 
@@ -339,7 +339,7 @@ namespace hpx { namespace threads { namespace policies {
                             // pool - we can schedule on any thread available
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
-                                    num_workers_);
+                                    static_cast<unsigned int>(num_workers_));
                         }
                         else if (!round_robin_) /* thread parent */
                         {
@@ -363,10 +363,13 @@ namespace hpx { namespace threads { namespace policies {
                                 parent_pool_->get_pool_name(),
                                 typename thread_holder_type::queue_data_print(
                                     numa_holder_[domain_num].thread_queue(
-                                        q_index)));
-                            thread_num = numa_holder_[domain_num]
-                                             .thread_queue(q_index)
-                                             ->worker_next(num_workers_);
+                                        static_cast<std::uint16_t>(q_index))));
+                            thread_num =
+                                numa_holder_[domain_num]
+                                    .thread_queue(
+                                        static_cast<std::uint16_t>(q_index))
+                                    ->worker_next(static_cast<unsigned int>(
+                                        num_workers_));
                         }
                         thread_num = select_active_pu(l, thread_num);
                         // cppcheck-suppress redundantAssignment
@@ -393,8 +396,9 @@ namespace hpx { namespace threads { namespace policies {
                         // Create thread on requested NUMA domain
                         debug::set(msg, "HINT_NUMA  ");
                         // TODO: This case does not handle suspended PUs.
-                        domain_num =
-                            fast_mod(data.schedulehint.hint, num_domains_);
+                        domain_num = fast_mod(
+                            static_cast<unsigned int>(data.schedulehint.hint),
+                            static_cast<unsigned int>(num_domains_));
                         // if the thread creating the new task is on the domain
                         // assigned to the new task - try to reuse the core as well
                         thread_num = local_num;
@@ -445,7 +449,7 @@ namespace hpx { namespace threads { namespace policies {
                             debug::threadinfo<thread_init_data>(data));
                     }
                     numa_holder_[domain_num]
-                        .thread_queue(q_index)
+                        .thread_queue(static_cast<std::uint16_t>(q_index))
                         ->create_thread(
                             data, thrd, initial_state, run_now, local_num, ec);
                 }
@@ -486,8 +490,11 @@ namespace hpx { namespace threads { namespace policies {
                         for (std::uint16_t d = 0; d < num_domains_; ++d)
                         {
                             std::uint16_t dom =
-                                fast_mod((domain + d), num_domains_);
-                            q_index = fast_mod(q_index, q_counts_[dom]);
+                                fast_mod(static_cast<unsigned int>(domain + d),
+                                    static_cast<unsigned int>(num_domains_));
+                            q_index =
+                                fast_mod(static_cast<unsigned int>(q_index),
+                                    static_cast<unsigned int>(q_counts_[dom]));
                             result = operation_HP(
                                 dom, q_index, origin, var, (d > 0), true);
                             if (result)
@@ -506,8 +513,11 @@ namespace hpx { namespace threads { namespace policies {
                         for (std::uint16_t d = 0; d < num_domains_; ++d)
                         {
                             std::uint16_t dom =
-                                fast_mod((domain + d), num_domains_);
-                            q_index = fast_mod(q_index, q_counts_[dom]);
+                                fast_mod(static_cast<unsigned int>(domain + d),
+                                    static_cast<unsigned int>(num_domains_));
+                            q_index =
+                                fast_mod(static_cast<unsigned int>(q_index),
+                                    static_cast<unsigned int>(q_counts_[dom]));
                             result = operation(
                                 dom, q_index, origin, var, (d > 0), true);
                             if (result)
@@ -568,9 +578,12 @@ namespace hpx { namespace threads { namespace policies {
                             // try other numa domains BP/HP
                             for (std::uint16_t d = 1; d < num_domains_; ++d)
                             {
-                                std::uint16_t dom =
-                                    fast_mod((domain + d), num_domains_);
-                                q_index = fast_mod(q_index, q_counts_[dom]);
+                                std::uint16_t dom = fast_mod(
+                                    static_cast<unsigned int>(domain + d),
+                                    static_cast<unsigned int>(num_domains_));
+                                q_index = fast_mod(
+                                    static_cast<unsigned int>(q_index),
+                                    static_cast<unsigned int>(q_counts_[dom]));
                                 result = operation_HP(
                                     dom, q_index, origin, var, true, true);
                                 if (result)
@@ -586,9 +599,12 @@ namespace hpx { namespace threads { namespace policies {
                             // try other numa domains NP/LP
                             for (std::uint16_t d = 1; d < num_domains_; ++d)
                             {
-                                std::uint16_t dom =
-                                    fast_mod((domain + d), num_domains_);
-                                q_index = fast_mod(q_index, q_counts_[dom]);
+                                std::uint16_t dom = fast_mod(
+                                    static_cast<unsigned int>(domain + d),
+                                    static_cast<unsigned int>(num_domains_));
+                                q_index = fast_mod(
+                                    static_cast<unsigned int>(q_index),
+                                    static_cast<unsigned int>(q_counts_[dom]));
                                 result = operation(
                                     dom, q_index, origin, var, true, true);
                                 if (result)
@@ -750,7 +766,7 @@ namespace hpx { namespace threads { namespace policies {
                             // pool - we can schedule on any thread available
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
-                                    num_workers_);
+                                    static_cast<unsigned int>(num_workers_));
                             q_index = 0;
                             // clang-format off
                             using namespace hpx::threads::detail;
@@ -779,9 +795,12 @@ namespace hpx { namespace threads { namespace policies {
                         {
                             domain_num = d_lookup_[thread_num];
                             q_index = q_lookup_[thread_num];
-                            thread_num = numa_holder_[domain_num]
-                                             .thread_queue(q_index)
-                                             ->worker_next(num_workers_);
+                            thread_num =
+                                numa_holder_[domain_num]
+                                    .thread_queue(
+                                        static_cast<std::uint16_t>(q_index))
+                                    ->worker_next(static_cast<unsigned int>(
+                                        num_workers_));
                             spq_deb.debug(debug::str<>("schedule_thread"),
                                 "assign_work_round_robin", "thread_num",
                                 thread_num,
@@ -809,7 +828,9 @@ namespace hpx { namespace threads { namespace policies {
                         // Create thread on requested NUMA domain
                         debug::set(msg, "HINT_NUMA  ");
                         // TODO: This case does not handle suspended PUs.
-                        domain_num = fast_mod(schedulehint.mode, num_domains_);
+                        domain_num = fast_mod(
+                            static_cast<unsigned int>(schedulehint.mode),
+                            static_cast<unsigned int>(num_domains_));
                         // if the thread creating the new task is on the domain
                         // assigned to the new task - try to reuse the core as well
                         if (d_lookup_[thread_num] == domain_num)
@@ -818,10 +839,6 @@ namespace hpx { namespace threads { namespace policies {
                         }
                         else
                         {
-                            thread_num =
-                                numa_holder_[0].thread_queue(0)->worker_next(
-                                    num_workers_);
-                            q_index = q_lookup_[thread_num];
                             throw std::runtime_error(
                                 "counter problem in thread scheduler");
                         }
@@ -840,7 +857,7 @@ namespace hpx { namespace threads { namespace policies {
                         debug::dec<2>(domain_num), "Q", debug::dec<3>(q_index));
 
                     numa_holder_[domain_num]
-                        .thread_queue(q_index)
+                        .thread_queue(static_cast<std::uint16_t>(q_index))
                         ->schedule_thread(thrd, priority, false);
                 }
 
@@ -907,7 +924,8 @@ namespace hpx { namespace threads { namespace policies {
                         std::size_t domain_num = d_lookup_[thread_num];
                         std::size_t q_index = q_lookup_[thread_num];
                         count += numa_holder_[domain_num]
-                                     .thread_queue(q_index)
+                                     .thread_queue(
+                                         static_cast<std::uint16_t>(q_index))
                                      ->get_queue_length();
                     }
                     else
@@ -934,7 +952,7 @@ namespace hpx { namespace threads { namespace policies {
                         std::size_t domain_num = d_lookup_[thread_num];
                         std::size_t q_index = q_lookup_[thread_num];
                         return numa_holder_[domain_num]
-                            .thread_queue(q_index)
+                            .thread_queue(static_cast<std::uint16_t>(q_index))
                             ->get_thread_count(state, priority);
                     }
                     else
@@ -1012,7 +1030,9 @@ namespace hpx { namespace threads { namespace policies {
                                 domain++;
                             }
 #endif
-                            d_lookup_[local_id] = domain;
+                            d_lookup_[local_id] =
+                                static_cast<std::uint16_t>(domain);
+
                             // each time a _new_ domain is added increment the offset
                             domain_map.insert({domain, domain_map.size()});
                         }
@@ -1026,8 +1046,9 @@ namespace hpx { namespace threads { namespace policies {
                         for (std::size_t local_id = 0; local_id < num_workers_;
                              ++local_id)
                         {
-                            d_lookup_[local_id] =
-                                domain_map[d_lookup_[local_id]];
+                            d_lookup_[local_id] = static_cast<std::uint16_t>(
+                                domain_map[d_lookup_[local_id]]);
+
                             // increment the count for the domain
                             q_counts_[d_lookup_[local_id]]++;
                         }
@@ -1125,13 +1146,15 @@ namespace hpx { namespace threads { namespace policies {
                             if (numa_holder_[domain].size() == 0)
                             {
                                 numa_holder_[domain].init(
-                                    domain, q_counts_[domain]);
+                                    static_cast<std::uint16_t>(domain),
+                                    q_counts_[domain]);
                             }
                         }
 
                         if (local_thread == local_id)
                         {
-                            q_lookup_[local_thread] = index;
+                            q_lookup_[local_thread] =
+                                static_cast<std::uint16_t>(index);
 
                             // bound queues are never shared
                             bp_queue =
@@ -1150,10 +1173,14 @@ namespace hpx { namespace threads { namespace policies {
                                 }
                                 else
                                 {
-                                    // share the queue with our next lowest neighbour
-                                    hp_queue = numa_holder_[domain]
-                                                   .thread_queue(index - 1)
-                                                   ->hp_queue_;
+                                    // share the queue with our next lowest neighbor
+                                    HPX_ASSERT(index != 0);
+                                    hp_queue =
+                                        numa_holder_[domain]
+                                            .thread_queue(
+                                                static_cast<std::uint16_t>(
+                                                    index - 1))
+                                            ->hp_queue_;
                                 }
                             }
                             // Normal priority
@@ -1166,9 +1193,12 @@ namespace hpx { namespace threads { namespace policies {
                             }
                             else
                             {
-                                // share the queue with our next lowest neighbour
+                                // share the queue with our next lowest neighbor
+                                HPX_ASSERT(index != 0);
                                 np_queue = numa_holder_[domain]
-                                               .thread_queue(index - 1)
+                                               .thread_queue(
+                                                   static_cast<std::uint16_t>(
+                                                       index - 1))
                                                ->np_queue_;
                             }
                             // Low priority
@@ -1184,10 +1214,14 @@ namespace hpx { namespace threads { namespace policies {
                                 }
                                 else
                                 {
-                                    // share the queue with our next lowest neighbour
-                                    lp_queue = numa_holder_[domain]
-                                                   .thread_queue(index - 1)
-                                                   ->lp_queue_;
+                                    // share the queue with our next lowest neighbor
+                                    HPX_ASSERT(index != 0);
+                                    lp_queue =
+                                        numa_holder_[domain]
+                                            .thread_queue(
+                                                static_cast<std::uint16_t>(
+                                                    index - 1))
+                                            ->lp_queue_;
                                 }
                             }
 
@@ -1199,7 +1233,10 @@ namespace hpx { namespace threads { namespace policies {
                             thread_holder =
                                 new queue_holder_thread<thread_queue_type>(
                                     bp_queue, hp_queue, np_queue, lp_queue,
-                                    domain, index, local_id, owner_mask,
+                                    static_cast<std::uint16_t>(domain),
+                                    static_cast<std::uint16_t>(index),
+                                    static_cast<std::uint16_t>(local_id),
+                                    static_cast<std::uint16_t>(owner_mask),
                                     queue_parameters_);
 
                             numa_holder_[domain].queues_[numa_id] =
