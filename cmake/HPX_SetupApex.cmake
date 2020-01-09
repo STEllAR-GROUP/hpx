@@ -14,7 +14,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_APEX)
+if(HPX_WITH_APEX AND NOT TARGET hpx::apex)
   if(NOT HPX_FIND_PACKAGE)
     set(_hpx_apex_no_update)
     if(HPX_WITH_APEX_NO_UPDATE)

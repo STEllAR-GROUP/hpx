@@ -11,7 +11,7 @@
 # If we compile with the MPI parcelport enabled, we need to additionally
 # add the MPI include path here, because for the main library, it's only
 # added for the plugin.
-if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI AND NOT TARGET hpx::mpi)
   find_package(MPI)
   # All cmake version don't have the same found variable set
   if(NOT MPI_FOUND AND NOT MPI_CXX_FOUND)
