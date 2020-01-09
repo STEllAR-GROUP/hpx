@@ -584,7 +584,9 @@ namespace util {
         namespace tuple_like_remapping {
             template <typename Strategy, typename Mapper, typename T,
                 typename Enable = void>
-            struct tuple_like_remapper;
+            struct tuple_like_remapper
+            {
+            };
 
             /// Specialization for std::tuple like types which contain
             /// an arbitrary amount of heterogeneous arguments.
