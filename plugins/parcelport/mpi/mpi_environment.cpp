@@ -31,6 +31,8 @@ namespace hpx { namespace util
     int mpi_environment::provided_threading_flag_ = MPI_THREAD_SINGLE;
     MPI_Comm mpi_environment::communicator_ = MPI_COMM_NULL;
 
+    int mpi_environment::is_initialized_ = -1;
+
     ///////////////////////////////////////////////////////////////////////////
     void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
@@ -49,43 +51,53 @@ namespace hpx { namespace util
 
         cfg.ini_config_.emplace_back("hpx.parcel.bootstrap!=mpi");
 
+        // Check if MPI_Init has been called previously
+        MPI_Initialized(&is_initialized_);
+        if(!is_initialized_)
+        {
 #if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
-        int flag = (get_entry_as(
-            cfg.rtcfg_, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
-                MPI_THREAD_MULTIPLE : MPI_THREAD_SINGLE;
+            int flag = (get_entry_as(
+                cfg.rtcfg_, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
+                    MPI_THREAD_MULTIPLE : MPI_THREAD_SINGLE;
 
 #if defined(MVAPICH2_VERSION) && defined(_POSIX_SOURCE)
-        // This enables multi threading support in MVAPICH2 if requested.
-        if(flag == MPI_THREAD_MULTIPLE)
-            setenv("MV2_ENABLE_AFFINITY", "0", 1);
+            // This enables multi threading support in MVAPICH2 if requested.
+            if(flag == MPI_THREAD_MULTIPLE)
+                setenv("MV2_ENABLE_AFFINITY", "0", 1);
 #endif
 
-        int retval = MPI_Init_thread(argc, argv, flag, &provided_threading_flag_);
+            int retval = MPI_Init_thread(argc, argv, flag, &provided_threading_flag_);
 #else
-        int retval = MPI_Init(argc, argv);
-        provided_threading_flag_ = MPI_THREAD_SINGLE;
+            int retval = MPI_Init(argc, argv);
+            provided_threading_flag_ = MPI_THREAD_SINGLE;
 #endif
-        if (MPI_SUCCESS != retval)
-        {
-            if (MPI_ERR_OTHER != retval)
+
+            if (MPI_SUCCESS != retval)
             {
-                // explicitly disable mpi if not run by mpirun
-                cfg.ini_config_.emplace_back("hpx.parcel.mpi.enable = 0");
+                if (MPI_ERR_OTHER != retval)
+                {
+                    // explicitly disable mpi if not run by mpirun
+                    cfg.ini_config_.emplace_back("hpx.parcel.mpi.enable = 0");
 
-                enabled_ = false;
+                    enabled_ = false;
 
-                int msglen = 0;
-                char message[MPI_MAX_ERROR_STRING+1];
-                MPI_Error_string(retval, message, &msglen);
-                message[msglen] = '\0';
+                    int msglen = 0;
+                    char message[MPI_MAX_ERROR_STRING+1];
+                    MPI_Error_string(retval, message, &msglen);
+                    message[msglen] = '\0';
 
-                std::string msg("mpi_environment::init: MPI_Init_thread failed: ");
-                msg = msg + message + ".";
-                throw std::runtime_error(msg.c_str());
+                    std::string msg("mpi_environment::init: MPI_Init_thread failed: ");
+                    msg = msg + message + ".";
+                    throw std::runtime_error(msg.c_str());
+                }
+
+                // somebody has already called MPI_Init before, we should be fine
+                has_called_init_ = false;
             }
-
-            // somebody has already called MPI_Init before, we should be fine
-            has_called_init_ = false;
+            else
+            {
+                has_called_init_ = true;
+            }
         }
         else
         {
