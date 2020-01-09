@@ -131,7 +131,7 @@ namespace hpx { namespace lcos { namespace local {
 
                 threads::register_thread_nullary(pool,
                     util::deferred_call(&base_type::run_impl, std::move(this_)),
-                    util::thread_description(f_, "task_object::apply"),
+                    util::thread_description(f_, annotation),
                     threads::pending, false, priority, schedulehint, stacksize,
                     ec);
                 return threads::invalid_thread_id;
