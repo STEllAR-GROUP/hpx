@@ -7,7 +7,7 @@
 # FIXME : in the future put it directly inside the cmake directory of the
 # corresponding plugin
 
-if (HPX_WITH_PARCELPORT_LIBFABRIC)
+if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET hpx::libfabric)
   #------------------------------------------------------------------------------
   # Add #define to global defines.hpp
   #------------------------------------------------------------------------------

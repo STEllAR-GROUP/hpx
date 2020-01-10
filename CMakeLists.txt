@@ -1612,8 +1612,8 @@ add_hpx_library_sources_noglob(hpx_external)
 add_hpx_library_headers_noglob(hpx_external)
 
 # Setup packages and subprojects
+include(HPX_SetupCUDA) # CUDA needs to come before Apex, to have cuda_add_library available
 include(HPX_SetupApex)
-include(HPX_SetupCUDA)
 include(HPX_SetupPapi)
 include(HPX_SetupHpxmp)
 include(HPX_SetupGooglePerfTools)
