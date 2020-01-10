@@ -14,7 +14,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_GOOGLE_PERFTOOLS)
+if(HPX_WITH_GOOGLE_PERFTOOLS AND NOT TARGET hpx::gperftools)
   find_package(GooglePerftools)
   if(NOT GOOGLE_PERFTOOLS_FOUND)
     hpx_error("Google Perftools could not be found and \

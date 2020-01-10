@@ -67,6 +67,8 @@ namespace hpx { namespace util
         static bool has_called_init_;
         static int provided_threading_flag_;
         static MPI_Comm communicator_;
+
+        static int is_initialized_;
     };
 }}
 

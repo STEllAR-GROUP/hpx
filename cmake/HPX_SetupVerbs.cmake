@@ -7,7 +7,7 @@
 # FIXME : in the future put it directly inside the cmake directory of the
 # corresponding plugin
 
-if (HPX_WITH_PARCELPORT_VERBS)
+if (HPX_WITH_PARCELPORT_VERBS AND NOT TARGET hpx::verbs)
   #------------------------------------------------------------------------------
   # OFED verbs stack
   #------------------------------------------------------------------------------
