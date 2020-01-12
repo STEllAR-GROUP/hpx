@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Agustin Berge
+//  Copyright (c) 2014-2020 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,8 +43,14 @@ namespace hpx { namespace util {
 
     template <std::size_t N>
     struct make_index_pack
+#if defined(HPX_HAVE_BUILTIN_INTEGER_PACK)
+      : pack_c<std::size_t, __integer_pack(N)...>
+#elif defined(HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ)
+      : __make_integer_seq<pack_c, std::size_t, N>
+#else
       : detail::make_index_pack_join<typename make_index_pack<N / 2>::type,
             typename make_index_pack<N - N / 2>::type>
+#endif
     {
     };
 
@@ -139,6 +145,22 @@ namespace hpx { namespace util {
         {
         };
 
+#if defined(HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT)
+        template <std::size_t I, typename Ts, bool C = (I < Ts::size)>
+        struct at_index_impl
+        {
+            using type = empty;
+        };
+
+        template <std::size_t I, typename... Ts>
+        struct at_index_impl<I, pack<Ts...>, true>
+        {
+            using type = struct
+            {
+                using type = __type_pack_element<I, Ts...>;
+            };
+        };
+#else
         template <std::size_t I, typename T>
         struct indexed
         {
@@ -165,12 +187,14 @@ namespace hpx { namespace util {
             typedef decltype(check_<I>(
                 indexer<Ts, typename make_index_pack<Ts::size>::type>())) type;
         };
+#endif
     }    // namespace detail
 
     template <std::size_t I, typename... Ts>
     struct at_index : detail::at_index_impl<I, pack<Ts...>>::type
     {
     };
+
 }}    // namespace hpx::util
 
 #endif

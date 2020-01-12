@@ -768,6 +768,27 @@ function(hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_builtin_integer_pack)
+  add_hpx_config_test(HPX_WITH_BUILTIN_INTEGER_PACK
+    SOURCE cmake/tests/builtin_integer_pack.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_builtin_make_integer_seq)
+  add_hpx_config_test(HPX_WITH_BUILTIN_MAKE_INTEGER_SEQ
+    SOURCE cmake/tests/builtin_make_integer_seq.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_builtin_type_pack_element)
+  add_hpx_config_test(HPX_WITH_BUILTIN_TYPE_PACK_ELEMENT
+    SOURCE cmake/tests/builtin_type_pack_element.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_mm_prefetch)
   add_hpx_config_test(HPX_WITH_MM_PREFETCH
     SOURCE cmake/tests/mm_prefetch.cpp
