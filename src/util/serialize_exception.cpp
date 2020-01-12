@@ -240,87 +240,91 @@ namespace hpx { namespace serialization
             ar & err_value & err_message;
         }
 
-        switch (type) {
+        switch (type)
+        {
         default:
         case hpx::util::std_exception:
         case hpx::util::unknown_exception:
             e = hpx::detail::construct_exception(
-                    hpx::detail::std_exception(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+                hpx::detail::std_exception(what),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         // standard exceptions
         case hpx::util::std_runtime_error:
-            e = hpx::detail::construct_exception(
-                    std::runtime_error(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+            e = hpx::detail::construct_exception(std::runtime_error(what),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         case hpx::util::std_invalid_argument:
-            e = hpx::detail::construct_exception(
-                    std::invalid_argument(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+            e = hpx::detail::construct_exception(std::invalid_argument(what),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         case hpx::util::std_out_of_range:
-            e = hpx::detail::construct_exception(
-                    std::out_of_range(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+            e = hpx::detail::construct_exception(std::out_of_range(what),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         case hpx::util::std_logic_error:
-            e = hpx::detail::construct_exception(
-                    std::logic_error(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+            e = hpx::detail::construct_exception(std::logic_error(what),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         case hpx::util::std_bad_alloc:
-            e = hpx::detail::construct_exception(
-                    hpx::detail::bad_alloc(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+            e = hpx::detail::construct_exception(hpx::detail::bad_alloc(what),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         case hpx::util::std_bad_cast:
-            e = hpx::detail::construct_exception(
-                    hpx::detail::bad_cast(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+            e = hpx::detail::construct_exception(hpx::detail::bad_cast(what),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         case hpx::util::std_bad_typeid:
             e = hpx::detail::construct_exception(hpx::detail::bad_typeid(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
         case hpx::util::std_bad_exception:
             e = hpx::detail::construct_exception(
-                    hpx::detail::bad_exception(what),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+                hpx::detail::bad_exception(what),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         // boost exceptions
@@ -331,29 +335,31 @@ namespace hpx { namespace serialization
         // boost::system::system_error
         case hpx::util::boost_system_error:
             e = hpx::detail::construct_exception(
-                    boost::system::system_error(err_value,
+                boost::system::system_error(err_value,
 #if BOOST_VERSION < 106600 && !defined(BOOST_SYSTEM_NO_DEPRECATED)
-                        boost::system::get_system_category()
+                    boost::system::get_system_category()
 #else
-                        boost::system::system_category()
+                    boost::system::system_category()
 #endif
-                      , err_message
-                    )
-                  , throw_function_, throw_file_, throw_line_, throw_back_trace_,
+                        ,
+                    err_message),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         // hpx::exception
         case hpx::util::hpx_exception:
             e = hpx::detail::construct_exception(
-                    hpx::exception(static_cast<hpx::error>(err_value),
-                        what, hpx::rethrow),
-                    throw_function_, throw_file_, throw_line_, throw_back_trace_,
+                hpx::exception(
+                    static_cast<hpx::error>(err_value), what, hpx::rethrow),
+                hpx::detail::construct_exception_info(throw_function_,
+                    throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
-                    throw_env_, throw_config_, throw_state_, throw_auxinfo_);
+                    throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
         // hpx::thread_interrupted
