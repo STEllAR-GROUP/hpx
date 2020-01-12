@@ -8,12 +8,12 @@
 #define HPX_PARALLEL_EXECUTORS_FUSED_BULK_EXECUTE_FEB_18_2019_0905AM
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -63,7 +63,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         std::size_t... Is, typename... Ts>
     HPX_FORCEINLINE auto fused_bulk_sync_execute(Executor&& exec, F&& f,
         Shape const& shape, Future&& predecessor,
-        hpx::util::detail::pack_c<std::size_t, Is...>,
+        hpx::util::pack_c<std::size_t, Is...>,
         hpx::util::tuple<Ts...> const& args)
         -> decltype(execution::bulk_sync_execute(std::forward<Executor>(exec),
             std::forward<F>(f), shape, std::forward<Future>(predecessor),
@@ -93,8 +93,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         {
             return fused_bulk_sync_execute(exec_, f_, shape_,
                 std::forward<Future>(predecessor),
-                typename hpx::util::detail::make_index_pack<sizeof...(
-                    Ts)>::type(),
+                typename hpx::util::make_index_pack<sizeof...(Ts)>::type(),
                 args_);
         }
     };
@@ -118,7 +117,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         std::size_t... Is, typename... Ts>
     HPX_FORCEINLINE auto fused_bulk_async_execute(Executor&& exec, F&& f,
         Shape const& shape, Future&& predecessor,
-        hpx::util::detail::pack_c<std::size_t, Is...>,
+        hpx::util::pack_c<std::size_t, Is...>,
         hpx::util::tuple<Ts...> const& args)
         -> decltype(execution::bulk_async_execute(std::forward<Executor>(exec),
             std::forward<F>(f), shape, std::forward<Future>(predecessor),
@@ -148,8 +147,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         {
             return fused_bulk_async_execute(exec_, f_, shape_,
                 std::forward<Future>(predecessor),
-                typename hpx::util::detail::make_index_pack<sizeof...(
-                    Ts)>::type(),
+                typename hpx::util::make_index_pack<sizeof...(Ts)>::type(),
                 args_);
         }
     };

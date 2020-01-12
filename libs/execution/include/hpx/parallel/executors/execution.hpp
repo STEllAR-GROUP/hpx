@@ -15,7 +15,6 @@
 #include <hpx/parallel/executors/execution_fwd.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -34,6 +33,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <cstddef>

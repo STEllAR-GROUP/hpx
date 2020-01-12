@@ -14,8 +14,8 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <array>
 #include <cstddef>
@@ -77,7 +77,7 @@ namespace hpx
             list_type hw_sizes = {})
         : begin_( begin ), end_( begin ), cbegin_(begin), cend_(begin), block_(block)
         {
-            using indices = typename hpx::util::detail::make_index_pack<N>::type;
+            using indices = typename hpx::util::make_index_pack<N>::type;
 
             // Physical sizes is equal to logical sizes if physical sizes are
             // not defined
@@ -117,7 +117,7 @@ namespace hpx
         void fill_basis(
             list_type const & sizes,
             std::array<std::size_t,N+1> & basis,
-            hpx::util::detail::pack_c<std::size_t, I...>) const
+            hpx::util::pack_c<std::size_t, I...>) const
         {
             basis[0] = 1;
 
@@ -139,8 +139,7 @@ namespace hpx
 
             // Check that all the elements are of integral type
             static_assert(
-                util::detail::all_of<
-                    typename std::is_integral<I>::type ... >::value,
+                util::all_of<typename std::is_integral<I>::type...>::value,
                 "One or more elements in subscript is not integral");
 
             std::size_t  offset = 0;

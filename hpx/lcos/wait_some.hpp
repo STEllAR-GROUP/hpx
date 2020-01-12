@@ -185,8 +185,8 @@ namespace hpx
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 
 #include <algorithm>
@@ -259,7 +259,7 @@ namespace hpx { namespace lcos
 
             template <typename Tuple, std::size_t ...Is>
             HPX_FORCEINLINE
-            void apply(Tuple& tuple, util::detail::pack_c<std::size_t, Is...>) const
+            void apply(Tuple& tuple, util::pack_c<std::size_t, Is...>) const
             {
                 int const _sequencer[]= {
                     (((*this)(util::get<Is>(tuple))), 0)...
@@ -272,7 +272,7 @@ namespace hpx { namespace lcos
             void apply(util::tuple<Ts...>& sequence) const
             {
                 apply(sequence,
-                    typename util::detail::make_index_pack<sizeof...(Ts)>::type());
+                    typename util::make_index_pack<sizeof...(Ts)>::type());
             }
 
             template <typename Sequence_>

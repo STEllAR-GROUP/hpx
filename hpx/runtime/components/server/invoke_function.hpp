@@ -8,10 +8,10 @@
 #define HPX_COMPONENTS_INVOKE_FUNCTION_JUL_21_2015_0521PM
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <utility>
 

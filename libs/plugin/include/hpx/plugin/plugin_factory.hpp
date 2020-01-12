@@ -190,7 +190,7 @@ namespace hpx { namespace util { namespace plugin {
 
         template <typename BasePlugin, typename Base, typename... Parameters>
         struct plugin_factory_item<BasePlugin, Base,
-            hpx::util::detail::pack<Parameters...>> : public Base
+            hpx::util::pack<Parameters...>> : public Base
         {
             plugin_factory_item(dll& d, std::string const& basename)
               : Base(d, basename)
@@ -251,7 +251,7 @@ namespace hpx { namespace util { namespace plugin {
 
         template <typename BasePlugin, typename Base, typename... Parameters>
         struct static_plugin_factory_item<BasePlugin, Base,
-            hpx::util::detail::pack<Parameters...>> : public Base
+            hpx::util::pack<Parameters...>> : public Base
         {
             static_plugin_factory_item(get_plugins_list_type const& f)
               : Base(f)

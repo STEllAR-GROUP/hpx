@@ -56,7 +56,7 @@ struct test_async_executor
 
     template <typename... Futures>
     struct is_tuple_of_futures<util::tuple<Futures...>>
-      : util::detail::all_of<
+      : util::all_of<
             traits::is_future<typename std::remove_reference<Futures>::type>...>
     {
     };

@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -44,7 +44,7 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename... Vector>
     struct vector_pack_alignment<hpx::util::tuple<Vector...>,
         typename std::enable_if<
-            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value>::type>
+            hpx::util::all_of<is_vector_pack<Vector>...>::value>::type>
     {
         typedef typename hpx::util::tuple_element<0,
             hpx::util::tuple<Vector...>>::type pack_type;
@@ -60,7 +60,7 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename... Vector>
     struct vector_pack_size<hpx::util::tuple<Vector...>,
         typename std::enable_if<
-            hpx::util::detail::all_of<is_vector_pack<Vector>...>::value>::type>
+            hpx::util::all_of<is_vector_pack<Vector>...>::value>::type>
     {
         typedef typename hpx::util::tuple_element<0,
             hpx::util::tuple<Vector...>>::type pack_type;

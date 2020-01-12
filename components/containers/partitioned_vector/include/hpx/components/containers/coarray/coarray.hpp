@@ -13,7 +13,7 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 #include <hpx/collectives/spmd_block.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
 #include <array>
@@ -73,7 +73,7 @@ namespace hpx
               : sizes_({{i...}})
             {
                 using last_element =
-                    typename util::detail::at_index<sizeof...(I) - 1, I...>::type;
+                    typename util::at_index<sizeof...(I) - 1, I...>::type;
                 using condition =
                     typename std::is_same<last_element, detail::auto_subscript>;
 
@@ -85,7 +85,7 @@ namespace hpx
                     "equal to its dimension");
 
                 static_assert(
-                    util::detail::all_of<typename std::is_integral<
+                    util::all_of<typename std::is_integral<
                         typename detail::cast_if_autosubscript<I>::type>::
                             type...>::value,
                     "One or more elements in sizes given to hpx::coarray() "
@@ -128,7 +128,7 @@ namespace hpx
     {
     private:
         using base_type = partitioned_vector_view<T, N, Data>;
-        using indices = typename hpx::util::detail::make_index_pack<N>::type;
+        using indices = typename hpx::util::make_index_pack<N>::type;
 
         std::vector<hpx::naming::id_type> get_unrolled_localities(
             std::vector<hpx::naming::id_type> const& in,
@@ -159,7 +159,7 @@ namespace hpx
         template <typename Iterator, std::size_t... I>
         base_type update_view(hpx::detail::coarray_sizes<N> const& cosizes,
             std::size_t num_images,
-            hpx::util::detail::pack_c<std::size_t, I...>,
+            hpx::util::pack_c<std::size_t, I...>,
             hpx::lcos::spmd_block const& block,
             Iterator&& begin,
             Iterator&& last) const
@@ -216,7 +216,7 @@ namespace hpx
         template<typename... I,
             typename = typename std::enable_if<
                 ! std::is_same<
-                    typename util::detail::at_index<sizeof...(I) - 1, I...>::type,
+                    typename util::at_index<sizeof...(I) - 1, I...>::type,
                     detail::auto_subscript
                 >::value
             >::type
@@ -232,7 +232,7 @@ namespace hpx
         template<typename... I,
             typename = typename std::enable_if<
                 std::is_same<
-                    typename util::detail::at_index<sizeof...(I) - 1, I...>::type,
+                    typename util::at_index<sizeof...(I) - 1, I...>::type,
                     detail::auto_subscript
                 >::value
             >::type

@@ -10,11 +10,11 @@
 #if !defined(HPX_RUNTIME_SERIALIZATION_TUPLE_HPP)
 #define HPX_RUNTIME_SERIALIZATION_TUPLE_HPP
 
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -23,7 +23,7 @@ namespace hpx { namespace traits {
 
     template <typename... Ts>
     struct is_bitwise_serializable<::hpx::util::tuple<Ts...>>
-      : ::hpx::util::detail::all_of<hpx::traits::is_bitwise_serializable<
+      : ::hpx::util::all_of<hpx::traits::is_bitwise_serializable<
             typename std::remove_const<Ts>::type>...>
     {
     };
@@ -42,7 +42,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Archive, std::size_t... Is, typename... Ts>
     struct serialize_with_index_pack<Archive,
-        hpx::util::detail::pack_c<std::size_t, Is...>, Ts...>
+        hpx::util::pack_c<std::size_t, Is...>, Ts...>
     {
         static void call(Archive& ar, hpx::util::tuple<Ts...>& t, unsigned int)
         {
@@ -53,7 +53,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Archive, std::size_t... Is, typename... Ts>
     struct load_construct_data_with_index_pack<Archive,
-        hpx::util::detail::pack_c<std::size_t, Is...>, Ts...>
+        hpx::util::pack_c<std::size_t, Is...>, Ts...>
     {
         static void call(
             Archive& ar, hpx::util::tuple<Ts...>& t, unsigned int version)
@@ -68,7 +68,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Archive, std::size_t... Is, typename... Ts>
     struct save_construct_data_with_index_pack<Archive,
-        hpx::util::detail::pack_c<std::size_t, Is...>, Ts...>
+        hpx::util::pack_c<std::size_t, Is...>, Ts...>
     {
         static void call(
             Archive& ar, hpx::util::tuple<Ts...> const& t, unsigned int version)
@@ -88,8 +88,7 @@ namespace hpx { namespace serialization {
     void serialize(
         Archive& ar, hpx::util::tuple<Ts...>& t, unsigned int version)
     {
-        using Is =
-            typename hpx::util::detail::make_index_pack<sizeof...(Ts)>::type;
+        using Is = typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
         hpx::util::detail::serialize_with_index_pack<Archive, Is, Ts...>::call(
             ar, t, version);
     }
@@ -103,8 +102,7 @@ namespace hpx { namespace serialization {
     void load_construct_data(
         Archive& ar, hpx::util::tuple<Ts...>* t, unsigned int version)
     {
-        using Is =
-            typename hpx::util::detail::make_index_pack<sizeof...(Ts)>::type;
+        using Is = typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
         hpx::util::detail::load_construct_data_with_index_pack<Archive, Is,
             Ts...>::call(ar, *t, version);
     }
@@ -113,8 +111,7 @@ namespace hpx { namespace serialization {
     void save_construct_data(
         Archive& ar, hpx::util::tuple<Ts...> const* t, unsigned int version)
     {
-        using Is =
-            typename hpx::util::detail::make_index_pack<sizeof...(Ts)>::type;
+        using Is = typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
         hpx::util::detail::save_construct_data_with_index_pack<Archive, Is,
             Ts...>::call(ar, *t, version);
     }

@@ -8,9 +8,9 @@
 #define HPX_PLUGIN_FACTORY_BASE_MAR_24_2013_0333PM
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/plugin.hpp>
 #include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/util/ini.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ namespace hpx { namespace util { namespace plugin
     struct virtual_constructor<hpx::plugins::plugin_factory_base>
     {
         typedef
-            hpx::util::detail::pack<
+            hpx::util::pack<
                 hpx::util::section const*, hpx::util::section const*, bool
             > type;
     };

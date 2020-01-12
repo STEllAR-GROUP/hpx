@@ -8,7 +8,6 @@
 #define HPX_UTIL_DETAIL_PACK_TRAVERSAL_IMPL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/traits/pack_traversal_rebind_container.hpp>
 #include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/container_category.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
@@ -227,7 +227,7 @@ namespace util {
             /// Deduces to a true_type if any of the given types marks
             /// the underlying type to be spread into the current context.
             template <typename... T>
-            using is_any_spread_t = any_of<is_spread<T>...>;
+            using is_any_spread_t = util::any_of<is_spread<T>...>;
 
             template <typename C, typename... T>
             HPX_CONSTEXPR auto map_spread(C&& callable, T&&... args)

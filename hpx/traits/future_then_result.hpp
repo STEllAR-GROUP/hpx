@@ -9,14 +9,14 @@
 #define HPX_TRAITS_FUTURE_THEN_RESULT_DEC_25_2016_1141AM
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/type_support/always_void.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
+#include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/identity.hpp>
+#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -33,7 +33,7 @@ namespace hpx { namespace traits
         struct executor_future;
 
         template <typename Executor, typename T, typename ...Ts>
-        struct executor_future<Executor, T, hpx::util::detail::pack<Ts...>,
+        struct executor_future<Executor, T, hpx::util::pack<Ts...>,
             typename std::enable_if<
                 hpx::traits::is_two_way_executor<Executor>::value
             >::type>
@@ -57,7 +57,7 @@ namespace hpx { namespace traits
     struct executor_future
       : detail::executor_future<
             typename std::decay<Executor>::type,
-            T, hpx::util::detail::pack<typename std::decay<Ts>::type...> >
+            T, hpx::util::pack<typename std::decay<Ts>::type...> >
     {};
 
     template <typename Executor, typename T, typename ...Ts>

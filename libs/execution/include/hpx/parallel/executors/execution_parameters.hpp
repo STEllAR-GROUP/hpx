@@ -13,7 +13,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_parameters_fwd.hpp>
@@ -673,9 +673,8 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename... Params>
         struct executor_parameters : public unwrapper<Params>...
         {
-            static_assert(
-                hpx::util::detail::all_of<hpx::traits::is_executor_parameters<
-                    typename std::decay<Params>::type>...>::value,
+            static_assert(hpx::util::all_of<hpx::traits::is_executor_parameters<
+                              typename std::decay<Params>::type>...>::value,
                 "All passed parameters must be a proper executor parameters "
                 "objects");
             static_assert(sizeof...(Params) >= 2,
@@ -693,8 +692,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename Dependent = void,
                 typename Enable = typename std::enable_if<
-                    hpx::util::detail::all_of<
-                        std::is_constructible<Params>...>::value,
+                    hpx::util::all_of<std::is_constructible<Params>...>::value,
                     Dependent>::type>
             executor_parameters()
               : unwrapper<Params>()...
@@ -702,9 +700,9 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename... Params_,
-                typename Enable = typename std::enable_if<
-                    hpx::util::detail::pack<Params...>::size ==
-                    hpx::util::detail::pack<Params_...>::size>::type>
+                typename Enable =
+                    typename std::enable_if<hpx::util::pack<Params...>::size ==
+                        hpx::util::pack<Params_...>::size>::type>
             executor_parameters(Params_&&... params)
               : unwrapper<Params>(std::forward<Params_>(params))...
             {

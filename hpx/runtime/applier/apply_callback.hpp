@@ -8,7 +8,6 @@
 #define HPX_APPLIER_APPLY_CALLBACK_DEC_16_2012_1228PM
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
@@ -17,6 +16,7 @@
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <hpx/runtime/applier/apply.hpp>
 
@@ -431,14 +431,12 @@ namespace hpx
             void operator()()
             {
                 apply_action(
-                    typename util::detail::make_index_pack<
-                        sizeof...(Ts)
-                    >::type());
+                    typename util::make_index_pack<sizeof...(Ts)>::type());
             }
 
         protected:
             template <std::size_t ...Is>
-            void apply_action(util::detail::pack_c<std::size_t, Is...>)
+            void apply_action(util::pack_c<std::size_t, Is...>)
             {
                 if (addr_)
                 {

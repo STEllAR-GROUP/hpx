@@ -128,7 +128,6 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -143,6 +142,7 @@ namespace hpx
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
 
 #include <algorithm>
@@ -341,12 +341,12 @@ namespace hpx { namespace lcos
                     typename util::tuple_element<I, Tuple>::type
                 >::type future_type;
 
-                typedef util::detail::any_of<
+                typedef util::any_of<
                         traits::is_future<future_type>,
                         traits::is_ref_wrapped_future<future_type>
                     > is_future;
 
-                typedef util::detail::any_of<
+                typedef util::any_of<
                         traits::is_future_range<future_type>,
                         traits::is_ref_wrapped_future_range<future_type>
                     > is_range;
@@ -464,7 +464,7 @@ namespace hpx { namespace lcos
     template <typename F, typename... Ts>
     typename std::enable_if<
         !traits::is_future<typename std::decay<F>::type>::value &&
-        util::detail::all_of<traits::is_future<Ts>...>::value,
+        util::all_of<traits::is_future<Ts>...>::value,
         lcos::future<void>
     >::type
     when_each(F&& f, Ts&&... ts)

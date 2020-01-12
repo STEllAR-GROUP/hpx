@@ -13,7 +13,7 @@
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/functional/first_argument.hpp>
 
 #include <boost/range/irange.hpp>
@@ -122,8 +122,7 @@ namespace hpx { namespace lcos { namespace local
 
         template<typename ... I>
         typename std::enable_if<
-            util::detail::all_of<
-                typename std::is_integral<I>::type ... >::value
+            util::all_of<typename std::is_integral<I>::type...>::value
         >::type
         sync_images(I ... i) const
         {

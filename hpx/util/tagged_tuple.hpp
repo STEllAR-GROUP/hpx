@@ -143,22 +143,13 @@ namespace hpx { namespace util
                 typename tagged_element_type<Tags, Is, tuple<Ts...> >::type...
             > type;
         };
-
-        // workaround for broken MSVC2013
-        template <typename ...Ts>
-        struct pack_size
-        {
-            static const std::size_t value = sizeof...(Ts);
-        };
     }
 
 #if defined(HPX_HAVE_CXX11_EXPLICIT_VARIADIC_TEMPLATES)
     template <typename ...Tags, typename ...Ts>
     hpx::future<typename detail::tagged_tuple_helper<
         tuple<Ts...>,
-        typename detail::make_index_pack<
-            detail::pack_size<Tags...>::value
-        >::type,
+        typename util::make_index_pack<sizeof...(Tags)>::type,
         Tags...
     >::type>
     make_tagged_tuple(hpx::future<tuple<Ts...> > && f)
@@ -168,7 +159,7 @@ namespace hpx { namespace util
 
         typedef typename detail::tagged_tuple_helper<
             tuple<Ts...>,
-            typename detail::make_index_pack<sizeof...(Tags)>::type,
+            typename util::make_index_pack<sizeof...(Tags)>::type,
             Tags...
         >::type result_type;
 
@@ -185,14 +176,14 @@ namespace hpx { namespace util
         typename T1, typename T2, typename T3>
     hpx::future<typename detail::tagged_tuple_helper<
         tuple<T1, T2, T3>,
-        typename detail::make_index_pack<3ul>::type,
+        typename util::make_index_pack<3ul>::type,
         Tag1, Tag2, Tag3
     >::type>
     make_tagged_tuple(hpx::future<tuple<T1, T2, T3> > && f)
     {
         typedef typename detail::tagged_tuple_helper<
             tuple<T1, T2, T3>,
-            typename detail::make_index_pack<3ul>::type,
+            typename util::make_index_pack<3ul>::type,
             Tag1, Tag2, Tag3
         >::type result_type;
 

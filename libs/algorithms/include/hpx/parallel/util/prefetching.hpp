@@ -8,11 +8,11 @@
 #define HPX_PREFETCHING_LOOP
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -269,7 +269,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename... Ts, std::size_t... Is>
         HPX_FORCEINLINE void prefetch_containers(
             hpx::util::tuple<Ts...> const& t,
-            hpx::util::detail::pack_c<std::size_t, Is...>, std::size_t idx)
+            hpx::util::pack_c<std::size_t, Is...>, std::size_t idx)
         {
             prefetch_addresses((hpx::util::get<Is>(t).get())[idx]...);
         }
@@ -277,7 +277,7 @@ namespace hpx { namespace parallel { namespace util {
         template <typename... Ts, std::size_t... Is>
         HPX_FORCEINLINE void prefetch_containers(
             hpx::util::tuple<Ts...> const& t,
-            hpx::util::detail::pack_c<std::size_t, Is...>, std::size_t idx)
+            hpx::util::pack_c<std::size_t, Is...>, std::size_t idx)
         {
             int const sequencer[] = {
                 (hpx::util::get<Is>(t).get()[idx], 0)..., 0};
@@ -291,9 +291,8 @@ namespace hpx { namespace parallel { namespace util {
         {
             typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
             typedef typename iterator_type::base_iterator type;
-            typedef
-                typename hpx::util::detail::make_index_pack<sizeof...(Ts)>::type
-                    index_pack_type;
+            typedef typename hpx::util::make_index_pack<sizeof...(Ts)>::type
+                index_pack_type;
 
             template <typename End, typename F>
             static iterator_type call(iterator_type it, End end, F&& f)
@@ -346,9 +345,8 @@ namespace hpx { namespace parallel { namespace util {
         {
             typedef detail::prefetching_iterator<Itr, Ts...> iterator_type;
             typedef typename iterator_type::base_iterator type;
-            typedef
-                typename hpx::util::detail::make_index_pack<sizeof...(Ts)>::type
-                    index_pack_type;
+            typedef typename hpx::util::make_index_pack<sizeof...(Ts)>::type
+                index_pack_type;
 
             template <typename F>
             static iterator_type call(
@@ -405,8 +403,7 @@ namespace hpx { namespace parallel { namespace util {
     {
         static_assert(hpx::traits::is_random_access_iterator<Itr>::value,
             "Iterators have to be of random access iterator category");
-        static_assert(
-            hpx::util::detail::all_of<hpx::traits::is_range<Ts>...>::value,
+        static_assert(hpx::util::all_of<hpx::traits::is_range<Ts>...>::value,
             "All variadic parameters have to represent ranges");
 
         typedef hpx::util::tuple<std::reference_wrapper<Ts const>...>

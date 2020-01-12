@@ -10,7 +10,6 @@
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/broadcast.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/functional/first_argument.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <boost/range/irange.hpp>
 
@@ -140,8 +140,8 @@ namespace hpx { namespace lcos {
         }
 
         template <typename... I>
-        typename std::enable_if<util::detail::all_of<
-            typename std::is_integral<I>::type...>::value>::type
+        typename std::enable_if<
+            util::all_of<typename std::is_integral<I>::type...>::value>::type
         sync_images(I... i)
         {
             std::set<std::size_t> images = {(std::size_t) i...};
@@ -204,7 +204,7 @@ namespace hpx { namespace lcos {
 
         template <typename... I>
         typename std::enable_if<
-            util::detail::all_of<typename std::is_integral<I>::type...>::value,
+            util::all_of<typename std::is_integral<I>::type...>::value,
             hpx::future<void>>::type
         sync_images(hpx::launch::async_policy const& policy, I... i) const
         {

@@ -67,7 +67,7 @@ namespace hpx { namespace traits
 
     template <typename NewType, typename OldType, typename Enable = void>
     struct pack_traversal_rebind_container
-      : detail::pack_traversal_rebind_container<NewType, OldType>
+      : pack_traversal_rebind_container<NewType, OldType>
     {};
 
     // gcc reports an ambiguity for any standard container that has a defaulted

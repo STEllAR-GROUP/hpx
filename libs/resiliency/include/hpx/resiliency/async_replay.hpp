@@ -15,8 +15,8 @@
 
 #include <hpx/async.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -82,8 +82,7 @@ namespace hpx { namespace resiliency {
             }
 
             template <std::size_t... Is>
-            hpx::future<Result> invoke(
-                hpx::util::detail::pack_c<std::size_t, Is...>)
+            hpx::future<Result> invoke(hpx::util::pack_c<std::size_t, Is...>)
             {
                 return hpx::async(f_, std::get<Is>(t_)...);
             }
@@ -91,9 +90,8 @@ namespace hpx { namespace resiliency {
             hpx::future<Result> call(std::size_t n)
             {
                 // launch given function asynchronously
-                hpx::future<Result> f =
-                    invoke(hpx::util::detail::make_index_pack<
-                        std::tuple_size<Tuple>::value>{});
+                hpx::future<Result> f = invoke(hpx::util::make_index_pack<
+                    std::tuple_size<Tuple>::value>{});
 
                 // attach a continuation that will relaunch the task, if
                 // necessary

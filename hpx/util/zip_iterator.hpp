@@ -61,7 +61,7 @@ namespace hpx { namespace traits {
     template <typename... Ts>
     struct segmented_iterator_traits<util::zip_iterator<Ts...>,
         typename std::enable_if<
-            util::detail::all_of<typename segmented_iterator_traits<
+            util::all_of<typename segmented_iterator_traits<
                 Ts>::is_segmented_iterator...>::value>::type>
     {
         typedef std::true_type is_segmented_iterator;
@@ -151,7 +151,7 @@ namespace hpx { namespace traits {
     template <typename... Ts>
     struct segmented_local_iterator_traits<util::zip_iterator<Ts...>,
         typename std::enable_if<
-            util::detail::all_of<typename segmented_local_iterator_traits<
+            util::all_of<typename segmented_local_iterator_traits<
                 Ts>::is_segmented_local_iterator...>::value>::type>
     {
         typedef std::true_type is_segmented_local_iterator;

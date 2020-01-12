@@ -120,7 +120,7 @@ namespace hpx
 #include <hpx/config.hpp>
 #include <hpx/lcos/when_each.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos
     template <typename F, typename... Ts>
     typename std::enable_if<
         !traits::is_future<typename std::decay<F>::type>::value &&
-        util::detail::all_of<traits::is_future<Ts>...>::value
+        util::all_of<traits::is_future<Ts>...>::value
     >::type
     wait_each(F&& f, Ts&&... ts)
     {
