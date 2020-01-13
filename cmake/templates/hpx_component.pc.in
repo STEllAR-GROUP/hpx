@@ -1,17 +1,13 @@
+# Copyright (c) 2018 Christopher Hinz
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2012 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-prefix=@HPX_CONF_PREFIX@
-exec_prefix=${prefix}
-libdir=${exec_prefix}/@HPX_CONF_LIBDIR@
-includedir=${exec_prefix}/@HPX_CONF_INCLUDEDIR@
-
 Name: hpx_component
-Description: High Performance ParalleX (application configuration)
+Description: High Performance ParalleX (component configuration)$<$<CONFIG:Debug>: - debug build>
 Version: @HPX_VERSION@
-Libs: @CXX_FLAG@ -shared -L${libdir} @HPX_PKG_LIBRARY_DIR@ @HPX_PKG_LIBRARIES@
-Cflags: @CXX_FLAG@ @HPX_CONF_INCLUDE_DIRS@ -fPIC -DHPX_COMPONENT_EXPORTS -DHPX_ENABLE_ASSERT_HANDLER
-
+Libs: -shared @hpx_library_list@
+Cflags: @CMAKE_CXX_FLAGS@ @hpx_cflags_list@

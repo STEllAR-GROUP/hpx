@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 #include <utility>
@@ -46,6 +47,7 @@ namespace hpx { namespace performance_counters
             invocation_count_registry::local_instance(), ec);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     bool remote_action_invocation_counter_discoverer(counter_info const& info,
         discover_counter_func const& f, discover_counters_mode mode,
         error_code& ec)
@@ -54,6 +56,7 @@ namespace hpx { namespace performance_counters
         return action_invocation_counter_discoverer(info, f, mode,
             invocation_count_registry::remote_instance(), ec);
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Creation function for action invocation counter
@@ -108,6 +111,7 @@ namespace hpx { namespace performance_counters
             invocation_count_registry::local_instance(), ec);
     }
 
+#if defined(HPX_HAVE_NETWORKING)
     naming::gid_type remote_action_invocation_counter_creator(
         counter_info const& info, error_code& ec)
     {
@@ -115,5 +119,6 @@ namespace hpx { namespace performance_counters
         return action_invocation_counter_creator(info,
             invocation_count_registry::remote_instance(), ec);
     }
+#endif
 }}
 

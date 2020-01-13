@@ -1,7 +1,9 @@
-// Copyright Sascha Ochsenknecht 2009.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Sascha Ochsenknecht 2009.
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
@@ -173,11 +175,13 @@ void split_defaults(const options_description& description)
 int main(int /*ac*/, char** /*av*/)
 {
     options_description desc;
+    // clang-format off
     desc.add_options()
         ("input,i", value<string>(),"the input file")
         ("optimization,O", value<unsigned>(), "optimization level")
         ("opt,o", value<string>(), "misc option")
         ;
+    // clang-format on
 
     split_whitespace(desc);
     split_equalsign(desc);

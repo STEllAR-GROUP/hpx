@@ -1,7 +1,9 @@
-// Copyright Sascha Ochsenknecht 2009.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Sascha Ochsenknecht 2009.
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
@@ -24,9 +26,12 @@ using namespace std;
 void test_ambiguous()
 {
     options_description desc;
-    desc.add_options()("cfgfile,c", value<string>()->multitoken(),
-        "the config file")("output,c", value<string>(), "the output file")(
-        "output,o", value<string>(), "the output file");
+    // clang-format off
+    desc.add_options()
+        ("cfgfile,c", value<string>()->multitoken(), "the config file")
+        ("output,c", value<string>(), "the output file")
+        ("output,o", value<string>(), "the output file");
+    // clang-format on
 
     const char* cmdline[] = {"program", "-c", "file", "-o", "anotherfile"};
 
@@ -49,9 +54,11 @@ void test_ambiguous()
 void test_ambiguous_long()
 {
     options_description desc;
-    desc.add_options()("cfgfile,c", value<string>()->multitoken(),
-        "the config file")("output,c", value<string>(), "the output file")(
-        "output,o", value<string>(), "the output file");
+    // clang-format off
+    desc.add_options()("cfgfile,c", value<string>()->multitoken(), "the config file")
+        ("output,c", value<string>(), "the output file")
+        ("output,o", value<string>(), "the output file");
+    // clang-format on
 
     const char* cmdline[] = {
         "program", "--cfgfile", "file", "--output", "anotherfile"};
@@ -74,9 +81,15 @@ void test_ambiguous_long()
 
 void test_ambiguous_multiple_long_names()
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     options_description desc;
-    desc.add_options()("cfgfile,foo,c", value<string>()->multitoken(),
-        "the config file")("output,foo,o", value<string>(), "the output file");
+    // clang-format off
+    desc.add_options()
+        ("cfgfile,foo,c", value<string>()->multitoken(), "the config file")
+        ("output,foo,o", value<string>(), "the output file");
+    // clang-format on
 
     const char* cmdline[] = {"program", "--foo", "file"};
 
@@ -94,6 +107,7 @@ void test_ambiguous_multiple_long_names()
         HPX_TEST_EQ(e.alternatives()[0], "cfgfile");
         HPX_TEST_EQ(e.alternatives()[1], "output");
     }
+#endif
 }
 
 void test_unknown_option()
@@ -176,6 +190,8 @@ void test_multiple_occurrences()
 
 void test_multiple_occurrences_with_different_names()
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     options_description desc;
     desc.add_options()(
         "cfgfile,config-file,c", value<string>(), "the configfile");
@@ -195,16 +211,18 @@ void test_multiple_occurrences_with_different_names()
     {
         HPX_TEST((e.get_option_name() == "--cfgfile") ||
             (e.get_option_name() == "--config-file"));
-        HPX_TEST(
-            (string(e.what()) ==
-                "option '--cfgfile' cannot be specified more than once") ||
+        HPX_TEST((string(e.what()) ==
+                     "option '--cfgfile' cannot be specified more than once") ||
             (string(e.what()) ==
                 "option '--config-file' cannot be specified more than once"));
     }
+#endif
 }
 
 void test_multiple_occurrences_with_non_key_names()
 {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
     options_description desc;
     desc.add_options()(
         "cfgfile,config-file,c", value<string>(), "the configfile");
@@ -226,6 +244,7 @@ void test_multiple_occurrences_with_non_key_names()
         HPX_TEST_EQ(string(e.what()),
             "option '--cfgfile' cannot be specified more than once");
     }
+#endif
 }
 
 void test_missing_value()

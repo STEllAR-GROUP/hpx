@@ -1,6 +1,7 @@
 //  Copyright (c) 1998-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,12 +9,14 @@
 #include <hpx/assertion.hpp>
 #include <hpx/state.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/format.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/logging.hpp>
 #endif
+#include <hpx/runtime/threads/register_thread.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>
 
@@ -156,7 +159,7 @@ namespace hpx { namespace util
     {
         if (nullptr == threads::get_self_ptr())
         {
-            hpx::applier::register_work_nullary(
+            hpx::threads::register_work_nullary(
                 util::bind_front(&one_size_heap_list::free, this, p, count),
                 "one_size_heap_list::free");
             return true;

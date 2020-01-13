@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -72,14 +73,17 @@ namespace hpx { namespace threads { namespace policies
           : base_type(init, deferred_initialization)
         {}
 
-        virtual bool has_thread_stealing(std::size_t num_thread) const override
-        {
-            return false;
-        }
-
         static std::string get_scheduler_name()
         {
             return "static_queue_scheduler";
+        }
+
+        void set_scheduler_mode(scheduler_mode mode) override
+        {
+            // this scheduler does not support stealing or numa stealing
+            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing);
+            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing_numa);
+            scheduler_base::set_scheduler_mode(mode);
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -143,16 +147,9 @@ namespace hpx { namespace threads { namespace policies
                 }
 
                 if (HPX_UNLIKELY(suspended_only)) {
-                    if (running) {
-                        LTM_(error) //-V128
-                            << "queue(" << num_thread << "): "
-                            << "no new work available, are we deadlocked?";
-                    }
-                    else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error) //-V128
-                              << "  [TM] queue(" << num_thread << "): "
-                              << "no new work available, are we deadlocked?\n";
-                    }
+                    LTM_(error) //-V128
+                        << "queue(" << num_thread << "): "
+                        << "no new work available, are we deadlocked?";
                 }
             }
 #endif

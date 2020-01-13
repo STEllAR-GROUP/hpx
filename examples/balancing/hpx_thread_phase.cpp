@@ -1,14 +1,15 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/lcos/local/barrier.hpp>
-#include <hpx/lcos/local/mutex.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/synchronization/barrier.hpp>
+#include <hpx/synchronization/mutex.hpp>
+#include <hpx/functional/bind.hpp>
 
 #include <boost/lockfree/queue.hpp>
 
@@ -31,7 +32,7 @@ using std::chrono::milliseconds;
 using hpx::lcos::local::barrier;
 using hpx::lcos::local::mutex;
 
-using hpx::applier::register_thread;
+using hpx::threads::register_thread;
 
 using hpx::threads::get_thread_phase;
 using hpx::threads::get_self_id;

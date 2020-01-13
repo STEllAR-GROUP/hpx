@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Antoine TRAN TAN
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -53,8 +54,9 @@ namespace hpx { namespace actions
             static ReturnType invoke(naming::address::address_type /*lva*/,
                 naming::address::component_type comptype, Ts&&... vs)
             {
-                 int * dummy = nullptr;
-                 return reinterpret_cast<const F&>(*dummy)( std::forward<Ts>(vs)... );
+                int* dummy = nullptr;
+                return reinterpret_cast<const F&>(*dummy)(    // -V522
+                    std::forward<Ts>(vs)...);
             }
         };
 
@@ -94,18 +96,13 @@ namespace hpx { namespace actions
         };
     }
 
-    template<typename F>
+    template <typename F>
     auto lambda_to_action(F&& f)
-    -> decltype( hpx::actions::detail::action_maker() += true
-        ? nullptr
-        : hpx::actions::detail::addr_add() +  f)
+        -> decltype(hpx::actions::detail::action_maker() +=
+            true ? nullptr : hpx::actions::detail::addr_add() + f)
     {
-        HPX_CONSTEXPR auto act =
-            hpx::actions::detail::action_maker() += true
-            ? nullptr
-            : hpx::actions::detail::addr_add() +  f;
-
-        return act;
+        return hpx::actions::detail::action_maker() +=
+            true ? nullptr : hpx::actions::detail::addr_add() + f;
     }
 }}
 

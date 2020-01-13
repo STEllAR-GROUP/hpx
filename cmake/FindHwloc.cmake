@@ -3,6 +3,7 @@
 # Copyright (c) 2010-2011 Matt Anderson
 # Copyright (c) 2011      Bryce Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,6 +13,7 @@ pkg_check_modules(PC_HWLOC QUIET hwloc)
 find_path(HWLOC_INCLUDE_DIR hwloc.h
   HINTS
     ${HWLOC_ROOT} ENV HWLOC_ROOT
+    ${HPX_HWLOC_ROOT}
     ${PC_HWLOC_MINIMAL_INCLUDEDIR}
     ${PC_HWLOC_MINIMAL_INCLUDE_DIRS}
     ${PC_HWLOC_INCLUDEDIR}
@@ -21,11 +23,19 @@ find_path(HWLOC_INCLUDE_DIR hwloc.h
 find_library(HWLOC_LIBRARY NAMES hwloc libhwloc
   HINTS
     ${HWLOC_ROOT} ENV HWLOC_ROOT
+    ${HPX_HWLOC_ROOT}
     ${PC_HWLOC_MINIMAL_LIBDIR}
     ${PC_HWLOC_MINIMAL_LIBRARY_DIRS}
     ${PC_HWLOC_LIBDIR}
     ${PC_HWLOC_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
+
+# Set HWLOC_ROOT in case the other hints are used
+if (NOT HWLOC_ROOT AND "$ENV{HWLOC_ROOT}")
+  set(HWLOC_ROOT $ENV{HWLOC_ROOT})
+elseif(NOT HWLOC_ROOT)
+  string(REPLACE "/include" "" HWLOC_ROOT "${HWLOC_INCLUDE_DIR}")
+endif()
 
 set(HWLOC_LIBRARIES ${HWLOC_LIBRARY})
 set(HWLOC_INCLUDE_DIRS ${HWLOC_INCLUDE_DIR})

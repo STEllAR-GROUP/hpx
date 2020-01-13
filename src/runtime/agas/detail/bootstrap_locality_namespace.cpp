@@ -3,6 +3,7 @@
 //  Copyright (c) 2012-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,13 +48,13 @@ namespace hpx { namespace agas { namespace detail
         parcelset::endpoints_type const& endpoints
       , std::uint64_t count
       , std::uint32_t num_threads
-      , naming::gid_type suggested_prefix
+      , naming::gid_type const& suggested_prefix
         )
     {
         return server_.allocate(endpoints, count, num_threads, suggested_prefix);
     }
 
-    void bootstrap_locality_namespace::free(naming::gid_type locality)
+    void bootstrap_locality_namespace::free(naming::gid_type const& locality)
     {
         server_.free(locality);
     }
@@ -63,8 +64,8 @@ namespace hpx { namespace agas { namespace detail
         return server_.localities();
     }
 
-    parcelset::endpoints_type
-    bootstrap_locality_namespace::resolve_locality(naming::gid_type locality)
+    parcelset::endpoints_type bootstrap_locality_namespace::resolve_locality(
+        naming::gid_type const& locality)
     {
         return server_.resolve_locality(locality);
     }

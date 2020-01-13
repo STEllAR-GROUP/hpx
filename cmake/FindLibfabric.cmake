@@ -1,5 +1,6 @@
 # Copyright (c)      2017 Thomas Heller
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,8 +18,10 @@ find_library(LIBFABRIC_LIBRARY NAMES fabric
     ${LIBFABRIC_ROOT} ENV LIBFABRIC_ROOT
   PATH_SUFFIXES lib lib64)
 
-set(LIBFABRIC_LIBRARIES ${LIBFABRIC_LIBRARY} CACHE INTERNAL "")
-set(LIBFABRIC_INCLUDE_DIRS ${LIBFABRIC_INCLUDE_DIR} CACHE INTERNAL "")
+if (NOT LIBFABRIC_INCLUDE_DIR OR NOT LIBFABRIC_LIBRARY)
+  hpx_error("Could not find LIBFABRIC_INCLUDE_DIR or LIBFABRIC_LIBRARY please \
+  set the LIBFABRIC_ROOT environment variable")
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Libfabric DEFAULT_MSG
@@ -34,4 +37,4 @@ find_package_handle_standard_args(Libfabric DEFAULT_MSG
 #  endif()
 #endforeach()
 
-mark_as_advanced(LIBFABRIC_ROOT LIBFABRIC_LIBRARY LIBFABRIC_INCLUDE_DIR)
+mark_as_advanced(LIBFABRIC_ROOT)

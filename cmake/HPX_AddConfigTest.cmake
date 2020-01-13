@@ -4,6 +4,7 @@
 # Copyright (c) 2017 Google
 # Copyright (c) 2017 Taeguk Kwon
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -71,7 +72,8 @@ function(add_hpx_config_test variable)
     set(CONFIG_TEST_INCLUDE_DIRS ${CONFIG_TEST_INCLUDE_DIRS} ${${variable}_INCLUDE_DIRECTORIES})
     set(CONFIG_TEST_LINK_DIRS ${CONFIG_TEST_LINK_DIRS} ${${variable}_LINK_DIRECTORIES})
 
-    set(CONFIG_TEST_LINK_LIBRARIES ${HPX_LIBRARIES} ${${variable}_LIBRARIES})
+    get_property(_base_libraries TARGET hpx_base_libraries PROPERTY INTERFACE_LINK_LIBRARIES)
+    set(CONFIG_TEST_LINK_LIBRARIES ${_base_libraries} ${${variable}_LIBRARIES})
 
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
@@ -521,6 +523,13 @@ function(hpx_check_for_cxx11_std_shared_ptr)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx11_std_shared_ptr_lwg3018)
+  add_hpx_config_test(HPX_WITH_CXX11_SHARED_PTR_LWG3018
+    SOURCE cmake/tests/cxx11_std_shared_ptr_lwg3018.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx11_std_shuffle)
   add_hpx_config_test(HPX_WITH_CXX11_SHUFFLE
     SOURCE cmake/tests/cxx11_std_shuffle.cpp
@@ -612,6 +621,13 @@ function(hpx_check_for_cxx11_override)
     SOURCE cmake/tests/cxx11_override.cpp
     FILE ${ARGN}
     CMAKECXXFEATURE cxx_override)
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx11_std_quick_exit)
+  add_hpx_config_test(HPX_WITH_CXX11_STD_QUICK_EXIT
+    SOURCE cmake/tests/cxx11_std_quick_exit.cpp
+    FILE ${ARGN})
 endfunction()
 
 ###############################################################################
@@ -723,6 +739,13 @@ function(hpx_check_for_cxx17_hardware_destructive_interference_size)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx17_std_in_place_type_t)
+  add_hpx_config_test(HPX_WITH_CXX17_STD_IN_PLACE_TYPE_T
+    SOURCE cmake/tests/cxx17_std_in_place_type_t.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx17_structured_bindings)
   add_hpx_config_test(HPX_WITH_CXX17_STRUCTURED_BINDINGS
     SOURCE cmake/tests/cxx17_structured_bindings.cpp
@@ -733,6 +756,14 @@ endfunction()
 function(hpx_check_for_cxx17_if_constexpr)
   add_hpx_config_test(HPX_WITH_CXX17_IF_CONSTEXPR
     SOURCE cmake/tests/cxx17_if_constexpr.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments)
+  add_hpx_config_test(
+    HPX_WITH_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS
+    SOURCE cmake/tests/cxx17_noexcept_function.cpp
     FILE ${ARGN})
 endfunction()
 

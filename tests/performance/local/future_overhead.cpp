@@ -1,10 +1,10 @@
-//  Copyright (c) 2018 Mikael Simberg
+//  Copyright (c) 2018=2019 Mikael Simberg
+//  Copyright (c) 2018-2019 John Biddiscombe
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-// TODO: Update
 
 #include <hpx/format.hpp>
 #include <hpx/hpx_init.hpp>
@@ -17,21 +17,24 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/util/yield_while.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/lcos/local/sliding_semaphore.hpp>
 #include <hpx/runtime/threads/executors/limiting_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/synchronization.hpp>
 
 #include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 using hpx::program_options::options_description;
@@ -55,7 +58,7 @@ using hpx::cout;
 using hpx::flush;
 
 // global vars we stick here to make printouts easy for plotting
-static std::string queuing = "";
+static std::string queuing = "default";
 static std::size_t numa_sensitive = 0;
 static std::uint64_t num_threads = 1;
 static std::string info_string = "";
@@ -64,21 +67,25 @@ static std::string info_string = "";
 void print_stats(const char* title, const char* wait, const char* exec,
     std::int64_t count, double duration, bool csv)
 {
+    std::ostringstream temp;
     double us = 1e6 * duration / count;
     if (csv)
-        hpx::util::format_to(cout,
-            "{1}, {:10}, {:15}, {:20}, {:10}, {:10}, {:20}, {:4}, {:4}, "
+    {
+        hpx::util::format_to(temp,
+            "{1}, {:27}, {:15}, {:18}, {:8}, {:8}, {:20}, {:4}, {:4}, "
             "{:20}\n",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
-            num_threads, info_string)
-            << flush;
+            num_threads, info_string);
+    }
     else
-        hpx::util::format_to(cout,
-            "invoked {1}, futures {:10} {:15} {:20} in \t{5} seconds \t: {6} "
-            "us/future, queue {7} numa {8}, threads {9}, info {10}\n",
+    {
+        hpx::util::format_to(temp,
+            "invoked {:1}, futures {:27} {:15} {:18} in {:8} seconds : {:8} "
+            "us/future, queue {:20}, numa {:4}, threads {:4}, info {:20}\n",
             count, title, wait, exec, duration, us, queuing, numa_sensitive,
-            num_threads, info_string)
-            << flush;
+            num_threads, info_string);
+    }
+    std::cout << temp.str() << std::endl;
     // CDash graph plotting
     //hpx::util::print_cdash_timing(title, duration);
 }
@@ -98,7 +105,7 @@ double global_scratch = 0;
 std::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
-double null_function()
+double null_function() noexcept
 {
     if (num_iterations > 0)
     {
@@ -202,9 +209,6 @@ template <typename Executor>
 void measure_function_futures_thread_count(
     std::uint64_t count, bool csv, Executor& exec)
 {
-    std::vector<future<double>> futures;
-    futures.reserve(count);
-
     std::atomic<std::uint64_t> sanity_check(count);
     auto this_pool = hpx::this_thread::get_pool();
 
@@ -230,7 +234,7 @@ void measure_function_futures_thread_count(
 
     if (sanity_check != 0)
     {
-        int count = this_pool->get_thread_count_unknown(std::size_t(-1), false);
+        auto count = this_pool->get_thread_count_unknown(std::size_t(-1), false);
         throw std::runtime_error(
             "This test is faulty " + std::to_string(count));
     }
@@ -247,13 +251,34 @@ void measure_function_futures_limiting_executor(
     std::uint64_t const tasks = num_threads * 2000;
     std::atomic<std::uint64_t> sanity_check(count);
 
+    auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+    if (std::string("core-shared_priority_queue_scheduler") ==
+        sched->get_description())
+    {
+        sched->add_remove_scheduler_mode(
+            // add these flags
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::enable_stealing |
+                hpx::threads::policies::assign_work_round_robin |
+                hpx::threads::policies::steal_after_local),
+            // remove these flags
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::enable_stealing_numa |
+                hpx::threads::policies::assign_work_thread_parent |
+                hpx::threads::policies::steal_high_priority_first));
+    }
+
+    // test a parallel algorithm on custom pool with high priority
+    auto const chunk_size = count / (num_threads * 2);
+    hpx::parallel::execution::static_chunk_size fixed(chunk_size);
+
     // start the clock
     high_resolution_timer walltime;
     {
         hpx::threads::executors::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
         hpx::parallel::for_loop(
-            hpx::parallel::execution::par, 0, count, [&](int) {
+            hpx::parallel::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
@@ -276,9 +301,6 @@ template <typename Executor>
 void measure_function_futures_sliding_semaphore(
     std::uint64_t count, bool csv, Executor& exec)
 {
-    std::vector<future<double>> futures;
-    futures.reserve(count);
-
     // start the clock
     high_resolution_timer walltime;
     const int sem_count = 5000;
@@ -291,11 +313,205 @@ void measure_function_futures_sliding_semaphore(
         });
         sem.wait(i);
     }
-    sem.wait(count);
+    sem.wait(count + sem_count - 1);
 
     // stop the clock
     const double duration = walltime.elapsed();
     print_stats("apply", "Sliding-Sem", ExecName(exec), count, duration, csv);
+}
+
+struct unlimited_number_of_chunks
+{
+    template <typename Executor>
+    std::size_t maximal_number_of_chunks(
+        Executor&& /*executor*/, std::size_t /*cores*/, std::size_t num_tasks)
+    {
+        return num_tasks;
+    }
+};
+
+namespace hpx { namespace parallel { namespace execution {
+    template <>
+    struct is_executor_parameters<unlimited_number_of_chunks> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
+
+void measure_function_futures_for_loop(std::uint64_t count, bool csv)
+{
+    // start the clock
+    high_resolution_timer walltime;
+    hpx::parallel::for_loop(hpx::parallel::execution::par.with(
+                                hpx::parallel::execution::static_chunk_size(1),
+                                unlimited_number_of_chunks()),
+        0, count, [](std::uint64_t) { null_function(); });
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
+}
+
+void measure_function_futures_register_work(std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::uint64_t i = 0; i < count; ++i)
+    {
+        hpx::threads::register_work_nullary([&l]() {
+            null_function();
+            l.count_down(1);
+        });
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("register_work", "latch", "none", count, duration, csv);
+}
+
+void measure_function_futures_create_thread(std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+    auto func = [&l]() {
+        null_function();
+        l.count_down(1);
+    };
+    auto const thread_func =
+        hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
+    auto const desc = hpx::util::thread_description();
+    auto const prio = hpx::threads::thread_priority_normal;
+    auto const hint = hpx::threads::thread_schedule_hint();
+    auto const stack_size =
+        hpx::threads::get_stack_size(hpx::threads::thread_stacksize_small);
+    hpx::error_code ec;
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::uint64_t i = 0; i < count; ++i)
+    {
+        auto init = hpx::threads::thread_init_data(
+            hpx::threads::thread_function_type(thread_func), desc, prio, hint,
+            stack_size, sched);
+        sched->create_thread(init, nullptr, hpx::threads::pending, false, ec);
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("create_thread", "latch", "none", count, duration, csv);
+}
+
+void measure_function_futures_create_thread_hierarchical_placement(
+    std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
+
+    if (std::string("core-shared_priority_queue_scheduler") ==
+        sched->get_description())
+    {
+        sched->add_remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::assign_work_thread_parent),
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::enable_stealing |
+                hpx::threads::policies::enable_stealing_numa |
+                hpx::threads::policies::assign_work_round_robin |
+                hpx::threads::policies::steal_after_local |
+                hpx::threads::policies::steal_high_priority_first));
+    }
+    auto const func = [&l]() {
+        null_function();
+        l.count_down(1);
+    };
+    auto const thread_func =
+        hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
+    auto const desc = hpx::util::thread_description();
+    auto prio = hpx::threads::thread_priority_normal;
+    auto const stack_size =
+        hpx::threads::get_stack_size(hpx::threads::thread_stacksize_small);
+    auto const num_threads = hpx::get_num_worker_threads();
+    hpx::error_code ec;
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::size_t t = 0; t < num_threads; ++t)
+    {
+        auto const hint =
+            hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
+        auto spawn_func = [&thread_func, sched, hint, t, count, num_threads,
+                              desc, stack_size, prio]() {
+            std::uint64_t const count_start = t * count / num_threads;
+            std::uint64_t const count_end = (t + 1) * count / num_threads;
+            hpx::error_code ec;
+            for (std::uint64_t i = count_start; i < count_end; ++i)
+            {
+                hpx::threads::thread_init_data init(
+                    hpx::threads::thread_function_type(thread_func), desc, prio,
+                    hint, stack_size, sched);
+                sched->create_thread(
+                    init, nullptr, hpx::threads::pending, false, ec);
+            }
+        };
+        auto const thread_spawn_func =
+            hpx::threads::detail::thread_function_nullary<decltype(spawn_func)>{
+                spawn_func};
+
+        hpx::threads::thread_init_data init(
+            hpx::threads::thread_function_type(thread_spawn_func), desc, prio,
+            hint, stack_size, sched);
+        sched->create_thread(init, nullptr, hpx::threads::pending, false, ec);
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats(
+        "create_thread_hierarchical", "latch", "none", count, duration, csv);
+}
+
+void measure_function_futures_apply_hierarchical_placement(
+    std::uint64_t count, bool csv)
+{
+    hpx::lcos::local::latch l(count);
+
+    auto const func = [&l]() {
+        null_function();
+        l.count_down(1);
+    };
+    auto const num_threads = hpx::get_num_worker_threads();
+
+    // start the clock
+    high_resolution_timer walltime;
+    for (std::size_t t = 0; t < num_threads; ++t)
+    {
+        auto const hint =
+            hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
+        auto spawn_func = [&func, hint, t, count, num_threads]() {
+            auto exec = hpx::threads::executors::default_executor(hint);
+            std::uint64_t const count_start = t * count / num_threads;
+            std::uint64_t const count_end = (t + 1) * count / num_threads;
+
+            for (std::uint64_t i = count_start; i < count_end; ++i)
+            {
+                hpx::apply(exec, func);
+            }
+        };
+
+        auto exec = hpx::threads::executors::default_executor(hint);
+        hpx::apply(exec, spawn_func);
+    }
+    l.wait();
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("apply_hierarchical", "latch", "default_executor", count,
+        duration, csv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -311,6 +527,7 @@ int hpx_main(variables_map& vm)
             numa_sensitive = 0;
 
         bool test_all = (vm.count("test-all") > 0);
+        const int repetitions = vm["repetitions"].as<int>();
 
         if (vm.count("info"))
             info_string = vm["info"].as<std::string>();
@@ -323,15 +540,18 @@ int hpx_main(variables_map& vm)
         bool csv = vm.count("csv") != 0;
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
-        const int nl = 1;
 
         hpx::parallel::execution::default_executor def;
         hpx::parallel::execution::parallel_executor par;
 
-        for (int i = 0; i < nl; i++)
+        for (int i = 0; i < repetitions; i++)
         {
+            measure_function_futures_limiting_executor(count, csv, par);
+            measure_function_futures_create_thread_hierarchical_placement(
+                count, csv);
             if (test_all)
             {
+                measure_function_futures_limiting_executor(count, csv, def);
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
                 measure_function_futures_wait_each(count, csv, def);
@@ -342,9 +562,12 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_thread_count(count, csv, par);
                 measure_function_futures_sliding_semaphore(count, csv, def);
                 measure_function_futures_sliding_semaphore(count, csv, par);
+                measure_function_futures_for_loop(count, csv);
+                measure_function_futures_register_work(count, csv);
+                measure_function_futures_create_thread(count, csv);
+                measure_function_futures_apply_hierarchical_placement(
+                    count, csv);
             }
-            measure_function_futures_limiting_executor(count, csv, def);
-            measure_function_futures_limiting_executor(count, csv, par);
         }
     }
 
@@ -366,8 +589,11 @@ int main(int argc, char* argv[])
          "number of iterations in the delay loop")
 
         ("csv", "output results as csv (format: count,duration)")
+        ("test-all", "run all benchmarks")
+        ("repetitions", value<int>()->default_value(1),
+         "number of repetitions of the full benchmark")
 
-        ("info", value<std::string>()->default_value("none"),
+        ("info", value<std::string>()->default_value("no-info"),
          "extra info for plot output (e.g. branch name)");
     // clang-format on
 

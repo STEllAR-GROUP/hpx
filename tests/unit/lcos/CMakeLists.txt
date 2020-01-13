@@ -1,6 +1,7 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -21,32 +22,13 @@ set(tests
     async_remote
     async_remote_client
     async_unwrap_result
-    barrier
-    broadcast
-    broadcast_component
-    broadcast_apply
     channel
-    channel_local
     client_then
-    condition_variable
-    counting_semaphore
-    fold
     future
     future_ref
     future_then
     future_then_executor
     future_wait
-    global_spmd_block
-    local_latch
-    local_barrier
-    local_barrier_count_up
-    local_barrier_reset
-    local_dataflow
-    local_dataflow_boost_small_vector
-    local_dataflow_executor
-    local_dataflow_std_array
-    local_event
-    local_mutex
     local_promise_allocator
     make_future
     make_ready_future
@@ -54,13 +36,8 @@ set(tests
     promise
     promise_allocator
     promise_emplace
-    reduce
     remote_dataflow
-    remote_latch
-    run_guarded
     shared_future
-    sliding_semaphore
-    split_future
     split_shared_future
     sync_remote
     use_allocator
@@ -81,54 +58,33 @@ if(HPX_WITH_AWAIT)
 endif()
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)
-set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
-set(apply_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(apply_remote_PARAMETERS LOCALITIES 2)
 set(apply_remote_client_PARAMETERS LOCALITIES 2)
+set(apply_local_PARAMETERS THREADS_PER_LOCALITY 4)
+set(apply_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_cb_colocated_PARAMETERS LOCALITIES 2)
+set(async_local_PARAMETERS THREADS_PER_LOCALITY 4)
+set(async_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(async_continue_PARAMETERS LOCALITIES 2)
 set(async_continue_cb_PARAMETERS LOCALITIES 2)
 set(async_continue_cb_colocated_PARAMETERS LOCALITIES 2)
-set(async_local_PARAMETERS THREADS_PER_LOCALITY 4)
-set(async_local_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(async_remote_PARAMETERS LOCALITIES 2)
 set(async_remote_client_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_client_PARAMETERS LOCALITIES 2)
-
-set(broadcast_PARAMETERS LOCALITIES 2)
-set(broadcast_apply_PARAMETERS LOCALITIES 2)
 
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
-set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
-set(sliding_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
-set(remote_latch_PARAMETERS LOCALITIES 2)
-
-set(local_dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
-set(local_dataflow_executor_PARAMETERS THREADS_PER_LOCALITY 4)
-
 set(remote_dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
 set(remote_dataflow_PARAMETERS LOCALITIES 2)
-
-set(local_event_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(local_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(promise_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(reduce_PARAMETERS LOCALITIES 2)
-
-set(run_guarded_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
@@ -140,58 +96,13 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
-                     SOURCES ${sources}
-                     ${${test}_FLAGS}
-                     EXCLUDE_FROM_ALL
-                     HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER ${folder_name})
+    INTERNAL_FLAGS
+    SOURCES ${sources}
+    ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    FOLDER ${folder_name})
 
   add_hpx_unit_test("lcos" ${test} ${${test}_PARAMETERS})
 
 endforeach()
-
-if(HPX_WITH_COMPILE_ONLY_TESTS)
-  # add compile time tests
-  set(compile_tests
-     )
-
-  if(HPX_WITH_FAIL_COMPILE_TESTS)
-    set(fail_compile_tests
-        fail_compile_mutex_move
-        fail_compile_spinlock_move
-        fail_compile_spinlock_no_backoff_move
-       )
-    foreach(fail_compile_test ${fail_compile_tests})
-      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
-    endforeach()
-
-    set(compile_tests ${compile_tests} ${fail_compile_tests})
-  endif()
-
-  foreach(compile_test ${compile_tests})
-    set(sources
-        ${compile_test}.cpp)
-
-    add_hpx_unit_compile_test(
-      "lcos"
-      ${compile_test}
-      SOURCES ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER "Tests/Unit/LCOs/CompileOnly")
-
-  endforeach()
-
-endif()
-
-#########################################################################################
-set(subdirs
-    shared_mutex
-   )
-
-# add sub directories
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.lcos.${subdir})
-  add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.lcos tests.unit.lcos.${subdir})
-endforeach()
-

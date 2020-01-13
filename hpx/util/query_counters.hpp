@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/util/interval_timer.hpp>

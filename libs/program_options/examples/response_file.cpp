@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,8 +19,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/program_options.hpp>
 
-#include <boost/tokenizer.hpp>
 #include <boost/token_functions.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -35,7 +36,7 @@ using namespace std;
 
 // Additional command line parser which interprets '@something' as a
 // option "config-file" with the value "something"
-pair<string, string> at_option_parser(string const&s)
+pair<string, string> at_option_parser(string const& s)
 {
     if ('@' == s[0])
         return std::make_pair(string("response-file"), s.substr(1));
@@ -45,8 +46,10 @@ pair<string, string> at_option_parser(string const&s)
 
 int main(int ac, char* av[])
 {
-    try {
+    try
+    {
         options_description desc("Allowed options");
+        // clang-format off
         desc.add_options()
             ("help", "produce a help message")
             ("include-path,I", value< vector<string> >()->composing(),
@@ -55,10 +58,14 @@ int main(int ac, char* av[])
             ("response-file", value<string>(),
                  "can be specified with '@name', too")
         ;
+        // clang-format on
 
         variables_map vm;
-        store(command_line_parser(ac, av).options(desc)
-              .extra_parser(at_option_parser).run(), vm);
+        store(command_line_parser(ac, av)
+                  .options(desc)
+                  .extra_parser(at_option_parser)
+                  .run(),
+            vm);
 
         if (vm.count("help"))
         {
@@ -82,7 +89,7 @@ int main(int ac, char* av[])
             // Split the file content
             string sstr = ss.str();
             char_separator<char> sep(" \n\r");
-            tokenizer<char_separator<char> > tok(sstr, sep);
+            tokenizer<char_separator<char>> tok(sstr, sep);
 
             vector<string> args;
             copy(tok.begin(), tok.end(), back_inserter(args));
@@ -93,7 +100,7 @@ int main(int ac, char* av[])
 
         if (vm.count("include-path"))
         {
-            const vector<string>& s = vm["include-path"].as<vector< string> >();
+            const vector<string>& s = vm["include-path"].as<vector<string>>();
             cout << "Include paths: ";
             copy(s.begin(), s.end(), ostream_iterator<string>(cout, " "));
             cout << "\n";

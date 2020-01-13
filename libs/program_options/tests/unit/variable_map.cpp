@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -32,6 +33,7 @@ vector<string> sv(const char* array[], unsigned size)
 void test_variable_map()
 {
     options_description desc;
+    // clang-format off
     desc.add_options()
         ("foo,f", new untyped_value)
         ("bar,b", value<string>())
@@ -39,6 +41,7 @@ void test_variable_map()
         ("baz", new untyped_value())
         ("output,o", new untyped_value(), "")
         ;
+    // clang-format on
 
     const char* cmdline3_[] = {"--foo='12'", "--bar=11", "-z3", "-ofoo"};
     vector<string> cmdline3 =
@@ -56,11 +59,13 @@ void test_variable_map()
     HPX_TEST(vm["output"].as<string>() == "foo");
 
     int i;
+    // clang-format off
     desc.add_options()
         ("zee", bool_switch(), "")
         ("zak", value<int>(&i), "")
         ("opt", bool_switch(), "")
         ;
+    // clang-format on
 
     const char* cmdline4_[] = {"--zee", "--zak=13"};
     vector<string> cmdline4 =
@@ -77,11 +82,13 @@ void test_variable_map()
     HPX_TEST(i == 13);
 
     options_description desc2;
+    // clang-format off
     desc2.add_options()
         ("vee", value<string>()->default_value("42"))
         ("voo", value<string>())
         ("iii", value<int>()->default_value(123))
-    ;
+        ;
+    // clang-format on
 
     const char* cmdline5_[] = {"--voo=1"};
     vector<string> cmdline5 =
@@ -97,12 +104,14 @@ void test_variable_map()
     HPX_TEST(vm3["iii"].as<int>() == 123);
 
     options_description desc3;
+    // clang-format off
     desc3.add_options()
         ("imp", value<int>()->implicit_value(100))
         ("iim", value<int>()->implicit_value(200)->default_value(201))
         ("mmp,m", value<int>()->implicit_value(123)->default_value(124))
         ("foo", value<int>())
-    ;
+        ;
+    // clang-format on
 
     /* The -m option is implicit. It does not have value in inside the token,
        and we should not grab the next token.  */
@@ -130,6 +139,7 @@ void notifier(const vector<int>& v)
 void test_semantic_values()
 {
     options_description desc;
+    // clang-format off
     desc.add_options()
         ("foo", new untyped_value())
         ("bar", value<int>())
@@ -137,6 +147,7 @@ void test_semantic_values()
         ("baz", value< vector<string> >()->multitoken())
         ("int", value< vector<int> >()->notifier(&notifier))
     ;
+    // clang-format on
 
     parsed_options parsed(&desc);
     vector<option>& options = parsed.options;
@@ -155,11 +166,11 @@ void test_semantic_values()
     notify(vm);
     HPX_TEST(vm.count("biz") == 1);
     HPX_TEST(vm.count("baz") == 1);
-    const vector<string> av = vm["biz"].as< vector<string> >();
-    const vector<string> av2 = vm["baz"].as< vector<string> >();
-    string exp1[] = { "a", "b x" };
+    const vector<string> av = vm["biz"].as<vector<string>>();
+    const vector<string> av2 = vm["baz"].as<vector<string>>();
+    string exp1[] = {"a", "b x"};
     HPX_TEST(av == vector<string>(exp1, exp1 + 2));
-    string exp2[] = { "q", "q", "w" };
+    string exp2[] = {"q", "q", "w"};
     HPX_TEST(av2 == vector<string>(exp2, exp2 + 3));
 
     options.emplace_back(option("int", vector<string>(1, "13")));
@@ -168,7 +179,7 @@ void test_semantic_values()
     store(parsed, vm2);
     notify(vm2);
     HPX_TEST(vm2.count("int") == 1);
-    HPX_TEST(vm2["int"].as< vector<int> >() == vector<int>(1, 13));
+    HPX_TEST(vm2["int"].as<vector<int>>() == vector<int>(1, 13));
     HPX_TEST_EQ(stored_value, 13);
 
     vector<option> saved_options = options;
@@ -189,16 +200,15 @@ void test_priority()
 {
     options_description desc;
     desc.add_options()
-    // Value of this option will be specified in two sources,
-    // and only first one should be used.
-    ("first", value< vector<int > >())
-    // Value of this option will have default value in the first source,
-    // and explicit assignment in the second, so the second should be used.
-    ("second", value< vector<int > >()->default_value(vector<int>(1, 1), ""))
-    ("aux", value< vector<int > >())
-     // This will have values in both sources, and values should be combined
-    ("include", value< vector<int> >()->composing())
-    ;
+        // Value of this option will be specified in two sources,
+        // and only first one should be used.
+        ("first", value<vector<int>>())
+        // Value of this option will have default value in the first source,
+        // and explicit assignment in the second, so the second should be used.
+        ("second", value<vector<int>>()->default_value(vector<int>(1, 1), ""))(
+            "aux", value<vector<int>>())
+        // This will have values in both sources, and values should be combined
+        ("include", value<vector<int>>()->composing());
 
     const char* cmdline1_[] = {
         "--first=1", "--aux=10", "--first=3", "--include=1"};
@@ -217,31 +227,31 @@ void test_priority()
     store(p1, vm);
 
     HPX_TEST(vm.count("first") == 1);
-    HPX_TEST(vm["first"].as< vector<int> >().size() == 2);
-    HPX_TEST_EQ(vm["first"].as< vector<int> >()[0], 1);
-    HPX_TEST_EQ(vm["first"].as< vector<int> >()[1], 3);
+    HPX_TEST(vm["first"].as<vector<int>>().size() == 2);
+    HPX_TEST_EQ(vm["first"].as<vector<int>>()[0], 1);
+    HPX_TEST_EQ(vm["first"].as<vector<int>>()[1], 3);
 
     HPX_TEST(vm.count("second") == 1);
-    HPX_TEST(vm["second"].as< vector<int> >().size() == 1);
-    HPX_TEST_EQ(vm["second"].as< vector<int> >()[0], 1);
+    HPX_TEST(vm["second"].as<vector<int>>().size() == 1);
+    HPX_TEST_EQ(vm["second"].as<vector<int>>()[0], 1);
 
     store(p2, vm);
 
     // Value should not change.
     HPX_TEST(vm.count("first") == 1);
-    HPX_TEST(vm["first"].as< vector<int> >().size() == 2);
-    HPX_TEST_EQ(vm["first"].as< vector<int> >()[0], 1);
-    HPX_TEST_EQ(vm["first"].as< vector<int> >()[1], 3);
+    HPX_TEST(vm["first"].as<vector<int>>().size() == 2);
+    HPX_TEST_EQ(vm["first"].as<vector<int>>()[0], 1);
+    HPX_TEST_EQ(vm["first"].as<vector<int>>()[1], 3);
 
     // Value should change to 7
     HPX_TEST(vm.count("second") == 1);
-    HPX_TEST(vm["second"].as< vector<int> >().size() == 1);
-    HPX_TEST_EQ(vm["second"].as< vector<int> >()[0], 7);
+    HPX_TEST(vm["second"].as<vector<int>>().size() == 1);
+    HPX_TEST_EQ(vm["second"].as<vector<int>>()[0], 7);
 
     HPX_TEST(vm.count("include") == 1);
-    HPX_TEST(vm["include"].as< vector<int> >().size() == 2);
-    HPX_TEST_EQ(vm["include"].as< vector<int> >()[0], 1);
-    HPX_TEST_EQ(vm["include"].as< vector<int> >()[1], 7);
+    HPX_TEST(vm["include"].as<vector<int>>().size() == 2);
+    HPX_TEST_EQ(vm["include"].as<vector<int>>()[0], 1);
+    HPX_TEST_EQ(vm["include"].as<vector<int>>()[1], 7);
 }
 
 void test_multiple_assignments_with_different_option_description()
@@ -251,15 +261,12 @@ void test_multiple_assignments_with_different_option_description()
     // in the options description provided the second time, we don't crash.
 
     options_description desc1("");
-    desc1.add_options()
-        ("help,h", "")
-        ("includes", value< vector<string> >()->composing(), "");
-        ;
+    desc1.add_options()("help,h", "")(
+        "includes", value<vector<string>>()->composing(), "");
+    ;
 
     options_description desc2("");
-    desc2.add_options()
-        ("output,o", "")
-        ;
+    desc2.add_options()("output,o", "");
 
     vector<string> input1;
     input1.emplace_back("--help");
@@ -274,7 +281,6 @@ void test_multiple_assignments_with_different_option_description()
     input3.emplace_back("--includes=b");
     parsed_options p3 = command_line_parser(input3).options(desc1).run();
 
-
     variables_map vm;
     store(p1, vm);
     store(p2, vm);
@@ -282,17 +288,16 @@ void test_multiple_assignments_with_different_option_description()
 
     HPX_TEST(vm.count("help") == 1);
     HPX_TEST(vm.count("includes") == 1);
-    HPX_TEST_EQ(vm["includes"].as< vector<string> >()[0], "a");
-    HPX_TEST_EQ(vm["includes"].as< vector<string> >()[1], "b");
+    HPX_TEST_EQ(vm["includes"].as<vector<string>>()[0], "a");
+    HPX_TEST_EQ(vm["includes"].as<vector<string>>()[1], "b");
 }
 
-int main(int, char* [])
+int main(int, char*[])
 {
     test_variable_map();
     test_semantic_values();
     test_priority();
     test_multiple_assignments_with_different_option_description();
 
-    return  hpx::util::report_errors();
+    return hpx::util::report_errors();
 }
-

@@ -2,6 +2,7 @@
 '''
 Copyright (c) 2018 Thomas Heller
 
+SPDX-License-Identifier: BSL-1.0
 Distributed under the Boost Software License, Version 1.0. (See accompanying
 file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -24,6 +25,7 @@ cmake_version = '3.3.2'
 
 cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 '''
@@ -38,6 +40,7 @@ set({component_name}_headers)
 set({component_name}_sources)
 
 add_hpx_component({component_name}
+  INTERNAL_FLAGS
   FOLDER "Core/Components"
   INSTALL_HEADERS
   HEADER_ROOT "${{CMAKE_CURRENT_SOURCE_DIR}}/include"

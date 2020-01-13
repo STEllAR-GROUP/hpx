@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -77,6 +78,7 @@ namespace hpx { namespace program_options { namespace detail {
     {
     public:
         common_config_file_iterator()
+          : m_allow_unregistered(false)
         {
             found_eof();
         }
@@ -84,7 +86,7 @@ namespace hpx { namespace program_options { namespace detail {
             const std::set<std::string>& allowed_options,
             bool allow_unregistered = false);
 
-        virtual ~common_config_file_iterator() {}
+        virtual ~common_config_file_iterator() = default;
 
     public:    // Method required by eof_iterator
         void get();

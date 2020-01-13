@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,8 +8,8 @@
 #define HPX_PARCELSET_POLICIES_LIBFABRIC_LOCALITY_HPP
 
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/array.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/array.hpp>
 //
 #include <utility>
 #include <cstring>

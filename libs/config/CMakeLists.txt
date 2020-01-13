@@ -1,9 +1,10 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -39,10 +40,12 @@ set(config_sources
 
 include(HPX_AddModule)
 add_hpx_module(config
-    COMPATIBILITY_HEADERS OFF
-    GLOBAL_HEADER_GEN OFF
-    SOURCES ${config_sources}
-    HEADERS ${config_headers}
-    DEPENDENCIES hpx_preprocessor
-    CMAKE_SUBDIRS examples tests
+  CONFIG_FILES
+  COMPATIBILITY_HEADERS OFF
+  GLOBAL_HEADER_GEN OFF
+  SOURCES ${config_sources}
+  HEADERS ${config_headers}
+  DEPENDENCIES
+  DEPENDENCIES hpx_preprocessor hpx::boost
+  CMAKE_SUBDIRS examples tests
 )

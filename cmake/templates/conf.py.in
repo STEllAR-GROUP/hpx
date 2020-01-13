@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2018 Mikael Simberg
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
@@ -106,15 +107,17 @@ api_ref_header = '''
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+.. _libs_{0}_api:
+
 -------------------------------------------------------------------------------
-{}
+{0}
 -------------------------------------------------------------------------------
 '''
 
 api_ref_file = '''
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`#include <{0}>`
+``#include <{0}>``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. autodoxygenfile:: {0}
    :project: {1}
@@ -327,7 +330,9 @@ rst_prolog += '''
 .. |visual_cxx| replace:: Visual C++
 .. _visual_cxx: https://msdn.microsoft.com/en-us/visualc/default.aspx
 .. |jemalloc| replace:: jemalloc
-.. _jemalloc: https://www.canonware.com/jemalloc
+.. _jemalloc: http://jemalloc.net
+.. |mimalloc| replace:: mi-malloc
+.. _mimalloc: http://microsoft.github.io/mimalloc/
 .. |libunwind| replace:: libunwind
 .. _libunwind: https://www.nongnu.org/libunwind
 .. |hdf5| replace:: Hierarchical Data Format V5 (HDF5)
@@ -380,8 +385,6 @@ rst_prolog += '''
 .. _lgd: https://www.libgeodecomp.org/
 .. |conan| replace:: Conan
 .. _conan: https://www.conan.io/
-.. |boost_simd| replace:: Boost.SIMD
-.. _boost_simd: https://github.com/NumScale/boost.simd
 .. |vc| replace:: Vc Library
 .. _vc: https://github.com/VcDevel/Vc
 

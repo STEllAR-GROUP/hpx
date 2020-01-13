@@ -5,6 +5,7 @@
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
 
+//  SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -13,18 +14,19 @@
 ==============================================================================*/
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/util/serializable_any.hpp>
 
 #include <boost/functional/hash.hpp>
 
 #include <cstddef>
+#include <type_traits>
 #include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
 
-    ///////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         struct hash_binary_filter : serialization::binary_filter
@@ -65,10 +67,11 @@ namespace hpx { namespace util {
         };
     }    // namespace detail
 
+    ////////////////////////////////////////////////////////////////////////////
     template <typename Char>
     std::size_t hash_any::operator()(
         const basic_any<serialization::input_archive,
-            serialization::output_archive, Char>& elem) const
+            serialization::output_archive, Char, std::true_type>& elem) const
     {
         detail::hash_binary_filter hasher;
 
@@ -84,11 +87,11 @@ namespace hpx { namespace util {
 
     template HPX_EXPORT std::size_t hash_any::operator()(
         const basic_any<serialization::input_archive,
-            serialization::output_archive, char>& elem) const;
+            serialization::output_archive, char, std::true_type>& elem) const;
 
     template HPX_EXPORT std::size_t hash_any::operator()(
         const basic_any<serialization::input_archive,
-            serialization::output_archive, wchar_t>& elem) const;
+            serialization::output_archive, wchar_t, std::true_type>& elem) const;
 
 }}    // namespace hpx::util
 

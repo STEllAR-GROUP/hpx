@@ -5,6 +5,7 @@
 // Copyright (c) 2011, 2012 Jeff Flinn, Boris Schaeling
 // Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -53,14 +54,17 @@ public:
 
     child &operator=(child && c)
     {
-        if (proc_info.hProcess != INVALID_HANDLE_VALUE)
-            ::CloseHandle(proc_info.hProcess);
-        if (proc_info.hThread != INVALID_HANDLE_VALUE)
-            ::CloseHandle(proc_info.hThread);
+        if (this == &c)
+        {
+            if (proc_info.hProcess != INVALID_HANDLE_VALUE)
+                ::CloseHandle(proc_info.hProcess);
+            if (proc_info.hThread != INVALID_HANDLE_VALUE)
+                ::CloseHandle(proc_info.hThread);
 
-        proc_info = c.proc_info;
-        c.proc_info.hProcess = INVALID_HANDLE_VALUE;
-        c.proc_info.hThread = INVALID_HANDLE_VALUE;
+            proc_info = c.proc_info;
+            c.proc_info.hProcess = INVALID_HANDLE_VALUE;
+            c.proc_info.hThread = INVALID_HANDLE_VALUE;
+        }
         return *this;
     }
 

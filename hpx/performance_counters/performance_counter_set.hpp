@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,7 +11,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/unwrap.hpp>

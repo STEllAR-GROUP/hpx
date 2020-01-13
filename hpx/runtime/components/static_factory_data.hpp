@@ -1,5 +1,6 @@
 //  Copyright (c) 2005-2014 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,10 +10,10 @@
 #define HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/any.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/util/plugin/export_plugin.hpp>
-#include <hpx/util/plugin/virtual_constructor.hpp>
+#include <hpx/plugin.hpp>
 
 #include <map>
 #include <string>
@@ -33,10 +34,10 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_DECLARE_FACTORY_STATIC(name, base)                                \
-    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, boost::any>*       \
-        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name, base)()                     \
-/**/
+#define HPX_DECLARE_FACTORY_STATIC(name, base)                                 \
+    extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string,                     \
+        hpx::util::any_nonser>* HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name,      \
+        base)() /**/
 
 #define HPX_DEFINE_FACTORY_STATIC(module, name, base)                         \
     {                                                                         \

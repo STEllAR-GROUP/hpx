@@ -1,9 +1,10 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 set(concepts_headers
   hpx/concepts/concepts.hpp
@@ -28,6 +29,9 @@ add_hpx_module(concepts
   SOURCES ${concepts_sources}
   HEADERS ${concepts_headers}
   COMPAT_HEADERS ${concepts_compat_headers}
-  DEPENDENCIES hpx_config hpx_preprocessor hpx_type_support
+  DEPENDENCIES
+    hpx_config
+    hpx_preprocessor
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

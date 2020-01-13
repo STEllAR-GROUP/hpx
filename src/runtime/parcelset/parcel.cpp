@@ -1,10 +1,13 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/runtime.hpp>
@@ -16,12 +19,13 @@
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/serialization/access.hpp>
-#include <hpx/runtime/serialization/detail/polymorphic_id_factory.hpp>
-#include <hpx/runtime/serialization/input_archive.hpp>
-#include <hpx/runtime/serialization/output_archive.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
+#include <hpx/serialization/access.hpp>
+#include <hpx/serialization/detail/polymorphic_id_factory.hpp>
+#include <hpx/serialization/input_archive.hpp>
+#include <hpx/serialization/output_archive.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 
 #include <hpx/thread_support/atomic_count.hpp>
 
@@ -159,15 +163,21 @@ namespace hpx { namespace parcelset
     }
 #endif
 
-    parcel::parcel() {}
+    parcel::parcel()
+      : data_()
+      , action_()
+      , size_(0)
+      , num_chunks_(0)
+    {}
 
     parcel::~parcel() {}
 
     parcel::parcel(naming::gid_type&& dest, naming::address&& addr,
-            std::unique_ptr<actions::base_action> act)
+        std::unique_ptr<actions::base_action> act)
       : data_(std::move(dest), std::move(addr), act->has_continuation())
       , action_(std::move(act))
       , size_(0)
+      , num_chunks_(0)
     {
 //         HPX_ASSERT(is_valid());
     }
@@ -311,9 +321,11 @@ namespace hpx { namespace parcelset
         return action_ ? action_->does_termination_detection() : false;
     }
 
-    parcel::split_gids_type& parcel::split_gids() const
+    parcel::split_gids_type parcel::move_split_gids() const
     {
-        return const_cast<split_gids_type&>(split_gids_);
+        split_gids_type gids;
+        std::swap(gids, split_gids_);
+        return gids;
     }
 
     void parcel::set_split_gids(parcel::split_gids_type&& split_gids)
@@ -446,7 +458,7 @@ namespace hpx { namespace parcelset
 
 #if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
         // tell APEX about the received parcel
-        apex::recv(data_.parcel_id_.get_lsb(), size_,
+        util::external_timer::recv(data_.parcel_id_.get_lsb(), size_,
             naming::get_locality_id_from_gid(data_.source_id_),
             reinterpret_cast<std::uint64_t>(action_->get_parent_thread_id().get()));
 #endif
@@ -536,3 +548,4 @@ namespace hpx { namespace parcelset
     }
 }}
 
+#endif

@@ -2,48 +2,94 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/threads/thread_data.hpp>
-
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/util/function.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #endif
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
-// #if HPX_DEBUG
-// #  define HPX_DEBUG_THREAD_POOL 1
-// #endif
+////////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace threads {
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads
-{
-#ifdef HPX_DEBUG_THREAD_POOL
-    enum guard_value
-    {
-        initial_value = 0xcc,           // memory has been initialized
-        freed_value = 0xdd              // memory has been freed
-    };
+    thread_data::thread_data(thread_init_data& init_data, void* queue,
+        thread_state_enum newstate, bool is_stackless)
+        : current_state_(thread_state(newstate, wait_signaled))
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+        , description_(init_data.description)
+        , lco_description_()
 #endif
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
+        , parent_locality_id_(init_data.parent_locality_id)
+        , parent_thread_id_(init_data.parent_id)
+        , parent_thread_phase_(init_data.parent_phase)
+#endif
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+        , marked_state_(unknown)
+#endif
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
+        , backtrace_(nullptr
+#endif
+        , priority_(init_data.priority)
+        , requested_interrupt_(false)
+        , enabled_interrupt_(true)
+        , ran_exit_funcs_(false)
+        , scheduler_base_(init_data.scheduler_base)
+        , stacksize_(init_data.stacksize)
+        , queue_(queue)
+        , is_stackless_(is_stackless)
+    {
+        LTM_(debug) << "thread::thread(" << this << "), description("
+                    << get_description() << ")";
+
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
+        // store the thread id of the parent thread, mainly for debugging
+        // purposes
+        if (parent_thread_id_)
+        {
+            thread_self* self = get_self_ptr();
+            if (self)
+            {
+                parent_thread_id_ = threads::get_self_id();
+                parent_thread_phase_ = self->get_thread_phase();
+            }
+        }
+        if (0 == parent_locality_id_)
+            parent_locality_id_ = get_locality_id();
+#endif
+#if defined(HPX_HAVE_APEX)
+        set_timer_data(init_data.timer_data);
+#endif
+    }
+
+    thread_data::~thread_data()
+    {
+        free_thread_exit_callbacks();
+    }
 
     void thread_data::run_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
 
-        while(!exit_funcs_.empty())
+        while (!exit_funcs_.empty())
         {
             {
                 hpx::util::unlock_guard<mutex_type::scoped_lock> ul(l);
-                if(!exit_funcs_.front().empty())
+                if (!exit_funcs_.front().empty())
                     exit_funcs_.front()();
             }
             exit_funcs_.pop_front();
@@ -99,6 +145,65 @@ namespace hpx { namespace threads
         return false;
     }
 
+    void thread_data::rebind_base(
+        thread_init_data& init_data, thread_state_enum newstate)
+    {
+        LTM_(debug) << "~thread(" << this << "), description("    //-V128
+                    << get_description() << "), phase("
+                    << get_thread_phase() << "), rebind";
+
+        free_thread_exit_callbacks();
+
+        current_state_.store(thread_state(newstate, wait_signaled));
+
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+        description_ = (init_data.description);
+        lco_description_ = util::thread_description();
+#endif
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
+        parent_locality_id_ = init_data.parent_locality_id;
+        parent_thread_id_ = init_data.parent_id;
+        parent_thread_phase_ = init_data.parent_phase;
+#endif
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+        set_marked_state(unknown);
+#endif
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
+        backtrace_ = nullptr;
+#endif
+        priority_ = init_data.priority;
+        requested_interrupt_ = false;
+        enabled_interrupt_ = true;
+        ran_exit_funcs_ = false;
+        exit_funcs_.clear();
+        scheduler_base_ = init_data.scheduler_base;
+
+        HPX_ASSERT(init_data.stacksize == get_stack_size());
+
+        LTM_(debug) << "thread::thread(" << this << "), description("
+                    << get_description() << "), rebind";
+
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
+        // store the thread id of the parent thread, mainly for debugging
+        // purposes
+        if (nullptr == parent_thread_id_)
+        {
+            thread_self* self = get_self_ptr();
+            if (self)
+            {
+                parent_thread_id_ = threads::get_self_id();
+                parent_thread_phase_ = self->get_thread_phase();
+            }
+        }
+        if (0 == parent_locality_id_)
+            parent_locality_id_ = get_locality_id();
+#endif
+#if defined(HPX_HAVE_APEX)
+        set_timer_data(init_data.timer_data);
+#endif
+        HPX_ASSERT(init_data.stacksize != 0);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     thread_self& get_self()
     {
@@ -106,7 +211,8 @@ namespace hpx { namespace threads
         if (HPX_UNLIKELY(p == nullptr))
         {
             HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self",
-                "null thread id encountered (is this executed on a HPX-thread?)");
+                "null thread id encountered (is this executed on a "
+                "HPX-thread?)");
         }
         return *p;
     }
@@ -116,13 +222,13 @@ namespace hpx { namespace threads
         return thread_self::get_self();
     }
 
-    namespace detail
-    {
-        void set_self_ptr(thread_self* self)
+    namespace detail {
+
+        void set_self_ptr(thread_self * self)
         {
             thread_self::set_self(self);
         }
-    }
+    }     // namespace detail
 
     thread_self::impl_type* get_ctx_ptr()
     {
@@ -136,8 +242,10 @@ namespace hpx { namespace threads
 
         if (HPX_UNLIKELY(p == nullptr))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked",
-                "null thread id encountered (is this executed on a HPX-thread?)");
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threads::get_self_ptr_checked",
+                "null thread id encountered (is this executed on a "
+                "HPX-thread?)");
             return nullptr;
         }
 
@@ -156,10 +264,19 @@ namespace hpx { namespace threads
         return threads::invalid_thread_id;
     }
 
+    thread_data* get_self_id_data()
+    {
+        thread_self* self = get_self_ptr();
+        if (HPX_LIKELY(nullptr != self))
+            return get_thread_id_data(self->get_thread_id());
+
+        return nullptr;
+    }
+
     std::size_t get_self_stacksize()
     {
-        thread_id_type id = get_self_id();
-        return id ? id->get_stack_size() : 0;
+        thread_data* thrd_data = get_self_id_data();
+        return thrd_data ? thrd_data->get_stack_size() : 0;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -180,25 +297,31 @@ namespace hpx { namespace threads
 #else
     thread_id_type get_parent_id()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_thread_id();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_parent_thread_id();
+        }
         return threads::invalid_thread_id;
     }
 
     std::size_t get_parent_phase()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_thread_phase();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_parent_thread_phase();
+        }
         return 0;
     }
 
     std::uint32_t get_parent_locality_id()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_parent_locality_id();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_parent_locality_id();
+        }
         return naming::invalid_locality_id;
     }
 #endif
@@ -206,29 +329,37 @@ namespace hpx { namespace threads
     naming::address::address_type get_self_component_id()
     {
 #ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
-        return 0;
+            return 0;
 #else
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_thread_id()->get_component_id();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_component_id();
+        }
         return 0;
 #endif
     }
 
 #if defined(HPX_HAVE_APEX)
-    apex_task_wrapper get_self_apex_data()
+    std::shared_ptr<hpx::util::external_timer::task_wrapper>
+        get_self_timer_data()
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            return self->get_apex_data();
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            return thrd_data->get_timer_data();
+        }
         return nullptr;
     }
-    void set_self_apex_data(apex_task_wrapper data)
+    void set_self_timer_data(
+        std::shared_ptr<hpx::util::external_timer::task_wrapper> data)
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
-            self->set_apex_data(data);
+        thread_data* thrd_data = get_self_id_data();
+        if (HPX_LIKELY(nullptr != thrd_data))
+        {
+            thrd_data->set_timer_data(data);
+        }
         return;
     }
 #endif
-}}
+}}    // namespace hpx::threads

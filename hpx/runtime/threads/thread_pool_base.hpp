@@ -1,6 +1,7 @@
 //  Copyright (c)      2018 Mikael Simberg
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,11 +11,9 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/no_mutex.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/detail/network_background_callback.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>

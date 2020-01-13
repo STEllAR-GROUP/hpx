@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,8 +27,8 @@
 #include <iostream>
 #include <string>
 
-#include <boost/tokenizer.hpp>
 #include <boost/token_functions.hpp>
+#include <boost/tokenizer.hpp>
 
 using namespace boost;
 using namespace hpx::program_options;
@@ -39,22 +40,24 @@ int main(int ac, char* av[])
     {
         // Declare three groups of options.
         options_description general("General options");
+        // clang-format off
         general.add_options()
             ("help", "produce a help message")
             ("help-module", value<string>(),
                 "produce a help for a given module")
             ("version", "output the version number")
             ;
+        // clang-format on
 
         options_description gui("GUI options");
-        gui.add_options()
-            ("display", value<string>(), "display to use")
-            ;
+        gui.add_options()("display", value<string>(), "display to use");
 
         options_description backend("Backend options");
+        // clang-format off
         backend.add_options()
             ("num-threads", value<int>(), "the initial number of threads")
             ;
+        // clang-format on
 
         // Declare an options description instance which will include
         // all the options
@@ -99,7 +102,7 @@ int main(int ac, char* av[])
                  << vm["num-threads"].as<int>() << "\n";
         }
     }
-    catch(std::exception const& e)
+    catch (std::exception const& e)
     {
         cout << e.what() << "\n";
     }

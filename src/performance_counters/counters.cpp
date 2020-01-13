@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -18,12 +19,12 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
-#include <hpx/runtime/serialization/base_object.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/serialization/base_object.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>

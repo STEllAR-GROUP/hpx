@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,15 +9,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/optional.hpp>
-#include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
-#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <atomic>
 #include <chrono>

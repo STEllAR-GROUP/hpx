@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,6 +38,7 @@ int main(int ac, char* av[])
         // Declare a group of options that will be
         // allowed only on command line
         po::options_description generic("Generic options");
+        // clang-format off
         generic.add_options()
             ("version,v","print version string")
             ("help", "produce help message")
@@ -45,24 +47,29 @@ int main(int ac, char* av[])
                     "multiple_sources.cfg"),
               "name of a file of a configuration.")
             ;
+        // clang-format on
 
         // Declare a group of options that will be
         // allowed both on command line and in
         // config file
         po::options_description config("Configuration");
+        // clang-format off
         config.add_options()
             ("optimization", po::value<int>(&opt)->default_value(10),
                 "optimization level")
             ("include-path,I", po::value<vector<string>>()->composing(),
                 "include path")
             ;
+        // clang-format on
 
         // Hidden options, will be allowed both on command line and
         // in config file, but will not be shown to the user.
         po::options_description hidden("Hidden options");
+        // clang-format off
         hidden.add_options()
             ("input-file", po::value<vector<string>>(), "input file")
             ;
+        // clang-format on
 
         po::options_description cmdline_options;
         cmdline_options.add(generic).add(config).add(hidden);

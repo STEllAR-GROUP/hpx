@@ -5,6 +5,7 @@
 // Copyright (c) 2011, 2012 Jeff Flinn, Boris Schaeling
 // Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,7 +17,7 @@
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <hpx/filesystem.hpp>
-#include <hpx/runtime/serialization/string.hpp>
+#include <hpx/serialization/string.hpp>
 
 #include <string>
 

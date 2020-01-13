@@ -1,10 +1,11 @@
 //  Copyright (c) 2014 Grant Mercer
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/testing.hpp>
 
@@ -37,19 +38,21 @@ void test_copy_if_exception(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
-    try {
-        hpx::parallel::copy_if(policy,
-            iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
-            [](std::size_t v) {
+    try
+    {
+        hpx::parallel::copy_if(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(d), [](std::size_t v) {
                 return throw std::runtime_error("test"), v != 0;
             });
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -68,25 +71,25 @@ void test_copy_if_exception_async(ExPolicy p, IteratorTag)
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
-    try {
-        auto f =
-            hpx::parallel::copy_if(p,
-                iterator(std::begin(c)), iterator(std::end(c)),
-                std::begin(d),
-                [](std::size_t v) {
-                    return throw std::runtime_error("test"), v != 0;
-                });
+    try
+    {
+        auto f = hpx::parallel::copy_if(p, iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(d), [](std::size_t v) {
+                return throw std::runtime_error("test"), v != 0;
+            });
 
         returned_from_algorithm = true;
         f.get();
 
         HPX_TEST(false);
     }
-    catch(hpx::exception_list const& e) {
+    catch (hpx::exception_list const& e)
+    {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -105,8 +108,10 @@ void test_copy_if_exception()
     test_copy_if_exception(execution::seq, IteratorTag());
     test_copy_if_exception(execution::par, IteratorTag());
 
-    test_copy_if_exception_async(execution::seq(execution::task), IteratorTag());
-    test_copy_if_exception_async(execution::par(execution::task), IteratorTag());
+    test_copy_if_exception_async(
+        execution::seq(execution::task), IteratorTag());
+    test_copy_if_exception_async(
+        execution::par(execution::task), IteratorTag());
 }
 
 void copy_if_exception_test()
@@ -134,15 +139,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(desc_commandline, argc, argv, cfg), 0,

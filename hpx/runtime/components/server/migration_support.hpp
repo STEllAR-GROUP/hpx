@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,14 +10,14 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/promise.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/local_lcos/promise.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 
 #include <cstdint>
 #include <mutex>

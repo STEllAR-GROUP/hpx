@@ -1,6 +1,7 @@
 # Copyright (c) 2007-2019 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -95,6 +96,7 @@ set(partitioned_vector_spmd_foreach_FLAGS
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(shared_mutex_LIBRARIES hpx::boost)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -152,6 +154,7 @@ foreach(example_program ${example_programs})
                      ${${example_program}_FLAGS}
                      FOLDER "Examples/Quickstart")
 
+  target_link_libraries(${example_program} PRIVATE ${${example_program}_LIBRARIES})
   add_hpx_example_target_dependencies("quickstart" ${example_program})
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND

@@ -1,8 +1,9 @@
 ..
-   Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2019 The STE||AR-Group
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 .. _libs_concurrency:
 
@@ -10,3 +11,14 @@
 concurrency
 ===========
 
+This module provides concurrency primitives useful for multi-threaded
+programming such as:
+
+* :cpp:class:`hpx::util::barrier`
+* :cpp:class:`hpx::util::cache_line_data` and
+  :cpp:class:`hpx::util::cache_aligned_data`: wrappers for aligning and padding
+  data to cache lines.
+* various lockfree queue data structures
+
+See the :ref:`API reference <libs_concurrency_api>` of the module for more
+details.

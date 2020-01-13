@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,7 +13,7 @@
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
@@ -29,16 +30,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     struct sender
     {
-        typedef
-            sender_connection
-            connection_type;
-        typedef std::shared_ptr<connection_type> connection_ptr;
-        typedef std::deque<connection_ptr> connection_list;
+        using connection_type = sender_connection;
+        using connection_ptr = std::shared_ptr<connection_type>;
+        using connection_list = std::deque<connection_ptr>;
 
-        typedef hpx::lcos::local::spinlock mutex_type;
+        using mutex_type = hpx::lcos::local::spinlock;
 
         sender()
-          : next_free_tag_(-1)
+          : next_free_tag_request_((MPI_Request)(-1))
+          , next_free_tag_(-1)
         {
         }
 

@@ -3,6 +3,7 @@
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,6 +17,8 @@
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -24,18 +27,18 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
-#include <hpx/runtime/resource/detail/create_partitioner.hpp>
+#include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/runtime_handlers.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/apex.hpp>
+#include <hpx/timing.hpp>
+#include <hpx/util/external_timer.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/function.hpp>
 #include <hpx/util/query_counters.hpp>
 
 #include <boost/algorithm/string/split.hpp>
@@ -310,83 +313,8 @@ namespace hpx
     extern void termination_handler(int signum);
 #endif
 
-    extern void new_handler();
-
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        HPX_NORETURN void assertion_handler(
-            hpx::assertion::source_location const& loc, const char* expr,
-            std::string const& msg)
-        {
-            hpx::util::may_attach_debugger("exception");
-
-            std::ostringstream strm;
-            strm << "Assertion '" << expr << "' failed";
-            if (!msg.empty())
-            {
-                strm << " (" << msg << ")";
-            }
-
-            hpx::exception e(hpx::assertion_failure, strm.str());
-            std::cerr << hpx::diagnostic_information(
-                             hpx::detail::get_exception(e, loc.function_name,
-                                 loc.file_name, loc.line_number))
-                      << std::endl;
-            std::abort();
-        }
-
-        void test_failure_handler()
-        {
-            hpx::util::may_attach_debugger("test-failure");
-        }
-
-#if defined(HPX_HAVE_VERIFY_LOCKS)
-        void registered_locks_error_handler()
-        {
-            std::string back_trace = hpx::util::trace(std::size_t(128));
-
-            // throw or log, depending on config options
-            if (get_config_entry("hpx.throw_on_held_lock", "1") == "0")
-            {
-                if (back_trace.empty())
-                {
-                    LERR_(debug)
-                        << "suspending thread while at least one lock is "
-                           "being held (stack backtrace was disabled at "
-                           "compile time)";
-                }
-                else
-                {
-                    LERR_(debug)
-                        << "suspending thread while at least one lock is "
-                        << "being held, stack backtrace: " << back_trace;
-                }
-            }
-            else
-            {
-                if (back_trace.empty())
-                {
-                    HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
-                        "suspending thread while at least one lock is "
-                        "being held (stack backtrace was disabled at "
-                        "compile time)");
-                }
-                else
-                {
-                    HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
-                        "suspending thread while at least one lock is "
-                        "being held, stack backtrace: " +
-                            back_trace);
-                }
-            }
-        }
-
-        bool register_locks_predicate()
-        {
-            return threads::get_self_ptr() != nullptr;
-        }
-#endif
+    namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
         struct dump_config
@@ -637,7 +565,10 @@ namespace hpx
             start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_, std::move(startup),
                 std::move(shutdown));
 
-            (void)rt.release();          // pointer to runtime is stored in TLS
+            // pointer to runtime is stored in TLS
+            hpx::runtime* p = rt.release();
+            (void)p;
+
             return 0;
         }
 
@@ -655,8 +586,14 @@ namespace hpx
 
             hpx::assertion::set_assertion_handler(&detail::assertion_handler);
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
+#if defined(HPX_HAVE_APEX)
+            hpx::util::set_enable_parent_task_handler(
+                    &detail::enable_parent_task_handler);
+#endif
             hpx::set_custom_exception_info_handler(&detail::custom_exception_info);
             hpx::set_pre_exception_handler(&detail::pre_exception_handler);
+            hpx::set_thread_termination_handler(
+                [](std::exception_ptr const& e) { report_error(e); });
 #if defined(HPX_HAVE_VERIFY_LOCKS)
             hpx::util::set_registered_locks_error_handler(
                 &detail::registered_locks_error_handler);
@@ -666,6 +603,8 @@ namespace hpx
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
             set_error_handlers();
 #endif
+            hpx::threads::detail::set_get_default_pool(
+                &detail::get_default_pool);
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");
@@ -737,8 +676,6 @@ namespace hpx
                               << hpx::get_error_what(e) << "\n";
                     return -1;
                 }
-
-                util::apex_wrapper_init apex(argc, argv);
 
                 // Initialize and start the HPX runtime.
                 LPROGRESS_ << "run_local: create runtime";
@@ -817,7 +754,6 @@ namespace hpx
         apply<components::server::runtime_support::shutdown_all_action>(
             hpx::find_root_locality(), shutdown_timeout);
 
-        //util::apex_finalize();
         return 0;
     }
 
@@ -854,8 +790,6 @@ namespace hpx
 
         if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
-
-        //util::apex_finalize();
 
         components::server::runtime_support* p =
             reinterpret_cast<components::server::runtime_support*>(
@@ -985,7 +919,7 @@ namespace hpx
                     argv[argcount++] = const_cast<char*>(args[i].data());
                 }
                 else if (6 == args[i].find("positional", 6)) {
-                    std::string::size_type p = args[i].find_first_of("=");
+                    std::string::size_type p = args[i].find_first_of('=');
                     if (p != std::string::npos) {
                         args[i] = args[i].substr(p+1);
                         argv[argcount++] = const_cast<char*>(args[i].data());
@@ -999,5 +933,5 @@ namespace hpx
             // Invoke custom startup functions
             return f(static_cast<int>(argcount), argv.data());
         }
-    }
-}
+    } // namespace detail
+} // namespace hpx

@@ -2,6 +2,7 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,19 +10,19 @@
 #define HPX_RUNTIME_NAMING_NAME_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
-#include <hpx/traits/get_remote_result.hpp>
-#include <hpx/traits/is_bitwise_serializable.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/detail/yield_k.hpp>
+#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -430,7 +431,7 @@ namespace hpx { namespace naming
     inline gid_type get_gid_from_locality_id(std::uint32_t locality_id) noexcept
     {
         return gid_type(
-            std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            (std::uint64_t(locality_id)+1) << gid_type::locality_id_shift,
             0);
     }
 
@@ -504,7 +505,7 @@ namespace hpx { namespace naming
         std::uint64_t msb = gid.get_msb() & ~gid_type::component_type_mask;
 
         HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
-        msb |= ((type << gid_type::component_type_shift) &
+        msb |= ((std::uint64_t(type) << gid_type::component_type_shift) &
                     gid_type::component_type_mask);
         return gid_type(msb, gid.get_lsb());
     }
@@ -658,7 +659,7 @@ namespace hpx { namespace naming
         {
             HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
             return (msb & ~gid_type::component_type_mask) |
-                ((type << gid_type::component_type_shift) &
+                ((std::uint64_t(type) << gid_type::component_type_shift) &
                     gid_type::component_type_mask);
         }
 
@@ -810,7 +811,7 @@ namespace hpx { namespace naming
             HPX_NON_COPYABLE(id_type_impl);
 
         private:
-            typedef void (*deleter_type)(detail::id_type_impl*);
+            using deleter_type = void (*)(detail::id_type_impl*);
             static deleter_type get_deleter(id_type_management t) noexcept;
 
         public:
@@ -921,7 +922,7 @@ namespace hpx { namespace naming
     inline id_type get_id_from_locality_id(std::uint32_t locality_id) noexcept
     {
         return id_type(
-            std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            (std::uint64_t(locality_id)+1) << gid_type::locality_id_shift,
             0, id_type::unmanaged);
     }
 

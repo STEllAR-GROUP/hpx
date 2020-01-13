@@ -1,4 +1,5 @@
 // Copyright Thomas Kent 2016
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,8 +10,8 @@
 #include <algorithm>
 #include <cctype>
 #include <functional>
-#include <string>
 #include <iostream>
+#include <string>
 
 namespace po = hpx::program_options;
 
@@ -31,11 +32,13 @@ std::string mapper(std::string env_var)
 void get_env_options()
 {
     po::options_description config("Configuration");
+    // clang-format off
     config.add_options()
         ("path", "the execution path")
         ("verbosity", po::value<std::string>()->default_value("INFO"),
          "set verbosity: DEBUG, INFO, WARN, ERROR, FATAL")
         ;
+    // clang-format on
 
     po::variables_map vm;
     store(po::parse_environment(

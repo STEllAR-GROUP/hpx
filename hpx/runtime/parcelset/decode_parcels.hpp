@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,6 +9,8 @@
 #define HPX_PARCELSET_DECODE_PARCELS_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
@@ -16,10 +19,10 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 
 #include <boost/exception/exception.hpp>
 
@@ -210,7 +213,7 @@ namespace hpx { namespace parcelset
                         for (std::size_t i = 1; i != deferred_parcels.size(); ++i)
                         {
                             // schedule all but the first parcel on a new thread.
-                            hpx::applier::register_thread_nullary(
+                            hpx::threads::register_thread_nullary(
                                 util::deferred_call(
                                     [num_thread](parcel&& p)
                                     {
@@ -287,7 +290,7 @@ namespace hpx { namespace parcelset
     {
 //         if(hpx::is_running() && parcelport.async_serialization())
 //         {
-//             hpx::applier::register_thread_nullary(
+//             hpx::threads::register_thread_nullary(
 //                 util::deferred_call(
 //                     &decode_message<Parcelport, Buffer>,
 //                     std::ref(parcelport), std::move(buffer), 1, num_thread),
@@ -306,7 +309,7 @@ namespace hpx { namespace parcelset
     {
 //         if(hpx::is_running() && parcelport.async_serialization())
 //         {
-//             hpx::applier::register_thread_nullary(
+//             hpx::threads::register_thread_nullary(
 //                 util::deferred_call(
 //                     &decode_message<Parcelport, Buffer>,
 //                     std::ref(parcelport), std::move(buffer), 0, num_thread),
@@ -322,4 +325,5 @@ namespace hpx { namespace parcelset
 
 }}
 
+#endif
 #endif

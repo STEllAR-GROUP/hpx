@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Taeguk Kwon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,42 +9,39 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/traits/is_callable.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/lcos/future.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <list>
-#include <vector>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // is_heap
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // sequential is_heap with projection function
         template <typename RandIter, typename Comp, typename Proj>
-        bool
-        sequential_is_heap(RandIter first, RandIter last,
-            Comp && comp, Proj && proj)
+        bool sequential_is_heap(
+            RandIter first, RandIter last, Comp&& comp, Proj&& proj)
         {
             typedef typename std::iterator_traits<RandIter>::difference_type
                 difference_type;
@@ -53,8 +51,8 @@ namespace hpx { namespace parallel { inline namespace v1
             for (difference_type i = 1; i < count; ++i)
             {
                 if (hpx::util::invoke(comp,
-                    hpx::util::invoke(proj, *(first + (i - 1) / 2)),
-                    hpx::util::invoke(proj, *(first + i))))
+                        hpx::util::invoke(proj, *(first + (i - 1) / 2)),
+                        hpx::util::invoke(proj, *(first + i))))
                     return false;
             }
             return true;
@@ -65,11 +63,12 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename RandIter, typename Comp,
                 typename Proj>
             typename util::detail::algorithm_result<ExPolicy, bool>::type
-            operator()(ExPolicy && policy, RandIter first, RandIter last,
+            operator()(ExPolicy&& policy, RandIter first, RandIter last,
                 Comp comp, Proj proj)
             {
                 typedef util::detail::algorithm_result<ExPolicy, bool> result;
-                typedef typename std::iterator_traits<RandIter>::value_type type;
+                typedef
+                    typename std::iterator_traits<RandIter>::value_type type;
                 typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
@@ -111,36 +110,32 @@ namespace hpx { namespace parallel { inline namespace v1
         };
 
         template <typename RandIter>
-        struct is_heap
-          : public detail::algorithm<is_heap<RandIter>, bool>
+        struct is_heap : public detail::algorithm<is_heap<RandIter>, bool>
         {
             is_heap()
               : is_heap::algorithm("is_heap")
-            {}
-
-            template <typename ExPolicy, typename Comp, typename Proj>
-            static bool
-            sequential(ExPolicy && policy, RandIter first, RandIter last,
-                Comp && comp, Proj && proj)
             {
-                return sequential_is_heap(first, last,
-                    std::forward<Comp>(comp), std::forward<Proj>(proj));
             }
 
             template <typename ExPolicy, typename Comp, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, bool
-            >::type
-            parallel(ExPolicy && policy, RandIter first, RandIter last,
-                Comp && comp, Proj && proj)
+            static bool sequential(ExPolicy&& policy, RandIter first,
+                RandIter last, Comp&& comp, Proj&& proj)
             {
-                return is_heap_helper()(
-                        std::forward<ExPolicy>(policy), first, last,
-                        std::forward<Comp>(comp), std::forward<Proj>(proj));
+                return sequential_is_heap(first, last, std::forward<Comp>(comp),
+                    std::forward<Proj>(proj));
+            }
+
+            template <typename ExPolicy, typename Comp, typename Proj>
+            static typename util::detail::algorithm_result<ExPolicy, bool>::type
+            parallel(ExPolicy&& policy, RandIter first, RandIter last,
+                Comp&& comp, Proj&& proj)
+            {
+                return is_heap_helper()(std::forward<ExPolicy>(policy), first,
+                    last, std::forward<Comp>(comp), std::forward<Proj>(proj));
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Returns whether the range is max heap. That is, true if the range is
     /// max heap, false otherwise. The function uses the given comparison
@@ -200,43 +195,37 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           The \a is_heap algorithm returns whether the range is max heap.
     ///           That is, true if the range is max heap, false otherwise.
     ///
-    template <typename ExPolicy, typename RandIter, typename Comp = detail::less,
-        typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<RandIter>::value &&
-        traits::is_projected<Proj, RandIter>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Comp,
-            traits::projected<Proj, RandIter>,
-            traits::projected<Proj, RandIter>
-        >::value)>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
-    is_heap(ExPolicy && policy, RandIter first, RandIter last,
-        Comp && comp = Comp(), Proj && proj = Proj())
+    template <typename ExPolicy, typename RandIter,
+        typename Comp = detail::less, typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<RandIter>::value&&
+                    traits::is_projected<Proj, RandIter>::value&&
+                        traits::is_indirect_callable<ExPolicy, Comp,
+                            traits::projected<Proj, RandIter>,
+                            traits::projected<Proj, RandIter>>::value)>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type is_heap(
+        ExPolicy&& policy, RandIter first, RandIter last, Comp&& comp = Comp(),
+        Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_random_access_iterator<RandIter>::value),
+        static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
             "Requires a random access iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::is_heap<RandIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+        return detail::is_heap<RandIter>().call(std::forward<ExPolicy>(policy),
+            is_seq(), first, last, std::forward<Comp>(comp),
+            std::forward<Proj>(proj));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // is_heap_until
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         // sequential is_heap_until with projection function
         template <typename RandIter, typename Comp, typename Proj>
-        RandIter
-        sequential_is_heap_until(RandIter first, RandIter last,
-            Comp && comp, Proj && proj)
+        RandIter sequential_is_heap_until(
+            RandIter first, RandIter last, Comp&& comp, Proj&& proj)
         {
             typedef typename std::iterator_traits<RandIter>::difference_type
                 difference_type;
@@ -246,8 +235,8 @@ namespace hpx { namespace parallel { inline namespace v1
             for (difference_type i = 1; i < count; ++i)
             {
                 if (hpx::util::invoke(comp,
-                    hpx::util::invoke(proj, *(first + (i - 1) / 2)),
-                    hpx::util::invoke(proj, *(first + i))))
+                        hpx::util::invoke(proj, *(first + (i - 1) / 2)),
+                        hpx::util::invoke(proj, *(first + i))))
                     return first + i;
             }
             return last;
@@ -258,11 +247,13 @@ namespace hpx { namespace parallel { inline namespace v1
             template <typename ExPolicy, typename RandIter, typename Comp,
                 typename Proj>
             typename util::detail::algorithm_result<ExPolicy, RandIter>::type
-            operator()(ExPolicy && policy, RandIter first, RandIter last,
+            operator()(ExPolicy&& policy, RandIter first, RandIter last,
                 Comp comp, Proj proj)
             {
-                typedef util::detail::algorithm_result<ExPolicy, RandIter> result;
-                typedef typename std::iterator_traits<RandIter>::value_type type;
+                typedef util::detail::algorithm_result<ExPolicy, RandIter>
+                    result;
+                typedef
+                    typename std::iterator_traits<RandIter>::value_type type;
                 typedef typename std::iterator_traits<RandIter>::difference_type
                     difference_type;
 
@@ -312,31 +303,30 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             is_heap_until()
               : is_heap_until::algorithm("is_heap_until")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename Comp, typename Proj>
-            static RandIter
-            sequential(ExPolicy && policy, RandIter first, RandIter last,
-                Comp && comp, Proj && proj)
+            static RandIter sequential(ExPolicy&& policy, RandIter first,
+                RandIter last, Comp&& comp, Proj&& proj)
             {
                 return sequential_is_heap_until(first, last,
                     std::forward<Comp>(comp), std::forward<Proj>(proj));
             }
 
             template <typename ExPolicy, typename Comp, typename Proj>
-            static typename util::detail::algorithm_result<
-                ExPolicy, RandIter
-            >::type
-            parallel(ExPolicy && policy, RandIter first, RandIter last,
-                Comp && comp, Proj && proj)
+            static typename util::detail::algorithm_result<ExPolicy,
+                RandIter>::type
+            parallel(ExPolicy&& policy, RandIter first, RandIter last,
+                Comp&& comp, Proj&& proj)
             {
-                return is_heap_until_helper()(
-                    std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Comp>(comp), std::forward<Proj>(proj));
+                return is_heap_until_helper()(std::forward<ExPolicy>(policy),
+                    first, last, std::forward<Comp>(comp),
+                    std::forward<Proj>(proj));
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Returns the upper bound of the largest range beginning at \a first
     /// which is a max heap. That is, the last iterator \a it for
@@ -399,31 +389,27 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           of the largest range beginning at first which is a max heap.
     ///           That is, the last iterator \a it for which range [first, it) is a max heap.
     ///
-    template <typename ExPolicy, typename RandIter, typename Comp = detail::less,
-        typename Proj = util::projection_identity,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<RandIter>::value &&
-        traits::is_projected<Proj, RandIter>::value &&
-        traits::is_indirect_callable<
-            ExPolicy, Comp,
-            traits::projected<Proj, RandIter>,
-            traits::projected<Proj, RandIter>
-        >::value)>
+    template <typename ExPolicy, typename RandIter,
+        typename Comp = detail::less, typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<RandIter>::value&&
+                    traits::is_projected<Proj, RandIter>::value&&
+                        traits::is_indirect_callable<ExPolicy, Comp,
+                            traits::projected<Proj, RandIter>,
+                            traits::projected<Proj, RandIter>>::value)>
     typename util::detail::algorithm_result<ExPolicy, RandIter>::type
-    is_heap_until(ExPolicy && policy, RandIter first, RandIter last,
-        Comp && comp = Comp(), Proj && proj = Proj())
+    is_heap_until(ExPolicy&& policy, RandIter first, RandIter last,
+        Comp&& comp = Comp(), Proj&& proj = Proj())
     {
-        static_assert(
-            (hpx::traits::is_random_access_iterator<RandIter>::value),
+        static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
             "Requires a random access iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
         return detail::is_heap_until<RandIter>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+            std::forward<ExPolicy>(policy), is_seq(), first, last,
+            std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

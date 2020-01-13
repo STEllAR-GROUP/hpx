@@ -6,6 +6,7 @@
 //
 // Copyright (C) 2007 John Torjo (see www.torjo.com for email)
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -66,14 +67,15 @@ file f("out.txt", file_settings.initial_overwrite(true).do_append(false) );
     namespace detail {
         template <class self_type, class type>
         struct flag_with_self_type
-        {    //-V690
+        {
             flag_with_self_type(self_type* self, const type& val = type())
               : m_val(val)
               , m_self(self)
             {
             }
-            flag_with_self_type(const flag_with_self_type& other)
+            flag_with_self_type(flag_with_self_type const& other)
               : m_val(other.m_val)
+              , m_self(other.m_self)
             {
             }
 
@@ -87,9 +89,16 @@ file f("out.txt", file_settings.initial_overwrite(true).do_append(false) );
                 return *m_self;
             }
 
-            void operator=(const self_type& other)
+            flag_with_self_type& operator=(self_type const& other)
             {
                 m_val = other.m_val;
+                return *this;
+            }
+            flag_with_self_type& operator=(flag_with_self_type const& other)
+            {
+                m_val = other.m_val;
+                m_self = other.m_self;
+                return *this;
             }
 
         private:

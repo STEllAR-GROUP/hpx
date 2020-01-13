@@ -3,6 +3,7 @@
 //  Copyright (c) 2007 Peter Dimov
 //  Copyright (c) Beman Dawes 2011
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,8 +11,8 @@
 //                               hpxinspect:noinclude:HPX_ASSERT
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/assertion/config/defines.hpp>
+#include <hpx/assertion.hpp>
 
 #if defined(HPX_ASSERTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
@@ -19,7 +20,8 @@
     "The header hpx/util/assert.hpp is deprecated,                             \
     please include hpx/assertion.hpp instead")
 #else
-#warning "The header hpx/util/assert.hpp is deprecated,                        \
+#warning                                                                       \
+    "The header hpx/util/assert.hpp is deprecated,                        \
     please include hpx/assertion.hpp instead"
 #endif
 #endif

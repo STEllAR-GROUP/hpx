@@ -1,13 +1,16 @@
 //  Copyright (c) 2017 Ajai V George
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_REDUCE)
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_REDUCE
+
 #include <hpx/config.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/invoke.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -25,8 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail
-{
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename T>
     struct seg_reduce : public detail::algorithm<seg_reduce<T>, T>
     {
@@ -76,7 +78,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
             ExPolicy, FwdIter first, FwdIter last, Reduce&& r, Convert&& conv)
         {
             typedef typename std::iterator_traits<FwdIter>::reference reference;
-            return util::accumulate<T>(first, last,
+            return util::accumulate<T>(
+                first, last,
                 [=](T const& res, reference next) -> T {
                     return hpx::util::invoke(
                         r, res, hpx::util::invoke(conv, next));
@@ -164,6 +167,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail
                 }));
         }
     };
-}}}}
+}}}}    // namespace hpx::parallel::v1::detail
 
 #endif

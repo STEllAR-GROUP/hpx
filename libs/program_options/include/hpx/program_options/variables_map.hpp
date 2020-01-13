@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,15 +15,15 @@
 // hpxinspect:nodeprecatedinclude:boost/program_options/value_semantic.hpp
 
 #include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/value_semantic.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 namespace hpx { namespace program_options {
 
-    using boost::program_options::store;
-    using boost::program_options::notify;
-    using boost::program_options::variable_value;
     using boost::program_options::abstract_variables_map;
+    using boost::program_options::notify;
+    using boost::program_options::store;
+    using boost::program_options::variable_value;
     using boost::program_options::variables_map;
 
 }}    // namespace hpx::program_options
@@ -211,7 +212,7 @@ namespace hpx { namespace program_options {
 
     inline bool variable_value::empty() const
     {
-        return v.empty();
+        return !v.has_value();
     }
 
     inline bool variable_value::defaulted() const

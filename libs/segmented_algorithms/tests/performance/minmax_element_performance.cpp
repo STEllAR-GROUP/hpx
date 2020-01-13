@@ -1,15 +1,16 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_minmax.hpp>
 #include <hpx/include/partitioned_vector.hpp>
-#include <hpx/include/iostreams.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/timing.hpp>
 
 #include <hpx/program_options.hpp>
 
@@ -23,15 +24,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
 HPX_REGISTER_PARTITIONED_VECTOR(int);
-unsigned int seed = (unsigned int)std::random_device{}();
+unsigned int seed = (unsigned int) std::random_device{}();
 
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
 {
     random_fill()
-      : gen(seed),
-        dist(0, RAND_MAX)
-    {}
+      : gen(seed)
+      , dist(0, RAND_MAX)
+    {
+    }
 
     int operator()()
     {
@@ -43,12 +45,13 @@ struct random_fill
 
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
-    {}
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_min_element_benchmark(int test_count,
-    hpx::partitioned_vector<int> const& v)
+double run_min_element_benchmark(
+    int test_count, hpx::partitioned_vector<int> const& v)
 {
     std::uint64_t time = hpx::util::high_resolution_clock::now();
 
@@ -56,7 +59,7 @@ double run_min_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        /*auto iters = */min_element(execution::par, v.begin(), v.end());
+        /*auto iters = */ min_element(execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -65,8 +68,8 @@ double run_min_element_benchmark(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_max_element_benchmark(int test_count,
-    hpx::partitioned_vector<int> const& v)
+double run_max_element_benchmark(
+    int test_count, hpx::partitioned_vector<int> const& v)
 {
     std::uint64_t time = hpx::util::high_resolution_clock::now();
 
@@ -74,7 +77,7 @@ double run_max_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        /*auto iters = */max_element(execution::par, v.begin(), v.end());
+        /*auto iters = */ max_element(execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -83,8 +86,8 @@ double run_max_element_benchmark(int test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_minmax_element_benchmark(int test_count,
-    hpx::partitioned_vector<int> const& v)
+double run_minmax_element_benchmark(
+    int test_count, hpx::partitioned_vector<int> const& v)
 {
     std::uint64_t time = hpx::util::high_resolution_clock::now();
 
@@ -92,7 +95,7 @@ double run_minmax_element_benchmark(int test_count,
     {
         // invoke minmax
         using namespace hpx::parallel;
-        /*auto iters = */minmax_element(execution::par, v.begin(), v.end());
+        /*auto iters = */ minmax_element(execution::par, v.begin(), v.end());
     }
 
     time = hpx::util::high_resolution_clock::now() - time;
@@ -125,7 +128,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // if (csvoutput)
         {
-            std::cout << "minmax" << test_count << "," << time_minmax << std::endl;
+            std::cout << "minmax" << test_count << "," << time_minmax
+                      << std::endl;
             std::cout << "min" << test_count << "," << time_min << std::endl;
             std::cout << "max" << test_count << "," << time_max << std::endl;
         }
@@ -138,30 +142,23 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
 int main(int argc, char* argv[])
 {
-    std::srand((unsigned int)std::time(nullptr));
+    std::srand((unsigned int) std::time(nullptr));
 
     // initialize program
     std::vector<std::string> const cfg = {
-        "hpx.os_threads=all",
-        "hpx.run_hpx_main!=1"
-    };
+        "hpx.os_threads=all", "hpx.run_hpx_main!=1"};
 
     hpx::program_options::options_description cmdline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ( "vector_size",
-            hpx::program_options::value<std::size_t>()->default_value(1000),
-            "size of vector (default: 1000)")
-        ("test_count",
-            hpx::program_options::value<int>()->default_value(100),
-            "number of tests to be averaged (default: 100)")
-        ("csv_output",
-            "print results in csv format")
-        ("seed,s", hpx::program_options::value<unsigned int>(),
-            "the random number generator seed to use for this run")
-        ;
+    cmdline.add_options()("vector_size",
+        hpx::program_options::value<std::size_t>()->default_value(1000),
+        "size of vector (default: 1000)")("test_count",
+        hpx::program_options::value<int>()->default_value(100),
+        "number of tests to be averaged (default: 100)")(
+        "csv_output", "print results in csv format")("seed,s",
+        hpx::program_options::value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     return hpx::init(cmdline, argc, argv, cfg);
 }
-

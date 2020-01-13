@@ -4,6 +4,7 @@
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -18,6 +19,7 @@
 #include <boost/asio/io_service.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <thread>
@@ -53,7 +55,9 @@ namespace hpx { namespace util
         // will not exit until they are explicitly stopped.
         for (std::size_t i = 0; i < pool_size; ++i)
         {
-            io_services_.emplace_back(new boost::asio::io_service);
+            std::unique_ptr<boost::asio::io_service> p(
+                new boost::asio::io_service);
+            io_services_.emplace_back(std::move(p));
             work_.emplace_back(initialize_work(*io_services_[i]));
         }
     }
@@ -169,7 +173,9 @@ namespace hpx { namespace util
 
             for (std::size_t i = 0; i < num_threads; ++i)
             {
-                io_services_.emplace_back(new boost::asio::io_service);
+                std::unique_ptr<boost::asio::io_service> p(
+                    new boost::asio::io_service);
+                io_services_.emplace_back(std::move(p));
                 work_.emplace_back(initialize_work(*io_services_[i]));
             }
         }
@@ -292,7 +298,7 @@ namespace hpx { namespace util
             next_io_service_ = static_cast<std::size_t>(index);
         }
 
-        return *io_services_[index]; //-V108
+        return *io_services_[static_cast<std::size_t>(index)]; //-V108
     }
 
     std::thread& io_service_pool::get_os_thread_handle(std::size_t thread_num)

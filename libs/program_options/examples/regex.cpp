@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,8 +20,8 @@
 //
 // and the second invocation should issue an error message.
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/datastructures/any.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/program_options.hpp>
 
 #include <iostream>
@@ -55,8 +56,8 @@ bool operator==(magic_number const& lhs, magic_number const& rhs)
    This has no practical meaning, meant only to show how
    regex can be used to validate values.
 */
-void validate(any& v, const std::vector<std::string>& values,
-    magic_number*, int)
+void validate(
+    any& v, const std::vector<std::string>& values, magic_number*, int)
 {
     static regex r(R"(\d\d\d-(\d\d\d))");
 
@@ -85,12 +86,14 @@ int main(int ac, char* av[])
     try
     {
         options_description desc("Allowed options");
+        // clang-format off
         desc.add_options()
             ("help","produce a help screen")
             ("version,v", "print the version number")
             ("magic,m", value<magic_number>(),
                 "magic value (in NNN-NNN format)")
             ;
+        // clang-format on
 
         variables_map vm;
         store(parse_command_line(ac, av, desc), vm);

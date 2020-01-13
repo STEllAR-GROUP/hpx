@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,14 +16,11 @@
 
 #include <hpx/lcos/packaged_action.hpp>
 
-#include <hpx/lcos/barrier.hpp>
+#include <hpx/collectives/barrier.hpp>
+#include <hpx/collectives/latch.hpp>
+#include <hpx/collectives/reduce.hpp>
+#include <hpx/collectives/gather.hpp>
 #include <hpx/lcos/channel.hpp>
-#include <hpx/lcos/gather.hpp>
-#include <hpx/lcos/latch.hpp>
-#if defined(HPX_HAVE_QUEUE_COMPATIBILITY)
-#include <hpx/lcos/queue.hpp>
-#endif
-#include <hpx/lcos/reduce.hpp>
 
 #include <hpx/include/async.hpp>
 #include <hpx/include/dataflow.hpp>

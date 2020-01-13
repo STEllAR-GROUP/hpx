@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,8 +10,8 @@
 #define HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
@@ -26,18 +27,17 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // includes
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter, typename T, typename F, typename CancelToken>
-        FwdIter lower_bound(FwdIter first, FwdIter last, T const& value,
-            F && f, CancelToken& tok)
+        template <typename FwdIter, typename T, typename F,
+            typename CancelToken>
+        FwdIter lower_bound(FwdIter first, FwdIter last, T const& value, F&& f,
+            CancelToken& tok)
         {
             typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
@@ -64,9 +64,10 @@ namespace hpx { namespace parallel { inline namespace v1
             return first;
         }
 
-        template <typename FwdIter, typename T, typename F, typename CancelToken>
-        FwdIter upper_bound(FwdIter first, FwdIter last, T const& value,
-            F && f, CancelToken& tok)
+        template <typename FwdIter, typename T, typename F,
+            typename CancelToken>
+        FwdIter upper_bound(FwdIter first, FwdIter last, T const& value, F&& f,
+            CancelToken& tok)
         {
             typedef typename std::iterator_traits<FwdIter>::difference_type
                 difference_type;
@@ -95,8 +96,8 @@ namespace hpx { namespace parallel { inline namespace v1
 
         template <typename FwdIter1, typename FwdIter2, typename F,
             typename CancelToken>
-        bool sequential_includes(FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-            FwdIter2 last2, F && f, CancelToken& tok)
+        bool sequential_includes(FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, F&& f, CancelToken& tok)
         {
             while (first2 != last2)
             {
@@ -118,23 +119,23 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             includes()
               : includes::algorithm("includes")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename F>
-            static bool
-            sequential(ExPolicy, InIter1 first1, InIter1 last1,
-                InIter2 first2, InIter2 last2, F && f)
+            static bool sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, F&& f)
             {
-                return std::includes(first1, last1, first2, last2,
-                    std::forward<F>(f));
+                return std::includes(
+                    first1, last1, first2, last2, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, FwdIter2 last2, F && f)
+            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+                FwdIter2 first2, FwdIter2 last2, F&& f)
             {
                 if (first1 == last1)
                 {
@@ -150,26 +151,25 @@ namespace hpx { namespace parallel { inline namespace v1
 
                 util::cancellation_token<> tok;
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy),
-                    first2, std::distance(first2, last2),
-                    [first1, last1, first2, last2, tok,
-                        HPX_CAPTURE_FORWARD(f)
-                    ](FwdIter2 part_begin, std::size_t part_count) mutable
-                    ->  bool
-                    {
-                        FwdIter2 part_end = detail::next(part_begin, part_count);
+                    std::forward<ExPolicy>(policy), first2,
+                    std::distance(first2, last2),
+                    [first1, last1, first2, last2, tok, HPX_CAPTURE_FORWARD(f)](
+                        FwdIter2 part_begin,
+                        std::size_t part_count) mutable -> bool {
+                        FwdIter2 part_end =
+                            detail::next(part_begin, part_count);
                         if (first2 != part_begin)
                         {
-                            part_begin = upper_bound(part_begin, part_end,
-                                *part_begin, f, tok);
+                            part_begin = upper_bound(
+                                part_begin, part_end, *part_begin, f, tok);
                             if (tok.was_cancelled())
                                 return false;
                             if (part_begin == part_end)
                                 return true;
                         }
 
-                        FwdIter1 low = lower_bound(first1, last1,
-                            *part_begin, f, tok);
+                        FwdIter1 low =
+                            lower_bound(first1, last1, *part_begin, f, tok);
                         if (tok.was_cancelled())
                             return false;
 
@@ -183,32 +183,28 @@ namespace hpx { namespace parallel { inline namespace v1
                         if (part_end != last2)
                         {
                             high = upper_bound(low, last1, *part_end, f, tok);
-                            part_end = upper_bound(part_end, last2,
-                                *part_end, f, tok);
+                            part_end =
+                                upper_bound(part_end, last2, *part_end, f, tok);
                             if (tok.was_cancelled())
                                 return false;
                         }
 
-                        if (!sequential_includes(low, high, part_begin,
-                            part_end, f, tok))
+                        if (!sequential_includes(
+                                low, high, part_begin, part_end, f, tok))
                         {
                             tok.cancel();
                         }
                         return !tok.was_cancelled();
                     },
-                    [](std::vector<hpx::future<bool> > && results)
-                    {
-                        return std::all_of(
-                            hpx::util::begin(results), hpx::util::end(results),
-                            [](hpx::future<bool>& val)
-                            {
-                                return val.get();
-                            });
+                    [](std::vector<hpx::future<bool>>&& results) {
+                        return std::all_of(hpx::util::begin(results),
+                            hpx::util::end(results),
+                            [](hpx::future<bool>& val) { return val.get(); });
                     });
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Returns true if every element from the sorted range [first2, last2) is
     /// found within the sorted range [first1, last1). Also returns true if
@@ -282,26 +278,22 @@ namespace hpx { namespace parallel { inline namespace v1
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::less>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-    >::type
-    includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, Pred && op = Pred())
+    inline
+        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
+            typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
+        includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return detail::includes().call(
-            std::forward<ExPolicy>(policy), is_seq(),
+        return detail::includes().call(std::forward<ExPolicy>(policy), is_seq(),
             first1, last1, first2, last2, std::forward<Pred>(op));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,13 +8,13 @@
 #define HPX_COMPONENTS_SERVER_LOCKING_HOOK_OCT_17_2012_0732PM
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/register_locks.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
-#include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/traits/action_decorate_function.hpp>
 
 #include <mutex>
 #include <utility>
@@ -47,7 +48,18 @@ namespace hpx { namespace components
           , mtx_()
         {}
 
-        typedef void decorates_action;
+        using decorates_action = void;
+
+        locking_hook& operator=(locking_hook const& rhs)
+        {
+            this->base_type::operator=(rhs);
+            return *this;
+        }
+        locking_hook& operator=(locking_hook&& rhs)
+        {
+            this->base_type::operator=(std::move(rhs));
+            return *this;
+        }
 
         /// This is the hook implementation for decorate_action which locks
         /// the component ensuring that only one action is executed at a time

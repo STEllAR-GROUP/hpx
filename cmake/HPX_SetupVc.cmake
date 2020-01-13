@@ -1,5 +1,6 @@
 # Copyright (c) 2016 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -33,60 +34,63 @@
 # Vc_SSE_INTRINSICS_BROKEN
 # Vc_AVX_INTRINSICS_BROKEN
 
-find_package(Vc ${Vc_FIND_VERSION} QUIET)
+if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
+  find_package(Vc ${Vc_FIND_VERSION} QUIET)
 
-if(NOT Vc_FOUND)
-  if(NOT Vc_VERSION_STRING)
-    # didn't find any version of Vc
-    hpx_error("Vc was not found while datapar support was requested. Set Vc_DIR to the installation path of Vc")
-  elseif(${Vc_VERSION_STRING} VERSION_LESS "1.70.0")
-    # didn't find current version of Vc
-    hpx_error("The Vc was found for requested datapar support was too old. Set Vc_DIR to the installation path of Vc (V1.70.0 is required)")
+  if(NOT Vc_FOUND)
+    if(NOT Vc_VERSION_STRING)
+      # didn't find any version of Vc
+      hpx_error("Vc was not found while datapar support was requested. Set Vc_DIR to the installation path of Vc")
+    elseif(${Vc_VERSION_STRING} VERSION_LESS "1.70.0")
+      # didn't find current version of Vc
+      hpx_error("The Vc was found for requested datapar support was too old. Set Vc_DIR to the installation path of Vc (V1.70.0 is required)")
+    endif()
   endif()
-endif()
 
-if(Vc_VERSION_STRING AND (NOT ${Vc_VERSION_STRING} VERSION_LESS "1.70.0"))
-  # found Vc V2
-  if(NOT Vc_INCLUDE_DIR)
-    hpx_error("Vc was not found while datapar support was requested. Set Vc_DIR to the installation path of Vc")
+  if(Vc_VERSION_STRING AND (NOT ${Vc_VERSION_STRING} VERSION_LESS "1.70.0"))
+    # found Vc V2
+    if(NOT Vc_INCLUDE_DIR)
+      hpx_error("Vc was not found while datapar support was requested. Set Vc_DIR to the installation path of Vc")
+    endif()
+    set(HPX_WITH_DATAPAR_VC_NO_LIBRARY On)
   endif()
-  set(HPX_WITH_DATAPAR_VC_NO_LIBRARY On)
-endif()
 
-include_directories(SYSTEM ${Vc_INCLUDE_DIR})
-if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
-  link_directories(${Vc_LIB_DIR})
+  add_library(hpx::vc INTERFACE IMPORTED)
+  set_property(TARGET hpx::vc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Vc_INCLUDE_DIR})
 
-  hpx_library_dir(${Vc_LIB_DIR})
-  hpx_libraries(${Vc_LIBRARIES})
-endif()
-
-foreach(_flag ${Vc_DEFINITIONS})
-  # remove leading '-D'
-  string(STRIP ${_flag} _flag)
-  string(FIND ${_flag} "-D" _flagpos)
-  if(${_flagpos} EQUAL 0)
-    string(SUBSTRING ${_flag} 2 -1 _flag)
+  if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
+    if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
+      set_property(TARGET hpx::vc PROPERTY INTERFACE_LINK_LIBRARIES ${Vc_LIBRARIES})
+      set_property(TARGET hpx::vc PROPERTY INTERFACE_LINK_DIRECTORIES ${Vc_LIB_DIR})
+    else()
+      target_link_libraries(hpx::vc INTERFACE ${Vc_LIBRARIES})
+      target_link_directories(hpx::vc INTERFACE ${Vc_LIB_DIR})
+    endif()
   endif()
-  hpx_add_target_compile_definition(${_flag})
-endforeach()
 
-# do not include Vc build flags for MSVC builds as this breaks building the
-# core HPX libraries itself
-if(NOT MSVC)
-  foreach(_flag ${Vc_COMPILE_FLAGS})
-    hpx_add_compile_flag(${_flag})
+  foreach(_flag ${Vc_DEFINITIONS})
+    # remove leading '-D'
+    string(STRIP ${_flag} _flag)
+    string(FIND ${_flag} "-D" _flagpos)
+    if(${_flagpos} EQUAL 0)
+      string(SUBSTRING ${_flag} 2 -1 _flag)
+    endif()
+
+    set_property(TARGET hpx::vc APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS ${_flag})
   endforeach()
 
-  foreach(_flag ${Vc_ARCHITECTURE_FLAGS})
-    hpx_add_compile_flag(${_flag})
-  endforeach()
-else()
-  hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+  include(HPX_AddDefinitions)
+
+  # do not include Vc build flags for MSVC builds as this breaks building the
+  # core HPX libraries itself
+  if(NOT MSVC)
+    set_property(TARGET hpx::vc PROPERTY INTERFACE_COMPILE_OPTIONS ${Vc_COMPILE_FLAGS} ${Vc_ARCHITECTURE_FLAGS})
+  else()
+    hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+  endif()
+
+  hpx_add_config_define(HPX_HAVE_DATAPAR)
+  hpx_add_config_define(HPX_HAVE_DATAPAR_VC)
+
+  hpx_info("Found Vc (vectorization):" ${Vc_INCLUDE_DIR} "- version:" ${Vc_VERSION_STRING})
 endif()
-
-hpx_add_config_define(HPX_HAVE_DATAPAR)
-hpx_add_config_define(HPX_HAVE_DATAPAR_VC)
-
-hpx_info("Found Vc (vectorization):" ${Vc_INCLUDE_DIR} "- version:" ${Vc_VERSION_STRING})
-

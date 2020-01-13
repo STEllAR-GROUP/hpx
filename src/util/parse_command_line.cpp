@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -52,13 +53,13 @@ namespace hpx { namespace util
 
             if (s.size() < hpx_prefix_len ||
                 s.compare(0, hpx_prefix_len, hpx_prefix) != 0 ||
-                !std::isdigit(s[hpx_prefix_len]))
+                !std::isdigit(s[hpx_prefix_len]))  // -V557
             {
                 return false;
             }
 
             // any --hpx: option without a second ':' is handled elsewhere as well
-            std::string::size_type p = s.find_first_of(":", hpx_prefix_len);
+            std::string::size_type p = s.find_first_of(':', hpx_prefix_len);
             if (p == std::string::npos)
                 return false;
 
@@ -115,7 +116,7 @@ namespace hpx { namespace util
             else {
                 // short option (no value) or long option
                 if (opt[1] == '-') {
-                    start_at = opt.find_last_of("=");
+                    start_at = opt.find_last_of('=');
                     long_option = true;
                 }
 
@@ -285,13 +286,13 @@ namespace hpx { namespace util
                 // here. Boost filesystem returns an empty path for
                 // "/".parent_path() whereas C++17 filesystem will keep
                 // returning "/".
-#if defined(HPX_HAVE_CXX17_FILESYSTEM)
+#if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
                 auto dir_prev = dir;
-#endif
                 dir = dir.parent_path();    // chop off last directory part
-#if defined(HPX_HAVE_CXX17_FILESYSTEM)
                 if (dir_prev == dir)
                     break;
+#else
+                dir = dir.parent_path();    // chop off last directory part
 #endif
             }
         }
@@ -355,14 +356,21 @@ namespace hpx { namespace util
 
             switch (mode) {
             case runtime_mode_default:
+#if defined(HPX_HAVE_NETWORKING)
                 hpx_options.add_options()
                     ("hpx:worker", "run this instance in worker mode")
                     ("hpx:console", "run this instance in console mode")
                     ("hpx:connect", "run this instance in worker mode, "
                          "but connecting late")
                 ;
+#else
+                hpx_options.add_options()
+                    ("hpx:console", "run this instance in console mode")
+                ;
+#endif
                 break;
 
+#if defined(HPX_HAVE_NETWORKING)
             case runtime_mode_worker:
             case runtime_mode_console:
             case runtime_mode_connect:
@@ -376,6 +384,13 @@ namespace hpx { namespace util
                         "but connecting late")
                 ;
                 break;
+#else
+            case runtime_mode_console:
+                hidden_options.add_options()
+                    ("hpx:console", "run this instance in console mode")
+                ;
+                break;
+#endif
 
             case runtime_mode_invalid:
             default:
@@ -387,6 +402,7 @@ namespace hpx { namespace util
             hpx_options.add_options()
                 ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
+#if defined(HPX_HAVE_NETWORKING)
                 ("hpx:agas", value<std::string>(),
                   "the IP address the AGAS root server is running on, "
                   "expected format: `address:port' (default: "
@@ -412,9 +428,11 @@ namespace hpx { namespace util
                 ("hpx:iftransform", value<std::string>(),
                   "sed-style search and replace (s/search/replace/) used to "
                   "transform host names to the proper network interconnect")
+#endif
                 ("hpx:localities", value<std::size_t>(),
                   "the number of localities to wait for at application "
                   "startup (default: 1)")
+#if defined(HPX_HAVE_NETWORKING)
                 ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
@@ -424,6 +442,7 @@ namespace hpx { namespace util
                   "this locality expects other localities to dynamically connect "
                   "(default: false if the number of localities is equal to one, "
                   "true if the number of initial localities is larger than 1)")
+#endif
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0), valid for "
@@ -523,7 +542,9 @@ namespace hpx { namespace util
                   "wait for a debugger to be attached, possible values: "
                   "off, startup, exception or test-failure (default: startup)")
 #endif
+#if defined(HPX_HAVE_NETWORKING)
                 ("hpx:list-parcel-ports", "list all available parcel-ports")
+#endif
             ;
 
             options_description counter_options(
@@ -769,7 +790,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     std::string embed_in_quotes(std::string const& s)
     {
-        char quote = (s.find_first_of("\"") != std::string::npos) ? '\'' : '\"';
+        char quote = (s.find_first_of('"') != std::string::npos) ? '\'' : '"';
 
         if (s.find_first_of("\t ") != std::string::npos)
             return quote + s + quote;

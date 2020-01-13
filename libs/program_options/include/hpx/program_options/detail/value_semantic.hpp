@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,9 +23,9 @@ namespace hpx { namespace program_options {
 
     namespace validators {
 
-        using boost::program_options::validators::get_single_string;
         using boost::program_options::validators::check_first_occurrence;
-    }
+        using boost::program_options::validators::get_single_string;
+    }    // namespace validators
 
     using namespace validators;
 
@@ -41,6 +42,7 @@ namespace hpx { namespace program_options {
 
 #include <boost/lexical_cast.hpp>
 
+#include <cstddef>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -53,15 +55,16 @@ namespace hpx { namespace program_options {
     std::string typed_value<T, Char>::name() const
     {
         std::string const& var = (m_value_name.empty() ? arg : m_value_name);
-        if (!m_implicit_value.empty() && !m_implicit_value_as_text.empty())
+        if (m_implicit_value.has_value() && !m_implicit_value_as_text.empty())
         {
             std::string msg =
                 "[=" + var + "(=" + m_implicit_value_as_text + ")]";
-            if (!m_default_value.empty() && !m_default_value_as_text.empty())
+            if (m_default_value.has_value() && !m_default_value_as_text.empty())
                 msg += " (=" + m_default_value_as_text + ")";
             return msg;
         }
-        else if (!m_default_value.empty() && !m_default_value_as_text.empty())
+        else if (m_default_value.has_value() &&
+            !m_default_value_as_text.empty())
         {
             return var + " (=" + m_default_value_as_text + ")";
         }
@@ -160,13 +163,13 @@ namespace hpx { namespace program_options {
     void validate(hpx::util::any_nonser& v,
         const std::vector<std::basic_string<Char>>& s, std::vector<T>*, int)
     {
-        if (v.empty())
+        if (!v.has_value())
         {
             v = hpx::util::any_nonser(std::vector<T>());
         }
         std::vector<T>* tv = hpx::util::any_cast<std::vector<T>>(&v);
         HPX_ASSERT(nullptr != tv);
-        for (unsigned i = 0; i < s.size(); ++i)
+        for (std::size_t i = 0; i < s.size(); ++i)
         {
             try
             {
@@ -207,7 +210,7 @@ namespace hpx { namespace program_options {
         // If no tokens were given, and the option accepts an implicit
         // value, then assign the implicit value as the stored value;
         // otherwise, validate the user-provided token(s).
-        if (new_tokens.empty() && !m_implicit_value.empty())
+        if (new_tokens.empty() && m_implicit_value.has_value())
             value_store = m_implicit_value;
         else
             validate(value_store, new_tokens, (T*) nullptr, 0);

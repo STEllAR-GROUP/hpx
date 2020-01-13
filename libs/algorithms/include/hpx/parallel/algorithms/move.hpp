@@ -1,6 +1,7 @@
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2016-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,7 +11,7 @@
 #define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
@@ -27,87 +28,80 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // move
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
 
         template <typename IterPair>
-        struct move_pair :
-            public detail::algorithm<detail::move_pair<IterPair>, IterPair>
+        struct move_pair
+          : public detail::algorithm<detail::move_pair<IterPair>, IterPair>
         {
             move_pair()
               : move_pair::algorithm("move")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter, typename OutIter>
-            static std::pair<InIter, OutIter>
-            sequential(ExPolicy, InIter first, InIter last, OutIter dest)
+            static std::pair<InIter, OutIter> sequential(
+                ExPolicy, InIter first, InIter last, OutIter dest)
             {
                 return util::move(first, last, dest);
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-            static typename util::detail::algorithm_result<
-                ExPolicy, std::pair<FwdIter1, FwdIter2>
-            >::type
-            parallel(ExPolicy && policy, FwdIter1 first, FwdIter1 last,
-                FwdIter2 dest)
+            static typename util::detail::algorithm_result<ExPolicy,
+                std::pair<FwdIter1, FwdIter2>>::type
+            parallel(
+                ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
+                    zip_iterator;
                 typedef typename zip_iterator::reference reference;
 
-                return get_iter_pair(
-                    util::foreach_partitioner<ExPolicy>::call(
-                        std::forward<ExPolicy>(policy),
-                        hpx::util::make_zip_iterator(first, dest),
-                        std::distance(first, last),
-                        [](zip_iterator part_begin, std::size_t part_size,
-                            std::size_t)
-                        {
-                            using hpx::util::get;
+                return get_iter_pair(util::foreach_partitioner<ExPolicy>::call(
+                    std::forward<ExPolicy>(policy),
+                    hpx::util::make_zip_iterator(first, dest),
+                    std::distance(first, last),
+                    [](zip_iterator part_begin, std::size_t part_size,
+                        std::size_t) {
+                        using hpx::util::get;
 
-                            auto iters = part_begin.get_iterator_tuple();
-                            util::move_n(get<0>(iters), part_size, get<1>(iters));
-                        },
-                        [](zip_iterator && last) -> zip_iterator
-                        {
-                            return std::move(last);
-                        }));
+                        auto iters = part_begin.get_iterator_tuple();
+                        util::move_n(get<0>(iters), part_size, get<1>(iters));
+                    },
+                    [](zip_iterator&& last) -> zip_iterator {
+                        return std::move(last);
+                    }));
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template<typename FwdIter1, typename FwdIter2, typename Enable = void>
+        template <typename FwdIter1, typename FwdIter2, typename Enable = void>
         struct move;
 
         template <typename FwdIter1, typename FwdIter2>
-        struct move<
-            FwdIter1, FwdIter2,
+        struct move<FwdIter1, FwdIter2,
             typename std::enable_if<
-                iterators_are_segmented<FwdIter1, FwdIter2>::value
-            >::type>
-          : public move_pair<std::pair<
-                typename hpx::traits::segmented_iterator_traits<FwdIter1>
-                    ::local_iterator,
-                typename hpx::traits::segmented_iterator_traits<FwdIter2>
-                    ::local_iterator
-            > >
-        {};
+                iterators_are_segmented<FwdIter1, FwdIter2>::value>::type>
+          : public move_pair<
+                std::pair<typename hpx::traits::segmented_iterator_traits<
+                              FwdIter1>::local_iterator,
+                    typename hpx::traits::segmented_iterator_traits<
+                        FwdIter2>::local_iterator>>
+        {
+        };
 
-        template<typename FwdIter1, typename FwdIter2>
-        struct move<
-            FwdIter1, FwdIter2,
+        template <typename FwdIter1, typename FwdIter2>
+        struct move<FwdIter1, FwdIter2,
             typename std::enable_if<
-                iterators_are_not_segmented<FwdIter1, FwdIter2>::value
-            >::type>
-          : public move_pair<std::pair<FwdIter1, FwdIter2> >
-        {};
+                iterators_are_not_segmented<FwdIter1, FwdIter2>::value>::type>
+          : public move_pair<std::pair<FwdIter1, FwdIter2>>
+        {
+        };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Moves the elements in the range [first, last), to another range
     /// beginning at \a dest. After this operation the elements in the
@@ -160,19 +154,16 @@ namespace hpx { namespace parallel { inline namespace v1
     ///           moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-    HPX_CONCEPT_REQUIRES_(
-        execution::is_execution_policy<ExPolicy>::value &&
-        hpx::traits::is_iterator<FwdIter1>::value &&
-        hpx::traits::is_iterator<FwdIter2>::value)>
-    typename util::detail::algorithm_result<
-        ExPolicy, hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    >::type
-    move(ExPolicy && policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter1>::value&&
+                    hpx::traits::is_iterator<FwdIter2>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+    move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
-        return detail::transfer<
-                detail::move<FwdIter1, FwdIter2>
-            >(std::forward<ExPolicy>(policy), first, last, dest);
+        return detail::transfer<detail::move<FwdIter1, FwdIter2>>(
+            std::forward<ExPolicy>(policy), first, last, dest);
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

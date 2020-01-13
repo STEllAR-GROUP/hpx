@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,16 +11,17 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/apex.hpp>
+#include <hpx/util/external_timer.hpp>
 #endif
 
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <memory>
 
 namespace hpx { namespace threads
 {
@@ -39,7 +41,7 @@ namespace hpx { namespace threads
             parent_locality_id(0), parent_id(nullptr), parent_phase(0),
 #endif
 #ifdef HPX_HAVE_APEX
-            apex_data(nullptr),
+            timer_data(nullptr),
 #endif
             priority(thread_priority_normal),
             schedulehint(),
@@ -64,7 +66,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         // HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
         // and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on
-            apex_data = apex_new_task(description, parent_locality_id, parent_id );
+            timer_data = rhs.timer_data;
 #endif
             return *this;
         }
@@ -81,7 +83,8 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-            apex_data(apex_new_task(description, parent_locality_id, parent_id )),
+            timer_data(util::external_timer::new_task(description,
+                parent_locality_id, parent_id )),
 #endif
             priority(rhs.priority),
             schedulehint(rhs.schedulehint),
@@ -108,7 +111,8 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-            apex_data(apex_new_task(description,parent_locality_id,parent_id)),
+            timer_data(util::external_timer::new_task(description,
+                parent_locality_id,parent_id)),
 #endif
             priority(priority_), schedulehint(os_thread),
             stacksize(stacksize_),
@@ -131,7 +135,7 @@ namespace hpx { namespace threads
 #ifdef HPX_HAVE_APEX
         /* HPX_HAVE_APEX forces the HPX_HAVE_THREAD_DESCRIPTION
          * and HPX_HAVE_THREAD_PARENT_REFERENCE settings to be on */
-        apex_task_wrapper apex_data;
+        std::shared_ptr<util::external_timer::task_wrapper> timer_data;
 #endif
 
         thread_priority priority;

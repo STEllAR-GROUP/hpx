@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,6 +12,7 @@
 #include <hpx/logging.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/timing.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/ini.hpp>
 
@@ -30,20 +32,14 @@
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/threads/coroutines/coroutine.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 
-#include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/broadcast.hpp>
-#include <hpx/lcos/detail/barrier_node.hpp>
-#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
-#include <hpx/lcos/reduce.hpp>
-#endif
-#include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/collectives.hpp>
+#include <hpx/local_lcos/packaged_task.hpp>
 
 #include <hpx/assertion.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -53,7 +49,9 @@
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
 
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+#endif
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
@@ -63,6 +61,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -136,13 +135,6 @@ namespace hpx
 {
     // helper function to stop evaluating counters during shutdown
     void stop_evaluating_counters();
-
-    namespace parcelset
-    {
-        // default parcel-sent handler function
-        void default_write_handler(boost::system::error_code const& ec,
-            parcelset::parcel const& p);
-    }
 }
 
 namespace hpx { namespace components
@@ -270,7 +262,12 @@ namespace hpx { namespace components { namespace server
       , main_thread_id_(std::this_thread::get_id())
       , dijkstra_color_(false)
       , shutdown_all_invoked_(false)
+      , dijkstra_mtx_()
+      , dijkstra_cond_()
+      , p_mtx_()
+      , plugins_()
       , modules_(cfg.modules())
+      , static_modules_()
     {}
 
     // function to be called during shutdown
@@ -288,23 +285,28 @@ namespace hpx { namespace components { namespace server
         // push pending logs
         components::cleanup_logging();
 
-        if (respond_to) {
+        if (respond_to)
+        {
             // respond synchronously
-            typedef lcos::base_lco_with_value<void> void_lco_type;
-            typedef void_lco_type::set_event_action action_type;
+            using void_lco_type = lcos::base_lco_with_value<void>;
+            using action_type = void_lco_type::set_event_action;
 
             naming::address addr;
-            if (agas::is_local_address_cached(respond_to, addr)) {
+            if (agas::is_local_address_cached(respond_to, addr))
+            {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
                 hpx::applier::detail::apply_l<action_type>(respond_to,
                     std::move(addr));
             }
-            else {
+#if defined(HPX_HAVE_NETWORKING)
+            else
+            {
                 // apply remotely, parcel is sent synchronously
                 hpx::applier::detail::apply_r_sync<action_type>(std::move(addr),
                     respond_to);
             }
+#endif
         }
 
         std::abort();
@@ -516,10 +518,13 @@ namespace hpx { namespace components { namespace server
     {
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = appl.get_agas_client();
-        parcelset::parcelhandler& ph = appl.get_parcel_handler();
 
         agas_client.start_shutdown();
+
+#if defined(HPX_HAVE_NETWORKING)
+        parcelset::parcelhandler& ph = appl.get_parcel_handler();
         ph.flush_parcels();
+#endif
 
         std::uint32_t locality_id = get_locality_id();
 
@@ -773,8 +778,10 @@ namespace hpx { namespace components { namespace server
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr) return;
 
+#if defined(HPX_HAVE_NETWORKING)
         // instruct our connection cache to drop all connections it is holding
         rt->get_parcel_handler().remove_from_connection_cache(gid, eps);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -879,21 +886,26 @@ namespace hpx { namespace components { namespace server
                 if (remove_from_remote_caches)
                     remove_here_from_console_connection_cache();
 
-                if (respond_to) {
+                if (respond_to)
+                {
                     // respond synchronously
-                    typedef lcos::base_lco_with_value<void> void_lco_type;
-                    typedef void_lco_type::set_event_action action_type;
+                    using void_lco_type = lcos::base_lco_with_value<void>;
+                    using action_type = void_lco_type::set_event_action;
 
                     naming::address addr;
-                    if (agas::is_local_address_cached(respond_to, addr)) {
+                    if (agas::is_local_address_cached(respond_to, addr))
+                    {
                         // this should never happen
                         HPX_ASSERT(false);
                     }
-                    else {
+#if defined(HPX_HAVE_NETWORKING)
+                    else
+                    {
                         // apply remotely, parcel is sent synchronously
                         hpx::applier::detail::apply_r_sync<action_type>(
                             std::move(addr), respond_to);
                     }
+#endif
                 }
             }
 
@@ -969,16 +981,15 @@ namespace hpx { namespace components { namespace server
                 {
                     // print the mask for the current PU
                     threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
-                    std::string pool_name = tm.get_pool(i).get_pool_name();
 
                     if (!threads::any(pu_mask))
                     {
-                        strm << std::setw(4) << i
-                             << ": thread binding disabled"    //-V112
-                             << std::endl;
+                        strm << std::setw(4) << i    //-V112
+                             << ": thread binding disabled" << std::endl;
                     }
                     else
                     {
+                        std::string pool_name = tm.get_pool(i).get_pool_name();
                         top.print_affinity_mask(strm, i, pu_mask, pool_name);
                     }
 
@@ -1016,6 +1027,7 @@ namespace hpx { namespace components { namespace server
             }
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         void handle_list_parcelports()
         {
             {
@@ -1029,6 +1041,7 @@ namespace hpx { namespace components { namespace server
                 std::cout << strm.str();
             }
         }
+#endif
     }
 
     int runtime_support::load_components()
@@ -1076,7 +1089,7 @@ namespace hpx { namespace components { namespace server
                     &still_unregistered_options);
 
                 std::string still_unknown_commandline;
-                for (std::size_t i = 1; i != still_unregistered_options.size();
+                for (std::size_t i = 1; i < still_unregistered_options.size();
                      ++i)
                 {
                     if (i != 1)
@@ -1128,9 +1141,10 @@ namespace hpx { namespace components { namespace server
                     detail::handle_print_bind(vm, num_threads);
                 }
 
+#if defined(HPX_HAVE_NETWORKING)
                 if (vm.count("hpx:list-parcel-ports"))
                     detail::handle_list_parcelports();
-
+#endif
                 if (vm.count("hpx:exit"))
                     return 1;
             }
@@ -1219,6 +1233,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::remove_here_from_connection_cache()
     {
+#if defined(HPX_HAVE_NETWORKING)
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
             return;
@@ -1240,14 +1255,17 @@ namespace hpx { namespace components { namespace server
 
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
+
             apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
         }
 
         wait_all(callbacks);
+#endif
     }
 
     void runtime_support::remove_here_from_console_connection_cache()
     {
+#if defined(HPX_HAVE_NETWORKING)
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
             return;
@@ -1264,9 +1282,11 @@ namespace hpx { namespace components { namespace server
         apply_cb(act, id, std::move(ipt), hpx::get_locality(), rt->endpoints());
 
         callback.wait();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
     void runtime_support::register_message_handler(
         char const* message_handler_type, char const* action, error_code& ec)
     {
@@ -1436,6 +1456,7 @@ namespace hpx { namespace components { namespace server
                     << binary_filter_type;
         return bf;
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component_static(
@@ -1458,7 +1479,6 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            error_code ec(lightweight);
             if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
@@ -1477,6 +1497,7 @@ namespace hpx { namespace components { namespace server
             // make sure startup/shutdown registration is called once for each
             // module, same for plugins
             if (startup_handled.find(component) == startup_handled.end()) {
+                error_code ec(lightweight);
                 startup_handled.insert(component);
                 load_commandline_options_static(component, options, ec);
                 if (ec) ec = error_code(lightweight);
@@ -1906,7 +1927,6 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            error_code ec(lightweight);
             if (nullptr == component_ini ||
                 "0" == component_ini->get_entry("no_factory", "0"))
             {
@@ -1921,6 +1941,7 @@ namespace hpx { namespace components { namespace server
             // make sure startup/shutdown registration is called once for each
             // module, same for plugins
             if (startup_handled.find(d.get_name()) == startup_handled.end()) {
+                error_code ec(lightweight);
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options, ec);
                 if (ec) ec = error_code(lightweight);

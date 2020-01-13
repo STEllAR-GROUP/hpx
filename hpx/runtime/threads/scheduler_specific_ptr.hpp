@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2015 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -12,7 +13,7 @@
 #define HPX_RUNTIME_THREADS_SCHEDULER_TSS_AUG_08_2015_0733PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/coroutines/detail/tss.hpp>
+#include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <memory>

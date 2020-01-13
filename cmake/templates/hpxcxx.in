@@ -2,8 +2,10 @@
 #
 # Copyright (c) 2014 Steven R. Brandt
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 import sys
 import os
 import re
@@ -52,7 +54,9 @@ Usage: hpxcxx -c flags files
 The hpxcxx command requires that you build either
 a component, an application, or that you specify
 the -c flag. If you are building against a debug
-build, you need to specify -g. All other flags
+build, you need to specify -g.
+If release-with-debug-info, specify -rd
+If minsize-release specify -mr. All other flags
 are passed through to the underlying C++ compiler.
 """)
     sys.exit(2)
@@ -93,7 +97,14 @@ while i < len(sys.argv):
     elif sys.argv[i].startswith('-g'):
         pkgconf_suffix = '_debug'
         args += [sys.argv[i]]
+    elif sys.argv[i].startswith('-rd'):
+        pkgconf_suffix = '_relwithdebinfo'
+        args += [sys.argv[i]]
+    elif sys.argv[i].startswith('-mr'):
+        pkgconf_suffix = '_minsizerel'
+        args += [sys.argv[i]]
     else:
+        pkgconf_suffix = '_release'
         args += [sys.argv[i]]
 
     i += 1

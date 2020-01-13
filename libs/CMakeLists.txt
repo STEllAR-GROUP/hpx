@@ -1,5 +1,6 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,29 +11,47 @@ include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
 set(HPX_LIBS
+  affinity
   algorithms
   allocator_support
   assertion
+  basic_execution
+  batch_environments
   cache
+  checkpoint
   collectives
+  compute
+  compute_cuda
   concepts
   concurrency
   config
+  coroutines
   datastructures
+  debugging
   errors
+  execution
   filesystem
   format
+  functional
   hardware
   hashing
   iterator_support
+  local_lcos
   logging
-  parallel_executors
+  memory
+  plugin
   preprocessor
   program_options
+  resiliency
+  resource_partitioner
   segmented_algorithms
+  serialization
+  static_reinit
   statistics
+  synchronization
   testing
   thread_support
+  threadmanager
   timing
   topology
   type_support
@@ -76,10 +95,17 @@ if(HPX_WITH_TESTS)
 endif()
 
 
+hpx_info("")
 hpx_info("Configuring modules:")
 
+# variables needed for modules.cpp
 set(MODULE_FORCE_LINKING_INCLUDES)
 set(MODULE_FORCE_LINKING_CALLS)
+
+# variables needed for config_strings_modules.hpp
+set(CONFIG_STRINGS_MODULES_INCLUDES)
+set(CONFIG_STRINGS_MODULES_ENTRIES)
+
 foreach(lib ${HPX_LIBS})
   add_subdirectory(${lib})
 
@@ -88,9 +114,23 @@ foreach(lib ${HPX_LIBS})
 
   set(MODULE_FORCE_LINKING_CALLS
     "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")
+
+  set(CONFIG_STRINGS_MODULES_INCLUDES
+    "${CONFIG_STRINGS_MODULES_INCLUDES}#include <hpx/${lib}/config/config_strings.hpp>\n")
+  set(CONFIG_STRINGS_MODULES_ENTRIES
+    "${CONFIG_STRINGS_MODULES_ENTRIES}\n        { \"${lib}\", ${lib}::config_strings },")
 endforeach()
 
 configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
-    "${CMAKE_BINARY_DIR}/libs/modules.cpp"
+    "${PROJECT_BINARY_DIR}/libs/modules.cpp"
     @ONLY)
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
+  "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
+  @ONLY)
+configure_file(
+  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
+  @ONLY)

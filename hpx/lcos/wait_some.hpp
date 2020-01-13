@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -184,7 +185,7 @@ namespace hpx
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/util/deferred_call.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 
@@ -233,11 +234,10 @@ namespace hpx { namespace lcos
                     // execute_deferred might have made the future ready
                     if (!shared_state->is_ready())
                     {
-                        shared_state->set_on_completed(
-                            util::deferred_call(
-                                &wait_some<Sequence>::on_future_ready,
-                                wait_.shared_from_this(),
-                                threads::get_self_id()));
+                        shared_state->set_on_completed(util::deferred_call(
+                            &wait_some<Sequence>::on_future_ready,
+                            wait_.shared_from_this(),
+                            hpx::basic_execution::this_thread::agent()));
                         return;
                     }
                 }
@@ -296,13 +296,13 @@ namespace hpx { namespace lcos
         struct wait_some : std::enable_shared_from_this<wait_some<Sequence> > //-V690
         {
         public:
-            void on_future_ready(threads::thread_id_type const& id)
+            void on_future_ready(hpx::basic_execution::agent_ref ctx)
             {
                 if (count_.fetch_add(1) + 1 == needed_count_)
                 {
                     // reactivate waiting thread only if it's not us
-                    if (id != threads::get_self_id())
-                        threads::set_thread_state(id, threads::pending);
+                    if (ctx != hpx::basic_execution::this_thread::agent())
+                        ctx.resume();
                     else
                         goal_reached_on_calling_thread_ = true;
                 }
@@ -334,7 +334,7 @@ namespace hpx { namespace lcos
                 if (!goal_reached_on_calling_thread_)
                 {
                     // wait for any of the futures to return to become ready
-                    this_thread::suspend(threads::suspended,
+                    hpx::basic_execution::this_thread::suspend(
                         "hpx::detail::wait_some::operator()");
                 }
 

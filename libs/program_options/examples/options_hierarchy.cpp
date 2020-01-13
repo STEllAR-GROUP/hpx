@@ -1,4 +1,5 @@
 // Copyright Thomas Kent 2016
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,8 +25,8 @@
 #include <hpx/program_options.hpp>
 
 #include <algorithm>
-#include <functional>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -140,6 +141,7 @@ private:
 
     void SetCommandLineOptions()
     {
+        // clang-format off
         command_line_options.add_options()
             ("help,h", "display this help message")
             ("version,v", "show program version")
@@ -151,6 +153,7 @@ private:
             ("master-file", po::value<std::string>())
             ("file", po::value<std::vector<std::string>>())
             ;
+        // clang-format on
 
         positional_options.add("master-file", 1);
         positional_options.add("file", -1);
@@ -158,6 +161,7 @@ private:
 
     void SetCommonOptions()
     {
+        // clang-format off
         common_options.add_options()
             ("path", po::value<std::string>()->default_value(""),
                 "the execution path to use (imports from environment if not "
@@ -168,10 +172,12 @@ private:
                 "paths to search for include files")
             ("run-gui", po::bool_switch(), "start the GUI")
             ;
+        // clang-format on
     }
 
     void SetConfigOnlyOptions()
     {
+        // clang-format off
         config_only_options.add_options()
             ("log-dir", po::value<std::string>()->default_value("log"))
             ("gui.height", po::value<unsigned int>()->default_value(100))
@@ -179,13 +185,13 @@ private:
             ("network.ip", po::value<std::string>()->default_value("127.0.0.1"))
             ("network.port", po::value<unsigned short>()->default_value(12345))
             ;
+        // clang-format on
 
         // Run a parser here (with no command line options) to add these defaults into
         // results, this way they will be enabled even if no config files are parsed.
         char const* argv[] = {"options_hierarchy", nullptr};
-        store(po::command_line_parser(1, argv)
-                  .options(config_only_options)
-                  .run(),
+        store(
+            po::command_line_parser(1, argv).options(config_only_options).run(),
             results);
         notify(results);
     }
@@ -247,8 +253,8 @@ private:
     void ParseEnvironment()
     {
         store(po::parse_environment(common_options,
-            std::bind(&OptionsHeirarchy::EnvironmentMapper, this,
-                std::placeholders::_1)),
+                  std::bind(&OptionsHeirarchy::EnvironmentMapper, this,
+                      std::placeholders::_1)),
             results);
         notify(results);
     }
@@ -272,7 +278,7 @@ private:
         if (results.count("config"))
         {
             auto files = results["config"].as<std::vector<std::string>>();
-            for (auto & file : files)
+            for (auto& file : files)
             {
                 LoadAConfigFile(file);
             }
@@ -323,7 +329,7 @@ void PrintOptions(OptionsHeirarchy options)
     std::cout << "Verbosity: " << options.Verbosity() << std::endl;
     std::cout << "Include Path:\n";
     auto includePaths = options.IncludePath();
-    for (auto & includePath : includePaths)
+    for (auto& includePath : includePaths)
     {
         std::cout << "   " << includePath << std::endl;
     }
@@ -331,7 +337,7 @@ void PrintOptions(OptionsHeirarchy options)
     std::cout << "Master-File: " << options.MasterFile() << std::endl;
     std::cout << "Additional Files:\n";
     auto files = options.Files();
-    for (auto & file : files)
+    for (auto& file : files)
     {
         std::cout << "   " << file << std::endl;
     }

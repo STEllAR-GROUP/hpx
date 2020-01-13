@@ -1,5 +1,6 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -17,11 +18,3 @@ foreach(type ${binary_filter_plugins})
   add_subdirectory(${type})
   add_hpx_pseudo_dependencies(plugins.binary_filter plugins.binary_filter.${type})
 endforeach()
-
-macro(add_binary_filter_modules)
-  if(HPX_WITH_NETWORKING)
-    add_bzip2_module()
-    add_snappy_module()
-    add_zlib_module()
-  endif()
-endmacro()

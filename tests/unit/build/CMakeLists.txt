@@ -1,6 +1,7 @@
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2018 Nikunj Gupta
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -37,6 +38,7 @@ function(create_cmake_test name hpx_dir)
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
       "${PROJECT_SOURCE_DIR}/examples/hello_world_component"
       -DHPX_DIR=${hpx_dir}
+      -DBOOST_ROOT=${BOOST_ROOT}
       ${ADDITIONAL_CMAKE_OPTIONS}
       -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION> VERBATIM)
@@ -83,7 +85,8 @@ function(create_pkgconfig_test name hpx_dir)
       CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       PKG_CONFIG=${PKG_CONFIG_EXECUTABLE}
       BUILD_TYPE=$<CONFIGURATION> VERBATIM)
-  add_dependencies(${name}.make_compile ${name}.make_build_dir hpx iostreams_component)
+  add_dependencies(${name}.make_compile ${name}.make_build_dir hpx_wrap
+    iostreams_component)
   if(NOT HPX_WITH_STATIC_LINKING)
     add_dependencies(${name}.make_compile hpx_init)
   endif()
@@ -98,22 +101,24 @@ endfunction()
 
 create_cmake_test(
   cmake_build_dir_test
-  "${CMAKE_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}")
+  "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}")
 
 create_cmake_test(
   cmake_install_dir_test
   "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}"
 )
 
-find_package(PkgConfig)
-if(PKGCONFIG_FOUND AND NOT MSVC)
-  create_pkgconfig_test(
-    pkgconfig_build_dir_test
-    "${CMAKE_BINARY_DIR}/lib/pkgconfig")
+if(NOT MSVC)
+  find_package(PkgConfig)
+  if(PKGCONFIG_FOUND)
+    create_pkgconfig_test(
+      pkgconfig_build_dir_test
+      "${PROJECT_BINARY_DIR}/lib/pkgconfig")
 
-  create_pkgconfig_test(
-    pkgconfig_install_dir_test
-    "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig")
+    create_pkgconfig_test(
+      pkgconfig_install_dir_test
+      "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig")
+  endif()
 endif()
 
 set(tests

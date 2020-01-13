@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,6 +21,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <utility>
 
 #ifdef _WIN32
 #include <stdlib.h>
@@ -42,7 +44,7 @@
 // available on iOS. The right replacement is not known. See
 // https://svn.boost.org/trac/boost/ticket/5053
 extern "C" {
-    extern char*** _NSGetEnviron(void);
+extern char*** _NSGetEnviron(void);
 }
 #define environ (*_NSGetEnviron())
 #else
@@ -168,7 +170,7 @@ namespace hpx { namespace program_options {
             if (!option_name.empty())
             {
                 option n;
-                n.string_key = option_name;
+                n.string_key = std::move(option_name);
                 n.value.push_back(i->second);
                 result.options.push_back(n);
             }

@@ -1,18 +1,20 @@
 # Copyright (c) 2007-2014 Hartmut Kaiser
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 add_hpx_executable(network_storage
+  INTERNAL_FLAGS
   AUTOGLOB
   EXCLUDE_FROM_ALL
   HPX_PREFIX ${HPX_BUILD_PREFIX}
   COMPONENT_DEPENDENCIES iostreams
   FOLDER "Benchmarks/Network/network_storage")
+
+target_include_directories(network_storage PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # add pseudo-target dependencies
 add_hpx_pseudo_target(

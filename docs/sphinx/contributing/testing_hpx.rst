@@ -1,14 +1,15 @@
 ..
-   Copyright (C)      2013 Thomas Heller
+    Copyright (C)      2013 Thomas Heller
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 =============
 Testing |hpx|
 =============
 
-To ensure correctness of |hpx| we ship a large variety of unit and regression
+To ensure correctness of |hpx|, we ship a large variety of unit and regression
 tests. The tests are driven by the |ctest|_ tool and are executed automatically
 by buildbot (see |hpx_buildbot|_) on each commit to the |hpx| |hpx_github|_
 repository. In addition, it is encouraged to run the test suite manually to
@@ -28,10 +29,10 @@ the ``ctest`` command. You can list all available test targets using ``make help
 Issue tracker
 =============
 
-If you stumble over a bug or missing feature missing feature in |hpx| please
-submit an issue to our |hpx_github_issues|_. For more information on how to
-submit support requests or other means of getting in contact with the developers
-please see the |support|_.
+If you stumble over a bug or missing feature in |hpx|, please
+submit an issue to our |hpx_github_issues|_ page. For more information on how to
+submit support requests or other means of getting in contact with the developers,
+please see the |support|_ page.
 
 Continuous testing
 ==================

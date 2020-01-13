@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,14 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -23,9 +26,6 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/util/bind_back.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <exception>
 #include <string>
@@ -76,14 +76,14 @@ namespace hpx { namespace traits
         {
             template <typename SharedState>
             HPX_FORCEINLINE static Derived
-            create(boost::intrusive_ptr<SharedState> const& shared_state)
+            create(hpx::intrusive_ptr<SharedState> const& shared_state)
             {
                 return Derived(future<id_type>(shared_state));
             }
 
             template <typename SharedState>
             HPX_FORCEINLINE static Derived
-            create(boost::intrusive_ptr<SharedState> && shared_state)
+            create(hpx::intrusive_ptr<SharedState> && shared_state)
             {
                 return Derived(future<id_type>(std::move(shared_state)));
             }
@@ -93,7 +93,7 @@ namespace hpx { namespace traits
             create(SharedState* shared_state, bool addref = true)
             {
                 return Derived(future<id_type>(
-                    boost::intrusive_ptr<SharedState>(shared_state, addref)));
+                    hpx::intrusive_ptr<SharedState>(shared_state, addref)));
             }
 
             HPX_FORCEINLINE static
@@ -255,11 +255,11 @@ namespace hpx { namespace components
 
         typedef shared_future<id_type> future_type;
 
-        client_base(boost::intrusive_ptr<shared_state_type> const& state)
+        client_base(hpx::intrusive_ptr<shared_state_type> const& state)
           : shared_state_(state)
         {}
 
-        client_base(boost::intrusive_ptr<shared_state_type> && state)
+        client_base(hpx::intrusive_ptr<shared_state_type> && state)
           : shared_state_(std::move(state))
         {}
 
@@ -605,7 +605,7 @@ namespace hpx { namespace components
 
     protected:
         // shared state holding the id_type this client refers to
-        boost::intrusive_ptr<shared_state_type> shared_state_;
+        hpx::intrusive_ptr<shared_state_type> shared_state_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

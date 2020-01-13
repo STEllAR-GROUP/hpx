@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,11 +9,11 @@
 #include <hpx/performance_counters/counters.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/collectives.hpp>
 #include <hpx/concurrency/thread_name.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/barrier.hpp>
-#include <hpx/lcos/latch.hpp>
+#include <hpx/functional/bind.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -20,17 +21,17 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/threads/coroutines/detail/context_impl.hpp>
+#include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/runtime/threads/scoped_background_timer.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
-#include <hpx/util/apex.hpp>
-#include <hpx/util/bind.hpp>
+#include <hpx/util/external_timer.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/yield_while.hpp>
@@ -111,11 +112,13 @@ namespace hpx
         {
             bool result = false;
 
+#if defined(HPX_HAVE_NETWORKING)
             if (hpx::parcelset::do_background_work(
                     num_thread, parcelset::parcelport_background_mode_all))
             {
                 result = true;
             }
+#endif
 
             if (0 == num_thread)
                 hpx::agas::garbage_collect_non_blocking();
@@ -223,15 +226,24 @@ namespace hpx
             &detail::network_background_callback
 #endif
             ))
+#if defined(HPX_HAVE_NETWORKING)
       , parcel_handler_notifier_(
             runtime_impl::get_notification_policy("parcel-thread"))
       , parcel_handler_(rtcfg, thread_manager_.get(), parcel_handler_notifier_)
       , agas_client_(ini_, rtcfg.mode_)
       , applier_(parcel_handler_, *thread_manager_)
+#else
+      , agas_client_(ini_, rtcfg.mode_)
+      , applier_(*thread_manager_)
+#endif
     {
         LPROGRESS_;
 
+#if defined(HPX_HAVE_NETWORKING)
         agas_client_.bootstrap(parcel_handler_, ini_);
+#else
+        agas_client_.bootstrap(ini_);
+#endif
 
         components::server::get_error_dispatcher().
             set_error_sink(&runtime_impl::default_errorsink);
@@ -243,11 +255,15 @@ namespace hpx
         thread_manager_->init();
 
         // now, launch AGAS and register all nodes, launch all other components
+#if defined(HPX_HAVE_NETWORKING)
         agas_client_.initialize(
             parcel_handler_, std::uint64_t(runtime_support_.get()),
             std::uint64_t(memory_.get()));
-
         parcel_handler_.initialize(agas_client_, &applier_);
+#else
+        agas_client_.initialize(
+            std::uint64_t(runtime_support_.get()), std::uint64_t(memory_.get()));
+#endif
 
         applier_.initialize(std::uint64_t(runtime_support_.get()),
             std::uint64_t(memory_.get()));
@@ -289,7 +305,9 @@ namespace hpx
         runtime_support_->delete_function_lists();
 
         // stop all services
+#if defined(HPX_HAVE_NETWORKING)
         parcel_handler_.stop();     // stops parcel pools as well
+#endif
         thread_manager_->stop();    // stops timer_pool_ as well
 #ifdef HPX_HAVE_IO_POOL
         io_pool_.stop();
@@ -326,7 +344,9 @@ namespace hpx
         lbt_ << "(4th stage) runtime_impl::run_helper: bootstrap complete";
         set_state(state_running);
 
+#if defined(HPX_HAVE_NETWORKING)
         parcel_handler_.enable_alternative_parcelports();
+#endif
 
         // reset all counters right before running main, if requested
         if (get_config_entry("hpx.print_counter.startup", "0") == "1")
@@ -385,11 +405,20 @@ namespace hpx
         // {{{ early startup code - local
 
         // initialize instrumentation system
-        util::apex_init();
+#ifdef HPX_HAVE_APEX
+        util::external_timer::init(nullptr, hpx::get_locality_id(),
+                hpx::get_initial_num_localities());
+#endif
+
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
         lbt_ << "(1st stage) runtime_impl::start: booting locality " << here();
+
+        // Register this thread with the runtime system to allow calling
+        // certain HPX functionality from the main thread. Also calls
+        // registered startup callbacks.
+        init_tss("main-thread", 0, 0, "", "", false);
 
         // start runtime_support services
         runtime_support_->run();
@@ -407,8 +436,10 @@ namespace hpx
         lbt_ << "(1st stage) runtime_impl::start: started threadmanager";
         // }}}
 
+#if defined(HPX_HAVE_NETWORKING)
         // invoke the AGAS v2 notifications
         agas::get_big_boot_barrier().trigger();
+#endif
 
         // {{{ launch main
         // register the given main function with the thread manager
@@ -430,11 +461,18 @@ namespace hpx
 
         // block if required
         if (blocking)
+        {
             return wait();     // wait for the shutdown_action to be executed
-
-        // Register this thread with the runtime system to allow calling certain
-        // HPX functionality from the main thread.
-        init_tss("main-thread", 0, 0, "", "", false);
+        }
+        else
+        {
+            // wait for at least state_running
+            util::yield_while(
+                [this]()
+                {
+                    return get_state() < state_running;
+                }, "runtime_impl::start");
+        }
 
         return 0;   // return zero as we don't know the outcome of hpx_main yet
     }
@@ -486,7 +524,7 @@ namespace hpx
 
 #if defined(HPX_HAVE_APEX)
         // not registering helper threads - for now
-        //apex::register_thread(thread_name.c_str());
+        //util::external_timer::register_thread(thread_name.c_str());
 #endif
 
         // wait for termination
@@ -513,7 +551,7 @@ namespace hpx
         // wait for the thread to run
         {
             std::unique_lock<std::mutex> lk(mtx);
-            while (!running)
+            while (!running)    // -V776 // -V1044
                 cond.wait(lk);
         }
 
@@ -571,7 +609,9 @@ namespace hpx
         }
 
         // stop the rest of the system
+#if defined(HPX_HAVE_NETWORKING)
         parcel_handler_.stop(blocking);     // stops parcel pools as well
+#endif
 #ifdef HPX_HAVE_TIMER_POOL
         LTM_(info) << "stop: stopping timer pool";
         timer_pool_.stop();    // stop timer pool as well
@@ -585,6 +625,9 @@ namespace hpx
         io_pool_.stop();                    // stops io_pool_ as well
 #endif
 //         deinit_tss();
+#ifdef HPX_HAVE_APEX
+        util::external_timer::finalize();
+#endif
     }
 
     // Second step in termination: shut down all services.
@@ -776,7 +819,9 @@ namespace hpx
         wait();
         stop();
 
+#if defined(HPX_HAVE_NETWORKING)
         parcel_handler_.stop();      // stops parcelport for sure
+#endif
 
         rethrow_exception();
         return result_;
@@ -792,7 +837,9 @@ namespace hpx
         int result = wait();
         stop();
 
+#if defined(HPX_HAVE_NETWORKING)
         parcel_handler_.stop();      // stops parcelport for sure
+#endif
 
         rethrow_exception();
         return result;
@@ -878,7 +925,7 @@ namespace hpx
 
 #if defined(HPX_HAVE_APEX)
         if (std::strstr(name, "worker") != nullptr)
-            apex::register_thread(name);
+            util::external_timer::register_thread(name);
 #endif
 
         // call thread-specific user-supplied on_start handler
@@ -900,8 +947,6 @@ namespace hpx
             // --hpx:bind=none  should disable all affinity definitions
             if (threads::any(used_processing_units))
             {
-                error_code ec;
-
                 this->topology_.set_thread_affinity_mask(
                     this->topology_.get_service_affinity_mask(
                         used_processing_units), ec);
@@ -979,8 +1024,10 @@ namespace hpx
         if (0 == std::strncmp(name, "io", 2))
             return &io_pool_;
 #endif
+#if defined(HPX_HAVE_NETWORKING)
         if (0 == std::strncmp(name, "parcel", 6))
             return parcel_handler_.get_thread_pool(name);
+#endif
 #ifdef HPX_HAVE_TIMER_POOL
         if (0 == std::strncmp(name, "timer", 5))
             return &timer_pool_;

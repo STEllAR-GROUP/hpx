@@ -1,9 +1,10 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 set(algorithms_headers
   hpx/parallel/algorithm.hpp
@@ -123,11 +124,24 @@ set(algorithms_headers
 
 include(HPX_AddModule)
 add_hpx_module(algorithms
-    FORCE_LINKING_GEN
-    HEADERS ${algorithms_headers}
-    # TODO: Really depends on main HPX library, but cannot add that as a
-    # dependency yet. Need to have the parts that algorithms depends on in
-    # separate modules first.
-    DEPENDENCIES hpx_assertion hpx_config hpx_iterator_support hpx_timing
-    CMAKE_SUBDIRS examples tests
+  FORCE_LINKING_GEN
+  HEADERS ${algorithms_headers}
+  # TODO: Really depends on main HPX library, but cannot add that as a
+  # dependency yet. Need to have the parts that algorithms depends on in
+  # separate modules first.
+  DEPENDENCIES
+    hpx_assertion
+    hpx_concepts
+    hpx_concurrency
+    hpx_config
+    hpx_datastructures
+    hpx_execution
+    hpx_iterator_support
+    hpx_functional
+    hpx_statistics
+    hpx_synchronization
+    hpx_timing
+    hpx_type_support
+  CMAKE_SUBDIRS examples tests
 )
+

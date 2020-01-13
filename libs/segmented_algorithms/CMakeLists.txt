@@ -1,9 +1,10 @@
 # Copyright (c) 2019 The STE||AR-Group
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 
 set(segmented_algorithms_headers
   hpx/parallel/segmented_algorithm.hpp
@@ -31,8 +32,17 @@ set(segmented_algorithms_headers
 
 include(HPX_AddModule)
 add_hpx_module(segmented_algorithms
-    FORCE_LINKING_GEN
-    HEADERS ${segmented_algorithms_headers}
-    DEPENDENCIES hpx_algorithms hpx_assertion hpx_config hpx_parallel_executors
-    CMAKE_SUBDIRS examples tests
+  FORCE_LINKING_GEN
+  HEADERS ${segmented_algorithms_headers}
+  DEPENDENCIES
+    hpx_algorithms
+    hpx_assertion
+    hpx_config
+    hpx_datastructures
+    hpx_execution
+    hpx_functional
+    hpx_iterator_support
+    hpx_serialization
+    hpx_type_support
+  CMAKE_SUBDIRS examples tests
 )

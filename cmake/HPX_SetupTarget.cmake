@@ -2,16 +2,19 @@
 # Copyright (c) 2007-2018 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
+# SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 cmake_policy(PUSH)
 
 hpx_set_cmake_policy(CMP0054 NEW)
+hpx_set_cmake_policy(CMP0060 NEW)
 
 function(hpx_setup_target target)
   # retrieve arguments
-  set(options EXPORT NOHPX_INIT INSTALL INSTALL_HEADERS NOLIBS PLUGIN NONAMEPREFIX NOTLLKEYWORD)
+  set(options EXPORT NOHPX_INIT INSTALL INSTALL_HEADERS INTERNAL_FLAGS NOLIBS PLUGIN
+    NONAMEPREFIX NOTLLKEYWORD)
   set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX HEADER_ROOT)
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
   cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
@@ -195,14 +198,9 @@ function(hpx_setup_target target)
   endif()
 
   if(NOT target_NOLIBS)
-    if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${_type}" STREQUAL "EXECUTABLE"))
-      if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-        set(hpx_libs hpx_wrap)
-        set_target_properties(${target} PROPERTIES LINK_FLAGS "-Wl,-wrap=main")
-      elseif(APPLE)
-        set(hpx_libs hpx_wrap)
-        set_target_properties(${target} PROPERTIES LINK_FLAGS "-Wl,-e,_initialize_main")
-      endif()
+    if(HPX_WITH_DYNAMIC_HPX_MAIN AND ("${_type}" STREQUAL "EXECUTABLE") AND
+       (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+      set(hpx_libs hpx_wrap)
     endif()
     set(hpx_libs ${hpx_libs} hpx)
     if(NOT target_STATIC_LINKING)
@@ -216,16 +214,13 @@ function(hpx_setup_target target)
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
       set(hpx_libs ${hpx_libs} imf svml irng intlc)
     endif()
-    if(DEFINED HPX_LIBRARIES)
-      set(hpx_libs ${hpx_libs} ${HPX_LIBRARIES})
-    endif()
   else()
     target_compile_options(${target} ${__tll_public} ${CXX_FLAG})
   endif()
 
   target_link_libraries(${target} ${__tll_public} ${hpx_libs} ${target_DEPENDENCIES})
 
-  if(TARGET hpx_internal_flags)
+  if(target_INTERNAL_FLAGS AND TARGET hpx_internal_flags)
     target_link_libraries(${target} ${__tll_private} hpx_internal_flags)
   endif()
 

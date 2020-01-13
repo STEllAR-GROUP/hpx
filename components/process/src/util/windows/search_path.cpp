@@ -5,6 +5,7 @@
 // Copyright (c) 2011, 2012 Jeff Flinn, Boris Schaeling
 // Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -15,7 +16,6 @@
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 
-#include <boost/system/error_code.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <shellapi.h>
@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace process { namespace windows
             {
                 filesystem::path p2 = p;
                 p2 += *it2;
-                boost::system::error_code ec;
+                filesystem::error_code ec;
                 bool file = filesystem::is_regular_file(p2, ec);
                 if (!ec && file &&
                     SHGetFileInfoW(p2.c_str(), 0, 0, 0, SHGFI_EXETYPE))
@@ -86,19 +86,20 @@ namespace hpx { namespace components { namespace process { namespace windows
         tokenizer tok(path, sep);
         for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
         {
-            boost::filesystem::path p = *it;
+            filesystem::path p = *it;
             p /= filename;
             std::array<std::string, 4> extensions = //-V112
                 {{ "", ".exe", ".com", ".bat" }};
             for (std::array<std::string, 4>::iterator it2 = extensions.begin();
                 it2 != extensions.end(); ++it2)
             {
-                boost::filesystem::path p2 = p;
+                filesystem::path p2 = p;
                 p2 += *it2;
-                boost::system::error_code ec;
-                bool file = boost::filesystem::is_regular_file(p2, ec);
+                filesystem::error_code ec;
+                bool file = filesystem::is_regular_file(p2, ec);
                 if (!ec && file &&
-                    SHGetFileInfoA(p2.string().c_str(), 0, 0, 0, SHGFI_EXETYPE)) //-V575
+                    SHGetFileInfoA(p2.string().c_str(), 0, nullptr, 0,
+                        SHGFI_EXETYPE))    //-V575
                 {
                     return p2.string();
                 }

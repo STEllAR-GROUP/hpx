@@ -1,6 +1,7 @@
 ..
     Copyright (c) 2018 The STE||AR-Group
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -22,3 +23,6 @@ needs to customize this, it needs to do so before calling
 :cpp:func:`hpx::hpx_init`, :cpp:func:`hpx::hpx_main` or using the C-main
 wrappers.
 
+
+See the :ref:`API reference <libs_assertion_api>` of the module for more
+details.

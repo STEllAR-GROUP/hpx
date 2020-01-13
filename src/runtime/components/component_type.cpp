@@ -1,18 +1,19 @@
 //  Copyright (c) 2007-2019 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/reinitializable_static.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/functional/unique_function.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -187,10 +188,10 @@ namespace hpx { namespace components
         {
             component_type type = component_invalid;
             naming::resolver_client& agas_client = hpx::naming::get_agas_client();
-            naming::gid_type locality = agas_client.get_local_locality();
 
             if (enabled)
             {
+                naming::gid_type locality = agas_client.get_local_locality();
                 type = agas_client.register_factory(locality, name);
                 if (component_invalid == type) {
                     HPX_THROW_EXCEPTION(duplicate_component_id,
@@ -199,7 +200,8 @@ namespace hpx { namespace components
                         " is already in use");
                 }
             }
-            else {
+            else
+            {
                 type = agas_client.get_component_id(name);
             }
 

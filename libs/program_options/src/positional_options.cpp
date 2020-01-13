@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +10,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/program_options/positional_options.hpp>
 
+#include <cstddef>
 #include <limits>
 #include <string>
 
@@ -25,7 +27,8 @@ namespace hpx { namespace program_options {
             m_trailing = name;
         else
         {
-            m_names.resize(m_names.size() + max_count, name);
+            m_names.resize(
+                m_names.size() + static_cast<std::size_t>(max_count), name);
         }
         return *this;
     }
@@ -41,10 +44,10 @@ namespace hpx { namespace program_options {
     {
         HPX_ASSERT(position < max_total_count());
 
-        if (position < m_names.size())
-            return m_names[position];
-        else
-            return m_trailing;
+        if (static_cast<std::size_t>(position) < m_names.size())
+            return m_names[static_cast<std::size_t>(position)];
+
+        return m_trailing;
     }
 
 }}    // namespace hpx::program_options

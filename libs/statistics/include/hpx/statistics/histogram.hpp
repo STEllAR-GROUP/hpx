@@ -1,5 +1,6 @@
 //  Copyright (c) 2016 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -90,8 +91,8 @@ namespace hpx { namespace util {
                     // determine bin positions (their lower bounds)
                     for (std::size_t i = 0; i < this->num_bins_ + 2; ++i)
                     {
-                        this->bin_positions_[i] =
-                            minimum_ + (i - 1.0) * bin_size_;
+                        this->bin_positions_[i] = minimum_ +
+                            (static_cast<double>(i) - 1.0) * bin_size_;
                     }
                 }
 #if defined(HPX_MSVC_WARNING_PRAGMA)

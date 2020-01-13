@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -66,20 +67,19 @@ namespace hpx
 #else // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/type_support/unused.hpp>
-
-#include <boost/intrusive_ptr.hpp>
 
 #include <array>
 #include <cstddef>
@@ -129,7 +129,7 @@ namespace hpx { namespace lcos
                 // Bind an on_completed handler to this future which will wait
                 // for the future and will transfer its result to the new
                 // future.
-                boost::intrusive_ptr<split_nth_continuation> this_(this);
+                hpx::intrusive_ptr<split_nth_continuation> this_(this);
                 shared_state_ptr const& state =
                     hpx::traits::detail::get_shared_state(future);
 
@@ -265,7 +265,7 @@ namespace hpx { namespace lcos
                 // Bind an on_completed handler to this future which will wait
                 // for the future and will transfer its result to the new
                 // future.
-                boost::intrusive_ptr<split_continuation> this_(this);
+                hpx::intrusive_ptr<split_continuation> this_(this);
                 shared_state_ptr const& state =
                     hpx::traits::detail::get_shared_state(future);
 

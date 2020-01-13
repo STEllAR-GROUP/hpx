@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Anton Bikineev
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -11,10 +12,10 @@
 
 #include <type_traits>
 
-// This macro creates a boolean unary metafunction which result is
-// true if and only if its parameter type has member function with
-// MEMBER name (no matter static it is or not). The generated trait
-// ends up in a namespace where the macro itself has been placed.
+/// This macro creates a boolean unary metafunction which result is
+/// true if and only if its parameter type has member function with
+/// MEMBER name (no matter static it is or not). The generated trait
+/// ends up in a namespace where the macro itself has been placed.
 #define HPX_HAS_MEMBER_XXX_TRAIT_DEF(MEMBER)                                   \
     namespace HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _detail)                    \
     {                                                                          \

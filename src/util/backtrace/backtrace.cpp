@@ -3,6 +3,7 @@
 //  Copyright (c) 2011-2012 Hartmut Kaiser
 //  Copyright (c) 2010 Artyom Beilis (Tonkikh)
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -19,7 +20,7 @@
 #include <boost/config.hpp>
 
 #include <hpx/util/backtrace/backtrace.hpp>
-#include <hpx/util/bind_front.hpp>
+#include <hpx/functional/bind_front.hpp>
 
 #if (defined(__linux) || defined(__APPLE__) || defined(__sun)) \
      && (!defined(__ANDROID__) || !defined(ANDROID))
@@ -413,7 +414,7 @@ namespace hpx { namespace util {
             stack_trace::get_symbols, &frames_.front(), frames_.size()));
 
         error_code ec(lightweight);
-        threads::thread_id_type tid = p.apply(
+        threads::thread_id_type tid = p.apply("backtrace",
             launch::fork, threads::thread_priority_default,
             threads::thread_stacksize_medium,
             threads::thread_schedule_hint(),

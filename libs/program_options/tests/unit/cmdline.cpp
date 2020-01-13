@@ -1,10 +1,12 @@
-// Copyright Vladimir Prus 2002-2004.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright Vladimir Prus 2002-2004.
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>
 
 #include <hpx/program_options/cmdline.hpp>
@@ -404,13 +406,24 @@ pair<string, string> at_option_parser_broken(string const& s)
 void test_additional_parser()
 {
     options_description desc;
-    desc.add_options()("response-file", value<string>(), "response file")(
-        "foo", value<int>(), "foo")("bar,baz", value<int>(), "bar");
+    // clang-format off
+    desc.add_options()
+        ("response-file", value<string>(), "response file")
+        ("foo", value<int>(), "foo");
+    // clang-format on
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    desc.add_options()("bar,baz", value<int>(), "bar");
+#endif
 
     vector<string> input;
     input.emplace_back("@config");
     input.emplace_back("--foo=1");
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     input.emplace_back("--baz=11");
+#endif
 
     cmdline cmd(input);
     cmd.set_options_description(desc);
@@ -418,13 +431,23 @@ void test_additional_parser()
 
     vector<option> result = cmd.run();
 
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     HPX_TEST(result.size() == 3);
+#else
+    HPX_TEST(result.size() == 2);
+#endif
     HPX_TEST_EQ(result[0].string_key, "response-file");
     HPX_TEST_EQ(result[0].value[0], "config");
     HPX_TEST_EQ(result[1].string_key, "foo");
     HPX_TEST_EQ(result[1].value[0], "1");
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106800)
+    // the long_names() API function was introduced in Boost V1.68
     HPX_TEST_EQ(result[2].string_key, "bar");
     HPX_TEST_EQ(result[2].value[0], "11");
+#endif
 
     // Test that invalid options returned by additional style
     // parser are detected.
@@ -437,7 +460,7 @@ void test_additional_parser()
     {
         cmd2.run();
     }
-    catch(unknown_option const&)
+    catch (unknown_option const&)
     {
         caught_exception = true;
     }
@@ -560,8 +583,11 @@ void test_implicit_value()
     style = cmdline::style_t(allow_long | long_allow_adjacent);
 
     test_case test_cases1[] = {
+#if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY) ||  \
+    (defined(BOOST_VERSION) && BOOST_VERSION >= 106500)
         // 'bar' does not even look like option, so is consumed
         {"--foo bar", s_success, "foo:bar"},
+#endif
         // '--bar' looks like option, and such option exists, so we don't
         // consume this token
         {"--foo --bar", s_success, "foo: bar:"},
@@ -573,7 +599,9 @@ void test_implicit_value()
         //     options
         // For --biz, an exception is thrown between 1 and 2.
         // We might want to fix that in future.
-        {"--foo --biz", s_unknown_option, ""}, {nullptr, 0, nullptr}};
+        {"--foo --biz", s_unknown_option, ""},
+        {nullptr, 0, nullptr}
+    };
 
     test_cmdline("foo? bar?", style, test_cases1);
 }

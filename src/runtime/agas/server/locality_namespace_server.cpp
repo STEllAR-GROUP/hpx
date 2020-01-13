@@ -3,6 +3,7 @@
 //  Copyright (c) 2012-2017 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -10,6 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -19,10 +22,8 @@
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/serialization/vector.hpp>
 #include <hpx/timing/scoped_timer.hpp>
-#include <hpx/util/bind_back.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 
@@ -268,7 +269,7 @@ std::uint32_t locality_namespace::allocate(
 } // }}}
 
 parcelset::endpoints_type locality_namespace::resolve_locality(
-    naming::gid_type locality)
+    naming::gid_type const& locality)
 { // {{{ resolve_locality implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.resolve_locality_.time_,
@@ -290,7 +291,7 @@ parcelset::endpoints_type locality_namespace::resolve_locality(
     return parcelset::endpoints_type();
 } // }}}
 
-void locality_namespace::free(naming::gid_type locality)
+void locality_namespace::free(naming::gid_type const& locality)
 { // {{{ free implementation
     util::scoped_timer<std::atomic<std::int64_t> > update(
         counter_data_.free_.time_,
@@ -449,7 +450,7 @@ std::uint32_t locality_namespace::get_num_overall_threads()
     return num_threads;
 }
 
-naming::gid_type locality_namespace::statistics_counter(std::string name)
+naming::gid_type locality_namespace::statistics_counter(std::string const& name)
 { // {{{ statistics_counter implementation
     LAGAS_(info) << "locality_namespace::statistics_counter";
 

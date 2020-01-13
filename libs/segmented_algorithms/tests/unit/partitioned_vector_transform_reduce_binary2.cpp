@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,9 +8,9 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
-#include <hpx/util/zip_iterator.hpp>
-
+#include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/util/zip_iterator.hpp>
 
 #include <iterator>
 
@@ -41,8 +42,7 @@ T test_transform_reduce_binary(ExPolicy&& policy,
 
 template <typename ExPolicy, typename T>
 hpx::future<T> test_transform_reduce_binary_async(ExPolicy&& policy,
-    hpx::partitioned_vector<T>& xvalues,
-    hpx::partitioned_vector<T>& yvalues)
+    hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& yvalues)
 {
     return hpx::parallel::transform_reduce(policy, xvalues.begin(),
         xvalues.end(), yvalues.begin(), T(1), std::plus<T>(),
@@ -51,8 +51,7 @@ hpx::future<T> test_transform_reduce_binary_async(ExPolicy&& policy,
 
 template <typename T>
 void transform_reduce_binary_tests(std::size_t num,
-    hpx::partitioned_vector<T>& xvalues,
-    hpx::partitioned_vector<T>& yvalues)
+    hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& yvalues)
 {
     HPX_TEST_EQ(test_transform_reduce_binary(
                     hpx::parallel::execution::seq, xvalues, yvalues),

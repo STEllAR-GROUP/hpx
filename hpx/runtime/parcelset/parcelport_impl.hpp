@@ -4,6 +4,7 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -11,8 +12,12 @@
 #define HPX_PARCELSET_PARCELPORT_IMPL_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
@@ -20,13 +25,11 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/bind_front.hpp>
 #include <hpx/util/connection_cache.hpp>
-#include <hpx/util/deferred_call.hpp>
-#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/yield_while.hpp>
 
 #include <boost/predef/other/endian.h>
 
@@ -169,23 +172,17 @@ namespace hpx { namespace parcelset
         void flush_parcels() override
         {
             // We suspend our thread, which will make progress on the network
-            if(threads::get_self_ptr())
-            {
-                hpx::this_thread::suspend(hpx::threads::pending_boost,
-                    "parcelport_impl::flush_parcels");
-            }
+            hpx::basic_execution::this_thread::yield(
+                "parcelport_impl::flush_parcels");
 
             // make sure no more work is pending, wait for service pool to get
             // empty
-
-            while(operations_in_flight_ != 0 || get_pending_parcels_count(false) != 0)
-            {
-                if(threads::get_self_ptr())
-                {
-                    hpx::this_thread::suspend(hpx::threads::pending_boost,
-                        "parcelport_impl::flush_parcels");
-                }
-            }
+            hpx::util::yield_while(
+                [this]() {
+                    return operations_in_flight_ != 0 ||
+                        get_pending_parcels_count(false) != 0;
+                },
+                "parcelport_impl::flush_parcels");
         }
 
         void stop(bool blocking = true) override
@@ -321,7 +318,7 @@ namespace hpx { namespace parcelset
             if (operations_in_flight_ != 0)
             {
                 error_code ec(lightweight);
-                hpx::applier::register_thread_nullary(
+                hpx::threads::register_thread_nullary(
                     util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache,
                         this, loc),
@@ -341,7 +338,7 @@ namespace hpx { namespace parcelset
         {
             error_code ec(lightweight);
             threads::thread_id_type id =
-                hpx::applier::register_thread_nullary(
+                hpx::threads::register_thread_nullary(
                     util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache_delayed,
                         this, loc),
@@ -534,7 +531,7 @@ namespace hpx { namespace parcelset
                     this_.archive_flags_,
                     this_.get_max_outbound_message_size());
 
-                typedef detail::call_for_each handler_type;
+                using handler_type = detail::call_for_each;
 
                 if (sender->parcelport_->async_write(
                     handler_type(
@@ -618,7 +615,7 @@ namespace hpx { namespace parcelset
         void enqueue_parcel(locality const& locality_id,
             parcel&& p, write_handler_type&& f)
         {
-            typedef pending_parcels_map::mapped_type mapped_type;
+            using mapped_type = pending_parcels_map::mapped_type;
 
             std::unique_lock<lcos::local::spinlock> l(mtx_);
             // We ignore the lock here. It might happen that while enqueuing,
@@ -640,7 +637,7 @@ namespace hpx { namespace parcelset
             std::vector<parcel>&& parcels,
             std::vector<write_handler_type>&& handlers)
         {
-            typedef pending_parcels_map::mapped_type mapped_type;
+            using mapped_type = pending_parcels_map::mapped_type;
 
             std::unique_lock<lcos::local::spinlock> l(mtx_);
             // We ignore the lock here. It might happen that while enqueuing,
@@ -680,7 +677,7 @@ namespace hpx { namespace parcelset
             std::vector<parcel>& parcels,
             std::vector<write_handler_type>& handlers)
         {
-            typedef pending_parcels_map::iterator iterator;
+            using iterator = pending_parcels_map::iterator;
 
             {
                 std::unique_lock<lcos::local::spinlock> l(mtx_, std::try_to_lock);
@@ -834,8 +831,7 @@ namespace hpx { namespace parcelset
             // We yield here for a short amount of time to give another
             // HPX thread the chance to put a subsequent parcel which
             // leads to a more effective parcel buffering
-//                 if (hpx::threads::get_self_ptr())
-//                     hpx::this_thread::yield();
+            //             hpx::basic_execution::this_thread::yield();
         }
 
 
@@ -939,12 +935,7 @@ namespace hpx { namespace parcelset
                     std::move(handlers));
             }
 
-            if(threads::get_self_ptr())
-            {
-                // We suspend our thread, which will make progress on the network
-                hpx::this_thread::suspend(hpx::threads::pending_boost,
-                    "parcelport_impl::send_pending_parcels");
-            }
+            hpx::basic_execution::this_thread::yield();
         }
 
     public:
@@ -960,7 +951,7 @@ namespace hpx { namespace parcelset
         /// The connection cache for sending connections
         util::connection_cache<connection, locality> connection_cache_;
 
-        typedef hpx::lcos::local::spinlock mutex_type;
+        using mutex_type = hpx::lcos::local::spinlock;
 
         int archive_flags_;
         hpx::util::atomic_count operations_in_flight_;
@@ -970,4 +961,5 @@ namespace hpx { namespace parcelset
     };
 }}
 
+#endif
 #endif

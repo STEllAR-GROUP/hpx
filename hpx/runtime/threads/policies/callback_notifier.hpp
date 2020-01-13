@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -7,7 +8,7 @@
 #define HPX_THREADMANAGER_POLICIES_CALLBACK_NOTIFIER_JUN_18_2009_1132AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/functional/function.hpp>
 
 #include <cstddef>
 #include <deque>

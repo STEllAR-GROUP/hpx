@@ -1,6 +1,7 @@
 //  Copyright (c) 2005-2017 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -8,6 +9,8 @@
 
 // TODO: move parcel ports into plugins
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -15,8 +18,6 @@
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/concurrency/register_locks.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/version.hpp>
@@ -33,6 +34,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <limits>
 #include <map>
 #include <memory>
 #include <set>
@@ -176,7 +178,8 @@ namespace hpx { namespace util
             "${HPX_SPINLOCK_DEADLOCK_DETECTION:0}",
 #endif
             "spinlock_deadlock_detection_limit = "
-            "${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:1000000}",
+            "${HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)) "}",
 #endif
             "expect_connecting_localities = "
             "${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
@@ -257,31 +260,28 @@ namespace hpx { namespace util
 #endif
 
             "[hpx.thread_queue]",
-            "max_count = ${HPX_THREAD_QUEUE_MAX_THREAD_COUNT:" HPX_PP_STRINGIZE(
+            "max_thread_count = ${HPX_THREAD_QUEUE_MAX_THREAD_COUNT:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
             "min_tasks_to_steal_pending = "
             "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:" HPX_PP_STRINGIZE(
-                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
-            "max_tasks_to_steal_pending = "
-            "${HPX_THREAD_QUEUE_MAX_TASKS_TO_STEAL_PENDING:" HPX_PP_STRINGIZE(
-                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
-            "min_tasks_to_steal_pending = "
-            "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:" HPX_PP_STRINGIZE(
-                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING)) "}",
             "min_tasks_to_steal_staged = "
             "${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:" HPX_PP_STRINGIZE(
-                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED)) "}",
             "min_add_new_count = "
             "${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:" HPX_PP_STRINGIZE(
-                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT)) "}",
             "max_add_new_count = "
             "${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:" HPX_PP_STRINGIZE(
-                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT)) "}",
+            "min_delete_count = "
+            "${HPX_THREAD_QUEUE_MIN_DELETE_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_MIN_DELETE_COUNT)) "}",
             "max_delete_count = "
             "${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)) "}",
             "max_terminated_threads = "
-            "${HPX_SCHEDULER_MAX_TERMINATED_THREADS:" HPX_PP_STRINGIZE(
+            "${HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)) "}",
 
             "[hpx.commandline]",
@@ -365,10 +365,12 @@ namespace hpx { namespace util
             "enabled = 1"
         };
 
+#if defined(HPX_HAVE_NETWORKING)
         std::vector<std::string> lines_pp =
             hpx::parcelset::parcelhandler::load_runtime_configuration();
 
         lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
+#endif
 
         // don't overload user overrides
         this->parse("<static defaults>", lines, false, false, false);
@@ -977,8 +979,10 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (nullptr != sec) {
-                return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "spinlock_deadlock_detection_limit", "1000000");
+                return hpx::util::get_entry_as<std::size_t>(*sec,
+                    "spinlock_deadlock_detection_limit",
+                    HPX_PP_STRINGIZE(
+                        HPX_PP_EXPAND(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)));
             }
         }
         return HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
@@ -1167,6 +1171,9 @@ namespace hpx { namespace util
 
         case threads::thread_stacksize_huge:
             return huge_stacksize;
+
+        case threads::thread_stacksize_nostack:
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
 
         default:
         case threads::thread_stacksize_small:

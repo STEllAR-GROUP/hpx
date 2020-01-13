@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2017 Hartmut Kaiser
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -9,7 +10,7 @@
 #define HPX_PARALLEL_ALGORITHM_SET_SYMMETRIC_DIFFERENCE_MAR_10_2015_0204PM
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/parallel/algorithms/copy.hpp>
@@ -24,12 +25,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1
-{
+namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // set_symmetric_difference
-    namespace detail
-    {
+    namespace detail {
         /// \cond NOINTERNAL
         template <typename FwdIter>
         struct set_symmetric_difference
@@ -37,25 +36,24 @@ namespace hpx { namespace parallel { inline namespace v1
         {
             set_symmetric_difference()
               : set_symmetric_difference::algorithm("set_symmetric_difference")
-            {}
+            {
+            }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename OutIter, typename F>
-            static FwdIter
-            sequential(ExPolicy, InIter1 first1, InIter1 last1,
-                InIter2 first2, InIter2 last2, OutIter dest, F && f)
+            static FwdIter sequential(ExPolicy, InIter1 first1, InIter1 last1,
+                InIter2 first2, InIter2 last2, OutIter dest, F&& f)
             {
-                return std::set_symmetric_difference(first1, last1,
-                    first2, last2, dest, std::forward<F>(f));
+                return std::set_symmetric_difference(
+                    first1, last1, first2, last2, dest, std::forward<F>(f));
             }
 
             template <typename ExPolicy, typename RanIter1, typename RanIter2,
                 typename F>
-            static typename util::detail::algorithm_result<
-                ExPolicy, FwdIter
-            >::type
-            parallel(ExPolicy && policy, RanIter1 first1, RanIter1 last1,
-                RanIter2 first2, RanIter2 last2, FwdIter dest, F && f)
+            static
+                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+                parallel(ExPolicy&& policy, RanIter1 first1, RanIter1 last1,
+                    RanIter2 first2, RanIter2 last2, FwdIter dest, F&& f)
             {
                 typedef typename std::iterator_traits<RanIter1>::difference_type
                     difference_type1;
@@ -65,56 +63,46 @@ namespace hpx { namespace parallel { inline namespace v1
                 if (first1 == last1)
                 {
                     return util::detail::convert_to_result(
-                        detail::copy<std::pair<RanIter2, FwdIter> >()
-                            .call(
-                                std::forward<ExPolicy>(policy),
-                                std::false_type(), first2, last2, dest
-                            ),
-                            [](std::pair<RanIter2, FwdIter> const& p) -> FwdIter
-                            {
-                                return p.second;
-                            });
+                        detail::copy<std::pair<RanIter2, FwdIter>>().call(
+                            std::forward<ExPolicy>(policy), std::false_type(),
+                            first2, last2, dest),
+                        [](std::pair<RanIter2, FwdIter> const& p) -> FwdIter {
+                            return p.second;
+                        });
                 }
 
                 if (first2 == last2)
                 {
                     return util::detail::convert_to_result(
-                        detail::copy<std::pair<RanIter1, FwdIter> >()
-                            .call(
-                                std::forward<ExPolicy>(policy),
-                                std::false_type(), first1, last1, dest
-                            ),
-                            [](std::pair<RanIter1, FwdIter> const& p) -> FwdIter
-                            {
-                                return p.second;
-                            });
+                        detail::copy<std::pair<RanIter1, FwdIter>>().call(
+                            std::forward<ExPolicy>(policy), std::false_type(),
+                            first1, last1, dest),
+                        [](std::pair<RanIter1, FwdIter> const& p) -> FwdIter {
+                            return p.second;
+                        });
                 }
 
-                typedef typename set_operations_buffer<FwdIter>::type buffer_type;
+                typedef
+                    typename set_operations_buffer<FwdIter>::type buffer_type;
                 typedef typename hpx::util::decay<F>::type func_type;
 
-                return set_operation(std::forward<ExPolicy>(policy),
-                    first1, last1, first2, last2, dest, std::forward<F>(f),
+                return set_operation(
+                    std::forward<ExPolicy>(policy), first1, last1, first2,
+                    last2, dest, std::forward<F>(f),
                     // calculate approximate destination index
                     [](difference_type1 idx1, difference_type2 idx2)
-                    ->  difference_type1
-                    {
-                        return idx1 + idx2;
-                    },
+                        -> difference_type1 { return idx1 + idx2; },
                     // perform required set operation for one chunk
                     [](RanIter1 part_first1, RanIter1 part_last1,
                         RanIter2 part_first2, RanIter2 part_last2,
-                        buffer_type* dest, func_type const& f)
-                    ->  buffer_type*
-                    {
-                        return std::set_symmetric_difference(
-                            part_first1, part_last1,
-                            part_first2, part_last2, dest, f);
+                        buffer_type* dest, func_type const& f) -> buffer_type* {
+                        return std::set_symmetric_difference(part_first1,
+                            part_last1, part_first2, part_last2, dest, f);
                     });
             }
         };
         /// \endcond
-    }
+    }    // namespace detail
 
     /// Constructs a sorted range beginning at dest consisting of all elements
     /// present in either of the sorted ranges [first1, last1) and
@@ -210,31 +198,27 @@ namespace hpx { namespace parallel { inline namespace v1
         typename FwdIter3, typename Pred = detail::less>
     inline typename std::enable_if<
         execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type
-    >::type
-    set_symmetric_difference(ExPolicy && policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred && op = Pred())
+        typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type>::type
+    set_symmetric_difference(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred())
     {
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter1>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter2>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
             "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<FwdIter3>::value),
+        static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
             "Requires at least forward iterator.");
 
         typedef std::integral_constant<bool,
-                execution::is_sequenced_execution_policy<ExPolicy>::value ||
-               !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
-               !hpx::traits::is_random_access_iterator<FwdIter2>::value
-            > is_seq;
+            execution::is_sequenced_execution_policy<ExPolicy>::value ||
+                !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
+                !hpx::traits::is_random_access_iterator<FwdIter2>::value>
+            is_seq;
 
         return detail::set_symmetric_difference<FwdIter3>().call(
-            std::forward<ExPolicy>(policy), is_seq(),
-            first1, last1, first2, last2, dest, std::forward<Pred>(op));
+            std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2,
+            last2, dest, std::forward<Pred>(op));
     }
-}}}
+}}}    // namespace hpx::parallel::v1
 
 #endif

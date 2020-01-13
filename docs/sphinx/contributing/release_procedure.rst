@@ -1,17 +1,19 @@
-.. Copyright (c) 2007-2017 Louisiana State University
+..
+    Copyright (c) 2007-2017 Louisiana State University
 
-   Distributed under the Boost Software License, Version 1.0. (See accompanying
-   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ===========================
 Release procedure for |hpx|
 ===========================
 
-Below is a step-wise procedure for making an HPX release. We aim to produce two
+Below is a step by step procedure for making an |hpx| release. We aim to produce two
 releases per year: one in March-April, and one in September-October.
 
 This is a living document and may not be totally current or accurate. It is an
-attempt to capture current practice in making an HPX release. Please update it
+attempt to capture current practices in making an |hpx| release. Please update it
 as appropriate.
 
 One way to use this procedure is to print a copy and check off the lines as they
@@ -53,11 +55,11 @@ are completed to avoid confusion.
    * Change the release branch to be the most current release tag available in
      the APEX/hpxMP ``git_external`` section in the main ``CMakeLists.txt``.
      Please contact the maintainers of the respective packages to generate a new
-     release to synchronize with the HPX release (`APEX
+     release to synchronize with the |hpx| release (`APEX
      <http://github.com/khuck/xpress-apex>`_, `hpxMP
      <https://github.com/STEllAR-GROUP/hpxMP>`_).
 
-#. If there have been any commits to the release branch since the last release
+#. If there have been any commits to the release branch since the last release,
    create a tag from the old release branch before deleting the old release
    branch in the next step.
 
@@ -91,9 +93,9 @@ are completed to avoid confusion.
    all related code and tests from the main source tree.
 
    The general deprecation policy involves a three-step process we have to go
-   through in order to introduce a breaking change
+   through in order to introduce a breaking change:
 
-   a. First release cycle: add a build option which allows to explicitly disable
+   a. First release cycle: add a build option that allows for explicitly disabling
       any old (now deprecated) code.
    b. Second release cycle: turn this build option OFF by default.
    c. Third release cycle: completely remove the old code.
@@ -101,7 +103,7 @@ are completed to avoid confusion.
    The main CMakeLists.txt contains a comment indicating for which version
    the breaking change was introduced first.
 
-#. Switch Buildbot over to test the release branch
+#. Switch Buildbot over to test the release branch.
 
    * ``https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg``
    * ``branch`` field in ``c['change_source'] =  GitPoller``
@@ -127,7 +129,7 @@ are completed to avoid confusion.
         only choice if there have been significant unrelated changes on master
         since the previous release.
       * Go back to the first step when enough patches have been added.
-      * If there are no more patches continue to make the final release.
+      * If there are no more patches, continue to make the final release.
 
 #. Update any occurrences of the latest stable release to refer to the version
    about to be released. For example, ``quickstart.rst`` contains instructions
@@ -161,10 +163,10 @@ are completed to avoid confusion.
 
 #. This step does not apply to patch releases. Bump version numbers on master.
 
-   #. Create a new branch from master, and check that branch out (name it for
-      example by the next version number).
+   #. Create a new branch from master, and check that branch out (name it, for
+      example, by the next version number).
 
-   #. Bump the HPX version to the next release target. The following files
+   #. Bump the |hpx| version to the next release target. The following files
       contain version info:
 
       * ``CMakeLists.txt``
@@ -176,7 +178,7 @@ are completed to avoid confusion.
 
    #. Modify the the release procedure if necessary.
 
-   #. Merge new branch containing next version numbers to master, resolve conflicts
+   #. Merge new branch containing next version numbers to master; resolve conflicts
       if necessary.
 
 #. Switch Buildbot back to test the main branch

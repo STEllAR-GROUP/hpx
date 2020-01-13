@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 John Biddiscombe
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
@@ -8,7 +9,7 @@
 #if !defined(HPX_CONCURRENT_UNORDERED_MAP)
 #define HPX_CONCURRENT_UNORDERED_MAP
 
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <plugins/parcelport/readers_writers_mutex.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 //

@@ -2,6 +2,7 @@
 //  Copyright (c) 2005-2018 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
+//  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -25,10 +26,10 @@
 #include <utility>
 
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/register_locks.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/serialization/map.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/serialization/map.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/ini.hpp>
 
@@ -169,7 +170,7 @@ void section::read (std::string const& filename)
 
 bool force_entry(std::string& str)
 {
-    std::string::size_type p = str.find_last_of("!");
+    std::string::size_type p = str.find_last_of('!');
     if (p != std::string::npos && str.find_first_not_of(" \t", p+1) == std::string::npos)
     {
         str = str.substr(0, p);   // remove forcing modifier ('!')
@@ -325,7 +326,7 @@ section* section::add_section_if_new(std::unique_lock<mutex_type>& l,
 bool section::has_section (std::unique_lock<mutex_type>& l,
     std::string const& sec_name) const
 {
-    std::string::size_type i = sec_name.find(".");
+    std::string::size_type i = sec_name.find('.');
     if (i != std::string::npos)
     {
         std::string cor_sec_name = sec_name.substr (0, i);
@@ -345,7 +346,7 @@ bool section::has_section (std::unique_lock<mutex_type>& l,
 section* section::get_section (std::unique_lock<mutex_type>& l,
     std::string const& sec_name)
 {
-    std::string::size_type i  = sec_name.find (".");
+    std::string::size_type i  = sec_name.find ('.');
     if (i != std::string::npos)
     {
         std::string cor_sec_name = sec_name.substr (0, i);
@@ -378,7 +379,7 @@ section* section::get_section (std::unique_lock<mutex_type>& l,
 section const* section::get_section (std::unique_lock<mutex_type>& l,
     std::string const& sec_name) const
 {
-    std::string::size_type i  = sec_name.find (".");
+    std::string::size_type i  = sec_name.find ('.');
     if (i != std::string::npos)
     {
         std::string cor_sec_name = sec_name.substr (0,  i);
@@ -414,7 +415,7 @@ void section::add_entry (std::unique_lock<mutex_type>& l,
     // first expand the full property name in the value (avoids infinite recursion)
     expand_only(l, val, std::string::size_type(-1), get_full_name() + "." + key);
 
-    std::string::size_type i = key.find_last_of(".");
+    std::string::size_type i = key.find_last_of('.');
     if (i != std::string::npos)
     {
         section* current = root_;
@@ -441,11 +442,12 @@ void section::add_entry (std::unique_lock<mutex_type>& l,
         entry_map::iterator it = entries_.find(key);
         if (it != entries_.end())
         {
-            it->second.first = std::move(val);
-            if (!it->second.second.empty())
+            auto& e = it->second;
+            e.first = std::move(val);
+            if (!e.second.empty())
             {
-                std::string value = it->second.first;
-                entry_changed_func f = it->second.second;
+                std::string value = e.first;
+                entry_changed_func f = e.second;
 
                 hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 f(fullkey, value);
@@ -462,7 +464,7 @@ void section::add_entry (std::unique_lock<mutex_type>& l,
 void section::add_entry (std::unique_lock<mutex_type>& l,
     std::string const& fullkey, std::string const& key, entry_type const& val)
 {
-    std::string::size_type i = key.find_last_of(".");
+    std::string::size_type i = key.find_last_of('.');
     if (i != std::string::npos)
     {
         section* current = root_;
@@ -561,7 +563,7 @@ compose_callback(F1 && f1, F2 && f2)
 void section::add_notification_callback(std::unique_lock<mutex_type>& l,
     std::string const& key, entry_changed_func const& callback)
 {
-    std::string::size_type i = key.find_last_of(".");
+    std::string::size_type i = key.find_last_of('.');
     if (i != std::string::npos)
     {
         section* current = root_;
@@ -600,7 +602,7 @@ void section::add_notification_callback(std::unique_lock<mutex_type>& l,
 
 bool section::has_entry (std::unique_lock<mutex_type>& l, std::string const& key) const
 {
-    std::string::size_type i = key.find (".");
+    std::string::size_type i = key.find('.');
     if (i != std::string::npos)
     {
         std::string sub_sec = key.substr(0, i);
@@ -620,7 +622,7 @@ bool section::has_entry (std::unique_lock<mutex_type>& l, std::string const& key
 std::string section::get_entry (std::unique_lock<mutex_type>& l,
     std::string const& key) const
 {
-    std::string::size_type i = key.find (".");
+    std::string::size_type i = key.find('.');
     if (i != std::string::npos)
     {
         std::string sub_sec = key.substr(0, i);
@@ -808,14 +810,14 @@ find_next(char const* ch, std::string& value,
 void section::expand(std::unique_lock<mutex_type>& l, std::string& value,
     std::string::size_type begin) const
 {
-    std::string::size_type p = value.find_first_of("$", begin+1);
+    std::string::size_type p = value.find_first_of('$', begin+1);
     while (p != std::string::npos && value.size()-1 != p)
     {
         if ('[' == value[p+1])
             expand_bracket(l, value, p);
         else if ('{' == value[p+1])
             expand_brace(l, value, p);
-        p = value.find_first_of("$", p+1);
+        p = value.find_first_of('$', p+1);
     }
 }
 
@@ -877,13 +879,13 @@ std::string section::expand (std::unique_lock<mutex_type>& l, std::string value)
 void section::expand_only(std::unique_lock<mutex_type>& l, std::string& value,
     std::string::size_type begin, std::string const& expand_this) const
 {
-    std::string::size_type p = value.find_first_of("$", begin+1);
+    std::string::size_type p = value.find_first_of('$', begin+1);
     while (p != std::string::npos && value.size()-1 != p) {
         if ('[' == value[p+1])
             expand_bracket_only(l, value, p, expand_this);
         else if ('{' == value[p+1])
             expand_brace_only(l, value, p, expand_this);
-        p = value.find_first_of("$", p+1);
+        p = value.find_first_of('$', p+1);
     }
 }
 

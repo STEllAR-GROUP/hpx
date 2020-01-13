@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2002-2004.
+//  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -57,6 +58,7 @@ int main(int argc, char* argv[])
         string root = ".";
 
         options_description desc("Allowed options");
+        // clang-format off
         desc.add_options()
         // First parameter describes option name/short name
         // The second is parameter to option
@@ -77,6 +79,7 @@ int main(int argc, char* argv[])
                 "write source package list to <pathname>")
             ("root,r", value(&root), "treat <dirname> as project root directory")
         ;
+        // clang-format on
 
         variables_map vm;
         store(parse_command_line(argc, argv, desc), vm);
