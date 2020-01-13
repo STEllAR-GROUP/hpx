@@ -90,6 +90,8 @@ Breaking changes
 Closed issues
 =============
 
+* :hpx-issue:`4282` - Build Issues with Release on Windows
+* :hpx-issue:`4278` - Build Issues with CMake 3.14.4
 * :hpx-issue:`4273` - Clients of HPX 1.4.0-rc2 with APEX ar not linked to
   libhpx-apex
 * :hpx-issue:`4269` - Building HPX 1.4.0-rc2 with support for APEX fails
@@ -161,11 +163,17 @@ Closed issues
 * :hpx-issue:`3838` - ``hpx::parallel::count/count_if`` failing tests
 * :hpx-issue:`3651` - ``hpx::parallel::transform_reduce`` with non const
   reference as lambda parameter
+* :hpx-issue:`3560` - Apex integration with HPX not working properly
 * :hpx-issue:`3322` - No warning when mixing debug/release builds
 
 Closed pull requests
 ====================
 
+* :hpx-pr:`4300` - Checks for ``MPI_Init`` being called twice
+* :hpx-pr:`4299` - Small CMake fixes
+* :hpx-pr:`4298` - Remove extra call to annotate function that messes up traces
+* :hpx-pr:`4296` - Fixing collectives locking problem
+* :hpx-pr:`4295` - Do not check ``LICENSE_1_0.txt`` for inspect violations
 * :hpx-pr:`4293` - Applying two small changes fixing carious MSVC/Windows
   problems
 * :hpx-pr:`4285` - Delete ``apex.hpp``
