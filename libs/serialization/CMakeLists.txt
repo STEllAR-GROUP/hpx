@@ -159,3 +159,9 @@ add_hpx_module(serialization
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
+
+# Temporary needs hpx_util cause still depending on custom_exception_info which
+# is itself depending on hpx/naming_base.hpp
+target_link_libraries(hpx_serialization PUBLIC
+  hpx_naming_base
+  )

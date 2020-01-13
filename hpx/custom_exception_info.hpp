@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/naming_base.hpp>
 
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>

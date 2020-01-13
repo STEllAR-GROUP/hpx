@@ -94,10 +94,6 @@ add_hpx_module({lib_name}
   DEPENDENCIES
   CMAKE_SUBDIRS examples tests
 )
-
-include(HPX_PrintSummary)
-create_configuration_summary(
-  "  Module configuration summary ({lib_name}):" "{lib_name}")
 '''
 
 examples_cmakelists_template = cmake_header + f'''

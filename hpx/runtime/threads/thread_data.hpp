@@ -19,11 +19,10 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/logging.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>

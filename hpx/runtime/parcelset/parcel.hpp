@@ -14,6 +14,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>

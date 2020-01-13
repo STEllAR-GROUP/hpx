@@ -11,7 +11,7 @@ set(jacobi_sources
 
 set(jacobi_FLAGS
     COMPONENT_DEPENDENCIES
-    iostreams jacobi_component)
+    iostreams jacobi)
 
 # add jacobi executable
 add_hpx_executable(jacobi_simple

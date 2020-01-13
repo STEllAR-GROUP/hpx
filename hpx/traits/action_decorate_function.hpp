@@ -9,7 +9,7 @@
 
 #include <hpx/concepts/has_xxx.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
