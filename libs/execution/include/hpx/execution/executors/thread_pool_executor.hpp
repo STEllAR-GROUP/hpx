@@ -108,9 +108,6 @@ namespace hpx { namespace parallel { namespace execution {
             F&& f, S const& shape, Ts&&... ts)
         {
             HPX_ASSERT(pool);
-            std::size_t const os_thread_count = pool->get_os_thread_count();
-            HPX_UNUSED(os_thread_count);
-            HPX_ASSERT(first_thread + num_threads <= os_thread_count);
 
             hpx::util::thread_description const desc(f,
                 "hpx::parallel::execution::thread_pool_executor::bulk_async_"
