@@ -39,7 +39,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
-
+#include <cmath>
 using boost::program_options::options_description;
 using boost::program_options::value;
 using boost::program_options::variables_map;
@@ -71,7 +71,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     std::int64_t count, double duration, bool csv)
 {
     std::ostringstream temp;
-    double us = 1e6 * duration / count;
+    double us = 1e6 * duration;
     if (csv)
     {
         hpx::util::format_to(temp,
@@ -83,10 +83,10 @@ void print_stats(const char* title, const char* wait, const char* exec,
     else
     {
         hpx::util::format_to(temp,
-            "num_iterations {:1}, {:27} {:15} {:18} in {:8} seconds : {:8} "
-            "us/future, queue {:20}, numa {:4}, threads {:4}, info {:20}\n",
-            count, title, wait, exec, duration, us, queuing, numa_sensitive,
-            num_threads, info_string);
+            "num_iterations {:1}, {:27} {:15} {:18} in {:8} microseconds "
+            ", queue {:20}, numa {:4}, threads {:4}\n",
+            count, title, wait, exec, us, queuing, numa_sensitive,
+            num_threads);
     }
     std::cout << temp.str() << std::endl;
     // CDash graph plotting
