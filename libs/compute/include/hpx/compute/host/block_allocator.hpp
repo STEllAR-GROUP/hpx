@@ -21,6 +21,7 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/executors/restricted_thread_pool_executor.hpp>
+#include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/topology/topology.hpp>

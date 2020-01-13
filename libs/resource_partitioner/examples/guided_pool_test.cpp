@@ -180,20 +180,20 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // static checks for laughs
     // ------------------------------------------------------------------------
     static_assert(
-        hpx::traits::has_sync_execute_member<hpx::parallel::execution::guided_pool_executor<
-                hint_type2>>::value == std::false_type(),
+        hpx::traits::has_sync_execute_member<hpx::parallel::execution::
+                guided_pool_executor<hint_type2>>::value == std::false_type(),
         "check has_sync_execute_member<Executor>::value");
     static_assert(
-        hpx::traits::has_async_execute_member<hpx::parallel::execution::guided_pool_executor<
-                hint_type2>>::value == std::true_type(),
+        hpx::traits::has_async_execute_member<hpx::parallel::execution::
+                guided_pool_executor<hint_type2>>::value == std::true_type(),
         "check has_async_execute_member<Executor>::value");
     static_assert(
-        hpx::traits::has_then_execute_member<hpx::parallel::execution::guided_pool_executor<
-                hint_type2>>::value == std::true_type(),
+        hpx::traits::has_then_execute_member<hpx::parallel::execution::
+                guided_pool_executor<hint_type2>>::value == std::true_type(),
         "has_then_execute_member<executor>::value");
     static_assert(
-        hpx::traits::has_post_member<hpx::parallel::execution::guided_pool_executor<
-                hint_type2>>::value == std::false_type(),
+        hpx::traits::has_post_member<hpx::parallel::execution::
+                guided_pool_executor<hint_type2>>::value == std::false_type(),
         "has_post_member<executor>::value");
 
     // ------------------------------------------------------------------------
