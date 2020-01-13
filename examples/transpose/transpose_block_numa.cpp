@@ -13,7 +13,7 @@
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <hpx/parallel/util/numa_allocator.hpp>
 
@@ -230,7 +230,7 @@ std::size_t get_num_numa_nodes(hpx::threads::topology const& topo,
 
     if (num_numa_domains_str != "all")
     {
-        numa_nodes = hpx::util::safe_lexical_cast<std::size_t>(num_numa_domains_str);
+        numa_nodes = hpx::util::from_string<std::size_t>(num_numa_domains_str);
     }
 
     return numa_nodes;
@@ -247,7 +247,7 @@ std::pair<std::size_t, std::size_t> get_num_numa_pus(
 
     if(num_threads_str != "all")
     {
-        pus = hpx::util::safe_lexical_cast<std::size_t>(num_threads_str);
+        pus = hpx::util::from_string<std::size_t>(num_threads_str);
     }
 
     return std::make_pair(numa_pus, pus);

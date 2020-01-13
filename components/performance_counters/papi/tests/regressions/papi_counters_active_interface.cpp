@@ -13,9 +13,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
-
-#include <boost/lexical_cast.hpp>
 #include <hpx/program_options.hpp>
+#include <hpx/util/from_string.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 const char *counter_name = "/papi{locality#0/worker-thread#0}/PAPI_SR_INS";
@@ -90,7 +89,7 @@ int check_(int fd)
                     }
                     else
                     {
-                        cnt.push_back(boost::lexical_cast<double>(value));
+                        cnt.push_back(hpx::util::from_string<double>(value));
                     }
                     if (cnt.size() == 5) break;
                     out.erase(0, pos+1);

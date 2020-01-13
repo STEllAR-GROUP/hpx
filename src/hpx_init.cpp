@@ -35,15 +35,15 @@
 #include <hpx/runtime_impl.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/util/external_timer.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
+#include <hpx/util/external_timer.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -704,10 +704,10 @@ namespace hpx
         {
             if (!config.empty()) {
                 try {
-                    return boost::lexical_cast<T>(
+                    return hpx::util::from_string<T>(
                         get_runtime().get_config().get_entry(config, default_));
                 }
-                catch (boost::bad_lexical_cast const&) {
+                catch (hpx::util::bad_lexical_cast const&) {
                     ;   // do nothing
                 }
             }

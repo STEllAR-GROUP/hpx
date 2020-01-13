@@ -10,12 +10,12 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <algorithm>
 
 #include "deprecated_name_check.hpp"
 #include "boost/regex.hpp"
-#include "boost/lexical_cast.hpp"
 #include "function_hyper.hpp"
 
 #include <set>
@@ -80,6 +80,7 @@ namespace boost
       { "(\\bboost\\s*::\\s*random\\s*::\\s*([^\\s]*)\\b)", "std::\\2" },
       { "(\\bboost\\s*::\\s*format\\b)", "hpx::util::format[_to]" },
       { "(\\bboost\\s*::\\s*(regex[^\\s]*)\\b)", "std::\\2" },
+      { "(\\bboost\\s*::\\s*lexical_cast\\b)", "hpx::util::((from_string)|(to_string))" },
       /////////////////////////////////////////////////////////////////////////
       { "((\\bhpx::\\b)?\\btraits\\s*::\\bis_callable\\b)", "\\2traits::is_invocable[_r]" },
       { "((\\bhpx::\\b)?\\butil\\s*::\\bresult_of\\b)", "\\2util::invoke_result" },
@@ -186,7 +187,7 @@ namespace boost
                   + " deprecated name ("
                   + found_name
                   + ") on line "
-                  + linelink(full_path, boost::lexical_cast<string>(line_number))
+                  + linelink(full_path, hpx::util::to_string(line_number))
                   + ", use " + m.format(d.data->use_instead)
                   + " instead");
             }

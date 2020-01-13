@@ -11,8 +11,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-
-#include <boost/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -43,7 +42,7 @@ int hpx_main(hpx::program_options::variables_map&)
             soln_count_total = 0;
             std::string arg;
             std::cin >> arg;
-            std::size_t sz = boost::lexical_cast<std::size_t>(arg);
+            std::size_t sz = hpx::util::from_string<std::size_t>(arg);
 
             std::size_t i = 0;
             std::list<nqueen::board> b;

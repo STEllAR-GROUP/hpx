@@ -7,10 +7,10 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include "template_function_accumulator.hpp"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -67,7 +67,7 @@ int hpx_main()
                                   << line << "'" << std::endl
                                   << help << std::endl;
                     else
-                        accu.add(boost::lexical_cast<int>(cmd[1]));
+                        accu.add(hpx::util::from_string<int>(cmd[1]));
                 }
 
                 else if (cmd[0] == "addfloat")
@@ -77,7 +77,7 @@ int hpx_main()
                                   << line << "'" << std::endl
                                   << help << std::endl;
                     else
-                        accu.add(boost::lexical_cast<double>(cmd[1]));
+                        accu.add(hpx::util::from_string<double>(cmd[1]));
                 }
 
                 else if (cmd[0] == "query")

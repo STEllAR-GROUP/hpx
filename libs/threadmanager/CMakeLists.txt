@@ -36,6 +36,7 @@ add_hpx_module(threadmanager
     hpx_coroutines
     hpx_errors
     hpx_execution
+    hpx_format
     hpx_functional
     hpx_hardware
     hpx_plugin

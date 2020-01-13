@@ -7,9 +7,9 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cctype>
 #include <cstddef>
@@ -63,7 +63,7 @@ namespace hpx { namespace util
             if (p == std::string::npos)
                 return false;
 
-            if (hpx::util::safe_lexical_cast(
+            if (hpx::util::from_string<std::size_t>(
                     s.substr(hpx_prefix_len, p-hpx_prefix_len),
                     std::size_t(-1)) == node)
             {
@@ -767,7 +767,7 @@ namespace hpx { namespace util
         if (cfg.has_entry("hpx.cmd_line"))
             cmdline = cfg.get_entry("hpx.cmd_line");
         if (cfg.has_entry("hpx.locality"))
-            node = hpx::util::safe_lexical_cast<std::size_t>
+            node = hpx::util::from_string<std::size_t>
                 (cfg.get_entry("hpx.locality"));
 
         return parse_commandline(cfg, app_options, cmdline, vm, node,

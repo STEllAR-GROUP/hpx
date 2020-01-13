@@ -50,8 +50,7 @@ namespace hpx { namespace program_options {
 
 #include <hpx/datastructures/any.hpp>
 #include <hpx/program_options/errors.hpp>
-
-#include <boost/lexical_cast.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <functional>
 #include <limits>
@@ -251,7 +250,7 @@ namespace hpx { namespace program_options {
         typed_value* default_value(const T& v)
         {
             m_default_value = hpx::util::any_nonser(v);
-            m_default_value_as_text = boost::lexical_cast<std::string>(v);
+            m_default_value_as_text = hpx::util::to_string(v);
             return this;
         }
 
@@ -275,7 +274,7 @@ namespace hpx { namespace program_options {
         typed_value* implicit_value(const T& v)
         {
             m_implicit_value = hpx::util::any_nonser(v);
-            m_implicit_value_as_text = boost::lexical_cast<std::string>(v);
+            m_implicit_value_as_text = hpx::util::to_string(v);
             return this;
         }
 

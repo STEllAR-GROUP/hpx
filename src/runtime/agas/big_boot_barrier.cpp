@@ -12,6 +12,8 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
+#include <hpx/format.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -33,14 +35,12 @@
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/synchronization/detail/yield_k.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/synchronization/detail/yield_k.hpp>
-#include <hpx/format.hpp>
-#include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -775,7 +775,7 @@ void big_boot_barrier::wait_hosted(
     if(locality_str != "-1")
     {
         suggested_prefix = naming::get_gid_from_locality_id(
-            util::safe_lexical_cast<std::uint32_t>(locality_str, -1));
+            util::from_string<std::uint32_t>(locality_str, -1));
     }
 
     // pre-load all unassigned ids

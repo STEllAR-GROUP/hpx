@@ -12,8 +12,6 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/local_lcos.hpp>
 
-#include <boost/lexical_cast.hpp>
-
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,7 +62,7 @@ namespace examples { namespace server
         {
             // Atomically add value_ to arg, and store the result in value_.
             std::lock_guard<mutex_type> l(mtx_);
-            value_ += boost::lexical_cast<double>(arg);
+            value_ += static_cast<double>(arg);
         }
 
         /// Return the current value to the caller.

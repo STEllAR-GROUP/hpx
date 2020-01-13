@@ -30,8 +30,6 @@
 #include <hpx/util/tick_counter.hpp>
 #endif
 
-#include <boost/lexical_cast.hpp>
-
 #include <atomic>
 #include <cstddef>
 #include <cstdint>

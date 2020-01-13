@@ -39,8 +39,7 @@ namespace hpx { namespace program_options {
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/program_options/errors.hpp>
-
-#include <boost/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <string>
@@ -135,9 +134,9 @@ namespace hpx { namespace program_options {
         std::basic_string<Char> s(validators::get_single_string(xs));
         try
         {
-            v = hpx::util::any_nonser(boost::lexical_cast<T>(s));
+            v = hpx::util::any_nonser(hpx::util::from_string<T>(s));
         }
-        catch (const boost::bad_lexical_cast&)
+        catch (const hpx::util::bad_lexical_cast&)
         {
             throw invalid_option_value(s);
         }
@@ -182,7 +181,7 @@ namespace hpx { namespace program_options {
                 validate(a, cv, (T*) nullptr, 0);
                 tv->push_back(hpx::util::any_cast<T>(a));
             }
-            catch (const boost::bad_lexical_cast& /*e*/)
+            catch (const hpx::util::bad_lexical_cast& /*e*/)
             {
                 throw invalid_option_value(s[i]);
             }

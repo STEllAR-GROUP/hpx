@@ -10,10 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include "path_name_check.hpp"
-
-#include "boost/lexical_cast.hpp"
 #include "function_hyper.hpp"
 
 #include <string>
@@ -98,7 +97,7 @@ namespace boost
         error( library_name, full_path,
             loclink(full_path, string(name()))
             + " path will exceed "
-            + boost::lexical_cast<string>(max_relative_path)
+            + hpx::util::to_string(max_relative_path)
             + " characters in a directory tree with a root in the form "
             + generic_root + ", and this exceeds ISO 9660:1999 limit of 207"  )
             ;

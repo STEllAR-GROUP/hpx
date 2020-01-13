@@ -8,7 +8,7 @@
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <fstream>
@@ -30,8 +30,7 @@ namespace hpx { namespace util { namespace batch_environments {
         if (valid_)
         {
             // Initialize our node number
-            node_num_ =
-                safe_lexical_cast<std::size_t>(node_num, std::size_t(1));
+            node_num_ = from_string<std::size_t>(node_num, std::size_t(1));
 
             if (nodelist.empty())
             {
@@ -51,7 +50,7 @@ namespace hpx { namespace util { namespace batch_environments {
             {
                 // Initialize number of cores to run on
                 num_threads_ =
-                    safe_lexical_cast<std::size_t>(thread_num, std::size_t(-1));
+                    from_string<std::size_t>(thread_num, std::size_t(-1));
             }
         }
     }

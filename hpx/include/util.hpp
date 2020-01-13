@@ -15,6 +15,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/function_ref.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -28,15 +29,14 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/annotated_function.hpp>
+#include <hpx/util/from_string.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/util/to_string.hpp>
 #include <hpx/util/unwrap.hpp>
 #include <hpx/util/yield_while.hpp>
 #include <hpx/util/zip_iterator.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 
 #endif
-

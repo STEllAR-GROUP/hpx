@@ -7,6 +7,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/format.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -22,10 +25,7 @@
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/format.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -321,7 +321,7 @@ namespace hpx { namespace performance_counters
             else if (!elements.instance_.parent_.index_.empty())
             {
                 path.parentinstanceindex_ =
-                    hpx::util::safe_lexical_cast<std::int64_t>(
+                    hpx::util::from_string<std::int64_t>(
                         elements.instance_.parent_.index_);
             }
 
@@ -342,7 +342,7 @@ namespace hpx { namespace performance_counters
                 else
                 {
                     path.instanceindex_ =
-                        hpx::util::safe_lexical_cast<std::int64_t>(
+                        hpx::util::from_string<std::int64_t>(
                             elements.instance_.child_.index_, std::int64_t(-2));
                     if (path.instanceindex_ == std::int64_t(-2))
                     {
@@ -362,7 +362,7 @@ namespace hpx { namespace performance_counters
             else if (!elements.instance_.subchild_.index_.empty())
             {
                 path.subinstanceindex_ =
-                    hpx::util::safe_lexical_cast<std::uint64_t>(
+                    hpx::util::from_string<std::uint64_t>(
                         elements.instance_.subchild_.index_);
             }
         }

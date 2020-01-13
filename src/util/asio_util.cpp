@@ -6,11 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstdint>
 #include <string>
-
-#include <boost/lexical_cast.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
@@ -337,7 +336,7 @@ namespace hpx { namespace util
         try {
             if (p != std::string::npos) {
                 tmp_host = v.substr(0, p);
-                tmp_port = boost::lexical_cast<std::uint16_t>(v.substr(p+1));
+                tmp_port = hpx::util::from_string<std::uint16_t>(v.substr(p+1));
             }
             else {
                 tmp_host = v;
@@ -349,7 +348,7 @@ namespace hpx { namespace util
                     port = tmp_port;
             }
         }
-        catch (boost::bad_lexical_cast const& /*e*/) {
+        catch (hpx::util::bad_lexical_cast const& /*e*/) {
             // port number is invalid
             return false;
         }

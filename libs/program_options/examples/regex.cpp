@@ -23,13 +23,12 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/program_options.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <iostream>
 #include <regex>
 #include <string>
 #include <vector>
-
-#include <boost/lexical_cast.hpp>
 
 using namespace hpx::program_options;
 using namespace std;
@@ -73,7 +72,7 @@ void validate(
     smatch match;
     if (regex_match(s, match, r))
     {
-        v = any(magic_number(boost::lexical_cast<int>(match[1])));
+        v = any(magic_number(hpx::util::from_string<int>(match[1])));
     }
     else
     {

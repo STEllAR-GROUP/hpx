@@ -12,13 +12,15 @@
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/command_line_handling.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
+#include <hpx/util/from_string.hpp>
+#include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
@@ -155,7 +157,7 @@ namespace verbs
                 util::section const * sec = ini.get_section("hpx.parcel.verbs");
                 if (nullptr != sec) {
                     std::string ibverbs_enabled(sec->get_entry("enable", "0"));
-                    if (boost::lexical_cast<int>(ibverbs_enabled)) {
+                    if (hpx::util::from_string<int>(ibverbs_enabled)) {
                         _ibverbs_device    =
                             sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
                         _ibverbs_interface =

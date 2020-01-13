@@ -57,6 +57,7 @@ add_hpx_module(program_options
     hpx_assertion
     hpx_config
     hpx_datastructures
+    hpx_format
     hpx_iterator_support
     ${__boost_program_options}
   CMAKE_SUBDIRS examples tests

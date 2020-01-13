@@ -11,10 +11,15 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
+#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/synchronization/counting_semaphore.hpp>
+#include <hpx/format.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/local_lcos/promise.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -30,17 +35,13 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/external_timer.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/format.hpp>
-#include <hpx/util/io_service_pool.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/util/external_timer.hpp>
+#include <hpx/util/from_string.hpp>
+#include <hpx/util/get_entry_as.hpp>
+#include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
@@ -109,7 +110,7 @@ namespace hpx { namespace parcelset
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
       , load_message_handlers_(util::get_entry_as<int>(cfg,
-                                   "hpx.parcel.message_handlers", "0") != 0)
+                                   "hpx.parcel.message_handlers", 0) != 0)
       , count_routed_(0)
       , write_handler_(&default_write_handler)
       , is_networking_enabled_(hpx::is_networking_enabled())
@@ -172,7 +173,7 @@ namespace hpx { namespace parcelset
         std::string cfgkey("hpx.parcel." + ppname + ".enable");
         std::string enabled = get_config_entry(cfgkey, "0");
         strm << ", "
-             << (hpx::util::safe_lexical_cast<int>(enabled, 0) ? "" : "not ")
+             << (hpx::util::from_string<int>(enabled, 0) ? "" : "not ")
              << "enabled";
 
         if (bootstrap)

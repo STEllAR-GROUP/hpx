@@ -12,9 +12,9 @@
 #include <hpx/logging.hpp>
 #include <hpx/logging/format/destination/defaults.hpp>
 #include <hpx/logging/format/named_write.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/version.hpp>
 
 #include <cstddef>
@@ -55,7 +55,7 @@ namespace hpx { namespace util {
         {
             try
             {
-                int env_val = boost::lexical_cast<int>(env);
+                int env_val = hpx::util::from_string<int>(env);
                 if (env_val < 0)
                     return hpx::util::logging::level::disable_all;
 
@@ -78,7 +78,7 @@ namespace hpx { namespace util {
                 }
                 return hpx::util::logging::level::debug;
             }
-            catch (boost::bad_lexical_cast const&)
+            catch (hpx::util::bad_lexical_cast const&)
             {
                 return hpx::util::logging::level::disable_all;
             }

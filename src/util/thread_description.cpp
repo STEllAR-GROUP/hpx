@@ -7,8 +7,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/thread_description.hpp>
+#include <hpx/util/to_string.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -42,7 +42,7 @@ namespace hpx { namespace util
 
         std::stringstream strm;
         strm << "address: 0x" << std::hex
-             << util::safe_lexical_cast<std::string>(desc.get_address());
+             << util::to_string(desc.get_address());
         return strm.str();
 #else
         return "<unknown>";

@@ -8,7 +8,7 @@
 #define HPX_UTIL_MANAGE_CONFIG_APR_11_2012_0519PM
 
 #include <hpx/config.hpp>
-#include <hpx/util/safe_lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <map>
 #include <string>
@@ -30,7 +30,7 @@ namespace hpx { namespace util {
         {
             map_type::const_iterator it = config_.find(key);
             if (it != config_.end())
-                return hpx::util::safe_lexical_cast<T>((*it).second, dflt);
+                return hpx::util::from_string<T>((*it).second, dflt);
             return dflt;
         }
 

@@ -7,8 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
-
-#include <boost/lexical_cast.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -18,11 +17,11 @@ int hpx_main(int argc, char* argv[])
 {
     // check number of localities
     HPX_TEST_EQ(
-        boost::lexical_cast<std::uint32_t>(
+        hpx::util::from_string<std::uint32_t>(
             hpx::get_config_entry("hpx.localities", "")),
                 hpx::get_num_localities(hpx::launch::sync));
     HPX_TEST_EQ(
-        boost::lexical_cast<std::size_t>(
+        hpx::util::from_string<std::size_t>(
             hpx::get_config_entry("hpx.os_threads", "")),
                 hpx::get_os_thread_count());
     HPX_TEST_EQ(hpx::get_config_entry("hpx.runtime_mode", ""),
