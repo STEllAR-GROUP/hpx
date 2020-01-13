@@ -10,6 +10,7 @@
 #define HPX_PARALLEL_EXECUTORS_SERVICE_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/lcos/future.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/executors/execution_fwd.hpp>
 #include <hpx/parallel/executors/fused_bulk_execute.hpp>
-#include <hpx/parallel/executors/static_chunk_size.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>

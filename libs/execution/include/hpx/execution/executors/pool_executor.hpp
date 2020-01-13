@@ -16,6 +16,9 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threadmanager.hpp>
 
+#include <string>
+#include <type_traits>
+
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT pool_executor : public thread_pool_executor

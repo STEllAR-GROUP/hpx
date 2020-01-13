@@ -12,10 +12,16 @@
 #define HPX_PARALLEL_EXECUTORS_RESTRICTED_THREAD_POOL_EXECUTORS_AUG_28_2015_0511PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/parallel/executors/execution_parameters.hpp>
 #include <hpx/parallel/executors/thread_pool_executor.hpp>
 
+#include <atomic>
+#include <cstddef>
 #include <cstdint>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace hpx { namespace parallel { namespace execution {
     struct restricted_thread_pool_executor
