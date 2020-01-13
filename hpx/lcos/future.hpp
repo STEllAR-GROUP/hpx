@@ -418,127 +418,9 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation_alloc_nounwrap(Allocator const& a,
         Future const& future, Policy&& policy, F&& f);
 
-    template <typename Executor, typename Future, typename F>
-    inline typename hpx::traits::future_then_executor_result<
-        Executor, typename std::decay<Future>::type, F
-    >::type
-    then_execute_helper(Executor &&, F &&, Future &&);
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename FD, typename Enable = void>
     struct future_then_dispatch;
-
-    // launch
-    template <typename Future, typename Policy>
-    struct future_then_dispatch<Future, Policy,
-        typename std::enable_if<
-            traits::is_launch_policy<Policy>::value
-        >::type>
-    {
-        template <typename Policy_, typename F>
-        HPX_FORCEINLINE
-        static typename hpx::traits::future_then_result<Future, F>::type
-        call(Future && fut, Policy_ && policy, F && f)
-        {
-            using result_type =
-                typename hpx::traits::future_then_result<Future, F>::result_type;
-            using continuation_result_type =
-                typename hpx::util::invoke_result<F, Future>::type;
-
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                detail::make_continuation_alloc<continuation_result_type>(
-                    hpx::util::internal_allocator<>{},
-                    std::move(fut), std::forward<Policy_>(policy),
-                    std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(
-                std::move(p));
-        }
-
-        template <typename Allocator, typename Policy_, typename F>
-        HPX_FORCEINLINE static
-        typename hpx::traits::future_then_result<Future, F>::type
-        call_alloc(
-            Allocator const& alloc, Future&& fut, Policy_&& policy, F&& f)
-        {
-            using result_type =
-                typename hpx::traits::future_then_result<Future, F>::result_type;
-            using continuation_result_type =
-                typename hpx::util::invoke_result<F, Future>::type;
-
-            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
-                detail::make_continuation_alloc<continuation_result_type>(
-                    alloc, std::move(fut), std::forward<Policy_>(policy),
-                    std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(
-                std::move(p));
-        }
-    };
-
-    // The overload for future::then taking an executor simply forwards to the
-    // corresponding executor customization point.
-    //
-    // parallel executors v2
-    // threads::executor
-    template <typename Future, typename Executor>
-    struct future_then_dispatch<Future, Executor,
-        typename std::enable_if<
-            traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value ||
-            traits::is_threads_executor<Executor>::value
-        >::type>
-    {
-        template <typename Executor_, typename F>
-        HPX_FORCEINLINE
-        static typename hpx::traits::future_then_executor_result<
-            Executor_, Future, F>::type
-        call(Future && fut, Executor_ && exec, F && f)
-        {
-            // simply forward this to executor
-            return detail::then_execute_helper(std::forward<Executor_>(exec),
-                std::forward<F>(f), std::move(fut));
-        }
-
-        template <typename Allocator, typename Executor_, typename F>
-        HPX_FORCEINLINE
-        static typename hpx::traits::future_then_executor_result<
-            Executor_, Future, F>::type
-        call_alloc(Allocator const&, Future && fut, Executor_ && exec, F && f)
-        {
-            return call(std::forward<Future>(fut),
-                std::forward<Executor_>(exec), std::forward<F>(f));
-        }
-    };
-
-    // plain function, or function object
-    template <typename Future, typename FD>
-    struct future_then_dispatch<Future, FD, typename std::enable_if<
-        !traits::is_launch_policy<FD>::value &&
-        !(
-            traits::is_one_way_executor<FD>::value ||
-            traits::is_two_way_executor<FD>::value ||
-            traits::is_threads_executor<FD>::value)
-        >::type>
-    {
-        template <typename F>
-        HPX_FORCEINLINE static auto
-        call(Future && fut, F && f)
-        ->  decltype(future_then_dispatch<Future, launch>::call(
-                std::move(fut), launch::all, std::forward<F>(f)))
-        {
-            return future_then_dispatch<Future, launch>::call(
-                std::move(fut), launch::all, std::forward<F>(f));
-        }
-
-        template <typename Allocator, typename F>
-        HPX_FORCEINLINE static auto
-        call_alloc(Allocator const& alloc, Future && fut, F && f)
-        ->  decltype(future_then_dispatch<Future, launch>::call_alloc(
-                alloc, std::move(fut), launch::all, std::forward<F>(f)))
-        {
-            return future_then_dispatch<Future, launch>::call_alloc(
-                alloc, std::move(fut), launch::all, std::forward<F>(f));
-        }
-    };
 
     ///////////////////////////////////////////////////////////////////////////
 //     template <typename R>
@@ -1722,5 +1604,130 @@ namespace hpx
 #define HPX_MAKE_EXCEPTIONAL_FUTURE(T, errorcode, f, msg)                     \
     hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))     \
     /**/
+
+/* Beginning of the file that has to go with executors */
+namespace hpx { namespace lcos { namespace detail
+{
+
+    template <typename Executor, typename Future, typename F>
+    inline typename hpx::traits::future_then_executor_result<
+        Executor, typename std::decay<Future>::type, F
+    >::type
+    then_execute_helper(Executor &&, F &&, Future &&);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // launch
+    template <typename Future, typename Policy>
+    struct future_then_dispatch<Future, Policy,
+        typename std::enable_if<
+            traits::is_launch_policy<Policy>::value
+        >::type>
+    {
+        template <typename Policy_, typename F>
+        HPX_FORCEINLINE
+        static typename hpx::traits::future_then_result<Future, F>::type
+        call(Future && fut, Policy_ && policy, F && f)
+        {
+            using result_type =
+                typename hpx::traits::future_then_result<Future, F>::result_type;
+            using continuation_result_type =
+                typename hpx::util::invoke_result<F, Future>::type;
+
+            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
+                detail::make_continuation_alloc<continuation_result_type>(
+                    hpx::util::internal_allocator<>{},
+                    std::move(fut), std::forward<Policy_>(policy),
+                    std::forward<F>(f));
+            return hpx::traits::future_access<future<result_type> >::create(
+                std::move(p));
+        }
+
+        template <typename Allocator, typename Policy_, typename F>
+        HPX_FORCEINLINE static
+        typename hpx::traits::future_then_result<Future, F>::type
+        call_alloc(
+            Allocator const& alloc, Future&& fut, Policy_&& policy, F&& f)
+        {
+            using result_type =
+                typename hpx::traits::future_then_result<Future, F>::result_type;
+            using continuation_result_type =
+                typename hpx::util::invoke_result<F, Future>::type;
+
+            typename hpx::traits::detail::shared_state_ptr<result_type>::type p =
+                detail::make_continuation_alloc<continuation_result_type>(
+                    alloc, std::move(fut), std::forward<Policy_>(policy),
+                    std::forward<F>(f));
+            return hpx::traits::future_access<future<result_type> >::create(
+                std::move(p));
+        }
+    };
+
+    // The overload for future::then taking an executor simply forwards to the
+    // corresponding executor customization point.
+    //
+    // parallel executors v2
+    // threads::executor
+    template <typename Future, typename Executor>
+    struct future_then_dispatch<Future, Executor,
+        typename std::enable_if<
+            traits::is_one_way_executor<Executor>::value ||
+            traits::is_two_way_executor<Executor>::value ||
+            traits::is_threads_executor<Executor>::value
+        >::type>
+    {
+        template <typename Executor_, typename F>
+        HPX_FORCEINLINE
+        static typename hpx::traits::future_then_executor_result<
+            Executor_, Future, F>::type
+        call(Future && fut, Executor_ && exec, F && f)
+        {
+            // simply forward this to executor
+            return detail::then_execute_helper(std::forward<Executor_>(exec),
+                std::forward<F>(f), std::move(fut));
+        }
+
+        template <typename Allocator, typename Executor_, typename F>
+        HPX_FORCEINLINE
+        static typename hpx::traits::future_then_executor_result<
+            Executor_, Future, F>::type
+        call_alloc(Allocator const&, Future && fut, Executor_ && exec, F && f)
+        {
+            return call(std::forward<Future>(fut),
+                std::forward<Executor_>(exec), std::forward<F>(f));
+        }
+    };
+
+    // plain function, or function object
+    template <typename Future, typename FD>
+    struct future_then_dispatch<Future, FD, typename std::enable_if<
+        !traits::is_launch_policy<FD>::value &&
+        !(
+            traits::is_one_way_executor<FD>::value ||
+            traits::is_two_way_executor<FD>::value ||
+            traits::is_threads_executor<FD>::value)
+        >::type>
+    {
+        template <typename F>
+        HPX_FORCEINLINE static auto
+        call(Future && fut, F && f)
+        ->  decltype(future_then_dispatch<Future, launch>::call(
+                std::move(fut), launch::all, std::forward<F>(f)))
+        {
+            return future_then_dispatch<Future, launch>::call(
+                std::move(fut), launch::all, std::forward<F>(f));
+        }
+
+        template <typename Allocator, typename F>
+        HPX_FORCEINLINE static auto
+        call_alloc(Allocator const& alloc, Future && fut, F && f)
+        ->  decltype(future_then_dispatch<Future, launch>::call_alloc(
+                alloc, std::move(fut), launch::all, std::forward<F>(f)))
+        {
+            return future_then_dispatch<Future, launch>::call_alloc(
+                alloc, std::move(fut), launch::all, std::forward<F>(f));
+        }
+    };
+
+}}} // namespace hpx::lcos::detail
 
 #endif
