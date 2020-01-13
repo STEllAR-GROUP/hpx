@@ -8,6 +8,7 @@
 #include <hpx/format.hpp>
 #include <hpx/testing.hpp>
 
+#include <ctime>
 #include <string>
 
 int main(int argc, char* argv[])
@@ -40,6 +41,17 @@ int main(int argc, char* argv[])
 
     {
         HPX_TEST_EQ((format("{} {}", true, false)), "1 0");
+    }
+
+    {
+        std::time_t t = std::time(nullptr);
+        std::tm tm = *std::localtime(&t);
+        char buffer[64] = {};
+        std::strftime(buffer, 64, "%c", &tm);
+        HPX_TEST_EQ((format("{}", tm)), buffer);
+
+        std::strftime(buffer, 64, "%A %c", &tm);
+        HPX_TEST_EQ((format("{:%A %c}", tm)), buffer);
     }
 
     {
