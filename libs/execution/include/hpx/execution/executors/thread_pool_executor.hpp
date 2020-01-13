@@ -232,7 +232,8 @@ namespace hpx { namespace parallel { namespace execution {
     /// and a BulkTwoWayExecutor
     class HPX_EXPORT thread_pool_executor
     {
-        ///  Associate the parallel_execution_tag executor tag type as a default
+    public:
+        /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
         typedef parallel_execution_tag execution_category;
 
