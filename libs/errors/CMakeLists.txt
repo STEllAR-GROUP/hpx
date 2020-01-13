@@ -48,7 +48,6 @@ add_hpx_module(errors
   DEPENDENCIES
     hpx_assertion
     hpx_config
-    hpx_datastructures
     hpx_filesystem
     hpx_format
     hpx_logging

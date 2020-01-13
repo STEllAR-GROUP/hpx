@@ -9,15 +9,12 @@
 #define HPX_EXCEPTION_INFO_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors/error_code.hpp>
 #include <hpx/errors/exception_info.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <memory>
-#include <tuple>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
@@ -75,45 +72,35 @@ namespace hpx {
         };
 
         template <typename... Ts>
-        class exception_info_node : public exception_info_node_base
+        class exception_info_node
+          : public exception_info_node_base
+          , Ts...
         {
         public:
             template <typename... ErrorInfo>
             explicit exception_info_node(ErrorInfo&&... tagged_values)
-              : data(tagged_values._value...)
+              : Ts(tagged_values)...
             {
             }
 
-            template <std::size_t... Is>
-            void const* _lookup(util::detail::pack_c<std::size_t, Is...>,
-                std::type_info const& tag) const noexcept
+            void const* lookup(std::type_info const& tag) const
+                noexcept override
             {
                 using entry_type =
                     std::pair<std::type_info const&, void const*>;
                 entry_type const entries[] = {{typeid(typename Ts::tag),
-                    std::addressof(std::get<Is>(data))}...};
+                    std::addressof(static_cast<Ts const*>(this)->_value)}...};
 
                 for (auto const& entry : entries)
                 {
                     if (entry.first == tag)
                         return entry.second;
                 }
-                return nullptr;
-            }
-
-            void const* lookup(std::type_info const& tag) const
-                noexcept override
-            {
-                using indices_pack =
-                    typename util::detail::make_index_pack<sizeof...(Ts)>::type;
-                if (void const* value = _lookup(indices_pack(), tag))
-                    return value;
 
                 return next ? next->lookup(tag) : nullptr;
             }
 
             using exception_info_node_base::next;
-            std::tuple<typename Ts::type...> data;
         };
     }    // namespace detail
 

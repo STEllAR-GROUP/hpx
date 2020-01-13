@@ -105,14 +105,17 @@ namespace hpx {
             std::exception_ptr const&);
         HPX_EXPORT void report_exception_and_continue(hpx::exception const&);
 
-        template <typename Exception>
-        HPX_EXPORT std::exception_ptr construct_exception(Exception const& e,
+        HPX_EXPORT hpx::exception_info construct_exception_info(
             std::string const& func, std::string const& file, long line,
             std::string const& back_trace, std::uint32_t node,
             std::string const& hostname, std::int64_t pid, std::size_t shepherd,
             std::size_t thread_id, std::string const& thread_name,
             std::string const& env, std::string const& config,
             std::string const& state_name, std::string const& auxinfo);
+
+        template <typename Exception>
+        HPX_EXPORT std::exception_ptr construct_exception(
+            Exception const& e, hpx::exception_info info);
 
         HPX_EXPORT void pre_exception_handler();
     }    // namespace detail
