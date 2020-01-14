@@ -10,7 +10,7 @@
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <map>
 #include <memory>
@@ -29,7 +29,7 @@ namespace hpx { namespace util { namespace plugin {
     template <typename BasePlugin>
     struct virtual_constructor
     {
-        using type = hpx::util::detail::pack<>;
+        using type = hpx::util::pack<>;
     };
 
 }}}    // namespace hpx::util::plugin

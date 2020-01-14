@@ -21,18 +21,18 @@ set(datastructures_headers
   hpx/datastructures/any.hpp
   hpx/datastructures/optional.hpp
   hpx/datastructures/tuple.hpp
-  hpx/datastructures/detail/pack.hpp
   hpx/datastructures/traits/supports_streaming_with_any.hpp
   hpx/datastructures/traits/is_tuple_like.hpp
 )
 
 set(datastructures_compat_headers
+  hpx/datastructures/detail/pack.hpp
+  hpx/traits/supports_streaming_with_any.hpp
+  hpx/traits/is_tuple_like.hpp
   hpx/util/detail/pack.hpp
   hpx/util/any.hpp
   hpx/util/optional.hpp
   hpx/util/tuple.hpp
-  hpx/traits/supports_streaming_with_any.hpp
-  hpx/traits/is_tuple_like.hpp
 )
 
 set(datastructures_sources)

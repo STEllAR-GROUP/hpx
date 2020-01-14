@@ -14,7 +14,6 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/lcos/dataflow.hpp>
 #endif
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -29,6 +28,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

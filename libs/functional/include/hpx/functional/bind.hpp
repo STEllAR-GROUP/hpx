@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
@@ -22,6 +21,7 @@
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -172,11 +172,11 @@ namespace hpx { namespace util {
         class bound
           : private bound_impl<F,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>,
-                typename detail::make_index_pack<sizeof...(Ts)>::type>
+                typename util::make_index_pack<sizeof...(Ts)>::type>
         {
             using base_type = detail::bound_impl<F,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>,
-                typename detail::make_index_pack<sizeof...(Ts)>::type>;
+                typename util::make_index_pack<sizeof...(Ts)>::type>;
 
         public:
             bound() {}    // needed for serialization

@@ -11,7 +11,7 @@
 
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <boost/iterator/iterator_facade.hpp>
 
@@ -33,11 +33,11 @@ namespace hpx {
     private:
         using pvector_iterator = hpx::vector_iterator<T,Data>;
         using segment_iterator = typename pvector_iterator::segment_iterator;
-        using indices = typename hpx::util::detail::make_index_pack<N>::type;
+        using indices = typename hpx::util::make_index_pack<N>::type;
 
     template<std::size_t... I>
     std::size_t  increment_solver( std::size_t dist,
-        hpx::util::detail::pack_c<std::size_t, I...> ) const
+        hpx::util::pack_c<std::size_t, I...> ) const
     {
         std::size_t max = N-1;
         std::size_t offset = 0;
@@ -141,15 +141,14 @@ namespace hpx {
                 hpx::detail::const_view_element<T,Data> >
     {
     private:
-        using const_pvector_iterator = hpx::const_vector_iterator<T,Data>;
+        using const_pvector_iterator = hpx::const_vector_iterator<T, Data>;
         using const_segment_iterator =
             typename const_pvector_iterator::segment_iterator;
-        using indices =
-            typename hpx::util::detail::make_index_pack<N>::type;
+        using indices = typename hpx::util::make_index_pack<N>::type;
 
     template<std::size_t... I>
     std::size_t  increment_solver( std::size_t dist,
-        hpx::util::detail::pack_c<std::size_t, I...> ) const
+        hpx::util::pack_c<std::size_t, I...> ) const
     {
         std::size_t max = N-1;
         std::size_t offset = 0;

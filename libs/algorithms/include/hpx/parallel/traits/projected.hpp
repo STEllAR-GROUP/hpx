@@ -8,7 +8,6 @@
 #define HPX_PARALLEL_TRAITS_PROJECTED_JUL_18_2015_1001PM
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -18,6 +17,7 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -190,14 +190,12 @@ namespace hpx { namespace parallel { namespace traits {
         };
 
         template <typename ExPolicy, typename F, typename... Projected>
-        struct is_indirect_callable<ExPolicy, F,
-            hpx::util::detail::pack<Projected...>,
+        struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
             typename std::enable_if<
-                hpx::util::detail::all_of<
-                    is_projected_indirect<Projected>...>::value &&
+                hpx::util::all_of<is_projected_indirect<Projected>...>::value &&
                 (!hpx::parallel::execution::is_vectorpack_execution_policy<
                      ExPolicy>::value ||
-                    !hpx::util::detail::all_of<
+                    !hpx::util::all_of<
                         is_projected_zip_iterator<Projected>...>::value)>::type>
           : is_indirect_callable_impl<F,
                 typename projected_result_of_indirect<Projected>::type...>
@@ -209,14 +207,12 @@ namespace hpx { namespace parallel { namespace traits {
         // special handling because zip_iterator<>::reference is not a real
         // reference type.
         template <typename ExPolicy, typename F, typename... Projected>
-        struct is_indirect_callable<ExPolicy, F,
-            hpx::util::detail::pack<Projected...>,
+        struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
             typename std::enable_if<
-                hpx::util::detail::all_of<
-                    is_projected_indirect<Projected>...>::value &&
+                hpx::util::all_of<is_projected_indirect<Projected>...>::value &&
                 hpx::parallel::execution::is_vectorpack_execution_policy<
                     ExPolicy>::value &&
-                hpx::util::detail::all_of<
+                hpx::util::all_of<
                     is_projected_zip_iterator<Projected>...>::value>::type>
           : is_indirect_callable_impl<F,
                 typename projected_result_of_vector_pack<Projected>::type...>
@@ -229,8 +225,7 @@ namespace hpx { namespace parallel { namespace traits {
     struct is_indirect_callable
       : detail::is_indirect_callable<typename hpx::util::decay<ExPolicy>::type,
             typename hpx::util::decay<F>::type,
-            hpx::util::detail::pack<
-                typename hpx::util::decay<Projected>::type...>>
+            hpx::util::pack<typename hpx::util::decay<Projected>::type...>>
     {
     };
 }}}    // namespace hpx::parallel::traits

@@ -8,7 +8,7 @@
 #define HPX_TRAITS_IS_EXECUTOR_DEC_23_0759PM
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <type_traits>
 
@@ -177,7 +177,7 @@ namespace hpx { namespace traits {
     // trait testing for any of the above
     template <typename T, typename Enable = void>
     struct is_executor_any
-      : util::detail::any_of<is_one_way_executor<T>,
+      : util::any_of<is_one_way_executor<T>,
             is_never_blocking_one_way_executor<T>, is_bulk_one_way_executor<T>,
             is_two_way_executor<T>, is_bulk_two_way_executor<T>>
     {

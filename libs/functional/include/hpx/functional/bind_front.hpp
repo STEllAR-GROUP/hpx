@@ -9,7 +9,6 @@
 #define HPX_UTIL_BIND_FRONT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/one_shot.hpp>
@@ -17,6 +16,7 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -90,10 +90,10 @@ namespace hpx { namespace util {
         template <typename F, typename... Ts>
         class bound_front
           : private bound_front_impl<F, util::tuple<Ts...>,
-                typename detail::make_index_pack<sizeof...(Ts)>::type>
+                typename util::make_index_pack<sizeof...(Ts)>::type>
         {
             using base_type = detail::bound_front_impl<F, util::tuple<Ts...>,
-                typename detail::make_index_pack<sizeof...(Ts)>::type>;
+                typename util::make_index_pack<sizeof...(Ts)>::type>;
 
         public:
             bound_front() {}    // needed for serialization

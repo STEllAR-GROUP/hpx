@@ -10,13 +10,13 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/always_void.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/container_category.hpp>
 
 #include <atomic>

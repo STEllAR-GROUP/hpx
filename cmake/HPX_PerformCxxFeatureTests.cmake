@@ -236,4 +236,14 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments(
     DEFINITIONS HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS)
 
+  # Check the availability of certain C++ builtins
+  hpx_check_for_builtin_integer_pack(
+    DEFINITIONS HPX_HAVE_BUILTIN_INTEGER_PACK)
+
+  hpx_check_for_builtin_make_integer_seq(
+    DEFINITIONS HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ)
+
+  hpx_check_for_builtin_type_pack_element(
+    DEFINITIONS HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT)
+
 endfunction()

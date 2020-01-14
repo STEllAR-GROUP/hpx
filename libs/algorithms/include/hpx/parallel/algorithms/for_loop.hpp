@@ -17,11 +17,11 @@
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
 #include <hpx/assertion.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/annotated_function.hpp>
 
@@ -51,8 +51,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE HPX_FORCEINLINE void init_iteration(
             hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>,
-            std::size_t part_index)
+            hpx::util::pack_c<std::size_t, Is...>, std::size_t part_index)
         {
             int const _sequencer[] = {
                 0, (hpx::util::get<Is>(args).init_iteration(part_index), 0)...};
@@ -62,7 +61,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         template <typename... Ts, std::size_t... Is, typename F, typename B>
         HPX_HOST_DEVICE HPX_FORCEINLINE void invoke_iteration(
             hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>, F&& f, B part_begin)
+            hpx::util::pack_c<std::size_t, Is...>, F&& f, B part_begin)
         {
             hpx::util::invoke(std::forward<F>(f), part_begin,
                 hpx::util::get<Is>(args).iteration_value()...);
@@ -71,8 +70,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE HPX_FORCEINLINE void next_iteration(
             hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>,
-            std::size_t part_index)
+            hpx::util::pack_c<std::size_t, Is...>, std::size_t part_index)
         {
             int const _sequencer[] = {
                 0, (hpx::util::get<Is>(args).next_iteration(part_index), 0)...};
@@ -82,7 +80,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE HPX_FORCEINLINE void exit_iteration(
             hpx::util::tuple<Ts...>& args,
-            hpx::util::detail::pack_c<std::size_t, Is...>, std::size_t size)
+            hpx::util::pack_c<std::size_t, Is...>, std::size_t size)
         {
             int const _sequencer[] = {
                 0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...};
@@ -115,8 +113,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
                 B part_begin, std::size_t part_steps, std::size_t part_index)
             {
                 auto pack =
-                    typename hpx::util::detail::make_index_pack<sizeof...(
-                        Ts)>::type();
+                    typename hpx::util::make_index_pack<sizeof...(Ts)>::type();
                 detail::init_iteration(args_, pack, part_index);
 
                 while (part_steps != 0)
@@ -213,8 +210,9 @@ namespace hpx { namespace parallel { inline namespace v2 {
                     part_iterations<F, S, args_type>{
                         std::forward<F>(f), stride, args},
                     [=](std::vector<hpx::future<void>>&&) mutable -> void {
-                        auto pack = typename hpx::util::detail::make_index_pack<
-                            sizeof...(Ts)>::type();
+                        auto pack =
+                            typename hpx::util::make_index_pack<sizeof...(
+                                Ts)>::type();
                         // make sure live-out variables are properly set on
                         // return
                         detail::exit_iteration(args, pack, size);
@@ -227,7 +225,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             std::size_t... Is, typename... Args>
         typename util::detail::algorithm_result<ExPolicy>::type for_loop(
             ExPolicy&& policy, B first, E last, S stride,
-            hpx::util::detail::pack_c<std::size_t, Is...>, Args&&... args)
+            hpx::util::pack_c<std::size_t, Is...>, Args&&... args)
         {
             // stride shall not be zero
             HPX_ASSERT(stride != 0);
@@ -264,7 +262,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             std::size_t... Is, typename... Args>
         typename util::detail::algorithm_result<ExPolicy>::type for_loop_n(
             ExPolicy&& policy, B first, Size size, S stride,
-            hpx::util::detail::pack_c<std::size_t, Is...>, Args&&... args)
+            hpx::util::pack_c<std::size_t, Is...>, Args&&... args)
         {
             // Size should be non-negative
             HPX_ASSERT(size >= 0);
@@ -393,7 +391,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         static_assert(sizeof...(Args) >= 1,
             "for_loop must be called with at least a function object");
 
-        using hpx::util::detail::make_index_pack;
+        using hpx::util::make_index_pack;
         return detail::for_loop(std::forward<ExPolicy>(policy), first, last, 1,
             typename make_index_pack<sizeof...(Args) - 1>::type(),
             std::forward<Args>(args)...);
@@ -592,7 +590,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         static_assert(sizeof...(Args) >= 1,
             "for_loop_strided must be called with at least a function object");
 
-        using hpx::util::detail::make_index_pack;
+        using hpx::util::make_index_pack;
         return detail::for_loop(std::forward<ExPolicy>(policy), first, last,
             stride, typename make_index_pack<sizeof...(Args) - 1>::type(),
             std::forward<Args>(args)...);
@@ -794,7 +792,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         static_assert(sizeof...(Args) >= 1,
             "for_loop_n must be called with at least a function object");
 
-        using hpx::util::detail::make_index_pack;
+        using hpx::util::make_index_pack;
         return detail::for_loop_n(std::forward<ExPolicy>(policy), first, size,
             1, typename make_index_pack<sizeof...(Args) - 1>::type(),
             std::forward<Args>(args)...);
@@ -999,7 +997,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             "for_loop_n_strided must be called with at least a function "
             "object");
 
-        using hpx::util::detail::make_index_pack;
+        using hpx::util::make_index_pack;
         return detail::for_loop_n(std::forward<ExPolicy>(policy), first, size,
             stride, typename make_index_pack<sizeof...(Args) - 1>::type(),
             std::forward<Args>(args)...);

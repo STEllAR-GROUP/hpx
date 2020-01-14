@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <boost/array.hpp>
 
@@ -203,12 +203,12 @@ namespace hpx { namespace util {
         };
 
         template <std::size_t... Is, typename... Ts, typename UTuple>
-        struct are_tuples_compatible_impl<detail::pack_c<std::size_t, Is...>,
+        struct are_tuples_compatible_impl<util::pack_c<std::size_t, Is...>,
             tuple<Ts...>, UTuple,
             typename std::enable_if<tuple_size<typename std::remove_reference<
                                         UTuple>::type>::value ==
-                detail::pack<Ts...>::size>::type>
-          : hpx::util::detail::all_of<std::is_convertible<
+                util::pack<Ts...>::size>::type>
+          : util::all_of<std::is_convertible<
                 decltype(util::get<Is>(std::declval<UTuple>())), Ts>...>
         {
         };
@@ -219,7 +219,7 @@ namespace hpx { namespace util {
         template <typename... Ts, typename UTuple>
         struct are_tuples_compatible<tuple<Ts...>, UTuple>
           : are_tuples_compatible_impl<
-                typename detail::make_index_pack<sizeof...(Ts)>::type,
+                typename util::make_index_pack<sizeof...(Ts)>::type,
                 tuple<Ts...>, UTuple>
         {
         };
@@ -229,14 +229,13 @@ namespace hpx { namespace util {
         struct tuple_impl;
 
         template <std::size_t... Is, typename... Ts>
-        struct tuple_impl<detail::pack_c<std::size_t, Is...>, Ts...>
+        struct tuple_impl<util::pack_c<std::size_t, Is...>, Ts...>
           : tuple_member<Is, Ts>...
         {
             // 20.4.2.1, tuple construction
             template <typename Dependent = void,
                 typename Enable = typename std::enable_if<
-                    hpx::util::detail::all_of<
-                        std::is_constructible<Ts>...>::value,
+                    util::all_of<std::is_constructible<Ts>...>::value,
                     Dependent>::type>
             HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl()
               : tuple_member<Is, Ts>()...
@@ -244,9 +243,8 @@ namespace hpx { namespace util {
             }
 
             template <typename... Us,
-                typename Enable =
-                    typename std::enable_if<detail::pack<Us...>::size ==
-                        detail::pack<Ts...>::size>::type>
+                typename Enable = typename std::enable_if<
+                    util::pack<Us...>::size == util::pack<Ts...>::size>::type>
             explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple_impl(
                 std::piecewise_construct_t, Us&&... vs)
               : tuple_member<Is, Ts>(std::forward<Us>(vs))...
@@ -318,20 +316,21 @@ namespace hpx { namespace util {
             }
 
             template <std::size_t I>
-            HPX_HOST_DEVICE typename detail::at_index<I, Ts...>::type&
+            HPX_HOST_DEVICE typename util::at_index<I, Ts...>::type&
             get() noexcept
             {
-                return static_cast<tuple_member<I,
-                    typename detail::at_index<I, Ts...>::type>&>(*this)
+                return static_cast<
+                    tuple_member<I, typename util::at_index<I, Ts...>::type>&>(
+                    *this)
                     .value();
             }
 
             template <std::size_t I>
-            HPX_HOST_DEVICE typename detail::at_index<I, Ts...>::type const&
-            get() const noexcept
+            HPX_HOST_DEVICE typename util::at_index<I, Ts...>::type const& get()
+                const noexcept
             {
                 return static_cast<tuple_member<I,
-                    typename detail::at_index<I, Ts...>::type> const&>(*this)
+                    typename util::at_index<I, Ts...>::type> const&>(*this)
                     .value();
             }
 
@@ -428,8 +427,8 @@ namespace hpx { namespace util {
     class tuple
     {
     public:    // exposition-only
-        detail::tuple_impl<
-            typename detail::make_index_pack<sizeof...(Ts)>::type, Ts...>
+        detail::tuple_impl<typename util::make_index_pack<sizeof...(Ts)>::type,
+            Ts...>
             _impl;
 
     public:
@@ -439,7 +438,7 @@ namespace hpx { namespace util {
         // Value initializes each element.
         template <typename Dependent = void,
             typename Enable = typename std::enable_if<
-                hpx::util::detail::all_of<std::is_constructible<Ts>...>::value,
+                util::all_of<std::is_constructible<Ts>...>::value,
                 Dependent>::type>
         HPX_CONSTEXPR HPX_HOST_DEVICE tuple()
           : _impl()
@@ -464,7 +463,7 @@ namespace hpx { namespace util {
         template <typename U, typename... Us,
             typename Enable = typename std::enable_if<
                 !std::is_same<tuple, typename std::decay<U>::type>::value ||
-                detail::pack<Us...>::size != 0>::type,
+                util::pack<Us...>::size != 0>::type,
             typename EnableCompatible = typename std::enable_if<detail::
                     are_tuples_compatible<tuple, tuple<U, Us...>>::value>::type>
         explicit HPX_CONSTEXPR HPX_HOST_DEVICE tuple(U&& v, Us&&... vs)
@@ -542,7 +541,7 @@ namespace hpx { namespace util {
         template <typename UTuple>
         HPX_HOST_DEVICE typename std::enable_if<
             tuple_size<typename std::decay<UTuple>::type>::value ==
-                detail::pack<Ts...>::size,
+                util::pack<Ts...>::size,
             tuple&>::type
         operator=(UTuple&& other)
         {
@@ -666,7 +665,7 @@ namespace hpx { namespace util {
     template <std::size_t I, typename... Ts>
     struct tuple_element<I, tuple<Ts...>>
     {
-        using type = typename detail::at_index<I, Ts...>::type;
+        using type = typename util::at_index<I, Ts...>::type;
 
         static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
             tuple<Ts...>& tuple) noexcept
@@ -879,20 +878,20 @@ namespace hpx { namespace util {
         struct tuple_cat_size_impl;
 
         template <std::size_t Size>
-        struct tuple_cat_size_impl<Size, detail::pack<>>
+        struct tuple_cat_size_impl<Size, util::pack<>>
           : std::integral_constant<std::size_t, Size>
         {
         };
 
         template <std::size_t Size, typename Head, typename... Tail>
-        struct tuple_cat_size_impl<Size, detail::pack<Head, Tail...>>
+        struct tuple_cat_size_impl<Size, util::pack<Head, Tail...>>
           : tuple_cat_size_impl<(Size + tuple_size<Head>::value),
-                detail::pack<Tail...>>
+                util::pack<Tail...>>
         {
         };
 
         template <typename... Tuples>
-        struct tuple_cat_size : tuple_cat_size_impl<0, detail::pack<Tuples...>>
+        struct tuple_cat_size : tuple_cat_size_impl<0, util::pack<Tuples...>>
         {
         };
 
@@ -901,7 +900,7 @@ namespace hpx { namespace util {
         struct tuple_cat_element;
 
         template <std::size_t I, typename Head, typename... Tail>
-        struct tuple_cat_element<I, detail::pack<Head, Tail...>,
+        struct tuple_cat_element<I, util::pack<Head, Tail...>,
             typename std::enable_if<(I < tuple_size<Head>::value)>::type>
           : tuple_element<I, Head>
         {
@@ -915,13 +914,12 @@ namespace hpx { namespace util {
         };
 
         template <std::size_t I, typename Head, typename... Tail>
-        struct tuple_cat_element<I, detail::pack<Head, Tail...>,
+        struct tuple_cat_element<I, util::pack<Head, Tail...>,
             typename std::enable_if<(I >= tuple_size<Head>::value)>::type>
-          : tuple_cat_element<I - tuple_size<Head>::value,
-                detail::pack<Tail...>>
+          : tuple_cat_element<I - tuple_size<Head>::value, util::pack<Tail...>>
         {
             using base_type = tuple_cat_element<I - tuple_size<Head>::value,
-                detail::pack<Tail...>>;
+                util::pack<Tail...>>;
 
             template <typename THead, typename... TTail>
             static HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
@@ -965,15 +963,15 @@ namespace hpx { namespace util {
     HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(
         Tuples&&... tuples)
         -> decltype(detail::tuple_cat_impl(
-            typename detail::make_index_pack<detail::tuple_cat_size<
+            typename util::make_index_pack<detail::tuple_cat_size<
                 typename std::decay<Tuples>::type...>::value>::type{},
-            detail::pack<typename std::decay<Tuples>::type...>{},
+            util::pack<typename std::decay<Tuples>::type...>{},
             std::forward<Tuples>(tuples)...))
     {
         return detail::tuple_cat_impl(
-            typename detail::make_index_pack<detail::tuple_cat_size<
+            typename util::make_index_pack<detail::tuple_cat_size<
                 typename std::decay<Tuples>::type...>::value>::type{},
-            detail::pack<typename std::decay<Tuples>::type...>{},
+            util::pack<typename std::decay<Tuples>::type...>{},
             std::forward<Tuples>(tuples)...);
     }
 

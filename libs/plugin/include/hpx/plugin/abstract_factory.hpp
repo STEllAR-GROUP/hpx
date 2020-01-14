@@ -8,8 +8,8 @@
 #define HPX_ABSTRACT_FACTORY_VP_2004_08_25
 
 #include <hpx/plugin/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/plugin/virtual_constructor.hpp>
+#include <hpx/type_support/pack.hpp>
 
 namespace hpx { namespace util { namespace plugin {
 
@@ -30,7 +30,7 @@ namespace hpx { namespace util { namespace plugin {
         */
         template <typename BasePlugin, typename Base, typename... Parameters>
         struct abstract_factory_item<BasePlugin, Base,
-            hpx::util::detail::pack<Parameters...>> : public Base
+            hpx::util::pack<Parameters...>> : public Base
         {
             using Base::create;
             virtual BasePlugin* create(

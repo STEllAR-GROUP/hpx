@@ -45,7 +45,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/concurrency/itt_notify.hpp>
@@ -222,19 +222,19 @@ namespace hpx { namespace actions
     {
         // Flag the use of raw pointer types as action arguments
         static_assert(
-            !util::detail::any_of<std::is_pointer<Args>...>::value,
+            !util::any_of<std::is_pointer<Args>...>::value,
             "Using raw pointers as arguments for actions is not supported.");
 
         // Flag the use of array types as action arguments
         static_assert(
-            !util::detail::any_of<
+            !util::any_of<
                 std::is_array<typename std::remove_reference<Args>::type>...
             >::value,
             "Using arrays as arguments for actions is not supported.");
 
         // Flag the use of non-const reference types as action arguments
         static_assert(
-            !util::detail::any_of<
+            !util::any_of<
                 detail::is_non_const_reference<Args>...
             >::value,
             "Using non-const references as arguments for actions is not supported.");

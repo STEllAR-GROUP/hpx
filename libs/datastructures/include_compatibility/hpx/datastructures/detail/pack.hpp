@@ -10,10 +10,11 @@
 
 #if defined(HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message("The header hpx/util/detail/pack.hpp is deprecated, \
+#pragma message(                                                               \
+    "The header hpx/datastructures/detail/pack.hpp is deprecated, \
     please include hpx/type_support/detail/pack.hpp instead")
 #else
-#warning "The header hpx/util/detail/pack.hpp is deprecated, \
+#warning "The header hpx/datastructures/detail/pack.hpp is deprecated, \
     please include hpx/type_support/detail/pack.hpp instead"
 #endif
 #endif

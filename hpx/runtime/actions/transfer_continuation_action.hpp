@@ -23,7 +23,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -76,7 +76,7 @@ namespace hpx { namespace actions
         ///       continuations.
         template <std::size_t ...Is>
         threads::thread_function_type
-        get_thread_function(util::detail::pack_c<std::size_t, Is...>,
+        get_thread_function(util::pack_c<std::size_t, Is...>,
             naming::id_type&& target, naming::address::address_type lva,
             naming::address::component_type comptype);
 
@@ -86,7 +86,7 @@ namespace hpx { namespace actions
             naming::address::component_type comptype) override;
 
         template <std::size_t... Is>
-        void schedule_thread(util::detail::pack_c<std::size_t, Is...>,
+        void schedule_thread(util::pack_c<std::size_t, Is...>,
             naming::gid_type const& target_gid,
             naming::address::address_type lva,
             naming::address::component_type comptype, std::size_t num_thread);
@@ -140,7 +140,7 @@ namespace hpx { namespace actions
     template <std::size_t ...Is>
     threads::thread_function_type
     transfer_continuation_action<Action>::get_thread_function(
-        util::detail::pack_c<std::size_t, Is...>,
+        util::pack_c<std::size_t, Is...>,
         naming::id_type&& target, naming::address::address_type lva,
         naming::address::component_type comptype)
     {
@@ -156,7 +156,7 @@ namespace hpx { namespace actions
         naming::address::component_type comptype)
     {
         return get_thread_function(
-            typename util::detail::make_index_pack<Action::arity>::type(),
+            typename util::make_index_pack<Action::arity>::type(),
             std::move(target), lva, comptype);
     }
 
@@ -164,7 +164,7 @@ namespace hpx { namespace actions
     template <std::size_t ...Is>
     void
     transfer_continuation_action<Action>::schedule_thread(
-        util::detail::pack_c<std::size_t, Is...>,
+        util::pack_c<std::size_t, Is...>,
         naming::gid_type const& target_gid,
         naming::address::address_type lva,
         naming::address::component_type comptype, std::size_t /*num_thread*/)
@@ -192,7 +192,7 @@ namespace hpx { namespace actions
         naming::address::component_type comptype, std::size_t num_thread)
     {
         schedule_thread(
-            typename util::detail::make_index_pack<Action::arity>::type(),
+            typename util::make_index_pack<Action::arity>::type(),
             target_gid, lva, comptype, num_thread);
 
         // keep track of number of invocations

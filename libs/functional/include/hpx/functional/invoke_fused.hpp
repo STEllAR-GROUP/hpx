@@ -10,10 +10,10 @@
 #define HPX_UTIL_INVOKE_FUSED_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/result_of.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>

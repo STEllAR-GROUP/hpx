@@ -160,7 +160,6 @@ namespace hpx { namespace lcos {
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
@@ -174,6 +173,7 @@ namespace hpx { namespace lcos {
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -246,8 +246,7 @@ namespace hpx { namespace lcos {
         struct make_fold_action_impl;
 
         template <typename Action, std::size_t... Is>
-        struct make_fold_action_impl<Action,
-            util::detail::pack_c<std::size_t, Is...>>
+        struct make_fold_action_impl<Action, util::pack_c<std::size_t, Is...>>
         {
             typedef typename fold_result<Action>::type action_result;
 
@@ -269,14 +268,14 @@ namespace hpx { namespace lcos {
         template <typename Action>
         struct make_fold_action
           : make_fold_action_impl<Action,
-                typename util::detail::make_index_pack<Action::arity>::type>
+                typename util::make_index_pack<Action::arity>::type>
         {
         };
 
         template <typename Action>
         struct make_fold_action<fold_with_index<Action>>
           : make_fold_action_impl<fold_with_index<Action>,
-                typename util::detail::make_index_pack<Action::arity - 1>::type>
+                typename util::make_index_pack<Action::arity - 1>::type>
         {
         };
 

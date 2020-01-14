@@ -90,11 +90,11 @@ namespace hpx { namespace util {
         class deferred
           : private deferred_impl<F,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>,
-                typename detail::make_index_pack<sizeof...(Ts)>::type>
+                typename util::make_index_pack<sizeof...(Ts)>::type>
         {
             using base_type = deferred_impl<F,
                 util::tuple<typename util::decay_unwrap<Ts>::type...>,
-                typename detail::make_index_pack<sizeof...(Ts)>::type>;
+                typename util::make_index_pack<sizeof...(Ts)>::type>;
 
         public:
             deferred() {}    // needed for serialization

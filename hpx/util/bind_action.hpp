@@ -37,7 +37,7 @@ namespace hpx { namespace util
             std::size_t ...Is, typename ...Ts, typename Us>
         HPX_FORCEINLINE
         bool bind_action_apply_impl(
-            detail::pack_c<std::size_t, Is...>,
+            pack_c<std::size_t, Is...>,
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
             return hpx::apply<Action>(
@@ -51,11 +51,10 @@ namespace hpx { namespace util
         bool
         bind_action_apply(Ts const& bound, Us&& unbound)
         {
-            using index_pack = typename detail::make_index_pack<
-                    util::tuple_size<typename std::decay<Ts>::type>::value
-                >::type;
-            return detail::bind_action_apply_impl<Action>(index_pack{},
-                bound, std::forward<Us>(unbound));
+            using index_pack = typename util::make_index_pack<
+                util::tuple_size<typename std::decay<Ts>::type>::value>::type;
+            return detail::bind_action_apply_impl<Action>(
+                index_pack{}, bound, std::forward<Us>(unbound));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -64,7 +63,7 @@ namespace hpx { namespace util
             std::size_t ...Is, typename ...Ts, typename Us>
         HPX_FORCEINLINE
         bool bind_action_apply_cont_impl(
-            detail::pack_c<std::size_t, Is...>,
+            pack_c<std::size_t, Is...>,
             naming::id_type const& cont,
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
@@ -80,7 +79,7 @@ namespace hpx { namespace util
         bind_action_apply_cont(naming::id_type const& cont,
             Ts const& bound, Us&& unbound)
         {
-            using index_pack = typename detail::make_index_pack<
+            using index_pack = typename util::make_index_pack<
                     util::tuple_size<typename std::decay<Ts>::type>::value
                 >::type;
             return detail::bind_action_apply_cont_impl<Action>(index_pack{},
@@ -93,7 +92,7 @@ namespace hpx { namespace util
             std::size_t ...Is, typename Continuation, typename ...Ts, typename Us>
         HPX_FORCEINLINE
         bool bind_action_apply_cont_impl2(
-            detail::pack_c<std::size_t, Is...>,
+            pack_c<std::size_t, Is...>,
             Continuation && cont,
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
@@ -112,7 +111,7 @@ namespace hpx { namespace util
         bind_action_apply_cont2(Continuation && cont,
             Ts const& bound, Us&& unbound)
         {
-            using index_pack = typename detail::make_index_pack<
+            using index_pack = typename util::make_index_pack<
                     util::tuple_size<typename std::decay<Ts>::type>::value
                 >::type;
             return detail::bind_action_apply_cont_impl2<Action>(index_pack{},
@@ -127,7 +126,7 @@ namespace hpx { namespace util
         lcos::future<typename traits::promise_local_result<
             typename hpx::traits::extract_action<Action>::remote_result_type
         >::type> bind_action_async_impl(
-            detail::pack_c<std::size_t, Is...>,
+            pack_c<std::size_t, Is...>,
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
             return hpx::async<Action>(
@@ -143,7 +142,7 @@ namespace hpx { namespace util
         >::type>
         bind_action_async(Ts const& bound, Us&& unbound)
         {
-            using index_pack = typename detail::make_index_pack<
+            using index_pack = typename util::make_index_pack<
                     util::tuple_size<typename std::decay<Ts>::type>::value
                 >::type;
             return detail::bind_action_async_impl<Action>(index_pack{},
@@ -158,7 +157,7 @@ namespace hpx { namespace util
         >::type
         bind_action_invoke(Ts&& bound, Us&& unbound)
         {
-            using index_pack = typename detail::make_index_pack<
+            using index_pack = typename util::make_index_pack<
                     util::tuple_size<typename std::decay<Ts>::type>::value
                 >::type;
             return detail::bind_action_async_impl<Action>(index_pack{},

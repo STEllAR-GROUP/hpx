@@ -9,12 +9,12 @@
 #define HPX_ITERATOR_SUPPORT_ZIP_ITERATOR_MAY_29_2014_0852PM
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/pack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -212,7 +212,7 @@ namespace hpx { namespace util {
             template <std::size_t... Is>
             HPX_HOST_DEVICE static
                 typename zip_iterator_reference<tuple<Ts...>>::type
-                call(detail::pack_c<std::size_t, Is...>,
+                call(util::pack_c<std::size_t, Is...>,
                     tuple<Ts...> const& iterators)
             {
                 return util::forward_as_tuple(*util::get<Is>(iterators)...);
@@ -300,7 +300,7 @@ namespace hpx { namespace util {
             HPX_HOST_DEVICE typename base_type::reference dereference() const
             {
                 return dereference_iterator<IteratorTuple>::call(
-                    typename detail::make_index_pack<
+                    typename util::make_index_pack<
                         util::tuple_size<IteratorTuple>::value>::type(),
                     iterators_);
             }
@@ -329,8 +329,7 @@ namespace hpx { namespace util {
 
         private:
             template <typename F, std::size_t... Is>
-            HPX_HOST_DEVICE void apply(
-                F&& f, detail::pack_c<std::size_t, Is...>)
+            HPX_HOST_DEVICE void apply(F&& f, util::pack_c<std::size_t, Is...>)
             {
                 int const _sequencer[] = {
                     ((f(util::get<Is>(iterators_))), 0)...};
@@ -341,7 +340,7 @@ namespace hpx { namespace util {
             HPX_HOST_DEVICE void apply(F&& f)
             {
                 return apply(std::forward<F>(f),
-                    detail::make_index_pack<
+                    util::make_index_pack<
                         util::tuple_size<IteratorTuple>::value>());
             }
 
@@ -542,8 +541,8 @@ namespace hpx { namespace traits {
                 result_type;
 
             template <std::size_t... Is, typename... Ts_>
-            static result_type call(util::detail::pack_c<std::size_t, Is...>,
-                util::tuple<Ts_...> const& t)
+            static result_type call(
+                util::pack_c<std::size_t, Is...>, util::tuple<Ts_...> const& t)
             {
                 return util::make_tuple(
                     typename F::template apply<Ts>()(util::get<Is>(t))...);
@@ -552,7 +551,7 @@ namespace hpx { namespace traits {
             template <typename... Ts_>
             static result_type call(util::zip_iterator<Ts_...> const& iter)
             {
-                using hpx::util::detail::make_index_pack;
+                using hpx::util::make_index_pack;
                 return call(typename make_index_pack<sizeof...(Ts)>::type(),
                     iter.get_iterator_tuple());
             }
