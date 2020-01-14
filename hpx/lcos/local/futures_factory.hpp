@@ -265,7 +265,7 @@ namespace hpx { namespace lcos { namespace local {
                     parallel::execution::post(*exec_,
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
-                        schedulehint, annotation);
+                        exec_->get_schedulehint(), annotation);
                     return threads::invalid_thread_id;
                 }
                 else if (policy == launch::fork)

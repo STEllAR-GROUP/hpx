@@ -278,8 +278,9 @@ namespace hpx { namespace threads
                     stacksize, ec);
             }
 
-            thread_priority  get_priority() const { return priority_; }
-            thread_stacksize get_stacksize() const { return stacksize_; }
+            thread_stacksize     get_stacksize() const { return stacksize_; }
+            thread_priority      get_priority() const { return priority_; }
+            thread_schedule_hint get_schedulehint() const { return schedulehint_; }
 
         protected:
             thread_stacksize     stacksize_;
@@ -476,6 +477,11 @@ namespace hpx { namespace threads
         thread_stacksize get_stacksize() const {
             return static_cast<detail::scheduled_executor_base*>
                     (executor_data_.get())->get_stacksize();
+        }
+
+        thread_schedule_hint get_schedulehint() const {
+            return static_cast<detail::scheduled_executor_base*>
+                    (executor_data_.get())->get_schedulehint();
         }
 
         /// Return a reference to the default executor for this process.
