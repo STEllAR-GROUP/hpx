@@ -60,3 +60,14 @@ endforeach()
 add_hpx_pseudo_dependencies(
   tests.unit.modules.functional tests.unit.modules.functional.function
 )
+
+source_group("Source Files" FILES tag_invoke.cpp)
+add_hpx_executable(tag_invoke_test
+INTERNAL_FLAGS
+SOURCES tag_invoke.cpp
+NOLIBS
+DEPENDENCIES hpx_functional hpx_testing
+EXCLUDE_FROM_ALL
+FOLDER "Tests/Unit/Modules/Functional")
+
+add_hpx_unit_test("modules.functional" tag_invoke)

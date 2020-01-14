@@ -9,7 +9,6 @@
 inline constexpr bool test1 = true;
 
 template <typename T>
-
 inline constexpr bool test2 = true;
 
 struct foo
