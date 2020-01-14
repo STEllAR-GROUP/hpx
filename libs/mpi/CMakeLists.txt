@@ -90,3 +90,12 @@ add_hpx_module(mpi
     hpx::mpi
   CMAKE_SUBDIRS examples tests
 )
+
+if (HPX_WITH_APEX)
+  cmake_policy(SET CMP0079 NEW)
+  # Reload the Apex setup but this time, with MPI
+  set(HPX_HAVE_LIB_MPI ON)
+  target_compile_definitions(apex_flags INTERFACE APEX_HAVE_MPI)
+  target_link_libraries(apex PRIVATE ${MPI_CXX_LIBRARY} ${MPI_C_LIBRARY} ${MPI_LIBRARIES})
+  target_include_directories(apex PRIVATE ${MPI_INCLUDE_PATH} ${MPI_C_INCLUDE_DIRS})
+endif()
