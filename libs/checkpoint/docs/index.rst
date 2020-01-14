@@ -12,22 +12,22 @@ checkpoint
 ==========
 
 A common need of users is to periodically backup an application. This practice
-provides resiliency and potential restart points in code. We have developed the
+provides resiliency and potential restart points in code. |hpx| utilizes the
 concept of a ``checkpoint`` to support this use case.
 
 Found in ``hpx/util/checkpoint.hpp``, ``checkpoint``\ s are defined as objects
-which hold a serialized version of an object or set of objects at a particular
+that hold a serialized version of an object or set of objects at a particular
 moment in time. This representation can be stored in memory for later use or it
 can be written to disk for storage and/or recovery at a later point. In order to
-create and fill this object with data we use a function called
+create and fill this object with data, users must use a function called
 ``save_checkpoint``. In code the function looks like this::
 
     hpx::future<hpx::util::checkpoint> hpx::util::save_checkpoint(a, b, c, ...);
 
-``save_checkpoint`` takes arbitrary data containers such as int, double, float,
-vector, and future and serializes them into a newly created ``checkpoint``
-object. This function returns a ``future`` to a ``checkpoint`` containing the
-data. Let us look a simple use case below::
+``save_checkpoint`` takes arbitrary data containers, such as ``int``,
+``double``, ``float``, ``vector``, and ``future``, and serializes them into a
+newly created ``checkpoint`` object. This function returns a ``future`` to a
+``checkpoint`` containing the data. Here's an example of a simple use case::
 
     using hpx::util::checkpoint;
     using hpx::util::save_checkpoint;
@@ -35,7 +35,7 @@ data. Let us look a simple use case below::
     std::vector<int> vec{1,2,3,4,5};
     hpx::future<checkpoint> save_checkpoint(vec);
 
-Once the future is ready the checkpoint object will contain the ``vector``
+Once the future is ready, the checkpoint object will contain the ``vector``
 ``vec`` and its five elements.
 
 It is also possible to modify the launch policy used by ``save_checkpoint``.
@@ -55,7 +55,7 @@ follow the launch policy). An example of these features can be found below:
    :language: c++
    :lines: 27-38
 
-Now that we can create ``checkpoint`` s we now must be able to restore the
+Once users can create ``checkpoint``\ s they must now be able to restore the
 objects they contain into memory. This is accomplished by the function
 ``restore_checkpoint``. This function takes a ``checkpoint`` and fills its data
 into the containers it is provided. It is important to remember that the
@@ -67,14 +67,13 @@ containers must be ordered in the same way they were placed into the
    :lines: 41-49
 
 The core utility of ``checkpoint`` is in its ability to make certain data
-persistent. Often this means that the data is needed to be stored in an object,
-such as a file, for later use. For these cases we have provided two solutions:
-stream operator overloads and access iterators.
+persistent. Often, this means that the data needs to be stored in an object,
+such as a file, for later use. |hpx| has two solutions for these issues: stream
+operator overloads and access iterators.
 
-We have created the two stream overloads
-``operator<<`` and ``operator>>`` to stream data
-out of and into ``checkpoint``. You can see an
-example of the overloads in use below:
+|hpx| contains two stream overloads, ``operator<<`` and ``operator>>``, to stream
+data out of and into ``checkpoint``. Here is an example of the overloads in
+use below:
 
 .. literalinclude:: ../../../../libs/tests/unit/checkpoint.cpp
    :language: c++
@@ -82,20 +81,20 @@ example of the overloads in use below:
 
 This is the primary way to move data into and out of a ``checkpoint``. It is
 important to note, however, that users should be cautious when using a stream
-operator to load data an another function to remove it (or vice versa). Both
+operator to load data and another function to remove it (or vice versa). Both
 ``operator<<`` and ``operator>>`` rely on a ``.write()`` and a ``.read()``
 function respectively. In order to know how much data to read from the
 ``std::istream``, the ``operator<<`` will write the size of the ``checkpoint``
 before writing the ``checkpoint`` data. Correspondingly, the ``operator>>`` will
-read the size of the stored data before reading the data into new instance of
+read the size of the stored data before reading the data into a new instance of
 ``checkpoint``. As long as the user employs the ``operator<<`` and
-``operator>>`` to stream the data this detail can be ignored.
+``operator>>`` to stream the data, this detail can be ignored.
 
 .. important::
 
    Be careful when mixing ``operator<<`` and ``operator>>`` with other
-   facilities to read and write to a ``checkpoint``. ``operator<<`` writes and
-   extra variable and ``operator>>`` reads this variable back separately. Used
+   facilities to read and write to a ``checkpoint``. ``operator<<`` writes an
+   extra variable, and ``operator>>`` reads this variable back separately. Used
    together the user will not encounter any issues and can safely ignore this
    detail.
 

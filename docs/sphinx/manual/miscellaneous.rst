@@ -15,12 +15,12 @@ Miscellaneous
 Error handling
 ==============
 
-Like in any other asynchronous invocation scheme it is important to be able to
+Like in any other asynchronous invocation scheme, it is important to be able to
 handle error conditions occurring while the asynchronous (and possibly remote)
 operation is executed. In |hpx| all error handling is based on standard C++
 exception handling. Any exception thrown during the execution of an asynchronous
 operation will be transferred back to the original invocation :term:`locality`,
-where it is rethrown during synchronization with the calling thread.
+where it will be rethrown during synchronization with the calling thread.
 
 The source code for this example can be found here:
 :download:`error_handling.cpp <../../examples/quickstart/error_handling.cpp>`.
@@ -30,7 +30,7 @@ The source code for this example can be found here:
 Working with exceptions
 -----------------------
 
-For the following description we assume that the function ``raise_exception()``
+For the following description assume that the function ``raise_exception()``
 is executed by invoking the plain action ``raise_exception_type``.
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
@@ -59,15 +59,15 @@ calling thread tries to wait for the result of the action by invoking either
 
 Additionally, this example demonstrates how an exception thrown by an (possibly
 remote) action can be handled. It shows the use of
-:cpp:func:`hpx::diagnostic_information` which retrieves all available diagnostic
+:cpp:func:`hpx::diagnostic_information`, which retrieves all available diagnostic
 information from the exception as a formatted string. This includes, for
 instance, the name of the source file and line number, the sequence number of
-the OS-thread and the |hpx|-thread id, the :term:`locality` id and the stack
+the OS thread and the |hpx| thread id, the :term:`locality` id and the stack
 backtrace of the point where the original exception was thrown.
 
 Under certain circumstances it is desirable to output only some of the
 diagnostics, or to output those using different formatting. For this case, |hpx|
-exposes a set of lower level functions as demonstrated in the following code
+exposes a set of lower-level functions as demonstrated in the following code
 snippet:
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
@@ -83,7 +83,7 @@ Most of the API functions exposed by |hpx| can be invoked in two different
 modes. By default those will throw an exception on error as described above.
 However, sometimes it is desirable not to throw an exception in case of an error
 condition. In this case an object instance of the :cpp:class:`hpx::error_code`
-type can be passed as the last argument to the API function. In case of an error
+type can be passed as the last argument to the API function. In case of an error,
 the error condition will be returned in that :cpp:class:`hpx::error_code`
 instance. The following example demonstrates extracting the full diagnostic
 information without exception handling:
@@ -100,14 +100,14 @@ information without exception handling:
 This example show how an error can be handled without having to resolve to
 exceptions and that the returned :cpp:class:`hpx::error_code` instance can be
 used in a very similar way as the :cpp:class:`hpx::exception` type above. Simply
-pass it to the :cpp:func:`hpx::diagnostic_information` which retrieves all
+pass it to the :cpp:func:`hpx::diagnostic_information`, which retrieves all
 available diagnostic information from the error code instance as a formatted
 string.
 
 As for handling exceptions, when working with error codes, under certain
 circumstances it is desirable to output only some of the diagnostics, or to
 output those using different formatting. For this case, |hpx| exposes a set of
-lower level functions usable with error codes as demonstrated in the following
+lower-level functions usable with error codes as demonstrated in the following
 code snippet:
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
@@ -132,13 +132,13 @@ Lightweight error codes
 Sometimes it is not desirable to collect all the ambient information about the
 error at the point where it happened as this might impose too much overhead for
 simple scenarios. In this case, |hpx| provides a lightweight error code facility
-which will hold the error code only. The following snippet demonstrates its use:
+that will hold the error code only. The following snippet demonstrates its use:
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
    :language: c++
    :lines: 146-166
 
-All functions which retrieve other diagnostic elements from the
+All functions that retrieve other diagnostic elements from the
 :cpp:class:`hpx::error_code` will fail if called with a lightweight error_code
 instance.
 
@@ -147,8 +147,15 @@ instance.
 Utilities in |hpx|
 ==================
 
-In order to ease the burden of programming in |hpx| we have provided several
+In order to ease the burden of programming, |hpx| provides several
 utilities to users. The following section documents those facilies.
+
+.. _checkpoint:
+
+Checkpoint
+----------
+
+See :ref:`libs_checkpoint`.
 
 .. _iostreams:
 
@@ -169,16 +176,16 @@ from ``hpx::cerr`` will be dispatched to ``std::cerr`` on the console
    ``hpx::endl`` and ``hpx::flush`` but those are just aliases for the
    corresponding standard manipulators.
 
-In order to use either ``hpx::cout`` or ``hpx::cerr`` application codes need to
+In order to use either ``hpx::cout`` or ``hpx::cerr``, application codes need to
 ``#include <hpx/include/iostreams.hpp>``. For an example, please see the
-simplest possible 'Hello world' program as included as an example with |hpx|:
+following 'Hello world' program:
 
 .. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
 
-Additionally those applications need to link with the iostreams component. When
-using cmake this can be achieved by using the ``COMPONENT_DEPENDENCIES``
-parameter, for instance:
+Additionally, those applications need to link with the iostreams component. When
+using CMake this can be achieved by using the ``COMPONENT_DEPENDENCIES``
+parameter; for instance:
 
 .. code-block:: cmake
 
@@ -194,4 +201,4 @@ parameter, for instance:
 
    The ``hpx::cout`` and ``hpx::cerr`` streams buffer all output locally until a
    ``std::endl`` or ``std::flush`` is encountered. That means that no output
-   will appear on the console as long as either of those is explicitly used.
+   will appear on the console as long as either of these is explicitly used.
