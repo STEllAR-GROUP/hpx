@@ -28,6 +28,7 @@
 #include <hpx/runtime/threads/executors/limiting_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 //#include <hpx/synchronization.hpp>
+#include "worker_timed.hpp"
 
 #include <array>
 #include <atomic>
@@ -114,7 +115,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv, std::uint6
     high_resolution_timer walltime;
     hpx::parallel::for_loop(hpx::parallel::execution::par.with(
                                 hpx::parallel::execution::dynamic_chunk_size( chunk_size )),
-        0, count, [&](std::uint64_t) { hpx::this_thread::sleep_for(std::chrono::microseconds(iter_length)); });
+        0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
 
     // stop the clock
     const double duration = walltime.elapsed();
