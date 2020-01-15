@@ -399,15 +399,14 @@ endif()
 ################################################################################
 # Native TLS configuration
 ################################################################################
-set(HPX_WITH_NATIVE_TLS_DEFAULT ON)
 hpx_option(HPX_WITH_NATIVE_TLS BOOL
   "Use native TLS support if available (default: ${HPX_WITH_NATIVE_TLS_DEFAULT})"
-  ${HPX_WITH_NATIVE_TLS_DEFAULT} ADVANCED)
+  ON ADVANCED)
 if(HPX_WITH_NATIVE_TLS)
   hpx_info("Native TLS is enabled.")
   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
 else()
-  hpx_info("Native TLS is disabled.")
+  hpx_error("Native TLS is disabled. HPX requires native TLS. This option will be removed in a future release.")
 endif()
 
 ################################################################################
