@@ -18,6 +18,7 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/traits/is_action.hpp>
+#include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
@@ -42,7 +43,52 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail {
+// forward declare the type we will get function annotations from
+namespace hpx { namespace lcos { namespace detail
+{
+    template <typename Frame>
+    struct dataflow_finalization;
+}}}
+
+namespace hpx { namespace traits {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    ///////////////////////////////////////////////////////////////////////////
+    // traits specialization to get annotation from dataflow_finalization
+    template <typename Frame>
+    struct get_function_annotation<lcos::detail::dataflow_finalization<Frame>>
+    {
+        using function_type = typename Frame::function_type;
+        //
+        static char const* call(
+            lcos::detail::dataflow_finalization<Frame> const& f) noexcept
+        {
+            char const* annotation = hpx::traits::get_function_annotation<
+                typename hpx::util::decay<function_type>::type>::call(f.this_->func_);
+            return annotation;
+        }
+    };
+#endif
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos { namespace detail
+{
+    template <typename Frame>
+    struct dataflow_finalization {
+        //
+        dataflow_finalization(Frame *df) : this_(df) {}
+        using is_void = typename Frame::is_void;
+        //
+        template <typename Futures>
+        void operator()(Futures&& futures) const
+        {
+            return this_->execute(is_void{}, std::forward<Futures>(futures));
+        }
+
+        // keep the dataflow frame alive with this pointer reference
+        hpx::intrusive_ptr<Frame> this_;
+    };
+
     template <typename F, typename Args>
     struct dataflow_not_callable
     {
@@ -89,6 +135,12 @@ namespace hpx { namespace lcos { namespace detail {
         typedef hpx::lcos::future<result_type> type;
 
         typedef std::is_void<result_type> is_void;
+
+        typedef Func function_type;
+        typedef dataflow_frame<Policy, Func, Futures> dataflow_type;
+
+        friend struct dataflow_finalization<dataflow_type>;
+        friend struct traits::get_function_annotation<dataflow_finalization<dataflow_type>>;
 
     private:
         // workaround gcc regression wrongly instantiating constructors
@@ -158,26 +210,30 @@ namespace hpx { namespace lcos { namespace detail {
             }
         }
 
-        HPX_FORCEINLINE void done(Futures futures)
-        {
-            hpx::util::annotate_function annotate(func_);
-
-            execute(is_void{}, std::move(futures));
-        }
-
         ///////////////////////////////////////////////////////////////////////
         void finalize(hpx::detail::async_policy policy, Futures&& futures)
         {
-            // schedule the final function invocation with high priority
-            hpx::intrusive_ptr<dataflow_frame> this_(this);
+            detail::dataflow_finalization<dataflow_type> this_f_(this);
 
-            // simply schedule new thread
             parallel::execution::parallel_policy_executor<launch::async_policy>
                 exec{policy};
+
+            parallel::execution::post(
+                exec,
+                std::move(this_f_),
+                std::move(futures));
+        }
+
+        void finalize(hpx::detail::fork_policy policy, Futures&& futures)
+        {
+            detail::dataflow_finalization<dataflow_type> this_f_(this);
+
+            parallel::execution::parallel_policy_executor<launch::fork_policy>
+                exec{policy};
+
             exec.post(
-                [this_ = std::move(this_)](Futures&& futures) -> void {
-                    return this_->done(std::move(futures));
-                },
+                exec,
+                std::move(this_f_),
                 std::move(futures));
         }
 
@@ -210,26 +266,13 @@ namespace hpx { namespace lcos { namespace detail {
 #endif
             if (!recurse_asynchronously)
             {
-                done(std::move(futures));
+                hpx::util::annotate_function annotate(func_);
+                execute(is_void{}, std::move(futures));
             }
             else
             {
                 finalize(hpx::launch::async, std::move(futures));
             }
-        }
-
-        void finalize(hpx::detail::fork_policy policy, Futures&& futures)
-        {
-            // schedule the final function invocation with high priority
-            hpx::intrusive_ptr<dataflow_frame> this_(this);
-
-            parallel::execution::parallel_policy_executor<launch::fork_policy>
-                exec{policy};
-            exec.post(
-                [this_ = std::move(this_)](Futures&& futures) -> void {
-                    return this_->done(std::move(futures));
-                },
-                std::move(futures));
         }
 
         void finalize(launch policy, Futures&& futures)
@@ -260,12 +303,11 @@ namespace hpx { namespace lcos { namespace detail {
             traits::is_threads_executor<Executor>::value>::type
         finalize(Executor&& exec, Futures&& futures)
         {
-            hpx::intrusive_ptr<dataflow_frame> this_(this);
+            detail::dataflow_finalization<dataflow_type> this_f_(this);
+
             parallel::execution::post(
                 std::forward<Executor>(exec),
-                [this_ = std::move(this_)](Futures&& futures) -> void {
-                    return this_->execute(is_void{}, std::move(futures));
-                },
+                std::move(this_f_),
                 std::move(futures));
         }
 
