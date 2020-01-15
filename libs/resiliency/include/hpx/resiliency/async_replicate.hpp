@@ -100,8 +100,7 @@ namespace hpx { namespace resiliency {
         // that passes the predicate, properly handle exceptions
         return hpx::dataflow(
             hpx::launch::sync,    // do not schedule new thread for the lambda
-            [pred = std::forward<Pred>(pred),
-                vote = std::forward<Vote>(vote),
+            [pred = std::forward<Pred>(pred), vote = std::forward<Vote>(vote),
                 n](std::vector<hpx::future<result_type>>&& results) mutable
             -> result_type {
                 // Store all valid results

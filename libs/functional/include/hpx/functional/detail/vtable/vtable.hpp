@@ -24,8 +24,7 @@ namespace hpx { namespace util { namespace detail {
     template <typename VTable, typename T>
     struct vtables
     {
-        static constexpr VTable instance =
-            detail::construct_vtable<T>();
+        static constexpr VTable instance = detail::construct_vtable<T>();
     };
 
     template <typename VTable, typename T>

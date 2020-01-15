@@ -309,8 +309,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    constexpr bool operator==(
-        optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator==(optional<T> const& lhs, optional<T> const& rhs)
     {
         return (bool(lhs) != bool(rhs)) ?
             false :
@@ -318,8 +317,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T>
-    constexpr bool operator!=(
-        optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator!=(optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs == rhs);
     }
@@ -331,8 +329,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T>
-    constexpr bool operator>=(
-        optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator>=(optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs < rhs);
     }
@@ -344,8 +341,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T>
-    constexpr bool operator<=(
-        optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator<=(optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs > rhs);
     }
@@ -517,8 +513,7 @@ namespace hpx { namespace util {
     }
 
     template <typename T, typename U, typename... Ts>
-    constexpr optional<T> make_optional(
-        std::initializer_list<U> il, Ts&&... ts)
+    constexpr optional<T> make_optional(std::initializer_list<U> il, Ts&&... ts)
     {
         return optional<T>(in_place, il, std::forward<Ts>(ts)...);
     }

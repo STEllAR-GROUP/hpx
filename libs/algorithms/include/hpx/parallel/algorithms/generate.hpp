@@ -58,8 +58,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return for_each_n<FwdIter>().call(
                     std::forward<ExPolicy>(policy), std::false_type(), first,
                     std::distance(first, last),
-                    [f = std::forward<F>(f)](
-                        type& v) mutable { v = f(); },
+                    [f = std::forward<F>(f)](type& v) mutable { v = f(); },
                     util::projection_identity());
             }
         };
@@ -185,8 +184,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return for_each_n<FwdIter>().call(
                     std::forward<ExPolicy>(policy), std::false_type(), first,
                     count,
-                    [f = std::forward<F>(f)](
-                        type& v) mutable { v = f(); },
+                    [f = std::forward<F>(f)](type& v) mutable { v = f(); },
                     util::projection_identity());
             }
         };

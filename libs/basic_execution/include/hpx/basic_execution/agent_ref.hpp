@@ -31,12 +31,10 @@ namespace hpx { namespace basic_execution {
         }
 
         constexpr agent_ref(agent_ref const&) noexcept = default;
-        constexpr agent_ref& operator=(
-            agent_ref const&) noexcept = default;
+        constexpr agent_ref& operator=(agent_ref const&) noexcept = default;
 
         constexpr agent_ref(agent_ref&&) noexcept = default;
-        constexpr agent_ref& operator=(
-            agent_ref&&) noexcept = default;
+        constexpr agent_ref& operator=(agent_ref&&) noexcept = default;
 
         constexpr explicit operator bool() const noexcept
         {

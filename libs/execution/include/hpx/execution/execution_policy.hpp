@@ -528,8 +528,8 @@ namespace hpx { namespace parallel { namespace execution {
         ///
         /// \returns The new sequenced_task_policy_shim
         ///
-        constexpr sequenced_task_policy_shim<Executor, Parameters>
-        operator()(task_policy_tag tag) const
+        constexpr sequenced_task_policy_shim<Executor, Parameters> operator()(
+            task_policy_tag tag) const
         {
             return sequenced_task_policy_shim<Executor, Parameters>(
                 exec_, params_);
@@ -628,8 +628,7 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         template <typename Executor_, typename Parameters_>
-        constexpr sequenced_policy_shim(
-            Executor_&& exec, Parameters_&& params)
+        constexpr sequenced_policy_shim(Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
         {
@@ -693,8 +692,7 @@ namespace hpx { namespace parallel { namespace execution {
         ///
         /// \returns The new parallel_task_policy
         ///
-        constexpr parallel_task_policy operator()(
-            task_policy_tag /*tag*/) const
+        constexpr parallel_task_policy operator()(task_policy_tag /*tag*/) const
         {
             return *this;
         }
@@ -995,8 +993,7 @@ namespace hpx { namespace parallel { namespace execution {
         ///
         /// \returns The new parallel_policy
         ///
-        constexpr parallel_task_policy operator()(
-            task_policy_tag /*tag*/) const
+        constexpr parallel_task_policy operator()(task_policy_tag /*tag*/) const
         {
             return parallel_task_policy();
         }
@@ -1129,8 +1126,8 @@ namespace hpx { namespace parallel { namespace execution {
         ///
         /// \returns The new parallel_policy
         ///
-        constexpr parallel_task_policy_shim<Executor, Parameters>
-        operator()(task_policy_tag tag) const
+        constexpr parallel_task_policy_shim<Executor, Parameters> operator()(
+            task_policy_tag tag) const
         {
             return parallel_task_policy_shim<Executor, Parameters>(
                 exec_, params_);
@@ -1228,8 +1225,7 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         template <typename Executor_, typename Parameters_>
-        constexpr parallel_policy_shim(
-            Executor_&& exec, Parameters_&& params)
+        constexpr parallel_policy_shim(Executor_&& exec, Parameters_&& params)
           : exec_(std::forward<Executor_>(exec))
           , params_(std::forward<Parameters_>(params))
         {
