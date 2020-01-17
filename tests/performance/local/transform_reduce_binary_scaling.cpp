@@ -21,7 +21,7 @@
 struct plus
 {
     template <typename T1, typename T2>
-    auto operator()(T1 && t1, T2 && t2) const
+    auto operator()(T1 && t1, T2 && t2) const -> decltype(t1 + t2)
     {
         return t1 + t2;
     }
@@ -30,7 +30,7 @@ struct plus
 struct multiplies
 {
     template <typename T1, typename T2>
-    auto operator()(T1 && t1, T2 && t2) const
+    auto operator()(T1 && t1, T2 && t2) const -> decltype(t1 * t2)
     {
         return t1 * t2;
     }

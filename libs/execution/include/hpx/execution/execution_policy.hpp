@@ -33,7 +33,7 @@
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Default sequential execution policy object.
-    static task_policy_tag constexpr task;
+    static constexpr task_policy_tag task;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: The class sequenced_task_policy is an execution
