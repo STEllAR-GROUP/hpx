@@ -13,15 +13,15 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/parallel_executor.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/parallel_executor.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/serialization/output_archive.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_futures.hpp>
 
 namespace hpx { namespace lcos { namespace detail {

@@ -12,15 +12,15 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/traits/executor_traits.hpp>
-#include <hpx/traits/is_executor.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/parallel/executors/execution.hpp>
+#include <hpx/execution/executors/execution.hpp>
 
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/cuda/default_executor_parameters.hpp>

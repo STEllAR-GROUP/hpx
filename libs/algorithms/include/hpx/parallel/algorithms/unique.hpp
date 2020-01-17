@@ -14,11 +14,11 @@
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/tagged_pair.hpp>
 
+#include <hpx/execution/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_negative.hpp>
-#include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
-#include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>

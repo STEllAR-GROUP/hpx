@@ -13,9 +13,9 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/executors/execution_information.hpp>
-#include <hpx/parallel/executors/static_chunk_size.hpp>
+#include <hpx/execution/execution_policy.hpp>
+#include <hpx/execution/executors/execution_information.hpp>
+#include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/topology/topology.hpp>
 

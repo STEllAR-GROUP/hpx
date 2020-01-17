@@ -15,9 +15,9 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <hpx/execution/execution_policy.hpp>
+#include <hpx/execution/executors/execution.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/parallel/executors/execution.hpp>
 #include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>

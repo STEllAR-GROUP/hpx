@@ -12,7 +12,7 @@
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/statistics/min.hpp>
 
-#include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 
 #include <algorithm>
 #include <cstddef>

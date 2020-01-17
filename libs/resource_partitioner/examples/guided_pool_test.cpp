@@ -7,8 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 //
+#include <hpx/execution/executors.hpp>
 #include <hpx/parallel/algorithms/for_loop.hpp>
-#include <hpx/parallel/executors.hpp>
 //
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>

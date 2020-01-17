@@ -9,8 +9,8 @@
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spmd_block.hpp>
-#include <hpx/parallel/execution_policy.hpp>
-#include <hpx/traits/is_execution_policy.hpp>
+#include <hpx/execution/execution_policy.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 
 #include <cstddef>
 #include <type_traits>

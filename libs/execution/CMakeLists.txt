@@ -9,6 +9,63 @@ cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(execution_headers
+  hpx/execution/algorithms/detail/is_negative.hpp
+  hpx/execution/algorithms/detail/predicates.hpp
+  hpx/execution/datapar/execution_policy_fwd.hpp
+  hpx/execution/datapar/execution_policy.hpp
+  hpx/execution/exception_list.hpp
+  hpx/execution/execution.hpp
+  hpx/execution/execution_policy_fwd.hpp
+  hpx/execution/execution_policy.hpp
+  hpx/execution/executor_parameters.hpp
+  hpx/execution/executors/auto_chunk_size.hpp
+  hpx/execution/executors/default_executor.hpp
+  hpx/execution/executors/distribution_policy_executor.hpp
+  hpx/execution/executors/dynamic_chunk_size.hpp
+  hpx/execution/executors/execution_fwd.hpp
+  hpx/execution/executors/execution.hpp
+  hpx/execution/executors/execution_information_fwd.hpp
+  hpx/execution/executors/execution_information.hpp
+  hpx/execution/executors/execution_parameters_fwd.hpp
+  hpx/execution/executors/execution_parameters.hpp
+  hpx/execution/executors/fused_bulk_execute.hpp
+  hpx/execution/executors/guided_chunk_size.hpp
+  hpx/execution/executors.hpp
+  hpx/execution/executors/parallel_executor_aggregated.hpp
+  hpx/execution/executors/parallel_executor.hpp
+  hpx/execution/executors/persistent_auto_chunk_size.hpp
+  hpx/execution/executors/pool_executor.hpp
+  hpx/execution/executors/post_policy_dispatch.hpp
+  hpx/execution/executors/rebind_executor.hpp
+  hpx/execution/executors/sequenced_executor.hpp
+  hpx/execution/executors/service_executors.hpp
+  hpx/execution/executors/static_chunk_size.hpp
+  hpx/execution/executors/this_thread_executors.hpp
+  hpx/execution/executors/thread_execution.hpp
+  hpx/execution/executors/thread_execution_information.hpp
+  hpx/execution/executors/thread_pool_attached_executors.hpp
+  hpx/execution/executors/thread_pool_executors.hpp
+  hpx/execution/executors/thread_pool_os_executors.hpp
+  hpx/execution/executors/thread_timed_execution.hpp
+  hpx/execution/executors/timed_execution_fwd.hpp
+  hpx/execution/executors/timed_execution.hpp
+  hpx/execution/executors/timed_executors.hpp
+  hpx/execution/parallel/traits/detail/vc/vector_pack_alignment_size.hpp
+  hpx/execution/parallel/traits/detail/vc/vector_pack_count_bits.hpp
+  hpx/execution/parallel/traits/detail/vc/vector_pack_load_store.hpp
+  hpx/execution/parallel/traits/detail/vc/vector_pack_type.hpp
+  hpx/execution/parallel/traits/vector_pack_alignment_size.hpp
+  hpx/execution/parallel/traits/vector_pack_count_bits.hpp
+  hpx/execution/parallel/traits/vector_pack_load_store.hpp
+  hpx/execution/parallel/traits/vector_pack_type.hpp
+  hpx/execution/traits/executor_traits.hpp
+  hpx/execution/traits/is_execution_policy.hpp
+  hpx/execution/traits/is_executor.hpp
+  hpx/execution/traits/is_executor_parameters.hpp
+  hpx/execution/traits/is_timed_executor.hpp
+)
+
+set(execution_compat_headers
   hpx/parallel/algorithms/detail/is_negative.hpp
   hpx/parallel/algorithms/detail/predicates.hpp
   hpx/parallel/datapar/execution_policy_fwd.hpp
@@ -69,6 +126,7 @@ include(HPX_AddModule)
 add_hpx_module(execution
   FORCE_LINKING_GEN
   HEADERS ${execution_headers}
+  COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES
     hpx_assertion
     hpx_allocator_support

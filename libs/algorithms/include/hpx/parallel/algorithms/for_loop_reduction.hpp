@@ -16,7 +16,7 @@
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 
 #include <boost/shared_array.hpp>
 

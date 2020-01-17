@@ -9,16 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute/host/target.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/static_chunk_size.hpp>
+#include <hpx/execution/executors/thread_pool_attached_executors.hpp>
+#include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/static_chunk_size.hpp>
-#include <hpx/parallel/executors/thread_pool_attached_executors.hpp>
-#include <hpx/traits/executor_traits.hpp>
-#include <hpx/traits/is_executor.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

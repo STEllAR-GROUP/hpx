@@ -23,7 +23,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <hpx/parallel/executors/execution.hpp>
+#include <hpx/execution/executors/execution.hpp>
 
 #include <cstddef>
 #include <cstdint>

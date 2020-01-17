@@ -8,7 +8,7 @@
 #define HPX_PARALLEL_UTIL_DETAIL_SCOPED_EXECUTOR_PARAMETERS_APR_22_1221PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/execution_parameters.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 
 namespace hpx { namespace parallel { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////

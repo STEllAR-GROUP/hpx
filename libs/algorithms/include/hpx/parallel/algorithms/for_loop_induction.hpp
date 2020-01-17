@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/parallel/algorithms/detail/predicates.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 
 #include <cstddef>
 #include <cstdlib>

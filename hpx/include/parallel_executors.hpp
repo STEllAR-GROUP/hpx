@@ -7,6 +7,6 @@
 #if !defined(HPX_PARALLEL_EXECUTORS_MAY_11_2015_0622PM)
 #define HPX_PARALLEL_EXECUTORS_MAY_11_2015_0622PM
 
-#include <hpx/parallel/executors.hpp>
+#include <hpx/execution/executors.hpp>
 
 #endif

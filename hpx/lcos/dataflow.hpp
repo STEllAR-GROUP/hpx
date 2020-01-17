@@ -35,7 +35,7 @@
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
@@ -44,8 +44,8 @@
 #include <hpx/util/pack_traversal_async.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/parallel_executor.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/parallel_executor.hpp>
 
 #include <boost/ref.hpp>
 
