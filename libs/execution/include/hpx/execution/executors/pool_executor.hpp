@@ -10,7 +10,7 @@
 #define HPX_PARALLEL_EXECUTORS_POOL_EXECUTOR_FEB_17_2018_0327PM
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/executors/thread_pool_executor.hpp>
+#include <hpx/execution/executors/thread_pool_executor.hpp>
 
 // TODO: Move this file elsewhere or remove these dependencies
 #include <hpx/runtime_fwd.hpp>

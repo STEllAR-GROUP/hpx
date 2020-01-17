@@ -16,10 +16,10 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/parallel/executors/current_executor.hpp>
-#include <hpx/parallel/executors/execution.hpp>
-#include <hpx/parallel/executors/execution_fwd.hpp>
-#include <hpx/parallel/executors/fused_bulk_execute.hpp>
+#include <hpx/execution/executors/current_executor.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/execution_fwd.hpp>
+#include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/future_traits.hpp>

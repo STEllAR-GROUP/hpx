@@ -7,7 +7,7 @@
 #ifndef HPX_RUNTIME_THREADS_LIMITING_EXECUTOR
 #define HPX_RUNTIME_THREADS_LIMITING_EXECUTOR
 
-#include <hpx/parallel/executors/limiting_executor.hpp>
+#include <hpx/execution/executors/limiting_executor.hpp>
 
 namespace hpx { namespace threads { namespace executors {
             using hpx::parallel::execution::limiting_executor;

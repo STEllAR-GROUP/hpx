@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/parallel/executors/default_executor.hpp>
+#include <hpx/execution/executors/default_executor.hpp>
 #endif
 
 #endif

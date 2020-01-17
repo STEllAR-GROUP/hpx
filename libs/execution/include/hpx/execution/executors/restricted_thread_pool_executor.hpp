@@ -13,8 +13,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/parallel/executors/execution_parameters.hpp>
-#include <hpx/parallel/executors/thread_pool_executor.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution/executors/thread_pool_executor.hpp>
 
 #include <atomic>
 #include <cstddef>

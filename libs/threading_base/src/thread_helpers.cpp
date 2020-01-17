@@ -13,7 +13,7 @@
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/basic_execution/register_locks.hpp>
 #endif
-#include <hpx/parallel/executors/current_executor.hpp>
+#include <hpx/execution/executors/current_executor.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>

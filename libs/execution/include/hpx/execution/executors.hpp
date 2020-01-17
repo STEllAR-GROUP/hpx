@@ -14,6 +14,7 @@
 #include <hpx/execution/executors/parallel_executor.hpp>
 #include <hpx/execution/executors/parallel_executor_aggregated.hpp>
 #include <hpx/execution/executors/pool_executor.hpp>
+#include <hpx/execution/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/execution/executors/sequenced_executor.hpp>
 #include <hpx/execution/executors/service_executors.hpp>
 #include <hpx/execution/executors/this_thread_executors.hpp>
