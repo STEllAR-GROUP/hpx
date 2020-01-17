@@ -426,7 +426,7 @@ namespace hpx { namespace debug {
 
     struct disable_print
     {
-        disable_print(const char* p) {}
+        constexpr disable_print(const char* p) {}
 #else
     template <bool enable>
     struct enable_print;
@@ -435,52 +435,55 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<false>
     {
-        enable_print(const char* p) {}
+        constexpr enable_print(const char* p) {}
 #endif
 
-        bool is_enabled() const
+        constexpr bool is_enabled() const
         {
             return false;
         }
 
         template <typename... Args>
-        void debug(Args... args) const
+        constexpr void debug(Args... args) const
         {
         }
 
         template <typename... Args>
-        void warning(Args... args) const
+        constexpr void warning(Args... args) const
         {
         }
 
         template <typename... Args>
-        void error(Args... args) const
+        constexpr void error(Args... args) const
         {
         }
 
         template <typename... Args>
-        void timed(Args... args) const
+        constexpr void timed(Args... args) const
         {
         }
 
         template <typename T>
-        void array(const std::string& name, const std::vector<T>& v) const
+        constexpr void array(
+            const std::string& name, const std::vector<T>& v) const
         {
         }
 
         template <typename T, std::size_t N>
-        void array(const std::string& name, const std::array<T, N>& v) const
+        constexpr void array(
+            const std::string& name, const std::array<T, N>& v) const
         {
         }
 
         template <typename Iter>
-        void array(const std::string& name, Iter begin, Iter end) const
+        constexpr void array(
+            const std::string& name, Iter begin, Iter end) const
         {
         }
 
         // @todo, return void so that timers have zero footprint when disabled
         template <typename... Args>
-        int make_timer(double delay, const Args... args) const
+        constexpr int make_timer(double delay, const Args... args) const
         {
             return 0;
         }
@@ -491,7 +494,7 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<false> : public disable_print
     {
-        enable_print(const char* p)
+        constexpr enable_print(const char* p)
           : disable_print(p)
         {
         }
@@ -500,7 +503,7 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<true> : public disable_print
     {
-        enable_print(const char* p)
+        constexpr enable_print(const char* p)
           : disable_print(p)
         {
         }
@@ -520,23 +523,23 @@ namespace hpx { namespace debug {
         {
         }
 
-        bool is_enabled() const
+        constexpr bool is_enabled() const
         {
             return true;
         }
 
         template <typename... Args>
-        void debug(Args... args)
+        constexpr void debug(Args... args)
         {
             detail::debug(prefix_, std::forward<Args>(args)...);
         }
         template <typename... Args>
-        void warning(Args... args)
+        constexpr void warning(Args... args)
         {
             detail::warning(prefix_, std::forward<Args>(args)...);
         }
         template <typename... Args>
-        void error(Args... args)
+        constexpr void error(Args... args)
         {
             detail::error(prefix_, std::forward<Args>(args)...);
         }
