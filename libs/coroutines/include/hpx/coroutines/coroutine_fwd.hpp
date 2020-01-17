@@ -41,7 +41,6 @@ namespace hpx { namespace threads { namespace coroutines {
     }    // namespace detail
 
     class coroutine;
-    class stackless_coroutine;
 }}}    // namespace hpx::threads::coroutines
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_FWD_HPP*/

@@ -16,8 +16,6 @@ set(exclude_from_headers
   "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_execution_fwd.hpp"
   "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
   "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
-  "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_stackful.hpp"
-  "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_stackless.hpp"
 )
 
 if(HPX_WITH_PARCELPORT_MPI)

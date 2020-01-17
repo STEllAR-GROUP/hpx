@@ -51,32 +51,40 @@ namespace hpx { namespace lcos { namespace local {
             typedef typename Base::init_no_addref init_no_addref;
 
             F f_;
-            bool runs_as_child_;
+            threads::thread_id_type runs_as_child_;
 
             task_object(F const& f)
               : f_(f)
-              , runs_as_child_(false)
+              , runs_as_child_(threads::invalid_thread_id)
             {
             }
 
             task_object(F&& f)
               : f_(std::move(f))
-              , runs_as_child_(false)
+              , runs_as_child_(threads::invalid_thread_id)
             {
             }
 
             task_object(init_no_addref no_addref, F const& f)
               : base_type(no_addref)
               , f_(f)
-              , runs_as_child_(false)
+              , runs_as_child_(threads::invalid_thread_id)
             {
             }
 
             task_object(init_no_addref no_addref, F&& f)
               : base_type(no_addref)
               , f_(std::move(f))
-              , runs_as_child_(false)
+              , runs_as_child_(threads::invalid_thread_id)
             {
+            }
+
+            ~task_object() override
+            {
+                if (runs_as_child_)
+                {
+                    get_thread_id_data(runs_as_child_)->destroy_thread();
+                }
             }
 
             void do_run() override
@@ -89,30 +97,23 @@ namespace hpx { namespace lcos { namespace local {
             {
                 if (runs_as_child_)
                 {
-                    threads::thread_data* self = threads::get_self_id_data();
-                    if (self->has_scoped_children())
+                    auto state = this->state_.load(std::memory_order_acquire);
+
+                    // this thread would block on the future, try to
+                    // directly execute the child thread in an attempt to
+                    // make this future ready
+                    if (state == this->empty)
                     {
-                        auto state =
-                            this->state_.load(std::memory_order_acquire);
-                        while (state == this->empty)
+                        threads::thread_data* child =
+                            get_thread_id_data(runs_as_child_);
+                        if (threads::detail::execute_thread(child))
                         {
-                            // this thread would block on the future
-                            threads::thread_data* child = self->pop_child();
-
-                            // we should not run out of children
-                            HPX_ASSERT(child != nullptr);
-
-                            // execute the child inline
-                            if (!threads::detail::execute_thread(child))
-                            {
-                                // the executed task did not run to completion
-                                self->push_child(child);
-                            }
-
-                            // recheck our state
-                            state =
-                                this->state_.load(std::memory_order_acquire);
+                            // thread terminated, mark as being destroyed
+                            runs_as_child_ = threads::invalid_thread_id;
+                            child->destroy_thread();
                         }
+
+                        // fall back to possibly suspended wait if necessary
                     }
                 }
                 return this->base_type::get_result_void(ec);
@@ -176,27 +177,28 @@ namespace hpx { namespace lcos { namespace local {
 
                     if (schedulehint.runs_as_child)
                     {
-                        runs_as_child_ = true;
-                        threads::get_self_id_data()->push_child(
-                            threads::get_thread_id_data(id));
+                        runs_as_child_ = id;
                     }
                     return id;
                 }
 
                 if (schedulehint.runs_as_child)
                 {
+                    // create new thread without scheduling it right away
                     threads::thread_id_type id =
                         threads::register_thread_nullary(pool,
                             util::deferred_call(
                                 &base_type::run_impl, std::move(this_)),
                             util::thread_description(f_, annotation),
-                            threads::pending, true, priority, schedulehint,
-                            stacksize, ec);
+                            threads::suspended, true, priority,
+                            schedulehint, stacksize, ec);
 
-                    runs_as_child_ = true;
-                    threads::get_self_id_data()->push_child(
-                        threads::get_thread_id_data(id));
+                    runs_as_child_ = id;
 
+                    // now schedule the thread
+                    threads::set_thread_state(id,threads::pending,
+                        threads::wait_signaled, threads::thread_priority_normal,
+                        true, ec);
                     return id;
                 }
 

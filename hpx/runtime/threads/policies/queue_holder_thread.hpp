@@ -13,8 +13,6 @@
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_data_stackful.hpp>
-#include <hpx/runtime/threads/thread_data_stackless.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cmath>
@@ -111,7 +109,6 @@ namespace hpx { namespace threads { namespace policies {
         thread_heap_type thread_heap_medium_;
         thread_heap_type thread_heap_large_;
         thread_heap_type thread_heap_huge_;
-        thread_heap_type thread_heap_nostack_;
 
         // number of terminated threads to discard
         const int min_delete_count_;
@@ -257,9 +254,6 @@ namespace hpx { namespace threads { namespace policies {
                 deallocate(get_thread_id_data(t));
 
             for (auto t : thread_heap_huge_)
-                deallocate(get_thread_id_data(t));
-
-            for (auto t : thread_heap_nostack_)
                 deallocate(get_thread_id_data(t));
         }
 
@@ -493,10 +487,6 @@ namespace hpx { namespace threads { namespace policies {
             {
                 heap = &thread_heap_huge_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_nostack))
-            {
-                heap = &thread_heap_nostack_;
-            }
             HPX_ASSERT(heap);
 
             if (state == pending_do_not_schedule || state == pending_boost)
@@ -518,17 +508,8 @@ namespace hpx { namespace threads { namespace policies {
             else
             {
                 // Allocate a new thread object.
-                threads::thread_data* p = nullptr;
-                if (stacksize == get_stack_size(thread_stacksize_nostack))
-                {
-                    p = threads::thread_data_stackless::create(
-                        data, this, state);
-                }
-                else
-                {
-                    p = threads::thread_data_stackful::create(
-                        data, this, state);
-                }
+                threads::thread_data* p =
+                    threads::thread_data::create(data, this, state);
                 tid = thread_id_type(p);
                 tq_deb.debug(debug::str<>("create_thread_object"), "new",
                     queue_data_print(this),
@@ -557,10 +538,6 @@ namespace hpx { namespace threads { namespace policies {
             else if (stacksize == get_stack_size(thread_stacksize_huge))
             {
                 thread_heap_huge_.push_front(tid);
-            }
-            else if (stacksize == get_stack_size(thread_stacksize_nostack))
-            {
-                thread_heap_nostack_.push_front(tid);
             }
             else
             {

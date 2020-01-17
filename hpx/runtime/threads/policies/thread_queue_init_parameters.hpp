@@ -52,7 +52,6 @@ namespace hpx { namespace threads { namespace policies {
           , medium_stacksize_(medium_stacksize)
           , large_stacksize_(large_stacksize)
           , huge_stacksize_(huge_stacksize)
-          , nostack_stacksize_((std::numeric_limits<std::ptrdiff_t>::max)())
         {
         }
 
@@ -69,7 +68,6 @@ namespace hpx { namespace threads { namespace policies {
         std::ptrdiff_t const medium_stacksize_;
         std::ptrdiff_t const large_stacksize_;
         std::ptrdiff_t const huge_stacksize_;
-        std::ptrdiff_t const nostack_stacksize_;
     };
 }}}    // namespace hpx::threads::policies
 

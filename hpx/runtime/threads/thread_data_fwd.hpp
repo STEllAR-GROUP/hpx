@@ -38,8 +38,6 @@ namespace hpx {
 namespace hpx { namespace threads {
 
     class thread_data;
-    class thread_data_stackful;
-    class thread_data_stackless;
 
     /// \cond NOINTERNAL
     struct HPX_EXPORT topology;
@@ -49,7 +47,6 @@ namespace hpx { namespace threads {
     using thread_id_type = thread_id;
 
     using coroutine_type = coroutines::coroutine;
-    using stackless_coroutine_type = coroutines::stackless_coroutine;
 
     using thread_self = coroutines::detail::coroutine_self;
     using thread_self_impl_type =

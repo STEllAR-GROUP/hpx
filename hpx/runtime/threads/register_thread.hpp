@@ -97,17 +97,6 @@ namespace hpx { namespace threads {
         return id;
     }
 
-    inline threads::thread_id_type register_non_suspendable_thread_plain(
-        threads::thread_pool_base* pool, threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true, error_code& ec = throws)
-    {
-        HPX_ASSERT(pool);
-        data.stacksize = pool->get_scheduler()->get_stack_size(
-            threads::thread_stacksize_nostack);
-        return register_thread_plain(pool, data, initial_state, run_now, ec);
-    }
-
     inline threads::thread_id_type register_thread_plain(
         threads::thread_pool_base* pool, threads::thread_function_type&& func,
         util::thread_description const& description =
@@ -131,22 +120,6 @@ namespace hpx { namespace threads {
         return register_thread_plain(pool, data, initial_state, run_now, ec);
     }
 
-    inline threads::thread_id_type register_non_suspendable_thread_plain(
-        threads::thread_pool_base* pool, threads::thread_function_type&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint schedulehint =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        return register_thread_plain(pool, std::move(func), description,
-            initial_state, run_now, priority, schedulehint,
-            threads::thread_stacksize_nostack, ec);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given data.
     ///
@@ -162,16 +135,6 @@ namespace hpx { namespace threads {
     {
         return register_thread_plain(detail::get_self_or_default_pool(), data,
             initial_state, run_now, ec);
-    }
-
-    inline threads::thread_id_type register_non_suspendable_thread_plain(
-        threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true, error_code& ec = throws)
-    {
-        return register_non_suspendable_thread_plain(
-            detail::get_self_or_default_pool(), data, initial_state, run_now,
-            ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -251,22 +214,6 @@ namespace hpx { namespace threads {
             schedulehint, stacksize, ec);
     }
 
-    inline threads::thread_id_type register_non_suspendable_thread_plain(
-        threads::thread_function_type&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint schedulehint =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        return register_non_suspendable_thread_plain(
-            detail::get_self_or_default_pool(), std::move(func), description,
-            initial_state, run_now, priority, schedulehint, ec);
-    }
-
     template <typename F>
     threads::thread_id_type register_thread(F&& func,
         util::thread_description const& description =
@@ -284,24 +231,6 @@ namespace hpx { namespace threads {
                 std::forward<F>(func)});
         return register_thread_plain(std::move(thread_func), description,
             initial_state, run_now, priority, os_thread, stacksize, ec);
-    }
-
-    template <typename F>
-    threads::thread_id_type register_non_suspendable_thread(F&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint os_thread =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        threads::thread_function_type thread_func(
-            detail::thread_function<typename std::decay<F>::type>{
-                std::forward<F>(func)});
-        return register_non_suspendable_thread_plain(std::move(thread_func),
-            description, initial_state, run_now, priority, os_thread, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -336,22 +265,6 @@ namespace hpx { namespace threads {
     }
 
     template <typename F>
-    threads::thread_id_type register_non_suspendable_thread_nullary(F&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint os_thread =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        return register_thread_nullary(std::forward<F>(func), description,
-            initial_state, run_now, priority, os_thread,
-            threads::thread_stacksize_nostack, ec);
-    }
-
-    template <typename F>
     threads::thread_id_type register_thread_nullary(
         threads::thread_pool_base* pool, F&& func,
         util::thread_description const& description =
@@ -371,26 +284,6 @@ namespace hpx { namespace threads {
             initial_state, run_now, priority, os_thread, stacksize, ec);
     }
 
-    template <typename F>
-    threads::thread_id_type register_non_suspendable_thread_nullary(
-        threads::thread_pool_base* pool, F&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        bool run_now = true,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint os_thread =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        threads::thread_function_type thread_func(
-            detail::thread_function_nullary<typename std::decay<F>::type>{
-                std::forward<F>(func)});
-        return register_non_suspendable_thread_plain(pool,
-            std::move(thread_func), description, initial_state, run_now,
-            priority, os_thread, ec);
-    }
-
     inline void register_work_plain(threads::thread_pool_base* pool,
         threads::thread_init_data& data,
         threads::thread_state_enum initial_state = threads::pending,
@@ -398,17 +291,6 @@ namespace hpx { namespace threads {
     {
         HPX_ASSERT(pool);
         pool->create_work(data, initial_state, ec);
-    }
-
-    inline void register_non_suspendable_work_plain(
-        threads::thread_pool_base* pool, threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
-        error_code& ec = throws)
-    {
-        HPX_ASSERT(pool);
-        data.stacksize = pool->get_scheduler()->get_stack_size(
-            threads::thread_stacksize_nostack);
-        register_work_plain(pool, data, initial_state, ec);
     }
 
     inline void register_work_plain(threads::thread_pool_base* pool,
@@ -433,21 +315,6 @@ namespace hpx { namespace threads {
         register_work_plain(pool, data, initial_state, ec);
     }
 
-    inline void register_non_suspendable_work_plain(
-        threads::thread_pool_base* pool, threads::thread_function_type&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint schedulehint =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        HPX_ASSERT(pool);
-        register_work_plain(pool, std::move(func), description, initial_state,
-            priority, schedulehint, threads::thread_stacksize_nostack, ec);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
     ///        work to be executed.
@@ -462,15 +329,6 @@ namespace hpx { namespace threads {
         error_code& ec = throws)
     {
         register_work_plain(
-            detail::get_self_or_default_pool(), data, initial_state, ec);
-    }
-
-    inline void register_non_suspendable_work_plain(
-        threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending,
-        error_code& ec = throws)
-    {
-        register_non_suspendable_work_plain(
             detail::get_self_or_default_pool(), data, initial_state, ec);
     }
 
@@ -536,21 +394,6 @@ namespace hpx { namespace threads {
             description, initial_state, priority, schedulehint, stacksize, ec);
     }
 
-    inline void register_non_suspendable_work_plain(
-        threads::thread_function_type&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint schedulehint =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        register_non_suspendable_work_plain(detail::get_self_or_default_pool(),
-            std::move(func), description, initial_state, priority, schedulehint,
-            ec);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the
     ///        work to be executed.
@@ -580,24 +423,6 @@ namespace hpx { namespace threads {
                 std::forward<F>(func)});
         register_work_plain(std::move(thread_func), description, initial_state,
             priority, os_thread, stacksize, ec);
-    }
-
-    template <typename F>
-    void register_non_suspendable_work(F&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint os_thread =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        threads::thread_function_type thread_func(
-            detail::thread_function<typename std::decay<F>::type>{
-                std::forward<F>(func)});
-        register_non_suspendable_work_plain(detail::get_self_or_default_pool(),
-            std::move(thread_func), description, initial_state, priority,
-            os_thread, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -631,24 +456,6 @@ namespace hpx { namespace threads {
     }
 
     template <typename F>
-    void register_non_suspendable_work_nullary(F&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint os_thread =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        threads::thread_function_type thread_func(
-            detail::thread_function_nullary<typename std::decay<F>::type>{
-                std::forward<F>(func)});
-        register_non_suspendable_work_plain(detail::get_self_or_default_pool(),
-            std::move(thread_func), description, initial_state, priority,
-            os_thread, ec);
-    }
-
-    template <typename F>
     void register_work_nullary(threads::thread_pool_base* pool, F&& func,
         util::thread_description const& description =
             util::thread_description(),
@@ -665,24 +472,6 @@ namespace hpx { namespace threads {
         register_work_plain(pool, std::move(thread_func), description,
             initial_state, priority, os_thread, stacksize, ec);
     }
-
-    template <typename F>
-    void register_non_suspendable_work_nullary(threads::thread_pool_base* pool,
-        F&& func,
-        util::thread_description const& description =
-            util::thread_description(),
-        threads::thread_state_enum initial_state = threads::pending,
-        threads::thread_priority priority = threads::thread_priority_normal,
-        threads::thread_schedule_hint os_thread =
-            threads::thread_schedule_hint(),
-        error_code& ec = throws)
-    {
-        threads::thread_function_type thread_func(
-            detail::thread_function_nullary<typename std::decay<F>::type>{
-                std::forward<F>(func)});
-        register_non_suspendable_work_plain(pool, std::move(thread_func),
-            description, initial_state, priority, os_thread, ec);
-    }
 }}    // namespace hpx::threads
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -695,14 +484,6 @@ namespace hpx { namespace applier {
     using threads::register_work;
     using threads::register_work_nullary;
     using threads::register_work_plain;
-
-    using threads::register_non_suspendable_thread;
-    using threads::register_non_suspendable_thread_nullary;
-    using threads::register_non_suspendable_thread_plain;
-
-    using threads::register_non_suspendable_work;
-    using threads::register_non_suspendable_work_nullary;
-    using threads::register_non_suspendable_work_plain;
 }}    // namespace hpx::applier
 #endif
 

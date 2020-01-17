@@ -86,7 +86,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         // execute the coroutine function directly in the context of the calling
         // thread
-        HPX_EXPORT result_type invoke_directly(arg_type arg) noexcept;
+        HPX_EXPORT result_type invoke_directly(arg_type arg);
 
     public:
         void bind_result(result_type res)
@@ -119,6 +119,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         void reset()
         {
             this->reset_stack();
+            m_result = result_type(terminated, invalid_thread_id);
+            m_arg = nullptr;
             m_fun.reset();    // just reset the bound function
             this->super_type::reset();
         }
@@ -126,6 +128,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         void rebind(functor_type&& f, thread_id_type id)
         {
             this->rebind_stack();    // count how often a coroutines object was reused
+            m_result = result_type(unknown, invalid_thread_id);
+            m_arg = nullptr;
             m_fun = std::move(f);
             this->super_type::rebind_base(id);
         }
@@ -133,7 +137,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     private:
         result_type m_result;
         arg_type* m_arg;
-
         functor_type m_fun;
     };
 }}}}    // namespace hpx::threads::coroutines::detail

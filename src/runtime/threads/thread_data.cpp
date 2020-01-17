@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -7,7 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/basic_execution.hpp>
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
@@ -28,32 +28,34 @@
 namespace hpx { namespace threads {
 
     thread_data::thread_data(thread_init_data& init_data, void* queue,
-        thread_state_enum newstate, bool is_stackless)
-        : current_state_(thread_state(newstate, wait_signaled))
+        thread_state_enum newstate)
+      : current_state_(thread_state(newstate, wait_signaled))
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-        , description_(init_data.description)
-        , lco_description_()
+      , description_(init_data.description)
+      , lco_description_()
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-        , parent_locality_id_(init_data.parent_locality_id)
-        , parent_thread_id_(init_data.parent_id)
-        , parent_thread_phase_(init_data.parent_phase)
+      , parent_locality_id_(init_data.parent_locality_id)
+      , parent_thread_id_(init_data.parent_id)
+      , parent_thread_phase_(init_data.parent_phase)
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        , marked_state_(unknown)
+      , marked_state_(unknown)
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-        , backtrace_(nullptr
+      , backtrace_(nullptr
 #endif
-        , priority_(init_data.priority)
-        , requested_interrupt_(false)
-        , enabled_interrupt_(true)
-        , ran_exit_funcs_(false)
-        , runs_as_child_(init_data.schedulehint.runs_as_child)
-        , scheduler_base_(init_data.scheduler_base)
-        , stacksize_(init_data.stacksize)
-        , queue_(queue)
-        , is_stackless_(is_stackless)
+      , priority_(init_data.priority)
+      , requested_interrupt_(false)
+      , enabled_interrupt_(true)
+      , ran_exit_funcs_(false)
+      , runs_as_child_(init_data.schedulehint.runs_as_child)
+      , scheduler_base_(init_data.scheduler_base)
+      , stacksize_(init_data.stacksize)
+      , queue_(queue)
+      , coroutine_(std::move(init_data.func), thread_id_type(this_()),
+          init_data.stacksize)
+      , agent_(coroutine_.impl())
     {
         LTM_(debug) << "thread::thread(" << this << "), description("
                     << get_description() << ")";
@@ -78,23 +80,21 @@ namespace hpx { namespace threads {
 #endif
     }
 
-    void thread_data::delete_scoped_children()
-    {
-        for(auto* thrd : scoped_children_)
-        {
-            static std::int64_t fake_busy_count = 0;
-            thrd->get_scheduler_base()->destroy_thread(thrd, fake_busy_count);
-        }
-        scoped_children_.clear();
-    }
+    util::internal_allocator<thread_data> thread_data::thread_alloc_;
 
     thread_data::~thread_data()
     {
-        if (has_scoped_children())
-        {
-            delete_scoped_children();
-        }
+        LTM_(debug) << "~thread_data(" << this
+                    << "), description("    //-V128
+                    << this->get_description() << "), phase("
+                    << this->get_thread_phase() << ")";
+
         free_thread_exit_callbacks();
+    }
+
+    void thread_data::destroy_thread()
+    {
+        this->get_scheduler_base()->destroy_thread(this);
     }
 
     void thread_data::run_thread_exit_callbacks()
@@ -164,7 +164,8 @@ namespace hpx { namespace threads {
     void thread_data::rebind_base(
         thread_init_data& init_data, thread_state_enum newstate)
     {
-        LTM_(debug) << "~thread(" << this << "), description("    //-V128
+        LTM_(debug) << "thread_data::rebind_base(" << this
+                    << "), description("    //-V128
                     << get_description() << "), phase("
                     << get_thread_phase() << "), rebind";
 
@@ -194,7 +195,6 @@ namespace hpx { namespace threads {
 
         *const_cast<bool*>(&runs_as_child_) =
             init_data.schedulehint.runs_as_child;
-        scoped_children_.clear();
 
         exit_funcs_.clear();
         scheduler_base_ = init_data.scheduler_base;
@@ -245,7 +245,7 @@ namespace hpx { namespace threads {
 
     namespace detail {
 
-        void set_self_ptr(thread_self * self)
+        void set_self_ptr(thread_self* self)
         {
             thread_self::set_self(self);
         }

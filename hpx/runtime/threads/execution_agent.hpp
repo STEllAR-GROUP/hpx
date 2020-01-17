@@ -13,7 +13,7 @@
 #include <hpx/basic_execution/context_base.hpp>
 #include <hpx/basic_execution/resource_base.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
-#include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
+#include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -25,6 +25,7 @@
 
 namespace hpx { namespace threads {
 
+    ////////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT execution_context : hpx::basic_execution::context_base
     {
         hpx::basic_execution::resource_base const& resource() const override
@@ -34,6 +35,7 @@ namespace hpx { namespace threads {
         hpx::basic_execution::resource_base resource_;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT execution_agent : hpx::basic_execution::agent_base
     {
         explicit execution_agent(
@@ -41,9 +43,21 @@ namespace hpx { namespace threads {
 
         std::string description() const override;
 
-        execution_context const& context() const override
+        execution_context const& context() const noexcept override
         {
             return context_;
+        }
+
+        using agent_specific_data = coroutines::detail::coroutine_self;
+
+        void* get_data() noexcept override
+        {
+            return &self_;
+        }
+
+        coroutines::detail::coroutine_self& get_self() noexcept
+        {
+            return self_;
         }
 
         void yield(char const* desc) override;
@@ -57,7 +71,7 @@ namespace hpx { namespace threads {
             char const* desc) override;
 
     private:
-        coroutines::detail::coroutine_stackful_self self_;
+        coroutines::detail::coroutine_self self_;
 
         hpx::threads::thread_state_ex_enum do_yield(
             char const* desc, threads::thread_state_enum state);
@@ -67,6 +81,7 @@ namespace hpx { namespace threads {
 
         execution_context context_;
     };
+
 }}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>

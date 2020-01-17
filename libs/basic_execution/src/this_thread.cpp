@@ -236,6 +236,7 @@ namespace hpx { namespace basic_execution {
             }
         }    // namespace detail
 
+        ////////////////////////////////////////////////////////////////////////
         reset_agent::reset_agent(
             detail::agent_storage* storage, agent_base& impl)
           : storage_(storage)
@@ -253,10 +254,34 @@ namespace hpx { namespace basic_execution {
             storage_->set(old_);
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        suspend_agent::suspend_agent(
+            detail::agent_storage* storage)
+          : storage_(storage)
+          , old_(storage_->impl_)
+        {
+        }
+
+        suspend_agent::suspend_agent()
+          : suspend_agent(detail::get_agent_storage())
+        {
+        }
+
+        suspend_agent::~suspend_agent()
+        {
+            storage_->set(old_);
+        }
+
+        ////////////////////////////////////////////////////////////////////////
         hpx::basic_execution::agent_ref agent()
         {
             return hpx::basic_execution::agent_ref(
                 detail::get_agent_storage()->impl_);
+        }
+
+        void set_agent(agent_base* new_agent)
+        {
+            detail::get_agent_storage()->set(new_agent);
         }
 
         void yield(char const* desc)

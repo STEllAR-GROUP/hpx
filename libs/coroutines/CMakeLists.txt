@@ -11,7 +11,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(coroutines_headers
   hpx/coroutines/coroutine.hpp
   hpx/coroutines/coroutine_fwd.hpp
-  hpx/coroutines/stackless_coroutine.hpp
   hpx/coroutines/detail/combined_tagged_state.hpp
   hpx/coroutines/detail/context_base.hpp
   hpx/coroutines/detail/context_generic_context.hpp
@@ -22,8 +21,6 @@ set(coroutines_headers
   hpx/coroutines/detail/coroutine_accessor.hpp
   hpx/coroutines/detail/coroutine_impl.hpp
   hpx/coroutines/detail/coroutine_self.hpp
-  hpx/coroutines/detail/coroutine_stackful_self.hpp
-  hpx/coroutines/detail/coroutine_stackless_self.hpp
   hpx/coroutines/detail/get_stack_pointer.hpp
   hpx/coroutines/detail/posix_utility.hpp
   hpx/coroutines/detail/swap_context.hpp
@@ -56,7 +53,6 @@ set(coroutines_compat_headers
 set(coroutines_sources
   detail/context_base.cpp
   detail/coroutine_impl.cpp
-  detail/coroutine_self.cpp
   detail/tss.cpp
   swapcontext.cpp
   )
@@ -76,6 +72,7 @@ add_hpx_module(coroutines
   COMPAT_HEADERS ${coroutines_compat_headers}
   DEPENDENCIES
     hpx_assertion
+    hpx_basic_execution
     hpx_config
     hpx_format
     hpx_functional

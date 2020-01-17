@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -82,7 +82,9 @@ namespace hpx { namespace threads { namespace detail
         ~switch_status ()
         {
             if (need_restore_state_)
+            {
                 store_state(prev_state_);
+            }
         }
 
         bool is_valid() const { return need_restore_state_; }
@@ -91,9 +93,14 @@ namespace hpx { namespace threads { namespace detail
         // execution
         thread_state operator=(thread_result_type && new_state)
         {
-            prev_state_ = thread_state(new_state.first,
-                prev_state_.state_ex(), prev_state_.tag() + 1);
-            next_thread_id_ = std::move(new_state.second);
+            // do not propagate the returned thread state if the thread has
+            // returned 'pending_do_not_schedule'
+            if (new_state.first != pending_do_not_schedule)
+            {
+                prev_state_ = thread_state(new_state.first,
+                    prev_state_.state_ex(), prev_state_.tag() + 1);
+                next_thread_id_ = std::move(new_state.second);
+            }
             return prev_state_;
         }
 
@@ -112,7 +119,9 @@ namespace hpx { namespace threads { namespace detail
         bool store_state(thread_state& newstate)
         {
             disable_restore();
-            if (thread_->restore_state(prev_state_, orig_state_)) {
+
+            if (thread_->restore_state(prev_state_, orig_state_))
+            {
                 newstate = prev_state_;
                 return true;
             }
@@ -513,7 +522,7 @@ namespace hpx { namespace threads { namespace detail
                         scheduler.SchedulingPolicy::
                             decrement_background_thread_count();
                         scheduler.SchedulingPolicy::destroy_thread(
-                            get_thread_id_data(background_thread), busy_count);
+                            get_thread_id_data(background_thread));
                         background_thread.reset();
                     }
                     else if(suspended == state_val)
@@ -653,7 +662,6 @@ namespace hpx { namespace threads { namespace detail
                                 // and add to aggregate execution time.
                                 exec_time_wrapper exec_time_collector(idle_rate);
 
-
 #if defined(HPX_HAVE_APEX)
                                 // get the APEX data pointer, in case we are resuming the
                                 // thread and have to restore any leaf timers from
@@ -666,11 +674,16 @@ namespace hpx { namespace threads { namespace detail
 
                                 thrd_stat = (*thrd)(context_storage);
 
-                                if (thrd_stat.get_previous() == terminated)
+                                thread_state_enum s = thrd_stat.get_previous();
+                                if (s == terminated)
                                 {
                                     profiler.stop();
                                     // just in case, clean up the now dead pointer.
                                     thrd->set_timer_data(nullptr);
+                                }
+                                else if (s == deleted)
+                                {
+                                    profiler.stop();
                                 }
                                 else
                                 {
@@ -697,7 +710,8 @@ namespace hpx { namespace threads { namespace detail
                         }
 
                         // store and retrieve the new state in the thread
-                        if (HPX_UNLIKELY(!thrd_stat.store_state(state))) {
+                        if (HPX_UNLIKELY(!thrd_stat.store_state(state)))
+                        {
                             // some other worker-thread got in between and changed
                             // the state of this thread, we just continue with
                             // the next one
@@ -784,26 +798,25 @@ namespace hpx { namespace threads { namespace detail
                         }
                     }
                 }
-                else if (HPX_UNLIKELY(active == state_val)) {
-                    LTM_(warning) << "tfunc(" << num_thread << "): " //-V128
-                        "thread(" << thrd->get_thread_id() << "), "
-                        "description(" << thrd->get_description() << "), "
-                        "rescheduling";
-
-                    // re-schedule thread, if it is still marked as active
-                    // this might happen, if some thread has been added to the
-                    // scheduler queue already but the state has not been reset
-                    // yet
-                    scheduler.SchedulingPolicy::schedule_thread(thrd,
-                        threads::thread_schedule_hint(
-                            static_cast<std::int16_t>(num_thread)),
-                        true, thrd->get_priority());
-                    scheduler.SchedulingPolicy::do_some_work(num_thread);
-                }
+//                 else if (HPX_UNLIKELY(active == state_val)) {
+//                     LTM_(warning) << "tfunc(" << num_thread << "): " //-V128
+//                         "thread(" << thrd->get_thread_id() << "), "
+//                         "description(" << thrd->get_description() << "), "
+//                         "rescheduling";
+//
+//                     // re-schedule thread, if it is still marked as active
+//                     // this might happen, if some thread has been added to the
+//                     // scheduler queue already but the state has not been reset
+//                     // yet
+//                     scheduler.SchedulingPolicy::schedule_thread_last(thrd,
+//                         threads::thread_schedule_hint(
+//                             static_cast<std::int16_t>(num_thread)),
+//                         true, thrd->get_priority());
+//                     scheduler.SchedulingPolicy::do_some_work(num_thread);
+//                 }
 
                 // Remove the mapping from thread_map_ if HPX thread is depleted
-                // or terminated, this will delete the HPX thread as all
-                // references go out of scope.
+                // or terminated, this will delete the HPX thread.
                 // REVIEW: what has to be done with depleted HPX threads?
                 if (HPX_LIKELY(state_val == depleted || state_val == terminated))
                 {
@@ -812,11 +825,8 @@ namespace hpx { namespace threads { namespace detail
 #endif
                     // if this thread has run as a child we don't destroy it
                     // here, the parent will do that
-                    if (!thrd->runs_as_child())
-                    {
-                        scheduler.SchedulingPolicy::destroy_thread(
-                            thrd, busy_loop_count);
-                    }
+                    HPX_ASSERT(!thrd->runs_as_child());
+                    scheduler.SchedulingPolicy::destroy_thread(thrd);
                 }
             }
 

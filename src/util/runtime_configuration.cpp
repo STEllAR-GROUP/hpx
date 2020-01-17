@@ -1172,10 +1172,7 @@ namespace hpx { namespace util
         case threads::thread_stacksize_huge:
             return huge_stacksize;
 
-        case threads::thread_stacksize_nostack:
-            return (std::numeric_limits<std::ptrdiff_t>::max)();
-
-        default:
+        default: HPX_FALLTHROUGH;
         case threads::thread_stacksize_small:
             break;
         }

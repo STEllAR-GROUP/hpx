@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -10,29 +10,28 @@
 #define HPX_RUNTIME_THREADS_THREAD_DATA_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/basic_execution.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
+#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/runtime/threads/execution_agent.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/util/external_timer.hpp>
 #endif
-
-#include <boost/container/small_vector.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -67,6 +66,15 @@ namespace hpx { namespace threads {
     /// implemented by the thread-manager.
     class HPX_EXPORT thread_data
     {
+    private:
+        // Avoid warning about using 'this' in initializer list
+        thread_data* this_()
+        {
+            return this;
+        }
+
+        static util::internal_allocator<thread_data> thread_alloc_;
+
     public:
         thread_data(thread_data const&) = delete;
         thread_data(thread_data&&) = delete;
@@ -495,27 +503,7 @@ namespace hpx { namespace threads {
             return runs_as_child_;
         }
 
-        bool has_scoped_children() const noexcept
-        {
-            return !scoped_children_.empty();
-        }
-        thread_data* pop_child()
-        {
-            HPX_ASSERT(get_self_id_data() == this);
-            if (scoped_children_.empty())
-            {
-                return nullptr;
-            }
-            thread_data* result = scoped_children_.front();
-            scoped_children_.erase(scoped_children_.begin());
-            return result;
-        }
-        void push_child(thread_data* c)
-        {
-            HPX_ASSERT(get_self_id_data() == this);
-            scoped_children_.push_back(c);
-        }
-        void delete_scoped_children();
+        void destroy_thread();
 
         policies::scheduler_base* get_scheduler_base() const noexcept
         {
@@ -539,38 +527,137 @@ namespace hpx { namespace threads {
         ///                 should be scheduled from this point on. The thread
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
-        inline coroutine_type::result_type operator()(
+        HPX_FORCEINLINE coroutine_type::result_type operator()(
             hpx::basic_execution::this_thread::detail::agent_storage*
-                agent_storage);
+                agent_storage)
+        {
+            HPX_ASSERT(get_state().state() == active);
+            HPX_ASSERT(this == coroutine_.get_thread_id().get());
 
+            // make sure this thread is executed using the correct agent
+            hpx::basic_execution::this_thread::reset_agent ctx(
+                agent_storage, agent_);
+
+            set_state_ex(wait_signaled);
+
+            coroutine_type::result_type result = coroutine_(wait_signaled);
+
+            if (result.first == terminated && runs_as_child())
+            {
+                result.first = deleted;
+            }
+
+            return result;
+        }
+
+    private:
+        struct reset_next_on_exit
+        {
+            using coroutine_accessor = coroutines::detail::coroutine_accessor;
+            using coroutine_self = coroutines::detail::coroutine_self;
+            using coroutine_impl = coroutines::detail::coroutine_impl;
+
+            reset_next_on_exit(coroutine_self& new_self,
+                basic_execution::agent_base* old_agent)
+              : self_(&new_self)
+              , old_next_(coroutine_accessor::get_impl_next(*self_))
+            {
+                auto* old_self =
+                    basic_execution::get_agent_data<coroutine_self>(old_agent);
+                HPX_ASSERT_(old_self != nullptr, "");
+
+                auto* old_self_next =
+                    coroutine_accessor::get_impl_next(*old_self);
+                if (old_self_next == nullptr)
+                {
+                    // the outer coroutine is non-direct, use it as is
+                    coroutine_accessor::set_impl_next(
+                        *self_, coroutine_accessor::get_impl(*old_self));
+                }
+                else
+                {
+                    // the outer coroutine is direct itself, propagate its
+                    // outer coroutine
+                    coroutine_accessor::set_impl_next(*self_, old_self_next);
+                }
+            }
+
+            ~reset_next_on_exit()
+            {
+                coroutine_accessor::set_impl_next(*self_, old_next_);
+            }
+
+            coroutine_self* self_;
+            coroutine_impl* old_next_;
+        };
+
+    public:
         /// \brief Directly execute the thread function (inline)
         ///
         /// \returns        This function returns the thread state the thread
         ///                 should be scheduled from this point on. The thread
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
-        inline coroutine_type::result_type invoke_directly(
+        HPX_FORCEINLINE coroutine_type::result_type invoke_directly(
             hpx::basic_execution::this_thread::detail::agent_storage*
-                agent_storage);
-
-        virtual thread_id_type get_thread_id() const
+                agent_storage)
         {
+            HPX_ASSERT(get_state().state() == active);
+            HPX_ASSERT(this == coroutine_.get_thread_id().get());
+
+            // make sure this thread is executed using the correct agent
+            hpx::basic_execution::this_thread::reset_agent ctx(
+                agent_storage, agent_);
+
+            // propagate the outer coroutine to the inner agent
+            reset_next_on_exit on_exit(agent_.get_self(), ctx.old_);
+
+            set_state_ex(wait_signaled);
+
+            coroutine_type::result_type result =
+                coroutine_.invoke_directly(wait_signaled);
+
+            if (result.first == terminated && runs_as_child())
+            {
+                result.first = deleted;
+            }
+
+            return result;
+        }
+
+        thread_id_type get_thread_id() const
+        {
+            HPX_ASSERT(this == coroutine_.get_thread_id().get());
             return thread_id_type{const_cast<thread_data*>(this)};
         }
 
-#if !defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        virtual std::size_t get_thread_phase() const noexcept
+        std::size_t get_thread_phase() const noexcept
         {
-            return 0;
-        }
+#if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
+            return coroutine_.get_thread_phase();
 #else
-        virtual std::size_t get_thread_phase() const noexcept= 0;
+            return 0;
 #endif
-        virtual std::size_t get_thread_data() const = 0;
-        virtual std::size_t set_thread_data(std::size_t data) = 0;
+        }
 
-        virtual void rebind(
-            thread_init_data& init_data, thread_state_enum newstate) = 0;
+        std::size_t get_thread_data() const
+        {
+            return coroutine_.get_thread_data();
+        }
+
+        std::size_t set_thread_data(std::size_t data)
+        {
+            return coroutine_.set_thread_data(data);
+        }
+
+        void rebind(thread_init_data& init_data, thread_state_enum newstate)
+        {
+            this->thread_data::rebind_base(init_data, newstate);
+
+            coroutine_.rebind(std::move(init_data.func), thread_id_type(this));
+
+            HPX_ASSERT(coroutine_.is_ready());
+        }
 
 #if defined(HPX_HAVE_APEX)
         std::shared_ptr<util::external_timer::task_wrapper>
@@ -587,10 +674,18 @@ namespace hpx { namespace threads {
 
         // Construct a new \a thread
         thread_data(thread_init_data& init_data, void* queue,
-            thread_state_enum newstate, bool is_stackless = false);
+            thread_state_enum newstate);
 
-        virtual ~thread_data();
-        virtual void destroy() = 0;
+        ~thread_data();
+
+        static inline thread_data* create(thread_init_data& init_data,
+            void* queue, thread_state_enum newstate);
+
+        void destroy()
+        {
+            this->~thread_data();
+            thread_alloc_.deallocate(this, 1);
+        }
 
     protected:
         void rebind_base(
@@ -632,7 +727,6 @@ namespace hpx { namespace threads {
 
         // support scoped child execution
         bool const runs_as_child_;
-        boost::container::small_vector<thread_data*, 2> scoped_children_;
 
         // Singly linked list (heap-allocated)
         std::forward_list<util::function_nonser<void()>> exit_funcs_;
@@ -644,59 +738,31 @@ namespace hpx { namespace threads {
 
         void* queue_;
 
+        coroutine_type coroutine_;
+        execution_agent agent_;
+
     public:
 #if defined(HPX_HAVE_APEX)
         std::shared_ptr<util::external_timer::task_wrapper> timer_data_;
 #endif
-        bool is_stackless_;
     };
 
     HPX_CXX14_CONSTEXPR inline thread_data* get_thread_id_data(
-        thread_id_type const& tid)
+        thread_id_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get());
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    inline thread_data* thread_data::create(
+        thread_init_data& data, void* queue, thread_state_enum state)
+    {
+        thread_data* p = thread_alloc_.allocate(1);
+        new (p) thread_data(data, queue, state);
+        return p;
     }
 }}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#include <hpx/runtime/threads/thread_data_stackful.hpp>
-#include <hpx/runtime/threads/thread_data_stackless.hpp>
-
-namespace hpx { namespace threads {
-
-    HPX_FORCEINLINE coroutine_type::result_type thread_data::operator()(
-        hpx::basic_execution::this_thread::detail::agent_storage* agent_storage)
-    {
-        if (is_stackless_)
-        {
-            return static_cast<thread_data_stackless*>(this)->call();
-        }
-        return static_cast<thread_data_stackful*>(this)->call(agent_storage);
-    }
-
-    HPX_FORCEINLINE coroutine_type::result_type thread_data::invoke_directly(
-        hpx::basic_execution::this_thread::detail::agent_storage* agent_storage)
-    {
-        coroutine_type::result_type result(
-            thread_state_enum::terminated, invalid_thread_id);
-
-        if (is_stackless_)
-        {
-            result = static_cast<thread_data_stackless*>(this)->call();
-        }
-        else
-        {
-            result = static_cast<thread_data_stackful*>(this)->invoke_directly();
-        }
-
-        if (result.first == terminated && has_scoped_children())
-        {
-            delete_scoped_children();
-        }
-
-        return result;
-    }
-}}
 
 #endif /*HPX_RUNTIME_THREADS_THREAD_DATA_HPP*/

@@ -108,7 +108,8 @@ namespace hpx { namespace threads {
             "terminated",
             "staged",
             "pending_do_not_schedule",
-            "pending_boost"
+            "pending_boost",
+            "deleted"
         };
         // clang-format on
 
@@ -116,7 +117,7 @@ namespace hpx { namespace threads {
 
     char const* get_thread_state_name(thread_state_enum state)
     {
-        if (state > pending_boost)
+        if (state > deleted)
             return "unknown";
         return strings::thread_state_names[state];
     }
@@ -181,7 +182,6 @@ namespace hpx { namespace threads {
             "medium",
             "large",
             "huge",
-            "nostack",
         };
         // clang-format on
 
@@ -201,10 +201,8 @@ namespace hpx { namespace threads {
             size = thread_stacksize_large;
         else if (rtcfg.get_stack_size(thread_stacksize_huge) == size)
             size = thread_stacksize_huge;
-        else if (rtcfg.get_stack_size(thread_stacksize_nostack) == size)
-            size = thread_stacksize_nostack;
 
-        if (size < thread_stacksize_small || size > thread_stacksize_nostack)
+        if (size < thread_stacksize_small || size > thread_stacksize_huge)
             return "custom";
 
         return strings::stack_size_names[size - 1];

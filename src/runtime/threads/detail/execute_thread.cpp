@@ -144,15 +144,8 @@ namespace hpx { namespace threads { namespace detail {
             // state at this point
         }
 
-        if (state_val == terminated)
-        {
-            // we are responsible for destroying terminated threads
-            static std::int64_t fake_busy_count = 0;
-            thrd->get_scheduler_base()->destroy_thread(thrd, fake_busy_count);
-            return true;
-        }
-
-        return false;
+        HPX_ASSERT_(state_val != terminated, "");
+        return state_val == deleted;
     }
 
 }}}    // namespace hpx::threads::detail

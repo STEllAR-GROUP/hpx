@@ -48,10 +48,12 @@ namespace hpx { namespace threads {
                                           but allows to create a thread in
                                           pending state without scheduling it
                                           (internal, do not use) */
-        pending_boost = 8             /*< this is not a real thread state,
+        pending_boost = 8,            /*< this is not a real thread state,
                                           but allows to suspend a thread in
                                           pending state without high priority
                                           rescheduling */
+        deleted = 9                   /*< thread has been stopped and was
+                                          deleted */
     };
     // clang-format on
 
@@ -158,9 +160,7 @@ namespace hpx { namespace threads {
         thread_stacksize_medium = 2,     ///< use medium sized stack size
         thread_stacksize_large = 3,      ///< use large stack size
         thread_stacksize_huge = 4,       ///< use very large stack size
-        thread_stacksize_nostack = 5,    ///< this thread does not suspend
-                                         ///< (does not need a stack)
-        thread_stacksize_current = 6,    ///< use size of current thread's stack
+        thread_stacksize_current = 5,    ///< use size of current thread's stack
 
         thread_stacksize_default =
             thread_stacksize_small,    ///< use default stack size

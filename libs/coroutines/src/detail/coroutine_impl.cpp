@@ -32,9 +32,9 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/coroutine.hpp>
+#include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
-#include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
-#include <hpx/coroutines/detail/coroutine_stackful_self_direct.hpp>
+#include <hpx/coroutines/detail/coroutine_self.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -50,31 +50,35 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     }
 #endif
 
+    ////////////////////////////////////////////////////////////////////////////
     void coroutine_impl::operator()() noexcept
     {
-        typedef super_type::context_exit_status context_exit_status;
-        context_exit_status status = super_type::ctx_exited_return;
-
-        // yield value once the thread function has finished executing
-        result_type result_last(
-            thread_state_enum::terminated, invalid_thread_id);
-
         // loop as long this coroutine has been rebound
         do
         {
+            context_exit_status status = ctx_not_exited;
+
+            HPX_ASSERT_(!m_fun.empty(), "");
+
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             finish_switch_fiber(nullptr, m_caller);
 #endif
             std::exception_ptr tinfo;
             {
-                coroutine_self* old_self = coroutine_self::get_self();
-                coroutine_stackful_self self(this, old_self);
-                reset_self_on_exit on_exit(&self, old_self);
+                basic_execution::agent_ref agent =
+                    basic_execution::this_thread::agent();
+                coroutine_self* self = coroutine_self::get_self();
+
+                // yield value once the thread function has finished executing
+                result_type result_last(
+                    thread_state_enum::unknown, invalid_thread_id);
+
                 try
                 {
                     result_last = m_fun(*this->args());
-                    HPX_ASSERT(
-                        result_last.first == thread_state_enum::terminated);
+                    HPX_ASSERT_(
+                        result_last.first == thread_state_enum::terminated, "");
+                    status = super_type::ctx_exited_return;
                 }
                 catch (...)
                 {
@@ -90,38 +94,62 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
             this->reset();
             this->do_return(status, std::move(tinfo));
+
         } while (this->m_state == super_type::ctx_running);
 
         // should not get here, never
         HPX_ASSERT(this->m_state == super_type::ctx_running);
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     // execute the coroutine function directly in the context of the calling
     // thread
     coroutine_impl::result_type coroutine_impl::invoke_directly(
-        coroutine_impl::arg_type arg) noexcept
+        coroutine_impl::arg_type arg)
     {
+        // we can't re-enter a coroutine directly if it is currently yielded
+        if (m_exit_status == ctx_exited_yielded)
+        {
+            // we return 'pending' as the new state to reschedule the thread
+            return result_type(thread_state_enum::pending, invalid_thread_id);
+        }
+
+        HPX_ASSERT_(m_state == ctx_ready, "");
         m_state = ctx_running;
+        m_exit_status = ctx_not_exited;
+
+        context_exit_status status = ctx_not_exited;
 
         std::exception_ptr tinfo;
         {
-            coroutine_self* old_self = coroutine_self::get_self();
-            coroutine_stackful_self_direct self(this, old_self);
-            reset_self_on_exit on_exit(&self, old_self);
+            basic_execution::agent_ref agent =
+                basic_execution::this_thread::agent();
+            coroutine_self* self = coroutine_self::get_self();
+
+            // yield value once the thread function has finished executing
+            result_type result_last(
+                thread_state_enum::unknown, invalid_thread_id);
+
             try
             {
-                m_result = m_fun(arg);
-                HPX_ASSERT(m_result.first == thread_state_enum::terminated);
+                result_last = m_fun(arg);
+                HPX_ASSERT_(
+                    result_last.first == thread_state_enum::terminated, "");
+                status = super_type::ctx_exited_return;
             }
             catch (...)
             {
+                status = super_type::ctx_exited_abnormally;
                 tinfo = std::current_exception();
             }
-            this->reset_tss();
-        }
-        this->reset();
 
+            this->reset_tss();
+            this->bind_result(result_last);
+        }
+
+        this->reset();
         m_state = ctx_exited;
+        m_exit_status = status;
 
         if (tinfo)
         {

@@ -10,7 +10,6 @@ set(tests
     resume_priority
     run_as_hpx_thread_exceptions_3304
     run_as_os_thread_lockup_2991
-    stackless_self_4155
     thread_data_1111
     thread_pool_executor_1112
     thread_rescheduling

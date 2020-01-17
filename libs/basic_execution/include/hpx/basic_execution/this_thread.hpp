@@ -34,7 +34,19 @@ namespace hpx { namespace basic_execution { namespace this_thread {
         agent_base* old_;
     };
 
+    struct HPX_EXPORT suspend_agent
+    {
+        suspend_agent();
+        explicit suspend_agent(detail::agent_storage*);
+
+        ~suspend_agent();
+
+        detail::agent_storage* storage_;
+        agent_base* old_;
+    };
+
     HPX_EXPORT hpx::basic_execution::agent_ref agent();
+    HPX_EXPORT void agent(hpx::basic_execution::agent_base*);
 
     HPX_EXPORT void yield(
         char const* desc = "hpx::basic_execution::this_thread::yield");
@@ -56,6 +68,14 @@ namespace hpx { namespace basic_execution { namespace this_thread {
     {
         agent().sleep_until(sleep_time, desc);
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename RT>
+    RT* get_agent_data(agent_ref& agent)
+    {
+        return get_agent_data<RT>(&agent.ref());
+    }
+
 }}}    // namespace hpx::basic_execution::this_thread
 
 #endif

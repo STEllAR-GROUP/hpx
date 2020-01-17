@@ -222,28 +222,6 @@ void stage_worker_static_balanced_stackbased(
     }
 }
 
-void stage_worker_static_balanced_stackless(
-    std::uint64_t target_thread, bool suspend)
-{
-    if (suspend)
-    {
-        hpx::threads::register_non_suspendable_thread_plain(
-            &invoke_worker_timed_suspension, "invoke_worker_timed_suspension",
-            hpx::threads::pending, false, hpx::threads::thread_priority_normal,
-            hpx::threads::thread_schedule_hint(
-                static_cast<std::int16_t>(target_thread)));
-    }
-    else
-    {
-        hpx::threads::register_non_suspendable_thread_plain(
-            &invoke_worker_timed_no_suspension,
-            "invoke_worker_timed_no_suspension", hpx::threads::pending, false,
-            hpx::threads::thread_priority_normal,
-            hpx::threads::thread_schedule_hint(
-                static_cast<std::int16_t>(target_thread)));
-    }
-}
-
 void stage_worker_static_imbalanced(std::uint64_t target_thread, bool suspend)
 {
     if (suspend)

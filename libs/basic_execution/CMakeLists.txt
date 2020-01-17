@@ -34,6 +34,7 @@ add_hpx_module(basic_execution
   SOURCES ${basic_execution_sources}
   HEADERS ${basic_execution_headers}
   COMPAT_HEADERS ${basic_execution_compat_headers}
+  GLOBAL_HEADER_GEN OFF
   DEPENDENCIES
     hpx_assertion
     hpx_config

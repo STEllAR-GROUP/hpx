@@ -48,7 +48,8 @@ namespace hpx { namespace threads { namespace detail
         thread_state_ex_enum newstate_ex, thread_priority priority,
         thread_state previous_state)
     {
-        if (HPX_UNLIKELY(!thrd)) {
+        if (HPX_UNLIKELY(!thrd))
+        {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threads::detail::set_active_state",
                 "null thread id encountered");
@@ -86,14 +87,18 @@ namespace hpx { namespace threads { namespace detail
         thread_priority priority, thread_schedule_hint schedulehint,
         bool retry_on_active, error_code& ec)
     {
-        if (HPX_UNLIKELY(!thrd)) {
-            HPX_THROWS_IF(ec, null_thread_id, "threads::detail::set_thread_state",
+        // we know that the id is actually the pointer to the thread
+        if (HPX_UNLIKELY(!thrd))
+        {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threads::detail::set_thread_state",
                 "null thread id encountered");
             return thread_state(unknown, wait_unknown);
         }
 
         // set_state can't be used to force a thread into active state
-        if (new_state == threads::active) {
+        if (new_state == threads::active)
+        {
             std::ostringstream strm;
             strm << "invalid new state: " << get_thread_state_name(new_state);
             HPX_THROWS_IF(ec, bad_parameter, "threads::detail::set_thread_state",
@@ -101,28 +106,23 @@ namespace hpx { namespace threads { namespace detail
             return thread_state(unknown, wait_unknown);
         }
 
-        // we know that the id is actually the pointer to the thread
-        if (!thrd) {
-            if (&ec != &throws)
-                ec = make_success_code();
-            return thread_state(terminated, wait_unknown);
-            // this thread has already been terminated
-        }
-
         thread_state previous_state;
+        std::size_t k = 0;
         do {
             // action depends on the current state
             previous_state = get_thread_id_data(thrd)->get_state();
             thread_state_enum previous_state_val = previous_state.state();
 
             // nothing to do here if the state doesn't change
-            if (new_state == previous_state_val) {
+            if (new_state == previous_state_val)
+            {
                 LTM_(warning)
                     << "set_thread_state: old thread state is the same as new "
                        "thread state, aborting state change, thread("
                     << thrd << "), description("
-                    << get_thread_id_data(thrd)->get_description() << "), new state("
-                    << get_thread_state_name(new_state) << ")";
+                    << get_thread_id_data(thrd)->get_description()
+                    << "), new state(" << get_thread_state_name(new_state)
+                    << ")";
 
                 if (&ec != &throws)
                     ec = make_success_code();
@@ -154,12 +154,13 @@ namespace hpx { namespace threads { namespace detail
                         create_work(
                             get_thread_id_data(thrd)->get_scheduler_base(),
                             data, pending, ec);
-
-                        if (&ec != &throws)
-                            ec = make_success_code();
                     }
                     else
                     {
+                        hpx::basic_execution::this_thread::yield_k(
+                            k, "hpx::threads::detail::set_thread_state");
+                        ++k;
+
                         LTM_(warning)
                             << "set_thread_state: thread is currently active, "
                                "but not scheduling new thread because "
@@ -168,17 +169,21 @@ namespace hpx { namespace threads { namespace detail
                             << get_thread_id_data(thrd)->get_description()
                             << "), new state("
                             << get_thread_state_name(new_state) << ")";
-                        ec = make_success_code();
+
+                        continue;
                     }
+
+                    if (&ec != &throws)
+                        ec = make_success_code();
 
                     return previous_state;     // done
                 }
                 break;
-            case terminated:
+            case terminated: HPX_FALLTHROUGH;
+            case deleted:
                 {
                     LTM_(warning) << "set_thread_state: thread is terminated, "
-                                     "aborting state "
-                                     "change, thread("
+                                     "aborting state change, thread("
                                   << thrd << "), description("
                                   << get_thread_id_data(thrd)->get_description()
                                   << "), new state("
@@ -192,7 +197,7 @@ namespace hpx { namespace threads { namespace detail
                     return previous_state;
                 }
                 break;
-            case pending:
+            case pending: HPX_FALLTHROUGH;
             case pending_boost:
                 if (suspended == new_state) {
                     // we do not allow explicit resetting of a state to suspended
@@ -216,7 +221,7 @@ namespace hpx { namespace threads { namespace detail
                 break;
             case suspended:
                 break;      // fine, just set the new state
-            case pending_do_not_schedule:
+            case pending_do_not_schedule: HPX_FALLTHROUGH;
             default:
                 {
                     std::ostringstream strm;
@@ -236,29 +241,30 @@ namespace hpx { namespace threads { namespace detail
             // (if it's not pending anymore).
 
             LTM_(info) << "set_thread_state: thread(" << thrd
-                       << "), "
-                          "description("
+                       << "), description("
                        << get_thread_id_data(thrd)->get_description()
-                       << "), "
-                          "new state("
+                       << "), new state("
                        << get_thread_state_name(new_state)
-                       << "), "
-                          "old state("
+                       << "), old state("
                        << get_thread_state_name(previous_state_val) << ")";
 
             // So all what we do here is to set the new state.
             if (get_thread_id_data(thrd)->restore_state(
                     new_state, new_state_ex, previous_state))
+            {
                 break;
+            }
 
             // state has changed since we fetched it from the thread, retry
-            LTM_(error)
-                << "set_thread_state: state has been changed since it was fetched, "
-                   "retrying, thread(" << thrd << "), "
-                   "description(" << get_thread_id_data(thrd)->get_description() << "), "
-                   "new state(" << get_thread_state_name(new_state) << "), "
-                   "old state(" << get_thread_state_name(previous_state_val)
-                << ")";
+            LTM_(error) << "set_thread_state: state has been changed since it "
+                           "was fetched, retrying, thread("
+                        << thrd
+                        << "), description("
+                        << get_thread_id_data(thrd)->get_description()
+                        << "), new state("
+                        << get_thread_state_name(new_state)
+                        << "), old state("
+                        << get_thread_state_name(previous_state_val) << ")";
         } while (true);
 
         thread_state_enum previous_state_val = previous_state.state();
@@ -269,12 +275,13 @@ namespace hpx { namespace threads { namespace detail
             // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
 
-            auto thrd_data = get_thread_id_data(thrd);
-            thrd_data->get_scheduler_base()->schedule_thread(thrd_data,
+            auto* thrd_data = get_thread_id_data(thrd);
+            auto* scheduler = thrd_data->get_scheduler_base();
+            scheduler->schedule_thread(thrd_data,
                 schedulehint, false, thrd_data->get_priority());
             // NOTE: Don't care if the hint is a NUMA hint, just want to wake up
             // a thread.
-            thrd_data->get_scheduler_base()->do_some_work(schedulehint.hint);
+            scheduler->do_some_work(schedulehint.hint);
         }
 
         if (&ec != &throws)

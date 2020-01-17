@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -734,12 +734,10 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(
-            threads::thread_data* thrd, std::int64_t& busy_count) override
+        void destroy_thread(threads::thread_data* thrd) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
-            thrd->get_queue<thread_queue_type>().destroy_thread(
-                thrd, busy_count);
+            thrd->get_queue<thread_queue_type>().destroy_thread(thrd);
         }
 
         ///////////////////////////////////////////////////////////////////////

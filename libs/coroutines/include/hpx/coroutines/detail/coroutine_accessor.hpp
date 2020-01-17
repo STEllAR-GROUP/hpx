@@ -30,15 +30,55 @@
 #ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
 #define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
 
+#include <utility>
+
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     struct coroutine_accessor
     {
         template <typename Coroutine>
-        static typename Coroutine::impl_ptr get_impl(Coroutine& x)
+        HPX_FORCEINLINE static typename Coroutine::impl_ptr get_impl(
+            Coroutine& x)
         {
             return x.get_impl();
         }
+
+        template <typename Coroutine>
+        HPX_FORCEINLINE static void set_impl(
+            Coroutine& x, typename Coroutine::impl_ptr coro)
+        {
+            return x.set_impl(coro);
+        }
+
+        template <typename Coroutine>
+        HPX_FORCEINLINE static typename Coroutine::impl_ptr get_impl_next(
+            Coroutine& x)
+        {
+            return x.get_impl_next();
+        }
+
+        template <typename Coroutine>
+        HPX_FORCEINLINE static void set_impl_next(
+            Coroutine& x, typename Coroutine::impl_ptr coro)
+        {
+            return x.set_impl_next(coro);
+        }
+
+//         template <typename Coroutine>
+//         HPX_FORCEINLINE static std::pair<typename Coroutine::impl_ptr,
+//             typename Coroutine::impl_ptr>
+//         get_impls(Coroutine const& x) noexcept
+//         {
+//             return x.get_impls();
+//         }
+//
+//         template <typename Coroutine>
+//         HPX_FORCEINLINE static void set_impls(Coroutine& x,
+//             typename Coroutine::impl_ptr coro,
+//             typename Coroutine::impl_ptr next) noexcept
+//         {
+//             x.set_impls(coro, next);
+//         }
     };
 }}}}    // namespace hpx::threads::coroutines::detail
 

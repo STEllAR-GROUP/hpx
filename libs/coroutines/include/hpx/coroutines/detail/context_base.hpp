@@ -62,26 +62,6 @@
         HPX_COROUTINE_NUM_HEAPS / 4 + HPX_COROUTINE_NUM_HEAPS / 4) /**/
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
-    //////////////////////////////////////////////////////////////////////////
-    //
-    struct allocation_counters
-    {
-        allocation_counters()
-        {
-            for (std::size_t i = 0; i < HPX_COROUTINE_NUM_ALL_HEAPS; ++i)
-            {
-                m_allocation_counter[i].store(0);
-            }
-        }
-
-        std::atomic<std::uint64_t>& get(std::size_t i)
-        {
-            return m_allocation_counter[i % HPX_COROUTINE_NUM_ALL_HEAPS];
-        }
-
-        std::atomic<std::uint64_t>
-            m_allocation_counter[HPX_COROUTINE_NUM_ALL_HEAPS];
-    };
 
     /////////////////////////////////////////////////////////////////////////////
     HPX_CONSTEXPR std::ptrdiff_t const default_stack_size = -1;
@@ -173,25 +153,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             this->init();
             HPX_ASSERT(is_ready());
             do_invoke();
-            // TODO: could use a binary or here to eliminate
-            // shortcut evaluation (and a branch), but maybe the compiler is
-            // smart enough to do it anyway as there are no side effects.
-            if (m_exit_status)
+
+            if (m_exit_status != ctx_not_exited)
             {
                 if (m_exit_status == ctx_exited_return)
                     return;
+                if (m_exit_status == ctx_exited_yielded)
+                    return;
                 if (m_exit_status == ctx_exited_abnormally)
                 {
+                    HPX_ASSERT(m_type_info);
                     std::rethrow_exception(m_type_info);
-                    //std::type_info const* tinfo = nullptr;
-                    //std::swap(m_type_info, tinfo);
-                    //throw abnormal_exit(tinfo ? *tinfo :
-                    //      typeid(unknown_exception_tag));
                 }
-                else
-                {
-                    HPX_ASSERT(0 && "unknown exit status");
-                }
+                HPX_ASSERT_MSG(false, "unknown exit status");
             }
         }
 
@@ -210,6 +184,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             HPX_ASSERT(running());
 
             m_state = ctx_ready;
+            m_exit_status = ctx_exited_yielded;
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             this->start_yield_fiber(&this->asan_fake_stack, m_caller);
 #endif
@@ -218,6 +193,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             this->finish_switch_fiber(this->asan_fake_stack, m_caller);
 #endif
+            m_exit_status = ctx_not_exited;
 
             HPX_ASSERT(running());
         }
@@ -275,24 +251,25 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         // global coroutine state
         enum context_state
         {
-            ctx_running,    // context running.
-            ctx_ready,      // context at yield point.
-            ctx_exited      // context is finished.
+            ctx_running = 0,    // context running.
+            ctx_ready,          // context at yield point.
+            ctx_exited          // context is finished.
         };
 
     protected:
         // exit request state
         enum context_exit_state
         {
-            ctx_exit_not_requested,    // exit not requested.
-            ctx_exit_pending,          // exit requested.
-            ctx_exit_signaled          // exit request delivered.
+            ctx_exit_not_requested = 0,    // exit not requested.
+            ctx_exit_pending,              // exit requested.
+            ctx_exit_signaled              // exit request delivered.
         };
 
         // exit status
         enum context_exit_status
         {
-            ctx_not_exited,
+            ctx_not_exited = 0,
+            ctx_exited_yielded,      // coroutine is currently yielded
             ctx_exited_return,       // process exited by return.
             ctx_exited_abnormally    // process exited uncleanly.
         };
@@ -363,7 +340,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             ctx_type;
         ctx_type m_caller;
 
-        static HPX_EXPORT allocation_counters m_allocation_counters;
         context_state m_state;
         context_exit_state m_exit_state;
         context_exit_status m_exit_status;

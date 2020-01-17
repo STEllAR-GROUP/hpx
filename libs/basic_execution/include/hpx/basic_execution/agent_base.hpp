@@ -32,7 +32,18 @@ namespace hpx { namespace basic_execution {
             char const* desc) = 0;
         virtual void sleep_until(hpx::util::steady_time_point const& sleep_time,
             char const* desc) = 0;
+
+        virtual void* get_data() { return nullptr; }
     };
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Extract the agent-specific data stored in the given agent instance
+    template <typename RT>
+    RT* get_agent_data(agent_base* agent)
+    {
+        return static_cast<RT*>(agent->get_data());
+    }
+
 }}    // namespace hpx::basic_execution
 
 #endif
