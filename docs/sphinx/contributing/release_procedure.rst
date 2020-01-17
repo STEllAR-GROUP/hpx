@@ -151,8 +151,7 @@ are completed to avoid confusion.
 #. Update the websites (`stellar-group.org <https://stellar-group.org>`_ and
    `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_) with the following:
 
-   * Download links on the downloads pages. Use the direct link to the release
-     printed by the previous step.
+   * Download links on the downloads pages. Link to the release on GitHub.
    * Documentation links on the docs page (link to generated documentation on
      GitHub Pages). Follow the style of previous releases.
    * A new blog post announcing the release, which links to downloads and the

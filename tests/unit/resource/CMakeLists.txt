@@ -16,6 +16,7 @@ set(tests
     suspend_thread_timed
 )
 
+# TODO: Enable unconditionally when C++14 is required.
 if (HPX_CXX_STANDARD GREATER 11)
   set(tests ${tests}
     cross_pool_injection

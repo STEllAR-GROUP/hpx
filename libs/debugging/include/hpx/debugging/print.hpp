@@ -426,7 +426,7 @@ namespace hpx { namespace debug {
 
     struct disable_print
     {
-        constexpr disable_print(const char* p) {}
+        HPX_CONSTEXPR disable_print(const char* p) {}
 #else
     template <bool enable>
     struct enable_print;
@@ -435,55 +435,55 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<false>
     {
-        constexpr enable_print(const char* p) {}
+        HPX_CONSTEXPR enable_print(const char* p) {}
 #endif
 
-        constexpr bool is_enabled()
+        HPX_CONSTEXPR bool is_enabled() const
         {
             return false;
         }
 
         template <typename... Args>
-        inline constexpr void debug(Args... args)
+        HPX_CXX14_CONSTEXPR void debug(Args... args) const
         {
         }
 
         template <typename... Args>
-        inline constexpr void warning(Args... args)
+        HPX_CXX14_CONSTEXPR void warning(Args... args) const
         {
         }
 
         template <typename... Args>
-        inline constexpr void error(Args... args)
+        HPX_CXX14_CONSTEXPR void error(Args... args) const
         {
         }
 
         template <typename... Args>
-        inline constexpr void timed(Args... args)
+        HPX_CXX14_CONSTEXPR void timed(Args... args) const
         {
         }
 
         template <typename T>
-        inline constexpr void array(
-            const std::string& name, const std::vector<T>& v)
+        HPX_CXX14_CONSTEXPR void array(
+            const std::string& name, const std::vector<T>& v) const
         {
         }
 
         template <typename T, std::size_t N>
-        inline constexpr void array(
-            const std::string& name, const std::array<T, N>& v)
+        HPX_CXX14_CONSTEXPR void array(
+            const std::string& name, const std::array<T, N>& v) const
         {
         }
 
         template <typename Iter>
-        inline constexpr void array(
-            const std::string& name, Iter begin, Iter end)
+        HPX_CXX14_CONSTEXPR void array(
+            const std::string& name, Iter begin, Iter end) const
         {
         }
 
         // @todo, return void so that timers have zero footprint when disabled
         template <typename... Args>
-        constexpr int make_timer(double delay, const Args... args)
+        HPX_CONSTEXPR int make_timer(double delay, const Args... args) const
         {
             return 0;
         }
@@ -494,7 +494,7 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<false> : public disable_print
     {
-        constexpr enable_print(const char* p)
+        HPX_CONSTEXPR enable_print(const char* p)
           : disable_print(p)
         {
         }
@@ -503,7 +503,7 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<true> : public disable_print
     {
-        constexpr enable_print(const char* p)
+        HPX_CONSTEXPR enable_print(const char* p)
           : disable_print(p)
         {
         }
@@ -518,28 +518,28 @@ namespace hpx { namespace debug {
         const char* prefix_;
 
     public:
-        constexpr enable_print(const char* p)
+        HPX_CONSTEXPR enable_print(const char* p)
           : prefix_(p)
         {
         }
 
-        constexpr bool is_enabled()
+        HPX_CONSTEXPR bool is_enabled() const
         {
             return true;
         }
 
         template <typename... Args>
-        constexpr void debug(Args... args)
+        HPX_CXX14_CONSTEXPR void debug(Args... args)
         {
             detail::debug(prefix_, std::forward<Args>(args)...);
         }
         template <typename... Args>
-        constexpr void warning(Args... args)
+        HPX_CXX14_CONSTEXPR void warning(Args... args)
         {
             detail::warning(prefix_, std::forward<Args>(args)...);
         }
         template <typename... Args>
-        constexpr void error(Args... args)
+        HPX_CXX14_CONSTEXPR void error(Args... args)
         {
             detail::error(prefix_, std::forward<Args>(args)...);
         }

@@ -108,8 +108,13 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
-* Auriane Reverdell, for her tireless work cleaing up the code base.
-* Rebecca Stobaugh, for her major documentation review and contributions 
+* Auriane Reverdell (|cscs|_), for her tireless work on refactoring our CMake
+  setup and modularizing |hpx|.
+* Christopher Hinz, for his work on refactoring our CMake setup.
+* Weile Wei, for fixing |hpx| builds with CUDA on Summit.
+* Severin Strobl, for fixing our CMake setup related to linking and adding new
+  entry points to the |hpx| runtime.
+* Rebecca Stobaugh, for her major documentation review and contributions
   during and after the 2019 Google Season of Documentation.
 * Jan Melech, for adding automatic serialization of simple structs.
 * Austin McCartney, for adding concept emulation of the Ranges TS bidirectional
@@ -245,8 +250,8 @@ the project through discussions, pull requests, documentation patches, etc.
 * Jayesh Badwaik, J. F. Bastien, Christoph Garth, Christopher Hinz, Brandon
   Kohn, Mario Lang, Maikel Nadolski, pierrele, hendrx, Dekken, woodmeister123,
   xaguilar, Andrew Kemp, Dylan Stark, Matthew Anderson, Jeremy Wilke, Jiazheng
-  Yuan, CyberDrudge, david8dixon, Maxwell Reeser, Raffaele Solcà, Marco
-  Ippolito, Jules Pénuchot, Weile Wei, Severin Strobl, Kor de Jong, albestro,
+  Yuan, CyberDrudge, david8dixon, Maxwell Reeser, Raffaele Solca, Marco
+  Ippolito, Jules Penuchot, Weile Wei, Severin Strobl, Kor de Jong, albestro,
   Jeff Trull, and Yuri Victorovich who contributed to the general
   improvement of |hpx|.
 
