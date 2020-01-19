@@ -12,15 +12,15 @@
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/datastructures/detail/pack.hpp is deprecated, \
-    please include hpx/type_support/detail/pack.hpp instead")
+    please include hpx/type_support/pack.hpp instead")
 #else
 #warning "The header hpx/datastructures/detail/pack.hpp is deprecated, \
-    please include hpx/type_support/detail/pack.hpp instead"
+    please include hpx/type_support/pack.hpp instead"
 #endif
 #endif
 
 namespace hpx { namespace util { namespace detail {
-    using hpx::util::empty;
+
     using hpx::util::pack;
     using hpx::util::pack_c;
 
