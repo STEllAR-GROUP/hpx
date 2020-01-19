@@ -37,7 +37,7 @@ namespace hpx { namespace util
             std::size_t ...Is, typename ...Ts, typename Us>
         HPX_FORCEINLINE
         bool bind_action_apply_impl(
-            pack_c<std::size_t, Is...>,
+            index_pack<Is...>,
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
             return hpx::apply<Action>(
@@ -63,7 +63,7 @@ namespace hpx { namespace util
             std::size_t ...Is, typename ...Ts, typename Us>
         HPX_FORCEINLINE
         bool bind_action_apply_cont_impl(
-            pack_c<std::size_t, Is...>,
+            index_pack<Is...>,
             naming::id_type const& cont,
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
@@ -92,7 +92,7 @@ namespace hpx { namespace util
             std::size_t ...Is, typename Continuation, typename ...Ts, typename Us>
         HPX_FORCEINLINE
         bool bind_action_apply_cont_impl2(
-            pack_c<std::size_t, Is...>,
+            index_pack<Is...>,
             Continuation && cont,
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
@@ -126,7 +126,7 @@ namespace hpx { namespace util
         lcos::future<typename traits::promise_local_result<
             typename hpx::traits::extract_action<Action>::remote_result_type
         >::type> bind_action_async_impl(
-            pack_c<std::size_t, Is...>,
+            index_pack<Is...>,
             util::tuple<Ts...> const& bound, Us&& unbound)
         {
             return hpx::async<Action>(

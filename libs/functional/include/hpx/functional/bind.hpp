@@ -119,7 +119,7 @@ namespace hpx { namespace util {
         struct bound_impl;
 
         template <typename F, typename... Ts, std::size_t... Is>
-        struct bound_impl<F, util::tuple<Ts...>, pack_c<std::size_t, Is...>>
+        struct bound_impl<F, util::tuple<Ts...>, index_pack<Is...>>
         {
             template <typename... Us>
             HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE typename invoke_bound_result<F&,

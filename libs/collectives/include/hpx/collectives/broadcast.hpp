@@ -278,8 +278,7 @@ namespace hpx { namespace lcos {
         struct make_broadcast_action_impl;
 
         template <typename Action, std::size_t... Is>
-        struct make_broadcast_action_impl<Action,
-            util::pack_c<std::size_t, Is...>>
+        struct make_broadcast_action_impl<Action, util::index_pack<Is...>>
         {
             typedef
                 typename broadcast_result<Action>::action_result action_result;
@@ -312,8 +311,7 @@ namespace hpx { namespace lcos {
         struct make_broadcast_apply_action_impl;
 
         template <typename Action, std::size_t... Is>
-        struct make_broadcast_apply_action_impl<Action,
-            util::pack_c<std::size_t, Is...>>
+        struct make_broadcast_apply_action_impl<Action, util::index_pack<Is...>>
         {
             typedef
                 typename broadcast_result<Action>::action_result action_result;

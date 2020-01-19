@@ -50,8 +50,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE HPX_FORCEINLINE void init_iteration(
-            hpx::util::tuple<Ts...>& args,
-            hpx::util::pack_c<std::size_t, Is...>, std::size_t part_index)
+            hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
+            std::size_t part_index)
         {
             int const _sequencer[] = {
                 0, (hpx::util::get<Is>(args).init_iteration(part_index), 0)...};
@@ -60,8 +60,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
         template <typename... Ts, std::size_t... Is, typename F, typename B>
         HPX_HOST_DEVICE HPX_FORCEINLINE void invoke_iteration(
-            hpx::util::tuple<Ts...>& args,
-            hpx::util::pack_c<std::size_t, Is...>, F&& f, B part_begin)
+            hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>, F&& f,
+            B part_begin)
         {
             hpx::util::invoke(std::forward<F>(f), part_begin,
                 hpx::util::get<Is>(args).iteration_value()...);
@@ -69,8 +69,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
         template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE HPX_FORCEINLINE void next_iteration(
-            hpx::util::tuple<Ts...>& args,
-            hpx::util::pack_c<std::size_t, Is...>, std::size_t part_index)
+            hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
+            std::size_t part_index)
         {
             int const _sequencer[] = {
                 0, (hpx::util::get<Is>(args).next_iteration(part_index), 0)...};
@@ -79,8 +79,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
         template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE HPX_FORCEINLINE void exit_iteration(
-            hpx::util::tuple<Ts...>& args,
-            hpx::util::pack_c<std::size_t, Is...>, std::size_t size)
+            hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
+            std::size_t size)
         {
             int const _sequencer[] = {
                 0, (hpx::util::get<Is>(args).exit_iteration(size), 0)...};
@@ -225,7 +225,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             std::size_t... Is, typename... Args>
         typename util::detail::algorithm_result<ExPolicy>::type for_loop(
             ExPolicy&& policy, B first, E last, S stride,
-            hpx::util::pack_c<std::size_t, Is...>, Args&&... args)
+            hpx::util::index_pack<Is...>, Args&&... args)
         {
             // stride shall not be zero
             HPX_ASSERT(stride != 0);
@@ -262,7 +262,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             std::size_t... Is, typename... Args>
         typename util::detail::algorithm_result<ExPolicy>::type for_loop_n(
             ExPolicy&& policy, B first, Size size, S stride,
-            hpx::util::pack_c<std::size_t, Is...>, Args&&... args)
+            hpx::util::index_pack<Is...>, Args&&... args)
         {
             // Size should be non-negative
             HPX_ASSERT(size >= 0);

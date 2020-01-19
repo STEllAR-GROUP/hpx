@@ -159,7 +159,7 @@ namespace hpx
         template <typename Iterator, std::size_t... I>
         base_type update_view(hpx::detail::coarray_sizes<N> const& cosizes,
             std::size_t num_images,
-            hpx::util::pack_c<std::size_t, I...>,
+            hpx::util::index_pack<I...>,
             hpx::lcos::spmd_block const& block,
             Iterator&& begin,
             Iterator&& last) const

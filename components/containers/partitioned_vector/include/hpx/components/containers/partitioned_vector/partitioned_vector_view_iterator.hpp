@@ -37,7 +37,7 @@ namespace hpx {
 
     template<std::size_t... I>
     std::size_t  increment_solver( std::size_t dist,
-        hpx::util::pack_c<std::size_t, I...> ) const
+        hpx::util::index_pack<I...> ) const
     {
         std::size_t max = N-1;
         std::size_t offset = 0;
@@ -148,7 +148,7 @@ namespace hpx {
 
     template<std::size_t... I>
     std::size_t  increment_solver( std::size_t dist,
-        hpx::util::pack_c<std::size_t, I...> ) const
+        hpx::util::index_pack<I...> ) const
     {
         std::size_t max = N-1;
         std::size_t offset = 0;

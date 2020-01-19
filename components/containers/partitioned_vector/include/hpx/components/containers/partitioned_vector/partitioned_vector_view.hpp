@@ -117,7 +117,7 @@ namespace hpx
         void fill_basis(
             list_type const & sizes,
             std::array<std::size_t,N+1> & basis,
-            hpx::util::pack_c<std::size_t, I...>) const
+            hpx::util::index_pack<I...>) const
         {
             basis[0] = 1;
 

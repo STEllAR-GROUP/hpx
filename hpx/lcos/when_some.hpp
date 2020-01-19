@@ -371,7 +371,7 @@ namespace hpx { namespace lcos
 
             template <typename Tuple, std::size_t ...Is>
             HPX_FORCEINLINE
-            void apply(Tuple& tuple, util::pack_c<std::size_t, Is...>) const
+            void apply(Tuple& tuple, util::index_pack<Is...>) const
             {
                 int const _sequencer[]= {
                     (((*this)(util::get<Is>(tuple))), 0)...

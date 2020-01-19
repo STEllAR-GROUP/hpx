@@ -436,7 +436,7 @@ namespace hpx
 
         protected:
             template <std::size_t ...Is>
-            void apply_action(util::pack_c<std::size_t, Is...>)
+            void apply_action(util::index_pack<Is...>)
             {
                 if (addr_)
                 {

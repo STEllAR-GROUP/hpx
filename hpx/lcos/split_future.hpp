@@ -192,7 +192,7 @@ namespace hpx { namespace lcos
         HPX_FORCEINLINE
         hpx::util::tuple<hpx::future<Ts>...>
         split_future_helper(hpx::future<hpx::util::tuple<Ts...> > && f,
-            hpx::util::pack_c<std::size_t, Is...>)
+            hpx::util::index_pack<Is...>)
         {
             return hpx::util::make_tuple(extract_nth_future<Is>(f)...);
         }
@@ -201,7 +201,7 @@ namespace hpx { namespace lcos
         HPX_FORCEINLINE
         hpx::util::tuple<hpx::future<Ts>...>
         split_future_helper(hpx::shared_future<hpx::util::tuple<Ts...> > && f,
-            hpx::util::pack_c<std::size_t, Is...>)
+            hpx::util::index_pack<Is...>)
         {
             return hpx::util::make_tuple(extract_nth_future<Is>(f)...);
         }

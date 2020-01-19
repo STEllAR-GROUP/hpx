@@ -246,7 +246,7 @@ namespace hpx { namespace lcos {
         struct make_fold_action_impl;
 
         template <typename Action, std::size_t... Is>
-        struct make_fold_action_impl<Action, util::pack_c<std::size_t, Is...>>
+        struct make_fold_action_impl<Action, util::index_pack<Is...>>
         {
             typedef typename fold_result<Action>::type action_result;
 

@@ -268,16 +268,16 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename... Ts, std::size_t... Is>
         HPX_FORCEINLINE void prefetch_containers(
-            hpx::util::tuple<Ts...> const& t,
-            hpx::util::pack_c<std::size_t, Is...>, std::size_t idx)
+            hpx::util::tuple<Ts...> const& t, hpx::util::index_pack<Is...>,
+            std::size_t idx)
         {
             prefetch_addresses((hpx::util::get<Is>(t).get())[idx]...);
         }
 #else
         template <typename... Ts, std::size_t... Is>
         HPX_FORCEINLINE void prefetch_containers(
-            hpx::util::tuple<Ts...> const& t,
-            hpx::util::pack_c<std::size_t, Is...>, std::size_t idx)
+            hpx::util::tuple<Ts...> const& t, hpx::util::index_pack<Is...>,
+            std::size_t idx)
         {
             int const sequencer[] = {
                 (hpx::util::get<Is>(t).get()[idx], 0)..., 0};

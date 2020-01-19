@@ -203,8 +203,8 @@ namespace hpx { namespace util {
         };
 
         template <std::size_t... Is, typename... Ts, typename UTuple>
-        struct are_tuples_compatible_impl<util::pack_c<std::size_t, Is...>,
-            tuple<Ts...>, UTuple,
+        struct are_tuples_compatible_impl<util::index_pack<Is...>, tuple<Ts...>,
+            UTuple,
             typename std::enable_if<tuple_size<typename std::remove_reference<
                                         UTuple>::type>::value ==
                 util::pack<Ts...>::size>::type>
@@ -229,7 +229,7 @@ namespace hpx { namespace util {
         struct tuple_impl;
 
         template <std::size_t... Is, typename... Ts>
-        struct tuple_impl<util::pack_c<std::size_t, Is...>, Ts...>
+        struct tuple_impl<util::index_pack<Is...>, Ts...>
           : tuple_member<Is, Ts>...
         {
             // 20.4.2.1, tuple construction
@@ -935,8 +935,7 @@ namespace hpx { namespace util {
         struct tuple_cat_result_impl;
 
         template <std::size_t... Is, typename... Tuples>
-        struct tuple_cat_result_impl<pack_c<std::size_t, Is...>,
-            pack<Tuples...>>
+        struct tuple_cat_result_impl<index_pack<Is...>, pack<Tuples...>>
         {
             using type =
                 tuple<typename tuple_cat_element<Is, pack<Tuples...>>::type...>;
@@ -948,7 +947,7 @@ namespace hpx { namespace util {
 
         template <std::size_t... Is, typename... Tuples, typename... Tuples_>
         HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat_impl(
-            pack_c<std::size_t, Is...> is_pack, pack<Tuples...> tuple_pack,
+            index_pack<Is...> is_pack, pack<Tuples...> tuple_pack,
             Tuples_&&... tuples)
             -> tuple_cat_result_of_t<decltype(is_pack), decltype(tuple_pack)>
         {

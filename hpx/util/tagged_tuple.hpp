@@ -137,7 +137,7 @@ namespace hpx { namespace util
 
         template <typename ...Ts, std::size_t ...Is, typename ...Tags>
         struct tagged_tuple_helper<
-            tuple<Ts...>, pack_c<std::size_t, Is...>, Tags...>
+            tuple<Ts...>, index_pack<Is...>, Tags...>
         {
             typedef tagged_tuple<
                 typename tagged_element_type<Tags, Is, tuple<Ts...> >::type...

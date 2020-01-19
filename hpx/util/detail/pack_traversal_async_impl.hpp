@@ -60,8 +60,8 @@ namespace util {
         template <std::size_t Offset, typename Pack>
         struct relocate_index_pack;
         template <std::size_t Offset, std::size_t... Sequence>
-        struct relocate_index_pack<Offset, pack_c<std::size_t, Sequence...>>
-          : std::common_type<pack_c<std::size_t, (Sequence + Offset)...>>
+        struct relocate_index_pack<Offset, index_pack<Sequence...>>
+          : std::common_type<index_pack<(Sequence + Offset)...>>
         {
         };
 
@@ -508,7 +508,7 @@ namespace util {
 
             template <std::size_t... Sequence, typename Current>
             void async_traverse_static_async_range(
-                pack_c<std::size_t, Sequence...>,
+                index_pack<Sequence...>,
                 Current&& current)
             {
                 int dummy[] = {((void) async_traverse_one_checked(
