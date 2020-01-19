@@ -12,7 +12,6 @@
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
@@ -57,12 +56,13 @@ namespace hpx { namespace util {
         template <std::size_t I>
         struct bind_eval_placeholder
         {
-            template <typename T, typename Us>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE typename util::tuple_element<I,
-                typename std::remove_reference<Us>::type>::type&&
-            call(T&& /*t*/, Us&& unbound)
+            template <typename T, typename... Us>
+            static HPX_CONSTEXPR HPX_HOST_DEVICE
+                typename util::tuple_element<I, util::tuple<Us&&...>>::type&&
+                call(T&& /*t*/, Us&&... vs)
             {
-                return util::get<I>(std::forward<Us>(unbound));
+                return util::get<I>(
+                    util::forward_as_tuple(std::forward<Us>(vs)...));
             }
         };
 
@@ -70,9 +70,8 @@ namespace hpx { namespace util {
             typename Enable = void>
         struct bind_eval
         {
-            template <typename Us>
-            static HPX_CONSTEXPR HPX_HOST_DEVICE T&& call(
-                T&& t, Us&& /*unbound*/)
+            template <typename... Us>
+            static HPX_CONSTEXPR HPX_HOST_DEVICE T&& call(T&& t, Us&&... /*vs*/)
             {
                 return std::forward<T>(t);
             }
@@ -92,25 +91,24 @@ namespace hpx { namespace util {
             typename std::enable_if<
                 traits::is_bind_expression<TD>::value>::type>
         {
-            template <typename Us>
+            template <typename... Us>
             static HPX_CONSTEXPR HPX_HOST_DEVICE
-                typename util::detail::invoke_fused_result<T, Us>::type
-                call(T&& t, Us&& unbound)
+                typename util::invoke_result<T, Us...>::type
+                call(T&& t, Us&&... vs)
             {
-                return util::invoke_fused(
-                    std::forward<T>(t), std::forward<Us>(unbound));
+                return HPX_INVOKE(std::forward<T>(t), std::forward<Us>(vs)...);
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Ts, typename Us>
+        template <typename F, typename Ts, typename... Us>
         struct invoke_bound_result;
 
-        template <typename F, typename... Ts, typename Us>
-        struct invoke_bound_result<F, util::tuple<Ts...>, Us>
+        template <typename F, typename... Ts, typename... Us>
+        struct invoke_bound_result<F, util::pack<Ts...>, Us...>
           : util::invoke_result<F,
                 decltype(bind_eval<Ts>::call(
-                    std::declval<Ts>(), std::declval<Us>()))...>
+                    std::declval<Ts>(), std::declval<Us>()...))...>
         {
         };
 
@@ -154,45 +152,45 @@ namespace hpx { namespace util {
 
             template <typename... Us>
             HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE typename invoke_bound_result<F&,
-                util::tuple<Ts&...>, util::tuple<Us&&...>>::type
+                util::pack<Ts&...>, Us&&...>::type
             operator()(Us&&... vs) &
             {
                 return HPX_INVOKE(_f,
-                    detail::bind_eval<Ts&>::call(util::get<Is>(_args),
-                        util::forward_as_tuple(std::forward<Us>(vs)...))...);
+                    detail::bind_eval<Ts&>::call(
+                        util::get<Is>(_args), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
             HPX_CONSTEXPR HPX_HOST_DEVICE typename invoke_bound_result<F const&,
-                util::tuple<Ts const&...>, util::tuple<Us&&...>>::type
+                util::pack<Ts const&...>, Us&&...>::type
             operator()(Us&&... vs) const&
             {
                 return HPX_INVOKE(_f,
-                    detail::bind_eval<Ts const&>::call(util::get<Is>(_args),
-                        util::forward_as_tuple(std::forward<Us>(vs)...))...);
+                    detail::bind_eval<Ts const&>::call(
+                        util::get<Is>(_args), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
             HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
-                typename invoke_bound_result<F&&, util::tuple<Ts&&...>,
-                    util::tuple<Us&&...>>::type
+                typename invoke_bound_result<F&&, util::pack<Ts&&...>,
+                    Us&&...>::type
                 operator()(Us&&... vs) &&
             {
                 return HPX_INVOKE(std::move(_f),
                     detail::bind_eval<Ts>::call(util::get<Is>(std::move(_args)),
-                        util::forward_as_tuple(std::forward<Us>(vs)...))...);
+                        std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
             HPX_CONSTEXPR HPX_HOST_DEVICE
                 typename invoke_bound_result<F const&&,
-                    util::tuple<Ts const&&...>, util::tuple<Us&&...>>::type
+                    util::pack<Ts const&&...>, Us&&...>::type
                 operator()(Us&&... vs) const&&
             {
                 return HPX_INVOKE(std::move(_f),
                     detail::bind_eval<Ts const>::call(
                         util::get<Is>(std::move(_args)),
-                        util::forward_as_tuple(std::forward<Us>(vs)...))...);
+                        std::forward<Us>(vs)...)...);
             }
 
             template <typename Archive>

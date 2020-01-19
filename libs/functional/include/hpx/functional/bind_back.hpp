@@ -28,14 +28,14 @@ namespace hpx { namespace util {
         struct invoke_bound_back_result;
 
         template <typename F, typename... Ts, typename... Us>
-        struct invoke_bound_back_result<F, util::tuple<Ts...>, Us...>
+        struct invoke_bound_back_result<F, util::pack<Ts...>, Us...>
           : util::invoke_result<F, Us..., Ts...>
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Is, typename... Ts>
-        struct bound_back;
+        class bound_back;
 
         template <typename F, std::size_t... Is, typename... Ts>
         class bound_back<F, index_pack<Is...>, Ts...>
@@ -73,7 +73,7 @@ namespace hpx { namespace util {
 
             template <typename... Us>
             HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
-                typename invoke_bound_back_result<F&, util::tuple<Ts&...>,
+                typename invoke_bound_back_result<F&, util::pack<Ts&...>,
                     Us&&...>::type
                 operator()(Us&&... vs) &
             {
@@ -84,7 +84,7 @@ namespace hpx { namespace util {
             template <typename... Us>
             HPX_CONSTEXPR HPX_HOST_DEVICE
                 typename invoke_bound_back_result<F const&,
-                    util::tuple<Ts const&...>, Us&&...>::type
+                    util::pack<Ts const&...>, Us&&...>::type
                 operator()(Us&&... vs) const&
             {
                 return HPX_INVOKE(
@@ -93,7 +93,7 @@ namespace hpx { namespace util {
 
             template <typename... Us>
             HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
-                typename invoke_bound_back_result<F&&, util::tuple<Ts&&...>,
+                typename invoke_bound_back_result<F&&, util::pack<Ts&&...>,
                     Us&&...>::type
                 operator()(Us&&... vs) &&
             {
@@ -104,7 +104,7 @@ namespace hpx { namespace util {
             template <typename... Us>
             HPX_CONSTEXPR HPX_HOST_DEVICE
                 typename invoke_bound_back_result<F const&&,
-                    util::tuple<Ts const&&...>, Us&&...>::type
+                    util::pack<Ts const&&...>, Us&&...>::type
                 operator()(Us&&... vs) const&&
             {
                 return HPX_INVOKE(std::move(_f), std::forward<Us>(vs)...,
