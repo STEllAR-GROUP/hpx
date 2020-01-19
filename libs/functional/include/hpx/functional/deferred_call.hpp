@@ -18,6 +18,7 @@
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -65,37 +66,12 @@ namespace hpx { namespace util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Ts, typename Is>
-        struct deferred_impl;
-
-        template <typename F, typename... Ts, std::size_t... Is>
-        struct deferred_impl<F, util::tuple<Ts...>, index_pack<Is...>>
-        {
-            HPX_HOST_DEVICE HPX_FORCEINLINE
-                typename util::invoke_result<F, Ts...>::type
-                operator()()
-            {
-                return HPX_INVOKE(
-                    std::move(_f), util::get<Is>(std::move(_args))...);
-            }
-
-            F _f;
-            util::tuple<Ts...> _args;
-        };
-
-        template <typename F, typename... Ts>
+        template <typename F, typename Is, typename... Ts>
         class deferred;
 
-        template <typename F, typename... Ts>
-        class deferred
-          : private deferred_impl<F,
-                util::tuple<typename util::decay_unwrap<Ts>::type...>,
-                typename util::make_index_pack<sizeof...(Ts)>::type>
+        template <typename F, std::size_t... Is, typename... Ts>
+        class deferred<F, index_pack<Is...>, Ts...>
         {
-            using base_type = deferred_impl<F,
-                util::tuple<typename util::decay_unwrap<Ts>::type...>,
-                typename util::make_index_pack<sizeof...(Ts)>::type>;
-
         public:
             deferred() {}    // needed for serialization
 
@@ -103,16 +79,17 @@ namespace hpx { namespace util {
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
             explicit HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
-              : base_type{std::forward<F_>(f),
-                    util::forward_as_tuple(std::forward<Ts_>(vs)...)}
+              : _f(std::forward<F_>(f))
+              , _args(std::forward<Ts_>(vs)...)
             {
             }
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
             deferred(deferred&&) = default;
 #else
-            HPX_HOST_DEVICE deferred(deferred&& other)
-              : base_type{std::move(other)}
+            HPX_CONSTEXPR HPX_HOST_DEVICE deferred(deferred&& other)
+              : _f(std::move(other._f))
+              , _args(std::move(other._args))
             {
             }
 #endif
@@ -120,7 +97,13 @@ namespace hpx { namespace util {
             deferred(deferred const&) = delete;
             deferred& operator=(deferred const&) = delete;
 
-            using base_type::operator();
+            HPX_HOST_DEVICE HPX_FORCEINLINE
+                typename util::invoke_result<F, Ts...>::type
+                operator()()
+            {
+                return HPX_INVOKE(
+                    std::move(_f), util::get<Is>(std::move(_args))...);
+            }
 
             template <typename Archive>
             void serialize(Archive& ar, unsigned int const /*version*/)
@@ -156,14 +139,15 @@ namespace hpx { namespace util {
 #endif
 
         private:
-            using base_type::_args;
-            using base_type::_f;
+            F _f;
+            util::tuple<Ts...> _args;
         };
     }    // namespace detail
 
     template <typename F, typename... Ts>
     detail::deferred<typename std::decay<F>::type,
-        typename std::decay<Ts>::type...>
+        typename util::make_index_pack<sizeof...(Ts)>::type,
+        typename util::decay_unwrap<Ts>::type...>
     deferred_call(F&& f, Ts&&... vs)
     {
         static_assert(
@@ -171,7 +155,8 @@ namespace hpx { namespace util {
             "F shall be Callable with decay_t<Ts> arguments");
 
         typedef detail::deferred<typename std::decay<F>::type,
-            typename std::decay<Ts>::type...>
+            typename util::make_index_pack<sizeof...(Ts)>::type,
+            typename util::decay_unwrap<Ts>::type...>
             result_type;
 
         return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);

@@ -34,12 +34,43 @@ namespace hpx { namespace util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Ts, typename Is>
-        struct bound_back_impl;
+        template <typename F, typename Is, typename... Ts>
+        struct bound_back;
 
-        template <typename F, typename... Ts, std::size_t... Is>
-        struct bound_back_impl<F, util::tuple<Ts...>, index_pack<Is...>>
+        template <typename F, std::size_t... Is, typename... Ts>
+        class bound_back<F, index_pack<Is...>, Ts...>
         {
+        public:
+            bound_back() {}    // needed for serialization
+
+            template <typename F_, typename... Ts_,
+                typename = typename std::enable_if<
+                    std::is_constructible<F, F_>::value>::type>
+            HPX_CONSTEXPR explicit bound_back(F_&& f, Ts_&&... vs)
+              : _f(std::forward<F_>(f))
+              , _args(std::forward<Ts_>(vs)...)
+            {
+            }
+
+#if !defined(__NVCC__) && !defined(__CUDACC__)
+            bound_back(bound_back const&) = default;
+            bound_back(bound_back&&) = default;
+#else
+            HPX_CONSTEXPR HPX_HOST_DEVICE bound_back(bound_back const& other)
+              : _f(other._f)
+              , _args(other._args)
+            {
+            }
+
+            HPX_CONSTEXPR HPX_HOST_DEVICE bound_back(bound_back&& other)
+              : _f(std::move(other._f))
+              , _args(std::move(other._args))
+            {
+            }
+#endif
+
+            bound_back& operator=(bound_back const&) = delete;
+
             template <typename... Us>
             HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
                 typename invoke_bound_back_result<F&, util::tuple<Ts&...>,
@@ -80,49 +111,6 @@ namespace hpx { namespace util {
                     util::get<Is>(std::move(_args))...);
             }
 
-            F _f;
-            util::tuple<Ts...> _args;
-        };
-
-        template <typename F, typename... Ts>
-        class bound_back
-          : private bound_back_impl<F, util::tuple<Ts...>,
-                typename util::make_index_pack<sizeof...(Ts)>::type>
-        {
-            using base_type = detail::bound_back_impl<F, util::tuple<Ts...>,
-                typename util::make_index_pack<sizeof...(Ts)>::type>;
-
-        public:
-            bound_back() {}    // needed for serialization
-
-            template <typename F_, typename... Ts_,
-                typename = typename std::enable_if<
-                    std::is_constructible<F, F_>::value>::type>
-            HPX_CONSTEXPR explicit bound_back(F_&& f, Ts_&&... vs)
-              : base_type{std::forward<F_>(f),
-                    util::forward_as_tuple(std::forward<Ts_>(vs)...)}
-            {
-            }
-
-#if !defined(__NVCC__) && !defined(__CUDACC__)
-            bound_back(bound_back const&) = default;
-            bound_back(bound_back&&) = default;
-#else
-            HPX_CONSTEXPR HPX_HOST_DEVICE bound_back(bound_back const& other)
-              : base_type{other}
-            {
-            }
-
-            HPX_CONSTEXPR HPX_HOST_DEVICE bound_back(bound_back&& other)
-              : base_type{std::move(other)}
-            {
-            }
-#endif
-
-            bound_back& operator=(bound_back const&) = delete;
-
-            using base_type::operator();
-
             template <typename Archive>
             void serialize(Archive& ar, unsigned int const /*version*/)
             {
@@ -157,18 +145,20 @@ namespace hpx { namespace util {
 #endif
 
         private:
-            using base_type::_args;
-            using base_type::_f;
+            F _f;
+            util::tuple<Ts...> _args;
         };
     }    // namespace detail
 
     template <typename F, typename... Ts>
     HPX_CONSTEXPR detail::bound_back<typename std::decay<F>::type,
-        typename std::decay<Ts>::type...>
+        typename util::make_index_pack<sizeof...(Ts)>::type,
+        typename util::decay_unwrap<Ts>::type...>
     bind_back(F&& f, Ts&&... vs)
     {
         typedef detail::bound_back<typename std::decay<F>::type,
-            typename std::decay<Ts>::type...>
+            typename util::make_index_pack<sizeof...(Ts)>::type,
+            typename util::decay_unwrap<Ts>::type...>
             result_type;
 
         return result_type(std::forward<F>(f), std::forward<Ts>(vs)...);
