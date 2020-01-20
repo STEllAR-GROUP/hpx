@@ -418,9 +418,39 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation_alloc_nounwrap(Allocator const& a,
         Future const& future, Policy&& policy, F&& f);
 
+    // Dummy struct to call static assert with a false type
+    template <typename T>
+    struct dummy_false_type : std::false_type
+    {
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename FD, typename Enable = void>
-    struct future_then_dispatch;
+    struct future_then_dispatch
+    {
+
+        template <typename F>
+        HPX_FORCEINLINE static
+        typename hpx::traits::future_then_result<Future, F>::type
+        call(Future&& fut, F&& f)
+        {
+            // dummy impl to fail compilation if this function is called
+            static_assert(dummy_false_type<Future>::value, "Cannot use the \
+                    dummy implementation of future_then_dispatch, please use \
+                    one of the template specialization.");
+        }
+
+        template <typename T0, typename F>
+        HPX_FORCEINLINE static decltype(auto)
+        call(Future && fut, T0 && t, F && f)
+        {
+            // dummy impl to fail compilation if this function is called
+            static_assert(dummy_false_type<Future>::value, "Cannot use the \
+                    dummy implementation of future_then_dispatch, please use \
+                    one of the template specialization.");
+        }
+
+    };
 
     ///////////////////////////////////////////////////////////////////////////
 //     template <typename R>
@@ -734,7 +764,7 @@ namespace hpx { namespace lcos { namespace detail
     protected:
         hpx::intrusive_ptr<shared_state_type> shared_state_;
     };
-}}}
+}}} // namespace hpx::lcos::detail
 
 namespace hpx { namespace lcos
 {
@@ -1070,7 +1100,7 @@ namespace hpx { namespace lcos
         return detail::convert_future_helper<R>(
             std::move(f), std::forward<Conv>(conv));
     }
-}}
+}}  // hpx::lcos
 
 namespace hpx { namespace lcos
 {
@@ -1375,7 +1405,7 @@ namespace hpx { namespace lcos
     {
         return f;
     }
-}}
+}}  // hpx::lcos
 
 namespace hpx { namespace lcos
 {
@@ -1564,7 +1594,7 @@ namespace hpx { namespace lcos
     {
         return make_ready_future_at(rel_time.from_now());
     }
-}}
+}}  //  namespace hpx::lcos
 
 namespace hpx { namespace serialization
 {
@@ -1581,7 +1611,7 @@ namespace hpx { namespace serialization
     {
         hpx::lcos::detail::serialize_future(ar, f, version);
     }
-}}
+}}  // namespace hpx::serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 // hoist names into main namespace
@@ -1597,7 +1627,7 @@ namespace hpx
     using lcos::make_future;
 
     using lcos::make_shared_future;
-}
+}   // namespace hpx
 
 #include <hpx/lcos/local/packaged_continuation.hpp>
 
