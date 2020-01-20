@@ -9,6 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/functional/bind.hpp>
+#include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/async_continue_fwd.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
@@ -20,31 +23,29 @@
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/functional/bind.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
-#include <hpx/functional/unique_function.hpp>
 
 #include <type_traits>
 #include <utility>
 
 namespace hpx { namespace detail
 {
-    template <typename Tuple>
-    struct async_colocated_bound_tuple;
+    template <typename Action, typename Ts = typename Action::arguments_type>
+    struct async_colocated_bound_action;
 
-    template <typename ...Ts>
-    struct async_colocated_bound_tuple<util::tuple<Ts...> >
+    template <typename Action, typename... Ts>
+    struct async_colocated_bound_action<Action, hpx::util::tuple<Ts...>>
     {
-        typedef
-            util::tuple<
-                hpx::util::detail::bound<
-                    hpx::util::functional::extract_locality
-                  , hpx::util::detail::placeholder<2ul>
-                  , hpx::id_type
-                >
-              , Ts...
-            >
+        typedef hpx::util::detail::bound_action<Action
+          , hpx::util::make_index_pack<1 + sizeof...(Ts)>
+          , hpx::util::detail::bound<
+                hpx::util::functional::extract_locality
+              , hpx::util::index_pack<0, 1>
+              , hpx::util::detail::placeholder<2ul>
+              , hpx::id_type>
+          , Ts...>
             type;
     };
 }}
@@ -53,13 +54,8 @@ namespace hpx { namespace detail
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(                            \
         void (hpx::naming::id_type, hpx::naming::id_type)                     \
       , (hpx::util::functional::detail::async_continuation_impl<              \
-            hpx::util::detail::bound_action<                                  \
-                Action                                                        \
-              , hpx::detail::async_colocated_bound_tuple<                     \
-                    Action ::arguments_type                                   \
-                >::type                                                       \
-            >,                                                                \
-            hpx::util::unused_type                                            \
+            typename hpx::detail::async_colocated_bound_action<Action>::type  \
+          , hpx::util::unused_type                                            \
         >)                                                                    \
       , Name                                                                  \
     );                                                                        \
@@ -69,13 +65,8 @@ namespace hpx { namespace detail
     HPX_UTIL_REGISTER_UNIQUE_FUNCTION(                                        \
         void (hpx::naming::id_type, hpx::naming::id_type)                     \
       , (hpx::util::functional::detail::async_continuation_impl<              \
-            hpx::util::detail::bound_action<                                  \
-                Action                                                        \
-              , hpx::detail::async_colocated_bound_tuple<                     \
-                    Action ::arguments_type                                   \
-                >::type                                                       \
-            >,                                                                \
-            hpx::util::unused_type                                            \
+            typename hpx::detail::async_colocated_bound_action<Action>::type  \
+          , hpx::util::unused_type                                            \
         >)                                                                    \
       , Name                                                                  \
     );                                                                        \
