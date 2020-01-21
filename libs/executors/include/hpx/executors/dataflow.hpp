@@ -76,7 +76,10 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Frame>
     struct dataflow_finalization {
         //
-        dataflow_finalization(Frame *df) : this_(df) {}
+        explicit dataflow_finalization(Frame* df)
+          : this_(df)
+        {
+        }
         using is_void = typename Frame::is_void;
         //
         template <typename Futures>

@@ -117,10 +117,12 @@ void test_execution(Execution &exec)
 {
     static int prefix = 1;
     // these string need to have lifetimes that don't go out of scope
-    std::string dfs  = std::to_string(prefix++) + "-" + execution_string(exec) + std::string(" Dataflow") ;
-    std::string pcs  = std::to_string(prefix++) + "-" + execution_string(exec) + std::string(" Continuation");
-    std::string dfsu = std::to_string(prefix++) + "-" + execution_string(exec) + std::string(" Unwrapping Dataflow") ;
-    std::string pcsu = std::to_string(prefix++) + "-" + execution_string(exec) + std::string(" Unwrapping Continuation");
+    std::string dfs = std::to_string(prefix++) + "-" + execution_string(exec) +
+        std::string(" Dataflow");
+    std::string pcs = std::to_string(prefix++) + "-" + execution_string(exec) +
+        std::string(" Continuation");
+    std::string pcsu = std::to_string(prefix++) + "-" + execution_string(exec) +
+        std::string(" Unwrapping Continuation");
 
     std::vector<hpx::future<void>> results;
     {

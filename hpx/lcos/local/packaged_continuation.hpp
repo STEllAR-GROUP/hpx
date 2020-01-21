@@ -64,7 +64,10 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Continuation>
     struct continuation_finalization {
         //
-        continuation_finalization(Continuation *c) : this_(c) {}
+        explicit continuation_finalization(Continuation* c)
+          : this_(c)
+        {
+        }
         //
         template <typename Future>
         void operator()(Future&& f) const
