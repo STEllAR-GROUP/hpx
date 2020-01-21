@@ -8,7 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB)
+#ifndef HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
 #include <hpx/config.hpp>

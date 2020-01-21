@@ -7,7 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_68441787_8A39_4DAC_9D9E_705B6FA19BCD)
+#ifndef HPX_68441787_8A39_4DAC_9D9E_705B6FA19BCD
 #define HPX_68441787_8A39_4DAC_9D9E_705B6FA19BCD
 
 #include <cstddef>

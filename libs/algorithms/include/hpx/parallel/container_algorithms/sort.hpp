@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/sort.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_SORT_DEC_06_2015_1133AM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_SORT_DEC_06_2015_1133AM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_SORT_DEC_06_2015_1133AM
 
 #include <hpx/config.hpp>

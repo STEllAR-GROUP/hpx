@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/reduce.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM)
+#ifndef HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM
 #define HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM
 
 #include <hpx/config.hpp>

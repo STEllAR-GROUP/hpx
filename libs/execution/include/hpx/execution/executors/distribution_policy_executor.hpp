@@ -6,8 +6,7 @@
 
 /// \file parallel/executors/distribution_policy_executor.hpp
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_DISTRIBUTION_POLICY_EXECUTOR_JUL_21_2015_0404PM)
+#ifndef HPX_PARALLEL_EXECUTORS_DISTRIBUTION_POLICY_EXECUTOR_JUL_21_2015_0404PM
 #define HPX_PARALLEL_EXECUTORS_DISTRIBUTION_POLICY_EXECUTOR_JUL_21_2015_0404PM
 
 #include <hpx/config.hpp>

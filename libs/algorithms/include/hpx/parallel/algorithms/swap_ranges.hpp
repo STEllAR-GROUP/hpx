@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/swap_ranges.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM)
+#ifndef HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
 #define HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
 
 #include <hpx/config.hpp>

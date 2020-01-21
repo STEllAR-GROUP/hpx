@@ -9,7 +9,7 @@
 
 /// \file manage_counter_type.hpp
 
-#if !defined(HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F)
+#ifndef HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F
 #define HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F
 
 #include <hpx/config.hpp>

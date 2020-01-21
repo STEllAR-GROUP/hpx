@@ -4,7 +4,7 @@
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#if !defined(HPX_8F5A7F0B_E4CE_422C_B58A_2AEC43AD2057)
+#ifndef HPX_8F5A7F0B_E4CE_422C_B58A_2AEC43AD2057
 #define HPX_8F5A7F0B_E4CE_422C_B58A_2AEC43AD2057
 
 #include <hpx/config.hpp>

@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_SET_DEC_19_2016_1055AM)
+#ifndef HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_SET_DEC_19_2016_1055AM
 #define HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_SET_DEC_19_2016_1055AM
 
 #include <hpx/config.hpp>

@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/is_heap.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_IS_HEAP_JUL_30_2017_0501PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_IS_HEAP_JUL_30_2017_0501PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_IS_HEAP_JUL_30_2017_0501PM
 
 #include <hpx/config.hpp>

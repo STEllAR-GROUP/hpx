@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/equal.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM)
+#ifndef HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
 #define HPX_PARALLEL_DETAIL_EQUAL_JUL_06_2014_0848PM
 
 #include <hpx/config.hpp>

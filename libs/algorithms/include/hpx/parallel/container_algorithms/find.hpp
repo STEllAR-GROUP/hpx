@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/find.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHMS_FIND)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHMS_FIND
 #define HPX_PARALLEL_CONTAINER_ALGORITHMS_FIND
 
 #include <hpx/config.hpp>

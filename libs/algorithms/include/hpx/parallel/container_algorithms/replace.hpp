@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/replace.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_REPLACE_DEC_18_2015_0103PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_REPLACE_DEC_18_2015_0103PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_REPLACE_DEC_18_2015_0103PM
 
 #include <hpx/config.hpp>

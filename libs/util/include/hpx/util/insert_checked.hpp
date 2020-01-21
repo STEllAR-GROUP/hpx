@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_CA606CBC_A6AA_44A8_BDB0_46A3A08BAA82)
+#ifndef HPX_CA606CBC_A6AA_44A8_BDB0_46A3A08BAA82
 #define HPX_CA606CBC_A6AA_44A8_BDB0_46A3A08BAA82
 
 #include <utility>

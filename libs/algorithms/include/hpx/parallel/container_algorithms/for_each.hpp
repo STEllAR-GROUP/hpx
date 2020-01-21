@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/for_each.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_FOR_EACH_JUL_18_2015_0959AM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_FOR_EACH_JUL_18_2015_0959AM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_FOR_EACH_JUL_18_2015_0959AM
 
 #include <hpx/config.hpp>

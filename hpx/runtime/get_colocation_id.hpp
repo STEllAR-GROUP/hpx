@@ -7,7 +7,7 @@
 
 /// \file get_colocation_id.hpp
 
-#if !defined(HPX_RUNTIME_GET_COLOCATION_ID_HPP)
+#ifndef HPX_RUNTIME_GET_COLOCATION_ID_HPP
 #define HPX_RUNTIME_GET_COLOCATION_ID_HPP
 
 #include <hpx/errors.hpp>

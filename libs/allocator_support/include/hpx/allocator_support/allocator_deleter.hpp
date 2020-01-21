@@ -6,7 +6,7 @@
 //
 // This is partially taken from: http://www.garret.ru/threadalloc/readme.html
 
-#if !defined(HPX_UTIL_ALLOCATOR_DELETER_AUG_08_2018_1047AM)
+#ifndef HPX_UTIL_ALLOCATOR_DELETER_AUG_08_2018_1047AM
 #define HPX_UTIL_ALLOCATOR_DELETER_AUG_08_2018_1047AM
 
 #include <hpx/config.hpp>

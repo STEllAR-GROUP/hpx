@@ -8,7 +8,7 @@
 
 /// \file lcos/when_each.hpp
 
-#if !defined(HPX_LCOS_WHEN_EACH_JUN_16_2014_0206PM)
+#ifndef HPX_LCOS_WHEN_EACH_JUN_16_2014_0206PM
 #define HPX_LCOS_WHEN_EACH_JUN_16_2014_0206PM
 
 #if defined(DOXYGEN)

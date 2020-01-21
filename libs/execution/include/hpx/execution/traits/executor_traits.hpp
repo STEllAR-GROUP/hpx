@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_EXECUTOR_TRAITS_JAN_04_2017_0626PM)
+#ifndef HPX_TRAITS_EXECUTOR_TRAITS_JAN_04_2017_0626PM
 #define HPX_TRAITS_EXECUTOR_TRAITS_JAN_04_2017_0626PM
 
 #include <hpx/config.hpp>

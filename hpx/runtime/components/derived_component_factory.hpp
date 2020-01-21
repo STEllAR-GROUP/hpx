@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_DERIVED_COMPONENT_FACTORY_NOV_05_2008_1209PM)
+#ifndef HPX_DERIVED_COMPONENT_FACTORY_NOV_05_2008_1209PM
 #define HPX_DERIVED_COMPONENT_FACTORY_NOV_05_2008_1209PM
 
 #include <hpx/runtime/components/component_factory.hpp>

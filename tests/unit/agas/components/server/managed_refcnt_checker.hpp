@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_2F9C9286_A4A2_451C_BBD6_CD884F57B21D)
+#ifndef HPX_2F9C9286_A4A2_451C_BBD6_CD884F57B21D
 #define HPX_2F9C9286_A4A2_451C_BBD6_CD884F57B21D
 
 #include <vector>

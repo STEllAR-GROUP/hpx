@@ -7,7 +7,7 @@
 
 // make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
 
-#if !defined(HPX_PLUGINS_PARCELPORT_FACTORY_HPP)
+#ifndef HPX_PLUGINS_PARCELPORT_FACTORY_HPP
 #define HPX_PLUGINS_PARCELPORT_FACTORY_HPP
 
 #include <hpx/config.hpp>

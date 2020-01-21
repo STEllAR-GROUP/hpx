@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(PERFORMANCE_COUNTERS_PAPI_SERVER_PAPI_201111181426)
+#ifndef PERFORMANCE_COUNTERS_PAPI_SERVER_PAPI_201111181426
 #define PERFORMANCE_COUNTERS_PAPI_SERVER_PAPI_201111181426
 
 #include <hpx/config.hpp>

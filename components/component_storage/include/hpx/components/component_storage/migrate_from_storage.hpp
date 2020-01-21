@@ -6,7 +6,7 @@
 
 /// \file migrate_from_storage.hpp
 
-#if !defined(HPX_MIGRATE_FROM_STORAGE_FEB_09_2015_0329PM)
+#ifndef HPX_MIGRATE_FROM_STORAGE_FEB_09_2015_0329PM
 #define HPX_MIGRATE_FROM_STORAGE_FEB_09_2015_0329PM
 
 #include <hpx/config.hpp>

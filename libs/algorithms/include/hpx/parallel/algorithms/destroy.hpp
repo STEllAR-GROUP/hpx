@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/destroy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_destroy_JUN_01_2017_1049AM)
+#ifndef HPX_PARALLEL_DETAIL_destroy_JUN_01_2017_1049AM
 #define HPX_PARALLEL_DETAIL_destroy_JUN_01_2017_1049AM
 
 #include <hpx/config.hpp>

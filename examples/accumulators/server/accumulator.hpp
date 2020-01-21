@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_4C46C86D_A43F_42A8_8164_C9EBA3B210CC)
+#ifndef HPX_4C46C86D_A43F_42A8_8164_C9EBA3B210CC
 #define HPX_4C46C86D_A43F_42A8_8164_C9EBA3B210CC
 
 #include <hpx/hpx.hpp>

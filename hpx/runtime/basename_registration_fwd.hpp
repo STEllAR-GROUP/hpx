@@ -6,7 +6,7 @@
 
 /// \file hpx/runtime/basename_registration_fwd.hpp
 
-#if !defined(HPX_RUNTIME_BASENAME_REGISTRATION_FWD_AUG_17_2015_0432PM)
+#ifndef HPX_RUNTIME_BASENAME_REGISTRATION_FWD_AUG_17_2015_0432PM
 #define HPX_RUNTIME_BASENAME_REGISTRATION_FWD_AUG_17_2015_0432PM
 
 #include <hpx/config.hpp>

@@ -11,7 +11,7 @@
 //  (C) Copyright Thomas Witt    2002.
 //  (C) copyright Jeffrey Lee Hellrung, Jr. 2012.
 
-#if !defined(HPX_UTIL_ITERATOR_FACADE_HPP)
+#ifndef HPX_UTIL_ITERATOR_FACADE_HPP
 #define HPX_UTIL_ITERATOR_FACADE_HPP
 
 #include <hpx/config.hpp>

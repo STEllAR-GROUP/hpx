@@ -7,7 +7,7 @@
 
 /// \file parallel/algorithms/find.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM)
+#ifndef HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM
 #define HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM
 
 #include <hpx/config.hpp>

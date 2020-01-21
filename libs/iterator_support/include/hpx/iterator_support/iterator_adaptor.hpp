@@ -9,7 +9,7 @@
 // (C) Copyright Jeremy Siek    2002.
 // (C) Copyright Thomas Witt    2002.
 
-#if !defined(HPX_UTIL_ITERATOR_ADAPTOR_HPP)
+#ifndef HPX_UTIL_ITERATOR_ADAPTOR_HPP
 #define HPX_UTIL_ITERATOR_ADAPTOR_HPP
 
 #include <hpx/config.hpp>

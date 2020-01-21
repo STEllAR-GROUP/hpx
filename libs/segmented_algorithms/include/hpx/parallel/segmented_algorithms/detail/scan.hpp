@@ -6,7 +6,7 @@
 
 /// \file parallel/segmented_algorithms/detail/scan.hpp
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHMS_SCAN)
+#ifndef HPX_PARALLEL_SEGMENTED_ALGORITHMS_SCAN
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_SCAN
 
 #include <hpx/config.hpp>

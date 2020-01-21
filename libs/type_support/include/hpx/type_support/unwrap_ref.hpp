@@ -7,7 +7,7 @@
 // hpxinspect:nodeprecatedinclude:boost/ref.hpp
 // hpxinspect:nodeprecatedname:boost::reference_wrapper
 
-#if !defined(HPX_UTIL_UNWRAP_REF_JAN_05_2017_0356PM)
+#ifndef HPX_UTIL_UNWRAP_REF_JAN_05_2017_0356PM
 #define HPX_UTIL_UNWRAP_REF_JAN_05_2017_0356PM
 
 #include <hpx/config.hpp>

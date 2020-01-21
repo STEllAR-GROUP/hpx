@@ -7,7 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_50B9885A_AAD3_48C5_814A_EBCD47C858AC)
+#ifndef HPX_50B9885A_AAD3_48C5_814A_EBCD47C858AC
 #define HPX_50B9885A_AAD3_48C5_814A_EBCD47C858AC
 
 #if defined(DOXYGEN)

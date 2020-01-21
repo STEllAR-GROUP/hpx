@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/uninitialized_fill.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM)
+#ifndef HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM
 
 #include <hpx/config.hpp>

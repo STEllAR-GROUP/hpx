@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_EXAMPLES_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM)
+#ifndef HPX_EXAMPLES_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM
 #define HPX_EXAMPLES_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM
 
 #include <hpx/hpx.hpp>

@@ -8,7 +8,7 @@
 
 /// \file parallel/algorithms/copy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM)
+#ifndef HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
 #define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
 
 #include <hpx/config.hpp>

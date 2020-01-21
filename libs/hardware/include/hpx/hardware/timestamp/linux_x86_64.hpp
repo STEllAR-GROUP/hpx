@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_E0A61B00_A571_48EF_8516_ECB48CDDBC00)
+#ifndef HPX_E0A61B00_A571_48EF_8516_ECB48CDDBC00
 #define HPX_E0A61B00_A571_48EF_8516_ECB48CDDBC00
 
 #include <cstdint>

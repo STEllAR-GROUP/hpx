@@ -7,8 +7,7 @@
 
 // hpxinspect:nounnamed
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_FWD_JAN_16_2017_0350PM)
+#ifndef HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_FWD_JAN_16_2017_0350PM
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_FWD_JAN_16_2017_0350PM
 
 #include <hpx/config.hpp>

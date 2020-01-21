@@ -6,7 +6,7 @@
 
 /// \file hpx/runtime/threads/thread_data_fwd.hpp
 
-#if !defined(HPX_THREADS_THREAD_DATA_FWD_AUG_11_2015_0228PM)
+#ifndef HPX_THREADS_THREAD_DATA_FWD_AUG_11_2015_0228PM
 #define HPX_THREADS_THREAD_DATA_FWD_AUG_11_2015_0228PM
 
 #include <hpx/config.hpp>

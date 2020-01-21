@@ -6,8 +6,7 @@
 
 /// \file parallel/executors/thread_pool_executors.hpp
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_AUG_28_2015_0511PM)
+#ifndef HPX_PARALLEL_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_AUG_28_2015_0511PM
 #define HPX_PARALLEL_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_AUG_28_2015_0511PM
 
 #include <hpx/config.hpp>

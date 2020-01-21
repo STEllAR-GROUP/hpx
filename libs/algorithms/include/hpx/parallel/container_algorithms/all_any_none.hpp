@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/all_any_none.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_ALL_ANY_NONE_NOV_01_2017_1509PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_ALL_ANY_NONE_NOV_01_2017_1509PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_ALL_ANY_NONE_NOV_01_2017_1509PM
 
 #include <hpx/config.hpp>

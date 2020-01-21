@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_DATAPAR_TRANSFORM_LOOP_SEP_08_2016_0657PM)
+#ifndef HPX_PARALLEL_DATAPAR_TRANSFORM_LOOP_SEP_08_2016_0657PM
 #define HPX_PARALLEL_DATAPAR_TRANSFORM_LOOP_SEP_08_2016_0657PM
 
 #include <hpx/config.hpp>

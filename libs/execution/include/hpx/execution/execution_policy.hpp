@@ -7,7 +7,7 @@
 
 /// \file parallel/execution_policy.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM)
+#ifndef HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
 #include <hpx/config.hpp>

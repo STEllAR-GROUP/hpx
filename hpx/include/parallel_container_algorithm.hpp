@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
-#if !defined(HPX_CONTAINER_ALGORITHM_JUL_18_2015_0958AM)
+#ifndef HPX_CONTAINER_ALGORITHM_JUL_18_2015_0958AM
 #define HPX_CONTAINER_ALGORITHM_JUL_18_2015_0958AM
 
 #include <hpx/parallel/algorithm.hpp>

@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_HEARTBEAT_WIN_PERF_COUNTERS_2011_JUL_24_0259PM)
+#ifndef HPX_HEARTBEAT_WIN_PERF_COUNTERS_2011_JUL_24_0259PM
 #define HPX_HEARTBEAT_WIN_PERF_COUNTERS_2011_JUL_24_0259PM
 
 #include <hpx/hpx.hpp>

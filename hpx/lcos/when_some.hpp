@@ -7,7 +7,7 @@
 
 /// \file lcos/when_some.hpp
 
-#if !defined(HPX_LCOS_WHEN_SOME_APR_19_2012_0203PM)
+#ifndef HPX_LCOS_WHEN_SOME_APR_19_2012_0203PM
 #define HPX_LCOS_WHEN_SOME_APR_19_2012_0203PM
 
 #if defined(DOXYGEN)

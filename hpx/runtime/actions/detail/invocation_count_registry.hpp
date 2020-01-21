@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_ACTIONS_INVOCATION_COUNT_REGISTRY_SEP_25_2015_0727AM)
+#ifndef HPX_ACTIONS_INVOCATION_COUNT_REGISTRY_SEP_25_2015_0727AM
 #define HPX_ACTIONS_INVOCATION_COUNT_REGISTRY_SEP_25_2015_0727AM
 
 #include <hpx/config.hpp>

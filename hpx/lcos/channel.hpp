@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_CHANNEL_JUL_23_2016_0722PM)
+#ifndef HPX_LCOS_CHANNEL_JUL_23_2016_0722PM
 #define HPX_LCOS_CHANNEL_JUL_23_2016_0722PM
 
 #include <hpx/config.hpp>

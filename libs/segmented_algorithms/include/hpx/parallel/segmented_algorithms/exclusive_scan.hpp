@@ -6,7 +6,7 @@
 
 /// \file parallel/segmented_algorithms/exclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHMS_EXCLUSIVE_SCAN)
+#ifndef HPX_PARALLEL_SEGMENTED_ALGORITHMS_EXCLUSIVE_SCAN
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_EXCLUSIVE_SCAN
 
 #include <hpx/config.hpp>

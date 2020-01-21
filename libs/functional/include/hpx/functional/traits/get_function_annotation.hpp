@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_GET_FUNCTION_ANNOTATION_JAN_31_2017_1201PM)
+#ifndef HPX_TRAITS_GET_FUNCTION_ANNOTATION_JAN_31_2017_1201PM
 #define HPX_TRAITS_GET_FUNCTION_ANNOTATION_JAN_31_2017_1201PM
 
 #include <hpx/config.hpp>

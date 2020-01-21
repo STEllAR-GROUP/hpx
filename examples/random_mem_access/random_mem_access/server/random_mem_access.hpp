@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM)
+#ifndef HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM
 #define HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM
 
 #include <hpx/hpx.hpp>

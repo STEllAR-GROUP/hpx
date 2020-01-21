@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_FWD_APR_15_2015_0831AM)
+#ifndef HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_FWD_APR_15_2015_0831AM
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_FWD_APR_15_2015_0831AM
 
 #include <hpx/config.hpp>

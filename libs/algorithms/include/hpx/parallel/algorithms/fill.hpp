@@ -7,7 +7,7 @@
 
 /// \file parallel/algorithms/fill.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM)
+#ifndef HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
 #include <hpx/config.hpp>

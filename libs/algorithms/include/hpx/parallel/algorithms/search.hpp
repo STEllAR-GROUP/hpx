@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/search.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM)
+#ifndef HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM
 #define HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM
 
 #include <hpx/config.hpp>

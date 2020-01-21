@@ -7,7 +7,7 @@
 
 /// \file exception.hpp
 
-#if !defined(HPX_EXCEPTION_MAR_24_2008_0929AM)
+#ifndef HPX_EXCEPTION_MAR_24_2008_0929AM
 #define HPX_EXCEPTION_MAR_24_2008_0929AM
 
 #include <hpx/config.hpp>

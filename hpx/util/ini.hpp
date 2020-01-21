@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_SECTION_SEP_17_2008_022PM)
+#ifndef HPX_UTIL_SECTION_SEP_17_2008_022PM
 #define HPX_UTIL_SECTION_SEP_17_2008_022PM
 
 #include <hpx/config.hpp>

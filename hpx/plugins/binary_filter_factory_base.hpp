@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_BINARY_FILTER_FACTORY_BASE_MAR_24_2013_0339PM)
+#ifndef HPX_BINARY_FILTER_FACTORY_BASE_MAR_24_2013_0339PM
 #define HPX_BINARY_FILTER_FACTORY_BASE_MAR_24_2013_0339PM
 
 #include <hpx/config.hpp>

@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/set_union.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM)
+#ifndef HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM
 #define HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM
 
 #include <hpx/config.hpp>

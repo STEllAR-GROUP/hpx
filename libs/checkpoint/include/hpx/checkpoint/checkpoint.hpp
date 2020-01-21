@@ -13,7 +13,7 @@
 
 /// \file hpx/util/checkpoint.hpp
 
-#if !defined(CHECKPOINT_HPP_07262017)
+#ifndef CHECKPOINT_HPP_07262017
 #define CHECKPOINT_HPP_07262017
 
 #include <hpx/dataflow.hpp>

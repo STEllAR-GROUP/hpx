@@ -6,7 +6,7 @@
 
 /// \file partition_unordered_map_component.hpp
 
-#if !defined(HPX_PARTITION_UNORDERED_MAP_COMPONENT_NOV_11_2014_0853PM)
+#ifndef HPX_PARTITION_UNORDERED_MAP_COMPONENT_NOV_11_2014_0853PM
 #define HPX_PARTITION_UNORDERED_MAP_COMPONENT_NOV_11_2014_0853PM
 
 /// \file hpx/components/unordered/partition_unordered_map_component.hpp

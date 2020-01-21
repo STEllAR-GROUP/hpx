@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_ASYNC_UNWRAP_IMPLEMENTATIONS_FWD_JUL_22_2018_0145PM)
+#ifndef HPX_LCOS_ASYNC_UNWRAP_IMPLEMENTATIONS_FWD_JUL_22_2018_0145PM
 #define HPX_LCOS_ASYNC_UNWRAP_IMPLEMENTATIONS_FWD_JUL_22_2018_0145PM
 
 #include <hpx/config.hpp>

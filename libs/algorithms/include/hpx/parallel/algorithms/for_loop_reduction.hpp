@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/for_loop_reduction.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM)
+#ifndef HPX_PARALLEL_ALGORITHM_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM
 #define HPX_PARALLEL_ALGORITHM_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM
 
 #include <hpx/config.hpp>

@@ -8,7 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF)
+#ifndef HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF
 #define HPX_LCOS_LOCAL_SPINLOCK_NO_BACKOFF
 
 #include <hpx/config.hpp>

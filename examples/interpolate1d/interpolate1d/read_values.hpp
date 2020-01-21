@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_INTERPOLATE1D_READ_VALUES_AUG_05_2011_1056AM)
+#ifndef HPX_INTERPOLATE1D_READ_VALUES_AUG_05_2011_1056AM
 #define HPX_INTERPOLATE1D_READ_VALUES_AUG_05_2011_1056AM
 
 #include <H5Cpp.h>

@@ -7,7 +7,7 @@
 
 /// \file parallel/algorithms/lexicographical_compare.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_LEXI_COMPARE_DEC_30_2014_0312PM)
+#ifndef HPX_PARALLEL_DETAIL_LEXI_COMPARE_DEC_30_2014_0312PM
 #define HPX_PARALLEL_DETAIL_LEXI_COMPARE_DEC_30_2014_0312PM
 
 #include <hpx/config.hpp>

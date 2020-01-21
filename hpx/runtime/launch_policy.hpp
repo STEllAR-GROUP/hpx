@@ -6,7 +6,7 @@
 
 /// \file hpx/runtime/launch_policy.hpp
 
-#if !defined(HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM)
+#ifndef HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM
 #define HPX_RUNTIME_LAUNCH_POLICY_AUG_13_2015_0647PM
 
 #include <hpx/config.hpp>

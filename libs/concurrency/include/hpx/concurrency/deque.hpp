@@ -16,7 +16,7 @@
 //  contention, all operations have a constant complexity, except for the dtor.
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0)
+#ifndef HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0
 #define HPX_F985C12D_03E7_4E25_8CB1_018A56A265E0
 
 #include <hpx/config.hpp>

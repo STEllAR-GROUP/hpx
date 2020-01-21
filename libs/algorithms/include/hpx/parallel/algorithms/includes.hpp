@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/includes.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM)
+#ifndef HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM
 #define HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM
 
 #include <hpx/config.hpp>

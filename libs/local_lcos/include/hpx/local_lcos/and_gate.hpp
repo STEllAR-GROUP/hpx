@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_AND_GATE_JUL_13_2012_0919AM)
+#ifndef HPX_LCOS_LOCAL_AND_GATE_JUL_13_2012_0919AM
 #define HPX_LCOS_LOCAL_AND_GATE_JUL_13_2012_0919AM
 
 #include <hpx/config.hpp>

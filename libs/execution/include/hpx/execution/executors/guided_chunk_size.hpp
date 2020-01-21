@@ -6,7 +6,7 @@
 
 /// \file parallel/executors/guided_chunk_size.hpp
 
-#if !defined(HPX_PARALLEL_GUIDED_CHUNK_SIZE_AUG_01_2015_0238PM)
+#ifndef HPX_PARALLEL_GUIDED_CHUNK_SIZE_AUG_01_2015_0238PM
 #define HPX_PARALLEL_GUIDED_CHUNK_SIZE_AUG_01_2015_0238PM
 
 #include <hpx/config.hpp>

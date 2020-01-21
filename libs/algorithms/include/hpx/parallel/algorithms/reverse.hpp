@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/reverse.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REVERSE_JUL_29_2014_0432PM)
+#ifndef HPX_PARALLEL_DETAIL_REVERSE_JUL_29_2014_0432PM
 #define HPX_PARALLEL_DETAIL_REVERSE_JUL_29_2014_0432PM
 
 #include <hpx/config.hpp>

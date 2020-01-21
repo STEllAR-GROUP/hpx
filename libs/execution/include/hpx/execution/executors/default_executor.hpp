@@ -6,7 +6,7 @@
 
 /// \file parallel/executors/default_executor.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_DEFAULT_EXECUTOR_AUG_24_2015_0624PM)
+#ifndef HPX_PARALLEL_EXECUTORS_DEFAULT_EXECUTOR_AUG_24_2015_0624PM
 #define HPX_PARALLEL_EXECUTORS_DEFAULT_EXECUTOR_AUG_24_2015_0624PM
 
 #include <hpx/config.hpp>

@@ -6,7 +6,7 @@
 
 // make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
 
-#if !defined(HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM)
+#ifndef HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM
 #define HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM
 
 #include <hpx/config.hpp>

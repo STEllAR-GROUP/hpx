@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/adjacent_find.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM)
+#ifndef HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM
 #define HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM
 
 #include <hpx/config.hpp>

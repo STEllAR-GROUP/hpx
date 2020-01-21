@@ -155,7 +155,7 @@ namespace hpx { namespace lcos {
 }}    // namespace hpx::lcos
 #else
 
-#if !defined(HPX_LCOS_FOLD_SEP_29_2013_1442AM)
+#ifndef HPX_LCOS_FOLD_SEP_29_2013_1442AM
 #define HPX_LCOS_FOLD_SEP_29_2013_1442AM
 
 #include <hpx/config.hpp>

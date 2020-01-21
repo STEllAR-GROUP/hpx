@@ -7,8 +7,7 @@
 
 /// \file parallel/executors/parallel_executor_aggregated.hpp
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_AGGREGATED_DEC_20_2018_0624PM)
+#ifndef HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_AGGREGATED_DEC_20_2018_0624PM
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_AGGREGATED_DEC_20_2018_0624PM
 
 #include <hpx/config.hpp>

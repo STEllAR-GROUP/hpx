@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/reduce_by_key.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015)
+#ifndef HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015
 #define HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015
 //
 #include <hpx/config.hpp>

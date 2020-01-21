@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(SERVER_STARTUP_SHUTDOWN_NOV_23_2011_0706PM)
+#ifndef SERVER_STARTUP_SHUTDOWN_NOV_23_2011_0706PM
 #define SERVER_STARTUP_SHUTDOWN_NOV_23_2011_0706PM
 
 #include <string>

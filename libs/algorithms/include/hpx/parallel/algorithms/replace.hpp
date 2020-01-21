@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/replace.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REPLACE_AUG_18_2014_0136PM)
+#ifndef HPX_PARALLEL_DETAIL_REPLACE_AUG_18_2014_0136PM
 #define HPX_PARALLEL_DETAIL_REPLACE_AUG_18_2014_0136PM
 
 #include <hpx/config.hpp>

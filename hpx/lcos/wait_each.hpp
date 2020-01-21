@@ -8,7 +8,7 @@
 
 /// \file lcos/wait_each.hpp
 
-#if !defined(HPX_LCOS_WAIT_EACH_JUN_16_2014_0428PM)
+#ifndef HPX_LCOS_WAIT_EACH_JUN_16_2014_0428PM
 #define HPX_LCOS_WAIT_EACH_JUN_16_2014_0428PM
 
 #if defined(DOXYGEN)

@@ -6,7 +6,7 @@
 
 /// \file get_ptr.hpp
 
-#if !defined(HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM)
+#ifndef HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM
 #define HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM
 
 #include <hpx/config.hpp>

@@ -7,7 +7,7 @@
 //
 //  The algorithm was taken from http://locklessinc.com/articles/barriers/
 
-#if !defined(HPX_LCOS_BARRIER_JUN_23_2008_0530PM)
+#ifndef HPX_LCOS_BARRIER_JUN_23_2008_0530PM
 #define HPX_LCOS_BARRIER_JUN_23_2008_0530PM
 
 #include <hpx/config.hpp>

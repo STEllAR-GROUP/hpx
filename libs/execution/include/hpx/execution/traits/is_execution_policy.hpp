@@ -6,7 +6,7 @@
 
 /// \file hpx/execution/traits/is_execution_policy.hpp
 
-#if !defined(HPX_TRAITS_IS_EXECUTION_POLICY_SEP_07_2016_0805AM)
+#ifndef HPX_TRAITS_IS_EXECUTION_POLICY_SEP_07_2016_0805AM
 #define HPX_TRAITS_IS_EXECUTION_POLICY_SEP_07_2016_0805AM
 
 #include <hpx/config.hpp>

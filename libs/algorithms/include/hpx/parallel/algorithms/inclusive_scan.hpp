@@ -7,7 +7,7 @@
 
 /// \file parallel/algorithms/inclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JAN_03_2015_0136PM)
+#ifndef HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JAN_03_2015_0136PM
 #define HPX_PARALLEL_ALGORITHM_INCLUSIVE_SCAN_JAN_03_2015_0136PM
 
 #include <hpx/config.hpp>

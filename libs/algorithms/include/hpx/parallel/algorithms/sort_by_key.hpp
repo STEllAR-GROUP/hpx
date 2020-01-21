@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_ALGORITHM_SORT_BY_KEY_DEC_2015)
+#ifndef HPX_PARALLEL_ALGORITHM_SORT_BY_KEY_DEC_2015
 #define HPX_PARALLEL_ALGORITHM_SORT_BY_KEY_DEC_2015
 
 #include <hpx/config.hpp>

@@ -6,7 +6,7 @@
 
 /// \file hpx/synchronization/latch.hpp
 
-#if !defined(HPX_LCOS_LATCH_APR_18_2015_0925PM)
+#ifndef HPX_LCOS_LATCH_APR_18_2015_0925PM
 #define HPX_LCOS_LATCH_APR_18_2015_0925PM
 
 #include <hpx/assertion.hpp>

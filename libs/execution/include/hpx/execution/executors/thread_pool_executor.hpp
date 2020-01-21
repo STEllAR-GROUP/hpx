@@ -7,7 +7,7 @@
 
 /// \file parallel/executors/parallel_executor.hpp
 
-#if !defined(HPX_THREAD_POOL_EXECUTOR_HPP)
+#ifndef HPX_THREAD_POOL_EXECUTOR_HPP
 #define HPX_THREAD_POOL_EXECUTOR_HPP
 
 #include <hpx/config.hpp>

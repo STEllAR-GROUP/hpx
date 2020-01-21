@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/for_loop_induction.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM)
+#ifndef HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM
 #define HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM
 
 #include <hpx/config.hpp>

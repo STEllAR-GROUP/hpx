@@ -6,7 +6,7 @@
 
 /// \file hpx/runtime/get_locality_name.hpp
 
-#if !defined(HPX_RUNTIME_GET_LOCALITY_NAME_SEP_26_2013_0533PM)
+#ifndef HPX_RUNTIME_GET_LOCALITY_NAME_SEP_26_2013_0533PM
 #define HPX_RUNTIME_GET_LOCALITY_NAME_SEP_26_2013_0533PM
 
 #include <hpx/config.hpp>

@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/move.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_MOVE_26_NOV_2017_1248PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_MOVE_26_NOV_2017_1248PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_MOVE_26_NOV_2017_1248PM
 
 #include <hpx/config.hpp>

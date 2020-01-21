@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_TRANSFORM_REDUCE_BINARY_SEP_13_2016_1227PM)
+#ifndef HPX_PARALLEL_TEST_TRANSFORM_REDUCE_BINARY_SEP_13_2016_1227PM
 #define HPX_PARALLEL_TEST_TRANSFORM_REDUCE_BINARY_SEP_13_2016_1227PM
 
 #include <hpx/include/parallel_transform_reduce.hpp>

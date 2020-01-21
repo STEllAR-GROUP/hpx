@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_UNINIT_COPY_MAY28_15_1344)
+#ifndef HPX_PARALLEL_TEST_UNINIT_COPY_MAY28_15_1344
 #define HPX_PARALLEL_TEST_UNINIT_COPY_MAY28_15_1344
 
 #include <hpx/hpx.hpp>

@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADS_SCHEDULER_MODE_AUG_27_2017_1136AM)
+#ifndef HPX_THREADS_SCHEDULER_MODE_AUG_27_2017_1136AM
 #define HPX_THREADS_SCHEDULER_MODE_AUG_27_2017_1136AM
 
 #include <cstdint>

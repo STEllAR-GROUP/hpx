@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM)
+#ifndef HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM
 #define HPX_COMPONENTS_STUB_STUB_BASE_CLIENT_OCT_31_2008_0441PM
 
 #include <hpx/config.hpp>

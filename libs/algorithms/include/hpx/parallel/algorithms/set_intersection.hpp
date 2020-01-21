@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/set_intersection.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_SET_INTERSECTION_MAR_10_2015_0152PM)
+#ifndef HPX_PARALLEL_ALGORITHM_SET_INTERSECTION_MAR_10_2015_0152PM
 #define HPX_PARALLEL_ALGORITHM_SET_INTERSECTION_MAR_10_2015_0152PM
 
 #include <hpx/config.hpp>

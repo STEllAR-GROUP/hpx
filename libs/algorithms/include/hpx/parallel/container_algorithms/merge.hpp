@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/merge.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_MERGE_AUG_15_2017_1045AM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_MERGE_AUG_15_2017_1045AM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_MERGE_AUG_15_2017_1045AM
 
 #include <hpx/config.hpp>

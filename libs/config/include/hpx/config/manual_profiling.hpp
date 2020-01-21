@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_8877B5FB_1967_43B9_AF98_1A01F162B725)
+#ifndef HPX_8877B5FB_1967_43B9_AF98_1A01F162B725
 #define HPX_8877B5FB_1967_43B9_AF98_1A01F162B725
 
 // clang-format off

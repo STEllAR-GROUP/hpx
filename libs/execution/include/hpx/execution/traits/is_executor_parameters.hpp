@@ -8,7 +8,7 @@
 // hpxinspect:nodeprecatedinclude:boost/ref.hpp
 // hpxinspect:nodeprecatedname:boost::reference_wrapper
 
-#if !defined(HPX_TRAITS_IS_EXECUTOR_PARAMETERS_MAY_19_2017_0232PM)
+#ifndef HPX_TRAITS_IS_EXECUTOR_PARAMETERS_MAY_19_2017_0232PM
 #define HPX_TRAITS_IS_EXECUTOR_PARAMETERS_MAY_19_2017_0232PM
 
 #include <hpx/config.hpp>

@@ -8,7 +8,7 @@
 
 /// \file error.hpp
 
-#if !defined(HPX_ERROR_SEP_08_2013_1109AM)
+#ifndef HPX_ERROR_SEP_08_2013_1109AM
 #define HPX_ERROR_SEP_08_2013_1109AM
 
 #include <hpx/config.hpp>

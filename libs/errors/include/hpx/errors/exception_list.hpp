@@ -6,7 +6,7 @@
 
 /// \file exception_list.hpp
 
-#if !defined(HPX_EXCEPTION_LIST_OCT_06_2008_0942AM)
+#ifndef HPX_EXCEPTION_LIST_OCT_06_2008_0942AM
 #define HPX_EXCEPTION_LIST_OCT_06_2008_0942AM
 
 #include <hpx/config.hpp>

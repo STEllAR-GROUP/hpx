@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_INFORMATION_JAN_17_2017_0130PM)
+#ifndef HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_INFORMATION_JAN_17_2017_0130PM
 #define HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_INFORMATION_JAN_17_2017_0130PM
 
 #include <hpx/config.hpp>

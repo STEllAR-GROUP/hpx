@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/uninitialized_value_construct.hpp
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_DETAIL_UNINITIALIZED_VALUE_CONSTRUCT_JUN_01_2017_1049AM)
+#ifndef HPX_PARALLEL_DETAIL_UNINITIALIZED_VALUE_CONSTRUCT_JUN_01_2017_1049AM
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_VALUE_CONSTRUCT_JUN_01_2017_1049AM
 
 #include <hpx/config.hpp>

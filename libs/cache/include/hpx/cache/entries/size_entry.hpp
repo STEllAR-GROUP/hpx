@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_CACHE_SIZE_ENTRY_NOV_19_2008_0800M)
+#ifndef HPX_UTIL_CACHE_SIZE_ENTRY_NOV_19_2008_0800M
 #define HPX_UTIL_CACHE_SIZE_ENTRY_NOV_19_2008_0800M
 
 #include <hpx/config.hpp>

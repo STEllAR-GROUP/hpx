@@ -6,7 +6,7 @@
 
 /// \file hpx/coroutines/thread_enums.hpp
 
-#if !defined(HPX_THREAD_ENUMS_JUL_23_2015_0852PM)
+#ifndef HPX_THREAD_ENUMS_JUL_23_2015_0852PM
 #define HPX_THREAD_ENUMS_JUL_23_2015_0852PM
 
 #include <hpx/config.hpp>

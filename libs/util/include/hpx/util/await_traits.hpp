@@ -7,7 +7,7 @@
 // Partial implementation of the coroutine support library
 // (<experimental/coroutines>).
 
-#if !defined(HPX_UTIL_933DADE6_D0AB_46EB_98F3_9ECDAE31A4DA)
+#ifndef HPX_UTIL_933DADE6_D0AB_46EB_98F3_9ECDAE31A4DA
 #define HPX_UTIL_933DADE6_D0AB_46EB_98F3_9ECDAE31A4DA
 
 #include <hpx/config.hpp>

@@ -71,7 +71,7 @@ namespace hpx { namespace lcos {
 }}    // namespace hpx::lcos
 #else
 
-#if !defined(HPX_LCOS_REDUCE_SEP_28_2013_1105AM)
+#ifndef HPX_LCOS_REDUCE_SEP_28_2013_1105AM
 #define HPX_LCOS_REDUCE_SEP_28_2013_1105AM
 
 #include <hpx/config.hpp>

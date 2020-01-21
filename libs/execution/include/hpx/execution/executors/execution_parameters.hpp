@@ -8,7 +8,7 @@
 // hpxinspect:nodeprecatedinclude:boost/ref.hpp
 // hpxinspect:nodeprecatedname:boost::reference_wrapper
 
-#if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETERS_AUG_21_2017_0750PM)
+#ifndef HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETERS_AUG_21_2017_0750PM
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETERS_AUG_21_2017_0750PM
 
 #include <hpx/config.hpp>

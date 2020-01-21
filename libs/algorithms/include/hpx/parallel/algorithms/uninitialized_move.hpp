@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/uninitialized_move.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_UNINITIALIZED_MOVE_MAY_30_2017_0843AM)
+#ifndef HPX_PARALLEL_DETAIL_UNINITIALIZED_MOVE_MAY_30_2017_0843AM
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_MOVE_MAY_30_2017_0843AM
 
 #include <hpx/config.hpp>

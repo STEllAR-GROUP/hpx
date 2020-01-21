@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_CONDITIONAL_TRIGGER_SEP_09_2012_1256PM)
+#ifndef HPX_LCOS_LOCAL_CONDITIONAL_TRIGGER_SEP_09_2012_1256PM
 #define HPX_LCOS_LOCAL_CONDITIONAL_TRIGGER_SEP_09_2012_1256PM
 
 #include <hpx/config.hpp>

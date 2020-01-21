@@ -12,7 +12,7 @@
 //      hpxinspect:nodeprecatedname:boost::mpl::false_type
 //      hpxinspect:nodeprecatedname:boost::mpl::true_type
 
-#if !defined(HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM)
+#ifndef HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM
 #define HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM
 
 #if defined(HPX_MSVC)

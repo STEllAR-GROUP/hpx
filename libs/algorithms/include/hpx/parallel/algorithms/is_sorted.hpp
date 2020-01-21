@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/is_sorted.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHMS_IS_SORTED_FEB_9_2015_0331PM)
+#ifndef HPX_PARALLEL_ALGORITHMS_IS_SORTED_FEB_9_2015_0331PM
 #define HPX_PARALLEL_ALGORITHMS_IS_SORTED_FEB_9_2015_0331PM
 
 #include <hpx/config.hpp>

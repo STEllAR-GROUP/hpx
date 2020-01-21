@@ -7,7 +7,7 @@
 
 /// \file parallel/algorithms/move.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM)
+#ifndef HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
 #define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
 
 #include <hpx/config.hpp>

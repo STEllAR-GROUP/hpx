@@ -7,7 +7,7 @@
 
 /// \file get_thread_name.hpp
 
-#if !defined(HPX_RUNTIME_GET_THREAD_NAME_HPP)
+#ifndef HPX_RUNTIME_GET_THREAD_NAME_HPP
 #define HPX_RUNTIME_GET_THREAD_NAME_HPP
 
 #include <hpx/config.hpp>

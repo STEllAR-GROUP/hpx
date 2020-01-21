@@ -9,7 +9,7 @@
 // (C) Copyright 2008 Anthony Williams
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
-#if !defined(HPX_RUNTIME_THREADS_SCHEDULER_TSS_AUG_08_2015_0733PM)
+#ifndef HPX_RUNTIME_THREADS_SCHEDULER_TSS_AUG_08_2015_0733PM
 #define HPX_RUNTIME_THREADS_SCHEDULER_TSS_AUG_08_2015_0733PM
 
 #include <hpx/config.hpp>

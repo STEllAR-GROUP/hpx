@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/remove.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_REMOVE_DEC_24_2017_0918PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_REMOVE_DEC_24_2017_0918PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_REMOVE_DEC_24_2017_0918PM
 
 #include <hpx/config.hpp>

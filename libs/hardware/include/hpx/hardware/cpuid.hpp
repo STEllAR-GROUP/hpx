@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_7309AC21_1B92_4CC1_8ACC_CAA4E841DB3A)
+#ifndef HPX_7309AC21_1B92_4CC1_8ACC_CAA4E841DB3A
 #define HPX_7309AC21_1B92_4CC1_8ACC_CAA4E841DB3A
 
 #if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) ||           \

@@ -6,7 +6,7 @@
 
 /// \file lcos/split_future.hpp
 
-#if !defined(HPX_LCOS_SPLIT_FUTURE_JUL_08_2016_0824AM)
+#ifndef HPX_LCOS_SPLIT_FUTURE_JUL_08_2016_0824AM
 #define HPX_LCOS_SPLIT_FUTURE_JUL_08_2016_0824AM
 
 #if defined(DOXYGEN)

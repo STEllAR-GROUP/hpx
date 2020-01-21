@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/unique.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_UNIQUE_JUL_11_2017_1018PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_UNIQUE_JUL_11_2017_1018PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_UNIQUE_JUL_11_2017_1018PM
 
 #include <hpx/config.hpp>

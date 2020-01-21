@@ -6,7 +6,7 @@
 
 /// \file parallel/executors/pool_executor.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_POOL_EXECUTOR_FEB_17_2018_0327PM)
+#ifndef HPX_PARALLEL_EXECUTORS_POOL_EXECUTOR_FEB_17_2018_0327PM
 #define HPX_PARALLEL_EXECUTORS_POOL_EXECUTOR_FEB_17_2018_0327PM
 
 #include <hpx/config.hpp>

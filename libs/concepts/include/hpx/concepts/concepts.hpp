@@ -7,7 +7,7 @@
 // Parts of this have been taken from Eric Niebler's Ranges V3 library, see
 // its project home at: https://github.com/ericniebler/range-v3.
 
-#if !defined(HPX_TRAITS_CONCEPTS_JUL_19_2015_0547PM)
+#ifndef HPX_TRAITS_CONCEPTS_JUL_19_2015_0547PM
 #define HPX_TRAITS_CONCEPTS_JUL_19_2015_0547PM
 
 #include <hpx/preprocessor/cat.hpp>

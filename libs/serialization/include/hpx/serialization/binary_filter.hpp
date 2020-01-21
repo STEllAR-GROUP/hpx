@@ -6,7 +6,7 @@
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM)
+#ifndef HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM
 #define HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM
 
 #include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>

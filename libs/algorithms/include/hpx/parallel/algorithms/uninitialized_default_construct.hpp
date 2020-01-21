@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/uninitialized_default_construct.hpp
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_DETAIL_UNINITIALIZED_DEFAULT_CONSTRUCT_MAY_31_2017_0928AM)
+#ifndef HPX_PARALLEL_DETAIL_UNINITIALIZED_DEFAULT_CONSTRUCT_MAY_31_2017_0928AM
 #define HPX_PARALLEL_DETAIL_UNINITIALIZED_DEFAULT_CONSTRUCT_MAY_31_2017_0928AM
 
 #include <hpx/config.hpp>

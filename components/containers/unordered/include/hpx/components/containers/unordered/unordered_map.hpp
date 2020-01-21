@@ -6,7 +6,7 @@
 
 /// \file hpx/components/unordered/unordered_map.hpp
 
-#if !defined(HPX_UNORDERED_MAP_NOV_11_2014_0852PM)
+#ifndef HPX_UNORDERED_MAP_NOV_11_2014_0852PM
 #define HPX_UNORDERED_MAP_NOV_11_2014_0852PM
 
 #include <hpx/config.hpp>

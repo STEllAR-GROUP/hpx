@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_ASSERT_OWNS_LOCK_DEC_4_2013_0130PM)
+#ifndef HPX_UTIL_ASSERT_OWNS_LOCK_DEC_4_2013_0130PM
 #define HPX_UTIL_ASSERT_OWNS_LOCK_DEC_4_2013_0130PM
 
 #include <hpx/config.hpp>

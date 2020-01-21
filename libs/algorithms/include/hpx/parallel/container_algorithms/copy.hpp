@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/copy.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_COPY_DEC_13_2015_0241PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_COPY_DEC_13_2015_0241PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_COPY_DEC_13_2015_0241PM
 
 #include <hpx/config.hpp>

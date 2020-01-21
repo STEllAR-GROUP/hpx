@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_UTIL_HARDWARE_TIMESTAMP_BGQ_HPP)
+#ifndef HPX_UTIL_HARDWARE_TIMESTAMP_BGQ_HPP
 #define HPX_UTIL_HARDWARE_TIMESTAMP_BGQ_HPP
 
 #if defined(__bgq__)

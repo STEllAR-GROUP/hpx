@@ -6,7 +6,7 @@
 
 /// \file hpx/runtime/report_error.hpp
 
-#if !defined(HPX_RUNTIME_REPORT_ERROR_HPP)
+#ifndef HPX_RUNTIME_REPORT_ERROR_HPP
 #define HPX_RUNTIME_REPORT_ERROR_HPP
 
 #include <hpx/config.hpp>

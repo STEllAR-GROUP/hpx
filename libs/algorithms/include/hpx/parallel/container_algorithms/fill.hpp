@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/fill.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_FILL_FEB_23_2018_0057AM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_FILL_FEB_23_2018_0057AM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_FILL_FEB_23_2018_0057AM
 
 #include <hpx/config.hpp>

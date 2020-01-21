@@ -8,7 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1139AM)
+#ifndef HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1139AM
 #define HPX_AGAS_LOCALITY_NAMESPACE_APR_03_2013_1139AM
 
 #include <hpx/config.hpp>

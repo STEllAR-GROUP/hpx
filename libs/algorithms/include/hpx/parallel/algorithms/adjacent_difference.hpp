@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/adjacent_difference.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15)
+#ifndef HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15
 #define HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15
 
 #include <hpx/config.hpp>

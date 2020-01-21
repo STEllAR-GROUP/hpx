@@ -8,7 +8,7 @@
 
 /// \file parallel/container_algorithms/minmax.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHMS_MINMAX_JAN_25_2016_1218PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHMS_MINMAX_JAN_25_2016_1218PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHMS_MINMAX_JAN_25_2016_1218PM
 
 #include <hpx/config.hpp>

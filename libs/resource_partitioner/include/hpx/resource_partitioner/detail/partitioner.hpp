@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_DETAIL_RESOURCE_PARTITIONER_AUG_10_2017_0926AM)
+#ifndef HPX_DETAIL_RESOURCE_PARTITIONER_AUG_10_2017_0926AM
 #define HPX_DETAIL_RESOURCE_PARTITIONER_AUG_10_2017_0926AM
 
 #include <hpx/config.hpp>

@@ -7,7 +7,7 @@
 //
 // This was modeled after the code available in the Range v3 library
 
-#if !defined(HPX_UTIL_TAGGED_TUPLE_DEC_23_2015_0123PM)
+#ifndef HPX_UTIL_TAGGED_TUPLE_DEC_23_2015_0123PM
 #define HPX_UTIL_TAGGED_TUPLE_DEC_23_2015_0123PM
 
 #include <hpx/config.hpp>

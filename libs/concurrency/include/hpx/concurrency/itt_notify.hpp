@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_ITT_NOTIFY_AUG_17_2010_1237PM)
+#ifndef HPX_UTIL_ITT_NOTIFY_AUG_17_2010_1237PM
 #define HPX_UTIL_ITT_NOTIFY_AUG_17_2010_1237PM
 
 #include <hpx/config.hpp>

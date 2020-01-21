@@ -6,7 +6,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_LCOS_SYNC_FWD_JUL_21_2018_0919PM)
+#ifndef HPX_LCOS_SYNC_FWD_JUL_21_2018_0919PM
 #define HPX_LCOS_SYNC_FWD_JUL_21_2018_0919PM
 
 #include <hpx/config.hpp>

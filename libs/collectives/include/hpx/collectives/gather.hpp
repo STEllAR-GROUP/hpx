@@ -6,7 +6,7 @@
 
 /// \file gather.hpp
 
-#if !defined(HPX_LCOS_GATHER_MAY_05_2014_0418PM)
+#ifndef HPX_LCOS_GATHER_MAY_05_2014_0418PM
 #define HPX_LCOS_GATHER_MAY_05_2014_0418PM
 
 #if defined(DOXYGEN)

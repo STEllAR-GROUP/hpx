@@ -6,7 +6,7 @@
 
 /// \file parallel/executors/dynamic_chunk_size.hpp
 
-#if !defined(HPX_PARALLEL_DYNAMIC_CHUNK_SIZE_AUG_01_2015_0234PM)
+#ifndef HPX_PARALLEL_DYNAMIC_CHUNK_SIZE_AUG_01_2015_0234PM
 #define HPX_PARALLEL_DYNAMIC_CHUNK_SIZE_AUG_01_2015_0234PM
 
 #include <hpx/config.hpp>

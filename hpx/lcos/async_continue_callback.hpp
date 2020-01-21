@@ -6,7 +6,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_LCOS_ASYNC_CONTINUE_CALLBACK_MAR_30_2015_1132AM)
+#ifndef HPX_LCOS_ASYNC_CONTINUE_CALLBACK_MAR_30_2015_1132AM
 #define HPX_LCOS_ASYNC_CONTINUE_CALLBACK_MAR_30_2015_1132AM
 
 #include <hpx/lcos/async_callback_fwd.hpp>

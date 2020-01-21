@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/remove.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_REMOVE_DEC_24_2017_0644PM)
+#ifndef HPX_PARALLEL_ALGORITHM_REMOVE_DEC_24_2017_0644PM
 #define HPX_PARALLEL_ALGORITHM_REMOVE_DEC_24_2017_0644PM
 
 #include <hpx/config.hpp>

@@ -6,7 +6,7 @@
 
 /// \file parallel/executors/thread_execution.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_JAN_03_2017_1145AM)
+#ifndef HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_JAN_03_2017_1145AM
 #define HPX_PARALLEL_EXECUTORS_THREAD_EXECUTION_JAN_03_2017_1145AM
 
 #include <hpx/config.hpp>

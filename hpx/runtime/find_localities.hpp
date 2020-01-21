@@ -7,7 +7,7 @@
 
 /// \file find_localities.hpp
 
-#if !defined(HPX_RUNTIME_FIND_LOCALITIES_HPP)
+#ifndef HPX_RUNTIME_FIND_LOCALITIES_HPP
 #define HPX_RUNTIME_FIND_LOCALITIES_HPP
 
 #include <hpx/config.hpp>

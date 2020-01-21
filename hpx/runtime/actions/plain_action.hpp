@@ -7,7 +7,7 @@
 
 /// \file plain_action.hpp
 
-#if !defined(HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM)
+#ifndef HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM
 #define HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM
 
 #include <hpx/config.hpp>

@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/rotate.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_ROTATE_DEC_22_2015_0736PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_ROTATE_DEC_22_2015_0736PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_ROTATE_DEC_22_2015_0736PM
 
 #include <hpx/config.hpp>

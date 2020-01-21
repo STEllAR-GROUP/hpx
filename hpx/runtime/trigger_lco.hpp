@@ -6,7 +6,7 @@
 
 /// \file hpx/runtime/trigger_lco.hpp
 
-#if !defined(HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM)
+#ifndef HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM
 #define HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM
 
 #include <hpx/config.hpp>

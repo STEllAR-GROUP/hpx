@@ -6,7 +6,7 @@
 
 /// \file hpx/runtime/get_worker_thread_num.hpp
 
-#if !defined(HPX_RUNTIME_GET_WORKER_THREAD_NUM_AUG_15_2015_1120AM)
+#ifndef HPX_RUNTIME_GET_WORKER_THREAD_NUM_AUG_15_2015_1120AM
 #define HPX_RUNTIME_GET_WORKER_THREAD_NUM_AUG_15_2015_1120AM
 
 #include <hpx/config.hpp>

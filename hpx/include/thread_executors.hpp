@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREAD_EXECUTORS_JAN_13_2013_0257PM)
+#ifndef HPX_THREAD_EXECUTORS_JAN_13_2013_0257PM
 #define HPX_THREAD_EXECUTORS_JAN_13_2013_0257PM
 
 #include <hpx/runtime/threads/executors/current_executor.hpp>

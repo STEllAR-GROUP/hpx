@@ -7,7 +7,7 @@
 // hpxinspect:nodeprecatedinclude:boost/ref.hpp
 // hpxinspect:nodeprecatedname:boost::reference_wrapper
 
-#if !defined(HPX_TRAITS_IS_FUTURE_APR_20_2012_0536PM)
+#ifndef HPX_TRAITS_IS_FUTURE_APR_20_2012_0536PM
 #define HPX_TRAITS_IS_FUTURE_APR_20_2012_0536PM
 
 #include <hpx/config.hpp>

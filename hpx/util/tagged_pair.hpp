@@ -7,7 +7,7 @@
 //
 // This was modeled after the code available in the Range v3 library
 
-#if !defined(HPX_UTIL_TAGGED_PAIR_DEC_23_2015_1014AM)
+#ifndef HPX_UTIL_TAGGED_PAIR_DEC_23_2015_1014AM
 #define HPX_UTIL_TAGGED_PAIR_DEC_23_2015_1014AM
 
 #include <hpx/config.hpp>

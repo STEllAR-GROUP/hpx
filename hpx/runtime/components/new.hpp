@@ -6,7 +6,7 @@
 
 /// \file new.hpp
 
-#if !defined(HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM)
+#ifndef HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM
 #define HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM
 
 #include <hpx/config.hpp>

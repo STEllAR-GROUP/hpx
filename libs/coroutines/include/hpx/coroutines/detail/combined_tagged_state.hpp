@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TAGGED_THREAD_STATE_MAR_12_2010_0125PM)
+#ifndef HPX_TAGGED_THREAD_STATE_MAR_12_2010_0125PM
 #define HPX_TAGGED_THREAD_STATE_MAR_12_2010_0125PM
 
 #include <hpx/config.hpp>

@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENT_STARTUP_SHUTDOWN_BASE_SEP_20_2011_0809PM)
+#ifndef HPX_COMPONENT_STARTUP_SHUTDOWN_BASE_SEP_20_2011_0809PM
 #define HPX_COMPONENT_STARTUP_SHUTDOWN_BASE_SEP_20_2011_0809PM
 
 #include <hpx/config.hpp>

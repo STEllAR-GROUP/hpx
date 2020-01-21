@@ -6,7 +6,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREAD_GROUP_AUG_03_2015_0908PM)
+#ifndef HPX_THREAD_GROUP_AUG_03_2015_0908PM
 #define HPX_THREAD_GROUP_AUG_03_2015_0908PM
 
 #include <hpx/config.hpp>

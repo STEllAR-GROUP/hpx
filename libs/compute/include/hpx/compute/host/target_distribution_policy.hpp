@@ -6,7 +6,7 @@
 
 /// \file host/target_distribution_policy.hpp
 
-#if !defined(HPX_COMPUTE_HOST_TARGET_DISTRIBUTION_POLICY)
+#ifndef HPX_COMPUTE_HOST_TARGET_DISTRIBUTION_POLICY
 #define HPX_COMPUTE_HOST_TARGET_DISTRIBUTION_POLICY
 
 #include <hpx/config.hpp>

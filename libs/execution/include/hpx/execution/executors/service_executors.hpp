@@ -6,7 +6,7 @@
 
 /// \file parallel/executors/service_executors.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_SERVICE_EXECUTORS_MAY_15_2015_0548PM)
+#ifndef HPX_PARALLEL_EXECUTORS_SERVICE_EXECUTORS_MAY_15_2015_0548PM
 #define HPX_PARALLEL_EXECUTORS_SERVICE_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>

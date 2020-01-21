@@ -10,7 +10,7 @@
 
 /// \file lcos/wait_all.hpp
 
-#if !defined(HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM)
+#ifndef HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM
 #define HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM
 
 #if defined(DOXYGEN)

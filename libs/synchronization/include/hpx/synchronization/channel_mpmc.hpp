@@ -6,7 +6,7 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#if !defined(HPX_LCOS_LOCAL_CHANNEL_MPMC_NOV_24_2019_1141AM)
+#ifndef HPX_LCOS_LOCAL_CHANNEL_MPMC_NOV_24_2019_1141AM
 #define HPX_LCOS_LOCAL_CHANNEL_MPMC_NOV_24_2019_1141AM
 
 #include <hpx/config.hpp>

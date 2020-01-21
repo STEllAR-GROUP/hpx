@@ -6,7 +6,7 @@
 
 /// \file cuda/target_distribution_policy.hpp
 
-#if !defined(HPX_COMPUTE_CUDA_TARGET_DISTRIBUTION_POLICY)
+#ifndef HPX_COMPUTE_CUDA_TARGET_DISTRIBUTION_POLICY
 #define HPX_COMPUTE_CUDA_TARGET_DISTRIBUTION_POLICY
 
 #include <hpx/config.hpp>

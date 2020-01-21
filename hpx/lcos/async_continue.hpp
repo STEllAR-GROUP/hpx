@@ -6,7 +6,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM)
+#ifndef HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM
 #define HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM
 
 #include <hpx/config.hpp>

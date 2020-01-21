@@ -13,7 +13,7 @@
 /// codebase. It also provides some functions only available in Boost.Filesystem
 /// when using C++17 filesystem.
 
-#if !defined(HPX_FILESYSTEM_HPP)
+#ifndef HPX_FILESYSTEM_HPP
 #define HPX_FILESYSTEM_HPP
 
 #include <hpx/config.hpp>

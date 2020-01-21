@@ -6,7 +6,7 @@
 
 /// \file parallel/algorithms/remove_copy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM)
+#ifndef HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM
 #define HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM
 
 #include <hpx/config.hpp>

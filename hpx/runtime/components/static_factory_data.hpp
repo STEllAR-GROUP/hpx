@@ -6,7 +6,7 @@
 
 // Make HPX inspect tool happy: hpxinspect:nounnamed
 
-#if !defined(HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP)
+#ifndef HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP
 #define HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP
 
 #include <hpx/config.hpp>

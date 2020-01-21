@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_DB9FD2D1_DFD8_491C_AB4B_1CDBCC56A7D0)
+#ifndef HPX_DB9FD2D1_DFD8_491C_AB4B_1CDBCC56A7D0
 #define HPX_DB9FD2D1_DFD8_491C_AB4B_1CDBCC56A7D0
 
 #include <hpx/runtime/components/server/simple_component_base.hpp>

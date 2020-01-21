@@ -7,7 +7,7 @@
 
 /// \file parallel/algorithms/is_partitioned.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHMS_IS_PARTITIONED_FEB_11_2015_0331PM)
+#ifndef HPX_PARALLEL_ALGORITHMS_IS_PARTITIONED_FEB_11_2015_0331PM
 #define HPX_PARALLEL_ALGORITHMS_IS_PARTITIONED_FEB_11_2015_0331PM
 
 #include <hpx/config.hpp>

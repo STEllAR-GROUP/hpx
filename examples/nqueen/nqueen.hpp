@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_527D225B_F1EC_4BC5_9245_3A69C6AE5304)
+#ifndef HPX_527D225B_F1EC_4BC5_9245_3A69C6AE5304
 #define HPX_527D225B_F1EC_4BC5_9245_3A69C6AE5304
 
 #include <hpx/runtime.hpp>

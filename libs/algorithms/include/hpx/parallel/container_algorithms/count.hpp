@@ -6,7 +6,7 @@
 
 /// \file parallel/container_algorithms/count.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_COUNT_FEB_09_2018_2057PM)
+#ifndef HPX_PARALLEL_CONTAINER_ALGORITHM_COUNT_FEB_09_2018_2057PM
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_COUNT_FEB_09_2018_2057PM
 
 #include <hpx/config.hpp>
