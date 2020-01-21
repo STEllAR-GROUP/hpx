@@ -86,6 +86,7 @@ IncludeCategories:
     Priority:        7
 # IncludeIsMainRegex: ''
 IndentCaseLabels: false
+IndentPPDirectives: AfterHash
 IndentWidth: 4
 IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: false
