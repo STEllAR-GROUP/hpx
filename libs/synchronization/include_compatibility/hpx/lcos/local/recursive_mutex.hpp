@@ -9,12 +9,13 @@
 #include <hpx/synchronization/recursive_mutex.hpp>
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/lcos/local/recursive_mutex.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/lcos/local/recursive_mutex.hpp is deprecated, \
     please include hpx/synchronization/recursive_mutex.hpp instead")
-#else
-#warning "The header hpx/lcos/local/recursive_mutex.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/lcos/local/recursive_mutex.hpp is deprecated, \
     please include hpx/synchronization/recursive_mutex.hpp instead"
-#endif
+#    endif
 #endif

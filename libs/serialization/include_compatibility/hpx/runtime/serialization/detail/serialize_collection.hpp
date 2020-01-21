@@ -9,13 +9,13 @@
 #include <hpx/serialization/detail/serialize_collection.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header \
+#    if defined(HPX_MSVC)
+#        pragma message("The header \
     hpx/runtime/serialization/detail/serialize_collection.hpp is deprecated, \
     please include hpx/serialization/detail/serialize_collection.hpp instead")
-#else
-#warning "The header \
+#    else
+#        warning "The header \
     hpx/runtime/serialization/detail/serialize_collection.hpp is deprecated, \
     please include hpx/serialization/detail/serialize_collection.hpp instead"
-#endif
+#    endif
 #endif

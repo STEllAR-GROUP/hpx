@@ -9,11 +9,12 @@
 #include <hpx/synchronization/spinlock_pool.hpp>
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/lcos/local/spinlock_pool.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/lcos/local/spinlock_pool.hpp is deprecated, \
     please include hpx/synchronization/spinlock_pool.hpp instead")
-#else
-#warning "The header hpx/lcos/local/spinlock_pool.hpp is deprecated, \
+#    else
+#        warning "The header hpx/lcos/local/spinlock_pool.hpp is deprecated, \
     please include hpx/synchronization/spinlock_pool.hpp instead"
-#endif
+#    endif
 #endif

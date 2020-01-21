@@ -17,7 +17,7 @@
 #include <hpx/serialization/serialize.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <boost/shared_ptr.hpp>
+#    include <boost/shared_ptr.hpp>
 #endif
 
 #include <memory>

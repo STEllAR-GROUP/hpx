@@ -20,7 +20,7 @@
 #if defined(HPX_HAVE_INTERNAL_ALLOCATOR)
 // this is currently used only for jemalloc and if a special API prefix is
 // used for its APIs
-#include <jemalloc/jemalloc.h>
+#    include <jemalloc/jemalloc.h>
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>

@@ -11,7 +11,7 @@
 
 #if defined(DOXYGEN)
 /// Marks a function to be forced inline.
-#define HPX_FORCEINLINE
+#    define HPX_FORCEINLINE
 #else
 
 // clang-format off

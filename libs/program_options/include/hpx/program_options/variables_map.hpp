@@ -14,9 +14,9 @@
 // hpxinspect:nodeprecatedinclude:boost/program_options/variables_map.hpp
 // hpxinspect:nodeprecatedinclude:boost/program_options/value_semantic.hpp
 
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/value_semantic.hpp>
-#include <boost/program_options/variables_map.hpp>
+#    include <boost/program_options/parsers.hpp>
+#    include <boost/program_options/value_semantic.hpp>
+#    include <boost/program_options/variables_map.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -30,14 +30,14 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <hpx/datastructures/any.hpp>
+#    include <hpx/datastructures/any.hpp>
 
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
+#    include <map>
+#    include <memory>
+#    include <set>
+#    include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
+#    include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -232,7 +232,7 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#    include <hpx/config/warnings_suffix.hpp>
 
 #endif
 #endif

@@ -13,11 +13,11 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/cuda/traits/access_target.hpp>
-#include <hpx/traits/is_value_proxy.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/compute/cuda/traits/access_target.hpp>
+#    include <hpx/traits/is_value_proxy.hpp>
 
-#include <type_traits>
+#    include <type_traits>
 
 namespace hpx { namespace compute { namespace cuda {
     template <typename T>

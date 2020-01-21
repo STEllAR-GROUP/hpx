@@ -9,13 +9,15 @@
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/parallel/algorithms/detail/is_negative.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/parallel/algorithms/detail/is_negative.hpp is \
+            deprecated, \
     please include hpx/execution/algorithms/detail/is_negative.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/parallel/algorithms/detail/is_negative.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/parallel/algorithms/detail/is_negative.hpp is \
+            deprecated, \
     please include hpx/execution/algorithms/detail/is_negative.hpp instead"
-#endif
+#    endif
 #endif

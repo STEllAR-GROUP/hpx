@@ -19,7 +19,7 @@
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
-#include <boost/cstdint.hpp>
+#    include <boost/cstdint.hpp>
 #endif
 #include <boost/predef/other/endian.h>
 

@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/datastructures/tuple.hpp>
+#    include <hpx/datastructures/tuple.hpp>
 
-#include <cstddef>
+#    include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits {
@@ -37,9 +37,9 @@ namespace hpx { namespace parallel { namespace traits {
     };
 }}}    // namespace hpx::parallel::traits
 
-#if !defined(__CUDACC__)
-#include <hpx/execution/parallel/traits/detail/vc/vector_pack_type.hpp>
-#endif
+#    if !defined(__CUDACC__)
+#        include <hpx/execution/parallel/traits/detail/vc/vector_pack_type.hpp>
+#    endif
 
 #endif
 #endif

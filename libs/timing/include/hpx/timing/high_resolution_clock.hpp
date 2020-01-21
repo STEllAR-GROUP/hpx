@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(__bgq__)
-#include <hwi/include/bqc/A2_inlines.h>
+#    include <hwi/include/bqc/A2_inlines.h>
 #endif
 
 #include <chrono>

@@ -20,8 +20,8 @@
 #include <hpx/filesystem/config/defines.hpp>
 
 #if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
-#include <filesystem>
-#include <system_error>
+#    include <filesystem>
+#    include <system_error>
 
 namespace hpx { namespace filesystem {
     using namespace std::filesystem;
@@ -65,7 +65,7 @@ namespace hpx { namespace filesystem {
 
 }}    // namespace hpx::filesystem
 #else
-#include <boost/filesystem.hpp>
+#    include <boost/filesystem.hpp>
 
 static_assert(BOOST_FILESYSTEM_VERSION == 3,
     "HPX requires Boost.Filesystem version 3 (or support for the C++17 "

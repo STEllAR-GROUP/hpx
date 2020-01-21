@@ -131,7 +131,7 @@ namespace hpx { namespace threads {
         mask = 0ull;
     }
 
-#define HPX_CPU_MASK_PREFIX "0x"
+#    define HPX_CPU_MASK_PREFIX "0x"
 
 // clang-format off
 #else

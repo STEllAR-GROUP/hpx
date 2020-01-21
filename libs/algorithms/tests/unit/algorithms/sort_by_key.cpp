@@ -18,9 +18,9 @@
 #include <vector>
 //
 #if defined(HPX_DEBUG)
-#define HPX_SORT_BY_KEY_TEST_SIZE (1 << 8)
+#    define HPX_SORT_BY_KEY_TEST_SIZE (1 << 8)
 #else
-#define HPX_SORT_BY_KEY_TEST_SIZE (1 << 18)
+#    define HPX_SORT_BY_KEY_TEST_SIZE (1 << 18)
 #endif
 //
 #include "sort_tests.hpp"
@@ -54,9 +54,9 @@ namespace debug {
     }
 
 #if defined(EXTRA_DEBUG)
-#define debug_msg(a) std::cout << a
+#    define debug_msg(a) std::cout << a
 #else
-#define debug_msg(a)
+#    define debug_msg(a)
 #endif
 };    // namespace debug
 

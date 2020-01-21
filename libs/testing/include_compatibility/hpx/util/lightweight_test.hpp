@@ -9,13 +9,13 @@
 #include <hpx/testing.hpp>
 
 #if defined(HPX_TESTING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/lightweight_test.hpp is deprecated,                   \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/lightweight_test.hpp is deprecated,        \
     please include hpx/testing.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/util/lightweight_test.hpp is deprecated,                   \
+#    else
+#        warning                                                               \
+            "The header hpx/util/lightweight_test.hpp is deprecated,        \
     please include hpx/testing.hpp instead"
-#endif
+#    endif
 #endif

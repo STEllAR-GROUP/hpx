@@ -25,9 +25,9 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_store;
 }}}    // namespace hpx::parallel::traits
 
-#if !defined(__CUDACC__)
-#include <hpx/execution/parallel/traits/detail/vc/vector_pack_load_store.hpp>
-#endif
+#    if !defined(__CUDACC__)
+#        include <hpx/execution/parallel/traits/detail/vc/vector_pack_load_store.hpp>
+#    endif
 
 #endif
 #endif

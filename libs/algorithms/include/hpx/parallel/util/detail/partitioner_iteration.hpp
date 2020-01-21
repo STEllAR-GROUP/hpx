@@ -32,8 +32,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 }}}}    // namespace hpx::parallel::util::detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
+#    include <hpx/functional/traits/get_function_address.hpp>
+#    include <hpx/functional/traits/get_function_annotation.hpp>
 
 namespace hpx { namespace traits {
     template <typename Result, typename F>
@@ -62,7 +62,7 @@ namespace hpx { namespace traits {
         }
     };
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#    if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename Result, typename F>
     struct get_function_annotation_itt<
         parallel::util::detail::partitioner_iteration<Result, F>>
@@ -75,7 +75,7 @@ namespace hpx { namespace traits {
                 typename std::decay<F>::type>::call(f.f_);
         }
     };
-#endif
+#    endif
 }}    // namespace hpx::traits
 #endif
 

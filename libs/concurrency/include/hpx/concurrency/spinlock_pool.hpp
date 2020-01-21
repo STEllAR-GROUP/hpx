@@ -16,7 +16,7 @@
 // MS compatible compilers support #pragma once
 
 #if defined(HPX_MSVC) && (HPX_MSVC >= 1020)
-#pragma once
+#    pragma once
 #endif
 
 #include <hpx/config.hpp>

@@ -9,11 +9,11 @@
 #include <hpx/concurrency/itt_notify.hpp>
 
 #if defined(HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/itt_notify.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/itt_notify.hpp is deprecated, \
     please include hpx/concurrency/itt_notify.hpp instead")
-#else
-#warning "The header hpx/util/itt_notify.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/itt_notify.hpp is deprecated, \
     please include hpx/concurrency/itt_notify.hpp instead"
-#endif
+#    endif
 #endif

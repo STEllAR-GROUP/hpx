@@ -9,11 +9,11 @@
 #include <hpx/plugin.hpp>
 
 #if defined(HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/plugin.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/plugin.hpp is deprecated, \
     please include hpx/plugin.hpp instead")
-#else
-#warning "The header hpx/util/plugin.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/plugin.hpp is deprecated, \
     please include hpx/plugin.hpp instead"
-#endif
+#    endif
 #endif

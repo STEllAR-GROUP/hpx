@@ -18,8 +18,8 @@
 #define JT28092007_destination_file_HPP_DEFINED
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4355)
+#    pragma warning(push)
+#    pragma warning(disable : 4355)
 #endif
 
 #include <hpx/logging/detail/fwd.hpp>
@@ -160,7 +160,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 }}}}    // namespace hpx::util::logging::destination
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 #endif

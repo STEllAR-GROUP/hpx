@@ -9,12 +9,13 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #if defined(HPX_TIMING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/high_resolution_clock.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/high_resolution_clock.hpp is deprecated, \
     please include hpx/timing/high_resolution_clock.hpp instead")
-#else
-#warning "The header hpx/util/high_resolution_clock.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/util/high_resolution_clock.hpp is deprecated, \
     please include hpx/timing/high_resolution_clock.hpp instead"
-#endif
+#    endif
 #endif

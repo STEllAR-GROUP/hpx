@@ -11,11 +11,11 @@
 
 #if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) &&                             \
     defined(HPX_HAVE_CXX17_IF_CONSTEXPR)
-#include <hpx/type_support/unused.hpp>
+#    include <hpx/type_support/unused.hpp>
 
-#include <cstddef>
-#include <type_traits>
-#include <utility>
+#    include <cstddef>
+#    include <type_traits>
+#    include <utility>
 
 namespace hpx { namespace traits {
 
@@ -102,16 +102,16 @@ namespace hpx { namespace traits {
             return {};
         }
 
-#define MAKE_ARITY_FUNC(count)                                                 \
-    template <typename T,                                                      \
-        typename Enable = typename std::enable_if<                             \
-            traits::is_brace_constructible<T, count>() &&                      \
-            !traits::is_brace_constructible<T, count + 1>() &&                 \
-            !traits::is_paren_constructible<T, count>()>::type>                \
-    constexpr size<count> arity()                                              \
-    {                                                                          \
-        return {};                                                             \
-    }
+#    define MAKE_ARITY_FUNC(count)                                             \
+        template <typename T,                                                  \
+            typename Enable = typename std::enable_if<                         \
+                traits::is_brace_constructible<T, count>() &&                  \
+                !traits::is_brace_constructible<T, count + 1>() &&             \
+                !traits::is_paren_constructible<T, count>()>::type>            \
+        constexpr size<count> arity()                                          \
+        {                                                                      \
+            return {};                                                         \
+        }
 
         MAKE_ARITY_FUNC(1)
         MAKE_ARITY_FUNC(2)
@@ -129,7 +129,7 @@ namespace hpx { namespace traits {
         MAKE_ARITY_FUNC(14)
         MAKE_ARITY_FUNC(15)
 
-#undef MAKE_ARITY_FUNC
+#    undef MAKE_ARITY_FUNC
     }    // namespace detail
 }}       // namespace hpx::traits
 

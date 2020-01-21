@@ -9,11 +9,13 @@
 #include <hpx/local_lcos/receive_buffer.hpp>
 
 #if defined(HPX_LOCAL_LCOS_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/lcos/local/receive_buffer.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/lcos/local/receive_buffer.hpp is deprecated, \
     please include hpx/local_lcos/receive_buffer.hpp instead")
-#else
-#warning "The header hpx/lcos/local/receive_buffer.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/lcos/local/receive_buffer.hpp is deprecated, \
     please include hpx/local_lcos/receive_buffer.hpp instead"
-#endif
+#    endif
 #endif

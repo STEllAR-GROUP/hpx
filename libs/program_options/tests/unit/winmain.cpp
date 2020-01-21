@@ -7,15 +7,15 @@
 #include <hpx/hpx_main.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/testing.hpp>
+#    include <hpx/preprocessor/cat.hpp>
+#    include <hpx/program_options/parsers.hpp>
+#    include <hpx/testing.hpp>
 
-#include <cctype>
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <vector>
+#    include <cctype>
+#    include <cstdlib>
+#    include <iostream>
+#    include <string>
+#    include <vector>
 
 using namespace hpx::program_options;
 using namespace std;
@@ -38,13 +38,13 @@ void check_equal(
     }
 }
 
-#define COMMA ,
-#define TEST(input, expected)                                                  \
-    char const* HPX_PP_CAT(e, __LINE__)[] = expected;                          \
-    vector<string> HPX_PP_CAT(v, __LINE__) = split_winmain(input);             \
-    check_equal(HPX_PP_CAT(v, __LINE__), HPX_PP_CAT(e, __LINE__),              \
-        sizeof(HPX_PP_CAT(e, __LINE__)) / sizeof(char*));                      \
-    /**/
+#    define COMMA ,
+#    define TEST(input, expected)                                              \
+        char const* HPX_PP_CAT(e, __LINE__)[] = expected;                      \
+        vector<string> HPX_PP_CAT(v, __LINE__) = split_winmain(input);         \
+        check_equal(HPX_PP_CAT(v, __LINE__), HPX_PP_CAT(e, __LINE__),          \
+            sizeof(HPX_PP_CAT(e, __LINE__)) / sizeof(char*));                  \
+        /**/
 
 void test_winmain()
 {

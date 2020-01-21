@@ -19,8 +19,8 @@
 #include <utility>
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
+#    pragma warning(push)
+#    pragma warning(disable : 4251)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 }}}}    // namespace hpx::lcos::local::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 #endif

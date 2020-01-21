@@ -9,13 +9,15 @@
 #include <hpx/coroutines/detail/context_base.hpp>
 
 #if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/threads/coroutines/detail/context_base.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/threads/coroutines/detail/context_base.hpp \
+            is deprecated, \
     please include hpx/coroutines/detail/context_base.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/runtime/threads/coroutines/detail/context_base.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/runtime/threads/coroutines/detail/context_base.hpp \
+            is deprecated, \
     please include hpx/coroutines/detail/context_base.hpp instead"
-#endif
+#    endif
 #endif

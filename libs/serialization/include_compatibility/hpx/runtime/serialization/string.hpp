@@ -9,12 +9,13 @@
 #include <hpx/serialization/string.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/serialization/string.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/serialization/string.hpp is deprecated, \
     please include hpx/serialization/string.hpp instead")
-#else
-#warning "The header hpx/runtime/serialization/string.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/runtime/serialization/string.hpp is deprecated, \
     please include hpx/serialization/string.hpp instead"
-#endif
+#    endif
 #endif

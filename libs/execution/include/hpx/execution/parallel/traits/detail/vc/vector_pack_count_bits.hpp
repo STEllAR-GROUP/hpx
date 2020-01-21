@@ -11,13 +11,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
-#include <cstddef>
+#    include <cstddef>
 
-#include <Vc/global.h>
+#    include <Vc/global.h>
 
-#if defined(Vc_IS_VERSION_1) && Vc_IS_VERSION_1
+#    if defined(Vc_IS_VERSION_1) && Vc_IS_VERSION_1
 
-#include <Vc/Vc>
+#        include <Vc/Vc>
 
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
@@ -29,9 +29,9 @@ namespace hpx { namespace parallel { namespace traits {
     }
 }}}    // namespace hpx::parallel::traits
 
-#else
+#    else
 
-#include <Vc/datapar>
+#        include <Vc/datapar>
 
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ namespace hpx { namespace parallel { namespace traits {
     }
 }}}    // namespace hpx::parallel::traits
 
-#endif    // Vc_IS_VERSION_1
+#    endif    // Vc_IS_VERSION_1
 
 #endif
 #endif

@@ -9,13 +9,14 @@
 #include <hpx/synchronization/detail/condition_variable.hpp>
 
 #if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/lcos/local/detail/condition_variable.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/lcos/local/detail/condition_variable.hpp is \
+            deprecated, \
     please include hpx/synchronization/detail/condition_variable.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/lcos/local/detail/condition_variable.hpp is deprecated, \
+#    else
+#        warning "The header hpx/lcos/local/detail/condition_variable.hpp is \
+            deprecated, \
     please include hpx/synchronization/detail/condition_variable.hpp instead"
-#endif
+#    endif
 #endif

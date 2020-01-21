@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/dataflow.hpp>
+#    include <hpx/dataflow.hpp>
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>

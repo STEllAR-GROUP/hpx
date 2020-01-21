@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/datapar/loop.hpp>
+#    include <hpx/parallel/datapar/loop.hpp>
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>

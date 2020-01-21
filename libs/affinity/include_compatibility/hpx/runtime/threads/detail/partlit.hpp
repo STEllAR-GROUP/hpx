@@ -9,12 +9,13 @@
 #include <hpx/affinity/detail/partlit.hpp>
 
 #if defined(HPX_AFFINITY_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/threads/detail/partlit.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/threads/detail/partlit.hpp is deprecated, \
     please include hpx/affinity/detail/partlit.hpp instead")
-#else
-#warning "The header hpx/runtime/threads/detail/partlit.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/runtime/threads/detail/partlit.hpp is deprecated, \
     please include hpx/affinity/detail/partlit.hpp instead"
-#endif
+#    endif
 #endif

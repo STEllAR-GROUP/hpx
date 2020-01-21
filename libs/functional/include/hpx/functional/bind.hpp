@@ -233,12 +233,12 @@ namespace hpx { namespace util {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             util::itt::string_handle get_function_annotation_itt() const
             {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#    if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation_itt<F>::call(_f);
-#else
+#    else
                 static util::itt::string_handle sh("bound");
                 return sh;
-#endif
+#    endif
             }
 #endif
 
@@ -300,7 +300,7 @@ namespace hpx { namespace traits {
         }
     };
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#    if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename F, typename... Ts>
     struct get_function_annotation_itt<util::detail::bound<F, Ts...>>
     {
@@ -310,7 +310,7 @@ namespace hpx { namespace traits {
             return f.get_function_annotation_itt();
         }
     };
-#endif
+#    endif
 #endif
 }}    // namespace hpx::traits
 

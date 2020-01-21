@@ -9,11 +9,11 @@
 #include <hpx/type_support/identity.hpp>
 
 #if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/identity.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/identity.hpp is deprecated, \
     please include hpx/type_support/identity.hpp instead")
-#else
-#warning "The header hpx/util/identity.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/identity.hpp is deprecated, \
     please include hpx/type_support/identity.hpp instead"
-#endif
+#    endif
 #endif

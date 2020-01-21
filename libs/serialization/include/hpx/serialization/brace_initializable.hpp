@@ -12,11 +12,11 @@
 #if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS) &&                             \
     defined(HPX_HAVE_CXX17_IF_CONSTEXPR)
 
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/serialization/brace_initializable_fwd.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/traits/brace_initializable_traits.hpp>
-#include <hpx/serialization/tuple.hpp>
+#    include <hpx/datastructures/tuple.hpp>
+#    include <hpx/serialization/brace_initializable_fwd.hpp>
+#    include <hpx/serialization/serialization_fwd.hpp>
+#    include <hpx/serialization/traits/brace_initializable_traits.hpp>
+#    include <hpx/serialization/tuple.hpp>
 
 namespace hpx { namespace serialization {
 

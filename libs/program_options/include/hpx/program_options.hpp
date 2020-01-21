@@ -10,7 +10,7 @@
 #define PROGRAM_OPTIONS_VP_2003_05_19
 
 #if defined(_MSC_VER)
-#pragma once
+#    pragma once
 #endif
 
 #include <hpx/program_options/config.hpp>

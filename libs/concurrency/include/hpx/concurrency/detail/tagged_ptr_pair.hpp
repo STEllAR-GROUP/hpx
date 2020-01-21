@@ -22,28 +22,28 @@
 #include <cstdint>
 
 #ifdef _MSC_VER
-#if defined(_M_IX86)
-#define HPX_LOCKFREE_DCAS_ALIGNMENT
-#elif defined(_M_X64) || defined(_M_IA64)
-#define HPX_LOCKFREE_DCAS_ALIGNMENT __declspec(align(16))
-#endif
+#    if defined(_M_IX86)
+#        define HPX_LOCKFREE_DCAS_ALIGNMENT
+#    elif defined(_M_X64) || defined(_M_IA64)
+#        define HPX_LOCKFREE_DCAS_ALIGNMENT __declspec(align(16))
+#    endif
 
 #endif /* _MSC_VER */
 
 #ifdef __GNUC__
-#if defined(__i386__) || defined(__ppc__)
-#define HPX_LOCKFREE_DCAS_ALIGNMENT
-#elif defined(__x86_64__)
-#define HPX_LOCKFREE_DCAS_ALIGNMENT __attribute__((aligned(16)))
-#elif defined(__alpha__)
+#    if defined(__i386__) || defined(__ppc__)
+#        define HPX_LOCKFREE_DCAS_ALIGNMENT
+#    elif defined(__x86_64__)
+#        define HPX_LOCKFREE_DCAS_ALIGNMENT __attribute__((aligned(16)))
+#    elif defined(__alpha__)
 // LATER: alpha may benefit from pointer compression.
 //  but what is the maximum size of the address space?
-#define HPX_LOCKFREE_DCAS_ALIGNMENT
-#endif
+#        define HPX_LOCKFREE_DCAS_ALIGNMENT
+#    endif
 #endif /* __GNUC__ */
 
 #if !defined(HPX_LOCKFREE_DCAS_ALIGNMENT)
-#define HPX_LOCKFREE_DCAS_ALIGNMENT
+#    define HPX_LOCKFREE_DCAS_ALIGNMENT
 #endif
 
 namespace boost { namespace lockfree {

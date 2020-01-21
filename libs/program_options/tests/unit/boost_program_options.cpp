@@ -9,9 +9,9 @@
 
 // We use boost::program_options here, so surpress the deprecation warning.
 #if defined(__clang__)
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#    pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#    pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 #include <hpx/hpx_init.hpp>

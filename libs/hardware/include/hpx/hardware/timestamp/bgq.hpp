@@ -14,9 +14,9 @@
 // Hardware cycle-accurate timer on BGQ.
 // see https://wiki.alcf.anl.gov/parts/index.php/Blue_Gene/Q#High-Resolution_Timers
 
-#include <hwi/include/bqc/A2_inlines.h>
+#    include <hwi/include/bqc/A2_inlines.h>
 
-#include <cstdint>
+#    include <cstdint>
 
 namespace hpx { namespace util { namespace hardware {
 

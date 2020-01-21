@@ -9,13 +9,13 @@
 #include <hpx/hardware/timestamp/bgq.hpp>
 
 #if defined(HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/hardware/timestamp/bgq.hpp is deprecated,             \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/hardware/timestamp/bgq.hpp is deprecated,  \
     please include hpx/hardware/timestamp/bgq.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/util/hardware/timestamp/bgq.hpp is deprecated,             \
+#    else
+#        warning                                                               \
+            "The header hpx/util/hardware/timestamp/bgq.hpp is deprecated,  \
     please include hpx/hardware/timestamp/bgq.hpp instead"
-#endif
+#    endif
 #endif

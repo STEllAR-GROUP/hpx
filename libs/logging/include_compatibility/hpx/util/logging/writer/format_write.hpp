@@ -9,12 +9,13 @@
 #include <hpx/logging/writer/format_write.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/logging/writer/format_write.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/logging/writer/format_write.hpp is deprecated, \
     please include hpx/logging/writer/format_write.hpp instead")
-#else
-#warning "The header hpx/util/logging/writer/format_write.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/util/logging/writer/format_write.hpp is deprecated, \
     please include hpx/logging/writer/format_write.hpp instead"
-#endif
+#    endif
 #endif

@@ -377,23 +377,23 @@ namespace hpx { namespace threads {
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
         std::int64_t avg_idle_rate(bool reset);
-#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+#    ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         std::int64_t avg_creation_idle_rate(bool reset);
         std::int64_t avg_cleanup_idle_rate(bool reset);
-#endif
+#    endif
 #endif
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
         std::int64_t get_executed_threads(bool reset);
         std::int64_t get_executed_thread_phases(bool reset);
-#ifdef HPX_HAVE_THREAD_IDLE_RATES
+#    ifdef HPX_HAVE_THREAD_IDLE_RATES
         std::int64_t get_thread_duration(bool reset);
         std::int64_t get_thread_phase_duration(bool reset);
         std::int64_t get_thread_overhead(bool reset);
         std::int64_t get_thread_phase_overhead(bool reset);
         std::int64_t get_cumulative_thread_duration(bool reset);
         std::int64_t get_cumulative_thread_overhead(bool reset);
-#endif
+#    endif
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS

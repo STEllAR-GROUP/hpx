@@ -9,11 +9,11 @@
 #include <hpx/collectives/fold.hpp>
 
 #if defined(HPX_COLLECTIVES_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/lcos/fold.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/lcos/fold.hpp is deprecated, \
     please include hpx/collectives/fold.hpp instead")
-#else
-#warning "The header hpx/lcos/fold.hpp is deprecated, \
+#    else
+#        warning "The header hpx/lcos/fold.hpp is deprecated, \
     please include hpx/collectives/fold.hpp instead"
-#endif
+#    endif
 #endif

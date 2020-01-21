@@ -11,10 +11,10 @@
 #include <hpx/config.hpp>
 
 #if !defined(__CUDA_ARCH__)
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#    include <hpx/serialization/serialize.hpp>
+#    include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #else
-#include <hpx/serialization/serialization_fwd.hpp>
+#    include <hpx/serialization/serialization_fwd.hpp>
 #endif
 
 #include <hpx/compute/vector.hpp>

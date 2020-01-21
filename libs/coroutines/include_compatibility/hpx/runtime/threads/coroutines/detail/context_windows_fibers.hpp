@@ -9,15 +9,15 @@
 #include <hpx/coroutines/detail/context_windows_fibers.hpp>
 
 #if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header \
+#    if defined(HPX_MSVC)
+#        pragma message("The header \
     hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp is \
     deprecated, \
     please include hpx/coroutines/detail/context_windows_fibers.hpp instead")
-#else
-#warning "The header \
+#    else
+#        warning "The header \
     hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp is \
     deprecated, \
     please include hpx/coroutines/detail/context_windows_fibers.hpp instead"
-#endif
+#    endif
 #endif

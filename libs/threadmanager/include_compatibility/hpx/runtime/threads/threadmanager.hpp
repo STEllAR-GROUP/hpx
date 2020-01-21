@@ -9,12 +9,13 @@
 #include <hpx/threadmanager.hpp>
 
 #if defined(HPX_THREAD_MANAGER_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/threads/threadmanager.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/threads/threadmanager.hpp is deprecated, \
     please include hpx/coroutines/threadmanager.hpp instead")
-#else
-#warning "The header hpx/runtime/threads/threadmanager.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/runtime/threads/threadmanager.hpp is deprecated, \
     please include hpx/coroutines/threadmanager.hpp instead"
-#endif
+#    endif
 #endif

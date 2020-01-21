@@ -18,9 +18,9 @@
 #define JT28092007_manipulator_HPP_DEFINED
 
 #if defined(HPX_MSVC_WARNING_PRAGMA) && (HPX_MSVC >= 1020)
-#pragma warning(push)
+#    pragma warning(push)
 // 'class1' : inherits 'class2::member' via dominance
-#pragma warning(disable : 4250)
+#    pragma warning(disable : 4250)
 #endif
 
 #include <hpx/logging/detail/fwd.hpp>
@@ -722,7 +722,7 @@ See:
 }}}    // namespace hpx::util::logging
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 #endif

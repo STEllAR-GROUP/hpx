@@ -13,13 +13,13 @@
 /// This macro is replaced with the compiler specific keyword attribute to mark
 /// a variable as thread local. For more details see
 /// `<https://en.cppreference.com/w/cpp/keyword/thread_local`__.
-#define HPX_NATIVE_TLS
+#    define HPX_NATIVE_TLS
 #else
 
 // don't #include ciso646 for MSVC as it contains '#define and &&' and similar
-#if !defined(_MSC_VER)
-#include <ciso646>
-#endif
+#    if !defined(_MSC_VER)
+#        include <ciso646>
+#    endif
 
 // clang-format off
 #if defined(__has_feature)

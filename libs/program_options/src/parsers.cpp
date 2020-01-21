@@ -7,27 +7,27 @@
 #include <hpx/program_options/config.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/program_options/detail/cmdline.hpp>
-#include <hpx/program_options/detail/config_file.hpp>
-#include <hpx/program_options/detail/convert.hpp>
-#include <hpx/program_options/environment_iterator.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/positional_options.hpp>
+#    include <hpx/program_options/detail/cmdline.hpp>
+#    include <hpx/program_options/detail/config_file.hpp>
+#    include <hpx/program_options/detail/convert.hpp>
+#    include <hpx/program_options/environment_iterator.hpp>
+#    include <hpx/program_options/options_description.hpp>
+#    include <hpx/program_options/parsers.hpp>
+#    include <hpx/program_options/positional_options.hpp>
 
-#include <algorithm>
-#include <cctype>
-#include <fstream>
-#include <functional>
-#include <iostream>
-#include <string>
-#include <utility>
+#    include <algorithm>
+#    include <cctype>
+#    include <fstream>
+#    include <functional>
+#    include <iostream>
+#    include <string>
+#    include <utility>
 
-#ifdef _WIN32
-#include <stdlib.h>
-#else
-#include <unistd.h>
-#endif
+#    ifdef _WIN32
+#        include <stdlib.h>
+#    else
+#        include <unistd.h>
+#    endif
 
 // The 'environ' should be declared in some cases. E.g. Linux man page says:
 // (This variable must be declared in the user program, but is declared in
@@ -39,23 +39,23 @@
 // available to dynamically linked libraries.
 // See: http://article.gmane.org/gmane.comp.lib.boost.devel/103843
 // See: http://lists.gnu.org/archive/html/bug-guile/2004-01/msg00013.html
-#if defined(__APPLE__) && defined(__DYNAMIC__)
+#    if defined(__APPLE__) && defined(__DYNAMIC__)
 // The proper include for this is crt_externs.h, however it's not
 // available on iOS. The right replacement is not known. See
 // https://svn.boost.org/trac/boost/ticket/5053
 extern "C" {
 extern char*** _NSGetEnviron(void);
 }
-#define environ (*_NSGetEnviron())
-#else
-#if defined(__MWERKS__)
-#include <crtl.h>
-#else
-#if !defined(_WIN32) || defined(__COMO_VERSION__)
+#        define environ (*_NSGetEnviron())
+#    else
+#        if defined(__MWERKS__)
+#            include <crtl.h>
+#        else
+#            if !defined(_WIN32) || defined(__COMO_VERSION__)
 extern char** environ;
-#endif
-#endif
-#endif
+#            endif
+#        endif
+#    endif
 
 using namespace std;
 

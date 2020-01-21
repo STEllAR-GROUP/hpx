@@ -8,31 +8,31 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/assertion.hpp>
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime/find_here.hpp>
-#include <hpx/runtime/naming/id_type_impl.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime_fwd.hpp>
+#    include <hpx/assertion.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/errors.hpp>
+#    include <hpx/memory/intrusive_ptr.hpp>
+#    include <hpx/runtime/find_here.hpp>
+#    include <hpx/runtime/naming/id_type_impl.hpp>
+#    include <hpx/runtime/threads/thread_helpers.hpp>
+#    include <hpx/runtime_fwd.hpp>
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#if defined(HPX_HAVE_MORE_THAN_64_THREADS)
-#if defined(HPX_HAVE_MAX_CPU_COUNT)
-#include <hpx/serialization/bitset.hpp>
-#else
-#include <hpx/serialization/dynamic_bitset.hpp>
-#endif
-#endif
-#include <hpx/serialization/serialize.hpp>
-#endif
+#    if !defined(HPX_COMPUTE_DEVICE_CODE)
+#        if defined(HPX_HAVE_MORE_THAN_64_THREADS)
+#            if defined(HPX_HAVE_MAX_CPU_COUNT)
+#                include <hpx/serialization/bitset.hpp>
+#            else
+#                include <hpx/serialization/dynamic_bitset.hpp>
+#            endif
+#        endif
+#        include <hpx/serialization/serialize.hpp>
+#    endif
 
-#include <cstddef>
-#include <string>
-#include <utility>
+#    include <cstddef>
+#    include <string>
+#    include <utility>
 
-#include <cuda_runtime.h>
+#    include <cuda_runtime.h>
 
 namespace hpx { namespace compute { namespace cuda {
     namespace detail {
@@ -320,7 +320,7 @@ namespace hpx { namespace compute { namespace cuda {
         return target_;
     }
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#    if !defined(HPX_COMPUTE_DEVICE_CODE)
     ///////////////////////////////////////////////////////////////////////////
     void target::serialize(
         serialization::input_archive& ar, const unsigned int version)
@@ -333,7 +333,7 @@ namespace hpx { namespace compute { namespace cuda {
     {
         ar << handle_.device_ << locality_;
     }
-#endif
+#    endif
 }}}    // namespace hpx::compute::cuda
 
 #endif

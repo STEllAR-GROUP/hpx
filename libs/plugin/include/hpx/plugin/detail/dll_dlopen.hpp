@@ -23,17 +23,17 @@
 #include <utility>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
-#include <link.h>
+#    include <link.h>
 #endif
 #if defined(__APPLE__)
-#include <mach-o/dyld.h>
+#    include <mach-o/dyld.h>
 #endif
 #include <dlfcn.h>
 #include <limits.h>
 
 #if !defined(HPX_HAS_DLOPEN)
-#error                                                                         \
-    "This file shouldn't be included directly, use the file hpx/plugin/dll.hpp only."
+#    error                                                                     \
+        "This file shouldn't be included directly, use the file hpx/plugin/dll.hpp only."
 #endif
 
 #if !defined(_WIN32)
@@ -44,10 +44,10 @@ using HMODULE = struct HINSTANCE__*;
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(RTLD_LOCAL)
-#define RTLD_LOCAL 0    // some systems do not have RTLD_LOCAL
+#    define RTLD_LOCAL 0    // some systems do not have RTLD_LOCAL
 #endif
 #if !defined(RTLD_DEEPBIND)
-#define RTLD_DEEPBIND 0    // some systems do not have RTLD_DEEPBIND
+#    define RTLD_DEEPBIND 0    // some systems do not have RTLD_DEEPBIND
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -9,11 +9,11 @@
 #include <hpx/type_support/detected.hpp>
 
 #if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/detected.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/detected.hpp is deprecated, \
     please include hpx/type_support/detected.hpp instead")
-#else
-#warning "The header hpx/util/detected.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/detected.hpp is deprecated, \
     please include hpx/type_support/detected.hpp instead"
-#endif
+#    endif
 #endif

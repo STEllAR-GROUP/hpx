@@ -20,8 +20,8 @@
 #include <utility>
 
 #if defined(HPX_WINDOWS)
-#include <excpt.h>
-#undef exception_info
+#    include <excpt.h>
+#    undef exception_info
 #endif
 
 namespace hpx {

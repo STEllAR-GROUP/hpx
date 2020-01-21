@@ -7,16 +7,16 @@
 #include <hpx/program_options/config.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/program_options/detail/convert.hpp>
-#include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
+#    include <hpx/program_options/detail/convert.hpp>
+#    include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
-#include <fstream>
-#include <functional>
-#include <iostream>
-#include <locale.h>
-#include <locale>
-#include <stdexcept>
-#include <string>
+#    include <fstream>
+#    include <functional>
+#    include <iostream>
+#    include <locale.h>
+#    include <locale>
+#    include <stdexcept>
+#    include <string>
 
 namespace hpx { namespace program_options { namespace detail {
 

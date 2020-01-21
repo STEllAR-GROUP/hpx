@@ -9,11 +9,13 @@
 #include <hpx/logging/format/array.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/logging/format/array.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/logging/format/array.hpp is deprecated, \
     please include hpx/logging/format/array.hpp instead")
-#else
-#warning "The header hpx/util/logging/format/array.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/util/logging/format/array.hpp is deprecated, \
     please include hpx/logging/format/array.hpp instead"
-#endif
+#    endif
 #endif

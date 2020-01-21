@@ -14,11 +14,11 @@
 #include <hpx/topology/topology.hpp>
 
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS)
-#if defined(HPX_HAVE_MAX_CPU_COUNT)
-#include <hpx/serialization/bitset.hpp>
-#else
-#include <hpx/serialization/dynamic_bitset.hpp>
-#endif
+#    if defined(HPX_HAVE_MAX_CPU_COUNT)
+#        include <hpx/serialization/bitset.hpp>
+#    else
+#        include <hpx/serialization/dynamic_bitset.hpp>
+#    endif
 #endif
 
 #include <cstddef>

@@ -9,12 +9,13 @@
 #include <hpx/serialization/tuple.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/serialization/tuple.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/serialization/tuple.hpp is deprecated, \
     please include hpx/serialization/tuple.hpp instead")
-#else
-#warning "The header hpx/runtime/serialization/tuple.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/runtime/serialization/tuple.hpp is deprecated, \
     please include hpx/serialization/tuple.hpp instead"
-#endif
+#    endif
 #endif

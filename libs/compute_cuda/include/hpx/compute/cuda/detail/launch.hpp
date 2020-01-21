@@ -13,20 +13,20 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/compute/cuda/detail/scoped_active_target.hpp>
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unused.hpp>
+#    include <hpx/compute/cuda/detail/scoped_active_target.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/functional/invoke_fused.hpp>
+#    include <hpx/type_support/decay.hpp>
+#    include <hpx/type_support/unused.hpp>
 
-#include <cuda_runtime.h>
+#    include <cuda_runtime.h>
 
-#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 350
-#include <cstring>
-#endif
-#include <string>
-#include <type_traits>
-#include <utility>
+#    if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 350
+#        include <cstring>
+#    endif
+#    include <string>
+#    include <type_traits>
+#    include <utility>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail {
     template <typename Closure>
@@ -97,7 +97,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
             static_assert(sizeof(Closure) < 256,
                 "We currently require the closure to be less than 256 bytes");
 
-#if defined(HPX_COMPUTE_HOST_CODE)
+#    if defined(HPX_COMPUTE_HOST_CODE)
             detail::scoped_active_target active(tgt);
 
             launch_function<<<gridDim, blockDim, 0, active.stream()>>>(
@@ -110,7 +110,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
                     std::string("kernel launch failed: ") +
                         cudaGetErrorString(error));
             }
-#elif __CUDA_ARCH__ >= 350
+#    elif __CUDA_ARCH__ >= 350
             void* param_buffer = cudaGetParameterBuffer(
                 std::alignment_of<Closure>::value, sizeof(Closure));
             std::memcpy(param_buffer, &c, sizeof(Closure));
@@ -120,7 +120,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
             cudaLaunchDevice(reinterpret_cast<void*>(launcher), param_buffer,
                 dim3(gridDim), dim3(blockDim), 0,
                 tgt.native_handle().get_stream());
-#endif
+#    endif
         }
     };
 

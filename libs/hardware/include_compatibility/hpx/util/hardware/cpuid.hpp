@@ -9,13 +9,13 @@
 #include <hpx/hardware/cpuid.hpp>
 
 #if defined(HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/hardware/cpuid.hpp is deprecated,                     \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/hardware/cpuid.hpp is deprecated,             \
     please include hpx/hardware/cpuid.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/util/hardware/cpuid.hpp is deprecated,                     \
+#    else
+#        warning                                                               \
+            "The header hpx/util/hardware/cpuid.hpp is deprecated,          \
     please include hpx/hardware/cpuid.hpp instead"
-#endif
+#    endif
 #endif

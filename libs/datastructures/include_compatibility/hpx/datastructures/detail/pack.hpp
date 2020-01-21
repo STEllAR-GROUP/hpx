@@ -9,14 +9,15 @@
 #include <hpx/type_support/pack.hpp>
 
 #if defined(HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/datastructures/detail/pack.hpp is deprecated, \
-    please include hpx/type_support/pack.hpp instead")
-#else
-#warning "The header hpx/datastructures/detail/pack.hpp is deprecated, \
-    please include hpx/type_support/pack.hpp instead"
-#endif
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/datastructures/detail/pack.hpp is deprecated, \
+            please include hpx/type_support/pack.hpp instead")
+#    else
+#        warning                                                               \
+            "The header hpx/datastructures/detail/pack.hpp is deprecated, \
+            please include hpx/type_support/pack.hpp instead"
+#    endif
 #endif
 
 namespace hpx { namespace util { namespace detail {

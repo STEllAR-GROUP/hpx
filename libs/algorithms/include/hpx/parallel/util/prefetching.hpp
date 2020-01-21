@@ -23,12 +23,12 @@
 #include <vector>
 
 #if defined(HPX_HAVE_MM_PREFETCH)
-#if defined(HPX_MSVC)
-#include <intrin.h>
-#endif
-#if defined(HPX_GCC_VERSION)
-#include <emmintrin.h>
-#endif
+#    if defined(HPX_MSVC)
+#        include <intrin.h>
+#    endif
+#    if defined(HPX_GCC_VERSION)
+#        include <emmintrin.h>
+#    endif
 #endif
 
 namespace hpx { namespace parallel { namespace util {

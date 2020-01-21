@@ -24,15 +24,15 @@
 #include <utility>
 
 #if defined(HPX_WINDOWS)
-#include <windows.h>
+#    include <windows.h>
 #else
-#ifndef _AIX
-#include <sched.h>
-#else
+#    ifndef _AIX
+#        include <sched.h>
+#    else
 // AIX's sched.h defines ::var which sometimes conflicts with Lambda's var
 extern "C" int sched_yield(void);
-#endif
-#include <time.h>
+#    endif
+#    include <time.h>
 #endif
 
 namespace hpx { namespace basic_execution {
@@ -95,11 +95,11 @@ namespace hpx { namespace basic_execution {
 #if defined(HPX_SMT_PAUSE)
             HPX_SMT_PAUSE;
 #else
-#if defined(HPX_WINDOWS)
+#    if defined(HPX_WINDOWS)
             Sleep(0);
-#else
+#    else
             sched_yield();
-#endif
+#    endif
 #endif
         }
 

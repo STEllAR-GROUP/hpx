@@ -9,12 +9,13 @@
 #include <hpx/execution/execution_policy_fwd.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/parallel/execution_policy_fwd.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/parallel/execution_policy_fwd.hpp is deprecated, \
     please include hpx/execution/execution_policy_fwd.hpp instead")
-#else
-#warning "The header hpx/parallel/execution_policy_fwd.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/parallel/execution_policy_fwd.hpp is deprecated, \
     please include hpx/execution/execution_policy_fwd.hpp instead"
-#endif
+#    endif
 #endif

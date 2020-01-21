@@ -18,7 +18,7 @@
 #include <hpx/preprocessor/stringize.hpp>
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-#include <assert.h>
+#    include <assert.h>
 #endif
 #include <string>
 #include <type_traits>
@@ -50,32 +50,32 @@ namespace hpx { namespace assertion {
 ///
 /// Asserts are enabled if \a HPX_DEBUG is set. This is the default for
 /// `CMAKE_BUILD_TYPE=Debug`
-#define HPX_ASSERT(expr)
+#    define HPX_ASSERT(expr)
 
 /// \see HPX_ASSERT
-#define HPX_ASSERT_MSG(expr, msg)
+#    define HPX_ASSERT_MSG(expr, msg)
 #else
 /// \cond NOINTERNAL
-#define HPX_ASSERT_(expr, msg)                                                 \
-    (!!(expr) ? void() :                                                       \
-                ::hpx::assertion::detail::handle_assert(                       \
-                    ::hpx::assertion::source_location{__FILE__,                \
-                        static_cast<unsigned>(__LINE__),                       \
-                        HPX_ASSERT_CURRENT_FUNCTION},                          \
-                    HPX_PP_STRINGIZE(expr), msg)) /**/
+#    define HPX_ASSERT_(expr, msg)                                             \
+        (!!(expr) ? void() :                                                   \
+                    ::hpx::assertion::detail::handle_assert(                   \
+                        ::hpx::assertion::source_location{__FILE__,            \
+                            static_cast<unsigned>(__LINE__),                   \
+                            HPX_ASSERT_CURRENT_FUNCTION},                      \
+                        HPX_PP_STRINGIZE(expr), msg)) /**/
 
-#if defined(HPX_DEBUG)
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-#define HPX_ASSERT(expr) assert(expr)
-#define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT(expr)
-#else
-#define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())
-#define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT_(expr, msg)
-#endif
-#define HPX_NOEXCEPT_WITH_ASSERT
-#else
-#define HPX_ASSERT(expr)
-#define HPX_ASSERT_MSG(expr, msg)
-#define HPX_NOEXCEPT_WITH_ASSERT noexcept
-#endif
+#    if defined(HPX_DEBUG)
+#        if defined(HPX_COMPUTE_DEVICE_CODE)
+#            define HPX_ASSERT(expr) assert(expr)
+#            define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT(expr)
+#        else
+#            define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())
+#            define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT_(expr, msg)
+#        endif
+#        define HPX_NOEXCEPT_WITH_ASSERT
+#    else
+#        define HPX_ASSERT(expr)
+#        define HPX_ASSERT_MSG(expr, msg)
+#        define HPX_NOEXCEPT_WITH_ASSERT noexcept
+#    endif
 #endif

@@ -12,7 +12,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/detail/parsers.hpp
 
-#include <boost/program_options/detail/parsers.hpp>
+#    include <boost/program_options/detail/parsers.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -23,15 +23,15 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <hpx/program_options/detail/convert.hpp>
-#include <hpx/program_options/parsers.hpp>
+#    include <hpx/program_options/detail/convert.hpp>
+#    include <hpx/program_options/parsers.hpp>
 
-#include <algorithm>
-#include <cstddef>
-#include <iterator>
-#include <string>
-#include <utility>
-#include <vector>
+#    include <algorithm>
+#    include <cstddef>
+#    include <iterator>
+#    include <string>
+#    include <utility>
+#    include <vector>
 
 namespace hpx { namespace program_options {
 

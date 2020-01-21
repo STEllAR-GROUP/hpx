@@ -9,11 +9,12 @@
 #include <hpx/logging/logging.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/logging/logging.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/logging/logging.hpp is deprecated, \
     please include hpx/logging/logging.hpp instead")
-#else
-#warning "The header hpx/util/logging/logging.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/logging/logging.hpp is deprecated, \
     please include hpx/logging/logging.hpp instead"
-#endif
+#    endif
 #endif

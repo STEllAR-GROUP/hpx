@@ -9,12 +9,13 @@
 #include <hpx/static_reinit/reinitializable_static.hpp>
 
 #if defined(HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/reinitializable_static.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/reinitializable_static.hpp is deprecated, \
     please include hpx/static_reinit/reinitializable_static.hpp instead")
-#else
-#warning "The header hpx/util/reinitializable_static.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/util/reinitializable_static.hpp is deprecated, \
     please include hpx/static_reinit/reinitializable_static.hpp instead"
-#endif
+#    endif
 #endif

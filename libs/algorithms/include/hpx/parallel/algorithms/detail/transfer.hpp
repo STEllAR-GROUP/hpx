@@ -9,7 +9,7 @@
 
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/traits/segmented_iterator_traits.hpp>
+#    include <hpx/traits/segmented_iterator_traits.hpp>
 #endif
 #include <hpx/util/tagged_pair.hpp>
 

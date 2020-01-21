@@ -15,17 +15,17 @@
 // hpx::util::function_nonser<double()> in test_emptiness. Triggered in
 // hpx/functional/function.hpp which is included latest by hpx/include/util.hpp.
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdouble-promotion"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wdouble-promotion"
 #elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdouble-promotion"
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wdouble-promotion"
 #endif
 #include <hpx/functional/function.hpp>
 #if defined(__clang__)
-#pragma clang diagnostic pop
+#    pragma clang diagnostic pop
 #elif defined(__GNUC__)
-#pragma GCC diagnostic pop
+#    pragma GCC diagnostic pop
 #endif
 
 #include <hpx/testing.hpp>
@@ -155,12 +155,12 @@ static void test_zero_args()
     global_int = 0;
 
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
     v1 = v1;
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic pop
+#    pragma clang diagnostic pop
 #endif
 
     v1();
@@ -173,12 +173,12 @@ static void test_zero_args()
     global_int = 0;
 
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
     v1 = (v1);
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic pop
+#    pragma clang diagnostic pop
 #endif
 
     v1();

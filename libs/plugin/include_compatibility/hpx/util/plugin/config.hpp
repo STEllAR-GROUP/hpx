@@ -9,11 +9,12 @@
 #include <hpx/plugin/config/defines.hpp>
 
 #if defined(HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/plugin/config.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/plugin/config.hpp is deprecated, \
     please include hpx/plugin/config.hpp instead")
-#else
-#warning "The header hpx/util/plugin/config.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/plugin/config.hpp is deprecated, \
     please include hpx/plugin/config.hpp instead"
-#endif
+#    endif
 #endif

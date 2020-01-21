@@ -24,8 +24,8 @@
 #include <windows.h>
 
 #if !defined(HPX_MSVC) && !defined(HPX_MINGW)
-#error                                                                         \
-    "This file shouldn't be included directly, use the file hpx/plugin/dll.hpp only."
+#    error                                                                     \
+        "This file shouldn't be included directly, use the file hpx/plugin/dll.hpp only."
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

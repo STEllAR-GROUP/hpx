@@ -129,37 +129,37 @@ namespace hpx { namespace lcos {
 // clang-format on
 #else
 
-#include <hpx/config.hpp>
+#    include <hpx/config.hpp>
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#    if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/assertion.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/dataflow.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/local_lcos/and_gate.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/components/new.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/runtime/get_num_localities.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unused.hpp>
+#        include <hpx/assertion.hpp>
+#        include <hpx/basic_execution/register_locks.hpp>
+#        include <hpx/dataflow.hpp>
+#        include <hpx/functional/bind_back.hpp>
+#        include <hpx/functional/bind_front.hpp>
+#        include <hpx/lcos/future.hpp>
+#        include <hpx/local_lcos/and_gate.hpp>
+#        include <hpx/synchronization/spinlock.hpp>
+#        include <hpx/preprocessor/cat.hpp>
+#        include <hpx/preprocessor/expand.hpp>
+#        include <hpx/preprocessor/nargs.hpp>
+#        include <hpx/runtime/basename_registration.hpp>
+#        include <hpx/runtime/components/new.hpp>
+#        include <hpx/runtime/components/server/component_base.hpp>
+#        include <hpx/runtime/get_num_localities.hpp>
+#        include <hpx/runtime/launch_policy.hpp>
+#        include <hpx/runtime/naming/id_type.hpp>
+#        include <hpx/runtime/naming/unmanaged.hpp>
+#        include <hpx/type_support/decay.hpp>
+#        include <hpx/type_support/unused.hpp>
 
-#include <cstddef>
-#include <mutex>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#        include <cstddef>
+#        include <mutex>
+#        include <string>
+#        include <type_traits>
+#        include <utility>
+#        include <vector>
 
 namespace hpx { namespace lcos {
 
@@ -435,49 +435,50 @@ namespace hpx {
 }    // namespace hpx
 
 ////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ALLTOALL_DECLARATION(...)                                 \
-    HPX_REGISTER_ALLTOALL_DECLARATION_(__VA_ARGS__)                            \
-    /**/
+#        define HPX_REGISTER_ALLTOALL_DECLARATION(...)                         \
+            HPX_REGISTER_ALLTOALL_DECLARATION_(__VA_ARGS__)                    \
+            /**/
 
-#define HPX_REGISTER_ALLTOALL_DECLARATION_(...)                                \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_ALLTOALL_DECLARATION_,               \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
+#        define HPX_REGISTER_ALLTOALL_DECLARATION_(...)                        \
+            HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_ALLTOALL_DECLARATION_,       \
+                HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                       \
+            /**/
 
-#define HPX_REGISTER_ALLTOALL_DECLARATION_1(type)                              \
-    HPX_REGISTER_ALLTOALL_DECLARATION_2(type, HPX_PP_CAT(type, _all_to_all))   \
-    /**/
+#        define HPX_REGISTER_ALLTOALL_DECLARATION_1(type)                      \
+            HPX_REGISTER_ALLTOALL_DECLARATION_2(                               \
+                type, HPX_PP_CAT(type, _all_to_all))                           \
+            /**/
 
-#define HPX_REGISTER_ALLTOALL_DECLARATION_2(type, name)                        \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        hpx::lcos::detail::all_to_all_server<type>::get_result_action,         \
-        HPX_PP_CAT(gather_get_result_action_, name));                          \
-    /**/
+#        define HPX_REGISTER_ALLTOALL_DECLARATION_2(type, name)                \
+            HPX_REGISTER_ACTION_DECLARATION(                                   \
+                hpx::lcos::detail::all_to_all_server<type>::get_result_action, \
+                HPX_PP_CAT(gather_get_result_action_, name));                  \
+            /**/
 
 ////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ALLTOALL(...)                                             \
-    HPX_REGISTER_ALLTOALL_(__VA_ARGS__)                                        \
-    /**/
+#        define HPX_REGISTER_ALLTOALL(...)                                     \
+            HPX_REGISTER_ALLTOALL_(__VA_ARGS__)                                \
+            /**/
 
-#define HPX_REGISTER_ALLTOALL_(...)                                            \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_ALLTOALL_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))       \
-    /**/
+#        define HPX_REGISTER_ALLTOALL_(...)                                    \
+            HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_ALLTOALL_,                   \
+                HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                       \
+            /**/
 
-#define HPX_REGISTER_ALLTOALL_1(type)                                          \
-    HPX_REGISTER_ALLTOALL_2(type, HPX_PP_CAT(type, _all_to_all))               \
-    /**/
+#        define HPX_REGISTER_ALLTOALL_1(type)                                  \
+            HPX_REGISTER_ALLTOALL_2(type, HPX_PP_CAT(type, _all_to_all))       \
+            /**/
 
-#define HPX_REGISTER_ALLTOALL_2(type, name)                                    \
-    HPX_REGISTER_ACTION(                                                       \
-        hpx::lcos::detail::all_to_all_server<type>::get_result_action,         \
-        HPX_PP_CAT(gather_get_result_action_, name));                          \
-    typedef hpx::components::component<                                        \
-        hpx::lcos::detail::all_to_all_server<type>>                            \
-        HPX_PP_CAT(all_to_all_, name);                                         \
-    HPX_REGISTER_COMPONENT(HPX_PP_CAT(all_to_all_, name))                      \
-    /**/
+#        define HPX_REGISTER_ALLTOALL_2(type, name)                            \
+            HPX_REGISTER_ACTION(                                               \
+                hpx::lcos::detail::all_to_all_server<type>::get_result_action, \
+                HPX_PP_CAT(gather_get_result_action_, name));                  \
+            typedef hpx::components::component<                                \
+                hpx::lcos::detail::all_to_all_server<type>>                    \
+                HPX_PP_CAT(all_to_all_, name);                                 \
+            HPX_REGISTER_COMPONENT(HPX_PP_CAT(all_to_all_, name))              \
+            /**/
 
-#endif    // COMPUTE_HOST_CODE
-#endif    // DOXYGEN
+#    endif    // COMPUTE_HOST_CODE
+#endif        // DOXYGEN
 #endif

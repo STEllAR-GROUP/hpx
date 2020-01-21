@@ -13,9 +13,9 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/options_description.hpp
 
-#include <boost/program_options/options_description.hpp>
+#    include <boost/program_options/options_description.hpp>
 
-#include <utility>
+#    include <utility>
 
 namespace hpx { namespace program_options {
 
@@ -58,20 +58,20 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <hpx/program_options/errors.hpp>
-#include <hpx/program_options/value_semantic.hpp>
+#    include <hpx/program_options/errors.hpp>
+#    include <hpx/program_options/value_semantic.hpp>
 
-#include <cstddef>
-#include <iosfwd>
-#include <map>
-#include <memory>
-#include <set>
-#include <stdexcept>
-#include <string>
-#include <utility>
-#include <vector>
+#    include <cstddef>
+#    include <iosfwd>
+#    include <map>
+#    include <memory>
+#    include <set>
+#    include <stdexcept>
+#    include <string>
+#    include <utility>
+#    include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#    include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -288,10 +288,10 @@ namespace hpx { namespace program_options {
         void print(std::ostream& os, std::size_t width = 0) const;
 
     private:
-#if defined(HPX_MSVC) && HPX_MSVC >= 1800
+#    if defined(HPX_MSVC) && HPX_MSVC >= 1800
         // prevent warning C4512: assignment operator could not be generated
         options_description& operator=(const options_description&);
-#endif
+#    endif
 
         using name2index_iterator = std::map<std::string, int>::const_iterator;
         using approximation_range =
@@ -328,7 +328,7 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#    include <hpx/config/warnings_suffix.hpp>
 
 #endif
 #endif

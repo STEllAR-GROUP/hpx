@@ -9,13 +9,14 @@
 #include <hpx/serialization/dynamic_bitset.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/serialization/dynamic_bitset.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/serialization/dynamic_bitset.hpp is \
+            deprecated, \
     please include hpx/serialization/dynamic_bitset.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/runtime/serialization/dynamic_bitset.hpp is deprecated, \
+#    else
+#        warning "The header hpx/runtime/serialization/dynamic_bitset.hpp is \
+            deprecated, \
     please include hpx/serialization/dynamic_bitset.hpp instead"
-#endif
+#    endif
 #endif

@@ -12,7 +12,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/value_semantic.hpp
 
-#include <boost/program_options/value_semantic.hpp>
+#    include <boost/program_options/value_semantic.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -48,15 +48,15 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <hpx/datastructures/any.hpp>
-#include <hpx/program_options/errors.hpp>
-#include <hpx/util/to_string.hpp>
+#    include <hpx/datastructures/any.hpp>
+#    include <hpx/program_options/errors.hpp>
+#    include <hpx/util/to_string.hpp>
 
-#include <functional>
-#include <limits>
-#include <string>
-#include <typeinfo>
-#include <vector>
+#    include <functional>
+#    include <limits>
+#    include <string>
+#    include <typeinfo>
+#    include <vector>
 
 namespace hpx { namespace program_options {
 
@@ -475,7 +475,7 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/program_options/detail/value_semantic.hpp>
+#    include <hpx/program_options/detail/value_semantic.hpp>
 
 #endif
 #endif

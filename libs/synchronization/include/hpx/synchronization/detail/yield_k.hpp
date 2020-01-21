@@ -16,7 +16,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#include <hpx/errors/throw_exception.hpp>
+#    include <hpx/errors/throw_exception.hpp>
 #endif
 
 #include <hpx/basic_execution/this_thread.hpp>

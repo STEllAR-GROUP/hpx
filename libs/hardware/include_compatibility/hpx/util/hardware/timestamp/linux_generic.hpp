@@ -9,13 +9,15 @@
 #include <hpx/hardware/timestamp/linux_generic.hpp>
 
 #if defined(HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/hardware/timestamp/linux_generic.hpp is deprecated,   \
-    please include hpx/hardware/timestamp/linux_generic.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/util/hardware/timestamp/linux_generic.hpp is deprecated,   \
-    please include hpx/hardware/timestamp/linux_generic.hpp instead"
-#endif
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/hardware/timestamp/linux_generic.hpp is \
+            deprecated,   \
+            please include hpx/hardware/timestamp/linux_generic.hpp instead")
+#    else
+#        warning                                                               \
+            "The header hpx/util/hardware/timestamp/linux_generic.hpp is \
+            deprecated,   \
+            please include hpx/hardware/timestamp/linux_generic.hpp instead"
+#    endif
 #endif

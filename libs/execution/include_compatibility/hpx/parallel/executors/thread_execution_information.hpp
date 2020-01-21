@@ -9,15 +9,15 @@
 #include <hpx/execution/executors/thread_execution_information.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/parallel/executors/thread_execution_information.hpp is \
-    deprecated, please include \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/parallel/executors/thread_execution_information.hpp\
+            is deprecated, please include \
     hpx/execution/executors/thread_execution_information.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/parallel/executors/thread_execution_information.hpp is \
-    deprecated, please include \
+#    else
+#        warning                                                               \
+            "The header hpx/parallel/executors/thread_execution_information.hpp\
+    is deprecated, please include \
     hpx/execution/executors/thread_execution_information.hpp instead"
-#endif
+#    endif
 #endif

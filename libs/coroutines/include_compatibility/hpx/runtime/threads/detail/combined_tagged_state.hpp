@@ -9,13 +9,15 @@
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 
 #if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/threads/detail/combined_tagged_state.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/threads/detail/combined_tagged_state.hpp is\
+            deprecated, \
     please include hpx/coroutines/detail/combined_tagged_state.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/runtime/threads/detail/combined_tagged_state.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/runtime/threads/detail/combined_tagged_state.hpp is\
+            deprecated, \
     please include hpx/coroutines/detail/combined_tagged_state.hpp instead"
-#endif
+#    endif
 #endif

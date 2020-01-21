@@ -8,9 +8,9 @@
 #define HPX_CONFIG_WEAK_SYMBOL_HPP
 
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(_MSC_VER)
-#define HPX_WEAK_SYMBOL __attribute__((weak))
+#    define HPX_WEAK_SYMBOL __attribute__((weak))
 #else
-#define HPX_WEAK_SYMBOL
+#    define HPX_WEAK_SYMBOL
 #endif
 
 #endif

@@ -12,7 +12,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/detail/convert.hpp
 
-#include <boost/program_options/detail/convert.hpp>
+#    include <boost/program_options/detail/convert.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -28,12 +28,12 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <cstddef>
-#include <cwchar>
-#include <locale>
-#include <stdexcept>
-#include <string>
-#include <vector>
+#    include <cstddef>
+#    include <cwchar>
+#    include <locale>
+#    include <stdexcept>
+#    include <string>
+#    include <vector>
 
 namespace hpx { namespace program_options {
 

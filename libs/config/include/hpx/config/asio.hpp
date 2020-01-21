@@ -8,7 +8,7 @@
 #define HPX_CONFIG_ASIO_HPP
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-#include <winsock2.h>
+#    include <winsock2.h>
 #endif
 
 #endif

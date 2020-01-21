@@ -13,16 +13,19 @@
 
 #if defined(HPX_MSVC)
 
-#pragma warning(disable : 4786)    // identifier truncated in debug info
-#pragma warning(disable : 4710)    // function not inlined
-#pragma warning(                                                               \
-    disable : 4711)    // function selected for automatic inline expansion
-#pragma warning(disable : 4514)    // unreferenced inline removed
-#pragma warning(                                                               \
-    disable : 4355)    // 'this' : used in base member initializer list
-#pragma warning(disable : 4511)    // copy constructor could not be generated
-#pragma warning(disable : 4512)    // assignment operator could not be generated
-#pragma warning(disable : 4675)    // resolved overload found with Koenig lookup
+#    pragma warning(disable : 4786)    // identifier truncated in debug info
+#    pragma warning(disable : 4710)    // function not inlined
+#    pragma warning(                                                           \
+        disable : 4711)    // function selected for automatic inline expansion
+#    pragma warning(disable : 4514)    // unreferenced inline removed
+#    pragma warning(                                                           \
+        disable : 4355)    // 'this' : used in base member initializer list
+#    pragma warning(                                                           \
+        disable : 4511)    // copy constructor could not be generated
+#    pragma warning(                                                           \
+        disable : 4512)    // assignment operator could not be generated
+#    pragma warning(                                                           \
+        disable : 4675)    // resolved overload found with Koenig lookup
 
 #endif
 
@@ -262,12 +265,12 @@ namespace n_assignment {
             hpx::intrusive_ptr<X> p1;
 
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
             p1 = p1;
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic pop
+#    pragma clang diagnostic pop
 #endif
 
             HPX_TEST(p1 == p1);

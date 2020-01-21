@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-#include <windows.h>
+#    include <windows.h>
 
 namespace hpx { namespace util {
     void set_thread_name(char const* threadName, DWORD dwThreadID = DWORD(-1));

@@ -12,10 +12,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/traits/access_target.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/compute/traits/access_target.hpp>
 
-#include <cuda_runtime.h>
+#    include <cuda_runtime.h>
 
 namespace hpx { namespace compute { namespace traits {
     template <>
@@ -26,27 +26,27 @@ namespace hpx { namespace compute { namespace traits {
         template <typename T>
         HPX_HOST_DEVICE static T read(cuda::target const& tgt, T const* t)
         {
-#if defined(__CUDA_ARCH__)
+#    if defined(__CUDA_ARCH__)
             return *t;
-#else
+#    else
             T tmp;
             cudaMemcpyAsync(&tmp, t, sizeof(T), cudaMemcpyDeviceToHost,
                 tgt.native_handle().get_stream());
             tgt.synchronize();
             return tmp;
-#endif
+#    endif
         }
 
         template <typename T>
         HPX_HOST_DEVICE static void write(
             cuda::target const& tgt, T* dst, T const* src)
         {
-#if defined(__CUDA_ARCH__)
+#    if defined(__CUDA_ARCH__)
             *dst = *src;
-#else
+#    else
             cudaMemcpyAsync(dst, src, sizeof(T), cudaMemcpyHostToDevice,
                 tgt.native_handle().get_stream());
-#endif
+#    endif
         }
     };
 }}}    // namespace hpx::compute::traits

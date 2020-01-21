@@ -9,15 +9,15 @@
 #include <hpx/logging/format/destination/convert_destination.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/logging/format/destination/convert_destination.hpp is \
+#    if defined(HPX_MSVC)
+#        pragma message("The header \
+            hpx/util/logging/format/destination/convert_destination.hpp is \
     deprecated, please include \
     hpx/logging/format/destination/convert_destination.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/util/logging/format/destination/convert_destination.hpp is \
+#    else
+#        warning "The header \
+            hpx/util/logging/format/destination/convert_destination.hpp is \
     deprecated, please include \
     hpx/logging/format/destination/convert_destination.hpp instead"
-#endif
+#    endif
 #endif

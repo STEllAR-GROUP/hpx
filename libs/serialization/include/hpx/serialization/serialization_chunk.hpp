@@ -16,7 +16,7 @@
 #include <cstring>
 
 #if CHAR_BIT != 8
-#error This code assumes an eight-bit byte.
+#    error This code assumes an eight-bit byte.
 #endif
 
 namespace hpx { namespace serialization {

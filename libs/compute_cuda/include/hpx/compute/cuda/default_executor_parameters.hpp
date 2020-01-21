@@ -11,10 +11,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/execution/traits/is_executor_parameters.hpp>
+#    include <hpx/execution/traits/is_executor_parameters.hpp>
 
-#include <cstddef>
-#include <type_traits>
+#    include <cstddef>
+#    include <type_traits>
 
 namespace hpx { namespace compute { namespace cuda {
     struct default_executor_parameters

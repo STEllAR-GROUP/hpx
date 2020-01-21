@@ -13,24 +13,24 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/assertion.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/lcos/dataflow.hpp>
-#endif
-#include <hpx/lcos/future.hpp>
-#include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/traits/is_distribution_policy.hpp>
+#    include <hpx/assertion.hpp>
+#    if !defined(HPX_COMPUTE_DEVICE_CODE)
+#        include <hpx/lcos/dataflow.hpp>
+#    endif
+#    include <hpx/lcos/future.hpp>
+#    include <hpx/runtime/components/stubs/stub_base.hpp>
+#    include <hpx/serialization/base_object.hpp>
+#    include <hpx/traits/is_distribution_policy.hpp>
 
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/detail/target_distribution_policy.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/compute/detail/target_distribution_policy.hpp>
 
-#include <algorithm>
-#include <cstddef>
-#include <map>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#    include <algorithm>
+#    include <cstddef>
+#    include <map>
+#    include <type_traits>
+#    include <utility>
+#    include <vector>
 
 namespace hpx { namespace compute { namespace cuda {
     /// A target_distribution_policy used for CPU bound localities.
@@ -145,10 +145,10 @@ namespace hpx { namespace compute { namespace cuda {
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
             std::size_t count, Ts&&... ts) const
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
             return hpx::future<std::vector<bulk_locality_result>>();
-#else
+#    else
             std::vector<hpx::id_type> localities;
             localities.reserve(this->targets_.size());
 
@@ -189,7 +189,7 @@ namespace hpx { namespace compute { namespace cuda {
                     return result;
                 },
                 std::move(objs));
-#endif
+#    endif
         }
 
     protected:

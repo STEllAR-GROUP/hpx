@@ -24,13 +24,13 @@
 // this file requires serializing threads::mask_type
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                  \
     (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT > 64)
-#if defined(HPX_HAVE_MAX_CPU_COUNT)
-#include <hpx/serialization/bitset.hpp>
-#include <bitset>
-#else
-#include <hpx/serialization/dynamic_bitset.hpp>
-#include <boost/dynamic_bitset.hpp>
-#endif
+#    if defined(HPX_HAVE_MAX_CPU_COUNT)
+#        include <hpx/serialization/bitset.hpp>
+#        include <bitset>
+#    else
+#        include <hpx/serialization/dynamic_bitset.hpp>
+#        include <boost/dynamic_bitset.hpp>
+#    endif
 #endif
 
 namespace hpx { namespace compute { namespace host {

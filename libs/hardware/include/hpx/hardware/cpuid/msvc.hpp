@@ -14,9 +14,9 @@
 #include <hpx/config.hpp>
 #if defined(HPX_WINDOWS)
 
-#include <cstdint>
+#    include <cstdint>
 
-#include <intrin.h>
+#    include <intrin.h>
 
 namespace hpx { namespace util { namespace hardware {
 

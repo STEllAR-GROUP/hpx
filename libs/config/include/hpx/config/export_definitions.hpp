@@ -13,7 +13,7 @@
 #if defined(DOXYGEN)
 /// Marks a class or function to be exported from HPX or imported if it is
 /// consumed.
-#define HPX_EXPORT
+#    define HPX_EXPORT
 #else
 
 // clang-format off

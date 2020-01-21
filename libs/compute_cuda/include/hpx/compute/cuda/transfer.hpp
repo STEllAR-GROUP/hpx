@@ -12,15 +12,15 @@
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 
-#include <hpx/parallel/util/transfer.hpp>
-#include <hpx/traits/pointer_category.hpp>
+#    include <hpx/parallel/util/transfer.hpp>
+#    include <hpx/traits/pointer_category.hpp>
 
-#include <hpx/compute/cuda/allocator.hpp>
-#include <hpx/compute/detail/iterator.hpp>
+#    include <hpx/compute/cuda/allocator.hpp>
+#    include <hpx/compute/detail/iterator.hpp>
 
-#include <cstddef>
-#include <type_traits>
-#include <utility>
+#    include <cstddef>
+#    include <type_traits>
+#    include <utility>
 
 namespace hpx { namespace traits {
     // Allow for matching of iterator<T const> to iterator<T> while calculating
@@ -52,11 +52,11 @@ namespace hpx { namespace traits {
     struct pointer_category<
         compute::detail::iterator<T, compute::cuda::allocator<T>>,
         compute::detail::iterator<T, compute::cuda::allocator<T>>
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+#    if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
         ,
         typename std::enable_if<!std::is_trivially_copyable<
             typename hpx::util::decay<T>::type>::value>::type
-#endif
+#    endif
         >
     {
         typedef cuda_copyable_pointer_tag type;
@@ -66,10 +66,10 @@ namespace hpx { namespace traits {
     struct pointer_category<Source,
         compute::detail::iterator<T, compute::cuda::allocator<T>>,
         typename std::enable_if<
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+#    if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
             !std::is_trivially_copyable<
                 typename hpx::util::decay<T>::type>::value &&
-#endif
+#    endif
             !std::is_same<Source,
                 compute::detail::iterator<T,
                     compute::cuda::allocator<T>>>::value>::type>
@@ -87,10 +87,10 @@ namespace hpx { namespace traits {
     struct pointer_category<
         compute::detail::iterator<T, compute::cuda::allocator<U>>, Dest,
         typename std::enable_if<
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+#    if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
             !std::is_trivially_copyable<
                 typename hpx::util::decay<T>::type>::value &&
-#endif
+#    endif
             !std::is_same<Dest,
                 compute::detail::iterator<T,
                     compute::cuda::allocator<U>>>::value>::type>
@@ -104,7 +104,7 @@ namespace hpx { namespace traits {
         typedef cuda_copyable_pointer_tag_to_host type;
     };
 
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+#    if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     struct trivially_cuda_copyable_pointer_tag : cuda_copyable_pointer_tag
     {
     };
@@ -162,11 +162,11 @@ namespace hpx { namespace traits {
 
         typedef trivially_cuda_copyable_pointer_tag_to_host type;
     };
-#endif
+#    endif
 }}    // namespace hpx::traits
 
 namespace hpx { namespace parallel { namespace util { namespace detail {
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+#    if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     template <typename Dummy>
     struct copy_helper<hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
     {
@@ -174,10 +174,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
             InIter first, InIter last, OutIter dest)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#        if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
-#else
+#        else
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
@@ -188,7 +188,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(dest, count);
             return std::make_pair(last, dest);
-#endif
+#        endif
         }
     };
 
@@ -200,10 +200,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
             InIter first, InIter last, OutIter dest)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#        if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
-#else
+#        else
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
@@ -214,7 +214,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(dest, count);
             return std::make_pair(last, dest);
-#endif
+#        endif
         }
     };
 
@@ -226,10 +226,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
             InIter first, InIter last, OutIter dest)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#        if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
                 first, last, dest);
-#else
+#        else
             std::size_t count = std::distance(first, last);
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
@@ -240,7 +240,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(dest, count);
             return std::make_pair(last, dest);
-#endif
+#        endif
         }
     };
 
@@ -253,10 +253,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
             InIter first, std::size_t count, OutIter dest)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#        if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
-#else
+#        else
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
@@ -267,7 +267,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::advance(first, count);
             std::advance(dest, count);
             return std::make_pair(first, dest);
-#endif
+#        endif
         }
     };
 
@@ -279,10 +279,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
             InIter first, std::size_t count, OutIter dest)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#        if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
-#else
+#        else
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
@@ -293,7 +293,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::advance(first, count);
             std::advance(dest, count);
             return std::make_pair(first, dest);
-#endif
+#        endif
         }
     };
 
@@ -305,10 +305,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
             InIter first, std::size_t count, OutIter dest)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#        if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
                 first, count, dest);
-#else
+#        else
             std::size_t bytes = count *
                 sizeof(typename std::iterator_traits<InIter>::value_type);
 
@@ -319,10 +319,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::advance(first, count);
             std::advance(dest, count);
             return std::make_pair(first, dest);
-#endif
+#        endif
         }
     };
-#endif
+#    endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for copy-synchronize operations
@@ -359,7 +359,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
     };
 
-#if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
+#    if defined(HPX_HAVE_CXX11_STD_IS_TRIVIALLY_COPYABLE)
     template <typename Dummy>
     struct copy_synchronize_helper<
         hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
@@ -392,7 +392,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             dest.target().synchronize();
         }
     };
-#endif
+#    endif
 }}}}    // namespace hpx::parallel::util::detail
 
 #endif

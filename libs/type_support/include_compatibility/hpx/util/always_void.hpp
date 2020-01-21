@@ -9,11 +9,11 @@
 #include <hpx/type_support/always_void.hpp>
 
 #if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/always_void.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/always_void.hpp is deprecated, \
     please include hpx/type_support/always_void.hpp instead")
-#else
-#warning "The header hpx/util/always_void.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/always_void.hpp is deprecated, \
     please include hpx/type_support/always_void.hpp instead"
-#endif
+#    endif
 #endif

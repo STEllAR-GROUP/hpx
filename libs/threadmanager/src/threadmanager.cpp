@@ -986,7 +986,7 @@ namespace hpx { namespace threads {
         return result;
     }
 
-#ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+#    ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
     std::int64_t threadmanager::avg_creation_idle_rate(bool reset)
     {
         std::int64_t result = 0;
@@ -1002,7 +1002,7 @@ namespace hpx { namespace threads {
             result += pool_iter->avg_cleanup_idle_rate(all_threads, reset);
         return result;
     }
-#endif
+#    endif
 #endif
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
@@ -1022,7 +1022,7 @@ namespace hpx { namespace threads {
         return result;
     }
 
-#ifdef HPX_HAVE_THREAD_IDLE_RATES
+#    ifdef HPX_HAVE_THREAD_IDLE_RATES
     std::int64_t threadmanager::get_thread_duration(bool reset)
     {
         std::int64_t result = 0;
@@ -1072,7 +1072,7 @@ namespace hpx { namespace threads {
                 pool_iter->get_cumulative_thread_overhead(all_threads, reset);
         return result;
     }
-#endif
+#    endif
 #endif
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS

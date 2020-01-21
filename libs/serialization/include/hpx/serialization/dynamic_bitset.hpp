@@ -10,12 +10,12 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/vector.hpp>
+#    include <hpx/serialization/vector.hpp>
 
-#include <cstddef>
-#include <vector>
+#    include <cstddef>
+#    include <vector>
 
-#include <boost/dynamic_bitset.hpp>
+#    include <boost/dynamic_bitset.hpp>
 
 namespace hpx { namespace serialization {
 

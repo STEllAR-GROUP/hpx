@@ -26,9 +26,9 @@
 #include <vector>
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-#include <linux/unistd.h>
-#include <sys/mman.h>
-#define DEBUGGING_PRINT_LINUX
+#    include <linux/unistd.h>
+#    include <sys/mman.h>
+#    define DEBUGGING_PRINT_LINUX
 #endif
 
 // ------------------------------------------------------------
@@ -277,12 +277,12 @@ namespace hpx { namespace debug {
                 os << dummy << " ";
             }
             os << hex<12, std::thread::id>(std::this_thread::get_id())
-#ifdef DEBUGGING_PRINT_LINUX
+#    ifdef DEBUGGING_PRINT_LINUX
                << " cpu " << debug::dec<3, int>(sched_getcpu()) << " ";
-#else
+#    else
                << " cpu "
                << "--- ";
-#endif
+#    endif
             return os;
         }
 

@@ -14,11 +14,11 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/errors.hpp>
+#    include <hpx/errors.hpp>
 
-#include <boost/variant.hpp>
+#    include <boost/variant.hpp>
 
-#include <utility>
+#    include <utility>
 
 namespace hpx { namespace serialization {
 

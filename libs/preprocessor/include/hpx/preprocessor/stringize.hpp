@@ -31,22 +31,22 @@
 /// The passed argument \c X will expand to \c "X". Note that the stringizing
 /// operator (#) prevents arguments from expanding. This macro circumvents this
 /// shortcoming.
-#define HPX_PP_STRINGIZE(X)
+#    define HPX_PP_STRINGIZE(X)
 #else
 
-#include <hpx/preprocessor/config.hpp>
+#    include <hpx/preprocessor/config.hpp>
 
-#if HPX_PP_CONFIG_FLAGS() & HPX_PP_CONFIG_MSVC()
-#define HPX_PP_STRINGIZE(text) HPX_PP_STRINGIZE_A((text))
-#define HPX_PP_STRINGIZE_A(arg) HPX_PP_STRINGIZE_I arg
-#elif HPX_PP_CONFIG_FLAGS() & HPX_PP_CONFIG_MWCC()
-#define HPX_PP_STRINGIZE(text) HPX_PP_STRINGIZE_OO((text))
-#define HPX_PP_STRINGIZE_OO(par) HPX_PP_STRINGIZE_I##par
-#else
-#define HPX_PP_STRINGIZE(text) HPX_PP_STRINGIZE_I(text)
-#endif
+#    if HPX_PP_CONFIG_FLAGS() & HPX_PP_CONFIG_MSVC()
+#        define HPX_PP_STRINGIZE(text) HPX_PP_STRINGIZE_A((text))
+#        define HPX_PP_STRINGIZE_A(arg) HPX_PP_STRINGIZE_I arg
+#    elif HPX_PP_CONFIG_FLAGS() & HPX_PP_CONFIG_MWCC()
+#        define HPX_PP_STRINGIZE(text) HPX_PP_STRINGIZE_OO((text))
+#        define HPX_PP_STRINGIZE_OO(par) HPX_PP_STRINGIZE_I##par
+#    else
+#        define HPX_PP_STRINGIZE(text) HPX_PP_STRINGIZE_I(text)
+#    endif
 
-#define HPX_PP_STRINGIZE_I(text) #text
+#    define HPX_PP_STRINGIZE_I(text) #    text
 
 #endif
 #endif

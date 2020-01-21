@@ -12,15 +12,15 @@
 
 #if defined(DOXYGEN)
 /// This macro evaluates to ``constexpr`` if the compiler supports it.
-#define HPX_CONSTEXPR
+#    define HPX_CONSTEXPR
 /// This macro evaluates to ``constexpr`` if the compiler supports it, ``const``
 /// otherwise.
-#define HPX_CONSTEXPR_OR_CONST
+#    define HPX_CONSTEXPR_OR_CONST
 /// This macro evaluates to ``constexpr`` if the compiler supports C++14
 /// constexpr.
-#define HPX_CXX14_CONSTEXPR
+#    define HPX_CXX14_CONSTEXPR
 /// This macro evaluates to ``static :c:macro:HPX_CONSTEXPR_OR_CONST``.
-#define HPX_STATIC_CONSTEXPR
+#    define HPX_STATIC_CONSTEXPR
 #else
 
 // clang-format off
@@ -40,7 +40,7 @@
 #endif
 // clang-format on
 
-#define HPX_STATIC_CONSTEXPR static HPX_CONSTEXPR_OR_CONST
+#    define HPX_STATIC_CONSTEXPR static HPX_CONSTEXPR_OR_CONST
 #endif
 
 #endif

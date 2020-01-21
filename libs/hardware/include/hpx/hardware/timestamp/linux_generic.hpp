@@ -11,9 +11,9 @@
 
 #if defined(__unix__)
 
-#include <cstdint>
+#    include <cstdint>
 
-#include <time.h>
+#    include <time.h>
 
 namespace hpx { namespace util { namespace hardware {
 

@@ -15,9 +15,9 @@
 #include <utility>
 #include <vector>
 #ifdef EXTRA_DEBUG
-#include <cstddef>
-#include <iostream>
-#include <string>
+#    include <cstddef>
+#    include <iostream>
+#    include <string>
 #endif
 //
 #define HPX_REDUCE_BY_KEY_TEST_SIZE (1 << 18)
@@ -52,9 +52,9 @@ namespace debug {
 #endif
     }
 #if defined(EXTRA_DEBUG)
-#define debug_msg(a) std::cout << a
+#    define debug_msg(a) std::cout << a
 #else
-#define debug_msg(a)
+#    define debug_msg(a)
 #endif
 };    // namespace debug
 

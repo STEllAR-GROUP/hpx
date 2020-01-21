@@ -9,11 +9,11 @@
 #include <hpx/concepts/concepts.hpp>
 
 #if defined(HPX_CONCEPTS_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/traits/concepts.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/traits/concepts.hpp is deprecated, \
     please include hpx/concepts/concepts.hpp instead")
-#else
-#warning "The header hpx/traits/concepts.hpp is deprecated, \
+#    else
+#        warning "The header hpx/traits/concepts.hpp is deprecated, \
     please include hpx/concepts/concepts.hpp instead"
-#endif
+#    endif
 #endif

@@ -11,26 +11,26 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/assertion.hpp>
-#include <hpx/compute/cuda/detail/launch.hpp>
-#include <hpx/compute/cuda/detail/scoped_active_target.hpp>
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/cuda/target_ptr.hpp>
-#include <hpx/compute/cuda/value_proxy.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/statistics/min.hpp>
-#include <hpx/type_support/unused.hpp>
+#    include <hpx/assertion.hpp>
+#    include <hpx/compute/cuda/detail/launch.hpp>
+#    include <hpx/compute/cuda/detail/scoped_active_target.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/compute/cuda/target_ptr.hpp>
+#    include <hpx/compute/cuda/value_proxy.hpp>
+#    include <hpx/errors.hpp>
+#    include <hpx/statistics/min.hpp>
+#    include <hpx/type_support/unused.hpp>
 
-#include <cuda_runtime.h>
+#    include <cuda_runtime.h>
 
-#include <algorithm>
-#include <cstddef>
-#include <cstdlib>
-#include <limits>
-#include <memory>
-#include <string>
-#include <type_traits>
-#include <utility>
+#    include <algorithm>
+#    include <cstddef>
+#    include <cstdlib>
+#    include <limits>
+#    include <memory>
+#    include <string>
+#    include <type_traits>
+#    include <utility>
 
 namespace hpx { namespace compute { namespace cuda {
     template <typename T>
@@ -40,13 +40,13 @@ namespace hpx { namespace compute { namespace cuda {
         typedef T value_type;
         typedef target_ptr<T> pointer;
         typedef target_ptr<T const> const_pointer;
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE)
         typedef T& reference;
         typedef T const& const_reference;
-#else
+#    else
         typedef value_proxy<T> reference;
         typedef value_proxy<T const> const_reference;
-#endif
+#    endif
         typedef std::size_t size_type;
         typedef std::ptrdiff_t difference_type;
 
@@ -86,20 +86,20 @@ namespace hpx { namespace compute { namespace cuda {
         // operator&
         pointer address(reference x) const noexcept
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE)
             return &x;
-#else
+#    else
             return pointer(x.device_ptr(), target_);
-#endif
+#    endif
         }
 
         const_pointer address(const_reference x) const noexcept
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE)
             return &x;
-#else
+#    else
             return pointer(x.device_ptr(), target_);
-#endif
+#    endif
         }
 
         // Allocates n * sizeof(T) bytes of uninitialized storage by calling
@@ -110,9 +110,9 @@ namespace hpx { namespace compute { namespace cuda {
         pointer allocate(
             size_type n, std::allocator<void>::const_pointer hint = nullptr)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE)
             pointer result;
-#else
+#    else
             value_type* p = nullptr;
             detail::scoped_active_target active(target_);
 
@@ -126,7 +126,7 @@ namespace hpx { namespace compute { namespace cuda {
                     std::string("cudaMalloc failed: ") +
                         cudaGetErrorString(error));
             }
-#endif
+#    endif
             return result;
         }
 
@@ -136,7 +136,7 @@ namespace hpx { namespace compute { namespace cuda {
         // originally produced p; otherwise, the behavior is undefined.
         void deallocate(pointer p, size_type n)
         {
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#    if !defined(HPX_COMPUTE_DEVICE_CODE)
             detail::scoped_active_target active(target_);
 
             cudaError_t error = cudaFree(p.device_ptr());
@@ -147,7 +147,7 @@ namespace hpx { namespace compute { namespace cuda {
                     std::string("cudaFree failed: ") +
                         cudaGetErrorString(error));
             }
-#endif
+#    endif
         }
 
         // Returns the maximum theoretically possible value of n, for which the
@@ -177,7 +177,7 @@ namespace hpx { namespace compute { namespace cuda {
         HPX_HOST_DEVICE void bulk_construct(
             pointer p, std::size_t count, Args&&... args)
         {
-#if defined(HPX_COMPUTE_CODE)
+#    if defined(HPX_COMPUTE_CODE)
             int threads_per_block = (hpx::util::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block - 1) / threads_per_block);
@@ -193,7 +193,7 @@ namespace hpx { namespace compute { namespace cuda {
                 },
                 p.device_ptr(), count, std::forward<Args>(args)...);
             target_.synchronize();
-#endif
+#    endif
         }
 
         // Constructs an object of type T in allocated uninitialized storage
@@ -201,7 +201,7 @@ namespace hpx { namespace compute { namespace cuda {
         template <typename... Args>
         HPX_HOST_DEVICE void construct(pointer p, Args&&... args)
         {
-#if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
             detail::launch(
                 target_, 1, 1,
                 [] HPX_DEVICE(T * p, Args const&... args) {
@@ -209,13 +209,13 @@ namespace hpx { namespace compute { namespace cuda {
                 },
                 p.device_ptr(), std::forward<Args>(args)...);
             target_.synchronize();
-#endif
+#    endif
         }
 
         // Calls the destructor of count objects pointed to by p
         HPX_HOST_DEVICE void bulk_destroy(pointer p, std::size_t count)
         {
-#if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_HOST_CODE) || defined(HPX_COMPUTE_DEVICE_CODE)
             int threads_per_block = (hpx::util::min)(1024, int(count));
             int num_blocks =
                 int((count + threads_per_block) / threads_per_block) - 1;
@@ -231,7 +231,7 @@ namespace hpx { namespace compute { namespace cuda {
                 },
                 p.device_ptr(), count);
             target_.synchronize();
-#endif
+#    endif
         }
 
         // Calls the destructor of the object pointed to by p

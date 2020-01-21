@@ -9,11 +9,12 @@
 #include <hpx/thread_support/assert_owns_lock.hpp>
 
 #if defined(HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/assert_owns_lock.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/assert_owns_lock.hpp is deprecated, \
     please include hpx/thread_support/assert_owns_lock.hpp instead")
-#else
-#warning "The header hpx/util/assert_owns_lock.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/assert_owns_lock.hpp is deprecated, \
     please include hpx/thread_support/assert_owns_lock.hpp instead"
-#endif
+#    endif
 #endif

@@ -9,11 +9,11 @@
 #include <hpx/statistics/histogram.hpp>
 
 #if defined(HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/histogram.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/histogram.hpp is deprecated, \
     please include hpx/statistics/histogram.hpp instead")
-#else
-#warning "The header hpx/util/histogram.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/histogram.hpp is deprecated, \
     please include hpx/statistics/histogram.hpp instead"
-#endif
+#    endif
 #endif

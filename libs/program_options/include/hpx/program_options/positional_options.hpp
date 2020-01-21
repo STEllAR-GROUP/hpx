@@ -12,7 +12,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/positional_options.hpp
 
-#include <boost/program_options/positional_options.hpp>
+#    include <boost/program_options/positional_options.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -22,10 +22,10 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <string>
-#include <vector>
+#    include <string>
+#    include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#    include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -77,7 +77,7 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#    include <hpx/config/warnings_suffix.hpp>
 
 #endif
 #endif

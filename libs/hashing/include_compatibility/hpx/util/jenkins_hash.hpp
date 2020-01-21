@@ -9,11 +9,11 @@
 #include <hpx/hashing/jenkins_hash.hpp>
 
 #if defined(HPX_HASHING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/jenkins_hash.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/jenkins_hash.hpp is deprecated, \
     please include hpx/hashing/jenkins_hash.hpp instead")
-#else
-#warning "The header hpx/util/jenkins_hash.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/jenkins_hash.hpp is deprecated, \
     please include hpx/hashing/jenkins_hash.hpp instead"
-#endif
+#    endif
 #endif

@@ -9,12 +9,13 @@
 #include <hpx/serialization/traits/serialization_access_data.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/traits/serialization_access_data.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/traits/serialization_access_data.hpp is deprecated, \
     please include hpx/serialization/traits/serialization_access_data.hpp instead")
-#else
-#warning "The header hpx/traits/serialization_access_data.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/traits/serialization_access_data.hpp is deprecated, \
     please include hpx/serialization/traits/serialization_access_data.hpp instead"
-#endif
+#    endif
 #endif

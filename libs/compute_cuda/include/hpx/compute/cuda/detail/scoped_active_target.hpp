@@ -12,13 +12,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/assertion.hpp>
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/errors.hpp>
+#    include <hpx/assertion.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/errors.hpp>
 
-#include <cuda_runtime.h>
+#    include <cuda_runtime.h>
 
-#include <string>
+#    include <string>
 
 namespace hpx { namespace compute { namespace cuda { namespace detail {
     struct scoped_active_target
@@ -54,7 +54,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
         ~scoped_active_target()
         {
             cudaError_t error = cudaSuccess;
-#if defined(HPX_DEBUG)
+#    if defined(HPX_DEBUG)
             int current_device = -1;
             error = cudaGetDevice(&current_device);
             if (error != cudaSuccess)
@@ -65,7 +65,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
                         cudaGetErrorString(error));
             }
             HPX_ASSERT(current_device == target_.native_handle().get_device());
-#endif
+#    endif
             if (previous_device_ != -1)
             {
                 error = cudaSetDevice(previous_device_);

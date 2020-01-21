@@ -7,17 +7,17 @@
 #include <hpx/program_options/config.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/datastructures/any.hpp>
-#include <hpx/program_options/detail/cmdline.hpp>
-#include <hpx/program_options/detail/convert.hpp>
-#include <hpx/program_options/value_semantic.hpp>
+#    include <hpx/datastructures/any.hpp>
+#    include <hpx/program_options/detail/cmdline.hpp>
+#    include <hpx/program_options/detail/convert.hpp>
+#    include <hpx/program_options/value_semantic.hpp>
 
-#include <cctype>
-#include <cstddef>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
+#    include <cctype>
+#    include <cstddef>
+#    include <map>
+#    include <set>
+#    include <string>
+#    include <vector>
 
 namespace hpx { namespace program_options {
 
@@ -208,13 +208,13 @@ namespace hpx { namespace program_options {
         set_substitute("value", bad_value);
     }
 
-#ifndef BOOST_NO_STD_WSTRING
+#    ifndef BOOST_NO_STD_WSTRING
     invalid_option_value::invalid_option_value(const std::wstring& bad_value)
       : validation_error(validation_error::invalid_option_value)
     {
         set_substitute("value", convert_value(bad_value));
     }
-#endif
+#    endif
 
     invalid_bool_value::invalid_bool_value(const std::string& bad_value)
       : validation_error(validation_error::invalid_bool_value)

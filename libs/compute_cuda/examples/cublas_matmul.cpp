@@ -39,7 +39,7 @@
 #include <hpx/include/compute.hpp>
 #include <hpx/timing.hpp>
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
-#include <hpx/compute/cuda/allocator.hpp>
+#    include <hpx/compute/cuda/allocator.hpp>
 #endif
 // CUDA runtime
 #include <cublas_v2.h>

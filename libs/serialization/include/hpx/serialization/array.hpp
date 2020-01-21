@@ -15,7 +15,7 @@
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <boost/array.hpp>
+#    include <boost/array.hpp>
 #endif
 #include <boost/predef/other/endian.h>
 

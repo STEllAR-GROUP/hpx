@@ -7,12 +7,12 @@
 #include <hpx/program_options/config.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/program_options/parsers.hpp>
+#    include <hpx/program_options/parsers.hpp>
 
-#include <boost/tokenizer.hpp>
+#    include <boost/tokenizer.hpp>
 
-#include <string>
-#include <vector>
+#    include <string>
+#    include <vector>
 
 namespace hpx { namespace program_options { namespace detail {
 

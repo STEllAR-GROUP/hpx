@@ -9,12 +9,13 @@
 #include <hpx/plugin/plugin_wrapper.hpp>
 
 #if defined(HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/plugin/plugin_wrapper.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/plugin/plugin_wrapper.hpp is deprecated, \
     please include hpx/plugin/plugin_wrapper.hpp instead")
-#else
-#warning "The header hpx/util/plugin/plugin_wrapper.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/util/plugin/plugin_wrapper.hpp is deprecated, \
     please include hpx/plugin/plugin_wrapper.hpp instead"
-#endif
+#    endif
 #endif

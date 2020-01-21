@@ -9,13 +9,13 @@
 #include <hpx/logging/detail/manipulator.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/logging/detail/manipulator.hpp is deprecated,         \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/logging/detail/manipulator.hpp is deprecated, \
     please include hpx/logging/detail/manipulator.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/util/logging/detail/manipulator.hpp is deprecated,    \
+#    else
+#        warning                                                               \
+            "The header hpx/util/logging/detail/manipulator.hpp is deprecated, \
     please include hpx/logging/detail/manipulator.hpp instead"
-#endif
+#    endif
 #endif

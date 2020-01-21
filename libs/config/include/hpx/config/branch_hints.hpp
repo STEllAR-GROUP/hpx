@@ -13,9 +13,9 @@
 #if defined(DOXYGEN)
 
 /// Hint at the compiler that \c expr is likely to be true.
-#define HPX_LIKELY(expr)
+#    define HPX_LIKELY(expr)
 /// Hint at the compiler that \c expr is likely to be false.
-#define HPX_UNLIKELY(expr)
+#    define HPX_UNLIKELY(expr)
 
 #else
 

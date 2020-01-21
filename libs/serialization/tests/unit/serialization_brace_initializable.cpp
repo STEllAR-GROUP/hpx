@@ -7,12 +7,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CXX17_STRUCTURED_BINDINGS)
-#include <hpx/serialization.hpp>
-#include <hpx/testing.hpp>
+#    include <hpx/serialization.hpp>
+#    include <hpx/testing.hpp>
 
-#include <string>
-#include <tuple>
-#include <vector>
+#    include <string>
+#    include <tuple>
+#    include <vector>
 
 struct A
 {

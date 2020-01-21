@@ -9,15 +9,15 @@
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/serialization/detail/non_default_constructible.hpp \
+#    if defined(HPX_MSVC)
+#        pragma message("The header \
+            hpx/runtime/serialization/detail/non_default_constructible.hpp \
     is deprecated, please \
     include hpx/serialization/detail/non_default_constructible.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/runtime/serialization/detail/non_default_constructible.hpp \
+#    else
+#        warning "The header \
+            hpx/runtime/serialization/detail/non_default_constructible.hpp \
     is deprecated, please \
     include hpx/serialization/detail/non_default_constructible.hpp instead"
-#endif
+#    endif
 #endif

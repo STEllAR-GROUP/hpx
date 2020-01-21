@@ -696,10 +696,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           to the last such element is returned.
     ///
 #if defined(HPX_MSVC)
-#pragma push_macro("min")
-#pragma push_macro("max")
-#undef min
-#undef max
+#    pragma push_macro("min")
+#    pragma push_macro("max")
+#    undef min
+#    undef max
 #endif
     template <typename ExPolicy, typename FwdIter,
         typename Proj = util::projection_identity, typename F = detail::less,
@@ -724,8 +724,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<F>(f), std::forward<Proj>(proj), is_segmented()));
     }
 #if defined(HPX_MSVC)
-#pragma pop_macro("min")
-#pragma pop_macro("max")
+#    pragma pop_macro("min")
+#    pragma pop_macro("max")
 #endif
 }}}    // namespace hpx::parallel::v1
 

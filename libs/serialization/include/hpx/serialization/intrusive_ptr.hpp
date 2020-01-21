@@ -15,9 +15,9 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/detail/pointer.hpp>
+#    include <hpx/serialization/detail/pointer.hpp>
 
-#include <boost/intrusive_ptr.hpp>
+#    include <boost/intrusive_ptr.hpp>
 
 namespace hpx { namespace serialization {
 

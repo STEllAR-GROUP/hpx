@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/lcos/dataflow.hpp>
+#    include <hpx/lcos/dataflow.hpp>
 #endif
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>

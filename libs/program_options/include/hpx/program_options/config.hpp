@@ -18,9 +18,9 @@
 // hpxinspect:nodeprecatedname:boost::optional
 // hpxinspect:nodeprecatedinclude:boost/program_options/config.hpp
 
-#include <boost/any.hpp>
-#include <boost/optional.hpp>
-#include <boost/program_options/config.hpp>
+#    include <boost/any.hpp>
+#    include <boost/optional.hpp>
+#    include <boost/program_options/config.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -29,18 +29,18 @@ namespace hpx { namespace program_options {
     template <typename T>
     using optional = boost::optional<T>;
 
-#define PROGRAM_OPTIONS_DEPRECATED_MESSAGE                                     \
-    "The Boost.ProgramOptions was replaced by an equivalent "                  \
-    "HPX ProgramOptions module that exposes a similar API."                    \
-    "Please consider changing your code to use that module instead."           \
-    "The easiest way to achieve this is to switch your includes "              \
-    "to #include <hpx/program_options/*> and the related types to the "        \
-    "namespace hpx::program_options."
+#    define PROGRAM_OPTIONS_DEPRECATED_MESSAGE                                 \
+        "The Boost.ProgramOptions was replaced by an equivalent "              \
+        "HPX ProgramOptions module that exposes a similar API."                \
+        "Please consider changing your code to use that module instead."       \
+        "The easiest way to achieve this is to switch your includes "          \
+        "to #include <hpx/program_options/*> and the related types to the "    \
+        "namespace hpx::program_options."
 
 }}    // namespace hpx::program_options
 #else
-#include <hpx/datastructures/any.hpp>
-#include <hpx/datastructures/optional.hpp>
+#    include <hpx/datastructures/any.hpp>
+#    include <hpx/datastructures/optional.hpp>
 
 namespace hpx { namespace program_options {
 

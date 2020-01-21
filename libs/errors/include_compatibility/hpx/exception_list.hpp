@@ -9,11 +9,11 @@
 #include <hpx/errors/exception_list.hpp>
 
 #if defined(HPX_ERRORS_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/exception_list.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/exception_list.hpp is deprecated, \
     please include hpx/errors/exception_list.hpp instead")
-#else
-#warning "The header hpx/exception_list.hpp is deprecated, \
+#    else
+#        warning "The header hpx/exception_list.hpp is deprecated, \
     please include hpx/errors/exception_list.hpp instead"
-#endif
+#    endif
 #endif

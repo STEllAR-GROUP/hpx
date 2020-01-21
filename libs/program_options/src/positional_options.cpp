@@ -7,12 +7,12 @@
 #include <hpx/program_options/config.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/assertion.hpp>
-#include <hpx/program_options/positional_options.hpp>
+#    include <hpx/assertion.hpp>
+#    include <hpx/program_options/positional_options.hpp>
 
-#include <cstddef>
-#include <limits>
-#include <string>
+#    include <cstddef>
+#    include <limits>
+#    include <string>
 
 namespace hpx { namespace program_options {
 

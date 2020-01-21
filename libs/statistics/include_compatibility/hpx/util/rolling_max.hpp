@@ -9,11 +9,11 @@
 #include <hpx/statistics/rolling_max.hpp>
 
 #if defined(HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/rolling_max.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/rolling_max.hpp is deprecated, \
     please include hpx/statistics/rolling_max.hpp instead")
-#else
-#warning "The header hpx/util/rolling_max.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/rolling_max.hpp is deprecated, \
     please include hpx/statistics/rolling_max.hpp instead"
-#endif
+#    endif
 #endif

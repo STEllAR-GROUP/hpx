@@ -9,15 +9,15 @@
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 
 #if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp \
-    is deprecated, \
-    please include hpx/coroutines/detail/get_stack_pointer.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp \
-    is deprecated, \
-    please include hpx/coroutines/detail/get_stack_pointer.hpp instead"
-#endif
+#    if defined(HPX_MSVC)
+#        pragma message("The header \
+            hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp \
+            is deprecated, \
+            please include hpx/coroutines/detail/get_stack_pointer.hpp instead")
+#    else
+#        warning "The header \
+            hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp \
+            is deprecated, \
+            please include hpx/coroutines/detail/get_stack_pointer.hpp instead"
+#    endif
 #endif

@@ -12,7 +12,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/option.hpp
 
-#include <boost/program_options/option.hpp>
+#    include <boost/program_options/option.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -25,8 +25,8 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <string>
-#include <vector>
+#    include <string>
+#    include <vector>
 
 namespace hpx { namespace program_options {
 

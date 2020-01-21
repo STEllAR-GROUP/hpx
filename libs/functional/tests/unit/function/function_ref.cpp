@@ -126,12 +126,12 @@ static void test_zero_args()
     global_int = 0;
 
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
     v1 = v1;
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic pop
+#    pragma clang diagnostic pop
 #endif
 
     v1();
@@ -144,12 +144,12 @@ static void test_zero_args()
     global_int = 0;
 
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
     v1 = (v1);
 #if defined(__clang__) && (HPX_CLANG_VERSION >= 70000)
-#pragma clang diagnostic pop
+#    pragma clang diagnostic pop
 #endif
 
     v1();

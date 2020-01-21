@@ -8,23 +8,23 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/async.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/find_here.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
+#    include <hpx/async.hpp>
+#    include <hpx/errors.hpp>
+#    include <hpx/lcos/future.hpp>
+#    include <hpx/runtime/actions/plain_action.hpp>
+#    include <hpx/runtime/find_here.hpp>
+#    include <hpx/runtime/naming/id_type.hpp>
+#    include <hpx/runtime/threads/thread_helpers.hpp>
+#    include <hpx/runtime_fwd.hpp>
+#    include <hpx/serialization/serialize.hpp>
+#    include <hpx/serialization/vector.hpp>
 
-#include <hpx/compute/cuda/target.hpp>
+#    include <hpx/compute/cuda/target.hpp>
 
-#include <string>
-#include <vector>
+#    include <string>
+#    include <vector>
 
-#include <cuda_runtime.h>
+#    include <cuda_runtime.h>
 
 namespace hpx { namespace compute { namespace cuda {
     std::vector<target> get_local_targets()

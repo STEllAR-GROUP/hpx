@@ -13,8 +13,8 @@
 // hpxinspect:nodeprecatedinclude:boost/program_options/cmdline.hpp
 // hpxinspect:nodeprecatedinclude:boost/program_options/detail/cmdline.hpp
 
-#include <boost/program_options/cmdline.hpp>
-#include <boost/program_options/detail/cmdline.hpp>
+#    include <boost/program_options/cmdline.hpp>
+#    include <boost/program_options/detail/cmdline.hpp>
 
 namespace hpx { namespace program_options { namespace command_line_style {
 
@@ -104,7 +104,7 @@ namespace hpx { namespace program_options { namespace command_line_style {
     };
 }}}    // namespace hpx::program_options::command_line_style
 
-#include <hpx/program_options/detail/cmdline.hpp>
+#    include <hpx/program_options/detail/cmdline.hpp>
 
 #endif
 #endif

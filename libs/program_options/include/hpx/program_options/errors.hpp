@@ -12,7 +12,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/errors.hpp
 
-#include <boost/program_options/errors.hpp>
+#    include <boost/program_options/errors.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -36,15 +36,15 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <hpx/program_options/config.hpp>
+#    include <hpx/program_options/config.hpp>
 
-#include <map>
-#include <stdexcept>
-#include <string>
-#include <utility>
-#include <vector>
+#    include <map>
+#    include <stdexcept>
+#    include <string>
+#    include <utility>
+#    include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#    include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -474,7 +474,7 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#    include <hpx/config/warnings_suffix.hpp>
 
 #endif
 #endif

@@ -11,21 +11,21 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/zip_iterator.hpp>
-#include <hpx/type_support/pack.hpp>
+#    include <hpx/iterator_support/traits/is_iterator.hpp>
+#    include <hpx/iterator_support/zip_iterator.hpp>
+#    include <hpx/type_support/pack.hpp>
 
-#include <hpx/execution/parallel/traits/vector_pack_alignment_size.hpp>
-#include <hpx/execution/parallel/traits/vector_pack_load_store.hpp>
-#include <hpx/execution/parallel/traits/vector_pack_type.hpp>
-#include <hpx/parallel/datapar/iterator_helpers.hpp>
+#    include <hpx/execution/parallel/traits/vector_pack_alignment_size.hpp>
+#    include <hpx/execution/parallel/traits/vector_pack_load_store.hpp>
+#    include <hpx/execution/parallel/traits/vector_pack_type.hpp>
+#    include <hpx/parallel/datapar/iterator_helpers.hpp>
 
-#include <algorithm>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <numeric>
-#include <type_traits>
+#    include <algorithm>
+#    include <cstddef>
+#    include <iterator>
+#    include <memory>
+#    include <numeric>
+#    include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail {

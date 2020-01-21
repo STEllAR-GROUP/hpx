@@ -13,34 +13,34 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/assertion.hpp>
-#include <hpx/iterator_support/iterator_adaptor.hpp>
+#    include <hpx/assertion.hpp>
+#    include <hpx/iterator_support/iterator_adaptor.hpp>
 
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/cuda/value_proxy.hpp>
-#include <hpx/compute/detail/get_proxy_type.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/compute/cuda/value_proxy.hpp>
+#    include <hpx/compute/detail/get_proxy_type.hpp>
 
-#include <cstddef>
+#    include <cstddef>
 
 namespace hpx { namespace compute { namespace cuda {
     template <typename T>
     class target_ptr
       : public hpx::util::iterator_adaptor<target_ptr<T>, T*,
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE)
             T, std::random_access_iterator_tag, T&, std::ptrdiff_t, T*
-#else
+#    else
             value_proxy<T>, std::random_access_iterator_tag, value_proxy<T>,
             std::ptrdiff_t, T*
-#endif
+#    endif
             >
     {
         typedef hpx::util::iterator_adaptor<target_ptr<T>, T*,
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE)
             T, std::random_access_iterator_tag, T&, std::ptrdiff_t, T*
-#else
+#    else
             value_proxy<T>, std::random_access_iterator_tag, value_proxy<T>,
             std::ptrdiff_t, T*
-#endif
+#    endif
             >
             base_type;
 
@@ -109,12 +109,12 @@ namespace hpx { namespace compute { namespace cuda {
         }
 
     public:
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_DEVICE HPX_FORCEINLINE operator T*() const
         {
             return this->base();
         }
-#else
+#    else
         // Note : need to define implicit cast at host_side because of invoke()
         //        which is defined host_device. This function should never be
         //        executed.
@@ -131,7 +131,7 @@ namespace hpx { namespace compute { namespace cuda {
         {
             return value_proxy<T>(this->base(), *tgt_);
         }
-#endif
+#    endif
 
     public:
         HPX_FORCEINLINE T* device_ptr() const

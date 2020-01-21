@@ -9,13 +9,15 @@
 #include <hpx/logging/format/formatter/defaults.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/logging/format/formatter/defaults.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/logging/format/formatter/defaults.hpp is \
+            deprecated, \
     please include hpx/logging/format/formatter/defaults.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/util/logging/format/formatter/defaults.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/util/logging/format/formatter/defaults.hpp is \
+            deprecated, \
     please include hpx/logging/format/formatter/defaults.hpp instead"
-#endif
+#    endif
 #endif

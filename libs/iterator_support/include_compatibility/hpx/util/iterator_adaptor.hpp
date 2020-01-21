@@ -9,11 +9,12 @@
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 
 #if defined(HPX_ITERATOR_SUPPORT_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/iterator_adaptor.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/iterator_adaptor.hpp is deprecated, \
     please include hpx/iterator_support/iterator_adaptor.hpp instead")
-#else
-#warning "The header hpx/util/iterator_adaptor.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/iterator_adaptor.hpp is deprecated, \
     please include hpx/iterator_support/iterator_adaptor.hpp instead"
-#endif
+#    endif
 #endif

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/datapar/execution_policy_fwd.hpp>
+#    include <hpx/execution/datapar/execution_policy_fwd.hpp>
 #endif
 
 namespace hpx { namespace parallel { namespace execution {

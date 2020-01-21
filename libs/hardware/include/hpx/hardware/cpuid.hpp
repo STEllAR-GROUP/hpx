@@ -88,7 +88,7 @@ namespace hpx { namespace util { namespace hardware {
 
 // clang-format on
 #else
-#error Unsupported platform.
+#    error Unsupported platform.
 #endif
 
 #endif    // HPX_7309AC21_1B92_4CC1_8ACC_CAA4E841DB3A

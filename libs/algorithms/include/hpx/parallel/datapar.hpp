@@ -11,11 +11,11 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
-#include <hpx/execution/datapar/execution_policy.hpp>
-#include <hpx/parallel/datapar/iterator_helpers.hpp>
-#include <hpx/parallel/datapar/loop.hpp>
-#include <hpx/parallel/datapar/transform_loop.hpp>
-#include <hpx/parallel/datapar/zip_iterator.hpp>
+#    include <hpx/execution/datapar/execution_policy.hpp>
+#    include <hpx/parallel/datapar/iterator_helpers.hpp>
+#    include <hpx/parallel/datapar/loop.hpp>
+#    include <hpx/parallel/datapar/transform_loop.hpp>
+#    include <hpx/parallel/datapar/zip_iterator.hpp>
 
 #endif
 #endif

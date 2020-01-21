@@ -9,15 +9,15 @@
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
 
 #if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp \
+#    if defined(HPX_MSVC)
+#        pragma message("The header \
+            hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp \
     is deprecated, \
     please include hpx/coroutines/detail/coroutine_accessor.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp \
+#    else
+#        warning "The header \
+            hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp \
     is deprecated, \
     please include hpx/coroutines/detail/coroutine_accessor.hpp instead"
-#endif
+#    endif
 #endif

@@ -20,8 +20,8 @@
 #include <vector>
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
+#    pragma warning(push)
+#    pragma warning(disable : 4251)
 #endif
 
 namespace hpx { namespace util {
@@ -91,7 +91,7 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 #endif

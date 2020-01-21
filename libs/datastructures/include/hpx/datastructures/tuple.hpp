@@ -24,13 +24,14 @@
 #include <utility>
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4520)    // multiple default constructors specified
+#    pragma warning(push)
+#    pragma warning(                                                           \
+        disable : 4520)    // multiple default constructors specified
 #endif
 
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmismatched-tags"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
 
 namespace hpx { namespace util {
@@ -1131,11 +1132,11 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 #if defined(__clang__)
-#pragma clang diagnostic pop
+#    pragma clang diagnostic pop
 #endif
 
 #endif

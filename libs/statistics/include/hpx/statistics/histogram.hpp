@@ -70,8 +70,8 @@ namespace hpx { namespace util {
 
 // conversion from 'const __int64' to 'const double', possible loss of data
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4244)
+#    pragma warning(push)
+#    pragma warning(disable : 4244)
 #endif
                 template <typename Args>
                 histogram_impl(Args const& args)
@@ -96,7 +96,7 @@ namespace hpx { namespace util {
                     }
                 }
 #if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
                 template <typename Args>

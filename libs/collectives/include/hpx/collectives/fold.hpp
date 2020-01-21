@@ -155,29 +155,29 @@ namespace hpx { namespace lcos {
 }}    // namespace hpx::lcos
 #else
 
-#ifndef HPX_LCOS_FOLD_SEP_29_2013_1442AM
-#define HPX_LCOS_FOLD_SEP_29_2013_1442AM
+#    ifndef HPX_LCOS_FOLD_SEP_29_2013_1442AM
+#        define HPX_LCOS_FOLD_SEP_29_2013_1442AM
 
-#include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_all.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/promise_local_result.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
+#        include <hpx/config.hpp>
+#        include <hpx/assertion.hpp>
+#        include <hpx/datastructures/tuple.hpp>
+#        include <hpx/lcos/detail/async_colocated.hpp>
+#        include <hpx/lcos/future.hpp>
+#        include <hpx/lcos/when_all.hpp>
+#        include <hpx/preprocessor/cat.hpp>
+#        include <hpx/preprocessor/expand.hpp>
+#        include <hpx/preprocessor/nargs.hpp>
+#        include <hpx/runtime/actions/action_support.hpp>
+#        include <hpx/runtime/naming/name.hpp>
+#        include <hpx/serialization/vector.hpp>
+#        include <hpx/traits/extract_action.hpp>
+#        include <hpx/traits/promise_local_result.hpp>
+#        include <hpx/type_support/decay.hpp>
+#        include <hpx/type_support/pack.hpp>
 
-#include <cstddef>
-#include <utility>
-#include <vector>
+#        include <cstddef>
+#        include <utility>
+#        include <vector>
 
 namespace hpx { namespace lcos {
 
@@ -478,90 +478,94 @@ namespace hpx { namespace lcos {
 }}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_FOLD_ACTION_DECLARATION(...)                              \
-    HPX_REGISTER_FOLD_ACTION_DECLARATION_(__VA_ARGS__)                         \
+#        define HPX_REGISTER_FOLD_ACTION_DECLARATION(...)                      \
+            HPX_REGISTER_FOLD_ACTION_DECLARATION_(__VA_ARGS__)                 \
 /**/
-#define HPX_REGISTER_FOLD_ACTION_DECLARATION_(...)                             \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_FOLD_ACTION_DECLARATION_,            \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
+#        define HPX_REGISTER_FOLD_ACTION_DECLARATION_(...)                     \
+            HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_FOLD_ACTION_DECLARATION_,    \
+                HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                       \
+            /**/
 
-#define HPX_REGISTER_FOLD_ACTION_DECLARATION_2(Action, FoldOp)                 \
-    HPX_REGISTER_ACTION_DECLARATION(::hpx::lcos::detail::make_fold_action<     \
-                                        Action>::fold_invoker<FoldOp>::type,   \
-        HPX_PP_CAT(HPX_PP_CAT(fold_, Action), FoldOp))                         \
+#        define HPX_REGISTER_FOLD_ACTION_DECLARATION_2(Action, FoldOp)         \
+            HPX_REGISTER_ACTION_DECLARATION(                                   \
+                ::hpx::lcos::detail::make_fold_action<Action>::fold_invoker<   \
+                    FoldOp>::type,                                             \
+                HPX_PP_CAT(HPX_PP_CAT(fold_, Action), FoldOp))                 \
 /**/
-#define HPX_REGISTER_FOLD_ACTION_DECLARATION_3(Action, FoldOp, Name)           \
-    HPX_REGISTER_ACTION_DECLARATION(::hpx::lcos::detail::make_fold_action<     \
-                                        Action>::fold_invoker<FoldOp>::type,   \
-        HPX_PP_CAT(fold_, Name))                                               \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_FOLD_ACTION(...)                                          \
-    HPX_REGISTER_FOLD_ACTION_(__VA_ARGS__)                                     \
-/**/
-#define HPX_REGISTER_FOLD_ACTION_(...)                                         \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_FOLD_ACTION_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))    \
-    /**/
-
-#define HPX_REGISTER_FOLD_ACTION_2(Action, FoldOp)                             \
-    HPX_REGISTER_ACTION(::hpx::lcos::detail::make_fold_action<                 \
-                            Action>::fold_invoker<FoldOp>::type,               \
-        HPX_PP_CAT(HPX_PP_CAT(fold_, Action), FoldOp))                         \
-/**/
-#define HPX_REGISTER_FOLD_ACTION_3(Action, FoldOp, Name)                       \
-    HPX_REGISTER_ACTION(::hpx::lcos::detail::make_fold_action<                 \
-                            Action>::fold_invoker<FoldOp>::type,               \
-        HPX_PP_CAT(fold_, Name))                                               \
+#        define HPX_REGISTER_FOLD_ACTION_DECLARATION_3(Action, FoldOp, Name)   \
+            HPX_REGISTER_ACTION_DECLARATION(                                   \
+                ::hpx::lcos::detail::make_fold_action<Action>::fold_invoker<   \
+                    FoldOp>::type,                                             \
+                HPX_PP_CAT(fold_, Name))                                       \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION(...)                   \
-    HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)              \
+#        define HPX_REGISTER_FOLD_ACTION(...)                                  \
+            HPX_REGISTER_FOLD_ACTION_(__VA_ARGS__)                             \
 /**/
-#define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_(...)                  \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_, \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
+#        define HPX_REGISTER_FOLD_ACTION_(...)                                 \
+            HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_FOLD_ACTION_,                \
+                HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                       \
+            /**/
 
-#define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_2(Action, FoldOp)      \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_fold_action<::hpx::lcos::detail::            \
-                fold_with_index<Action>>::fold_invoker<FoldOp>::type,          \
-        HPX_PP_CAT(HPX_PP_CAT(fold_, Action), FoldOp))                         \
+#        define HPX_REGISTER_FOLD_ACTION_2(Action, FoldOp)                     \
+            HPX_REGISTER_ACTION(::hpx::lcos::detail::make_fold_action<         \
+                                    Action>::fold_invoker<FoldOp>::type,       \
+                HPX_PP_CAT(HPX_PP_CAT(fold_, Action), FoldOp))                 \
 /**/
-#define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_3(                     \
-    Action, FoldOp, Name)                                                      \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_fold_action<::hpx::lcos::detail::            \
-                fold_with_index<Action>>::fold_invoker<FoldOp>::type,          \
-        HPX_PP_CAT(fold_, Name))                                               \
+#        define HPX_REGISTER_FOLD_ACTION_3(Action, FoldOp, Name)               \
+            HPX_REGISTER_ACTION(::hpx::lcos::detail::make_fold_action<         \
+                                    Action>::fold_invoker<FoldOp>::type,       \
+                HPX_PP_CAT(fold_, Name))                                       \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_FOLD_WITH_INDEX_ACTION(...)                               \
-    HPX_REGISTER_FOLD_WITH_INDEX_ACTION_(__VA_ARGS__)                          \
+#        define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION(...)           \
+            HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)      \
 /**/
-#define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_(...)                              \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_FOLD_WITH_INDEX_ACTION_,             \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
+#        define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_(...)          \
+            HPX_PP_EXPAND(                                                     \
+                HPX_PP_CAT(HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_,   \
+                    HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                   \
+            /**/
 
-#define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_2(Action, FoldOp)                  \
-    HPX_REGISTER_ACTION(                                                       \
-        ::hpx::lcos::detail::make_fold_action<::hpx::lcos::detail::            \
-                fold_with_index<Action>>::fold_invoker<FoldOp>::type,          \
-        HPX_PP_CAT(HPX_PP_CAT(fold_, Action), FoldOp))                         \
+#        define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_2(             \
+            Action, FoldOp)                                                    \
+            HPX_REGISTER_ACTION_DECLARATION(                                   \
+                ::hpx::lcos::detail::make_fold_action<::hpx::lcos::detail::    \
+                        fold_with_index<Action>>::fold_invoker<FoldOp>::type,  \
+                HPX_PP_CAT(HPX_PP_CAT(fold_, Action), FoldOp))                 \
 /**/
-#define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_3(Action, FoldOp, Name)            \
-    HPX_REGISTER_ACTION(                                                       \
-        ::hpx::lcos::detail::make_fold_action<::hpx::lcos::detail::            \
-                fold_with_index<Action>>::fold_invoker<FoldOp>::type,          \
-        HPX_PP_CAT(fold_, Name))                                               \
-    /**/
+#        define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_DECLARATION_3(             \
+            Action, FoldOp, Name)                                              \
+            HPX_REGISTER_ACTION_DECLARATION(                                   \
+                ::hpx::lcos::detail::make_fold_action<::hpx::lcos::detail::    \
+                        fold_with_index<Action>>::fold_invoker<FoldOp>::type,  \
+                HPX_PP_CAT(fold_, Name))                                       \
+/**/
 
-#endif
+///////////////////////////////////////////////////////////////////////////////
+#        define HPX_REGISTER_FOLD_WITH_INDEX_ACTION(...)                       \
+            HPX_REGISTER_FOLD_WITH_INDEX_ACTION_(__VA_ARGS__)                  \
+/**/
+#        define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_(...)                      \
+            HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_FOLD_WITH_INDEX_ACTION_,     \
+                HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                       \
+            /**/
+
+#        define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_2(Action, FoldOp)          \
+            HPX_REGISTER_ACTION(                                               \
+                ::hpx::lcos::detail::make_fold_action<::hpx::lcos::detail::    \
+                        fold_with_index<Action>>::fold_invoker<FoldOp>::type,  \
+                HPX_PP_CAT(HPX_PP_CAT(fold_, Action), FoldOp))                 \
+/**/
+#        define HPX_REGISTER_FOLD_WITH_INDEX_ACTION_3(Action, FoldOp, Name)    \
+            HPX_REGISTER_ACTION(                                               \
+                ::hpx::lcos::detail::make_fold_action<::hpx::lcos::detail::    \
+                        fold_with_index<Action>>::fold_invoker<FoldOp>::type,  \
+                HPX_PP_CAT(fold_, Name))                                       \
+            /**/
+
+#    endif
 
 #endif    // DOXYGEN

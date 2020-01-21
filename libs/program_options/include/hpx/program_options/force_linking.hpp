@@ -20,12 +20,12 @@ namespace hpx { namespace program_options {
 }}    // namespace hpx::program_options
 #else
 
-#include <hpx/program_options.hpp>
+#    include <hpx/program_options.hpp>
 
-#include <functional>
-#include <iosfwd>
-#include <string>
-#include <vector>
+#    include <functional>
+#    include <iosfwd>
+#    include <string>
+#    include <vector>
 
 namespace hpx { namespace program_options {
 

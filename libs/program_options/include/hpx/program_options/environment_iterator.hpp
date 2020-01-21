@@ -12,7 +12,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/environment_iterator.hpp
 
-#include <boost/program_options/environment_iterator.hpp>
+#    include <boost/program_options/environment_iterator.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -22,11 +22,11 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <hpx/assertion.hpp>
-#include <hpx/program_options/eof_iterator.hpp>
+#    include <hpx/assertion.hpp>
+#    include <hpx/program_options/eof_iterator.hpp>
 
-#include <string>
-#include <utility>
+#    include <string>
+#    include <utility>
 
 namespace hpx { namespace program_options {
 

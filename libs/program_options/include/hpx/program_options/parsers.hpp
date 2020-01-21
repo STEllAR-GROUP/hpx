@@ -13,8 +13,8 @@
 // hpxinspect:nodeprecatedinclude:boost/program_options/parsers.hpp
 // hpxinspect:nodeprecatedinclude:boost/program_options/options_description.hpp
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
+#    include <boost/program_options/options_description.hpp>
+#    include <boost/program_options/parsers.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -38,24 +38,24 @@ namespace hpx { namespace program_options {
     using boost::program_options::parse_config_file;
     using boost::program_options::parse_environment;
     using boost::program_options::split_unix;
-#ifdef HPX_WINDOWS
+#    ifdef HPX_WINDOWS
     using boost::program_options::split_winmain;
-#endif
+#    endif
 
 }}    // namespace hpx::program_options
 
 #else
 
-#include <hpx/program_options/detail/cmdline.hpp>
-#include <hpx/program_options/option.hpp>
+#    include <hpx/program_options/detail/cmdline.hpp>
+#    include <hpx/program_options/option.hpp>
 
-#include <functional>
-#include <iosfwd>
-#include <string>
-#include <utility>
-#include <vector>
+#    include <functional>
+#    include <iosfwd>
+#    include <string>
+#    include <utility>
+#    include <vector>
 
-#include <hpx/config/warnings_prefix.hpp>
+#    include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options {
 
@@ -294,7 +294,7 @@ namespace hpx { namespace program_options {
         const std::wstring& seperator = L" \t",
         const std::wstring& quote = L"'\"", const std::wstring& escape = L"\\");
 
-#ifdef HPX_WINDOWS
+#    ifdef HPX_WINDOWS
     /** Parses the char* string which is passed to WinMain function on
         windows. This function is provided for convenience, and because it's
         not clear how to portably access split command line string from
@@ -307,11 +307,11 @@ namespace hpx { namespace program_options {
     /** @overload */
     HPX_EXPORT std::vector<std::wstring> split_winmain(
         const std::wstring& cmdline);
-#endif
+#    endif
 
 }}    // namespace hpx::program_options
 
-#include <hpx/config/warnings_suffix.hpp>
+#    include <hpx/config/warnings_suffix.hpp>
 
 #endif
 

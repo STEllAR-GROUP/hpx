@@ -9,21 +9,21 @@
 
 #if defined(DOXYGEN)
 /// Returns the GCC version HPX is compiled with. Only set if compiled with GCC.
-#define HPX_GCC_VERSION
+#    define HPX_GCC_VERSION
 /// Returns the Clang version HPX is compiled with. Only set if compiled with
 /// Clang.
-#define HPX_CLANG_VERSION
+#    define HPX_CLANG_VERSION
 /// Returns the Intel Compiler version HPX is compiled with. Only set if
 /// compiled with the Intel Compiler.
-#define HPX_INTEL_VERSION
+#    define HPX_INTEL_VERSION
 /// This macro is set if the compilation is with MSVC.
-#define HPX_MSVC
+#    define HPX_MSVC
 /// This macro is set if the compilation is with Mingw.
-#define HPX_MINGW
+#    define HPX_MINGW
 /// This macro is set if the compilation is for Windows.
-#define HPX_WINDOWS
+#    define HPX_WINDOWS
 /// This macro is set if the compilation is for Intel Knights Landing.
-#define HPX_NATIVE_MIC
+#    define HPX_NATIVE_MIC
 #else
 
 // clang-format off

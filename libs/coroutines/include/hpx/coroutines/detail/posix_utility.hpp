@@ -37,7 +37,7 @@
 // include unist.d conditionally to check for POSIX version. Not all OSs have the
 // unistd header...
 #if defined(HPX_HAVE_UNISTD_H)
-#include <unistd.h>
+#    include <unistd.h>
 #endif
 
 #if defined(_POSIX_VERSION)
@@ -45,28 +45,28 @@
  * Most of these utilities are really pure C++, but they are useful
  * only on posix systems.
  */
-#include <cerrno>
-#include <cstddef>
-#include <cstdlib>
-#include <stdexcept>
+#    include <cerrno>
+#    include <cstddef>
+#    include <cstdlib>
+#    include <stdexcept>
 
-#if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
-#include <errno.h>
-#include <sys/mman.h>
-#include <sys/param.h>
+#    if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
+#        include <errno.h>
+#        include <sys/mman.h>
+#        include <sys/param.h>
 
-#include <stdexcept>
-#endif
+#        include <stdexcept>
+#    endif
 
-#if defined(__FreeBSD__)
-#include <sys/param.h>
-#define EXEC_PAGESIZE PAGE_SIZE
-#endif
+#    if defined(__FreeBSD__)
+#        include <sys/param.h>
+#        define EXEC_PAGESIZE PAGE_SIZE
+#    endif
 
-#if defined(__APPLE__)
-#include <unistd.h>
-#define EXEC_PAGESIZE static_cast<std::size_t>(sysconf(_SC_PAGESIZE))
-#endif
+#    if defined(__APPLE__)
+#        include <unistd.h>
+#        define EXEC_PAGESIZE static_cast<std::size_t>(sysconf(_SC_PAGESIZE))
+#    endif
 
 /**
  * Stack allocation routines and trampolines for setcontext
@@ -75,20 +75,20 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     namespace posix {
         HPX_EXPORT extern bool use_guard_pages;
 
-#if defined(HPX_HAVE_THREAD_STACK_MMAP) && defined(_POSIX_MAPPED_FILES) &&     \
-    _POSIX_MAPPED_FILES > 0
+#    if defined(HPX_HAVE_THREAD_STACK_MMAP) && defined(_POSIX_MAPPED_FILES) && \
+        _POSIX_MAPPED_FILES > 0
 
         inline void* alloc_stack(std::size_t size)
         {
             void* real_stack = ::mmap(nullptr, size + EXEC_PAGESIZE,
                 PROT_EXEC | PROT_READ | PROT_WRITE,
-#if defined(__APPLE__)
+#        if defined(__APPLE__)
                 MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
-#elif defined(__FreeBSD__)
+#        elif defined(__FreeBSD__)
                 MAP_PRIVATE | MAP_ANON,
-#else
+#        else
                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
-#endif
+#        endif
                 -1, 0);
 
             if (real_stack == MAP_FAILED)
@@ -108,7 +108,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 }
             }
 
-#if defined(HPX_HAVE_THREAD_GUARD_PAGE)
+#        if defined(HPX_HAVE_THREAD_GUARD_PAGE)
             if (use_guard_pages)
             {
                 // Add a guard page.
@@ -119,9 +119,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 return static_cast<void*>(stack);
             }
             return real_stack;
-#else
+#        else
             return real_stack;
-#endif
+#        endif
         }
 
         inline void watermark_stack(void* stack, std::size_t size)
@@ -154,7 +154,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         inline void free_stack(void* stack, std::size_t size)
         {
-#if defined(HPX_HAVE_THREAD_GUARD_PAGE)
+#        if defined(HPX_HAVE_THREAD_GUARD_PAGE)
             if (use_guard_pages)
             {
                 void** real_stack = static_cast<void**>(stack) -
@@ -165,12 +165,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             {
                 ::munmap(stack, size);
             }
-#else
+#        else
             ::munmap(stack, size);
-#endif
+#        endif
         }
 
-#else    // non-mmap()
+#    else    // non-mmap()
 
         //this should be a fine default.
         static const std::size_t stack_alignment = sizeof(void*) > 16 ?
@@ -209,7 +209,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             delete[] static_cast<stack_aligner*>(stack);
         }
 
-#endif    // non-mmap() implementation of alloc_stack()/free_stack()
+#    endif    // non-mmap() implementation of alloc_stack()/free_stack()
 
         /**
      * The splitter is needed for 64 bit systems.
@@ -266,7 +266,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 }}}}}    // namespace hpx::threads::coroutines::detail::posix
 
 #else
-#error This header can only be included when compiling for posix systems.
+#    error This header can only be included when compiling for posix systems.
 #endif
 
 #endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_POSIX_UTILITY_HPP*/

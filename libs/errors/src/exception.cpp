@@ -15,9 +15,9 @@
 #include <hpx/logging.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <process.h>
+#    include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)
-#include <unistd.h>
+#    include <unistd.h>
 #endif
 
 #include <algorithm>

@@ -9,11 +9,11 @@
 #include <hpx/functional/function_ref.hpp>
 
 #if defined(HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/function_ref.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/function_ref.hpp is deprecated, \
     please include hpx/functional/function_ref.hpp instead")
-#else
-#warning "The header hpx/util/function_ref.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/function_ref.hpp is deprecated, \
     please include hpx/functional/function_ref.hpp instead"
-#endif
+#    endif
 #endif

@@ -9,12 +9,13 @@
 #include <hpx/serialization/array.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/serialization/array.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/serialization/array.hpp is deprecated, \
     please include hpx/serialization/array.hpp instead")
-#else
-#warning "The header hpx/runtime/serialization/array.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/runtime/serialization/array.hpp is deprecated, \
     please include hpx/serialization/array.hpp instead"
-#endif
+#    endif
 #endif

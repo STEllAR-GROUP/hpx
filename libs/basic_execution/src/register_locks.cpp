@@ -26,18 +26,18 @@ namespace hpx { namespace util {
             lock_data()
               : ignore_(false)
               , user_data_(nullptr)
-#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+#    ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
               , backtrace_(hpx::util::trace())
-#endif
+#    endif
             {
             }
 
             lock_data(register_lock_data* data)
               : ignore_(false)
               , user_data_(data)
-#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+#    ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
               , backtrace_(hpx::detail::trace())
-#endif
+#    endif
             {
             }
 
@@ -48,9 +48,9 @@ namespace hpx { namespace util {
 
             bool ignore_;
             register_lock_data* user_data_;
-#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+#    ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
             std::string backtrace_;
-#endif
+#    endif
         };
 
         struct register_locks

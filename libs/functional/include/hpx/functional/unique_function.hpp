@@ -96,7 +96,7 @@ namespace hpx { namespace traits {
         }
     };
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#    if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename Sig, bool Serializable>
     struct get_function_annotation_itt<util::unique_function<Sig, Serializable>>
     {
@@ -106,7 +106,7 @@ namespace hpx { namespace traits {
             return f.get_function_annotation_itt();
         }
     };
-#endif
+#    endif
 }}    // namespace hpx::traits
 #endif
 

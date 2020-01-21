@@ -9,13 +9,15 @@
 #include <hpx/batch_environments/alps_environment.hpp>
 
 #if defined(HPX_BATCH_ENVIRONMENTS_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/util/batch_environments/alps_environment.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/batch_environments/alps_environment.hpp is \
+            deprecated, \
     please include hpx/batch_environments/alps_environment.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/util/batch_environments/alps_environment.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/util/batch_environments/alps_environment.hpp is \
+            deprecated, \
     please include hpx/batch_environments/alps_environment.hpp instead"
-#endif
+#    endif
 #endif

@@ -26,7 +26,7 @@
 // native implementation
 #if defined(HPX_HAVE_NATIVE_TLS)
 
-#if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
+#    if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
 
 namespace hpx { namespace util {
     template <typename T, typename Tag>
@@ -64,10 +64,10 @@ namespace hpx { namespace util {
     HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = nullptr;
 }}    // namespace hpx::util
 
-#else
+#    else
 
-#include <hpx/type_support/static.hpp>
-#include <pthread.h>
+#        include <hpx/type_support/static.hpp>
+#        include <pthread.h>
 
 namespace hpx { namespace util {
     namespace detail {
@@ -134,12 +134,12 @@ namespace hpx { namespace util {
     };
 }}    // namespace hpx::util
 
-#endif
+#    endif
 
 // fallback implementation
 #else
 
-#include <boost/thread/tss.hpp>
+#    include <boost/thread/tss.hpp>
 
 namespace hpx { namespace util {
     template <typename T, typename Tag>

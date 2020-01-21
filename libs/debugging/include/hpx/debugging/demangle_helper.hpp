@@ -30,9 +30,9 @@ namespace hpx { namespace util { namespace debug {
 
 #if defined(__GNUG__)
 
-#include <cxxabi.h>
-#include <memory>
-#include <stdlib.h>
+#    include <cxxabi.h>
+#    include <memory>
+#    include <stdlib.h>
 
 // --------------------------------------------------------------------
 // if available : demangle an arbitrary c++ type using gnu utility

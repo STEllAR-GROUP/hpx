@@ -13,8 +13,8 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
+#    include <hpx/functional/traits/get_function_address.hpp>
+#    include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -1130,7 +1130,7 @@ namespace hpx { namespace traits {
         }
     };
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#    if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename F, typename S, typename Tuple>
     struct get_function_annotation_itt<
         parallel::v2::detail::part_iterations<F, S, Tuple>>
@@ -1143,7 +1143,7 @@ namespace hpx { namespace traits {
                 typename hpx::util::decay<F>::type>::call(f.f_);
         }
     };
-#endif
+#    endif
 }}    // namespace hpx::traits
 #endif
 

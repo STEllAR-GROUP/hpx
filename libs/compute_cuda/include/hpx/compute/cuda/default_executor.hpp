@@ -10,30 +10,30 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/type_support/decay.hpp>
+#    include <hpx/datastructures/tuple.hpp>
+#    include <hpx/errors.hpp>
+#    include <hpx/execution/traits/executor_traits.hpp>
+#    include <hpx/execution/traits/is_executor.hpp>
+#    include <hpx/iterator_support/range.hpp>
+#    include <hpx/iterator_support/traits/is_iterator.hpp>
+#    include <hpx/iterator_support/traits/is_range.hpp>
+#    include <hpx/lcos/future.hpp>
+#    include <hpx/type_support/decay.hpp>
 
-#include <hpx/execution/executors/execution.hpp>
+#    include <hpx/execution/executors/execution.hpp>
 
-#include <hpx/compute/cuda/allocator.hpp>
-#include <hpx/compute/cuda/default_executor_parameters.hpp>
-#include <hpx/compute/cuda/detail/launch.hpp>
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/vector.hpp>
+#    include <hpx/compute/cuda/allocator.hpp>
+#    include <hpx/compute/cuda/default_executor_parameters.hpp>
+#    include <hpx/compute/cuda/detail/launch.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/compute/vector.hpp>
 
-#include <algorithm>
-#include <cstddef>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#    include <algorithm>
+#    include <cstddef>
+#    include <string>
+#    include <type_traits>
+#    include <utility>
+#    include <vector>
 
 namespace hpx { namespace compute { namespace cuda {
     namespace detail {
@@ -45,7 +45,7 @@ namespace hpx { namespace compute { namespace cuda {
             static void call(cuda::target const& target, F&& f,
                 Shape const& shape, Ts&&... ts)
             {
-#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 std::size_t count = util::size(shape);
 
                 int threads_per_block =
@@ -73,12 +73,12 @@ namespace hpx { namespace compute { namespace cuda {
                     },
                     std::forward<F>(f), shape_container.data(), count,
                     std::forward<Ts>(ts)...);
-#else
+#    else
                 HPX_THROW_EXCEPTION(hpx::not_implemented,
                     "hpx::compute::cuda::detail::bulk_launch_helper",
                     "Trying to launch a CUDA kernel, but did not compile in "
                     "CUDA mode");
-#endif
+#    endif
             }
         };
 
@@ -93,7 +93,7 @@ namespace hpx { namespace compute { namespace cuda {
             static void call(cuda::target const& target, F&& f,
                 Shape const& shape, Ts&&... ts)
             {
-#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
+#    if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 typedef typename hpx::traits::range_traits<Shape>::value_type
                     value_type;
 
@@ -122,12 +122,12 @@ namespace hpx { namespace compute { namespace cuda {
                         },
                         std::forward<F>(f), std::forward<Ts>(ts)...);
                 }
-#else
+#    else
                 HPX_THROW_EXCEPTION(hpx::not_implemented,
                     "hpx::compute::cuda::detail::bulk_launch_helper",
                     "Trying to launch a CUDA kernel, but did not compile in "
                     "CUDA mode");
-#endif
+#    endif
             }
         };
     }    // namespace detail

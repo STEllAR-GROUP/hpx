@@ -7,23 +7,23 @@
 #include <hpx/program_options/config.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/assertion.hpp>
-#include <hpx/program_options/detail/cmdline.hpp>
-#include <hpx/program_options/errors.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/positional_options.hpp>
-#include <hpx/program_options/value_semantic.hpp>
+#    include <hpx/assertion.hpp>
+#    include <hpx/program_options/detail/cmdline.hpp>
+#    include <hpx/program_options/errors.hpp>
+#    include <hpx/program_options/options_description.hpp>
+#    include <hpx/program_options/positional_options.hpp>
+#    include <hpx/program_options/value_semantic.hpp>
 
-#include <cctype>
-#include <climits>
-#include <cstddef>
-#include <cstdio>
-#include <cstring>
-#include <functional>
-#include <iostream>
-#include <string>
-#include <utility>
-#include <vector>
+#    include <cctype>
+#    include <climits>
+#    include <cstddef>
+#    include <cstdio>
+#    include <cstring>
+#    include <functional>
+#    include <iostream>
+#    include <string>
+#    include <utility>
+#    include <vector>
 
 namespace hpx { namespace program_options {
 

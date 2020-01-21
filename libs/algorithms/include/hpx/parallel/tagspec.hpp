@@ -24,18 +24,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEFINE_TAG_SPECIFIER(out2)     // defines tag::out2
 
 #if defined(HPX_MSVC)
-#pragma push_macro("min")
-#pragma push_macro("max")
-#undef min
-#undef max
+#    pragma push_macro("min")
+#    pragma push_macro("max")
+#    undef min
+#    undef max
 #endif
 
     HPX_DEFINE_TAG_SPECIFIER(min)    // defines tag::min
     HPX_DEFINE_TAG_SPECIFIER(max)    // defines tag::max
 
 #if defined(HPX_MSVC)
-#pragma pop_macro("min")
-#pragma pop_macro("max")
+#    pragma pop_macro("min")
+#    pragma pop_macro("max")
 #endif
 }}}    // namespace hpx::parallel::v1
 

@@ -9,11 +9,11 @@
 #include <hpx/concurrency/spinlock.hpp>
 
 #if defined(HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/spinlock.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header hpx/util/spinlock.hpp is deprecated, \
     please include hpx/concurrency/spinlock.hpp instead")
-#else
-#warning "The header hpx/util/spinlock.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/spinlock.hpp is deprecated, \
     please include hpx/concurrency/spinlock.hpp instead"
-#endif
+#    endif
 #endif

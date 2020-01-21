@@ -12,10 +12,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
+#    include <hpx/lcos_fwd.hpp>
+#    include <hpx/runtime/naming_fwd.hpp>
 
-#include <vector>
+#    include <vector>
 
 namespace hpx { namespace compute { namespace cuda {
     struct HPX_EXPORT target;

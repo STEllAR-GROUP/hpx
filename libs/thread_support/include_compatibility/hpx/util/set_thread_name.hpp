@@ -9,11 +9,12 @@
 #include <hpx/thread_support/set_thread_name.hpp>
 
 #if defined(HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/util/set_thread_name.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/util/set_thread_name.hpp is deprecated, \
     please include hpx/thread_support/set_thread_name.hpp instead")
-#else
-#warning "The header hpx/util/set_thread_name.hpp is deprecated, \
+#    else
+#        warning "The header hpx/util/set_thread_name.hpp is deprecated, \
     please include hpx/thread_support/set_thread_name.hpp instead"
-#endif
+#    endif
 #endif

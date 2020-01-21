@@ -9,13 +9,15 @@
 #include <hpx/affinity/affinity_data.hpp>
 
 #if defined(HPX_AFFINITY_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/runtime/threads/policies/affinity_data.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/runtime/threads/policies/affinity_data.hpp is \
+            deprecated, \
     please include hpx/affinity/affinity_data.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/runtime/threads/policies/affinity_data.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/runtime/threads/policies/affinity_data.hpp is \
+        deprecated, \
     please include hpx/affinity/affinity_data.hpp instead"
-#endif
+#    endif
 #endif

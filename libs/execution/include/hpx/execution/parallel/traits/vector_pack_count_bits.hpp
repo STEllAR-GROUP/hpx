@@ -21,9 +21,9 @@ namespace hpx { namespace parallel { namespace traits {
 
 #if defined(HPX_HAVE_DATAPAR)
 
-#if !defined(__CUDACC__)
-#include <hpx/execution/parallel/traits/detail/vc/vector_pack_count_bits.hpp>
-#endif
+#    if !defined(__CUDACC__)
+#        include <hpx/execution/parallel/traits/detail/vc/vector_pack_count_bits.hpp>
+#    endif
 
 #endif
 #endif

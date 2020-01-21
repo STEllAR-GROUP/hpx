@@ -25,11 +25,11 @@
 #define INITIAL_VAL 50
 #define DISPLAY 10    // for debug output
 #ifdef DUMP_VALUES
-#define DEBUG_OUT(x)                                                           \
-    std::cout << x << std::endl;                                               \
-#endif
+#    define DEBUG_OUT(x)                                                       \
+        std::cout << x << std::endl;                                           \
+#        endif
 #else
-#define DEBUG_OUT(x)
+#    define DEBUG_OUT(x)
 #endif
 
 // n'th value of sum of 1+2+3+...

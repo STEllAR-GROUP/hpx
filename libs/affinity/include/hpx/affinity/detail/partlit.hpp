@@ -16,7 +16,7 @@
 #define HPX_RUNTIME_THREADS_DETAIL_PARTLIT_FEB_02_2013_0845PM
 
 #if defined(HPX_MSVC)
-#pragma once
+#    pragma once
 #endif
 
 #include <hpx/config.hpp>

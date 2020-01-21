@@ -19,11 +19,11 @@
 // include unist.d conditionally to check for POSIX version. Not all OSs have the
 // unistd header...
 #if defined(HPX_HAVE_UNISTD_H)
-#include <unistd.h>
+#    include <unistd.h>
 #endif
 
 #if defined(_POSIX_VERSION)
-#include <hpx/coroutines/detail/posix_utility.hpp>
+#    include <hpx/coroutines/detail/posix_utility.hpp>
 #endif
 
 #include <boost/context/detail/fcontext.hpp>
@@ -40,7 +40,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
 
-#define HPX_COROUTINES_SEGMENTS 10
+#    define HPX_COROUTINES_SEGMENTS 10
 
 extern "C" {
 void* __splitstack_makecontext(
@@ -53,10 +53,10 @@ void __splitstack_getcontext(void * [HPX_COROUTINES_SEGMENTS]);
 void __splitstack_setcontext(void * [HPX_COROUTINES_SEGMENTS]);
 }
 
-#if !defined(SIGSTKSZ)
-#define SIGSTKSZ (8 * 1024)
-#define UDEF_SIGSTKSZ
-#endif
+#    if !defined(SIGSTKSZ)
+#        define SIGSTKSZ (8 * 1024)
+#        define UDEF_SIGSTKSZ
+#    endif
 
 #endif
 
@@ -91,14 +91,14 @@ namespace hpx { namespace threads { namespace coroutines {
 
             void* allocate(std::size_t size) const
             {
-#if defined(_POSIX_VERSION)
+#    if defined(_POSIX_VERSION)
                 void* limit = posix::alloc_stack(size);
                 posix::watermark_stack(limit, size);
-#else
+#    else
                 void* limit = std::calloc(size, sizeof(char));
                 if (!limit)
                     throw std::bad_alloc();
-#endif
+#    endif
                 return static_cast<char*>(limit) + size;
             }
 
@@ -106,11 +106,11 @@ namespace hpx { namespace threads { namespace coroutines {
             {
                 HPX_ASSERT(vp);
                 void* limit = static_cast<char*>(vp) - size;
-#if defined(_POSIX_VERSION)
+#    if defined(_POSIX_VERSION)
                 posix::free_stack(limit, size);
-#else
+#    else
                 std::free(limit);
-#endif
+#    endif
             }
         };
 #else
@@ -249,9 +249,9 @@ namespace hpx { namespace threads { namespace coroutines {
                         static_cast<char*>(stack_pointer_) - stack_size_;
                     if (posix::reset_stack(limit, stack_size_))
                     {
-#if defined(HPX_HAVE_COROUTINE_COUNTERS)
+#    if defined(HPX_HAVE_COROUTINE_COUNTERS)
                         increment_stack_unbind_count();
-#endif
+#    endif
                     }
 #else
                     // nothing we can do here ...

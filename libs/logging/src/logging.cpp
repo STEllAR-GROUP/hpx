@@ -8,28 +8,28 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <hpx/filesystem.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/logging/format/destination/defaults.hpp>
-#include <hpx/logging/format/named_write.hpp>
-#include <hpx/util/from_string.hpp>
+#    include <hpx/filesystem.hpp>
+#    include <hpx/logging.hpp>
+#    include <hpx/logging/format/destination/defaults.hpp>
+#    include <hpx/logging/format/named_write.hpp>
+#    include <hpx/util/from_string.hpp>
 
-#include <boost/config.hpp>
-#include <boost/version.hpp>
+#    include <boost/config.hpp>
+#    include <boost/version.hpp>
 
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
+#    include <cstddef>
+#    include <cstdint>
+#    include <cstdlib>
+#    include <sstream>
+#    include <string>
+#    include <utility>
+#    include <vector>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
+#    if defined(HPX_MSVC_WARNING_PRAGMA)
+#        pragma warning(push)
 // 'class1' : inherits 'class2::member' via dominance
-#pragma warning(disable : 4250)
-#endif
+#        pragma warning(disable : 4250)
+#    endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
@@ -113,7 +113,7 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-#include <hpx/logging/detail/cache_before_init.hpp>
+#    include <hpx/logging/detail/cache_before_init.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
     void cache_before_init::turn_cache_off(writer::named_write const& writer_)
@@ -135,14 +135,14 @@ namespace hpx { namespace util { namespace logging { namespace detail {
 }}}}    // namespace hpx::util::logging::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-#include <hpx/logging/format/destination/file.hpp>
+#    include <hpx/logging/format/destination/file.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
     file::mutex_type file::mtx_ = BOOST_DETAIL_SPINLOCK_INIT;
 }}}}    // namespace hpx::util::logging::destination
 
 ///////////////////////////////////////////////////////////////////////////////
-#include <hpx/logging/format/destination/named.hpp>
+#    include <hpx/logging/format/destination/named.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
     namespace detail {
@@ -169,7 +169,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 }}}}}    // namespace hpx::util::logging::destination::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-#include <hpx/logging/format/formatter/named_spacer.hpp>
+#    include <hpx/logging/format/formatter/named_spacer.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace formatter {
     namespace detail {
@@ -221,8 +221,8 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         }
 }}}}}    // namespace hpx::util::logging::formatter::detail
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#    if defined(HPX_MSVC_WARNING_PRAGMA)
+#        pragma warning(pop)
+#    endif
 
 #endif    // HPX_HAVE_LOGGING

@@ -10,9 +10,9 @@
 
 #if defined(DOXYGEN)
 /// Defined if HPX is compiled in debug mode.
-#define HPX_DEBUG
+#    define HPX_DEBUG
 /// Evaluates to ``debug`` if compiled in debug mode, ``release`` otherwise.
-#define HPX_BUILD_TYPE
+#    define HPX_BUILD_TYPE
 #else
 
 // clang-format off

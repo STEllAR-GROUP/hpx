@@ -9,15 +9,15 @@
 #include <hpx/execution/parallel/traits/detail/vc/vector_pack_load_store.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/parallel/traits/detail/vc/vector_pack_load_store.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message("The header \
+            hpx/parallel/traits/detail/vc/vector_pack_load_store.hpp is deprecated, \
     please include hpx/execution/parallel/traits/detail/vc/vector_pack_load_store.hpp \
     instead")
-#else
-#warning                                                                       \
-    "The header hpx/parallel/traits/detail/vc/vector_pack_load_store.hpp is deprecated, \
+#    else
+#        warning "The header \
+            hpx/parallel/traits/detail/vc/vector_pack_load_store.hpp is deprecated, \
     please include hpx/execution/parallel/traits/detail/vc/vector_pack_load_store.hpp \
     instead"
-#endif
+#    endif
 #endif

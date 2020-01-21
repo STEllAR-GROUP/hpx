@@ -12,7 +12,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/detail/config_file.hpp
 
-#include <boost/program_options/detail/config_file.hpp>
+#    include <boost/program_options/detail/config_file.hpp>
 
 namespace hpx { namespace program_options { namespace detail {
 
@@ -28,17 +28,17 @@ namespace hpx { namespace program_options { namespace detail {
 
 #else
 
-#include <hpx/program_options/detail/convert.hpp>
-#include <hpx/program_options/eof_iterator.hpp>
-#include <hpx/program_options/option.hpp>
+#    include <hpx/program_options/detail/convert.hpp>
+#    include <hpx/program_options/eof_iterator.hpp>
+#    include <hpx/program_options/option.hpp>
 
-#include <iosfwd>
-#include <istream>    // std::getline
-#include <memory>
-#include <set>
-#include <string>
+#    include <iosfwd>
+#    include <istream>    // std::getline
+#    include <memory>
+#    include <set>
+#    include <string>
 
-#include <hpx/config/warnings_prefix.hpp>
+#    include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace program_options { namespace detail {
 
@@ -91,10 +91,10 @@ namespace hpx { namespace program_options { namespace detail {
     public:    // Method required by eof_iterator
         void get();
 
-#if defined(HPX_MSVC) && HPX_MSVC <= 1900
+#    if defined(HPX_MSVC) && HPX_MSVC <= 1900
         void decrement() {}
         void advance(difference_type) {}
-#endif
+#    endif
 
     protected:    // Stubs for derived classes
         // Obtains next line from the config file
@@ -187,7 +187,7 @@ namespace hpx { namespace program_options { namespace detail {
 
 }}}    // namespace hpx::program_options::detail
 
-#include <hpx/config/warnings_suffix.hpp>
+#    include <hpx/config/warnings_suffix.hpp>
 
 #endif
 #endif

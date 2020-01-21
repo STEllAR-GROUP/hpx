@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #ifdef HPX_HAVE_CXX11_STD_IS_BIND_EXPRESSION
-#include <functional>
+#    include <functional>
 #endif
 #include <type_traits>
 

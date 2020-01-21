@@ -10,11 +10,11 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/array.hpp>
+#    include <hpx/serialization/array.hpp>
 
-#include <boost/multi_array.hpp>
+#    include <boost/multi_array.hpp>
 
-#include <cstddef>
+#    include <cstddef>
 
 namespace hpx { namespace serialization {
 

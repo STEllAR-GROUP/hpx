@@ -13,8 +13,8 @@
 
 #if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) &&                \
     !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS))
-#include <memory>    // for placement new
-#include <mutex>
+#    include <memory>    // for placement new
+#    include <mutex>
 #endif
 
 // clang-format off

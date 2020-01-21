@@ -24,11 +24,11 @@
 #define SKIP_LARGE 2
 
 #if defined(HPX_DEBUG)
-#define WINDOW_SIZE_SMALL 32
-#define WINDOW_SIZE_LARGE 32
+#    define WINDOW_SIZE_SMALL 32
+#    define WINDOW_SIZE_LARGE 32
 #else
-#define WINDOW_SIZE_SMALL 2048
-#define WINDOW_SIZE_LARGE 2048
+#    define WINDOW_SIZE_SMALL 2048
+#    define WINDOW_SIZE_LARGE 2048
 #endif
 
 #define LARGE_MESSAGE_SIZE 8192

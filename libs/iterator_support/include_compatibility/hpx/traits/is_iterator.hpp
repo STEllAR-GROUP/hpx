@@ -9,11 +9,12 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #if defined(HPX_ITERATOR_SUPPORT_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message("The header hpx/traits/is_iterator.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/traits/is_iterator.hpp is deprecated, \
     please include hpx/iterator_support/traits/is_iterator.hpp instead")
-#else
-#warning "The header hpx/traits/is_iterator.hpp is deprecated, \
+#    else
+#        warning "The header hpx/traits/is_iterator.hpp is deprecated, \
     please include hpx/iterator_support/traits/is_iterator.hpp instead"
-#endif
+#    endif
 #endif

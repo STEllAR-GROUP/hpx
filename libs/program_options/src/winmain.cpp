@@ -8,12 +8,12 @@
 
 #if defined(HPX_WINDOWS) &&                                                    \
     !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/program_options/parsers.hpp>
+#    include <hpx/program_options/parsers.hpp>
 
-#include <cctype>
-#include <cstddef>
-#include <string>
-#include <vector>
+#    include <cctype>
+#    include <cstddef>
+#    include <string>
+#    include <vector>
 
 using std::size_t;
 

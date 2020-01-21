@@ -15,11 +15,11 @@
 #include <hpx/program_options/config.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
+#    include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
-#include <cstddef>
-#include <cstdlib>    // for multi-byte conversion routines
-#include <limits>
+#    include <cstddef>
+#    include <cstdlib>    // for multi-byte conversion routines
+#    include <limits>
 
 // If we don't have wstring, then Unicode support
 // is not available anyway, so we don't need to even
@@ -258,9 +258,9 @@ namespace hpx { namespace program_options { namespace detail {
             // against that.  Including <boost/detail/utf8_codecvt_facet.hpp> as we do
             // should be enough to get WCHAR_MAX defined.
             // cope with VC++ 7.1 or earlier having invalid WCHAR_MAX
-#if defined(_MSC_VER) && _MSC_VER <= 1310    // 7.1 or earlier
+#    if defined(_MSC_VER) && _MSC_VER <= 1310    // 7.1 or earlier
             return 2;
-#elif WCHAR_MAX > 0x10000
+#    elif WCHAR_MAX > 0x10000
 
             if (word < 0x10000)
             {
@@ -276,9 +276,9 @@ namespace hpx { namespace program_options { namespace detail {
             }
             return 5;
 
-#else
+#    else
             return 2;
-#endif
+#    endif
         }
 
     }    // namespace detail

@@ -16,7 +16,7 @@
 // pointers (see http//wg21.link/lwg3018)
 #if defined(HPX_HAVE_CXX11_SHARED_PTR_LWG3018)
 
-#include <memory>
+#    include <memory>
 
 namespace hpx { namespace util { namespace plugin {
 
@@ -30,7 +30,7 @@ namespace hpx { namespace util { namespace plugin {
 // hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
 // hpxinspect:nodeprecatedname:boost::shared_ptr
 
-#include <boost/shared_ptr.hpp>
+#    include <boost/shared_ptr.hpp>
 
 namespace hpx { namespace util { namespace plugin {
 
@@ -44,27 +44,27 @@ namespace hpx { namespace util { namespace plugin {
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NO_EXPORT_API)
 
-#define HPX_PLUGIN_EXPORT_API HPX_SYMBOL_EXPORT
+#    define HPX_PLUGIN_EXPORT_API HPX_SYMBOL_EXPORT
 
-#if defined(HPX_WINDOWS)
+#    if defined(HPX_WINDOWS)
 
-#define HPX_PLUGIN_API __cdecl
+#        define HPX_PLUGIN_API __cdecl
 
-#else    // HPX_WINDOWS
+#    else    // HPX_WINDOWS
 
-#if defined(__GNUC__) && defined(__i386)
-#define HPX_PLUGIN_API __attribute__((cdecl))
-#endif
+#        if defined(__GNUC__) && defined(__i386)
+#            define HPX_PLUGIN_API __attribute__((cdecl))
+#        endif
 
-#endif    // HPX_WINDOWS
+#    endif    // HPX_WINDOWS
 
 #endif    // !HPX_PLUGIN_NO_EXPORT_API
 
 #if !defined(HPX_PLUGIN_EXPORT_API)
-#define HPX_PLUGIN_EXPORT_API /* empty */
+#    define HPX_PLUGIN_EXPORT_API /* empty */
 #endif
 #if !defined(HPX_PLUGIN_API)
-#define HPX_PLUGIN_API /* empty */
+#    define HPX_PLUGIN_API /* empty */
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ namespace hpx { namespace util { namespace plugin {
 //
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_ARGUMENT_LIMIT)
-#define HPX_PLUGIN_ARGUMENT_LIMIT 10
+#    define HPX_PLUGIN_ARGUMENT_LIMIT 10
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,13 +84,13 @@ namespace hpx { namespace util { namespace plugin {
 //
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_SYMBOLS_PREFIX)
-#if defined(HPX_DEBUG)
-#define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpxd
-#define HPX_PLUGIN_SYMBOLS_PREFIX hpxd
-#else
-#define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpx
-#define HPX_PLUGIN_SYMBOLS_PREFIX hpx
-#endif
+#    if defined(HPX_DEBUG)
+#        define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpxd
+#        define HPX_PLUGIN_SYMBOLS_PREFIX hpxd
+#    else
+#        define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC hpx
+#        define HPX_PLUGIN_SYMBOLS_PREFIX hpx
+#    endif
 #endif
 
 #define HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR                                  \

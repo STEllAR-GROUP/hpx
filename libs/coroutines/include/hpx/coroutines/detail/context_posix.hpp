@@ -36,12 +36,12 @@
 // ucontext_t struct when _XOPEN_SOURCE is not defined (rdar://problem/5578699 ).
 // As a workaround, define _XOPEN_SOURCE before including ucontext.h.
 #if defined(__APPLE__) && !defined(_XOPEN_SOURCE)
-#define _XOPEN_SOURCE
+#    define _XOPEN_SOURCE
 // However, the above #define will only affect <ucontext.h> if it has not yet
 // been #included by something else!
-#if defined(_STRUCT_UCONTEXT)
+#    if defined(_STRUCT_UCONTEXT)
 #error You must #include coroutine headers before anything that #includes <ucontext.h>
-#endif
+#    endif
 #endif
 
 #include <hpx/assertion.hpp>
@@ -51,7 +51,7 @@
 // include unist.d conditionally to check for POSIX version. Not all OSs have the
 // unistd header...
 #if defined(HPX_HAVE_UNISTD_H)
-#include <unistd.h>
+#    include <unistd.h>
 #endif
 
 #if defined(__FreeBSD__) ||                                                    \
@@ -59,13 +59,14 @@
 
 // OS X 10.4 -- despite passing the test above -- doesn't support
 // swapcontext() et al. Use GNU Pth workalike functions.
-#if defined(__APPLE__) && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1050)
+#    if defined(__APPLE__) &&                                                  \
+        (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1050)
 
-#include <cerrno>
-#include <cstddef>
-#include <cstdint>
-#include <limits>
-#include "pth/pth.h"
+#        include <cerrno>
+#        include <cstddef>
+#        include <cstdint>
+#        include <limits>
+#        include "pth/pth.h"
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
     namespace posix { namespace pth {
@@ -79,24 +80,25 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 }}}}}}    // namespace hpx::threads::coroutines::detail::posix::pth
 
-#define HPX_COROUTINE_POSIX_IMPL "Pth implementation"
-#define HPX_COROUTINE_DECLARE_CONTEXT(name) pth_uctx_t name
-#define HPX_COROUTINE_CREATE_CONTEXT(ctx)                                      \
-    hpx::threads::coroutines::detail::posix::pth::check_(                      \
-        pth_uctx_create(&(ctx)))
-#define HPX_COROUTINE_MAKE_CONTEXT(                                                   \
-    ctx, stack, size, startfunc, startarg, exitto)                                    \
-    /* const sigset_t* sigmask = nullptr: we don't expect per-context signal masks */ \
-    hpx::threads::coroutines::detail::posix::pth::check_(                             \
-        pth_uctx_make(*(ctx), static_cast<char*>(stack), (size), nullptr,             \
-            (startfunc), (startarg), (exitto)))
-#define HPX_COROUTINE_SWAP_CONTEXT(from, to)                                   \
-    hpx::threads::coroutines::detail::posix::pth::check_(pth_uctx_switch(      \
-        *(from), *(to))) #define HPX_COROUTINE_DESTROY_CONTEXT(ctx)            \
-        hpx::threads::coroutines::detail::posix::pth::check_(                  \
-            pth_uctx_destroy(ctx))
+#        define HPX_COROUTINE_POSIX_IMPL "Pth implementation"
+#        define HPX_COROUTINE_DECLARE_CONTEXT(name) pth_uctx_t name
+#        define HPX_COROUTINE_CREATE_CONTEXT(ctx)                              \
+            hpx::threads::coroutines::detail::posix::pth::check_(              \
+                pth_uctx_create(&(ctx)))
+#        define HPX_COROUTINE_MAKE_CONTEXT(                                                   \
+            ctx, stack, size, startfunc, startarg, exitto)                                    \
+            /* const sigset_t* sigmask = nullptr: we don't expect per-context signal masks */ \
+            hpx::threads::coroutines::detail::posix::pth::check_(                             \
+                pth_uctx_make(*(ctx), static_cast<char*>(stack), (size),                      \
+                    nullptr, (startfunc), (startarg), (exitto)))
+#        define HPX_COROUTINE_SWAP_CONTEXT(from, to)                           \
+            hpx::threads::coroutines::detail::posix::pth::check_(              \
+                pth_uctx_switch(*(from),                                       \
+                    *(to))) #define HPX_COROUTINE_DESTROY_CONTEXT(ctx)         \
+                hpx::threads::coroutines::detail::posix::pth::check_(          \
+                    pth_uctx_destroy(ctx))
 
-#else                 // generic Posix platform (e.g. OS X >= 10.5)
+#    else                     // generic Posix platform (e.g. OS X >= 10.5)
 
 /*
  * makecontext based context implementation. Should be available on all
@@ -108,24 +110,24 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
  * NOTE2: makecontext and friends are declared obsolescent in SuSv3, but
  * it is unlikely that they will be removed any time soon.
  */
-#include <cstddef>    // ptrdiff_t
-#include <ucontext.h>
+#        include <cstddef>    // ptrdiff_t
+#        include <ucontext.h>
 
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+#        if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
 
-#include <cstring>
-#include <signal.h>
-#include <stdlib.h>
-#include <strings.h>
+#            include <cstring>
+#            include <signal.h>
+#            include <stdlib.h>
+#            include <strings.h>
 
-#ifndef SEGV_STACK_SIZE
-#define SEGV_STACK_SIZE MINSIGSTKSZ + 4096
-#endif
+#            ifndef SEGV_STACK_SIZE
+#                define SEGV_STACK_SIZE MINSIGSTKSZ + 4096
+#            endif
 
-#endif
+#        endif
 
-#include <iomanip>
-#include <iostream>
+#        include <iomanip>
+#        include <iostream>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
     namespace posix { namespace ucontext {
@@ -148,23 +150,24 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 }}}}}}    // namespace hpx::threads::coroutines::detail::posix::ucontext
 
-#define HPX_COROUTINE_POSIX_IMPL "ucontext implementation"
-#define HPX_COROUTINE_DECLARE_CONTEXT(name) ::ucontext_t name
-#define HPX_COROUTINE_CREATE_CONTEXT(ctx) /* nop */
-#define HPX_COROUTINE_MAKE_CONTEXT(                                            \
-    ctx, stack, size, startfunc, startarg, exitto)                             \
-    hpx::threads::coroutines::detail::posix::ucontext::make_context(           \
-        ctx, stack, size, startfunc, startarg, exitto)
-#define HPX_COROUTINE_SWAP_CONTEXT(pfrom, pto) ::swapcontext((pfrom), (pto))
-#define HPX_COROUTINE_DESTROY_CONTEXT(ctx) /* nop */
+#        define HPX_COROUTINE_POSIX_IMPL "ucontext implementation"
+#        define HPX_COROUTINE_DECLARE_CONTEXT(name) ::ucontext_t name
+#        define HPX_COROUTINE_CREATE_CONTEXT(ctx) /* nop */
+#        define HPX_COROUTINE_MAKE_CONTEXT(                                    \
+            ctx, stack, size, startfunc, startarg, exitto)                     \
+            hpx::threads::coroutines::detail::posix::ucontext::make_context(   \
+                ctx, stack, size, startfunc, startarg, exitto)
+#        define HPX_COROUTINE_SWAP_CONTEXT(pfrom, pto)                         \
+            ::swapcontext((pfrom), (pto))
+#        define HPX_COROUTINE_DESTROY_CONTEXT(ctx) /* nop */
 
-#endif    // generic Posix platform
+#    endif    // generic Posix platform
 
-#include <hpx/coroutines/detail/get_stack_pointer.hpp>
-#include <hpx/coroutines/detail/posix_utility.hpp>
-#include <hpx/coroutines/detail/swap_context.hpp>
-#include <atomic>
-#include <signal.h>    // SIGSTKSZ
+#    include <hpx/coroutines/detail/get_stack_pointer.hpp>
+#    include <hpx/coroutines/detail/posix_utility.hpp>
+#    include <hpx/coroutines/detail/swap_context.hpp>
+#    include <atomic>
+#    include <signal.h>    // SIGSTKSZ
 
 namespace hpx { namespace threads { namespace coroutines {
     // some platforms need special preparation of the main thread
@@ -255,7 +258,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 HPX_UNUSED(error);
                 HPX_ASSERT(error == 0);
 
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+#    if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
                 // concept inspired by the following links:
                 //
                 // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
@@ -273,15 +276,15 @@ namespace hpx { namespace threads { namespace coroutines {
                 sigemptyset(&action.sa_mask);
                 sigaddset(&action.sa_mask, SIGSEGV);
                 sigaction(SIGSEGV, &action, nullptr);
-#endif
+#    endif
             }
 
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+#    if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
 
             // heuristic value 1 kilobyte
             //
 
-#define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
+#        define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
 
             static void sigsegv_handler(
                 int signum, siginfo_t* infoptr, void* ctxptr)
@@ -322,7 +325,7 @@ namespace hpx { namespace threads { namespace coroutines {
                     std::terminate();
                 }
             }
-#endif
+#    endif
 
             ~ucontext_context_impl()
             {
@@ -338,11 +341,11 @@ namespace hpx { namespace threads { namespace coroutines {
 
             std::ptrdiff_t get_available_stack_space()
             {
-#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+#    if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
                 return get_stack_ptr() - reinterpret_cast<std::size_t>(m_stack);
-#else
+#    else
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
-#endif
+#    endif
             }
 
             void reset_stack()
@@ -352,9 +355,9 @@ namespace hpx { namespace threads { namespace coroutines {
                     if (posix::reset_stack(
                             m_stack, static_cast<std::size_t>(m_stack_size)))
                     {
-#if defined(HPX_HAVE_COROUTINE_COUNTERS)
+#    if defined(HPX_HAVE_COROUTINE_COUNTERS)
                         increment_stack_unbind_count();
-#endif
+#    endif
                     }
                 }
             }
@@ -365,9 +368,9 @@ namespace hpx { namespace threads { namespace coroutines {
                 {
                     // just reset the context stack pointer to its initial value at
                     // the stack start
-#if defined(HPX_HAVE_COROUTINE_COUNTERS)
+#    if defined(HPX_HAVE_COROUTINE_COUNTERS)
                     increment_stack_recycle_count();
-#endif
+#    endif
                     int error = HPX_COROUTINE_MAKE_CONTEXT(
                         &m_ctx, m_stack, m_stack_size, funp_, this, nullptr);
                     HPX_UNUSED(error);
@@ -375,7 +378,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 }
             }
 
-#if defined(HPX_HAVE_COROUTINE_COUNTERS)
+#    if defined(HPX_HAVE_COROUTINE_COUNTERS)
             typedef std::atomic<std::int64_t> counter_type;
 
         private:
@@ -413,7 +416,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 return util::get_and_reset_value(
                     get_stack_recycle_counter(), reset);
             }
-#endif
+#    endif
 
         private:
             // declare m_stack_size first so we can use it to initialize m_stack
@@ -421,10 +424,10 @@ namespace hpx { namespace threads { namespace coroutines {
             void* m_stack;
             void (*funp_)(void*);
 
-#if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
+#    if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
             struct sigaction action;
             stack_t segv_stack;
-#endif
+#    endif
         };
     }}    // namespace detail::posix
 }}}       // namespace hpx::threads::coroutines
@@ -440,7 +443,7 @@ namespace hpx { namespace threads { namespace coroutines {
  * encounter such a system, perhaps the best approach would be to twiddle the
  * #if logic in this header to use the pth.h implementation above.
  */
-#error No context implementation for this POSIX system.
+#    error No context implementation for this POSIX system.
 
 #endif
 

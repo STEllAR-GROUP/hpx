@@ -165,7 +165,7 @@ namespace hpx { namespace lcos {
 ///       or 2 arguments. The second argument is optional and defaults to
 ///       \a \<type\>_gather.
 ///
-#define HPX_REGISTER_GATHER_DECLARATION(type, name)
+#    define HPX_REGISTER_GATHER_DECLARATION(type, name)
 
 /// \def HPX_REGISTER_GATHER(type, name)
 ///
@@ -185,41 +185,41 @@ namespace hpx { namespace lcos {
 ///       or 2 arguments. The second argument is optional and defaults to
 ///       \a \<type\>_gather.
 ///
-#define HPX_REGISTER_GATHER(type, name)
+#    define HPX_REGISTER_GATHER(type, name)
 }}    // namespace hpx::lcos
 #else
 
-#include <hpx/config.hpp>
+#    include <hpx/config.hpp>
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#    if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/dataflow.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/local_lcos/and_gate.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/components/new.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/get_num_localities.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/unmanaged.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unused.hpp>
+#        include <hpx/config.hpp>
+#        include <hpx/assertion.hpp>
+#        include <hpx/dataflow.hpp>
+#        include <hpx/functional/bind_back.hpp>
+#        include <hpx/functional/bind_front.hpp>
+#        include <hpx/lcos/future.hpp>
+#        include <hpx/local_lcos/and_gate.hpp>
+#        include <hpx/preprocessor/cat.hpp>
+#        include <hpx/preprocessor/expand.hpp>
+#        include <hpx/preprocessor/nargs.hpp>
+#        include <hpx/runtime/basename_registration.hpp>
+#        include <hpx/runtime/components/new.hpp>
+#        include <hpx/runtime/components/server/simple_component_base.hpp>
+#        include <hpx/runtime/get_num_localities.hpp>
+#        include <hpx/runtime/launch_policy.hpp>
+#        include <hpx/runtime/naming/id_type.hpp>
+#        include <hpx/runtime/naming/unmanaged.hpp>
+#        include <hpx/synchronization/spinlock.hpp>
+#        include <hpx/type_support/decay.hpp>
+#        include <hpx/type_support/unused.hpp>
 
-#include <cstddef>
-#include <mutex>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#        include <cstddef>
+#        include <mutex>
+#        include <string>
+#        include <type_traits>
+#        include <utility>
+#        include <vector>
 
 namespace hpx { namespace lcos {
 
@@ -548,55 +548,55 @@ namespace hpx { namespace lcos {
 }}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_GATHER_DECLARATION(...)                                   \
-    HPX_REGISTER_GATHER_DECLARATION_(__VA_ARGS__)                              \
-    /**/
+#        define HPX_REGISTER_GATHER_DECLARATION(...)                           \
+            HPX_REGISTER_GATHER_DECLARATION_(__VA_ARGS__)                      \
+            /**/
 
-#define HPX_REGISTER_GATHER_DECLARATION_(...)                                  \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_GATHER_DECLARATION_,                 \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
+#        define HPX_REGISTER_GATHER_DECLARATION_(...)                          \
+            HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_GATHER_DECLARATION_,         \
+                HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                       \
+            /**/
 
-#define HPX_REGISTER_GATHER_DECLARATION_1(type)                                \
-    HPX_REGISTER_GATHER_DECLARATION_2(type, HPX_PP_CAT(type, _gather))         \
-    /**/
+#        define HPX_REGISTER_GATHER_DECLARATION_1(type)                        \
+            HPX_REGISTER_GATHER_DECLARATION_2(type, HPX_PP_CAT(type, _gather)) \
+            /**/
 
-#define HPX_REGISTER_GATHER_DECLARATION_2(type, name)                          \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        hpx::lcos::detail::gather_server<type>::get_result_action,             \
-        HPX_PP_CAT(gather_get_result_action_, name));                          \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        hpx::lcos::detail::gather_server<type>::set_result_action,             \
-        HPX_PP_CAT(set_result_action_, name))                                  \
-    /**/
+#        define HPX_REGISTER_GATHER_DECLARATION_2(type, name)                  \
+            HPX_REGISTER_ACTION_DECLARATION(                                   \
+                hpx::lcos::detail::gather_server<type>::get_result_action,     \
+                HPX_PP_CAT(gather_get_result_action_, name));                  \
+            HPX_REGISTER_ACTION_DECLARATION(                                   \
+                hpx::lcos::detail::gather_server<type>::set_result_action,     \
+                HPX_PP_CAT(set_result_action_, name))                          \
+            /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_GATHER(...)                                               \
-    HPX_REGISTER_GATHER_(__VA_ARGS__)                                          \
-    /**/
+#        define HPX_REGISTER_GATHER(...)                                       \
+            HPX_REGISTER_GATHER_(__VA_ARGS__)                                  \
+            /**/
 
-#define HPX_REGISTER_GATHER_(...)                                              \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_GATHER_, HPX_PP_NARGS(__VA_ARGS__))( \
-        __VA_ARGS__))                                                          \
-    /**/
+#        define HPX_REGISTER_GATHER_(...)                                      \
+            HPX_PP_EXPAND(HPX_PP_CAT(                                          \
+                HPX_REGISTER_GATHER_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__)) \
+            /**/
 
-#define HPX_REGISTER_GATHER_1(type)                                            \
-    HPX_REGISTER_GATHER_2(type, HPX_PP_CAT(type, _gather))                     \
-    /**/
+#        define HPX_REGISTER_GATHER_1(type)                                    \
+            HPX_REGISTER_GATHER_2(type, HPX_PP_CAT(type, _gather))             \
+            /**/
 
-#define HPX_REGISTER_GATHER_2(type, name)                                      \
-    HPX_REGISTER_ACTION(                                                       \
-        hpx::lcos::detail::gather_server<type>::get_result_action,             \
-        HPX_PP_CAT(gather_get_result_action_, name));                          \
-    HPX_REGISTER_ACTION(                                                       \
-        hpx::lcos::detail::gather_server<type>::set_result_action,             \
-        HPX_PP_CAT(set_result_action_, name));                                 \
-    typedef hpx::components::simple_component<                                 \
-        hpx::lcos::detail::gather_server<type>>                                \
-        HPX_PP_CAT(gather_, name);                                             \
-    HPX_REGISTER_COMPONENT(HPX_PP_CAT(gather_, name))                          \
-    /**/
+#        define HPX_REGISTER_GATHER_2(type, name)                              \
+            HPX_REGISTER_ACTION(                                               \
+                hpx::lcos::detail::gather_server<type>::get_result_action,     \
+                HPX_PP_CAT(gather_get_result_action_, name));                  \
+            HPX_REGISTER_ACTION(                                               \
+                hpx::lcos::detail::gather_server<type>::set_result_action,     \
+                HPX_PP_CAT(set_result_action_, name));                         \
+            typedef hpx::components::simple_component<                         \
+                hpx::lcos::detail::gather_server<type>>                        \
+                HPX_PP_CAT(gather_, name);                                     \
+            HPX_REGISTER_COMPONENT(HPX_PP_CAT(gather_, name))                  \
+            /**/
 
-#endif    // COMPUTE_HOST_CODE
-#endif    // DOXYGEN
+#    endif    // COMPUTE_HOST_CODE
+#endif        // DOXYGEN
 #endif

@@ -16,7 +16,7 @@
 #include <string>
 
 #if !defined(BOOST_SYSTEM_NOEXCEPT)
-#define BOOST_SYSTEM_NOEXCEPT noexcept
+#    define BOOST_SYSTEM_NOEXCEPT noexcept
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

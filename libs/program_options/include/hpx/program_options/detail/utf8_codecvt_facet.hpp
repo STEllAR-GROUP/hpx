@@ -9,7 +9,7 @@
 
 // MS compatible compilers support #pragma once
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
-#pragma once
+#    pragma once
 #endif
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -85,7 +85,7 @@
 #if defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
 // hpxinspect:nodeprecatedinclude:boost/program_options/detail/utf8_codecvt_facet.hpp
 
-#include <boost/program_options/detail/utf8_codecvt_facet.hpp>
+#    include <boost/program_options/detail/utf8_codecvt_facet.hpp>
 
 namespace hpx { namespace program_options { namespace detail {
 
@@ -95,12 +95,12 @@ namespace hpx { namespace program_options { namespace detail {
 
 #else
 
-#include <cstddef>    // for std::size_t
-#include <cwchar>     // for mbstate_t
-#include <locale>
+#    include <cstddef>    // for std::size_t
+#    include <cwchar>     // for mbstate_t
+#    include <locale>
 
 // maximum length of a multibyte string
-#define MB_LENGTH_MAX 8
+#    define MB_LENGTH_MAX 8
 
 //----------------------------------------------------------------------------//
 //                                                                            //

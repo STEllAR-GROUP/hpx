@@ -9,13 +9,14 @@
 #include <hpx/execution/executors/timed_executors.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/parallel/executors/timed_executors.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/parallel/executors/timed_executors.hpp is \
+            deprecated, \
     please include hpx/execution/executors/timed_executors.hpp instead")
-#else
-#warning                                                                       \
-    "The header hpx/parallel/executors/timed_executors.hpp is deprecated, \
+#    else
+#        warning "The header hpx/parallel/executors/timed_executors.hpp is \
+            deprecated, \
     please include hpx/execution/executors/timed_executors.hpp instead"
-#endif
+#    endif
 #endif

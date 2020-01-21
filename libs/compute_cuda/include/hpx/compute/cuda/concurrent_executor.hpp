@@ -10,20 +10,20 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/execution/traits/executor_traits.hpp>
+#    include <hpx/execution/traits/executor_traits.hpp>
 
-#include <hpx/compute/cuda/concurrent_executor_parameters.hpp>
-#include <hpx/compute/cuda/default_executor.hpp>
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/compute/host/block_executor.hpp>
-#include <hpx/compute/host/target.hpp>
+#    include <hpx/compute/cuda/concurrent_executor_parameters.hpp>
+#    include <hpx/compute/cuda/default_executor.hpp>
+#    include <hpx/compute/cuda/target.hpp>
+#    include <hpx/compute/host/block_executor.hpp>
+#    include <hpx/compute/host/target.hpp>
 
-#include <array>
-#include <atomic>
-#include <cstddef>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#    include <array>
+#    include <atomic>
+#    include <cstddef>
+#    include <type_traits>
+#    include <utility>
+#    include <vector>
 
 namespace hpx { namespace compute { namespace cuda {
     template <

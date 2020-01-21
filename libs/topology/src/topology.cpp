@@ -29,24 +29,24 @@
 #include <hwloc.h>
 
 #if HWLOC_API_VERSION < 0x00010b00
-#define HWLOC_OBJ_NUMANODE HWLOC_OBJ_NODE
+#    define HWLOC_OBJ_NUMANODE HWLOC_OBJ_NODE
 #endif
 
 #if defined(__ANDROID__) && defined(ANDROID)
-#include <cpu-features.h>
+#    include <cpu-features.h>
 #endif
 
 #if defined(__bgq__)
-#include <hwi/include/bqc/A2_inlines.h>
+#    include <hwi/include/bqc/A2_inlines.h>
 #endif
 
 #if defined(_POSIX_VERSION)
-#include <sys/resource.h>
-#include <sys/syscall.h>
+#    include <sys/resource.h>
+#    include <sys/syscall.h>
 #endif
 
 #if defined(HPX_HAVE_UNISTD_H)
-#include <unistd.h>
+#    include <unistd.h>
 #endif
 
 namespace hpx { namespace threads { namespace detail {
@@ -171,7 +171,7 @@ namespace hpx { namespace threads {
     bool topology::reduce_thread_priority(error_code& ec) const
     {
 #ifdef HPX_HAVE_NICE_THREADLEVEL
-#if defined(__linux__) && !defined(__ANDROID__) && !defined(__bgq__)
+#    if defined(__linux__) && !defined(__ANDROID__) && !defined(__bgq__)
         pid_t tid;
         tid = syscall(SYS_gettid);
         if (setpriority(PRIO_PROCESS, tid, 19))
@@ -180,7 +180,7 @@ namespace hpx { namespace threads {
                 "setpriority returned an error");
             return false;
         }
-#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#    elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 
         if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST))
         {
@@ -188,9 +188,9 @@ namespace hpx { namespace threads {
                 "SetThreadPriority returned an error");
             return false;
         }
-#elif defined(__bgq__)
+#    elif defined(__bgq__)
         ThreadPriority_Low();
-#endif
+#    endif
 #endif
         return true;
     }
@@ -491,10 +491,10 @@ namespace hpx { namespace threads {
                 }
             }
         }
-#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
-    defined(__FreeBSD__)
+#    if defined(__linux) || defined(linux) || defined(__linux__) ||            \
+        defined(__FreeBSD__)
         sleep(0);    // Allow the OS to pick up the change.
-#endif
+#    endif
         hwloc_bitmap_free(cpuset);
 #endif    // __APPLE__
 
@@ -1287,12 +1287,12 @@ namespace hpx { namespace threads {
         hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
         hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
         int ret =
-#if HWLOC_API_VERSION >= 0x00010b06
+#    if HWLOC_API_VERSION >= 0x00010b06
             hwloc_set_area_membind(
                 topo, addr, len, ns, policy, HWLOC_MEMBIND_BYNODESET);
-#else
+#    else
             hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
-#endif
+#    endif
 
         if (ret < 0)
         {

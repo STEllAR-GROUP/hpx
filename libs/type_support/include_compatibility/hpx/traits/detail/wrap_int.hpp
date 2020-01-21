@@ -9,12 +9,13 @@
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
-#if defined(HPX_MSVC)
-#pragma message(                                                               \
-    "The header hpx/type_support/detail/wrap_int.hpp is deprecated, \
+#    if defined(HPX_MSVC)
+#        pragma message(                                                       \
+            "The header hpx/type_support/detail/wrap_int.hpp is deprecated, \
     please include hpx/type_support/detail/wrap_int.hpp instead")
-#else
-#warning "The header hpx/type_support/detail/wrap_int.hpp is deprecated, \
+#    else
+#        warning                                                               \
+            "The header hpx/type_support/detail/wrap_int.hpp is deprecated, \
     please include hpx/type_support/detail/wrap_int.hpp instead"
-#endif
+#    endif
 #endif
