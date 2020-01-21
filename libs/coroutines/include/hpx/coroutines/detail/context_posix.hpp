@@ -80,16 +80,18 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 }}}}}}    // namespace hpx::threads::coroutines::detail::posix::pth
 
+// clang-format off
 #        define HPX_COROUTINE_POSIX_IMPL "Pth implementation"
 #        define HPX_COROUTINE_DECLARE_CONTEXT(name) pth_uctx_t name
 #        define HPX_COROUTINE_CREATE_CONTEXT(ctx)                              \
             hpx::threads::coroutines::detail::posix::pth::check_(              \
                 pth_uctx_create(&(ctx)))
-#        define HPX_COROUTINE_MAKE_CONTEXT(                                                   \
-            ctx, stack, size, startfunc, startarg, exitto)                                    \
-            /* const sigset_t* sigmask = nullptr: we don't expect per-context signal masks */ \
-            hpx::threads::coroutines::detail::posix::pth::check_(                             \
-                pth_uctx_make(*(ctx), static_cast<char*>(stack), (size),                      \
+#        define HPX_COROUTINE_MAKE_CONTEXT(                                    \
+            ctx, stack, size, startfunc, startarg, exitto)                     \
+            /* const sigset_t* sigmask = nullptr: we don't expect per-context  \
+             * signal masks */ \
+            hpx::threads::coroutines::detail::posix::pth::check_(              \
+                pth_uctx_make(*(ctx), static_cast<char*>(stack), (size),       \
                     nullptr, (startfunc), (startarg), (exitto)))
 #        define HPX_COROUTINE_SWAP_CONTEXT(from, to)                           \
             hpx::threads::coroutines::detail::posix::pth::check_(              \
@@ -98,6 +100,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 hpx::threads::coroutines::detail::posix::pth::check_(          \
                     pth_uctx_destroy(ctx))
 
+// clang-format on
 #    else                     // generic Posix platform (e.g. OS X >= 10.5)
 
 /*
