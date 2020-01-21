@@ -21,6 +21,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/testing.hpp>
+#include "apex_options.hpp"
 
 #include <atomic>
 #include <cstddef>
@@ -28,6 +29,18 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+//
+// This test generates a set of tasks with certain names, then checks
+// if the names are present in the screen output from apex.
+// The tasks are spawned using dataflow, or continuations with different
+// launch policies and executors
+// To make scanning the output possible, we prefix the names so that
+// the alphabetical output from apex can be scanned with a regex to
+// check that the expected names are present.
+//
+// See the CMakeLists
+// set_tests_properties( ...  PROPERTIES PASS_REGULAR_EXPRESSION ...)
 
 // --------------------------------------------------------------------------
 // dummy function that just triggers a delay that can be seen in task plots
@@ -102,9 +115,12 @@ execution_string(const Policy &policy) { return policy_string(policy); }
 template <typename Execution>
 void test_execution(Execution &exec)
 {
+    static int prefix = 1;
     // these string need to have lifetimes that don't go out of scope
-    std::string dfs = "- " + execution_string(exec) + std::string("     Dataflow") ;
-    std::string pcs = "- " + execution_string(exec) + std::string(" Continuation");
+    std::string dfs  = std::to_string(prefix++) + "-" + execution_string(exec) + std::string(" Dataflow") ;
+    std::string pcs  = std::to_string(prefix++) + "-" + execution_string(exec) + std::string(" Continuation");
+    std::string dfsu = std::to_string(prefix++) + "-" + execution_string(exec) + std::string(" Unwrapping Dataflow") ;
+    std::string pcsu = std::to_string(prefix++) + "-" + execution_string(exec) + std::string(" Unwrapping Continuation");
 
     std::vector<hpx::future<void>> results;
     {
@@ -129,6 +145,17 @@ void test_execution(Execution &exec)
                 },
                 pcs.c_str())));
     }
+    {
+        hpx::future<int> f1 = hpx::make_ready_future(5);
+        results.emplace_back(f1.then(
+            exec,
+            hpx::util::unwrapping(
+                hpx::util::annotated_function(
+                    [](auto &&f1) {
+                        dummy_task(std::size_t(1000));
+                    },
+                    pcsu.c_str()))));
+    }
     // wait for completion
     hpx::when_all(results).get();
 }
@@ -138,8 +165,8 @@ void test_execution(Execution &exec)
 void test_none()
 {
     // these string need to have lifetimes that don't go out of scope
-    std::string dfs = "- " + std::string("Dataflow");
-    std::string pcs = "- " + std::string("Continuation");
+    std::string dfs = std::string("1-Dataflow");
+    std::string pcs = std::string("2-Continuation");
 
     std::vector<hpx::future<void>> results;
     {
@@ -179,11 +206,11 @@ int hpx_main()
 
     test_none();
     //
-    test_execution(hpx::launch::async);
-    test_execution(hpx::launch::sync);
-    test_execution(hpx::launch::fork);
     test_execution(hpx::launch::apply);
+    test_execution(hpx::launch::async);
     test_execution(hpx::launch::deferred);
+    test_execution(hpx::launch::fork);
+    test_execution(hpx::launch::sync);
     //
     test_execution(NP_executor);
     test_execution(par_exec);
@@ -193,6 +220,7 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
+    apex::apex_options::use_screen_output(true);
     HPX_TEST_EQ(hpx::init(), 0);
     return hpx::util::report_errors();
 }
