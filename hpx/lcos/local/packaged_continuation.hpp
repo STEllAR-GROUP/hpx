@@ -13,6 +13,7 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/future_exec.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/future_access.hpp>

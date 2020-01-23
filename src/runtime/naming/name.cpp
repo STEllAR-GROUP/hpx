@@ -11,7 +11,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/future_exec.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/memory/serialization/intrusive_ptr.hpp>

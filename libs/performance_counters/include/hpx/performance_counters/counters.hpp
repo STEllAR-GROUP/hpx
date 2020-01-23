@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/future_exec.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
