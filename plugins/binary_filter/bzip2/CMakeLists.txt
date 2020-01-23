@@ -19,23 +19,29 @@ if(HPX_WITH_COMPRESSION_BZIP2)
 
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
 
-  add_hpx_library(compress_bzip2
+  set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
+  set(HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+  add_hpx_library(compression_bzip2
     INTERNAL_FLAGS
     PLUGIN
     SOURCES
-      "${PROJECT_SOURCE_DIR}/plugins/binary_filter/bzip2/bzip2_serialization_filter.cpp"
+      "${SOURCE_ROOT}/bzip2_serialization_filter.cpp"
     HEADERS
-      "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
-      "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp"
+      "${HEADER_ROOT}/hpx/include/compression_bzip2.hpp"
+      "${HEADER_ROOT}/hpx/plugins/binary_filter/bzip2_serialization_filter.hpp"
+      "${HEADER_ROOT}/hpx/plugins/binary_filter/bzip2_serialization_filter_registration.hpp"
     FOLDER "Core/Plugins/Compression"
     DEPENDENCIES ${BZIP2_LIBRARIES})
 
   if(NOT MSVC)
-    target_include_directories(compress_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR})
+    target_include_directories(compression_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR})
   endif()
 
-  target_link_libraries(compress_bzip2 PRIVATE hpx::boost::iostreams)
+  target_include_directories(compression_bzip2 PUBLIC
+    $<BUILD_INTERFACE:${HEADER_ROOT}>)
+  target_link_libraries(compression_bzip2 PUBLIC hpx::boost::iostreams)
 
-  add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compress_bzip2)
+  add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compression_bzip2)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)
 endif()
