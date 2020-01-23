@@ -263,7 +263,6 @@ namespace hpx { namespace threads { namespace policies {
           , low_priority_queue_(thread_queue_init_)
           , curr_queue_(0)
           , gen_(random_seed())
-          , uniform_int_()
           , affinity_data_(init.affinity_data_)
           , num_queues_(init.num_queues_)
           , num_high_priority_queues_(init.num_high_priority_queues_)
@@ -1248,36 +1247,33 @@ namespace hpx { namespace threads { namespace policies {
         // return a random victim for the current stealing operation
         std::size_t random_victim(steal_request const& req) noexcept
         {
-            std::size_t bucket_size =
-                (std::numeric_limits<std::int16_t>::max)() / num_queues_;
-
-            // generate 3 random numbers max before resorting to more expensive
-            // algorithm
             std::size_t result = 0;
-            int attempts = 0;
-            do
+
             {
-                result = uniform_int_(gen_) / bucket_size;
-                if (result < num_queues_ && result != req.num_thread_ &&
-                    !test(req.victims_, result))
+                // generate 3 random numbers max before resorting to more
+                // expensive algorithm
+                std::uniform_int_distribution<std::int16_t> uniform(
+                    0, std::int16_t(num_queues_ - 1));
+                int attempts = 0;
+                do
                 {
-                    return result;
-                }
-            } while (++attempts < 3);
+                    result = uniform(gen_);
+                    if (result != req.num_thread_ &&
+                        !test(req.victims_, result))
+                    {
+                        HPX_ASSERT(result < num_queues_);
+                        return result;
+                    }
+                } while (++attempts < 3);
+            }
 
             // to avoid infinite trials we randomly select one of the possible
             // victims
-            std::size_t const num_victims = num_queues_ - count(req.victims_);
+            std::uniform_int_distribution<std::int16_t> uniform(
+                0, std::int16_t(num_queues_ - count(req.victims_) - 1));
 
             // generate one more random number
-            std::size_t selected_victim = 0;
-            bucket_size =
-                (std::numeric_limits<std::int16_t>::max)() / num_victims;
-            do
-            {
-                selected_victim = uniform_int_(gen_) / bucket_size;
-            } while (selected_victim >= num_victims);
-
+            std::size_t selected_victim = uniform(gen_);
             for (std::size_t i = 0; i != num_queues_; ++i)
             {
                 if (!test(req.victims_, i))
@@ -1596,7 +1592,6 @@ namespace hpx { namespace threads { namespace policies {
         std::atomic<std::size_t> curr_queue_;
 
         std::mt19937 gen_;
-        std::uniform_int_distribution<std::int16_t> uniform_int_;
 
         detail::affinity_data const& affinity_data_;
         std::size_t const num_queues_;
