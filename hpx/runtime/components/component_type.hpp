@@ -256,12 +256,12 @@ namespace hpx { namespace components
 
 #define HPX_DEFINE_COMPONENT_NAME_2(Component, name)                          \
 namespace hpx { namespace components {                                        \
-    template <> constexpr                                                 \
+    template <> constexpr                                                     \
     char const* get_component_name< Component, void>()                        \
     {                                                                         \
         return HPX_PP_STRINGIZE(name);                                        \
     }                                                                         \
-    template <> constexpr                                                 \
+    template <> constexpr                                                     \
     char const* get_component_base_name< Component, void>()                   \
     {                                                                         \
         return nullptr;                                                       \
@@ -271,12 +271,12 @@ namespace hpx { namespace components {                                        \
 
 #define HPX_DEFINE_COMPONENT_NAME_3(Component, name, base_name)               \
 namespace hpx { namespace components {                                        \
-    template <> constexpr                                                 \
+    template <> constexpr                                                     \
     char const* get_component_name< Component, void>()                        \
     {                                                                         \
         return HPX_PP_STRINGIZE(name);                                        \
     }                                                                         \
-    template <> constexpr                                                 \
+    template <> constexpr                                                     \
     char const* get_component_base_name< Component, void>()                   \
     {                                                                         \
         return base_name;                                                     \

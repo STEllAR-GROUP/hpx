@@ -302,7 +302,7 @@ namespace util {
         template <typename Target, std::size_t Begin>
         struct static_async_range<Target, Begin, Begin>
         {
-            explicit static_async_range(Target*) {}
+            explicit constexpr static_async_range(Target*) {}
 
             constexpr bool is_finished() const noexcept
             {
