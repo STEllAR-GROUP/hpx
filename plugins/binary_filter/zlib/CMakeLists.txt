@@ -21,26 +21,31 @@ if(HPX_WITH_COMPRESSION_ZLIB)
   endif()
 
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
+  set(HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
   include(HPX_AddLibrary)
-  add_hpx_library(compress_zlib
+  add_hpx_library(compression_zlib
     INTERNAL_FLAGS
     PLUGIN
     SOURCES
-      "${PROJECT_SOURCE_DIR}/plugins/binary_filter/zlib/zlib_serialization_filter.cpp"
+      "${SOURCE_ROOT}/zlib_serialization_filter.cpp"
     HEADERS
-      "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
-      "${PROJECT_SOURCE_DIR}/hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp"
+      "${HEADER_ROOT}/hpx/include/compression_zlib.hpp"
+      "${HEADER_ROOT}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
+      "${HEADER_ROOT}/hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp"
     FOLDER "Core/Plugins/Compression"
     DEPENDENCIES ${ZLIB_LIBRARIES})
 
   if(NOT MSVC)
-    target_include_directories(compress_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS})
+    target_include_directories(compression_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS})
   endif()
+  target_include_directories(compression_zlib PUBLIC
+    $<BUILD_INTERFACE:${HEADER_ROOT}>)
 
-  target_link_libraries(compress_zlib PRIVATE hpx::boost::iostreams)
+  target_link_libraries(compression_zlib PUBLIC hpx::boost::iostreams)
 
-  add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compress_zlib)
+  add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compression_zlib)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.zlib)
 
 endif()
