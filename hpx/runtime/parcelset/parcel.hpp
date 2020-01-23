@@ -22,6 +22,7 @@
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 
 #include <cstddef>
 #include <cstdint>

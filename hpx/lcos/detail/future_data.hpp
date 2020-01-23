@@ -20,6 +20,7 @@
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>

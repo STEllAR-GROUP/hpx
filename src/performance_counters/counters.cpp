@@ -23,6 +23,8 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>

@@ -13,6 +13,7 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/cpu_mask.hpp>
@@ -31,19 +32,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
-    /// \brief Data structure which stores statistics collected by an
-    ///        executor instance.
-    struct executor_statistics
-    {
-        executor_statistics()
-          : tasks_scheduled_(0), tasks_completed_(0), queue_length_(0)
-        {}
-
-        std::uint64_t tasks_scheduled_;
-        std::uint64_t tasks_completed_;
-        std::uint64_t queue_length_;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -113,41 +101,6 @@ namespace hpx { namespace threads
 
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        enum executor_parameter
-        {
-            min_concurrency = 1,
-            max_concurrency = 2,
-            current_concurrency = 3
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        // The interface below is used by the resource manager to
-        // interact with the executor.
-        struct manage_executor
-        {
-            virtual ~manage_executor() {}
-
-            // Return the requested policy element
-            virtual std::size_t get_policy_element(executor_parameter p,
-                error_code& ec) const = 0;
-
-            // Return statistics collected by this scheduler
-            virtual void get_statistics(executor_statistics& stats,
-                error_code& ec) const = 0;
-
-            // Provide the given processing unit to the scheduler.
-            virtual void add_processing_unit(std::size_t virt_core,
-                std::size_t thread_num, error_code& ec) = 0;
-
-            // Remove the given processing unit from the scheduler.
-            virtual void remove_processing_unit(std::size_t thread_num,
-                error_code& ec) = 0;
-
-            // return the description string of the underlying scheduler
-            virtual char const* get_description() const = 0;
-        };
-
         ///////////////////////////////////////////////////////////////////////
         // Main executor interface
         void intrusive_ptr_add_ref(executor_base* p);

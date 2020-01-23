@@ -604,6 +604,10 @@ namespace hpx
 #endif
             hpx::threads::detail::set_get_default_pool(
                 &detail::get_default_pool);
+            hpx::threads::detail::set_get_default_timer_service(
+                &hpx::detail::get_default_timer_service);
+            hpx::threads::detail::set_get_locality_id(
+                &get_locality_id);
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");

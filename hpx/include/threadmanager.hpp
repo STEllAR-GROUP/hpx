@@ -9,6 +9,7 @@
 #if !defined(HPX_THREADMANAGER_MAY_20_2008_840AM)
 #define HPX_THREADMANAGER_MAY_20_2008_840AM
 
+#include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>

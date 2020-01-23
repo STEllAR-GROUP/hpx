@@ -31,6 +31,7 @@ set(functional_headers
   hpx/functional/protect.hpp
   hpx/functional/result_of.hpp
   hpx/functional/unique_function.hpp
+  hpx/functional/traits/get_action_name.hpp
   hpx/functional/traits/get_function_address.hpp
   hpx/functional/traits/get_function_annotation.hpp
   hpx/functional/traits/is_action.hpp

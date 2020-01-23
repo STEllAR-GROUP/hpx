@@ -51,6 +51,7 @@ set(HPX_LIBS
   statistics
   synchronization
   testing
+  threading_base
   thread_support
   threadmanager
   timing

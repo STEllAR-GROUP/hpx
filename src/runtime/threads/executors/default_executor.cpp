@@ -9,6 +9,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/thread_description.hpp>

@@ -16,6 +16,7 @@
 #endif
 
 #include <hpx/assertion.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>

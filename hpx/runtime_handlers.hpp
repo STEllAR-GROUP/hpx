@@ -11,6 +11,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 
+#include <boost/asio/io_service.hpp>
+
 #include <string>
 
 namespace hpx { namespace detail {
@@ -26,4 +28,5 @@ namespace hpx { namespace detail {
     bool register_locks_predicate();
 #endif
     threads::thread_pool_base* get_default_pool();
+    boost::asio::io_service* get_default_timer_service();
 }}    // namespace hpx::detail

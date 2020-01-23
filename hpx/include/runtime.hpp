@@ -13,6 +13,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/naming.hpp>
 #include <hpx/include/parcelset.hpp>
+#include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/runtime.hpp>
 
