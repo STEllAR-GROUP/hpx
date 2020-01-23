@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,8 +45,7 @@ namespace hpx { namespace threads { namespace policies {
         using const_reference = T const&;
         using size_type = std::uint64_t;
 
-        lockfree_fifo_backend(
-            size_type initial_size = 0, size_type num_thread = size_type(-1))
+        lockfree_fifo_backend(size_type initial_size = 0)
           : queue_(std::size_t(initial_size))
         {
         }
@@ -102,8 +101,7 @@ namespace hpx { namespace threads { namespace policies {
         using rval_reference = T&&;
         using size_type = std::uint64_t;
 
-        moodycamel_fifo_backend(
-            size_type initial_size = 0, size_type num_thread = size_type(-1))
+        moodycamel_fifo_backend(size_type initial_size = 0)
           : queue_(std::size_t(initial_size))
         {
         }
@@ -155,8 +153,7 @@ namespace hpx { namespace threads { namespace policies {
         using const_reference = T const&;
         using size_type = std::uint64_t;
 
-        lockfree_lifo_backend(
-            size_type initial_size = 0, size_type num_thread = size_type(-1))
+        lockfree_lifo_backend(size_type initial_size = 0)
           : queue_(std::size_t(initial_size))
         {
         }
@@ -209,8 +206,7 @@ namespace hpx { namespace threads { namespace policies {
         using const_reference = T const&;
         using size_type = std::uint64_t;
 
-        lockfree_abp_fifo_backend(
-            size_type initial_size = 0, size_type num_thread = size_type(-1))
+        lockfree_abp_fifo_backend(size_type initial_size = 0)
           : queue_(std::size_t(initial_size))
         {
         }
@@ -259,8 +255,7 @@ namespace hpx { namespace threads { namespace policies {
         using const_reference = T const&;
         using size_type = std::uint64_t;
 
-        lockfree_abp_lifo_backend(
-            size_type initial_size = 0, size_type num_thread = size_type(-1))
+        lockfree_abp_lifo_backend(size_type initial_size = 0)
           : queue_(std::size_t(initial_size))
         {
         }

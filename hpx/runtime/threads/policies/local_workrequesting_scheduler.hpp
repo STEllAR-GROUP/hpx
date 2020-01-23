@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -199,11 +199,11 @@ namespace hpx { namespace threads { namespace policies {
                     num_thread_ = static_cast<std::uint16_t>(num_thread);
 
                     // initialize queues
-                    queue_.reset(new thread_queue_type(num_thread, queue_init));
+                    queue_.reset(new thread_queue_type(queue_init));
                     if (need_high_priority_queue)
                     {
                         high_priority_queue_.reset(
-                            new thread_queue_type(num_thread, queue_init));
+                            new thread_queue_type(queue_init));
                     }
 
                     // initialize channels needed for work stealing
@@ -260,7 +260,7 @@ namespace hpx { namespace threads { namespace policies {
           : scheduler_base(init.num_queues_, init.description_,
                 init.thread_queue_init_, policies::fast_idle_mode)
           , data_(init.num_queues_)
-          , low_priority_queue_(init.num_queues_ - 1, thread_queue_init_)
+          , low_priority_queue_(thread_queue_init_)
           , curr_queue_(0)
           , gen_(random_seed())
           , uniform_int_()

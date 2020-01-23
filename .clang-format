@@ -42,11 +42,9 @@ AlwaysBreakTemplateDeclarations: true
 BinPackArguments: true
 BinPackParameters: true
 BraceWrapping:
-#    AfterCaseLabel: true       # added in V10
     AfterClass: true
     AfterControlStatement: true
     AfterEnum: true
-#    AfterExternBlock: true     # added in V10
     AfterFunction: true
     AfterNamespace: false
     AfterStruct: true
@@ -54,9 +52,6 @@ BraceWrapping:
     BeforeCatch: true
     BeforeElse: true
     IndentBraces: false
-#    SplitEmptyFunction: true   # added in V10
-#    SplitEmptyNamespace: true  # added in V10
-#    SplitEmptyRecord: true     # added in V10
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
 BreakBeforeInheritanceComma: true

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-202020 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -457,11 +457,10 @@ namespace hpx { namespace threads { namespace policies {
             return cleanup_terminated_locked(false);
         }
 
-        thread_queue(std::size_t queue_num = std::size_t(-1),
-            thread_queue_init_parameters parameters = {})
+        thread_queue(thread_queue_init_parameters parameters = {})
           : parameters_(parameters)
           , thread_map_count_(0)
-          , work_items_(128, queue_num)
+          , work_items_(128)
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
           , work_items_wait_(0)
           , work_items_wait_count_(0)

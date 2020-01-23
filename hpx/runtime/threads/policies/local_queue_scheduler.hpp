@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -127,7 +127,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 HPX_ASSERT(init.num_queues_ != 0);
                 for (std::size_t i = 0; i < init.num_queues_; ++i)
-                    queues_[i] = new thread_queue_type(i, thread_queue_init_);
+                    queues_[i] = new thread_queue_type(thread_queue_init_);
             }
         }
 
@@ -849,8 +849,7 @@ namespace hpx { namespace threads { namespace policies {
         {
             if (nullptr == queues_[num_thread])
             {
-                queues_[num_thread] =
-                    new thread_queue_type(num_thread, thread_queue_init_);
+                queues_[num_thread] = new thread_queue_type(thread_queue_init_);
             }
 
             queues_[num_thread]->on_start_thread(num_thread);
