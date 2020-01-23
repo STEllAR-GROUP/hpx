@@ -480,9 +480,9 @@ namespace hpx { namespace threads {
                 break;
             }
 
-            case resource::local_workstealing_fifo:
+            case resource::local_workrequesting_fifo:
             {
-#if defined(HPX_HAVE_LOCAL_WORKSTEALING_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_WORKREQUESTING_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
@@ -491,12 +491,12 @@ namespace hpx { namespace threads {
 
                 // instantiate the scheduler
                 using local_sched_type =
-                    hpx::threads::policies::local_workstealing_scheduler<>;
+                    hpx::threads::policies::local_workrequesting_scheduler<>;
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    thread_queue_init, "core-local_workstealing_scheduler");
+                    thread_queue_init, "core-local_workrequesting_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -507,16 +507,16 @@ namespace hpx { namespace threads {
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
-                    "Command line option --hpx:queuing=local-workstealing-fifo "
+                    "Command line option --hpx:queuing=local-workrequesting-fifo "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local-workstealing'.");
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local-workrequesting'.");
 #endif
                 break;
             }
 
-            case resource::local_workstealing_lifo:
+            case resource::local_workrequesting_lifo:
             {
-#if defined(HPX_HAVE_LOCAL_WORKSTEALING_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_WORKREQUESTING_SCHEDULER)
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
                 std::size_t num_high_priority_queues =
@@ -525,13 +525,13 @@ namespace hpx { namespace threads {
 
                 // instantiate the scheduler
                 using local_sched_type =
-                    hpx::threads::policies::local_workstealing_scheduler<
+                    hpx::threads::policies::local_workrequesting_scheduler<
                         std::mutex, hpx::threads::policies::lockfree_lifo>;
 
                 local_sched_type::init_parameter_type init(
                     thread_pool_init.num_threads_,
                     thread_pool_init.affinity_data_, num_high_priority_queues,
-                    thread_queue_init, "core-local_workstealing_scheduler");
+                    thread_queue_init, "core-local_workrequesting_scheduler");
                 std::unique_ptr<local_sched_type> sched(
                     new local_sched_type(init));
 
@@ -542,9 +542,9 @@ namespace hpx { namespace threads {
                 pools_.push_back(std::move(pool));
 #else
                 throw hpx::detail::command_line_error(
-                    "Command line option --hpx:queuing=local-workstealing-lifo "
+                    "Command line option --hpx:queuing=local-workrequesting-lifo "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local-workstealing'.");
+                    "'cmake -DHPX_WITH_THREAD_SCHEDULERS=local-workrequesting'.");
 #endif
                 break;
             }

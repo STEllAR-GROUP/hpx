@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_WORKSTEALING_NOV_26_2019_0145PM)
-#define HPX_THREADMANAGER_SCHEDULING_LOCAL_WORKSTEALING_NOV_26_2019_0145PM
+#if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_WORKREQUESTING_NOV_26_2019_0145PM)
+#define HPX_THREADMANAGER_SCHEDULING_LOCAL_WORKREQUESTING_NOV_26_2019_0145PM
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_LOCAL_WORKSTEALING_SCHEDULER)
+#if defined(HPX_HAVE_LOCAL_WORKREQUESTING_SCHEDULER)
 #include <hpx/affinity.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency.hpp>
@@ -49,21 +49,23 @@ namespace hpx { namespace threads { namespace policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_local_workstealing_scheduler_terminated_queue = lockfree_lifo;
+    using default_local_workrequesting_scheduler_terminated_queue =
+        lockfree_lifo;
 #else
-    using default_local_workstealing_scheduler_terminated_queue = lockfree_fifo;
+    using default_local_workrequesting_scheduler_terminated_queue =
+        lockfree_fifo;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The local_workstealing_scheduler maintains exactly one queue of work
+    /// The local_workrequesting_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
     template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
-            default_local_workstealing_scheduler_terminated_queue>
-    class HPX_EXPORT local_workstealing_scheduler : public scheduler_base
+            default_local_workrequesting_scheduler_terminated_queue>
+    class HPX_EXPORT local_workrequesting_scheduler : public scheduler_base
     {
     public:
         using has_periodic_maintenance = std::false_type;
@@ -78,7 +80,7 @@ namespace hpx { namespace threads { namespace policies {
                 detail::affinity_data const& affinity_data,
                 std::size_t num_high_priority_queues = std::size_t(-1),
                 thread_queue_init_parameters const& thread_queue_init = {},
-                char const* description = "local_workstealing_scheduler")
+                char const* description = "local_workrequesting_scheduler")
               : num_queues_(num_queues)
               , num_high_priority_queues_(
                     num_high_priority_queues == std::size_t(-1) ?
@@ -164,7 +166,7 @@ namespace hpx { namespace threads { namespace policies {
             scheduler_data() noexcept
               : requested_(0)
               , num_thread_(static_cast<std::uint16_t>(-1))
-#if defined(HPX_HAVE_WORKSTEALING_LAST_VICTIM)
+#if defined(HPX_HAVE_WORKREQUESTING_LAST_VICTIM)
               , last_victim_(static_cast<std::uint16_t>(-1))
 #endif
               , victims_()
@@ -218,7 +220,7 @@ namespace hpx { namespace threads { namespace policies {
             // core number this scheduler data instance refers to
             std::uint16_t num_thread_;
 
-#if defined(HPX_HAVE_WORKSTEALING_LAST_VICTIM)
+#if defined(HPX_HAVE_WORKREQUESTING_LAST_VICTIM)
             // core number the last stolen tasks originated from
             std::uint16_t last_victim_;
 #endif
@@ -253,7 +255,7 @@ namespace hpx { namespace threads { namespace policies {
             return rd();
         }
 
-        local_workstealing_scheduler(init_parameter_type const& init,
+        local_workrequesting_scheduler(init_parameter_type const& init,
             bool deferred_initialization = true)
           : scheduler_base(init.num_queues_, init.description_,
                 init.thread_queue_init_, policies::fast_idle_mode)
@@ -281,11 +283,11 @@ namespace hpx { namespace threads { namespace policies {
             }
         }
 
-        ~local_workstealing_scheduler() override = default;
+        ~local_workrequesting_scheduler() override = default;
 
         static std::string get_scheduler_name()
         {
-            return "local_workstealing_scheduler";
+            return "local_workrequesting_scheduler";
         }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
@@ -1054,7 +1056,7 @@ namespace hpx { namespace threads { namespace policies {
                 case thread_priority_unknown:
                 {
                     HPX_THROW_EXCEPTION(bad_parameter,
-                        "local_workstealing_scheduler::get_thread_count",
+                        "local_workrequesting_scheduler::get_thread_count",
                         "unknown thread priority value "
                         "(thread_priority_unknown)");
                     return 0;
@@ -1111,7 +1113,7 @@ namespace hpx { namespace threads { namespace policies {
             case thread_priority_unknown:
             {
                 HPX_THROW_EXCEPTION(bad_parameter,
-                    "local_workstealing_scheduler::get_thread_count",
+                    "local_workrequesting_scheduler::get_thread_count",
                     "unknown thread priority value "
                     "(thread_priority_unknown)");
                 return 0;
@@ -1313,7 +1315,7 @@ namespace hpx { namespace threads { namespace policies {
                     (req.attempt_ == 0 && req.num_thread_ == d.num_thread_) ||
                     (req.attempt_ > 0 && req.num_thread_ != d.num_thread_));
 
-#if defined(HPX_HAVE_WORKSTEALING_LAST_VICTIM)
+#if defined(HPX_HAVE_WORKREQUESTING_LAST_VICTIM)
                 if (d.last_victim_ != std::uint16_t(-1))
                 {
                     victim = d.last_victim_;
@@ -1409,7 +1411,7 @@ namespace hpx { namespace threads { namespace policies {
                         ++added;
                     }
 
-#if defined(HPX_HAVE_WORKSTEALING_LAST_VICTIM)
+#if defined(HPX_HAVE_WORKREQUESTING_LAST_VICTIM)
                     // store the originating core for the next stealing
                     // operation
                     d.last_victim_ = thrds.num_thread_;

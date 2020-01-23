@@ -132,11 +132,11 @@ namespace hpx { namespace resource { namespace detail {
         case resource::local_priority_lifo:
             sched = "local_priority_lifo";
             break;
-        case resource::local_workstealing_fifo:
-            sched = "local_workstealing_fifo";
+        case resource::local_workrequesting_fifo:
+            sched = "local_workrequesting_fifo";
             break;
-        case resource::local_workstealing_lifo:
-            sched = "local_workstealing_lifo";
+        case resource::local_workrequesting_lifo:
+            sched = "local_workrequesting_lifo";
             break;
         case resource::static_:
             sched = "static";
@@ -451,14 +451,14 @@ namespace hpx { namespace resource { namespace detail {
             default_scheduler = scheduling_policy::local_priority_lifo;
         }
         else if (0 ==
-            std::string("local-workstealing-fifo").find(cfg_.queuing_))
+            std::string("local-workrequesting-fifo").find(cfg_.queuing_))
         {
-            default_scheduler = scheduling_policy::local_workstealing_fifo;
+            default_scheduler = scheduling_policy::local_workrequesting_fifo;
         }
         else if (0 ==
-            std::string("local-workstealing-lifo").find(cfg_.queuing_))
+            std::string("local-workrequesting-lifo").find(cfg_.queuing_))
         {
-            default_scheduler = scheduling_policy::local_workstealing_lifo;
+            default_scheduler = scheduling_policy::local_workrequesting_lifo;
         }
         else if (0 == std::string("static").find(cfg_.queuing_))
         {
