@@ -19,14 +19,14 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/naming_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/backtrace.hpp> // TODO: Move to a separate module.
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 #endif
 
 #include <atomic>
@@ -682,8 +682,8 @@ namespace hpx { namespace threads {
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#include <hpx/runtime/threads/thread_data_stackful.hpp>
-#include <hpx/runtime/threads/thread_data_stackless.hpp>
+#include <hpx/threading_base/thread_data_stackful.hpp>
+#include <hpx/threading_base/thread_data_stackless.hpp>
 
 namespace hpx { namespace threads {
 

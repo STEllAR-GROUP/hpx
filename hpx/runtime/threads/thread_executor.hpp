@@ -12,13 +12,13 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 
 #include <chrono>
 #include <cstddef>

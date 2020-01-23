@@ -28,7 +28,7 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/activate_counters.hpp>
-#include <hpx/util/annotated_function.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/interval_timer.hpp>
@@ -36,7 +36,7 @@
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
 #include <hpx/util/unwrap.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #endif

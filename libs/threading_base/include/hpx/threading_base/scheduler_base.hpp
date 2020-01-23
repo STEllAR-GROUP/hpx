@@ -11,12 +11,12 @@
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/format.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/coroutines/detail/tss.hpp>

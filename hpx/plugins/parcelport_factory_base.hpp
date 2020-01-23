@@ -9,7 +9,7 @@
 #define HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <cstddef>

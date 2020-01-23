@@ -9,7 +9,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/util/interval_timer.hpp>

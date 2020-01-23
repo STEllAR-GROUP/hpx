@@ -12,7 +12,7 @@
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
 #include <hpx/assertion.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 //
 #include <cstddef>
 #include <cstdint>

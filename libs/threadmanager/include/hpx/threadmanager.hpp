@@ -15,10 +15,10 @@
 #include <hpx/errors.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/io_service_pool.hpp>
 

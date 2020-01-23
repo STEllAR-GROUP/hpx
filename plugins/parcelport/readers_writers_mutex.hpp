@@ -12,7 +12,7 @@
 #define HPX_READERS_WRITERS_MUTEX_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/detail/yield_k.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <plugins/parcelport/parcelport_logging.hpp>
 

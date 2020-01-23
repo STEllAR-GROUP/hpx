@@ -14,8 +14,8 @@
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -9,9 +9,9 @@
 #define HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
 
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #include <hpx/functional/unique_function.hpp>
 
 #include <cstddef>

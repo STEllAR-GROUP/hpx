@@ -15,9 +15,9 @@
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/runtime/threads/execution_agent.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/threading_base/execution_agent.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -7,8 +7,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -7,9 +7,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/runtime/threads/scheduler_base.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/functional/bind.hpp>

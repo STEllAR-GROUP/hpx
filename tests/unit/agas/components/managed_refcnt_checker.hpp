@@ -12,8 +12,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/include/client.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <tests/unit/agas/components/stubs/managed_refcnt_checker.hpp>
 

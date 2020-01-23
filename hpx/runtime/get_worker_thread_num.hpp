@@ -9,6 +9,6 @@
 #if !defined(HPX_RUNTIME_GET_WORKER_THREAD_NUM_AUG_15_2015_1120AM)
 #define HPX_RUNTIME_GET_WORKER_THREAD_NUM_AUG_15_2015_1120AM
 
-#include <hpx/thread_data/thread_num_tss.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 
 #endif

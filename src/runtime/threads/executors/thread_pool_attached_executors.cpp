@@ -19,11 +19,11 @@
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/timing/steady_clock.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <chrono>
 #include <cstddef>

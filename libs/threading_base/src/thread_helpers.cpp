@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -13,16 +13,16 @@
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/basic_execution/register_locks.hpp>
 #endif
-#include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/thread_description.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <atomic>
 #include <cstddef>

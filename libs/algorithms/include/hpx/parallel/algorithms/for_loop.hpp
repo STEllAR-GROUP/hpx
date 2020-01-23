@@ -23,7 +23,7 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/annotated_function.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/execution_policy.hpp>

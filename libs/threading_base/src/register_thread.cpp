@@ -6,10 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/register_thread.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/register_thread.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 
 #include <cstddef>
 #include <limits>

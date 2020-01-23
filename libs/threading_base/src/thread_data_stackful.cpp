@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {

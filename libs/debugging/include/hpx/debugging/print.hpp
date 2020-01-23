@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 
 #include <array>
 #include <bitset>

@@ -14,9 +14,9 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/runtime/get_thread_name.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
 #include <hpx/runtime/threads/scoped_background_timer.hpp>
@@ -27,7 +27,7 @@
 #include <hpx/state.hpp>
 
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 #endif
 
 #include <atomic>

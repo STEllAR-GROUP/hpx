@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/detail/network_background_callback.hpp>
+#include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/timing/steady_clock.hpp>

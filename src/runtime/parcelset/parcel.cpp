@@ -25,7 +25,7 @@
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 
 #include <hpx/thread_support/atomic_count.hpp>
 

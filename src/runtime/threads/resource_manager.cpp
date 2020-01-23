@@ -10,7 +10,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/topology.hpp>
 

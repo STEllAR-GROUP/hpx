@@ -12,10 +12,10 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime/threads/detail/create_thread.hpp>
-#include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/threading_base/create_thread.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>

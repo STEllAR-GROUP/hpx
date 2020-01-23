@@ -14,11 +14,11 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
-#include <hpx/runtime/threads/detail/network_background_callback.hpp>
+#include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <atomic>
 #include <cstddef>

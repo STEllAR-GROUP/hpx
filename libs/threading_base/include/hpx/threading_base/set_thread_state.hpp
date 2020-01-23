@@ -15,10 +15,10 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/detail/create_thread.hpp>
-#include <hpx/runtime/threads/detail/create_work.hpp>
-#include <hpx/runtime/threads/register_thread.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/create_thread.hpp>
+#include <hpx/threading_base/create_work.hpp>
+#include <hpx/threading_base/register_thread.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>

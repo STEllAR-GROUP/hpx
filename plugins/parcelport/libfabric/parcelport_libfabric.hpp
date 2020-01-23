@@ -14,7 +14,7 @@
 #include <hpx/format.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
 #include <hpx/runtime.hpp>

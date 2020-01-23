@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/runtime/threads/detail/network_background_callback.hpp>
-#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/network_background_callback.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstddef>
 #include <memory>

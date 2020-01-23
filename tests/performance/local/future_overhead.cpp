@@ -18,8 +18,8 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/util/annotated_function.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/runtime/threads/executors/limiting_executor.hpp>

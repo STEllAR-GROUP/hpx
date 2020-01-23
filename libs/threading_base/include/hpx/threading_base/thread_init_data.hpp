@@ -11,9 +11,9 @@
 #include <hpx/config.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 #endif
 
 #include <cstddef>

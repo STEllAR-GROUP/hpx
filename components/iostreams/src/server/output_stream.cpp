@@ -10,7 +10,7 @@
 #include <hpx/functional/bind_front.hpp>
 
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/serialization/vector.hpp>

@@ -7,9 +7,9 @@
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 
 #include <cstddef>

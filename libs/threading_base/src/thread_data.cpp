@@ -13,10 +13,10 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/naming_base.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 #endif
 
 #include <cstddef>

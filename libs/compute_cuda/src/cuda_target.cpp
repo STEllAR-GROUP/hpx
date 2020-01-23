@@ -14,7 +14,7 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)

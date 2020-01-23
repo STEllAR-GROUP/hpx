@@ -12,9 +12,9 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
-#include <hpx/runtime/threads/execution_agent.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/execution_agent.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>

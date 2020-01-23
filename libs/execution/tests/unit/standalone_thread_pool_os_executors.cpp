@@ -16,7 +16,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <algorithm>
 #include <cstddef>
