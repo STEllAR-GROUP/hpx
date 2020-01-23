@@ -10,14 +10,10 @@
 #define HPX_RUNTIME_THREAD_POOL_HELPERS_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstddef>
 #include <string>
-
-namespace hpx { namespace threads
-{
-    class HPX_EXPORT thread_pool_base;
-}}
 
 namespace hpx { namespace resource
 {
