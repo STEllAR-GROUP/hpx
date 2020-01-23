@@ -17,6 +17,16 @@
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 
 #include <boost/asio/io_service.hpp>
+/* The boost asio support includes termios.h.
+ * The termios.h file on ppc64le defines these macros, which
+ * are also used by blaze, blaze_tensor as Template names.
+ * Make sure we undefine them before continuing. */
+#ifdef VT1
+#undef VT1
+#endif
+#ifdef VT2
+#undef VT2
+#endif
 
 #include <cstddef>
 #include <memory>
