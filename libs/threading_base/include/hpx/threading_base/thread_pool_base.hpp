@@ -9,20 +9,19 @@
 #define HPX_RUNTIME_THREADS_DETAIL_THREAD_POOL_JUN_11_2015_1137AM
 
 #include <hpx/config.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/threading_base/network_background_callback.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/util_fwd.hpp>
 
-#include <thread>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -31,19 +30,22 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     /// \brief Data structure which stores statistics collected by an
     ///        executor instance.
     struct executor_statistics
     {
         executor_statistics()
-          : tasks_scheduled_(0), tasks_completed_(0), queue_length_(0)
-        {}
+          : tasks_scheduled_(0)
+          , tasks_completed_(0)
+          , queue_length_(0)
+        {
+        }
 
         std::uint64_t tasks_scheduled_;
         std::uint64_t tasks_completed_;
@@ -67,36 +69,44 @@ namespace hpx { namespace threads
             virtual ~manage_executor() {}
 
             // Return the requested policy element
-            virtual std::size_t get_policy_element(executor_parameter p,
-                error_code& ec) const = 0;
+            virtual std::size_t get_policy_element(
+                executor_parameter p, error_code& ec) const = 0;
 
             // Return statistics collected by this scheduler
-            virtual void get_statistics(executor_statistics& stats,
-                error_code& ec) const = 0;
+            virtual void get_statistics(
+                executor_statistics& stats, error_code& ec) const = 0;
 
             // Provide the given processing unit to the scheduler.
             virtual void add_processing_unit(std::size_t virt_core,
                 std::size_t thread_num, error_code& ec) = 0;
 
             // Remove the given processing unit from the scheduler.
-            virtual void remove_processing_unit(std::size_t thread_num,
-                error_code& ec) = 0;
+            virtual void remove_processing_unit(
+                std::size_t thread_num, error_code& ec) = 0;
 
             // return the description string of the underlying scheduler
             virtual char const* get_description() const = 0;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     struct pool_id_type
     {
         pool_id_type(std::size_t index, std::string const& name)
-          : index_(index), name_(name)
-        {}
+          : index_(index)
+          , name_(name)
+        {
+        }
 
-        std::size_t index() const { return index_; };
-        std::string const& name() const { return name_; }
+        std::size_t index() const
+        {
+            return index_;
+        };
+        std::string const& name() const
+        {
+            return name_;
+        }
 
     private:
         std::size_t const index_;
@@ -159,8 +169,8 @@ namespace hpx { namespace threads
 
         virtual void init(std::size_t num_threads, std::size_t threads_offset);
 
-        virtual bool run(std::unique_lock<std::mutex>& l,
-            std::size_t num_threads) = 0;
+        virtual bool run(
+            std::unique_lock<std::mutex>& l, std::size_t num_threads) = 0;
 
         virtual void stop(
             std::unique_lock<std::mutex>& l, bool blocking = true) = 0;
@@ -216,8 +226,7 @@ namespace hpx { namespace threads
         /// \cond NOINTERNAL
         virtual std::size_t get_os_thread_count() const = 0;
 
-        virtual std::thread& get_os_thread_handle(
-            std::size_t num_thread) = 0;
+        virtual std::thread& get_os_thread_handle(std::size_t num_thread) = 0;
 
         virtual std::size_t get_active_os_thread_count() const;
 
@@ -230,10 +239,10 @@ namespace hpx { namespace threads
             thread_state_enum new_state, thread_state_ex_enum new_state_ex,
             thread_priority priority, error_code& ec) = 0;
 
-        virtual thread_id_type set_state(util::steady_time_point const& abs_time,
-            thread_id_type const& id, thread_state_enum newstate,
-            thread_state_ex_enum newstate_ex, thread_priority priority,
-            error_code& ec) = 0;
+        virtual thread_id_type set_state(
+            util::steady_time_point const& abs_time, thread_id_type const& id,
+            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
+            thread_priority priority, error_code& ec) = 0;
 
         std::size_t get_pool_index() const
         {
@@ -259,87 +268,178 @@ namespace hpx { namespace threads
         // performance counters
 #if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
         virtual std::int64_t get_executed_threads(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_executed_thread_phases(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
         virtual std::int64_t get_thread_phase_duration(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_thread_duration(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_thread_phase_overhead(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_thread_overhead(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_cumulative_thread_duration(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_cumulative_thread_overhead(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 #endif
 #endif
 
         virtual std::int64_t get_cumulative_duration(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
         virtual std::int64_t get_background_work_duration(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_background_overhead(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 
         virtual std::int64_t get_background_send_duration(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_background_send_overhead(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 
         virtual std::int64_t get_background_receive_duration(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_background_receive_overhead(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
-        virtual std::int64_t avg_idle_rate_all(bool /*reset*/) { return 0; }
-        virtual std::int64_t avg_idle_rate(std::size_t, bool) { return 0; }
+        virtual std::int64_t avg_idle_rate_all(bool /*reset*/)
+        {
+            return 0;
+        }
+        virtual std::int64_t avg_idle_rate(std::size_t, bool)
+        {
+            return 0;
+        }
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
         virtual std::int64_t avg_creation_idle_rate(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t avg_cleanup_idle_rate(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 #endif
 #endif
 
-        virtual std::int64_t get_queue_length(std::size_t, bool) { return 0; }
+        virtual std::int64_t get_queue_length(std::size_t, bool)
+        {
+            return 0;
+        }
 
 #if defined(HPX_HAVE_THREAD_QUEUE_WAITTIME)
         virtual std::int64_t get_average_thread_wait_time(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_average_task_wait_time(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 #endif
 
 #if defined(HPX_HAVE_THREAD_STEALING_COUNTS)
         virtual std::int64_t get_num_pending_misses(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_num_pending_accesses(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 
         virtual std::int64_t get_num_stolen_from_pending(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_num_stolen_to_pending(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_num_stolen_from_staged(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
         virtual std::int64_t get_num_stolen_to_staged(
-            std::size_t /*thread_num*/, bool /*reset*/) { return 0; }
+            std::size_t /*thread_num*/, bool /*reset*/)
+        {
+            return 0;
+        }
 #endif
 
         virtual std::int64_t get_thread_count(thread_state_enum /*state*/,
             thread_priority /*priority*/, std::size_t /*num_thread*/,
-            bool /*reset*/) { return 0; }
+            bool /*reset*/)
+        {
+            return 0;
+        }
 
-        virtual std::int64_t get_background_thread_count() { return 0; }
+        virtual std::int64_t get_background_thread_count()
+        {
+            return 0;
+        }
 
         std::int64_t get_thread_count_unknown(
             std::size_t num_thread, bool reset)
@@ -395,13 +495,19 @@ namespace hpx { namespace threads
 
         virtual void set_scheduler_mode(threads::policies::scheduler_mode) {}
         virtual void add_scheduler_mode(threads::policies::scheduler_mode) {}
-        virtual void add_remove_scheduler_mode(threads::policies::scheduler_mode,
-            threads::policies::scheduler_mode) {}
+        virtual void add_remove_scheduler_mode(
+            threads::policies::scheduler_mode,
+            threads::policies::scheduler_mode)
+        {
+        }
         virtual void remove_scheduler_mode(threads::policies::scheduler_mode) {}
 
         //
         virtual void abort_all_suspended_threads() {}
-        virtual bool cleanup_terminated(bool /*delete_all*/) { return false; }
+        virtual bool cleanup_terminated(bool /*delete_all*/)
+        {
+            return false;
+        }
 
         virtual hpx::state get_state() const = 0;
         virtual hpx::state get_state(std::size_t num_thread) const = 0;
@@ -432,8 +538,8 @@ namespace hpx { namespace threads
             std::size_t thread_num, error_code& ec = throws) override = 0;
 
         // \brief Remove the given processing unit from the scheduler.
-        virtual void remove_processing_unit(std::size_t thread_num,
-            error_code& ec = throws) override = 0;
+        virtual void remove_processing_unit(
+            std::size_t thread_num, error_code& ec = throws) override = 0;
 
         // \brief Return the description string of the underlying scheduler.
         char const* get_description() const override;
@@ -475,7 +581,7 @@ namespace hpx { namespace threads
         threads::policies::callback_notifier& notifier_;
         /// \endcond
     };
-}}
+}}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
 

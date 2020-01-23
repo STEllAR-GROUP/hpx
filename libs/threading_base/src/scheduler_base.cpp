@@ -6,12 +6,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/coroutines/detail/tss.hpp>
 #endif
@@ -33,8 +33,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies
-{
+namespace hpx { namespace threads { namespace policies {
     scheduler_base::scheduler_base(std::size_t num_threads,
         char const* description, thread_queue_init_parameters thread_queue_init,
         scheduler_mode mode)
@@ -53,7 +52,7 @@ namespace hpx { namespace threads { namespace policies
         double max_time = thread_queue_init.max_idle_backoff_time_;
 
         wait_counts_.resize(num_threads);
-        for (auto && data : wait_counts_)
+        for (auto&& data : wait_counts_)
         {
             data.data_.wait_count_ = 0;
             data.data_.max_idle_backoff_time_ = max_time;
@@ -68,7 +67,7 @@ namespace hpx { namespace threads { namespace policies
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         if (mode_.data_.load(std::memory_order_relaxed) &
-                policies::enable_idle_backoff)
+            policies::enable_idle_backoff)
         {
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
@@ -92,7 +91,7 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 #else
-        (void)num_thread;
+        (void) num_thread;
 #endif
     }
 
@@ -120,8 +119,8 @@ namespace hpx { namespace threads { namespace policies
         hpx::state expected = state_sleeping;
         states_[num_thread].compare_exchange_strong(expected, state_running);
 
-        HPX_ASSERT(expected == state_sleeping ||
-            expected == state_stopping || expected == state_terminating);
+        HPX_ASSERT(expected == state_sleeping || expected == state_stopping ||
+            expected == state_terminating);
     }
 
     void scheduler_base::resume(std::size_t num_thread)
@@ -336,10 +335,12 @@ namespace hpx { namespace threads { namespace policies
 
     void scheduler_base::update_scheduler_mode(scheduler_mode mode, bool set)
     {
-        if (set) {
+        if (set)
+        {
             add_scheduler_mode(mode);
         }
-        else {
+        else
+        {
             remove_scheduler_mode(mode);
         }
     }
@@ -370,13 +371,12 @@ namespace hpx { namespace threads { namespace policies
     }
 
     void scheduler_base::add_new_tss_node(void const* key,
-        std::shared_ptr<coroutines::detail::tss_cleanup_function>
-            const& func, void* tss_data)
+        std::shared_ptr<coroutines::detail::tss_cleanup_function> const& func,
+        void* tss_data)
     {
         if (!thread_data_)
         {
-            thread_data_ =
-                std::make_shared<coroutines::detail::tss_storage>();
+            thread_data_ = std::make_shared<coroutines::detail::tss_storage>();
         }
         thread_data_->insert(key, func, tss_data);
     }
@@ -398,8 +398,8 @@ namespace hpx { namespace threads { namespace policies
     }
 
     void scheduler_base::set_tss_data(void const* key,
-        std::shared_ptr<coroutines::detail::tss_cleanup_function>
-            const& func, void* tss_data, bool cleanup_existing)
+        std::shared_ptr<coroutines::detail::tss_cleanup_function> const& func,
+        void* tss_data, bool cleanup_existing)
     {
         if (coroutines::detail::tss_data_node* const current_node =
                 find_tss_data(key))
@@ -409,11 +409,10 @@ namespace hpx { namespace threads { namespace policies
             else
                 erase_tss_node(key, cleanup_existing);
         }
-        else if(func || (tss_data != 0))
+        else if (func || (tss_data != 0))
         {
             add_new_tss_node(key, func, tss_data);
         }
     }
 #endif
-}}}
-
+}}}    // namespace hpx::threads::policies

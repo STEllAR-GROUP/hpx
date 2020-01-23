@@ -57,8 +57,8 @@ namespace hpx { namespace threads { namespace policies {
             {
                 if (callback)
                 {
-                    callback(
-                        local_thread_num, global_thread_num, pool_name, postfix);
+                    callback(local_thread_num, global_thread_num, pool_name,
+                        postfix);
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace hpx { namespace threads { namespace policies {
         on_error_type on_error_;
     };
 
-}}}
+}}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
 

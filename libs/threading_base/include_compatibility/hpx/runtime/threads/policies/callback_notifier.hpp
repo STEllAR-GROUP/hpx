@@ -19,4 +19,3 @@
     please include hpx/threading_base/callback_notifier.hpp instead"
 #endif
 #endif
-

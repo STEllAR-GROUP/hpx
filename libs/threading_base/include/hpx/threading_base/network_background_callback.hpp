@@ -22,6 +22,6 @@ namespace hpx { namespace threads { namespace detail {
     using network_background_callback_type =
         util::function_nonser<bool(std::size_t)>;
 #endif
-}}}
+}}}    // namespace hpx::threads::detail
 
 #endif

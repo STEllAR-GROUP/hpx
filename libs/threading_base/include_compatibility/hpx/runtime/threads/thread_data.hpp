@@ -10,7 +10,8 @@
 
 #if defined(HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message("The header hpx/runtime/threads/thread_data.hpp is deprecated, \
+#pragma message(                                                               \
+    "The header hpx/runtime/threads/thread_data.hpp is deprecated, \
     please include hpx/threading_base/thread_data.hpp instead")
 #else
 #warning "The header hpx/runtime/threads/thread_data.hpp is deprecated, \

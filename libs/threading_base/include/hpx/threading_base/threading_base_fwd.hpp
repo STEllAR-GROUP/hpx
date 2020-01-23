@@ -25,7 +25,7 @@
 #if defined(HPX_HAVE_APEX)
 namespace hpx { namespace util { namespace external_timer {
     struct task_wrapper;
-}}}
+}}}    // namespace hpx::util::external_timer
 #endif
 
 namespace hpx { namespace threads {
@@ -53,8 +53,7 @@ namespace hpx { namespace threads {
         util::unique_function_nonser<thread_function_sig>;
 
     using thread_self = coroutines::detail::coroutine_self;
-    using thread_self_impl_type =
-        coroutines::detail::coroutine_impl;
+    using thread_self_impl_type = coroutines::detail::coroutine_impl;
 
     using thread_result_type = std::pair<thread_state_enum, thread_id_type>;
     using thread_arg_type = thread_state_ex_enum;
@@ -65,7 +64,7 @@ namespace hpx { namespace threads {
 
 #if defined(HPX_HAVE_APEX)
     HPX_API_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>
-        get_self_timer_data(void);
+    get_self_timer_data(void);
     HPX_API_EXPORT void set_self_timer_data(
         std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
 #endif

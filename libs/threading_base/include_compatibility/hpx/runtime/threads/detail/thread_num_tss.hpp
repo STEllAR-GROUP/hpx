@@ -19,5 +19,3 @@
     please include hpx/threading_base/thread_num_tss.hpp instead"
 #endif
 #endif
-
-

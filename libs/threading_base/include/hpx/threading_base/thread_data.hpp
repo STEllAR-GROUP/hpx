@@ -14,17 +14,17 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
+#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/naming_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/util/backtrace.hpp> // TODO: Move to a separate module.
 #include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/util/backtrace.hpp>    // TODO: Move to a separate module.
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif
@@ -33,10 +33,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <forward_list>
+#include <memory>
 #include <stack>
 #include <string>
 #include <utility>
-#include <memory>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -248,7 +248,8 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-        naming::address_type get_component_id() const noexcept
+            naming::address_type
+            get_component_id() const noexcept
         {
             return 0;
         }
@@ -305,7 +306,8 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-        std::uint32_t get_parent_locality_id() const noexcept
+            std::uint32_t
+            get_parent_locality_id() const noexcept
         {
             return naming::invalid_locality_id;
         }
@@ -314,7 +316,8 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-        thread_id_type get_parent_thread_id() const noexcept
+            thread_id_type
+            get_parent_thread_id() const noexcept
         {
             return threads::invalid_thread_id;
         }
@@ -323,7 +326,8 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-        std::size_t get_parent_thread_phase() const noexcept
+            std::size_t
+            get_parent_thread_phase() const noexcept
         {
             return 0;
         }
@@ -364,7 +368,8 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-        char const* get_backtrace() const noexcept
+            char const*
+            get_backtrace() const noexcept
         {
             return nullptr;
         }
@@ -376,7 +381,8 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-        util::backtrace const* get_backtrace() const noexcept
+            util::backtrace const*
+            get_backtrace() const noexcept
         {
             return nullptr;
         }
@@ -439,7 +445,8 @@ namespace hpx { namespace threads {
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
 #endif
-        thread_priority get_priority() const noexcept
+            thread_priority
+            get_priority() const noexcept
         {
             return priority_;
         }
@@ -525,7 +532,7 @@ namespace hpx { namespace threads {
             return 0;
         }
 #else
-        virtual std::size_t get_thread_phase() const noexcept= 0;
+        virtual std::size_t get_thread_phase() const noexcept = 0;
 #endif
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
@@ -534,8 +541,8 @@ namespace hpx { namespace threads {
             thread_init_data& init_data, thread_state_enum newstate) = 0;
 
 #if defined(HPX_HAVE_APEX)
-        std::shared_ptr<util::external_timer::task_wrapper>
-            get_timer_data() const noexcept
+        std::shared_ptr<util::external_timer::task_wrapper> get_timer_data()
+            const noexcept
         {
             return timer_data_;
         }
@@ -608,8 +615,7 @@ namespace hpx { namespace threads {
         bool is_stackless_;
     };
 
-    constexpr inline thread_data* get_thread_id_data(
-        thread_id_type const& tid)
+    constexpr inline thread_data* get_thread_id_data(thread_id_type const& tid)
     {
         return static_cast<thread_data*>(tid.get());
     }
@@ -696,5 +702,5 @@ namespace hpx { namespace threads {
         }
         return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
-}}
+}}     // namespace hpx::threads
 #endif /*HPX_RUNTIME_THREADS_THREAD_DATA_HPP*/

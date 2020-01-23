@@ -19,8 +19,8 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/tagged_pair.hpp>
 #include <hpx/util/tagged_tuple.hpp>
 

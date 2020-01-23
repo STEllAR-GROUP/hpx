@@ -13,16 +13,16 @@
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/basic_execution/register_locks.hpp>
 #endif
-#include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/threading_base/thread_description.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <cstddef>

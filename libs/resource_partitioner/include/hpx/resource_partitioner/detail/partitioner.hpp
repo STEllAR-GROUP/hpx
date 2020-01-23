@@ -14,8 +14,8 @@
 #include <hpx/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>

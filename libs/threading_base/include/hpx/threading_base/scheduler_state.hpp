@@ -11,8 +11,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx
-{
+namespace hpx {
     enum state
     {
         state_invalid = -1,
@@ -35,4 +34,4 @@ namespace hpx
     };
 }
 
-#endif // HPX_703646B3_0567_484E_AD34_A752B8163B30
+#endif    // HPX_703646B3_0567_484E_AD34_A752B8163B30

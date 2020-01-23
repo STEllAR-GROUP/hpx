@@ -81,11 +81,11 @@ namespace hpx { namespace util {
 #endif
             hpx::basic_execution::this_thread::yield_k(k, thread_name);
         }
-    }
+    }    // namespace detail
 
     template <typename Predicate>
-    inline void yield_while(Predicate && predicate,
-        const char *thread_name = nullptr, bool allow_timed_suspension = true)
+    inline void yield_while(Predicate&& predicate,
+        const char* thread_name = nullptr, bool allow_timed_suspension = true)
     {
         if (allow_timed_suspension)
         {
@@ -102,6 +102,6 @@ namespace hpx { namespace util {
             }
         }
     }
-}}    // namespace hpx::util::detail
+}}    // namespace hpx::util
 
 #endif

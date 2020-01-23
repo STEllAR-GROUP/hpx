@@ -19,5 +19,3 @@
     please include hpx/threading_base/create_work.hpp instead"
 #endif
 #endif
-
-

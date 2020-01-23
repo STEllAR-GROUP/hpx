@@ -14,8 +14,7 @@
 #include <sstream>
 #include <string>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     std::ostream& operator<<(std::ostream& os, thread_description const& d)
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -26,7 +25,7 @@ namespace hpx { namespace util
         else
         {
             HPX_ASSERT(d.kind() == thread_description::data_type_address);
-            os << d.get_address(); //-V128
+            os << d.get_address();    //-V128
         }
 #else
         os << "<unknown>";
@@ -52,8 +51,10 @@ namespace hpx { namespace util
     /* The priority of description is altname, id::name, id::address */
     void thread_description::init_from_alternative_name(char const* altname)
     {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION) && !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
-        if (altname != nullptr) {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION) &&                                    \
+    !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
+        if (altname != nullptr)
+        {
             type_ = data_type_description;
             data_.desc_ = altname;
             return;
@@ -78,7 +79,7 @@ namespace hpx { namespace util
         }
 #endif
     }
-}}
+}}    // namespace hpx::util
 
 namespace hpx { namespace threads {
     util::thread_description get_thread_description(
@@ -139,4 +140,4 @@ namespace hpx { namespace threads {
 
         return get_thread_id_data(id)->set_lco_description(desc);
     }
-}}
+}}    // namespace hpx::threads

@@ -4,17 +4,17 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/affinity/affinity_data.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/hardware/timestamp.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/scheduler_state.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -23,11 +23,9 @@
 #include <string>
 #include <thread>
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
-    thread_pool_base::thread_pool_base(
-        thread_pool_init_parameters const& init)
+    thread_pool_base::thread_pool_base(thread_pool_init_parameters const& init)
       : id_(init.index_, init.name_)
       , mode_(init.mode_)
       , thread_offset_(init.thread_offset_)
@@ -47,12 +45,12 @@ namespace hpx { namespace threads
         threads::resize(used_processing_units, hardware_concurrency());
 
         for (std::size_t thread_num = 0; thread_num < get_os_thread_count();
-            ++thread_num)
+             ++thread_num)
         {
             if (sched->get_state(thread_num).load() <= state_suspended)
             {
-                used_processing_units |=
-                    affinity_data_.get_pu_mask(topo, thread_num + get_thread_offset());
+                used_processing_units |= affinity_data_.get_pu_mask(
+                    topo, thread_num + get_thread_offset());
             }
         }
 
@@ -71,9 +69,10 @@ namespace hpx { namespace threads
         std::size_t active_os_thread_count = 0;
 
         for (std::size_t thread_num = 0; thread_num < get_os_thread_count();
-            ++thread_num)
+             ++thread_num)
         {
-            if (get_scheduler()->get_state(thread_num).load() <= state_suspended)
+            if (get_scheduler()->get_state(thread_num).load() <=
+                state_suspended)
             {
                 ++active_os_thread_count;
             }
@@ -111,10 +110,9 @@ namespace hpx { namespace threads
         }
     }
 
-    void thread_pool_base::init(std::size_t pool_threads,
-        std::size_t threads_offset)
+    void thread_pool_base::init(
+        std::size_t pool_threads, std::size_t threads_offset)
     {
         thread_offset_ = threads_offset;
     }
-}}
-
+}}    // namespace hpx::threads

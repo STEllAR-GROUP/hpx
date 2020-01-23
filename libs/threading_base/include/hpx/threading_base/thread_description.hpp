@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/threading_base/threading_base_fwd.hpp>
 #include <hpx/functional/traits/get_action_name.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_action.hpp>
+#include <hpx/threading_base/threading_base_fwd.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/concurrency/itt_notify.hpp>
 #endif
@@ -24,8 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     struct thread_description
@@ -40,8 +39,8 @@ namespace hpx { namespace util
     private:
         union data
         {
-            char const* desc_; //-V117
-            std::size_t addr_; //-V117
+            char const* desc_;    //-V117
+            std::size_t addr_;    //-V117
         };
 
         data_type type_;
@@ -66,8 +65,8 @@ namespace hpx { namespace util
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        thread_description(char const* desc,
-                util::itt::string_handle const& sh) noexcept
+        thread_description(
+            char const* desc, util::itt::string_handle const& sh) noexcept
           : type_(data_type_description)
         {
             data_.desc_ = desc ? desc : "<unknown>";
@@ -76,13 +75,12 @@ namespace hpx { namespace util
 #endif
 
         /* The priority of description is name, altname, address */
-        template <typename F, typename =
-            typename std::enable_if<
+        template <typename F,
+            typename = typename std::enable_if<
                 !std::is_same<F, thread_description>::value &&
-                !traits::is_action<F>::value
-            >::type>
-        explicit thread_description(F const& f,
-                char const* altname = nullptr) noexcept
+                !traits::is_action<F>::value>::type>
+        explicit thread_description(
+            F const& f, char const* altname = nullptr) noexcept
           : type_(data_type_description)
         {
             char const* name = traits::get_function_annotation<F>::call(f);
@@ -117,12 +115,11 @@ namespace hpx { namespace util
 #endif
         }
 
-        template <typename Action, typename =
-            typename std::enable_if<
-                traits::is_action<Action>::value
-            >::type>
-        explicit thread_description(Action,
-                char const* altname = nullptr) noexcept
+        template <typename Action,
+            typename =
+                typename std::enable_if<traits::is_action<Action>::value>::type>
+        explicit thread_description(
+            Action, char const* altname = nullptr) noexcept
           : type_(data_type_description)
         {
             data_.desc_ = hpx::actions::detail::get_action_name<Action>();
@@ -147,7 +144,7 @@ namespace hpx { namespace util
         {
             HPX_ASSERT(type_ == data_type_description);
             return desc_itt_ ? desc_itt_ :
-                util::itt::string_handle(get_description());
+                               util::itt::string_handle(get_description());
         }
 
         util::itt::task get_task_itt(util::itt::domain const& domain) const
@@ -206,30 +203,24 @@ namespace hpx { namespace util
         HPX_EXPORT void init_from_alternative_name(char const* altname);
 
     public:
-        thread_description() noexcept
-        {
-        }
+        thread_description() noexcept {}
 
-        thread_description(char const* /*desc*/) noexcept
-        {
-        }
+        thread_description(char const* /*desc*/) noexcept {}
 
-        template <typename F, typename =
-            typename std::enable_if<
+        template <typename F,
+            typename = typename std::enable_if<
                 !std::is_same<F, thread_description>::value &&
-                !traits::is_action<F>::value
-            >::type>
-        explicit thread_description(F const& /*f*/,
-            char const* /*altname*/ = nullptr) noexcept
+                !traits::is_action<F>::value>::type>
+        explicit thread_description(
+            F const& /*f*/, char const* /*altname*/ = nullptr) noexcept
         {
         }
 
-        template <typename Action, typename =
-            typename std::enable_if<
-                traits::is_action<Action>::value
-            >::type>
-        explicit thread_description(Action,
-            char const* /*altname*/ = nullptr) noexcept
+        template <typename Action,
+            typename =
+                typename std::enable_if<traits::is_action<Action>::value>::type>
+        explicit thread_description(
+            Action, char const* /*altname*/ = nullptr) noexcept
         {
         }
 
@@ -287,9 +278,10 @@ namespace hpx { namespace util
     };
 #endif
 
-    HPX_EXPORT std::ostream& operator<<(std::ostream&, thread_description const&);
+    HPX_EXPORT std::ostream& operator<<(
+        std::ostream&, thread_description const&);
     HPX_EXPORT std::string as_string(thread_description const& desc);
-}}
+}}    // namespace hpx::util
 
 namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
@@ -325,7 +317,6 @@ namespace hpx { namespace threads {
         thread_id_type const& id,
         util::thread_description const& desc = util::thread_description(),
         error_code& ec = throws);
-}}
+}}    // namespace hpx::threads
 
 #endif
-

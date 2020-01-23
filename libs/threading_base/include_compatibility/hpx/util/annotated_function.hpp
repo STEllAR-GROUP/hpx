@@ -17,4 +17,3 @@
     please include hpx/threading_base/annotated_function.hpp instead"
 #endif
 #endif
-

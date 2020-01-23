@@ -17,4 +17,3 @@
     please include hpx/threading_base/external_timer.hpp instead"
 #endif
 #endif
-

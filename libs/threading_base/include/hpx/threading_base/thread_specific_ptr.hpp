@@ -9,7 +9,8 @@
 // (C) Copyright 2008 Anthony Williams
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
-#if !defined(HPX_UTIL_RUNTIME_THREADS_THREAD_SPECIFIC_PTR_MAR_20_2014_0941A320PM)
+#if !defined(                                                                  \
+    HPX_UTIL_RUNTIME_THREADS_THREAD_SPECIFIC_PTR_MAR_20_2014_0941A320PM)
 #define HPX_UTIL_RUNTIME_THREADS_THREAD_SPECIFIC_PTR_MAR_20_2014_0941A320PM
 
 #include <hpx/config.hpp>
@@ -18,8 +19,7 @@
 
 #include <memory>
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class thread_specific_ptr
@@ -30,8 +30,7 @@ namespace hpx { namespace threads
         thread_specific_ptr(thread_specific_ptr&);
         thread_specific_ptr& operator=(thread_specific_ptr&);
 
-        struct delete_data
-          : coroutines::detail::tss_cleanup_function
+        struct delete_data : coroutines::detail::tss_cleanup_function
         {
             void operator()(void* data) override
             {
@@ -42,9 +41,10 @@ namespace hpx { namespace threads
         struct run_custom_cleanup_function
           : coroutines::detail::tss_cleanup_function
         {
-            explicit run_custom_cleanup_function(void (*cleanup_function_)(T*)):
-                cleanup_function(cleanup_function_)
-            {}
+            explicit run_custom_cleanup_function(void (*cleanup_function_)(T*))
+              : cleanup_function(cleanup_function_)
+            {
+            }
 
             void operator()(void* data) override
             {
@@ -61,7 +61,8 @@ namespace hpx { namespace threads
 
         thread_specific_ptr()
           : cleanup_(std::make_shared<delete_data>())
-        {}
+        {
+        }
 
         explicit thread_specific_ptr(void (*func_)(T*))
         {
@@ -108,6 +109,6 @@ namespace hpx { namespace threads
             }
         }
     };
-}}
+}}    // namespace hpx::threads
 
 #endif

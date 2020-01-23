@@ -55,8 +55,7 @@ namespace hpx { namespace threads { namespace detail {
     };
 }}}    // namespace hpx::threads::detail
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current OS-thread running in the
     ///        runtime instance the current HPX-thread is executed with.
@@ -90,7 +89,7 @@ namespace hpx
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
     HPX_API_EXPORT std::size_t get_worker_thread_num(error_code& ec);
-}
+}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
 

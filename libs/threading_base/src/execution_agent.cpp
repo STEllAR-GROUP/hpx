@@ -6,10 +6,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/throw_exception.hpp>
 #include <hpx/format.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
 #include <hpx/threading_base/execution_agent.hpp>
@@ -155,8 +155,8 @@ namespace hpx { namespace threads {
 #endif
             HPX_ASSERT(thrd_data->get_state().state() == active);
             HPX_ASSERT(state != active);
-            statex = self_.yield(threads::thread_result_type(state,
-                threads::invalid_thread_id));
+            statex = self_.yield(
+                threads::thread_result_type(state, threads::invalid_thread_id));
             HPX_ASSERT(get_thread_id_data(id)->get_state().state() == active);
         }
 
@@ -201,7 +201,8 @@ namespace hpx { namespace threads {
             {
             // The thread is still running... we yield our current context
             // and retry..
-            case active: {
+            case active:
+            {
                 hpx::basic_execution::this_thread::yield_k(
                     k, "hpx::threads::execution_agent::resume");
                 ++k;
@@ -212,7 +213,8 @@ namespace hpx { namespace threads {
                     << get_thread_id_data(id)->get_description() << ")";
                 continue;
             }
-            case terminated: {
+            case terminated:
+            {
                 LTM_(warning)
                     << "resume: thread is terminated, aborting state "
                        "change, thread("
@@ -226,7 +228,8 @@ namespace hpx { namespace threads {
                 // We can now safely set the new state...
                 break;
             case pending_do_not_schedule:
-            default: {
+            default:
+            {
                 // should not happen...
                 std::ostringstream strm;
                 strm << "resume: previous state was "
@@ -243,8 +246,7 @@ namespace hpx { namespace threads {
             // at some point will ignore this thread by simply skipping it
             // (if it's not pending anymore).
 
-            LTM_(info) << "resume: thread(" << id
-                       << "), description("
+            LTM_(info) << "resume: thread(" << id << "), description("
                        << get_thread_id_data(id)->get_description()
                        << "), old state("
                        << get_thread_state_name(previous_state_val) << ")";
@@ -260,10 +262,8 @@ namespace hpx { namespace threads {
             LTM_(error)
                 << "resume: state has been changed since it was fetched, "
                    "retrying, thread("
-                << id
-                << "), description("
-                << get_thread_id_data(id)->get_description()
-                << "), old state("
+                << id << "), description("
+                << get_thread_id_data(id)->get_description() << "), old state("
                 << get_thread_state_name(previous_state_val) << ")";
 
         } while (true);
