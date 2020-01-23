@@ -69,7 +69,7 @@ namespace hpx { namespace util {
         struct deferred_impl;
 
         template <typename F, typename... Ts, std::size_t... Is>
-        struct deferred_impl<F, util::tuple<Ts...>, pack_c<std::size_t, Is...>>
+        struct deferred_impl<F, util::tuple<Ts...>, index_pack<Is...>>
         {
             HPX_HOST_DEVICE HPX_FORCEINLINE
                 typename util::invoke_result<F, Ts...>::type

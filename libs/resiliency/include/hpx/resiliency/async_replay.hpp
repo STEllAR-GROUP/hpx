@@ -82,7 +82,7 @@ namespace hpx { namespace resiliency {
             }
 
             template <std::size_t... Is>
-            hpx::future<Result> invoke(hpx::util::pack_c<std::size_t, Is...>)
+            hpx::future<Result> invoke(hpx::util::index_pack<Is...>)
             {
                 return hpx::async(f_, std::get<Is>(t_)...);
             }

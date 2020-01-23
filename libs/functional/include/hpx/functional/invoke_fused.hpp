@@ -35,14 +35,14 @@ namespace hpx { namespace util {
         struct fused_result_of_impl;
 
         template <typename F, typename Tuple, std::size_t... Is>
-        struct fused_result_of_impl<F, Tuple&, pack_c<std::size_t, Is...>>
+        struct fused_result_of_impl<F, Tuple&, index_pack<Is...>>
           : util::result_of<F(
                 typename util::tuple_element<Is, Tuple>::type&...)>
         {
         };
 
         template <typename F, typename Tuple, std::size_t... Is>
-        struct fused_result_of_impl<F, Tuple&&, pack_c<std::size_t, Is...>>
+        struct fused_result_of_impl<F, Tuple&&, index_pack<Is...>>
           : util::result_of<F(
                 typename util::tuple_element<Is, Tuple>::type&&...)>
         {
@@ -69,7 +69,7 @@ namespace hpx { namespace util {
         template <std::size_t... Is, typename F, typename Tuple>
         HPX_CONSTEXPR HPX_HOST_DEVICE
             typename invoke_fused_result<F, Tuple>::type
-            invoke_fused_impl(pack_c<std::size_t, Is...>, F&& f, Tuple&& t)
+            invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t)
         {
             return HPX_INVOKE(
                 std::forward<F>(f), util::get<Is>(std::forward<Tuple>(t))...);

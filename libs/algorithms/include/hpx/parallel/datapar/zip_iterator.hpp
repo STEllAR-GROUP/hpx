@@ -36,7 +36,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         template <std::size_t... Is>
         static HPX_FORCEINLINE bool call(
             hpx::util::zip_iterator<Iter...> const& it,
-            hpx::util::pack_c<std::size_t, Is...>)
+            hpx::util::index_pack<Is...>)
         {
             auto const& t = it.get_iterator_tuple();
             bool const sequencer[] = {
@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { namespace traits {
     namespace detail {
         template <typename Tuple, typename... Iter, std::size_t... Is>
         Tuple aligned_pack(hpx::util::zip_iterator<Iter...> const& iter,
-            hpx::util::pack_c<std::size_t, Is...>)
+            hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
             return hpx::util::make_tuple(vector_pack_load<
@@ -79,7 +79,7 @@ namespace hpx { namespace parallel { namespace traits {
 
         template <typename Tuple, typename... Iter, std::size_t... Is>
         Tuple unaligned_pack(hpx::util::zip_iterator<Iter...> const& iter,
-            hpx::util::pack_c<std::size_t, Is...>)
+            hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
             return hpx::util::make_tuple(vector_pack_load<
@@ -115,7 +115,7 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename Tuple, typename... Iter, std::size_t... Is>
         void aligned_pack(Tuple const& value,
             hpx::util::zip_iterator<Iter...> const& iter,
-            hpx::util::pack_c<std::size_t, Is...>)
+            hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
             int const sequencer[] = {0,
@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename Tuple, typename... Iter, std::size_t... Is>
         void unaligned_pack(Tuple const& value,
             hpx::util::zip_iterator<Iter...> const& iter,
-            hpx::util::pack_c<std::size_t, Is...>)
+            hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
             int const sequencer[] = {0,

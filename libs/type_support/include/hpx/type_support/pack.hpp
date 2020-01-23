@@ -28,15 +28,17 @@ namespace hpx { namespace util {
         static const std::size_t size = sizeof...(Vs);
     };
 
+    template <std::size_t... Is>
+    using index_pack = pack_c<std::size_t, Is...>;
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename Left, typename Right>
         struct make_index_pack_join;
 
         template <std::size_t... Left, std::size_t... Right>
-        struct make_index_pack_join<pack_c<std::size_t, Left...>,
-            pack_c<std::size_t, Right...>>
-          : pack_c<std::size_t, Left..., (sizeof...(Left) + Right)...>
+        struct make_index_pack_join<index_pack<Left...>, index_pack<Right...>>
+          : index_pack<Left..., (sizeof...(Left) + Right)...>
         {
         };
     }    // namespace detail
@@ -44,7 +46,7 @@ namespace hpx { namespace util {
     template <std::size_t N>
     struct make_index_pack
 #if defined(HPX_HAVE_BUILTIN_INTEGER_PACK)
-      : pack_c<std::size_t, __integer_pack(N)...>
+      : index_pack<__integer_pack(N)...>
 #elif defined(HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ)
       : __make_integer_seq<pack_c, std::size_t, N>
 #else
@@ -60,7 +62,7 @@ namespace hpx { namespace util {
     };
 
     template <>
-    struct make_index_pack<1> : pack_c<std::size_t, 0>
+    struct make_index_pack<1> : index_pack<0>
     {
     };
 

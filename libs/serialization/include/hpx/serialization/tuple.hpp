@@ -41,8 +41,8 @@ namespace hpx { namespace util { namespace detail {
     struct save_construct_data_with_index_pack;
 
     template <typename Archive, std::size_t... Is, typename... Ts>
-    struct serialize_with_index_pack<Archive,
-        hpx::util::pack_c<std::size_t, Is...>, Ts...>
+    struct serialize_with_index_pack<Archive, hpx::util::index_pack<Is...>,
+        Ts...>
     {
         static void call(Archive& ar, hpx::util::tuple<Ts...>& t, unsigned int)
         {
@@ -53,7 +53,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Archive, std::size_t... Is, typename... Ts>
     struct load_construct_data_with_index_pack<Archive,
-        hpx::util::pack_c<std::size_t, Is...>, Ts...>
+        hpx::util::index_pack<Is...>, Ts...>
     {
         static void call(
             Archive& ar, hpx::util::tuple<Ts...>& t, unsigned int version)
@@ -68,7 +68,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Archive, std::size_t... Is, typename... Ts>
     struct save_construct_data_with_index_pack<Archive,
-        hpx::util::pack_c<std::size_t, Is...>, Ts...>
+        hpx::util::index_pack<Is...>, Ts...>
     {
         static void call(
             Archive& ar, hpx::util::tuple<Ts...> const& t, unsigned int version)

@@ -212,8 +212,7 @@ namespace hpx { namespace util {
             template <std::size_t... Is>
             HPX_HOST_DEVICE static
                 typename zip_iterator_reference<tuple<Ts...>>::type
-                call(util::pack_c<std::size_t, Is...>,
-                    tuple<Ts...> const& iterators)
+                call(util::index_pack<Is...>, tuple<Ts...> const& iterators)
             {
                 return util::forward_as_tuple(*util::get<Is>(iterators)...);
             }
@@ -329,7 +328,7 @@ namespace hpx { namespace util {
 
         private:
             template <typename F, std::size_t... Is>
-            HPX_HOST_DEVICE void apply(F&& f, util::pack_c<std::size_t, Is...>)
+            HPX_HOST_DEVICE void apply(F&& f, util::index_pack<Is...>)
             {
                 int const _sequencer[] = {
                     ((f(util::get<Is>(iterators_))), 0)...};
@@ -542,7 +541,7 @@ namespace hpx { namespace traits {
 
             template <std::size_t... Is, typename... Ts_>
             static result_type call(
-                util::pack_c<std::size_t, Is...>, util::tuple<Ts_...> const& t)
+                util::index_pack<Is...>, util::tuple<Ts_...> const& t)
             {
                 return util::make_tuple(
                     typename F::template apply<Ts>()(util::get<Is>(t))...);

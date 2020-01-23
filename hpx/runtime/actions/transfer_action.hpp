@@ -71,7 +71,7 @@ namespace hpx { namespace actions
         ///       continuations.
         template <std::size_t ...Is>
         threads::thread_function_type
-        get_thread_function(util::pack_c<std::size_t, Is...>,
+        get_thread_function(util::index_pack<Is...>,
             naming::id_type&& target, naming::address::address_type lva,
             naming::address::component_type comptype);
 
@@ -82,7 +82,7 @@ namespace hpx { namespace actions
 
         template <std::size_t ...Is>
         void
-        schedule_thread(util::pack_c<std::size_t, Is...>,
+        schedule_thread(util::index_pack<Is...>,
             naming::gid_type const& target_gid,
             naming::address::address_type lva,
             naming::address::component_type comptype,
@@ -131,7 +131,7 @@ namespace hpx { namespace actions
     template <std::size_t ...Is>
     threads::thread_function_type
     transfer_action<Action>::get_thread_function(
-        util::pack_c<std::size_t, Is...>,
+        util::index_pack<Is...>,
         naming::id_type&& target, naming::address::address_type lva,
         naming::address::component_type comptype)
     {
@@ -155,7 +155,7 @@ namespace hpx { namespace actions
     template <std::size_t ...Is>
     void
     transfer_action<Action>::schedule_thread(
-            util::pack_c<std::size_t, Is...>,
+            util::index_pack<Is...>,
         naming::gid_type const& target_gid,
         naming::address::address_type lva,
         naming::address::component_type comptype,

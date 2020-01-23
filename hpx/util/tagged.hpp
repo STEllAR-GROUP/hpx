@@ -57,7 +57,7 @@ namespace hpx { namespace util
             struct collect_;
 
             template <typename T, std::size_t ...Is, typename ...Tags>
-            struct collect_<T, pack_c<std::size_t, Is...>, Tags...>
+            struct collect_<T, index_pack<Is...>, Tags...>
               : unpack_getter<T, Tags, Is>::type...
             {};
 
