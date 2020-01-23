@@ -14,6 +14,7 @@ set(local_lcos_headers
   hpx/local_lcos/channel.hpp
   hpx/local_lcos/composable_guard.hpp
   hpx/local_lcos/conditional_trigger.hpp
+  hpx/local_lcos/force_linking.hpp
   hpx/local_lcos/packaged_task.hpp
   hpx/local_lcos/promise.hpp
   hpx/local_lcos/receive_buffer.hpp
@@ -34,13 +35,13 @@ set(local_lcos_compat_headers
 
 set(local_lcos_sources
   composable_guard.cpp
+  force_linking.cpp
   )
 
 include(HPX_AddModule)
 add_hpx_module(local_lcos
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
   DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
   SOURCES ${local_lcos_sources}
   HEADERS ${local_lcos_headers}
   COMPAT_HEADERS ${local_lcos_compat_headers}
