@@ -184,7 +184,7 @@ namespace hpx { namespace compute {
 
             size_ = other.size_;
             capacity_ = other.capacity_;
-            alloc_ = other.alloc_;
+            alloc_ = std::move(tmp_alloc);
             data_ = std::move(data);
 
             return *this;
