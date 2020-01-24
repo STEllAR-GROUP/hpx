@@ -25,6 +25,7 @@ foreach(example_program ${example_programs})
 
   # add example executable
   add_hpx_executable(${example_program}
+                     INTERNAL_FLAGS
                      SOURCES ${sources}
                      ${${example_program}_FLAGS}
                      FOLDER "Examples/AsyncIO/${example_program}")

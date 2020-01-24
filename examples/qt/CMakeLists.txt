@@ -16,6 +16,7 @@ if(HPX_WITH_EXAMPLES_QT4)
         ${QT_MOC_SOURCES})
 
     add_hpx_executable(qt
+        INTERNAL_FLAGS
         MODULE qt
         SOURCES ${qt_sources}
         ${qt_FLAGS}

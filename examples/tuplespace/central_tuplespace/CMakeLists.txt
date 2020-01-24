@@ -12,6 +12,7 @@ set(components
 foreach(component ${components})
 
   add_hpx_component(${component}
+    INTERNAL_FLAGS
     AUTOGLOB
     HEADER_GLOB "${component}.h*"
     SOURCE_GLOB "${component}.c*"

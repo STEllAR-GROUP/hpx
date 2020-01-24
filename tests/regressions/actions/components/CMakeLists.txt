@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_component(action_move_semantics
+  INTERNAL_FLAGS
   FOLDER "Tests/Regressions/Actions"
   EXCLUDE_FROM_ALL
   AUTOGLOB)

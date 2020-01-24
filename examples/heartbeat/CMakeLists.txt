@@ -24,6 +24,7 @@ if(MSVC)
 endif()
 
 add_hpx_executable(heartbeat
+                   INTERNAL_FLAGS
                    SOURCES ${heartbeat_SOURCES}
                    HEADERS ${heartbeat_HEADERS}
                    FOLDER "Examples/HeartBeat"
@@ -34,6 +35,7 @@ add_hpx_pseudo_dependencies(examples.heartbeat heartbeat)
 
 ###############################################################################
 add_hpx_executable(heartbeat_console
+                   INTERNAL_FLAGS
                    SOURCES heartbeat_console.cpp
                    FOLDER "Examples/HeartBeat"
                    DEPENDENCIES iostreams_component)

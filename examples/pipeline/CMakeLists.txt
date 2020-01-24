@@ -7,6 +7,9 @@
 set(pipeline emitter worker collector)
 
 foreach(app ${pipeline})
-  add_hpx_executable(${app} SOURCES ${app}.cpp FOLDER "Examples/Pipeline")
+  add_hpx_executable(${app}
+    INTERNAL_FLAGS
+    SOURCES ${app}.cpp
+    FOLDER "Examples/Pipeline")
   add_hpx_example_target_dependencies("pipeline" ${app})
 endforeach()

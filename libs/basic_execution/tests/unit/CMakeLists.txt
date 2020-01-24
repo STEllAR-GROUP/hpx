@@ -16,6 +16,7 @@ foreach(test ${tests})
 
   # add example executable
   add_hpx_executable(${test}_test
+                     INTERNAL_FLAGS
                      SOURCES ${sources}
                      NOLIBS
                      DEPENDENCIES

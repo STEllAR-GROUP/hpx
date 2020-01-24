@@ -16,6 +16,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   add_hpx_executable(${test}_test
+                     INTERNAL_FLAGS
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL

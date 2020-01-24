@@ -35,6 +35,7 @@ source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
 add_hpx_component(throttle
+  INTERNAL_FLAGS
   SOURCES ${client_sources} ${server_sources}
   HEADERS ${headers}
   FOLDER "Examples/Throttle")

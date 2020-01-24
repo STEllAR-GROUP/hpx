@@ -6,6 +6,7 @@
 
 add_hpx_component(
   launch_process_test_server
+  INTERNAL_FLAGS
   FOLDER "Tests/Unit/Components"
   EXCLUDE_FROM_ALL
   AUTOGLOB)

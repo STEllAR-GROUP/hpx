@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_executable(thread_aware_timer
+  INTERNAL_FLAGS
   SOURCES thread_aware_timer.cpp
   FOLDER "Examples/ThreadAwareTimer"
   DEPENDENCIES iostreams_component)

@@ -46,6 +46,7 @@ foreach(jacobi_smp_application ${jacobi_smp_applications})
 
     # add jacobi_smp executable
     add_hpx_executable(${jacobi_smp_application}
+        INTERNAL_FLAGS
         MODULE jacobi_smp
         SOURCES ${sources}
         ${${jacobi_smp_application}_FLAGS}

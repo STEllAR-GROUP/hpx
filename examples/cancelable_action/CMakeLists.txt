@@ -14,6 +14,7 @@ source_group("Source Files" FILES ${sources})
 
 # add example executable
 add_hpx_executable(cancelable_action_client
+    INTERNAL_FLAGS
     SOURCES ${sources}
     DEPENDENCIES cancelable_action_component
     FOLDER "Examples/CancelableAction")

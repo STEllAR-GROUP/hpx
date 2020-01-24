@@ -9,6 +9,7 @@
 include(HPX_SetupBoostRegex)
 
 add_hpx_executable(inspect
+  INTERNAL_FLAGS
   AUTOGLOB
   NOLIBS
   FOLDER "Tools/Inspect")
