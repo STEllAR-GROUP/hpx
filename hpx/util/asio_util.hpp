@@ -18,6 +18,12 @@
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
+/* The boost asio support includes termios.h.
+ * The termios.h file on ppc64le defines these macros, which
+ * are also used by blaze, blaze_tensor as Template names.
+ * Make sure we undefine them before continuing. */
+#undef VT1
+#undef VT2
 
 namespace hpx { namespace util
 {
