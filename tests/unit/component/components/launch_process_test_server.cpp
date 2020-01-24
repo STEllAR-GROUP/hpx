@@ -7,7 +7,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
-#include <tests/unit/component/components/launch_process_test_server.hpp>
+#include "launch_process_test_server.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Test-component which is instantiated by the launching process and registered

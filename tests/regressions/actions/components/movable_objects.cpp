@@ -9,7 +9,7 @@
 
 #include <cstddef>
 
-#include <tests/regressions/actions/components/movable_objects.hpp>
+#include "movable_objects.hpp"
 
 namespace hpx { namespace test
 {

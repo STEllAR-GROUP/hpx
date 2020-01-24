@@ -22,7 +22,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Util/")
+                     FOLDER "Tests/Unit/Modules/Affinity")
 
   add_hpx_unit_test("modules.affinity" ${test} ${${test}_PARAMETERS})
 endforeach()

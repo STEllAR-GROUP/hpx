@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-#include <tests/regressions/actions/components/movable_objects.hpp>
+#include "components/movable_objects.hpp"
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;

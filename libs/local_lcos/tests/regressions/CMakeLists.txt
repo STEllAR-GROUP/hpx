@@ -22,7 +22,7 @@ foreach(test ${tests})
     ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/Local_LCOs")
+    FOLDER "Tests/Regressions/Modules/LocalLCOs")
 
   target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})
   add_hpx_regression_test("modules.local_lcos" ${test} ${${test}_PARAMETERS})

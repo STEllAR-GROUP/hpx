@@ -8,7 +8,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
 
-#include <tests/unit/agas/components/server/simple_mobile_object.hpp>
+#include "server/simple_mobile_object.hpp"
 
 HPX_REGISTER_COMPONENT_MODULE();
 

@@ -46,8 +46,14 @@ function(add_hpx_test category name)
     set(args ${args} "--hpx:debug-hpx-log=${HPX_WITH_TESTS_DEBUG_LOG_DESTINATION}")
   endif()
 
+  if(HPX_WITH_INSTALLED_VERSION)
+    set(_script_location ${HPX_PREFIX})
+  else()
+    set(_script_location ${PROJECT_BINARY_DIR})
+  endif()
+
   set(cmd "${PYTHON_EXECUTABLE}"
-          "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
+          "${_script_location}/bin/hpxrun.py"
           ${_exe}
           "-e" "${expected}"
           "-t" "${${name}_THREADS_PER_LOCALITY}")

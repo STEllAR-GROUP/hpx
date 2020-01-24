@@ -6,11 +6,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/testing.hpp>
 
-#include <tests/unit/component/components/launch_process_test_server.hpp>
-
-#include <hpx/program_options.hpp>
+#include "components/launch_process_test_server.hpp"
 
 #include <chrono>
 #include <string>
