@@ -8,6 +8,7 @@
 #define HPX_PREFETCHING_LOOP
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -226,16 +227,13 @@ namespace hpx { namespace parallel { namespace util {
                     ranges_type>::type::type);
 
         public:
-            // FIXME: cache line size is probably platform dependent
-            static HPX_CONSTEXPR_OR_CONST std::size_t cache_line_size = 64ull;
-
             prefetcher_context(Itr begin, Itr end, ranges_type const& rngs,
                 std::size_t p_factor = 1)
               : it_begin_(begin)
               , it_end_(end)
               , rngs_(rngs)
-              , chunk_size_(
-                    (p_factor * cache_line_size) / sizeof_first_value_type)
+              , chunk_size_((p_factor * threads::get_cache_line_size()) /
+                    sizeof_first_value_type)
               , range_size_(std::distance(begin, end))
             {
             }
