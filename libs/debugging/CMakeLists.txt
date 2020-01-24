@@ -8,8 +8,7 @@ cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 set(debugging_headers
   hpx/debugging/demangle_helper.hpp
-  # do not add hpx/debugging/print.hpp as it includes threads
-  # instead users should add this manually on demand
+  hpx/debugging/print.hpp
   )
 
 set(debugging_compat_headers
@@ -30,11 +29,5 @@ add_hpx_module(debugging
   COMPAT_HEADERS ${debugging_compat_headers}
   DEPENDENCIES
     hpx_config
-    hpx_errors
-    hpx_functional
-    hpx_coroutines
-    hpx_hardware
-    hpx_topology
-    hpx_program_options
   CMAKE_SUBDIRS examples tests
 )

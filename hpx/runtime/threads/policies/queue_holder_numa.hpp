@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_mc.hpp>
+#include <hpx/threading_base/print.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 //
 #include <hpx/logging.hpp>

@@ -16,6 +16,7 @@ set(threading_base_headers
   hpx/threading_base/execution_agent.hpp
   hpx/threading_base/external_timer.hpp
   hpx/threading_base/network_background_callback.hpp
+  hpx/threading_base/print.hpp
   hpx/threading_base/register_thread.hpp
   hpx/threading_base/scheduler_base.hpp
   hpx/threading_base/scheduler_mode.hpp

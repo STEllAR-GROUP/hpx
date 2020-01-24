@@ -15,6 +15,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/threading_base/print.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_holder_numa.hpp>
