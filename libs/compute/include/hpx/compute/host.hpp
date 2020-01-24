@@ -11,7 +11,6 @@
 
 #include <hpx/compute/host/block_allocator.hpp>
 #include <hpx/compute/host/block_executor.hpp>
-#include <hpx/compute/host/default_executor.hpp>
 #include <hpx/compute/host/get_targets.hpp>
 #include <hpx/compute/host/numa_domains.hpp>
 #include <hpx/compute/host/target.hpp>
