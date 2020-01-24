@@ -37,6 +37,13 @@ namespace hpx { namespace threads {
     std::string execution_agent::description() const
     {
         thread_id_type id = self_.get_thread_id();
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::description",
+                "null thread id encountered (is this executed on a "
+                "HPX-thread?)");
+        }
+
         return hpx::util::format(
             "{}: {}", id, get_thread_id_data(id)->get_description());
     }
@@ -126,6 +133,12 @@ namespace hpx { namespace threads {
         const char* desc, threads::thread_state_enum state)
     {
         thread_id_type id = self_.get_thread_id();
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::do_yield",
+                "null thread id encountered (is this executed on a "
+                "HPX-thread?)");
+        }
 
         // handle interruption, if needed
         threads::interruption_point(id);
@@ -143,7 +156,7 @@ namespace hpx { namespace threads {
             HPX_ASSERT(get_thread_id_data(id)->get_state().state() == active);
             HPX_ASSERT(state != active);
             statex = self_.yield(threads::thread_result_type(state,
-                threads::thread_id_type{nullptr}));
+                threads::invalid_thread_id));
             HPX_ASSERT(get_thread_id_data(id)->get_state().state() == active);
         }
 
@@ -160,7 +173,6 @@ namespace hpx { namespace threads {
         }
 
         return statex;
-        // HPX_ASSERT(statex == threads::wait_signaled);
     }
 
     void execution_agent::do_resume(

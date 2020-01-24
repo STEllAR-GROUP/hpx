@@ -16,8 +16,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     template class context_base<coroutine_impl>;
 
-    // initialize static allocation counter
-    template <typename CoroutineImpl>
-    allocation_counters context_base<CoroutineImpl>::m_allocation_counters;
-
 }}}}    // namespace hpx::threads::coroutines::detail

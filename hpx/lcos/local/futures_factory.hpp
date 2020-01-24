@@ -255,43 +255,23 @@ namespace hpx { namespace lcos { namespace local {
                 threads::thread_schedule_hint schedulehint,
                 error_code& ec) override
             {
-                this->check_started();
-
-                typedef typename Base::future_base_type future_base_type;
-                future_base_type this_(this);
-
                 if (exec_)
                 {
+                    this->check_started();
+
+                    typedef typename Base::future_base_type future_base_type;
+                    future_base_type this_(this);
+
                     parallel::execution::post(*exec_,
                         util::deferred_call(
                             &base_type::run_impl, std::move(this_)),
                         schedulehint, annotation);
                     return threads::invalid_thread_id;
                 }
-                else if (policy == launch::fork)
-                {
-                    return threads::register_thread_nullary(pool,
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)),
-                        util::thread_description(
-                            this->f_, annotation),
-                        threads::pending_do_not_schedule, true,
-                        threads::thread_priority_boost,
-                        threads::thread_schedule_hint(
-                            static_cast<std::int16_t>(get_worker_thread_num())),
-                        stacksize, ec);
-                }
-                else
-                {
-                    threads::register_thread_nullary(pool,
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)),
-                        util::thread_description(
-                            this->f_, annotation),
-                        threads::pending, false, priority, schedulehint,
-                        stacksize, ec);
-                    return threads::invalid_thread_id;
-                }
+
+                return this->base_type::apply(
+                    pool, annotation, policy, priority, stacksize,
+                    schedulehint, ec);
             }
         };
 

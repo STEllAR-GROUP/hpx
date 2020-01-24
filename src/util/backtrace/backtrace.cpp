@@ -407,8 +407,14 @@ namespace hpx { namespace util {
     {
         if(frames_.empty())
             return std::string();
-        if (nullptr == threads::get_self_ptr())
+
+        // avoid infinite recursion on handling errors
+        auto* self = threads::get_self_ptr();
+        if (nullptr == self ||
+            self->get_thread_id() == threads::invalid_thread_id)
+        {
             return trace();
+        }
 
         lcos::local::futures_factory<std::string()> p(util::bind_front(
             stack_trace::get_symbols, &frames_.front(), frames_.size()));

@@ -312,12 +312,12 @@ namespace hpx { namespace threads { namespace policies {
                 }
                 else if (work_items_.empty())
                 {
-                    add_count =
-                        parameters_
-                            .min_add_new_count_;    // add this number of threads
+                    // add this number of threads
+                    add_count = parameters_.min_add_new_count_;
+
+                    // increase max_thread_count
                     parameters_.max_thread_count_ +=
-                        parameters_
-                            .min_add_new_count_;    // increase max_thread_count //-V101
+                        parameters_.min_add_new_count_;    //-V101
                 }
                 else
                 {
@@ -374,7 +374,7 @@ namespace hpx { namespace threads { namespace policies {
             util::tick_counter tc(cleanup_terminated_time_);
 #endif
 
-            if (terminated_items_count_ == 0)
+            if (terminated_items_count_.load(std::memory_order_acquire) == 0)
                 return true;
 
             if (delete_all)
@@ -416,27 +416,28 @@ namespace hpx { namespace threads { namespace policies {
                     thread_id_type tid(todelete);
                     --terminated_items_count_;
 
-                    thread_map_type::iterator it = thread_map_.find(tid);
-
                     // this thread has to be in this map
-                    HPX_ASSERT(it != thread_map_.end());
+                    HPX_ASSERT(thread_map_.find(tid) != thread_map_.end());
 
-                    recycle_thread(*it);
-
-                    thread_map_.erase(it);
+                    bool deleted = thread_map_.erase(tid) != 0;
+                    HPX_ASSERT(deleted);
+                    (void)deleted;
                     --thread_map_count_;
+
                     HPX_ASSERT(thread_map_count_ >= 0);
+
+                    recycle_thread(tid);
 
                     --delete_count;
                 }
             }
-            return terminated_items_count_ == 0;
+            return terminated_items_count_.load(std::memory_order_acquire) == 0;
         }
 
     public:
         bool cleanup_terminated(bool delete_all = false)
         {
-            if (terminated_items_count_ == 0)
+            if (terminated_items_count_.load(std::memory_order_acquire) == 0)
                 return true;
 
             if (delete_all)
@@ -532,20 +533,23 @@ namespace hpx { namespace threads { namespace policies {
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
-        std::int64_t get_queue_length() const
+        std::int64_t get_queue_length(
+            std::memory_order order = std::memory_order_acquire) const
         {
-            return work_items_count_.data_ + new_tasks_count_.data_;
+            return work_items_count_.data_.load(order) +
+                new_tasks_count_.data_.load(order);
         }
 
         // This returns the current length of the pending queue
-        std::int64_t get_pending_queue_length() const
+        std::int64_t get_pending_queue_length(
+            std::memory_order order = std::memory_order_acquire) const
         {
-            return work_items_count_.data_;
+            return work_items_count_.data_.load(order);
         }
 
         // This returns the current length of the staged queue
         std::int64_t get_staged_queue_length(
-            std::memory_order order = std::memory_order_seq_cst) const
+            std::memory_order order = std::memory_order_acquire) const
         {
             return new_tasks_count_.data_.load(order);
         }
@@ -697,9 +701,11 @@ namespace hpx { namespace threads { namespace policies {
                         &get_thread_id_data(thrd)->get_queue<thread_queue>() ==
                         this);
 
-                    // push the new thread in the pending queue thread
+                    // push the new thread in the pending thread queue
                     if (initial_state == pending)
+                    {
                         schedule_thread(get_thread_id_data(thrd));
+                    }
 
                     // return the thread_id of the newly created thread
                     if (id)
@@ -841,10 +847,10 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(
-            threads::thread_data* thrd, std::int64_t& busy_count)
+        void destroy_thread(threads::thread_data* thrd)
         {
             HPX_ASSERT(&thrd->get_queue<thread_queue>() == this);
+
             terminated_items_.push(thrd);
 
             std::int64_t count = ++terminated_items_count_;
@@ -1074,30 +1080,30 @@ namespace hpx { namespace threads { namespace policies {
         mutable mutex_type mtx_;    // mutex protecting the members
 
         thread_map_type thread_map_;    // mapping of thread id's to HPX-threads
-        std::atomic<std::int64_t>
-            thread_map_count_;    // overall count of work items
+
+        // overall count of work items
+        std::atomic<std::int64_t> thread_map_count_;
 
         work_items_type work_items_;    // list of active work items
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::atomic<std::int64_t>
-            work_items_wait_;    // overall wait time of work items
-        std::atomic<std::int64_t>
-            work_items_wait_count_;    // overall number of
-                                       // work items in queue
+        // overall wait time of work items
+        std::atomic<std::int64_t> work_items_wait_;
+        // overall number of work items in queue
+        std::atomic<std::int64_t> work_items_wait_count_;
 #endif
-        terminated_items_type
-            terminated_items_;    // list of terminated threads
-        std::atomic<std::int64_t>
-            terminated_items_count_;    // count of terminated items
+        // list of terminated threads
+        terminated_items_type terminated_items_;
+        // count of terminated items
+        std::atomic<std::int64_t> terminated_items_count_;
 
         task_items_type new_tasks_;    // list of new tasks to run
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        std::atomic<std::int64_t>
-            new_tasks_wait_;    // overall wait time of new tasks
-        std::atomic<std::int64_t>
-            new_tasks_wait_count_;    // overall number tasks waited
+        // overall wait time of new tasks
+        std::atomic<std::int64_t> new_tasks_wait_;
+        // overall number tasks waited
+        std::atomic<std::int64_t> new_tasks_wait_count_;
 #endif
 
         thread_heap_type thread_heap_small_;

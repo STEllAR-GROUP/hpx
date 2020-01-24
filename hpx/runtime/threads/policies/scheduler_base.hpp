@@ -221,8 +221,7 @@ namespace hpx { namespace threads { namespace policies {
             bool allow_fallback = false,
             thread_priority priority = thread_priority_normal) = 0;
 
-        virtual void destroy_thread(
-            threads::thread_data* thrd, std::int64_t& busy_count) = 0;
+        virtual void destroy_thread(threads::thread_data* thrd) = 0;
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool enable_stealing,
