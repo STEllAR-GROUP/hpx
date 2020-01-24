@@ -421,7 +421,7 @@ namespace hpx { namespace threads { namespace policies {
 
                     bool deleted = thread_map_.erase(tid) != 0;
                     HPX_ASSERT(deleted);
-                    (void)deleted;
+                    HPX_UNUSED(deleted);
                     --thread_map_count_;
 
                     HPX_ASSERT(thread_map_count_ >= 0);
