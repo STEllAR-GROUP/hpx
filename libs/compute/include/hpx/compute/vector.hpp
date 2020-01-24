@@ -168,11 +168,10 @@ namespace hpx { namespace compute {
         {
             if (this == &other)
                 return *this;
-            
+
             allocator_type tmp_alloc = other.alloc_;
 
-            pointer data =
-                alloc_traits::allocate(tmp_alloc, other.capacity_);
+            pointer data = alloc_traits::allocate(tmp_alloc, other.capacity_);
             hpx::parallel::util::copy(other.begin(), other.end(),
                 iterator(data, 0, alloc_traits::target(tmp_alloc)));
 
