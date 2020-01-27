@@ -3,4 +3,4 @@ freebsd_instance:
 
 configure_and_build:
    install_script: pkg install -y gcc hwloc boost cmake
-   script: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && make core
+   script: echo hi there && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && make core
