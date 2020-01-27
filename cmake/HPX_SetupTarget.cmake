@@ -16,7 +16,7 @@ function(hpx_setup_target target)
   set(options EXPORT NOHPX_INIT INSTALL INSTALL_HEADERS INTERNAL_FLAGS NOLIBS PLUGIN
     NONAMEPREFIX NOTLLKEYWORD)
   set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX HEADER_ROOT)
-  set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS)
+  set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS INSTALL_PDB)
   cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT TARGET ${target})
@@ -236,6 +236,9 @@ function(hpx_setup_target target)
       ${install_export}
       ${target_INSTALL_FLAGS}
     )
+    if(target_INSTALL_PDB)
+      install(${target_INSTALL_PDB})
+    endif()
     if(target_INSTALL_HEADERS AND (NOT target_HEADER_ROOT STREQUAL ""))
       install(
         DIRECTORY "${target_HEADER_ROOT}/"
