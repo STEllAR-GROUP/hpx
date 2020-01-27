@@ -513,7 +513,6 @@ namespace hpx { namespace threads { namespace detail
                     }
                     else if(terminated == state_val)
                     {
-                        std::int64_t busy_count = 0;
                         scheduler.SchedulingPolicy::
                             decrement_background_thread_count();
                         scheduler.SchedulingPolicy::destroy_thread(

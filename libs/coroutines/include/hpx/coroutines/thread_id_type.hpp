@@ -36,21 +36,8 @@ namespace hpx { namespace threads {
         thread_id(thread_id const&) = default;
         thread_id& operator=(thread_id const&) = default;
 
-        thread_id(thread_id&& rhs) noexcept
-          : thrd_(rhs.thrd_)
-        {
-            rhs.thrd_ = nullptr;
-        }
-
-        thread_id& operator=(thread_id&& rhs) noexcept
-        {
-            if (&rhs != this)
-            {
-                thrd_ = rhs.thrd_;
-                rhs.thrd_ = nullptr;
-            }
-            return *this;
-        }
+        thread_id(thread_id&& rhs) noexcept = default;
+        thread_id& operator=(thread_id&& rhs) noexcept = default;
 
         explicit constexpr operator bool() const noexcept
         {
