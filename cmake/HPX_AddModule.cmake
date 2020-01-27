@@ -227,6 +227,16 @@ function(add_hpx_module name)
     FOLDER "Core/Modules"
     POSITION_INDEPENDENT_CODE ON)
 
+  if(MSVC)
+    set_target_properties(hpx_${name} PROPERTIES
+      COMPILE_PDB_NAME_DEBUG hpx_${name}d
+      COMPILE_PDB_NAME_RELWITHDEBINFO hpx_${name}
+      COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG
+        ${CMAKE_CURRENT_BINARY_DIR}/Debug
+      COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO
+        ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo)
+  endif()
+
   # Install the static library for the module
   install(TARGETS hpx_${name} EXPORT HPXModulesTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -256,6 +266,20 @@ function(add_hpx_module name)
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT ${name}
   )
+
+  # install PDB if needed
+  if(MSVC)
+    foreach(cfg DEBUG;RELWITHDEBINFO)
+      get_target_property(_pdb_file hpx_${name} COMPILE_PDB_NAME_${cfg})
+      get_target_property(_pdb_dir hpx_${name} COMPILE_PDB_OUTPUT_DIRECTORY_${cfg})
+      install(
+        FILES ${_pdb_dir}/${_pdb_file}.pdb
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        CONFIGURATIONS ${cfg}
+        OPTIONAL
+      )
+    endforeach()
+  endif()
 
   foreach(dir ${${name}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
