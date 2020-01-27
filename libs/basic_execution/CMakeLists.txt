@@ -7,7 +7,6 @@
 cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 set(basic_execution_headers
-  hpx/basic_execution.hpp
   hpx/basic_execution/agent_base.hpp
   hpx/basic_execution/agent_ref.hpp
   hpx/basic_execution/context_base.hpp
@@ -31,6 +30,7 @@ add_hpx_module(basic_execution
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN ON
   SOURCES ${basic_execution_sources}
   HEADERS ${basic_execution_headers}
   COMPAT_HEADERS ${basic_execution_compat_headers}
