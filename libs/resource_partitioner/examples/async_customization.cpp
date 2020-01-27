@@ -393,9 +393,9 @@ int test(const std::string& message, Executor& exec)
                     auto tup = f.get();
                     auto cmplx =
                         std::complex<double>(double(util::get<0>(tup).get()),
-                            util::get<1>(tup).get());
-                    auto cmplxe =
-                        std::complex<double>(double(testval4), testval5);
+                            double(util::get<1>(tup).get()));
+                    auto cmplxe = std::complex<double>(
+                        double(testval4), double(testval5));
                     std::cout << "expected " << cmplxe << " got " << cmplx
                               << std::endl;
                     HPX_TEST_EQ(cmplx, cmplxe);
