@@ -1497,7 +1497,7 @@ The predefined command line options for any application using
    makes the scheduler NUMA sensitive
 
 
-|hpx| configuraton options
+|hpx| configuration options
 --------------------------
 
 .. option:: --hpx:app-config arg
