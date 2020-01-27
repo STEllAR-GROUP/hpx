@@ -121,7 +121,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         }
 
         // ------------------------------------------------------------------
-        // helper fuction for printing CRC32
+        // helper function for printing CRC32
         // ------------------------------------------------------------------
         inline uint32_t crc32(const void* address, size_t length)
         {
@@ -131,7 +131,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         }
 
         // ------------------------------------------------------------------
-        // helper fuction for printing CRC32 and short memory dump
+        // helper function for printing CRC32 and short memory dump
         // ------------------------------------------------------------------
         inline std::string mem_crc32(
             const void* address, size_t length, const char* txt)
@@ -224,7 +224,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
 
 // ------------------------------------------------------------------
 // Timed log macros : used during long loops to avoid excessive output
-// only prints the log messge every N seconds
+// only prints the log message every N seconds
 // ------------------------------------------------------------------
 #ifdef HPX_PARCELPORT_LOGGING_HAVE_TIMED_LOG
 

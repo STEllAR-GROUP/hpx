@@ -1026,7 +1026,7 @@ namespace hpx { namespace util
         return 2;     // the default size for all pools is 2
     }
 
-    // Return the endianess to be used for out-serialization
+    // Return the endianness to be used for out-serialization
     std::string runtime_configuration::get_endian_out() const
     {
         if (has_section("hpx.parcel")) {

@@ -79,7 +79,7 @@ to console, a file, etc.)
 You can use a typedef - one for the formatters, and one for the destinations:
 
 @code
-// ptr_type - optional ; usualy  you don't need to worry about this
+// ptr_type - optional ; usually  you don't need to worry about this
 typedef formatter::base<  arg_type [,ptr_type] > formatter_base;
 typedef destination::base< arg_type [,ptr_type] > destination_base;
 @endcode
@@ -259,7 +259,7 @@ As long as data is constant, it's all ok - that is, no matter what functions get
 all the data in the formatter/destination
 must remain constant. We need constant functors - just like in STL - because internally,
 we copy formatters/destinations: that is, we keep
-several copies of a certain object - they all need to be syncronized.
+several copies of a certain object - they all need to be synchronized.
 In case the objects' data is constant, that's no problem.
 
 In case the data needs to be changed - it needs to be shared.

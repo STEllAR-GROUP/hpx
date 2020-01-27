@@ -41,8 +41,8 @@ int async_io(char const* string_to_write)
 
     // Note that the destructor of the scheduler object will wait for
     // the scheduled task to finish executing. This might be
-    // undesireable, in which case the technique demonstrated in
-    // the example async_io_low_level.cpp is preferrable.
+    // undesirable, in which case the technique demonstrated in
+    // the example async_io_low_level.cpp is preferable.
     }
 
     return result;   // this will be executed only after result has been set

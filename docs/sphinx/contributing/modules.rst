@@ -93,7 +93,7 @@ Optional multi-value arguments-are:
 The ``include`` directory should contain only headers that other libraries need.
 For each of those headers, an automatic header test to check for self
 containment will be generated. Private headers should be placed under the
-``src`` directory. This allows for clear seperation. The ``cmake`` subdirectory
+``src`` directory. This allows for clear separation. The ``cmake`` subdirectory
 may include additional |cmake|_ scripts needed to generate the respective build
 configurations.
 

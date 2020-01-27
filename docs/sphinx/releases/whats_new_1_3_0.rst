@@ -97,7 +97,7 @@ Closed issues
 * :hpx-issue:`3676` - HPX master built from source, cmake fails to link main.cpp
   example in docs
 * :hpx-issue:`3673` - HPX build fails with ``std::atomic`` missing error
-* :hpx-issue:`3670` - Generate PDF again from documention (with Sphinx)
+* :hpx-issue:`3670` - Generate PDF again from documentation (with Sphinx)
 * :hpx-issue:`3643` - Warnings when compiling HPX 1.2.1 with gcc 9
 * :hpx-issue:`3641` - Trouble with using ranges-v3 and ``hpx::parallel::reduce``
 * :hpx-issue:`3639` - ``util::unwrapping`` does not work well with member
@@ -108,7 +108,7 @@ Closed issues
 * :hpx-issue:`3616` - HPX Fails to Build with CUDA 10
 * :hpx-issue:`3612` - False sharing of scheduling counters
 * :hpx-issue:`3609` - executor_parameters timeout with gcc <= 7 and Debug mode
-* :hpx-issue:`3601` - Missleading error message on power pc for rdtsc and rdtscp
+* :hpx-issue:`3601` - Misleading error message on power pc for rdtsc and rdtscp
 * :hpx-issue:`3598` - Build of some examples fails when using Vc
 * :hpx-issue:`3594` - Error: The number of OS threads requested (20) does not
   match the number of threads to bind (12): HPX(bad_parameter)
@@ -290,8 +290,8 @@ Closed pull requests
 * :hpx-pr:`3685` - Revise quickstart CMakeLists.txt explanation
 * :hpx-pr:`3684` - Provide concept emulation for Ranges-TS concepts
 * :hpx-pr:`3683` - Ignore uninitialized chunks
-* :hpx-pr:`3682` - Ignore unitialized chunks. Check proper indices.
-* :hpx-pr:`3680` - Ignore unitialized chunks. Check proper range indices
+* :hpx-pr:`3682` - Ignore uninitialized chunks. Check proper indices.
+* :hpx-pr:`3680` - Ignore uninitialized chunks. Check proper range indices
 * :hpx-pr:`3679` - Simplify basic action implementations
 * :hpx-pr:`3678` - Making sure ``HPX_HAVE_LIBATOMIC`` is unset before checking
 * :hpx-pr:`3677` - Fix generated full version number to be usable in expressions
@@ -344,7 +344,7 @@ Closed pull requests
 * :hpx-pr:`3610` - Don't wait for ``stop_condition`` in main thread
 * :hpx-pr:`3608` - Add inline keyword to ``invalid_thread_id`` definition for
   nvcc
-* :hpx-pr:`3607` - Adding configuration key that allows to explicitly add a
+* :hpx-pr:`3607` - Adding configuration key that allows one to explicitly add a
   directory to the component search path
 * :hpx-pr:`3606` - Add nvcc to exclude constexpress since is it not supported by
   nvcc

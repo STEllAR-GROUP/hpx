@@ -295,7 +295,7 @@ namespace libfabric
     }
 
     // --------------------------------------------------------------------
-    // the root node has spacial handlig, this returns its Id
+    // the root node has spacial handling, this returns its Id
     parcelset::locality parcelport::
     agas_locality(util::runtime_configuration const & ini) const
     {

@@ -883,7 +883,7 @@ namespace hpx
     std::string get_thread_name()
     {
         std::string& thread_name = detail::thread_name();
-        if (thread_name.empty()) return "<unkown>";
+        if (thread_name.empty()) return "<unknown>";
         return thread_name;
     }
 

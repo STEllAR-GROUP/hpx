@@ -31,7 +31,7 @@ namespace libfabric
     {
         typedef serialization::serialization_chunk chunktype;
 
-        // if chunks are not piggybacked, we must send an rma handle for chunk acccess
+        // if chunks are not piggybacked, we must send an rma handle for chunk access
         // and state how many other rma chunks need to be retrieved (since this is
         // normally stored in the missing chunk info)
         struct chunk_header {

@@ -48,7 +48,7 @@ Bug fixes (closed tickets)
 
 Here is a list of the important tickets we closed for this release.
 
-* :hpx-issue:`1005` - Allow to disable array optimizations and zero copy
+* :hpx-issue:`1005` - Allow one to disable array optimizations and zero copy
   optimizations for each parcelport
 * :hpx-issue:`1004` - Generate new HPX logo image for the docs
 * :hpx-issue:`1002` - If MPI parcelport is not available, running HPX under

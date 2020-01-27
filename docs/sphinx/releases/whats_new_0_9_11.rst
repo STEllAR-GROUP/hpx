@@ -51,9 +51,9 @@ General changes
   supported by the used compiler.
 * The API for creating instances of components has been consolidated. All
   component instances should be created using the :cpp:func:`hpx::new_` only. It
-  allows to instantiate both, single component instances and multiple component
-  instances. The placement of the created components can be controlled by
-  special distribution policies. Please see the corresponding documentation
+  allows one to instantiate both, single component instances and multiple
+  component instances. The placement of the created components can be controlled
+  by special distribution policies. Please see the corresponding documentation
   outlining the use of :cpp:func:`hpx::new_`.
 * Introduced four new distribution policies which can be used with many API
   functions which traditionally expected to be used with a locality id. The new
@@ -66,7 +66,7 @@ General changes
   * :cpp:class:`hpx::components::binpacking_distribution_policy` which will
     place multiple component instances as evenly as possible based on any
     performance counter.
-  * :cpp:class:`hpx::components::target_distribution_policy` which allows to
+  * :cpp:class:`hpx::components::target_distribution_policy` which allows one to
     represent a given locality in the context of a distrwibution policy.
 * The new distribution policies can now be also used with ``hpx::async``. This
   change also deprecates ``hpx::async_colocated(id, ...)`` which now is replaced
@@ -119,7 +119,7 @@ Breaking changes
   performance benefit when using stackless threads. As such, we decided to clean
   up our codebase. This feature was not documented.
 * The CMake project name has changed from 'hpx' to 'HPX' for consistency and
-  compatibilty with naming conventions and other CMake projects. Generated
+  compatibility with naming conventions and other CMake projects. Generated
   config files go into <prefix>/lib/cmake/HPX and not <prefix>/lib/cmake/hpx.
 * The macro ``HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`` has been deprecated.
   Please use :c:macro:`HPX_REGISTER_COMPONENT`.
@@ -196,7 +196,7 @@ Here is a list of the important tickets we closed for this release.
   implementation
 * :hpx-pr:`1838` - Update version rc1
 * :hpx-pr:`1837` - Removing broken lcos::local::channel
-* :hpx-pr:`1835` - Adding exlicit move constructor and assignment operator to
+* :hpx-pr:`1835` - Adding explicit move constructor and assignment operator to
   hpx::lcos::promise
 * :hpx-pr:`1834` - Making hpx::lcos::promise move-only
 * :hpx-pr:`1833` - Adding fedora docs
@@ -583,7 +583,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-issue:`1481` - Sync primitives safe destruction
 * :hpx-issue:`1480` - Move external/boost/endian into hpx/util
 * :hpx-issue:`1478` - Boost inspect violations
-* :hpx-pr:`1479` - Adds serialization for arrays; some futher/minor fixes
+* :hpx-pr:`1479` - Adds serialization for arrays; some further/minor fixes
 * :hpx-pr:`1477` - Fixing problems with the Intel compiler using a GCC 4.4 std
   library
 * :hpx-pr:`1476` - Adding ``hpx::lcos::latch`` and ``hpx::lcos::local::latch``

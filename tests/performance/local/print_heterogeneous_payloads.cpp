@@ -199,7 +199,7 @@ int main(
         ( "seed"
         , value<std::uint64_t>(&seed)->default_value(0)
         , "seed for the pseudo random number generator (if 0, a seed is "
-          "choosen based on the current system time)")
+          "chosen based on the current system time)")
         ;
 
     store(command_line_parser(argc, argv).options(cmdline).run(), vm);

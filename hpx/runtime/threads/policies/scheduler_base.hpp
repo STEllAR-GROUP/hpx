@@ -122,7 +122,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // set mode flags that control scheduler behaviour
-        // This set function is virtual so that flags may be overriden
+        // This set function is virtual so that flags may be overridden
         // by schedulers that do not support certain operations/modes.
         // All other mode set functions should call this one to ensure
         // that flags are always consistent

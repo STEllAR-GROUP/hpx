@@ -306,7 +306,7 @@ namespace hpx
         void add_startup_function(startup_function_type f) override;
 
         /// Add a function to be executed inside a HPX thread during
-        /// hpx::finalize, but guaranteed before any of teh shutdown functions
+        /// hpx::finalize, but guaranteed before any of the shutdown functions
         /// is executed.
         ///
         /// \param  f   The function 'f' will be called from inside a HPX

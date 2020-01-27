@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This test verifies that 'hpx.os_threads=all' is equivalent to specifying
-// all of the avalable cores (see #2262).
+// all of the available cores (see #2262).
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>

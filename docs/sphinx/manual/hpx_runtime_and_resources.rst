@@ -176,7 +176,7 @@ thread pool.
 
 .. note::
 
-   It is simpler in some situations to to schedule important tasks with high
+   It is simpler in some situations to schedule important tasks with high
    priority instead of using a separate thread pool.
 
 Using the resource partitioner

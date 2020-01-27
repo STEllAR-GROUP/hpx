@@ -17,10 +17,10 @@ General changes
 Here are some of the main highlights and changes for this release (in no
 particular order):
 
-* Added the facility ``hpx::split_future`` which allows to convert a
+* Added the facility ``hpx::split_future`` which allows one to convert a
   ``future<tuple<Ts...>>`` into a ``tuple<future<Ts>...>``. This functionality
   is not available when compiling |hpx| with VS2012.
-* Added a new type of performance counter which allows to return a list of
+* Added a new type of performance counter which allows one to return a list of
   values for each invocation. We also added a first counter of this type which
   collects a histogram of the times between parcels being created.
 * Added new LCOs: ``hpx::lcos::channel`` and ``hpx::lcos::local::channel`` which
@@ -67,8 +67,8 @@ particular order):
   those.
 * We have consolidated all of the code in HPX.Compute related to the integration
   of CUDA. ``hpx::partitioned_vector`` has been enabled to be usable with
-  ``hpx::compute::vector`` which allows to place the partitions on one or more
-  GPU devices.
+  ``hpx::compute::vector`` which allows one to place the partitions on one or
+  more GPU devices.
 * Added new performance counters exposing various internals of the thread
   scheduling subsystem, such as the current idle- and busy-loop counters and
   instantaneous scheduler utilization.
@@ -109,7 +109,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`2588` - Daint fixes
 * :hpx-pr:`2587` - Fixing transfer_(continuation)_action::schedule
 * :hpx-pr:`2585` - Work around MSVC having an ICE when compiling with -Ob2
-* :hpx-pr:`2583` - chaning 7zip command to 7za in roll_release.sh
+* :hpx-pr:`2583` - changing 7zip command to 7za in roll_release.sh
 * :hpx-pr:`2582` - First attempt to introduce spmd_block in hpx
 * :hpx-pr:`2581` - Enable annotated function for parallel algorithms
 * :hpx-pr:`2580` - First attempt to introduce spmd_block in hpx

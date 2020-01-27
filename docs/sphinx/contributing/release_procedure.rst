@@ -175,7 +175,7 @@ are completed to avoid confusion.
       release. Set the date to "unreleased". Make sure you add it to the table
       of contents in ``docs/sphinx/releases.rst``.
 
-   #. Modify the the release procedure if necessary.
+   #. Modify the release procedure if necessary.
 
    #. Merge new branch containing next version numbers to master; resolve conflicts
       if necessary.

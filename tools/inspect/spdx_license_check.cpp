@@ -16,7 +16,7 @@ namespace
 {
   boost::regex spdx_license_regex(
     //~ The next two lines change the regex so that it detects when the license
-    //~ doesn't follow the prefered statement.
+    //~ doesn't follow the preferred statement.
     "spdx-license-identifier[\\s\\W]*:[\\s\\W]+bsl-",
     boost::regbase::normal | boost::regbase::icase);
 

@@ -29,7 +29,7 @@ namespace hpx { namespace performance_counters { namespace parcels
           , buffer_allocate_time_(0)
         {}
 
-        std::size_t bytes_;           ///< number of bytes on tyhe wire for this parcel
+        std::size_t bytes_;           ///< number of bytes on the wire for this parcel
                                       ///< (possibly compressed)
         std::int64_t time_;           ///< during processing holds start timestamp
                                       ///< after processing holds elapsed time

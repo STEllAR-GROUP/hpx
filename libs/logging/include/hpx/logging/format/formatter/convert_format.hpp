@@ -24,7 +24,7 @@
 namespace hpx { namespace util { namespace logging { namespace formatter {
 
     /**
-    @brief Allows format convertions
+    @brief Allows format conversions
     - In case you're using a formatter that does not match your string type
 
     In case you want to use a formatter developed by someone else

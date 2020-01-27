@@ -272,7 +272,7 @@ namespace verbs
         // this poll for event function is used by the main server endpoint when
         // it is waiting for connection/disconnection requests etc
         // ack_event, deletes the cm_event data structure allocated by the CM,
-        // so we do not ack and alow the event handler routine to do it
+        // so we do not ack and allow the event handler routine to do it
         template<typename Func>
         int poll_for_event(Func &&f)
         {

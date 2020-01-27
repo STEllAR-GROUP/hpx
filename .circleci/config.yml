@@ -117,7 +117,7 @@ jobs:
           path: /tmp/circular_deps.svg
           destination: /hpx/artifacts/circular_deps.svg
 
-  # Insure that the modules stay clang-formatted
+  # Ensure that the modules stay clang-formatted
   clang_format:
     <<: *defaults
     steps:
@@ -1001,7 +1001,7 @@ jobs:
           name: Push stable tag
           command: |
               if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
-                  # Tag the commmit
+                  # Tag the commit
                   cd /hpx/source
                   git tag -f stable
                   ##########################################################

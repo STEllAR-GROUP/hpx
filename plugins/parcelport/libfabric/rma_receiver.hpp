@@ -28,8 +28,8 @@ namespace libfabric
     struct parcelport;
 
 
-    // The rma_receiver is repsonsible for receiving the
-    // mising chunks of the message:
+    // The rma_receiver is responsible for receiving the
+    // missing chunks of the message:
     //      1) Non-piggy backed non-zero copy chunks (if existing)
     //      2) The zero copy chunks from serialization
     struct rma_receiver : public rma_base

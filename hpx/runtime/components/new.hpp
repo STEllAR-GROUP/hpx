@@ -107,7 +107,7 @@ namespace hpx
     ///          of that type which can be used to refer to the newly created
     ///          component instance.
     ///
-    /// \note    The difference of this funtion to \a hpx::new_ is that it can
+    /// \note    The difference of this function to \a hpx::new_ is that it can
     ///          be used in cases where the supplied arguments are non-copyable
     ///          and non-movable. All operations are guaranteed to be local
     ///          only.

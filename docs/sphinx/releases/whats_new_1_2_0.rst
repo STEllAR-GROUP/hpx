@@ -181,7 +181,7 @@ Closed pull requests
 * :hpx-pr:`3485` - Use BUILD_INTERFACE generator expression to fix cmake flag exports
 * :hpx-pr:`3483` - Fixing type attribute warning for transfer_action
 * :hpx-pr:`3481` - Remove unused variables
-* :hpx-pr:`3480` - Towards a more lightweigh transfer action
+* :hpx-pr:`3480` - Towards a more lightweight transfer action
 * :hpx-pr:`3479` - Fix FLAGS - Use correct version of target_compile_options
 * :hpx-pr:`3478` - Making sure the application's exit code is properly propagated back to the OS
 * :hpx-pr:`3476` - Don't print docker credentials as part of the environment.
@@ -231,7 +231,7 @@ Closed pull requests
 * :hpx-pr:`3407` - Fix unused param and extra ; warnings emitted by gcc 8.x
 * :hpx-pr:`3406` - Adding thread local allocator and use it for future shared states
 * :hpx-pr:`3405` - Adding DHPX_HAVE_THREAD_LOCAL_STORAGE=ON to builds
-* :hpx-pr:`3404` - fixing multiple difinition of main() in linux
+* :hpx-pr:`3404` - fixing multiple definition of main() in linux
 * :hpx-pr:`3402` - Allow debug option to be enabled only for Linux systems with dynamic main on
 * :hpx-pr:`3401` - Fix cuda_future_helper.h when compiling with C++11
 * :hpx-pr:`3400` - Fix floating point exception scheduler_base idle backoff

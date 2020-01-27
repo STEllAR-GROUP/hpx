@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         //           returns \a FwdIter2 otherwise.
         //           The \a move algorithm returns the output iterator to the
         //           element in the destination range, one past the last element
-        //           transfered.
+        //           transferred.
         //
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename FwdIter2,

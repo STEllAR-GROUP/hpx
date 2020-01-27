@@ -61,7 +61,7 @@
   alignment of all allocated chunks,
   and which extends and generalizes the framework provided by the simple segregated
   storage solution.
-  Also provides two UserAllocator classes which can be used in conjuction with \ref pool.
+  Also provides two UserAllocator classes which can be used in conjunction with \ref pool.
  */
 
 /*!
@@ -111,7 +111,7 @@ namespace verbs {
     };
 
 namespace details
-{  //! Implemention only.
+{  //! Implementation only.
 
     template<typename SizeType>
     class PODptr

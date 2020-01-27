@@ -201,7 +201,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-issue:`1153` - Standard manipulators (like std::endl) do not work with
   hpx::ostream
 * :hpx-issue:`1152` - Functions revamp
-* :hpx-issue:`1151` - Supressing cmake 3.0 policy warning for CMP0026
+* :hpx-issue:`1151` - Suppressing cmake 3.0 policy warning for CMP0026
 * :hpx-issue:`1150` - Client Serialization error
 * :hpx-issue:`1149` - Segfault on Stampede
 * :hpx-issue:`1148` - Refactoring mini-ghost

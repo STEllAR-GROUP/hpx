@@ -498,7 +498,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`1927` - Using ninja for circle-ci builds
 * :hpx-pr:`1926` - Fixing serialization of std::array
 * :hpx-issue:`1925` - Issues with static HPX libraries
-* :hpx-issue:`1924` - Peformance degrading over time
+* :hpx-issue:`1924` - Performance degrading over time
 * :hpx-issue:`1923` - serialization of std::array appears broken in latest
   commit
 * :hpx-pr:`1922` - Container algorithms

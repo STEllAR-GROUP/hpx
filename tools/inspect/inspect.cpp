@@ -535,7 +535,7 @@ namespace
               string link = linelink(full_path, line);
               out << sep << itr->msg << "(line " << link << ") ";
               //Since the brackets are not used in inspect besides for formatting
-              //html_encode is unneccessary
+              //html_encode is unnecessary
               //out << sep << "(line " << link << ") " << html_encode(itr->msg);
           }
           else out << sep << itr->msg;

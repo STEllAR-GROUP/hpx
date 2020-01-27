@@ -91,7 +91,7 @@ namespace hpx { namespace parcelset
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(util::runtime_configuration& cfg,
             threads::threadmanager* tm,
-            threads::policies::callback_notifier const& notifer);
+            threads::policies::callback_notifier const& notifier);
 
         ~parcelhandler() = default;
 

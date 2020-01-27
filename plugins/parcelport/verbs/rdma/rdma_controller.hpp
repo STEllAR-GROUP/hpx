@@ -49,7 +49,7 @@ namespace verbs
         typedef hpx::parcelset::policies::verbs::unique_lock<mutex_type> unique_lock;
         typedef hpx::parcelset::policies::verbs::scoped_lock<mutex_type> scoped_lock;
 
-        // constructor gets infor from device and sets up all necessary
+        // constructor gets info from device and sets up all necessary
         // maps, queues and server endpoint etc
         rdma_controller(const char *device, const char *interface, int port);
 

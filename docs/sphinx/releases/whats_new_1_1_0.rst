@@ -60,7 +60,7 @@ particular order):
   parallel algorithms was supporting input iterators (and output iterators) as
   well by simply falling back to sequential execution. We have now made our
   implementations conforming by requiring at least forward iterators. In order
-  to enable the old behavior use the the compatibility option
+  to enable the old behavior use the compatibility option
   ``-DHPX_WITH_ALGORITHM_INPUT_ITERATOR_SUPPORT=On`` on the |cmake|_ command
   line.
 * We have added the functionalities allowing for LCOs being implemented using
@@ -69,9 +69,9 @@ particular order):
 * User defined components don't have to be default-constructible anymore. Return
   types from actions don't have to be default-constructible anymore either. Our
   serialization layer now in general supports non-default-constructible types.
-* We have added a new launch policy ``hpx::launch::lazy`` that allows to defer
-  the decision on what launch policy to use to the point of execution. This
-  policy is initialized with a function (object) that -- when invoked -- is
+* We have added a new launch policy ``hpx::launch::lazy`` that allows oneto
+  defer the decision on what launch policy to use to the point of execution.
+  This policy is initialized with a function (object) that -- when invoked -- is
   expected to produce the desired launch policy.
 
 Breaking changes
@@ -120,7 +120,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`3245` - Apex refactoring with guids
 * :hpx-pr:`3242` - Modify task counting in thread_queue.hpp
 * :hpx-pr:`3240` - Fixed typos
-* :hpx-pr:`3238` - Readding accidently removed std::abort
+* :hpx-pr:`3238` - Readding accidentally removed std::abort
 * :hpx-pr:`3237` - Adding Pipeline example
 * :hpx-pr:`3236` - Fixing memory_block
 * :hpx-pr:`3233` - Make schedule_thread take suspended threads into account
@@ -470,7 +470,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`2909` - Fix typo in include path
 * :hpx-pr:`2908` - Use proper container according to iterator tag in benchmarks
   of parallel algorithms
-* :hpx-pr:`2907` - Optionaly force-delete remaining channel items on close
+* :hpx-pr:`2907` - Optionally force-delete remaining channel items on close
 * :hpx-pr:`2906` - Making sure generated performance counter names are correct
 * :hpx-issue:`2905` - collecting idle-rate performance counters on multiple
   localities produces an error
@@ -513,7 +513,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`2870` - Disambiguate use of base_lco_with_value macros with channel
 * :hpx-issue:`2869` - Difficulty compiling
   ``HPX_REGISTER_CHANNEL_DECLARATION(double)``
-* :hpx-pr:`2868` - Removing uneeded assert
+* :hpx-pr:`2868` - Removing unneeded assert
 * :hpx-pr:`2867` - Implement parallel::unique
 * :hpx-issue:`2866` - The chunk_size_iterator violates multipass guarantee
 * :hpx-pr:`2865` - Only use sched_getcpu on linux machines
@@ -651,7 +651,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-issue:`2746` - HPX segfaulting with valgrind
 * :hpx-pr:`2745` - Adding extended arithmetic performance counters
 * :hpx-pr:`2744` - Adding ability to statistics counters to reset base counter
-* :hpx-issue:`2743` - Statistics counter does not support reseting
+* :hpx-issue:`2743` - Statistics counter does not support resetting
 * :hpx-pr:`2742` - Making sure Vc V2 builds without additional HPX configuration
   flags
 * :hpx-pr:`2741` - Deprecate unwrapped and implement unwrap and unwrapping
@@ -660,7 +660,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`2739` - Add files via upload
 * :hpx-pr:`2738` - Appveyor support
 * :hpx-pr:`2737` - Fixing 2735
-* :hpx-issue:`2736` - 1d_hydro example does't work
+* :hpx-issue:`2736` - 1d_hydro example doesn't work
 * :hpx-issue:`2735` - partitioned_vector_subview test failing
 * :hpx-pr:`2734` - Add C++11 range utilities
 * :hpx-pr:`2733` - Adapting iterator requirements for parallel algorithms
@@ -735,7 +735,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`2672` - C++17 invoke forms
 * :hpx-pr:`2671` - Adding uninitialized_value_construct and
   uninitialized_value_construct_n
-* :hpx-pr:`2670` - Integrate spmd multidimensionnal views for
+* :hpx-pr:`2670` - Integrate spmd multidimensional views for
   partitioned_vectors
 * :hpx-pr:`2669` - Adding uninitialized_default_construct and
   uninitialized_default_construct_n
@@ -763,7 +763,7 @@ Here is a list of the important tickets we closed for this release.
   properly handled
 * :hpx-pr:`2649` - Update docs (Table 18) - move transform to end
 * :hpx-issue:`2647` - hpx::parcelset::detail::parcel_data::has_continuation_ is
-  unitialized
+  uninitialized
 * :hpx-issue:`2644` - Some .vcxproj in the HPX.sln fail to build
 * :hpx-issue:`2641` - ``hpx::lcos::queue`` should be deprecated
 * :hpx-pr:`2640` - A new throttling policy with public APIs to suspend/resume

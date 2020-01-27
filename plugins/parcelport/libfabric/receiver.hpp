@@ -29,7 +29,7 @@ namespace libfabric
     // The receiver is responsible for handling incoming messages. For that purpose,
     // it posts receive buffers. Incoming messages can be of two kinds:
     //      1) An ACK message which has been sent from an rma_receiver, to signal
-    //         the sender about the succesful retreival of an incoming message.
+    //         the sender about the successful retrieval of an incoming message.
     //      2) An incoming parcel, that consists of an header and an eventually
     //         piggy backed message. If the message is not piggy backed or zero
     //         copy RMA chunks need to be read, a rma_receiver is created to
@@ -64,7 +64,7 @@ namespace libfabric
         // --------------------------------------------------------------------
         // the receiver posts a single receive buffer to the queue, attaching
         // itself as the context, so that when a message is received
-        // the owning reciever is called to handle processing of the buffer
+        // the owning receiver is called to handle processing of the buffer
         void pre_post_receive();
 
         // --------------------------------------------------------------------
