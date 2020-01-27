@@ -11,6 +11,7 @@
 #define HPX_RUNTIME_THREADS_REGISTER_THREAD_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
