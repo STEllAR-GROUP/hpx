@@ -1,3 +1,4 @@
+# Copyright (c)      2020 Mikael Simberg
 # Copyright (c) 2007-2019 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
@@ -372,10 +373,6 @@ hpx_option(HPX_WITH_CUDA BOOL
   "Enable CUDA support (default: OFF)" OFF ADVANCED)
 hpx_option(HPX_WITH_CUDA_CLANG BOOL
   "Use clang to compile CUDA code (default: OFF)" OFF ADVANCED)
-hpx_option(HPX_WITH_HCC BOOL
-  "Enable hcc support (default: OFF)" OFF ADVANCED)
-hpx_option(HPX_WITH_SYCL BOOL
-  "Enable sycl support (default: OFF)" OFF ADVANCED)
 
 ################################################################################
 # HPX datapar configuration
