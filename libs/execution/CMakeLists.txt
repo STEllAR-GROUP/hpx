@@ -126,6 +126,7 @@ include(HPX_AddModule)
 add_hpx_module(execution
   FORCE_LINKING_GEN
   HEADERS ${execution_headers}
+  COMPATIBILITY_HEADERS ON    # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES
     hpx_assertion
