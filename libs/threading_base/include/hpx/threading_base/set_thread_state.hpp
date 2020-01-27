@@ -8,8 +8,8 @@
 #define HPX_RUNTIME_THREADS_DETAIL_SET_THREAD_STATE_JAN_13_2013_0518PM
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>

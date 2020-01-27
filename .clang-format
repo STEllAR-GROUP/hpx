@@ -73,18 +73,20 @@ FixNamespaceComments: true
 IncludeCategories:
   - Regex:           '^<hpx/config\.hpp>'
     Priority:        1
-  - Regex:           '^<hpx/.*/config\.hpp>'
+  - Regex:           '^<hpx/config/.*\.hpp>'
     Priority:        2
-  - Regex:           '^<hpx/.*/config/defines\.hpp>'
+  - Regex:           '^<hpx/.*/config\.hpp>'
     Priority:        3
-  - Regex:           '^<hpx/.*\.hpp>'
+  - Regex:           '^<hpx/.*/config/defines\.hpp>'
     Priority:        4
-  - Regex:           '^<hpx/parallel/.*\.hpp>'
+  - Regex:           '^<hpx/.*\.hpp>'
     Priority:        5
-  - Regex:           '^<.*'
+  - Regex:           '^<hpx/parallel/.*\.hpp>'
     Priority:        6
-  - Regex:           '.*'
+  - Regex:           '^<.*'
     Priority:        7
+  - Regex:           '.*'
+    Priority:        8
 # IncludeIsMainRegex: ''
 IndentCaseLabels: false
 IndentWidth: 4
