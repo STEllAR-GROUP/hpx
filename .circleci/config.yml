@@ -249,6 +249,23 @@ jobs:
           paths:
             - ./build/bin/inspect
 
+  # We need a full clone here to be able to compare to master.
+  spellcheck:
+    <<: *defaults
+    steps:
+      - checkout:
+          path: /hpx/source
+      - run:
+          name: Running codespell
+          command: |
+              cd /hpx/source
+              codespell $(git diff --name-only origin/master) > /tmp/spelling_suggestions.txt
+              if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
+          when: always
+      - store_artifacts:
+          path: /tmp/spelling_suggestions.txt
+          destination: /hpx/artifacts/spelling_suggestions.txt
+
   docs:
     <<: *defaults
     steps:
@@ -1043,6 +1060,8 @@ workflows:
           requires:
             - configure
           <<: *gh_pages_filter
+      - spellcheck:
+          <<: *gh_pages_filter
       - docs:
           requires:
             - configure
@@ -1112,6 +1131,7 @@ workflows:
       - install:
           requires:
             - inspect
+            - spellcheck
             - core
             - docs
             - tests.examples
