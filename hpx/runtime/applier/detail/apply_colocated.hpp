@@ -73,7 +73,7 @@ namespace hpx { namespace detail
         // shortcut co-location code if target already is a locality
         if (naming::is_locality(gid))
         {
-            return apply_c<Action>(std::forward<Continuation>(cont), gid,
+            return apply_continue<Action>(std::forward<Continuation>(cont), gid,
                 std::forward<Ts>(vs)...);
         }
 

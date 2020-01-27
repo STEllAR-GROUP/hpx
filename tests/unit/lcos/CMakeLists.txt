@@ -14,9 +14,11 @@ set(tests
     async_cb_colocated
     async_cb_remote
     async_cb_remote_client
+    async_colocated
     async_continue
     async_continue_cb
     async_continue_cb_colocated
+    async_continue_colocated
     async_local
     async_local_executor
     async_remote
