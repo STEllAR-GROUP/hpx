@@ -1,0 +1,6 @@
+freebsd_instance:
+  image_family: freebsd-12-1
+
+configure_and_build:
+   install_script: pkg install -y gcc hwloc boost cmake
+   script: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && make core
