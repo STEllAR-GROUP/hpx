@@ -138,6 +138,16 @@ function(add_hpx_component name)
         ARCHIVE DESTINATION ${archive_install_destination}
         RUNTIME DESTINATION ${runtime_install_destination}
     )
+    # install PDB if needed
+    if(MSVC)
+      set(_target_flags ${_target_flags}
+        INSTALL_PDB
+          FILES $<TARGET_PDB_FILE:${name}_component>
+          DESTINATION ${runtime_install_destination}
+          CONFIGURATIONS Debug RelWithDebInfo
+          OPTIONAL
+      )
+    endif()
   endif()
 
   if(${name}_INTERNAL_FLAGS)

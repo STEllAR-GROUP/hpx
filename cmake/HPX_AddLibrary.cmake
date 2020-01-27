@@ -123,6 +123,16 @@ function(add_hpx_library name)
         ARCHIVE DESTINATION ${archive_install_destination}
         RUNTIME DESTINATION ${runtime_install_destination}
     )
+    # install PDB if needed
+    if(MSVC AND NOT ${name}_STATIC AND NOT HPX_WITH_STATIC_LINKING)
+      set(_target_flags ${_target_flags}
+        INSTALL_PDB
+          FILES $<TARGET_PDB_FILE:${name}>
+          DESTINATION ${runtime_install_destination}
+          CONFIGURATIONS Debug RelWithDebInfo
+          OPTIONAL
+      )
+    endif()
   endif()
 
   if(${name}_PLUGIN)

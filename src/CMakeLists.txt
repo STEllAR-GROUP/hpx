@@ -406,6 +406,16 @@ if(NOT HPX_WITH_STATIC_LINKING)
 
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
+
+  if(MSVC)
+    set_target_properties(hpx_init PROPERTIES
+      COMPILE_PDB_NAME_DEBUG hpx_initd
+      COMPILE_PDB_NAME_RELWITHDEBINFO hpx_init
+      COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG
+        ${CMAKE_CURRENT_BINARY_DIR}/Debug
+      COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO
+        ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo)
+  endif()
 endif()
 
 ################################################################################
@@ -502,8 +512,7 @@ if(HPX_WITH_DEFAULT_TARGETS)
 endif()
 
 install(
-  TARGETS
-    ${hpx_targets}
+  TARGETS ${hpx_targets}
   EXPORT HPXTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -511,6 +520,26 @@ install(
   COMPONENT runtime
   ${_optional}
 )
+
+# install PDB if needed
+if(MSVC)
+  install(
+    FILES $<TARGET_PDB_FILE:hpx>
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    CONFIGURATIONS Debug RelWithDebInfo
+    OPTIONAL
+  )
+  foreach(cfg DEBUG;RELWITHDEBINFO)
+    get_target_property(_pdb_file hpx_init COMPILE_PDB_NAME_${cfg})
+    get_target_property(_pdb_dir hpx_init COMPILE_PDB_OUTPUT_DIRECTORY_${cfg})
+    install(
+      FILES ${_pdb_dir}/${_pdb_file}.pdb
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      CONFIGURATIONS ${cfg}
+      OPTIONAL
+    )
+  endforeach()
+endif()
 
 hpx_export_targets(${hpx_targets})
 
