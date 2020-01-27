@@ -14,7 +14,6 @@ set(compute_headers
   hpx/compute/detail/target_distribution_policy.hpp
   hpx/compute/host/block_allocator.hpp
   hpx/compute/host/block_executor.hpp
-  hpx/compute/host/default_executor.hpp
   hpx/compute/host/get_targets.hpp
   hpx/compute/host.hpp
   hpx/compute/host/numa_domains.hpp
