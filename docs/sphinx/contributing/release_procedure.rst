@@ -84,9 +84,6 @@ are completed to avoid confusion.
 #. Make sure ``HPX_VERSION_MAJOR/MINOR/SUBMINOR`` in ``CMakeLists.txt`` contain
    the correct values. Change them if needed.
 
-#. Remove the examples and benchmarks that will not go into the release from the
-   release branch.
-
 #. This step does not apply to patch releases. Remove features which have been
    deprecated for at least 2 releases. This involves removing build options
    which enable those features from the main CMakeLists.txt and also deleting
@@ -160,25 +157,12 @@ are completed to avoid confusion.
 
 #. Merge release branch into master.
 
-#. This step does not apply to patch releases. Bump version numbers on master.
-
-   #. Create a new branch from master, and check that branch out (name it, for
-      example, by the next version number).
-
-   #. Bump the |hpx| version to the next release target. The following files
-      contain version info:
-
-      * ``CMakeLists.txt``
-      * Grep for old version number
-
-   #. Create a new "What's New" section for the docs of the next anticipated
-      release. Set the date to "unreleased". Make sure you add it to the table
-      of contents in ``docs/sphinx/releases.rst``.
+#. Post-release cleanup. Create a new pull request against master with the
+   following changes:
 
    #. Modify the the release procedure if necessary.
 
-   #. Merge new branch containing next version numbers to master; resolve conflicts
-      if necessary.
+   #. Change ``HPX_VERSION_TAG`` in ``CMakeLists.txt`` back to ``-trunk``.
 
 #. Switch Buildbot back to test the main branch
 
