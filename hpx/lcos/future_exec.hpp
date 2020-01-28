@@ -28,7 +28,7 @@
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_then_result.hpp>
+#include <hpx/traits/future_then_result_exec.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
