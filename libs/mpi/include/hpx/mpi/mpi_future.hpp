@@ -195,6 +195,7 @@ namespace hpx { namespace mpi {
                 i = detail::active_futures_.erase(i);
             }
             else {
+                ++i;
                 mpi_debug.timed(timer
                                , "no promise"
                                , "request", hpx::debug::hex<8>(req)
@@ -204,7 +205,6 @@ namespace hpx { namespace mpi {
                            , "request", hpx::debug::hex<8>(req)
                            , "list size", detail::active_futures_.size());
 
-            ++i;
         }
 #else
         bool keep_trying = detail::active_requests_.size()>0;
