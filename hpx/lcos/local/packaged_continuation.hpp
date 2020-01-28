@@ -45,7 +45,8 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////////
         // traits specialization to get annotation from dataflow_finalization
         template <typename Continuation>
-        struct get_function_annotation<lcos::detail::continuation_finalization<Continuation>>
+        struct get_function_annotation<lcos::detail::continuation_finalization
+            <Continuation>>
         {
             using function_type = typename Continuation::function_type;
             static char const* call(
@@ -229,7 +230,8 @@ namespace hpx { namespace lcos { namespace detail
         typedef continuation<Future, F, ContResult> continuation_type;
 
         friend struct continuation_finalization<continuation_type>;
-        friend struct traits::get_function_annotation<continuation_finalization<continuation_type>>;
+        friend struct traits::get_function_annotation<continuation_finalization
+            <continuation_type>>;
 
     protected:
         threads::thread_id_type get_id() const

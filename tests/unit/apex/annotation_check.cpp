@@ -29,6 +29,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <type_traits>
 
 //
 // This test generates a set of tasks with certain names, then checks
@@ -99,7 +100,8 @@ std::string exec_string(const Executor &)
 
 // --------------------------------------------------------------------------
 template <typename Executor>
-typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value, std::string>::type
+typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
+         std::string>::type
 execution_string(const Executor &exec) { return exec_string(exec); }
 
 template <typename Executor>

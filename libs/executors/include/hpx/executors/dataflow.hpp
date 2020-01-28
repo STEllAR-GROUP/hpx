@@ -143,7 +143,8 @@ namespace hpx { namespace lcos { namespace detail
         typedef dataflow_frame<Policy, Func, Futures> dataflow_type;
 
         friend struct dataflow_finalization<dataflow_type>;
-        friend struct traits::get_function_annotation<dataflow_finalization<dataflow_type>>;
+        friend struct traits::get_function_annotation
+            <dataflow_finalization<dataflow_type>>;
 
     private:
         // workaround gcc regression wrongly instantiating constructors
