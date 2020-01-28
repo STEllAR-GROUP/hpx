@@ -9,40 +9,22 @@
 #define HPX_LCOS_FUTURE_EXEC_MAR_06_2012_1059AM
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result_exec.hpp>
-#include <hpx/traits/future_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_enable_if.hpp>
-#include <hpx/type_support/void_guard.hpp>
-#include <hpx/util/serialize_exception.hpp>
-
-#if defined(HPX_HAVE_AWAIT)
-    #include <hpx/lcos/detail/future_await_traits.hpp>
-#endif
 
 #include <exception>
 #include <iterator>
