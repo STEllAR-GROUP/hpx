@@ -8,14 +8,20 @@
 // tasks bound to that core incrementally.
 // Tasks should always report the right core number when they run.
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/async.hpp>
-#include <hpx/runtime/threads/executors/default_executor.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/parallel/executors/thread_pool_executors.hpp>
+#include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
+#include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
+#include <hpx/testing.hpp>
+
+#include <iostream>
+#include <string>
+#include <cstdint>
+#include <cstddef>
+#include <atomic>
 
 // counts down on destruction
 struct dec_counter
@@ -34,41 +40,44 @@ struct dec_counter
 
 void threadLoop()
 {
-   const unsigned iterations = 256;
-   std::atomic<int> count_down(iterations);
+    const unsigned iterations = 256;
+    std::atomic<int> count_down(iterations);
 
-   auto f = [&count_down](std::size_t threadnum) {
-      dec_counter dec(count_down);
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      std::size_t thread_num = hpx::get_worker_thread_num();
-      std::cout << "Running on thread num: " << thread_num
-                << " Expected  " << threadnum << std::endl;
-      HPX_TEST_EQ(thread_num, threadnum);
-   };
+    auto f = [&count_down](std::size_t threadnum) {
+        dec_counter dec(count_down);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::size_t thread_num = hpx::get_worker_thread_num();
+        std::cout << "Running on thread num: " << thread_num << " Expected  "
+                  << threadnum << std::endl;
+        HPX_TEST_EQ(thread_num, threadnum);
+    };
 
-   std::size_t threads = hpx::get_num_worker_threads();
-   // launch tasks on threads using numbering 0,1,2,3...0,1,2,3
-   for(std::size_t i=0; i<iterations; ++i){
-       auto exec = hpx::threads::executors::default_executor(
-                        hpx::threads::thread_priority_bound,
-                        hpx::threads::thread_stacksize_default,
-                        hpx::threads::thread_schedule_hint(std::int16_t(i % threads)));
-      hpx::async(exec, f, (i % threads)).get();
-   }
+    std::size_t threads = hpx::get_num_worker_threads();
+    // launch tasks on threads using numbering 0,1,2,3...0,1,2,3
+    for (std::size_t i = 0; i < iterations; ++i)
+    {
+        auto exec = hpx::threads::executors::default_executor(
+            hpx::threads::thread_priority_bound,
+            hpx::threads::thread_stacksize_default,
+            hpx::threads::thread_schedule_hint(std::int16_t(i % threads)));
+        hpx::async(exec, f, (i % threads)).get();
+    }
 
-   do
-   {
-       hpx::this_thread::yield();
-   } while (count_down > 0);
+    do
+    {
+        hpx::this_thread::yield();
+    } while (count_down > 0);
 
-   return;
+    return;
 }
 
-int hpx_main(boost::program_options::variables_map &)
+int hpx_main(boost::program_options::variables_map&)
 {
     auto const current = hpx::threads::get_self_id_data()->get_scheduler_base();
     std::cout << "Scheduler is " << current->get_description() << std::endl;
-    if (std::string("core-shared_priority_queue_scheduler") != current->get_description()) {
+    if (std::string("core-shared_priority_queue_scheduler") !=
+        current->get_description())
+    {
         std::cout << "The scheduler won't work properly " << std::endl;
     }
 
@@ -80,8 +89,8 @@ int hpx_main(boost::program_options::variables_map &)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    hpx::program_options::options_description
-       desc_cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_cmdline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Create the resource partitioner
     hpx::resource::partitioner rp(desc_cmdline, argc, argv);
