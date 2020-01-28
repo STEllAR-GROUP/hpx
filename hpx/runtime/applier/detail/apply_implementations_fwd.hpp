@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/traits/is_continuation.hpp>
 
 #include <type_traits>

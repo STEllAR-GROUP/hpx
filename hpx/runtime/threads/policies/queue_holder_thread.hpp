@@ -9,8 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/threading_base/print.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/thread_data.hpp>

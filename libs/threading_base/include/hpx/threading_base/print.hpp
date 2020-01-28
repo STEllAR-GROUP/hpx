@@ -9,9 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/debugging/print.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 // ------------------------------------------------------------
 /// \cond NODETAIL
