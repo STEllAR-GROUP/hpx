@@ -450,6 +450,16 @@ namespace hpx { namespace lcos { namespace detail
                     one of the template specialization.");
         }
 
+        template <typename Allocator, typename F>
+        HPX_FORCEINLINE static decltype(auto)
+        call_alloc(Allocator const& alloc, Future && fut, F && f)
+        {
+            // dummy impl to fail compilation if this function is called
+            static_assert(dummy_false_type<Future>::value, "Cannot use the \
+                    dummy implementation of future_then_dispatch::call_alloc, \
+                    please use one of the template specialization.");
+        }
+
     };
 
     ///////////////////////////////////////////////////////////////////////////
