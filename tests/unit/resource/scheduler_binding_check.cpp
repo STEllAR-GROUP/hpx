@@ -1,3 +1,13 @@
+//  Copyright (c) 2020 John Biddiscombe
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// Test that loops over each core assigned to the program and launches
+// tasks bound to that core incrementally.
+// Tasks should always report the right core number when they run.
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/async.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
