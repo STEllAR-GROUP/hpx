@@ -189,7 +189,7 @@ int hpx_main(int argc, char* /*argv*/[])
         std::size_t random_pool_2 = st_rand(0, num_pools - 1);
         auto& exec_7 = NP_executors[random_pool_1];
         auto& exec_8 = HP_executors[random_pool_2];
-        // random delay up to 5 miliseconds
+        // random delay up to 5 milliseconds
         std::size_t delay = st_rand(0, 5);
         auto f7 = hpx::async(exec_7, &dummy_task, delay);
         auto f8 = hpx::async(exec_8, [f7(std::move(f7)), &counter]() mutable {

@@ -95,7 +95,7 @@ namespace hpx { namespace threads {
         ///
         /// \param newstate [in] The new state to be set for the thread.
         ///
-        /// \note           This function will be seldomly used directly. Most of
+        /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager. Moreover,
         ///                 changing the thread state using this function does
@@ -164,7 +164,7 @@ namespace hpx { namespace threads {
         /// \param oldstate [in] The old state of the thread which still has to
         ///                 be the current state.
         ///
-        /// \note           This function will be seldomly used directly. Most of
+        /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager. Moreover,
         ///                 changing the thread state using this function does

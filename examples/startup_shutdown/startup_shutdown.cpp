@@ -13,7 +13,7 @@
 // is guaranteed to be executed before hpx_main() is invoked.
 //
 // The HPX API function retrieve_commandline_arguments() demonstrated below
-// expectes 2 arguments: a) an options_description object describing any
+// expects 2 arguments: a) an options_description object describing any
 // special options to be recognized by this component and b) a variables_map
 // object which on return will be initialized with all found command line
 // options and arguments passed while invoking the application on the locality

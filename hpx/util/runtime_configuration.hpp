@@ -122,7 +122,7 @@ namespace hpx { namespace util
         // Return the configured sizes of any of the know thread pools
         std::size_t get_thread_pool_size(char const* poolname) const;
 
-        // Return the endianess to be used for out-serialization
+        // Return the endianness to be used for out-serialization
         std::string get_endian_out() const;
 
         // Return maximally allowed message sizes

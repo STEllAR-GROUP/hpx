@@ -117,7 +117,7 @@ jobs:
           path: /tmp/circular_deps.svg
           destination: /hpx/artifacts/circular_deps.svg
 
-  # Insure that the modules stay clang-formatted
+  # Ensure that the modules stay clang-formatted
   clang_format:
     <<: *defaults
     steps:
@@ -248,6 +248,23 @@ jobs:
           root: /hpx
           paths:
             - ./build/bin/inspect
+
+  # We need a full clone here to be able to compare to master.
+  spellcheck:
+    <<: *defaults
+    steps:
+      - checkout:
+          path: /hpx/source
+      - run:
+          name: Running codespell
+          command: |
+              cd /hpx/source
+              codespell $(git diff --name-only origin/master) > /tmp/spelling_suggestions.txt
+              if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
+          when: always
+      - store_artifacts:
+          path: /tmp/spelling_suggestions.txt
+          destination: /hpx/artifacts/spelling_suggestions.txt
 
   docs:
     <<: *defaults
@@ -1001,7 +1018,7 @@ jobs:
           name: Push stable tag
           command: |
               if [[ -z "$CIRCLE_PR_NUMBER" ]] && [[ "$CIRCLE_BRANCH" == "master" ]]; then
-                  # Tag the commmit
+                  # Tag the commit
                   cd /hpx/source
                   git tag -f stable
                   ##########################################################
@@ -1042,6 +1059,8 @@ workflows:
       - inspect:
           requires:
             - configure
+          <<: *gh_pages_filter
+      - spellcheck:
           <<: *gh_pages_filter
       - docs:
           requires:
@@ -1112,6 +1131,7 @@ workflows:
       - install:
           requires:
             - inspect
+            - spellcheck
             - core
             - docs
             - tests.examples

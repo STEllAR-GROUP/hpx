@@ -31,7 +31,7 @@ The major new fetures in this release are:
 * Major efforts have been dedicated to improving the performance counter
   framework, numerous new counters were implemented and new APIs were added.
 * We added a modular parcel compression system allowing to improve bandwidth
-  utilization (by reducing the overall size of the tranferred data).
+  utilization (by reducing the overall size of the transferred data).
 * We added a modular parcel coalescing system allowing to combine several
   parcels into larger messages. This reduces latencies introduced by the
   communication layer.

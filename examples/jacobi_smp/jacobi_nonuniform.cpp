@@ -187,7 +187,7 @@ int hpx_main(variables_map &vm)
         }
         else
         {
-                std::cout << "Unkown mode " << mode << "\n";
+                std::cout << "Unknown mode " << mode << "\n";
 #if !defined(JACOBI_SMP_NO_HPX)
                 hpx::finalize();
 #endif

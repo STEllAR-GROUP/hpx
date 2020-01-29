@@ -180,7 +180,7 @@ namespace hpx { namespace util { namespace cache {
         ///
         /// \returns    This function returns \a true if successful. It returns
         ///             \a false if the new \a max_size is smaller than the
-        ///             current limit and the cache could not be shrinked to
+        ///             current limit and the cache could not be shrunk to
         ///             the new maximum size.
         bool reserve(size_type max_size)
         {

@@ -659,7 +659,7 @@ namespace hpx { namespace threads { namespace policies {
                     std::uint16_t q_index = q_lookup_[this_thread];
 
                     // first try a high priority task, allow stealing
-                    // if stealingo og HP tasks in on, this wil be fine
+                    // if stealing of HP tasks in on, this will be fine
                     // but send a null function for normal tasks
                     bool result = steal_by_function<threads::thread_data*>(
                         domain, q_index, numa_stealing_, core_stealing_,

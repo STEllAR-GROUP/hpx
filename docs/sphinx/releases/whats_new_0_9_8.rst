@@ -31,8 +31,8 @@ of using |hpx|:
   programmers know about the concurrency primitives of the standard C++ library
   is still valid in the context of |hpx|.
 * It provides a competitive, high performance implementation of modern,
-  future-proof ideas which gives an smooth migration path from todays mainstream
-  techniques
+  future-proof ideas which gives an smooth migration path from today's
+  mainstream techniques
 * There is no need for the programmer to worry about lower level parallelization
   paradigms like threads or message passing; no need to understand pthreads,
   MPI, OpenMP, or Windows threads, etc.
@@ -115,7 +115,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-issue:`1065` - AGAS cache isn't used/populated on worker localities
 * :hpx-issue:`1064` - Reorder includes to ensure ws2 includes early
 * :hpx-issue:`1063` - Add ``hpx::runtime::suspend`` and ``hpx::runtime::resume``
-* :hpx-issue:`1062` - Fix ``async_continue`` to propery handle return types
+* :hpx-issue:`1062` - Fix ``async_continue`` to properly handle return types
 * :hpx-issue:`1061` - Implement ``async_colocated`` and ``apply_colocated``
 * :hpx-issue:`1060` - Implement minimal component migration
 * :hpx-issue:`1058` - Remove ``HPX_UTIL_TUPLE`` from code base

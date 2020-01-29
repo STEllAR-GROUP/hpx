@@ -456,7 +456,7 @@ if(HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
 hpx_option(HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD STRING
-  "The threshhold in bytes to when perform zero copy optimizations (default: 128)"
+  "The threshold in bytes to when perform zero copy optimizations (default: 128)"
   "128"
   ADVANCED)
 hpx_add_config_define(HPX_ZERO_COPY_SERIALIZATION_THRESHOLD ${HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD})
@@ -1594,7 +1594,7 @@ hpx_option(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
 # Find Our dependencies:
 #   These are all dependencies needed to build the core library. Dependencies
 #   that are only needed by plugins, examples or tests should be found
-#   seperately in the appropriate subdirectory.
+#   separately in the appropriate subdirectory.
 
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)

@@ -1129,7 +1129,7 @@ number of images per :term:`locality` to create::
         bulk_action act;
         std::size_t images_per_locality = 4;
 
-        // Instanciate the parallel section
+        // Instantiate the parallel section
         hpx::lcos::define_spmd_block(
             "some_name", images_per_locality, std::move(act) /*, arg0, arg1, ... */);
 
@@ -1216,7 +1216,7 @@ Here are some examples of using subscripts in the 2-D view case::
     {
         std::size_t height, width;
 
-        // Instanciate the view
+        // Instantiate the view
         View_2D vv(block, v.begin(), v.end(), {height,width});
 
         // The l-value is a view subscript, the image that owns vv(1,0)
@@ -1255,7 +1255,7 @@ Here are some examples of using iterators in the 3-D view case::
     {
         std::size_t sixe_x, size_y, size_z;
 
-        // Instanciate the views
+        // Instantiate the views
         View_3D vv1(block, v1.begin(), v1.end(), {sixe_x,size_y,size_z});
         View_3D vv2(block, v2.begin(), v2.end(), {sixe_x,size_y,size_z});
 
@@ -1310,10 +1310,10 @@ owned by the current image::
     {
         std::size_t num_segments;
 
-        // Instanciate the view
+        // Instantiate the view
         View_1D vv(block, v.begin(), v.end(), {num_segments});
 
-        // Instanciate the local view from the view
+        // Instantiate the local view from the view
         auto local_vv = hpx::local_view(vv);
 
         for ( auto i = localvv.begin(); i != localvv.end(); i++ )
@@ -1327,7 +1327,7 @@ owned by the current image::
 
 .. _sub_views:
 
-Instanciating sub-views
+Instantiating sub-views
 ,,,,,,,,,,,,,,,,,,,,,,,
 
 It is possible to construct views from other views: we call it sub-views. The
@@ -1355,10 +1355,10 @@ sub-view::
         std::size_t N = 20;
         std::size_t tilesize = 5;
 
-        // Instanciate the view
+        // Instantiate the view
         View_2D vv(block, v.begin(), v.end(), {N,N});
 
-        // Instanciate the subview
+        // Instantiate the subview
         View_2D svv(
             block,&vv(tilesize,0),&vv(2*tilesize-1,tilesize-1),{tilesize,tilesize},{N,N});
 
@@ -1397,7 +1397,7 @@ Preface: co-array, a segmented container tied to a SPMD multidimensional views
 As mentioned before, a co-array is a distributed array whose segments are
 accessible through an array-inspired access mode. We have previously seen that
 it is possible to reproduce such access mode using the concept of views.
-Nevertheless, the user must pre-create a segmented container to instanciate this
+Nevertheless, the user must pre-create a segmented container to instantiate this
 view. We illustrate below how a single constructor call can perform those two
 operations::
 

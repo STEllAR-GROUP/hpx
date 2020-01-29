@@ -160,7 +160,7 @@ are completed to avoid confusion.
 #. Post-release cleanup. Create a new pull request against master with the
    following changes:
 
-   #. Modify the the release procedure if necessary.
+   #. Modify the release procedure if necessary.
 
    #. Change ``HPX_VERSION_TAG`` in ``CMakeLists.txt`` back to ``-trunk``.
 

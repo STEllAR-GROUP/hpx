@@ -47,9 +47,9 @@ namespace hpx { namespace serialization {
             // properly interpret the flags
 
             // FIXME: make bool once integer compression is implemented
-            std::uint64_t endianess = 0ul;
-            load(endianess);
-            if (endianess)
+            std::uint64_t endianness = 0ul;
+            load(endianness);
+            if (endianness)
                 this->base_type::flags_ = hpx::serialization::endian_big;
 
             // load flags sent by the other end to make sure both ends have

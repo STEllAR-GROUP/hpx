@@ -20,7 +20,7 @@ namespace util {
     ///
     /// This function tries to visit all plain elements which may be wrapped in:
     /// - homogeneous containers (`std::vector`, `std::list`)
-    /// - heterogenous containers `(hpx::tuple`, `std::pair`, `std::array`)
+    /// - heterogeneous containers `(hpx::tuple`, `std::pair`, `std::array`)
     /// and re-assembles the pack with the result of the mapper.
     /// Mapping from one type to a different one is supported.
     ///

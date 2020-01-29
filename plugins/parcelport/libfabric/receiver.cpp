@@ -90,11 +90,11 @@ namespace libfabric
         static_assert(sizeof(std::uint64_t) == sizeof(std::size_t),
             "sizeof(std::uint64_t) != sizeof(std::size_t)");
 
-        // If we recieve a message of 8 bytes, we got a tag and need to handle
+        // If we receive a message of 8 bytes, we got a tag and need to handle
         // the tag completion...
         if (len <= sizeof(std::uint64_t))
         {
-            // @TODO: fixme immediate tag retreival
+            // @TODO: fixme immediate tag retrieval
             // Get the sender that has completed rma operations and signal to it
             // that it can now cleanup - all remote get operations are done.
             sender* snd = *reinterpret_cast<sender **>(header_region_->get_address());
@@ -117,7 +117,7 @@ namespace libfabric
                     // if the capacity overflowed, just delete this one
                     delete recv;
                 }
-                // Notify one possibly waiting reciever that one receive just finished
+                // Notify one possibly waiting receiver that one receive just finished
                 if (threads::threadmanager_is_at_least(state_running)
                     && hpx::threads::get_self_ptr())
                 {

@@ -122,9 +122,9 @@ namespace hpx { namespace serialization {
             // properly interpret the flags
 
             // FIXME: make bool once integer compression is implemented
-            std::uint64_t endianess =
+            std::uint64_t endianness =
                 this->base_type::endian_big() ? ~0ul : 0ul;
-            save(endianess);
+            save(endianness);
 
             // send flags sent by the other end to make sure both ends have
             // the same assumptions about the archive format

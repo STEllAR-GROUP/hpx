@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace server
         {
             // Check if component was migrated, we are not interested in
             // pinning the object as it is supposed to be destroyed anyways
-            // that is, noone else has a handle to it anymore
+            // that is, no one else has a handle to it anymore
             auto r = agas::was_object_migrated(gid,
                 [](){ return pinned_ptr(); });
 

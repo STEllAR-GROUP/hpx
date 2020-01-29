@@ -568,7 +568,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::lcos::local::spinlock mutex_;
             };
 
-            // std::swap_ranges doens't support overlapped ranges in standard.
+            // std::swap_ranges doesn't support overlapped ranges in standard.
             // But, actually general implementations of std::swap_ranges are useful
             //     in specific cases.
             // The problem is that standard doesn't guarantee that implementation.

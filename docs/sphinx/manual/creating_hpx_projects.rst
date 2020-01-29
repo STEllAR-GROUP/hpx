@@ -402,7 +402,7 @@ To build the program, type:
 
    make
 
-A successfull build should result in hello_world binary. To test, type:
+A successful build should result in hello_world binary. To test, type:
 
 .. code-block:: bash
 
@@ -470,7 +470,7 @@ To build the program, type:
 
    make
 
-A successfull build should result in hello_world binary. To test, type:
+A successful build should result in hello_world binary. To test, type:
 
 .. code-block:: bash
 

@@ -573,12 +573,12 @@ void bidirectional_concept()
     {
         using iterator = bidirectional_traversal_iterator;
         HPX_TEST_MSG((bidirectional_concept<iterator>::value),
-            "bidirectional traveral input iterator");
+            "bidirectional traversal input iterator");
     }
     {
         using iterator = random_access_traversal_iterator;
         HPX_TEST_MSG((bidirectional_concept<iterator>::value),
-            "random access traveral input iterator");
+            "random access traversal input iterator");
     }
 }
 

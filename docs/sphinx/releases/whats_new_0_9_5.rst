@@ -160,7 +160,7 @@ HPX' releases so far.
 * :hpx-issue:`545` - ``AUTOGLOB`` broken for add_hpx_component
 * :hpx-issue:`542` - FindHPX_HDF5 still searches multiple times
 * :hpx-issue:`541` - Quotes around application name in hpx::init
-* :hpx-issue:`539` - Race conditition occuring with new lightweight threads
+* :hpx-issue:`539` - Race conditition occurring with new lightweight threads
 * :hpx-issue:`535` - hpx_run_tests.py exits with no error code when tests are
   missing
 * :hpx-issue:`530` - Thread description(<unknown>) in logs

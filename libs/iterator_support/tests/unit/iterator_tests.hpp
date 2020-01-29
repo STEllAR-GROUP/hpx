@@ -107,7 +107,7 @@ namespace tests {
         HPX_TEST(*i1 == v2);
         HPX_TEST(*i == v2);
 
-        // i is dereferencable, so it must be incrementable.
+        // i is dereferenceable, so it must be incrementable.
         ++i;
 
         // how to test for operator-> ?

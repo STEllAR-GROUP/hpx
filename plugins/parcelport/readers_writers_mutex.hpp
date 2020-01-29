@@ -22,7 +22,7 @@
 # define RWL_DEBUG_MSG(x)
 #endif
 
-// Note that this implementaion uses 16bit counters so can handle 65536
+// Note that this implementation uses 16bit counters so can handle 65536
 // contentions on the lock without wraparound. It has not proven to be a
 // problem so far. (c.f. original description below)
 

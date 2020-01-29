@@ -33,7 +33,7 @@
 
 // ------------------------------------------------------------
 // This file provides a simple to use printf style debugging
-// tool that can be used on a per file basis to enable ouput.
+// tool that can be used on a per file basis to enable output.
 // It is not intended to be exposed to users, but rather as
 // an aid for hpx development.
 // ------------------------------------------------------------

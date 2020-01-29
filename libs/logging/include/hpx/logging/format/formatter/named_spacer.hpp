@@ -155,7 +155,7 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
                 }
             }
 
-            // recomputes the write steps - note taht this takes place after
+            // recomputes the write steps - note that this takes place after
             // each operation for instance, the user might have first set the
             // string and later added the formatters
             void HPX_EXPORT compute_write_steps();

@@ -43,9 +43,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     //Create instance of the actions
     pingpong_get_element_action act;
     std::vector<hpx::future<std::complex<double>>> vec;
-    std::vector<std::complex<double>> recieved;
+    std::vector<std::complex<double>> received;
     vec.reserve(n);
-    recieved.reserve(n);
+    received.reserve(n);
     //Find the other locality
     std::vector<hpx::naming::id_type> dummy = hpx::find_remote_localities();
     hpx::naming::id_type other_locality = dummy[0];
@@ -57,16 +57,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     hpx::when_all(vec).then(
-        [&recieved, n](hpx::future<std::vector<hpx::future<std::complex<double>>>> dummy)
+        [&received, n](hpx::future<std::vector<hpx::future<std::complex<double>>>> dummy)
         {
             std::vector<hpx::future<std::complex<double>>> number = dummy.get();
             for (std::size_t i = 0; i < n; ++i)
             {
-                recieved.push_back(number[i].get());
+                received.push_back(number[i].get());
             }
             hpx::evaluate_active_counters(false, " All Futures Done");
-            hpx::cout << "Now Done With Lambda and the last recieved value is "
-                      <<recieved[n-1]<< "\n" << hpx::flush;
+            hpx::cout << "Now Done With Lambda and the last received value is "
+                      <<received[n-1]<< "\n" << hpx::flush;
         }
     ).get();
     return hpx::finalize();

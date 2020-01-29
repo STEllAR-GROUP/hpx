@@ -57,7 +57,7 @@ Options
     The number of worker/measurement threads to create per locality.
 
 --seed : std::size_t : 0
-    The seed for the pseudo random number generator (if 0, a seed is choosen
+    The seed for the pseudo random number generator (if 0, a seed is chosen
     based on the current system time).
 
 Input File Format

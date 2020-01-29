@@ -400,7 +400,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     std::cout
         << "-------------------------------------------------------------\n"
-        << "Modified STREAM bechmark based on\nHPX version: "
+        << "Modified STREAM benchmark based on\nHPX version: "
             << hpx::build_string() << "\n"
         << "-------------------------------------------------------------\n"
         << "This system uses " << sizeof(STREAM_TYPE)

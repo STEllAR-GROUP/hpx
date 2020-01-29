@@ -115,7 +115,7 @@ Closed issues
   ``invalid_thread_id``
 * :hpx-issue:`4151` - build error with MPI code
 * :hpx-issue:`4150` - hpx won't build on POWER9 with clang 8
-* :hpx-issue:`4148` - ``cacheline_data`` delivers poor perfomance with C++17
+* :hpx-issue:`4148` - ``cacheline_data`` delivers poor performance with C++17
   compared to C++14
 * :hpx-issue:`4144` - target general in ``HPX_LIBRARIES`` does not exist
 * :hpx-issue:`4134` - CMake Error when ``-DHPX_WITH_HPXMP=ON``
@@ -184,7 +184,7 @@ Closed pull requests
 * :hpx-pr:`4272` - Fix pushing of documentation
 * :hpx-pr:`4271` - Updating APEX tag, don't create new task_wrapper on
   ``operator=`` of hpx_thread object
-* :hpx-pr:`4268` - Testing for noexcept function specializations in in C++11/14
+* :hpx-pr:`4268` - Testing for noexcept function specializations in C++11/14
   mode
 * :hpx-pr:`4267` - Fixing MSVC warning
 * :hpx-pr:`4266` - Make sure macOS Travis CI fails if build step fails
@@ -201,7 +201,7 @@ Closed pull requests
 * :hpx-pr:`4253` - Move ``partlit.hpp`` to affinity module
 * :hpx-pr:`4252` - Make mismatching build types a hard error in CMake
 * :hpx-pr:`4249` - Scheduler improvement
-* :hpx-pr:`4248` - update hpxmp tage to v0.3.0
+* :hpx-pr:`4248` - update hpxmp tag to v0.3.0
 * :hpx-pr:`4245` - Adding high performance channels
 * :hpx-pr:`4244` - Ignore lock in ignore_while_locked_1485 test
 * :hpx-pr:`4243` - Fix PAPI command line option documentation
@@ -422,7 +422,7 @@ Closed pull requests
 * :hpx-pr:`3996` - Attempt to solve issue where ``-latomic`` does not support
   128bit atomics
 * :hpx-pr:`3993` - Make sure ``__LINE__`` is an unsigned
-* :hpx-pr:`3991` - Fix dependencies and flags for for header tests
+* :hpx-pr:`3991` - Fix dependencies and flags for header tests
 * :hpx-pr:`3990` - Documentation tags fixes
 * :hpx-pr:`3988` - Adding missing solution folder for format module test
 * :hpx-pr:`3987` - Move runtime-dependent functions out of command line handling
@@ -513,8 +513,8 @@ Closed pull requests
 * :hpx-pr:`3877` - Documentation
 * :hpx-pr:`3876` - Module hardware
 * :hpx-pr:`3875` - Converted typedefs in actions submodule to using directives
-* :hpx-pr:`3874` - Allow to suppress target keywords in ``hpx_setup_target`` for
-  backwards compatibility
+* :hpx-pr:`3874` - Allow one to suppress target keywords in ``hpx_setup_target``
+  for backwards compatibility
 * :hpx-pr:`3873` - Add scripts to create releases and generate lists of PRs and
   issues
 * :hpx-pr:`3872` - Fix latest HTML docs location

@@ -17,7 +17,7 @@
 #include <array>
 #include <rdma/fabric.h>
 
-// Different providers use different address formats that we must accomodate
+// Different providers use different address formats that we must accommodate
 // in our locality object.
 #ifdef HPX_PARCELPORT_LIBFABRIC_GNI
 # define HPX_PARCELPORT_LIBFABRIC_LOCALITY_SIZE 48

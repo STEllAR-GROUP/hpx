@@ -560,7 +560,7 @@ int rdma_controller::handle_connect_request(
         }
         else {
             // we need to delete the connection we started and replace it with a new one
-            LOG_DEVEL_MSG("Priorty to new, Aborting old from "
+            LOG_DEVEL_MSG("Priority to new, Aborting old from "
                 << sockaddress(&local_addr_) << "to "
                 << ipaddress(remote_ip)
                 << "( " << sockaddress(&local_addr_) << ")");

@@ -162,7 +162,7 @@ functions to run on.
 
 In example 6, we begin to distribute the partition data on different nodes. This
 is accomplished in ``stepper::do_work()`` by passing the GID of the
-:term:`locality` where we wish to create the partition to the the partition
+:term:`locality` where we wish to create the partition to the partition
 constructor.
 
 .. literalinclude:: ../../examples/1d_stencil/1d_stencil_6.cpp

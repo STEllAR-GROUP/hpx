@@ -54,7 +54,7 @@ the library and a link to the generated documentation.
 
 The ``include`` directory should contain only headers that other libraries need.
 Private headers should be placed under the ``src`` directory. This allows for
-clear seperation. The ``cmake`` subdirectory may include additional |cmake|_
+clear separation. The ``cmake`` subdirectory may include additional |cmake|_
 scripts needed to generate the respective build configurations.
 
 Documentation is placed in the ``docs`` folder. A empty skeleton for the index

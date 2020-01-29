@@ -366,8 +366,8 @@ The ``hpx.thread_queue`` configuration section
        converted into |hpx| threads whenever the thread queues for a core have
        run empty.
    * * ``hpx.thread_queue.max_delete_count``
-     * The value of this property defines the number number of terminated |hpx|
-       threads to discard during each invocation of the corresponding function.
+     * The value of this property defines the number of terminated |hpx| threads
+       to discard during each invocation of the corresponding function.
 
 The ``hpx.components`` configuration section
 ............................................
@@ -598,7 +598,7 @@ equivalent cmake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    * * ``hpx.parcel.mpi.enable``
      * Enable the use of the MPI parcelport. HPX tries to detect if the
        application was started within a parallel MPI environment. If the
-       detection was succesful, the MPI parcelport is enabled by default. To
+       detection was successful, the MPI parcelport is enabled by default. To
        explicitly disable the MPI parcelport, set to 0. Note that the initial
        bootstrap of the overall |hpx| application will be performed using MPI as
        well.
@@ -1498,7 +1498,7 @@ The predefined command line options for any application using
 
 
 |hpx| configuration options
---------------------------
+---------------------------
 
 .. option:: --hpx:app-config arg
 

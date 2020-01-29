@@ -1021,9 +1021,9 @@ system and application performance.
 
        Please see :ref:`cmake_variables` for more details.
      * If the configure-time option ``-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On``
-       was specified, this counter allows to specify an optional action name as
-       its parameter. In this case the counter will report the number of bytes
-       transmitted for the given action only.
+       was specified, this counter allows one to specify an optional action name
+       as its parameter. In this case the counter will report the number of
+       bytes transmitted for the given action only.
    * * ``/serialize/time/<connection_type>/<operation>``
 
        where:
@@ -1050,8 +1050,8 @@ system and application performance.
 
        Please see :ref:`cmake_variables` for more details.
      * If the configure-time option ``-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On``
-       was specified, this counter allows to specify an optional action name as
-       its parameter. In this case the counter will report the serialization
+       was specified, this counter allows one to specify an optional action name
+       as its parameter. In this case the counter will report the serialization
        time for the given action only.
    * * ``/parcels/count/routed``
      * ``locality#*/total``
@@ -1072,9 +1072,9 @@ system and application performance.
        :term:`AGAS` service component will deliver the parcel to its final
        target.
      * If the configure-time option ``-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On``
-       was specified, this counter allows to specify an optional action name as
-       its parameter. In this case the counter will report the number of parcels
-       for the given action only.
+       was specified, this counter allows one to specify an optional action name
+       as its parameter. In this case the counter will report the number of
+       parcels for the given action only.
    * * ``/parcels/count/<connection_type>/<operation>``
 
        where:

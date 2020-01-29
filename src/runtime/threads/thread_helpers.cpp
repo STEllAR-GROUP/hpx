@@ -668,7 +668,7 @@ namespace hpx { namespace this_thread {
             std::size_t(remaining_stack) >= space_needed;
 
         // We might find ourselves in the situation where we don't have enough
-        // stack space, but can't really schedule a new thread. In this sitation,
+        // stack space, but can't really schedule a new thread. In this situation,
         // it would be best to change the code that provoked this behaviour
         // instead of dynamically schedule a new thread. A such, we throw an
         // exception to point to that problem instead of silently hanging because

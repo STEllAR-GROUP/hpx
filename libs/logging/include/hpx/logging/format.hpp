@@ -140,7 +140,7 @@ and you want to define the logger classes, in a source file
     namespace msg_route {
 
         /**
-        @brief Recomended base class for message routers that
+        @brief Recommended base class for message routers that
         need access to the underlying formatter and/or destination array.
     */
         template <class formatter_array, class destination_array>

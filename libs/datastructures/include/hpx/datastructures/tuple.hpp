@@ -74,7 +74,7 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
-// Adapt hpx::util::tuple to be useable with std::tuple
+// Adapt hpx::util::tuple to be usable with std::tuple
 namespace std {
 
     template <typename... Ts>

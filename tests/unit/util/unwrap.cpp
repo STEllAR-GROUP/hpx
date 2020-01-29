@@ -235,7 +235,7 @@ void test_unwrapping_all(FutureProvider&& futurize)
 }
 
 /// This section declare some unit tests which ensure that issues
-/// that occured while developing the implementation were fixed.
+/// that occurred while developing the implementation were fixed.
 template <template <typename> class FutureType, typename FutureProvider>
 void test_development_regressions(FutureProvider&& futurize)
 {
