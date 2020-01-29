@@ -101,7 +101,7 @@ namespace hpx { namespace util
         }
         else
         {
-            has_called_init_ = true;
+            has_called_init_ = false;
         }
 
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
