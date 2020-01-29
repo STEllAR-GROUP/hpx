@@ -47,6 +47,7 @@
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines {
+
     /////////////////////////////////////////////////////////////////////////////
     class coroutine
     {

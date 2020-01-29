@@ -17,6 +17,7 @@
 #include <iosfwd>
 
 namespace hpx { namespace threads {
+
     struct thread_id
     {
     private:
@@ -34,6 +35,9 @@ namespace hpx { namespace threads {
 
         thread_id(thread_id const&) = default;
         thread_id& operator=(thread_id const&) = default;
+
+        thread_id(thread_id&& rhs) noexcept = default;
+        thread_id& operator=(thread_id&& rhs) noexcept = default;
 
         explicit constexpr operator bool() const noexcept
         {

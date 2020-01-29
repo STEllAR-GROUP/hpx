@@ -21,7 +21,8 @@
 #include <utility>
 
 namespace hpx { namespace parallel { namespace execution { namespace detail {
-    ///////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////
     template <typename Policy>
     struct post_policy_dispatch
     {
@@ -57,13 +58,13 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             threads::thread_pool_base* pool, threads::thread_schedule_hint hint,
             F&& f, Ts&&... ts)
         {
+            hint.mode = threads::thread_schedule_hint_mode_thread;
+            hint.hint = static_cast<std::int16_t>(get_worker_thread_num());
             threads::thread_id_type tid = threads::register_thread_nullary(pool,
                 hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...),
                 desc, threads::pending_do_not_schedule, true, policy.priority(),
-                threads::thread_schedule_hint(
-                    static_cast<std::int16_t>(get_worker_thread_num())),
-                threads::thread_stacksize_current);
+                hint, threads::thread_stacksize_current);
             threads::thread_id_type tid_self = threads::get_self_id();
 
             // make sure this thread is executed last

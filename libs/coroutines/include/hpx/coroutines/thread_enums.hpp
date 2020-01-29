@@ -193,7 +193,7 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     struct thread_schedule_hint
     {
-        thread_schedule_hint()
+        thread_schedule_hint() noexcept
           : mode(thread_schedule_hint_mode_none)
           , hint(-1)
         {
@@ -205,7 +205,8 @@ namespace hpx { namespace threads {
         {
         }
 
-        thread_schedule_hint(thread_schedule_hint_mode mode, std::int16_t hint)
+        thread_schedule_hint(
+            thread_schedule_hint_mode mode, std::int16_t hint) noexcept
           : mode(mode)
           , hint(hint)
         {

@@ -49,6 +49,7 @@
 #include <utility>
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
     // functor.
@@ -80,6 +81,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         HPX_EXPORT ~coroutine_impl();
 #endif
 
+        // execute the coroutine using normal context switching
         HPX_EXPORT void operator()() noexcept;
 
     public:
@@ -92,13 +94,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
             return m_result;
         }
-        arg_type* args()
+        arg_type* args() noexcept
         {
             HPX_ASSERT(m_arg);
             return m_arg;
         };
 
-        void bind_args(arg_type* arg)
+        void bind_args(arg_type* arg) noexcept
         {
             m_arg = arg;
         }
@@ -113,6 +115,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         void reset()
         {
             this->reset_stack();
+            m_result = result_type(terminated, invalid_thread_id);
+            m_arg = nullptr;
             m_fun.reset();    // just reset the bound function
             this->super_type::reset();
         }
@@ -120,6 +124,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         void rebind(functor_type&& f, thread_id_type id)
         {
             this->rebind_stack();    // count how often a coroutines object was reused
+            m_result = result_type(unknown, invalid_thread_id);
+            m_arg = nullptr;
             m_fun = std::move(f);
             this->super_type::rebind_base(id);
         }
@@ -127,7 +133,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     private:
         result_type m_result;
         arg_type* m_arg;
-
         functor_type m_fun;
     };
 }}}}    // namespace hpx::threads::coroutines::detail

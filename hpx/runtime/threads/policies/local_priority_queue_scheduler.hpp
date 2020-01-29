@@ -157,7 +157,7 @@ namespace hpx { namespace threads { namespace policies {
             }
         }
 
-        virtual ~local_priority_queue_scheduler()
+        ~local_priority_queue_scheduler() override
         {
             for (std::size_t i = 0; i != num_queues_; ++i)
             {
@@ -734,12 +734,10 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         /// Destroy the passed thread as it has been terminated
-        void destroy_thread(
-            threads::thread_data* thrd, std::int64_t& busy_count) override
+        void destroy_thread(threads::thread_data* thrd) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
-            thrd->get_queue<thread_queue_type>().destroy_thread(
-                thrd, busy_count);
+            thrd->get_queue<thread_queue_type>().destroy_thread(thrd);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -832,8 +830,7 @@ namespace hpx { namespace threads { namespace policies {
                 case thread_priority_unknown:
                 {
                     HPX_THROW_EXCEPTION(bad_parameter,
-                        "local_priority_queue_scheduler::get_thread_"
-                        "count",
+                        "local_priority_queue_scheduler::get_thread_count",
                         "unknown thread priority value "
                         "(thread_priority_unknown)");
                     return 0;
@@ -1284,7 +1281,7 @@ namespace hpx { namespace threads { namespace policies {
 
         void reset_thread_distribution() override
         {
-            curr_queue_.store(0);
+            curr_queue_.store(0, std::memory_order_release);
         }
 
     protected:

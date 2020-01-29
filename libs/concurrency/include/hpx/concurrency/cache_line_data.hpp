@@ -105,7 +105,7 @@ namespace hpx {
             {
             }
 
-            // no ned to pad to cache line size
+            // no need to pad to cache line size
             Data data_;
         };
 
