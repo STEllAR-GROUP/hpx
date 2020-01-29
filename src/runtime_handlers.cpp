@@ -52,7 +52,7 @@ namespace hpx { namespace detail {
 #if defined(HPX_HAVE_APEX)
     bool enable_parent_task_handler()
     {
-        return hpx::get_initial_num_localities() == 1;
+        return !hpx::is_networking_enabled();
     }
 #endif
 
