@@ -82,6 +82,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
   hpx_set_cmake_policy(CMP0054 OLD)
 endif()
 hpx_set_cmake_policy(CMP0060 NEW)
+hpx_set_cmake_policy(CMP0074 NEW)
 
 # If we have a cmake version older than 3.12, we can't rely on CONFIGURE_DEPENDS
 if(${CMAKE_VERSION} VERSION_LESS "3.12")
