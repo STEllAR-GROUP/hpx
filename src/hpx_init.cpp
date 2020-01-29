@@ -13,7 +13,6 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/custom_exception_info.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/format.hpp>
@@ -35,6 +34,7 @@
 #include <hpx/runtime_impl.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing.hpp>
+#include <hpx/type_support/pack.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
@@ -100,11 +100,10 @@ HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,
 typedef
     hpx::util::detail::bound_action<
         list_component_type_action
-      , hpx::util::tuple<
-            hpx::naming::id_type
-          , hpx::util::detail::placeholder<1>
-          , hpx::util::detail::placeholder<2>
-        >
+      , hpx::util::index_pack<0, 1, 2>
+      , hpx::naming::id_type
+      , hpx::util::detail::placeholder<1>
+      , hpx::util::detail::placeholder<2>
     >
     bound_list_component_type_action;
 

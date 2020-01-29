@@ -86,12 +86,12 @@ namespace hpx { namespace detail
             traits::is_bound_action<Bound>::value
         >::type>
     {
-        template <typename Action, typename BoundArgs, typename ...Ts>
+        template <typename Action, typename Is, typename... Ts, typename ...Us>
         HPX_FORCEINLINE static bool
-        call(hpx::util::detail::bound_action<Action, BoundArgs> const& bound,
-            Ts&&... ts)
+        call(hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
+            Us&&... vs)
         {
-            return bound.apply(std::forward<Ts>(ts)...);
+            return bound.apply(std::forward<Us>(vs)...);
         }
     };
 }}

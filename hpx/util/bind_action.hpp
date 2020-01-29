@@ -12,314 +12,175 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind.hpp>
+#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/functional/traits/is_bind_expression.hpp>
+#include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action,
-            std::size_t ...Is, typename ...Ts, typename Us>
-        HPX_FORCEINLINE
-        bool bind_action_apply_impl(
-            index_pack<Is...>,
-            util::tuple<Ts...> const& bound, Us&& unbound)
-        {
-            return hpx::apply<Action>(
-                detail::bind_eval<Ts const&>::call(
-                    util::get<Is>(bound),
-                    std::forward<Us>(unbound))...);
-        }
+        template <typename Action, typename Is, typename... Ts>
+        class bound_action;
 
-        template <typename Action, typename Ts, typename Us>
-        HPX_FORCEINLINE
-        bool
-        bind_action_apply(Ts const& bound, Us&& unbound)
-        {
-            using index_pack = typename util::make_index_pack<
-                util::tuple_size<typename std::decay<Ts>::type>::value>::type;
-            return detail::bind_action_apply_impl<Action>(
-                index_pack{}, bound, std::forward<Us>(unbound));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action,
-            std::size_t ...Is, typename ...Ts, typename Us>
-        HPX_FORCEINLINE
-        bool bind_action_apply_cont_impl(
-            index_pack<Is...>,
-            naming::id_type const& cont,
-            util::tuple<Ts...> const& bound, Us&& unbound)
-        {
-            return hpx::apply_c<Action>(cont,
-                detail::bind_eval<Ts const&>::call(
-                    util::get<Is>(bound),
-                    std::forward<Us>(unbound))...);
-        }
-
-        template <typename Action, typename Ts, typename Us>
-        HPX_FORCEINLINE
-        bool
-        bind_action_apply_cont(naming::id_type const& cont,
-            Ts const& bound, Us&& unbound)
-        {
-            using index_pack = typename util::make_index_pack<
-                    util::tuple_size<typename std::decay<Ts>::type>::value
-                >::type;
-            return detail::bind_action_apply_cont_impl<Action>(index_pack{},
-                cont, bound, std::forward<Us>(unbound));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action,
-            std::size_t ...Is, typename Continuation, typename ...Ts, typename Us>
-        HPX_FORCEINLINE
-        bool bind_action_apply_cont_impl2(
-            index_pack<Is...>,
-            Continuation && cont,
-            util::tuple<Ts...> const& bound, Us&& unbound)
-        {
-            return hpx::apply<Action>(std::forward<Continuation>(cont),
-                detail::bind_eval<Ts const&>::call(
-                    util::get<Is>(bound),
-                    std::forward<Us>(unbound))...);
-        }
-
-        template <typename Action, typename Continuation, typename Ts,
-            typename Us>
-        HPX_FORCEINLINE
-        typename std::enable_if<
-            traits::is_continuation<Continuation>::value, bool
-        >::type
-        bind_action_apply_cont2(Continuation && cont,
-            Ts const& bound, Us&& unbound)
-        {
-            using index_pack = typename util::make_index_pack<
-                    util::tuple_size<typename std::decay<Ts>::type>::value
-                >::type;
-            return detail::bind_action_apply_cont_impl2<Action>(index_pack{},
-                std::forward<Continuation>(cont), bound, std::forward<Us>(unbound));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Action,
-            std::size_t ...Is, typename ...Ts, typename Us>
-        HPX_FORCEINLINE
-        lcos::future<typename traits::promise_local_result<
-            typename hpx::traits::extract_action<Action>::remote_result_type
-        >::type> bind_action_async_impl(
-            index_pack<Is...>,
-            util::tuple<Ts...> const& bound, Us&& unbound)
-        {
-            return hpx::async<Action>(
-                detail::bind_eval<Ts const&>::call(
-                    util::get<Is>(bound),
-                    std::forward<Us>(unbound))...);
-        }
-
-        template <typename Action, typename Ts, typename Us>
-        HPX_FORCEINLINE
-        lcos::future<typename traits::promise_local_result<
-            typename hpx::traits::extract_action<Action>::remote_result_type
-        >::type>
-        bind_action_async(Ts const& bound, Us&& unbound)
-        {
-            using index_pack = typename util::make_index_pack<
-                    util::tuple_size<typename std::decay<Ts>::type>::value
-                >::type;
-            return detail::bind_action_async_impl<Action>(index_pack{},
-                bound, std::forward<Us>(unbound));
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Ts, typename Us>
-        HPX_FORCEINLINE
-        typename traits::promise_local_result<
-            typename hpx::traits::extract_action<Action>::remote_result_type
-        >::type
-        bind_action_invoke(Ts&& bound, Us&& unbound)
-        {
-            using index_pack = typename util::make_index_pack<
-                    util::tuple_size<typename std::decay<Ts>::type>::value
-                >::type;
-            return detail::bind_action_async_impl<Action>(index_pack{},
-                bound, std::forward<Us>(unbound)).get();
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename BoundArgs>
-        class bound_action //-V690
+        template <typename Action, std::size_t... Is, typename... Ts>
+        class bound_action<Action, index_pack<Is...>, Ts...>
         {
         public:
             typedef typename traits::promise_local_result<
-                typename hpx::traits::extract_action<Action>::remote_result_type
-            >::type result_type;
+                typename hpx::traits::extract_action<
+                    Action>::remote_result_type>::type result_type;
 
         public:
             // default constructor is needed for serialization
-            bound_action()
-            {}
+            bound_action() = default;
 
-            template <typename BoundArgs_>
-            explicit bound_action(Action /*action*/, BoundArgs_&& bound_args)
-              : _bound_args(std::forward<BoundArgs_>(bound_args))
-            {}
-
-            bound_action(bound_action const& other)
-              : _bound_args(other._bound_args)
-            {}
-            bound_action(bound_action&& other)
-              : _bound_args(std::move(other._bound_args))
-            {}
-
-            template <typename ...Us>
-            HPX_FORCEINLINE
-            bool
-            apply(Us&&... us) const
+            template <typename Derived, typename... Ts_>
+            explicit bound_action(Derived /*action*/, Ts_&&... vs)
+              : _args(std::forward<Ts_>(vs)...)
             {
-                return detail::bind_action_apply<Action>(
-                    _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
             }
 
-            template <typename ...Us>
-            HPX_FORCEINLINE
-            bool
-            apply_c(naming::id_type const& contgid, Us&&... us) const
+#if !defined(__NVCC__) && !defined(__CUDACC__)
+            bound_action(bound_action const&) = default;
+            bound_action(bound_action&&) = default;
+#else
+            HPX_HOST_DEVICE bound_action(bound_action const& other)
+              : _args(other._args)
             {
-                return detail::bind_action_apply_cont<Action>(contgid,
-                    _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
             }
 
-            template <typename Continuation, typename ...Us>
-            HPX_FORCEINLINE
-            typename std::enable_if<
-                traits::is_continuation<Continuation>::value, bool
-            >::type
-            apply_c(Continuation && cont, Us&&... us) const
+            HPX_HOST_DEVICE bound_action(bound_action&& other)
+              : _args(std::move(other._args))
             {
-                return detail::bind_action_apply_cont2<Action>(
-                    std::forward<Continuation>(cont),
-                    _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
+            }
+#endif
+
+            bound_action& operator=(bound_action const&) = delete;
+
+            template <typename... Us>
+            HPX_FORCEINLINE bool apply(Us&&... vs) const
+            {
+                return hpx::apply<Action>(detail::bind_eval<Ts const&>::call(
+                    util::get<Is>(_args), std::forward<Us>(vs)...)...);
             }
 
-            template <typename ...Us>
-            HPX_FORCEINLINE
-            hpx::lcos::future<result_type>
-            async(Us&&... us) const
+            template <typename... Us>
+            HPX_FORCEINLINE bool apply_c(
+                naming::id_type const& cont, Us&&... vs) const
             {
-                return detail::bind_action_async<Action>(
-                    _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
+                return hpx::apply_c<Action>(cont,
+                    detail::bind_eval<Ts const&>::call(
+                        util::get<Is>(_args), std::forward<Us>(vs)...)...);
             }
 
-            template <typename ...Us>
-            HPX_FORCEINLINE
-            result_type
-            operator()(Us&&... us) const
+            template <typename Continuation, typename... Us>
+            HPX_FORCEINLINE typename std::enable_if<
+                traits::is_continuation<Continuation>::value, bool>::type
+            apply_c(Continuation&& cont, Us&&... vs) const
             {
-                return detail::bind_action_invoke<Action>(
-                    _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
+                return hpx::apply<Action>(std::forward<Continuation>(cont),
+                    detail::bind_eval<Ts const&>::call(
+                        util::get<Is>(_args), std::forward<Us>(vs)...)...);
             }
 
-        public: // exposition-only
-            BoundArgs _bound_args;
+            template <typename... Us>
+            HPX_FORCEINLINE hpx::lcos::future<result_type> async(
+                Us&&... vs) const
+            {
+                return hpx::async<Action>(detail::bind_eval<Ts const&>::call(
+                    util::get<Is>(_args), std::forward<Us>(vs)...)...);
+            }
+
+            template <typename... Us>
+            HPX_FORCEINLINE result_type operator()(Us&&... vs) const
+            {
+                return async(std::forward<Us>(vs)...).get();
+            }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned int const /*version*/)
+            {
+                ar& _args;
+            }
+
+        private:
+            util::tuple<Ts...> _args;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename ...Ts>
-    typename std::enable_if<
-        traits::is_action<typename std::decay<Action>::type>::value
-      , detail::bound_action<
-            typename std::decay<Action>::type
-          , util::tuple<typename std::decay<Ts>::type...>
-        >
-    >::type
+    template <typename Action, typename... Ts,
+        typename Enable = typename std::enable_if<
+            traits::is_action<typename std::decay<Action>::type>::value>::type>
+    detail::bound_action<typename std::decay<Action>::type,
+        typename util::make_index_pack<sizeof...(Ts)>::type,
+        typename std::decay<Ts>::type...>
     bind(Ts&&... vs)
     {
-        typedef detail::bound_action<
-            typename std::decay<Action>::type,
-            util::tuple<typename std::decay<Ts>::type...>
-        > result_type;
+        typedef detail::bound_action<typename std::decay<Action>::type,
+            typename util::make_index_pack<sizeof...(Ts)>::type,
+            typename std::decay<Ts>::type...>
+            result_type;
 
-        return result_type(Action(),
-            util::forward_as_tuple(std::forward<Ts>(vs)...));
+        return result_type(Action(), std::forward<Ts>(vs)...);
     }
 
-    template <
-        typename Component, typename Signature, typename Derived
-      , typename ...Ts>
-    detail::bound_action<
-        Derived
-      , util::tuple<typename std::decay<Ts>::type...>
-    >
-    bind(
-        hpx::actions::basic_action<Component, Signature, Derived> action,
+    template <typename Component, typename Signature, typename Derived,
+        typename... Ts>
+    detail::bound_action<Derived,
+        typename util::make_index_pack<sizeof...(Ts)>::type,
+        typename std::decay<Ts>::type...>
+    bind(hpx::actions::basic_action<Component, Signature, Derived> action,
         Ts&&... vs)
     {
-        typedef detail::bound_action<
-            Derived,
-            util::tuple<typename std::decay<Ts>::type...>
-        > result_type;
+        typedef detail::bound_action<Derived,
+            typename util::make_index_pack<sizeof...(Ts)>::type,
+            typename std::decay<Ts>::type...>
+            result_type;
 
-        return result_type(static_cast<Derived const&>(action),
-            util::forward_as_tuple(std::forward<Ts>(vs)...));
+        return result_type(
+            static_cast<Derived const&>(action), std::forward<Ts>(vs)...);
     }
-}}
+}}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename BoundArgs>
-    struct is_bind_expression<util::detail::bound_action<Action, BoundArgs> >
+    template <typename Action, typename Is, typename... Ts>
+    struct is_bind_expression<util::detail::bound_action<Action, Is, Ts...>>
       : std::true_type
-    {};
+    {
+    };
 
-    template <typename Action, typename BoundArgs>
-    struct is_bound_action<util::detail::bound_action<Action, BoundArgs> >
+    template <typename Action, typename Is, typename... Ts>
+    struct is_bound_action<util::detail::bound_action<Action, Is, Ts...>>
       : std::true_type
-    {};
-}}
+    {
+    };
+}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     // serialization of the bound action object
-    template <typename Action, typename BoundArgs>
-    void serialize(
-        ::hpx::serialization::input_archive& ar
-      , ::hpx::util::detail::bound_action<Action, BoundArgs>& bound
-      , unsigned int const /*version*/)
+    template <typename Archive, typename F, typename... Ts>
+    void serialize(Archive& ar,
+        ::hpx::util::detail::bound_action<F, Ts...>& bound,
+        unsigned int const version = 0)
     {
-        ar >> bound._bound_args;
+        bound.serialize(ar, version);
     }
-
-    template <typename Action, typename BoundArgs>
-    void serialize(
-        ::hpx::serialization::output_archive& ar
-      , ::hpx::util::detail::bound_action<Action, BoundArgs>& bound
-      , unsigned int const /*version*/)
-    {
-        ar << bound._bound_args;
-    }
-}}
+}}    // namespace hpx::serialization
 
 #endif
