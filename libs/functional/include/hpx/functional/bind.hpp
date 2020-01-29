@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/functional/result_of.hpp>
@@ -57,12 +57,12 @@ namespace hpx { namespace util {
         struct bind_eval_placeholder
         {
             template <typename T, typename... Us>
-            static constexpr HPX_HOST_DEVICE
-                typename util::tuple_element<I, util::tuple<Us&&...>>::type&&
-                call(T&& /*t*/, Us&&... vs)
+            static constexpr HPX_HOST_DEVICE decltype(auto) call(
+                T&& /*t*/, Us&&... vs)
             {
-                return util::get<I>(
-                    util::forward_as_tuple(std::forward<Us>(vs)...));
+                return util::member_pack_for<Us&&...>(
+                    std::piecewise_construct, std::forward<Us>(vs)...)
+                    .template get<I>();
             }
         };
 
@@ -120,14 +120,14 @@ namespace hpx { namespace util {
         class bound<F, index_pack<Is...>, Ts...>
         {
         public:
-            bound() {}    // needed for serialization
+            bound() = default;    // needed for serialization
 
             template <typename F_, typename... Ts_,
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
             constexpr explicit bound(F_&& f, Ts_&&... vs)
               : _f(std::forward<F_>(f))
-              , _args(std::forward<Ts_>(vs)...)
+              , _args(std::piecewise_construct, std::forward<Ts_>(vs)...)
             {
             }
 
@@ -157,7 +157,7 @@ namespace hpx { namespace util {
             {
                 return HPX_INVOKE(_f,
                     detail::bind_eval<Ts&>::call(
-                        util::get<Is>(_args), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
@@ -167,7 +167,7 @@ namespace hpx { namespace util {
             {
                 return HPX_INVOKE(_f,
                     detail::bind_eval<Ts const&>::call(
-                        util::get<Is>(_args), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
@@ -176,7 +176,8 @@ namespace hpx { namespace util {
             operator()(Us&&... vs) &&
             {
                 return HPX_INVOKE(std::move(_f),
-                    detail::bind_eval<Ts>::call(util::get<Is>(std::move(_args)),
+                    detail::bind_eval<Ts>::call(
+                        std::move(_args).template get<Is>(),
                         std::forward<Us>(vs)...)...);
             }
 
@@ -187,7 +188,7 @@ namespace hpx { namespace util {
             {
                 return HPX_INVOKE(std::move(_f),
                     detail::bind_eval<Ts const>::call(
-                        util::get<Is>(std::move(_args)),
+                        std::move(_args).template get<Is>(),
                         std::forward<Us>(vs)...)...);
             }
 
@@ -226,7 +227,7 @@ namespace hpx { namespace util {
 
         private:
             F _f;
-            util::tuple<Ts...> _args;
+            util::member_pack_for<Ts...> _args;
         };
     }    // namespace detail
 

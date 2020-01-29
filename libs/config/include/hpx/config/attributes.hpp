@@ -72,6 +72,14 @@
 #else
 #   define HPX_FALLTHROUGH
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+// handle empty_bases
+#if defined(_MSC_VER)
+#  define HPX_EMPTY_BASES __declspec(empty_bases)
+#else
+#  define HPX_EMPTY_BASES
+#endif
 // clang-format on
 
 #endif

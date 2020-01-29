@@ -11,7 +11,7 @@
 #define HPX_UTIL_DEFERRED_CALL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
@@ -73,14 +73,14 @@ namespace hpx { namespace util {
         class deferred<F, index_pack<Is...>, Ts...>
         {
         public:
-            deferred() {}    // needed for serialization
+            deferred() = default;    // needed for serialization
 
             template <typename F_, typename... Ts_,
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
-            explicit HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
+            explicit constexpr HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
               : _f(std::forward<F_>(f))
-              , _args(std::forward<Ts_>(vs)...)
+              , _args(std::piecewise_construct, std::forward<Ts_>(vs)...)
             {
             }
 
@@ -102,7 +102,7 @@ namespace hpx { namespace util {
                 operator()()
             {
                 return HPX_INVOKE(
-                    std::move(_f), util::get<Is>(std::move(_args))...);
+                    std::move(_f), std::move(_args).template get<Is>()...);
             }
 
             template <typename Archive>
@@ -140,7 +140,7 @@ namespace hpx { namespace util {
 
         private:
             F _f;
-            util::tuple<Ts...> _args;
+            util::member_pack_for<Ts...> _args;
         };
     }    // namespace detail
 
