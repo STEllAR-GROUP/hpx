@@ -38,29 +38,29 @@ namespace hpx
 
         struct policy_holder_base
         {
-            HPX_CONSTEXPR explicit policy_holder_base(launch_policy p,
+            constexpr explicit policy_holder_base(launch_policy p,
                     threads::thread_priority priority =
                         threads::thread_priority_default) noexcept
               : policy_(p),
                 priority_(priority)
             {}
 
-            HPX_CONSTEXPR explicit operator bool() const noexcept
+            constexpr explicit operator bool() const noexcept
             {
                 return is_valid();
             }
 
-            HPX_CONSTEXPR launch_policy get_policy() const noexcept
+            constexpr launch_policy get_policy() const noexcept
             {
                 return policy_;
             }
 
-            HPX_CONSTEXPR bool is_valid() const noexcept
+            constexpr bool is_valid() const noexcept
             {
                 return static_cast<int>(policy_) != 0;
             }
 
-            HPX_CONSTEXPR threads::thread_priority get_priority() const
+            constexpr threads::thread_priority get_priority() const
             {
                 return priority_;
             }
@@ -81,31 +81,31 @@ namespace hpx
         template <typename Derived = void>
         struct policy_holder : policy_holder_base
         {
-            HPX_CONSTEXPR explicit policy_holder(launch_policy p,
+            constexpr explicit policy_holder(launch_policy p,
                     threads::thread_priority priority =
                         threads::thread_priority_default) noexcept
               : policy_holder_base(p, priority)
             {}
 
-            HPX_CONSTEXPR explicit policy_holder(policy_holder_base p) noexcept
+            constexpr explicit policy_holder(policy_holder_base p) noexcept
               : policy_holder_base(p)
             {}
 
-            HPX_CONSTEXPR operator launch_policy() const noexcept
+            constexpr operator launch_policy() const noexcept
             {
                 return static_cast<Derived const*>(this)->get_policy();
             }
 
-            HPX_CONSTEXPR explicit operator bool() const noexcept
+            constexpr explicit operator bool() const noexcept
             {
                 return static_cast<Derived const*>(this)->is_valid();
             }
 
-            HPX_CONSTEXPR launch_policy policy() const
+            constexpr launch_policy policy() const
             {
                 return static_cast<Derived const*>(this)->get_policy();
             }
-            HPX_CONSTEXPR threads::thread_priority priority() const
+            constexpr threads::thread_priority priority() const
             {
                 return static_cast<Derived const*>(this)->get_priority();
             }
@@ -114,31 +114,31 @@ namespace hpx
         template <>
         struct policy_holder<void> : policy_holder_base
         {
-            HPX_CONSTEXPR explicit policy_holder(launch_policy p,
+            constexpr explicit policy_holder(launch_policy p,
                     threads::thread_priority priority =
                         threads::thread_priority_default) noexcept
               : policy_holder_base(p, priority)
             {}
 
-            HPX_CONSTEXPR explicit policy_holder(policy_holder_base p) noexcept
+            constexpr explicit policy_holder(policy_holder_base p) noexcept
               : policy_holder_base(p)
             {}
 
-            HPX_CONSTEXPR operator launch_policy() const noexcept
+            constexpr operator launch_policy() const noexcept
             {
                 return this->policy_holder_base::get_policy();
             }
 
-            HPX_CONSTEXPR explicit operator bool() const noexcept
+            constexpr explicit operator bool() const noexcept
             {
                 return this->policy_holder_base::is_valid();
             }
 
-            HPX_CONSTEXPR launch_policy policy() const
+            constexpr launch_policy policy() const
             {
                 return this->policy_holder_base::get_policy();
             }
-            HPX_CONSTEXPR threads::thread_priority priority() const
+            constexpr threads::thread_priority priority() const
             {
                 return this->policy_holder_base::get_priority();
             }
@@ -147,13 +147,13 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         struct async_policy : policy_holder<async_policy>
         {
-            HPX_CONSTEXPR explicit async_policy(
+            constexpr explicit async_policy(
                     threads::thread_priority priority =
                         threads::thread_priority_default) noexcept
               : policy_holder<async_policy>(launch_policy::async, priority)
             {}
 
-            HPX_CONSTEXPR async_policy operator()(
+            constexpr async_policy operator()(
                 threads::thread_priority priority) const noexcept
             {
                 return async_policy(priority);
@@ -162,13 +162,13 @@ namespace hpx
 
         struct fork_policy : policy_holder<fork_policy>
         {
-            HPX_CONSTEXPR explicit fork_policy(
+            constexpr explicit fork_policy(
                     threads::thread_priority priority =
                         threads::thread_priority_boost) noexcept
               : policy_holder<fork_policy>(launch_policy::fork, priority)
             {}
 
-            HPX_CONSTEXPR fork_policy operator()(
+            constexpr fork_policy operator()(
                 threads::thread_priority priority) const noexcept
             {
                 return fork_policy(priority);
@@ -177,21 +177,21 @@ namespace hpx
 
         struct sync_policy : policy_holder<sync_policy>
         {
-            HPX_CONSTEXPR sync_policy() noexcept
+            constexpr sync_policy() noexcept
               : policy_holder<sync_policy>(launch_policy::sync)
             {}
         };
 
         struct deferred_policy : policy_holder<deferred_policy>
         {
-            HPX_CONSTEXPR deferred_policy() noexcept
+            constexpr deferred_policy() noexcept
               : policy_holder<deferred_policy>(launch_policy::deferred)
             {}
         };
 
         struct apply_policy : policy_holder<apply_policy>
         {
-            HPX_CONSTEXPR apply_policy() noexcept
+            constexpr apply_policy() noexcept
               : policy_holder<apply_policy>(launch_policy::apply)
             {}
         };
@@ -211,12 +211,12 @@ namespace hpx
               , pred_(std::forward<F>(f))
             {}
 
-            HPX_CONSTEXPR launch_policy get_policy() const
+            constexpr launch_policy get_policy() const
             {
                 return pred_();
             }
 
-            HPX_CONSTEXPR bool is_valid() const noexcept
+            constexpr bool is_valid() const noexcept
             {
                 return true;
             }
@@ -227,7 +227,7 @@ namespace hpx
 
         struct select_policy_generator
         {
-            HPX_CONSTEXPR async_policy operator()(
+            constexpr async_policy operator()(
                 threads::thread_priority priority) const noexcept
             {
                 return async_policy(priority);
@@ -245,7 +245,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Left, typename Right>
-        HPX_CONSTEXPR inline policy_holder_base operator&(
+        constexpr inline policy_holder_base operator&(
             policy_holder<Left> const& lhs,
             policy_holder<Right> const& rhs) noexcept
         {
@@ -257,7 +257,7 @@ namespace hpx
         }
 
         template <typename Left, typename Right>
-        HPX_CONSTEXPR inline policy_holder_base operator|(
+        constexpr inline policy_holder_base operator|(
             policy_holder<Left> const& lhs,
             policy_holder<Right> const& rhs) noexcept
         {
@@ -269,7 +269,7 @@ namespace hpx
         }
 
         template <typename Left, typename Right>
-        HPX_CONSTEXPR inline policy_holder_base operator^(
+        constexpr inline policy_holder_base operator^(
             policy_holder<Left> const& lhs,
             policy_holder<Right> const& rhs) noexcept
         {
@@ -281,7 +281,7 @@ namespace hpx
         }
 
         template <typename Derived>
-        HPX_CONSTEXPR inline policy_holder<Derived>
+        constexpr inline policy_holder<Derived>
         operator~(policy_holder<Derived> const& p) noexcept
         {
             return policy_holder<Derived>(
@@ -315,14 +315,14 @@ namespace hpx
         }
 
         template <typename Left, typename Right>
-        HPX_CONSTEXPR inline bool operator==(policy_holder<Left> const& lhs,
+        constexpr inline bool operator==(policy_holder<Left> const& lhs,
             policy_holder<Right> const& rhs) noexcept
         {
             return static_cast<int>(lhs.policy()) == static_cast<int>(rhs.policy());
         }
 
         template <typename Left, typename Right>
-        HPX_CONSTEXPR inline bool operator!=(policy_holder<Left> const& lhs,
+        constexpr inline bool operator!=(policy_holder<Left> const& lhs,
             policy_holder<Right> const& rhs) noexcept
         {
             return !(lhs == rhs);
@@ -337,50 +337,50 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         /// Default constructor. This creates a launch policy representing all
         /// possible launch modes
-        HPX_CONSTEXPR launch() noexcept
+        constexpr launch() noexcept
           : detail::policy_holder<>{detail::launch_policy::all}
         {}
 
         /// \cond NOINTERNAL
         template <typename Derived>
-        HPX_CONSTEXPR launch(detail::policy_holder<Derived> const& ph) noexcept
+        constexpr launch(detail::policy_holder<Derived> const& ph) noexcept
           : detail::policy_holder<>{ph}
         {}
 
-        HPX_CONSTEXPR launch(detail::policy_holder_base const& ph) noexcept
+        constexpr launch(detail::policy_holder_base const& ph) noexcept
           : detail::policy_holder<>{ph}
         {}
         /// \endcond
 
         /// Create a launch policy representing asynchronous execution
-        HPX_CONSTEXPR launch(detail::async_policy) noexcept
+        constexpr launch(detail::async_policy) noexcept
           : detail::policy_holder<>{detail::launch_policy::async}
         {}
 
         /// Create a launch policy representing asynchronous execution. The
         /// new thread is executed in a preferred way
-        HPX_CONSTEXPR launch(detail::fork_policy) noexcept
+        constexpr launch(detail::fork_policy) noexcept
           : detail::policy_holder<>{detail::launch_policy::fork}
         {}
 
         /// Create a launch policy representing synchronous execution
-        HPX_CONSTEXPR launch(detail::sync_policy) noexcept
+        constexpr launch(detail::sync_policy) noexcept
           : detail::policy_holder<>{detail::launch_policy::sync}
         {}
 
         /// Create a launch policy representing deferred execution
-        HPX_CONSTEXPR launch(detail::deferred_policy) noexcept
+        constexpr launch(detail::deferred_policy) noexcept
           : detail::policy_holder<>{detail::launch_policy::deferred}
         {}
 
         /// Create a launch policy representing fire and forget execution
-        HPX_CONSTEXPR launch(detail::apply_policy) noexcept
+        constexpr launch(detail::apply_policy) noexcept
           : detail::policy_holder<>{detail::launch_policy::apply}
         {}
 
         /// Create a launch policy representing fire and forget execution
         template <typename F>
-        HPX_CONSTEXPR launch(detail::select_policy<F> const& p) noexcept
+        constexpr launch(detail::select_policy<F> const& p) noexcept
           : detail::policy_holder<>{p.policy()}
         {}
 
@@ -426,7 +426,7 @@ namespace hpx
     /// \cond NOINTERNAL
     namespace detail
     {
-        HPX_FORCEINLINE HPX_CONSTEXPR
+        HPX_FORCEINLINE constexpr
         bool has_async_policy(launch p) noexcept
         {
             return bool(
@@ -436,7 +436,7 @@ namespace hpx
         }
 
         template <typename F>
-        HPX_FORCEINLINE HPX_CONSTEXPR
+        HPX_FORCEINLINE constexpr
         bool has_async_policy(detail::policy_holder<F> const& p) noexcept
         {
             return bool(

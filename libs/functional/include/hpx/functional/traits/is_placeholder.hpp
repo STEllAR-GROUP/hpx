@@ -13,22 +13,16 @@
 
 #include <boost/bind/arg.hpp>
 
-#ifdef HPX_HAVE_CXX11_STD_IS_PLACEHOLDER
 #include <functional>
-#endif
 #include <type_traits>
 
 namespace hpx { namespace traits {
     template <typename T>
     struct is_placeholder
-#ifdef HPX_HAVE_CXX11_STD_IS_PLACEHOLDER
       : std::integral_constant<int,
             std::is_placeholder<T>::value != 0 ?
                 std::is_placeholder<T>::value :
                 boost::is_placeholder<T>::value>
-#else
-      : boost::is_placeholder<T>
-#endif
     {
     };
 

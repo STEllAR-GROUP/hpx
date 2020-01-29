@@ -81,7 +81,7 @@ namespace hpx { namespace actions
             }
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-            HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+            constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             Args const& data() const
             {
                 return *data_;
@@ -104,7 +104,7 @@ namespace hpx { namespace actions
 namespace hpx { namespace util
 {
     template <std::size_t I, typename Args>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::tuple_element<I, Args>::type&
     get(hpx::actions::detail::argument_holder<Args>& t)
     {
@@ -112,7 +112,7 @@ namespace hpx { namespace util
     }
 
     template <std::size_t I, typename Args>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::tuple_element<I, Args>::type const&
     get(hpx::actions::detail::argument_holder<Args> const& t)
     {
@@ -120,7 +120,7 @@ namespace hpx { namespace util
     }
 
     template <std::size_t I, typename Args>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::tuple_element<I, Args>::type&&
     get(hpx::actions::detail::argument_holder<Args>&& t)
     {
@@ -129,7 +129,7 @@ namespace hpx { namespace util
     }
 
     template <std::size_t I, typename Args>
-    HPX_CONSTEXPR HPX_HOST_DEVICE HPX_FORCEINLINE
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
     typename util::tuple_element<I, Args>::type const&&
     get(hpx::actions::detail::argument_holder<Args> const&& t)
     {
@@ -283,7 +283,7 @@ namespace hpx { namespace actions
     public:
         /// retrieve the N's argument
         template <std::size_t N>
-        HPX_CONSTEXPR inline
+        constexpr inline
         typename util::tuple_element<N, arguments_type>::type const&
         get() const
         {
@@ -343,7 +343,7 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t N, typename Action>
-    HPX_CONSTEXPR inline typename util::tuple_element<
+    constexpr inline typename util::tuple_element<
         N, typename transfer_action<Action>::arguments_type
     >::type const& get(transfer_base_action<Action> const& args)
     {

@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(true);
 
                 util::cancellation_token<> tok;
-                auto f1 = [tok, last, HPX_CAPTURE_FORWARD(pred)](
+                auto f1 = [tok, last, pred = std::forward<Pred>(pred)](
                               FwdIter part_begin,
                               std::size_t part_size) mutable -> bool {
                     FwdIter trail = part_begin++;
@@ -217,7 +217,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(std::move(last));
 
                 util::cancellation_token<difference_type> tok(count);
-                auto f1 = [tok, last, HPX_CAPTURE_FORWARD(pred)](
+                auto f1 = [tok, last, pred = std::forward<Pred>(pred)](
                               FwdIter part_begin, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     FwdIter trail = part_begin++;

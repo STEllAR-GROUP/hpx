@@ -14,7 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Older implementations of std::shared_ptr do not support binding function
 // pointers (see http//wg21.link/lwg3018)
-#if defined(HPX_HAVE_CXX11_SHARED_PTR_LWG3018)
+#if defined(HPX_HAVE_CXX11_STD_SHARED_PTR_LWG3018)
 
 #include <memory>
 

@@ -31,26 +31,26 @@ namespace hpx { namespace serialization {
         ///////////////////////////////////////////////////////////////////////
         struct basic_chunker
         {
-            HPX_CONSTEXPR basic_chunker(std::vector<serialization_chunk>*) {}
+            constexpr basic_chunker(std::vector<serialization_chunk>*) {}
 
-            HPX_CONSTEXPR static std::size_t get_chunk_size()
+            static constexpr std::size_t get_chunk_size()
             {
                 return 0;
             }
 
             static void set_chunk_size(std::size_t) {}
 
-            HPX_CONSTEXPR static std::uint8_t get_chunk_type()
+            static constexpr std::uint8_t get_chunk_type()
             {
                 return chunk_type_index;
             }
 
-            HPX_CONSTEXPR static std::size_t get_chunk_data_index()
+            static constexpr std::size_t get_chunk_data_index()
             {
                 return 0;
             }
 
-            HPX_CONSTEXPR static std::size_t get_num_chunks()
+            static constexpr std::size_t get_num_chunks()
             {
                 return 1;
             }

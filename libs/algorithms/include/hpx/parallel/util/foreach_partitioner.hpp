@@ -206,9 +206,9 @@ namespace hpx { namespace parallel { namespace util {
 #else
                 // wait for all tasks to finish
                 return hpx::dataflow(
-                    [last, HPX_CAPTURE_MOVE(errors),
-                        HPX_CAPTURE_MOVE(scoped_params),
-                        HPX_CAPTURE_FORWARD(f)](
+                    [last, errors = std::move(errors),
+                        scoped_params = std::move(scoped_params),
+                        f = std::forward<F>(f)](
                         std::vector<hpx::future<Result>>&& r1,
                         std::vector<hpx::future<Result>>&& r2) mutable
                     -> FwdIter {

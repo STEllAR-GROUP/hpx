@@ -34,7 +34,7 @@ on how to write CMake-based projects.
 Basic CMake usage
 -----------------
 
-This section explains basic aspects of |cmake|, specifically options needed for     
+This section explains basic aspects of |cmake|, specifically options needed for
 day-to-day usage.
 
 CMake comes with extensive documentation in the form of html files and on the
@@ -130,7 +130,7 @@ value. You can also undefine a variable:
 Variables are stored on the CMake cache. This is a file named ``CMakeCache.txt``
 on the root of the build directory. Do not hand-edit it.
 
-Variables are listed here appending its type after a colon. You should write the 
+Variables are listed here appending its type after a colon. You should write the
 variable and the type on the CMake command line:
 
 .. code-block:: bash
@@ -339,7 +339,7 @@ listed below.
      * Minimum version
      * Notes
    * * |papi|
-     * 
+     *
      *
      * Used for accessing hardware performance data.
    * * |jemalloc|_
@@ -570,10 +570,7 @@ of those features. That is, the default will be the highest C++ standard version
 available. If you want to force |hpx| to use a specific C++ standard version, you
 can use the following CMake variables:
 
-* ``HPX_WITH_CXX0X``: Enables Pre-C++11 support (This is the minimum required
-  mode on older gcc versions).
-* ``HPX_WITH_CXX11``: Enables C++11 support
-* ``HPX_WITH_CXX14``: Enables C++14 support
+* ``HPX_WITH_CXX14``: Enables C++14 support (this is the minimum requirement)
 * ``HPX_WITH_CXX17``: Enables C++17 support
 * ``HPX_WITH_CXX2A``: Enables (experimental) C++20 support
 
@@ -589,7 +586,7 @@ support). The |cmake| variable used to set the build type is
 <https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html>`_).
 Available build types are:
 
-* **Debug**: Full debug symbols are available as well as additional assertions to 
+* **Debug**: Full debug symbols are available as well as additional assertions to
   help debugging. To enable the debug build type for the |hpx| API, the C++ Macro
   ``HPX_DEBUG`` is defined.
 * **RelWithDebInfo**: Release build with debugging symbols. This is most useful
@@ -1225,7 +1222,7 @@ Building |hpx|
 ..............
 
 After all the prerequisites have been successfully installed, we can now start
-building and installing |hpx|. The build procedure is almost the same as the one 
+building and installing |hpx|. The build procedure is almost the same as the one
 for :ref:`unix_installation` with the sole difference that you have to enable the
 Xeon Phi in the CMake Build system. This is achieved by invoking CMake in the
 following way:

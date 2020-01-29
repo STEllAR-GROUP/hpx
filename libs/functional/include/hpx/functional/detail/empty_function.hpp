@@ -35,9 +35,9 @@ namespace hpx { namespace util { namespace detail {
 // NOTE: nvcc (at least CUDA 9.2 and 10.1) fails with an internal compiler error
 // ("there was an error in verifying the lgenfe output!") with this enabled, so
 // we explicitly use the fallback.
-#if defined(HPX_HAVE_CXX11_CONSTEXPR) && !defined(HPX_HAVE_CUDA)
+#if !defined(HPX_HAVE_CUDA)
             template <typename Sig>
-            HPX_CONSTEXPR function_vtable<Sig, true> const*
+            constexpr function_vtable<Sig, true> const*
             get_empty_function_vtable() noexcept
             {
                 return &vtables<function_vtable<Sig, true>,

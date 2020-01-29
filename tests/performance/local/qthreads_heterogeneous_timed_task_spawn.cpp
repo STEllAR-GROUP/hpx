@@ -218,15 +218,9 @@ int qthreads_main(
         }
 
         // Randomly shuffle the entire sequence to deal with drift.
-#if defined(HPX_HAVE_CXX11_STD_SHUFFLE)
         std::random_device random_device;
         std::mt19937 generator(random_device());
         std::shuffle(payloads.begin(), payloads.end(), std::move(generator));
-#else
-        using hpx::util::placeholders::_1;
-        std::random_shuffle(payloads.begin(), payloads.end(),
-            hpx::util::bind(&shuffler, std::ref(prng), _1));
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Validate the payloads.

@@ -63,7 +63,7 @@ namespace hpx { namespace threads { namespace executors {
     // --------------------------------------------------------------------
     struct future_extract_value
     {
-        template <typename T, template <typename> class Future>
+        template<typename T, template <typename> class Future>
         const T& operator()(const Future<T>& el) const
         {
             const auto& state = traits::detail::get_shared_state(el);
@@ -301,7 +301,7 @@ namespace hpx { namespace threads { namespace executors {
             // the real task will be spawned on a new task with hints - as intended
             return dataflow(
                 launch::sync,
-                [HPX_CAPTURE_FORWARD(f), this](
+                [f = std::forward<F>(f), this](
                     Future&& predecessor, Ts&&... ts) {
                     pre_execution_then_domain_schedule<pool_executor,
                         pool_numa_hint<Tag>>
@@ -359,7 +359,7 @@ namespace hpx { namespace threads { namespace executors {
             // Please see notes for previous then_execute function above
             return dataflow(
                 launch::sync,
-                [HPX_CAPTURE_FORWARD(f), this](
+                [f = std::forward<F>(f), this](
                     OuterFuture<util::tuple<InnerFutures...>>&& predecessor,
                     Ts&&... ts) {
                     pre_execution_then_domain_schedule<pool_executor,

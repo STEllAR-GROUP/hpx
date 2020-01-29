@@ -78,7 +78,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef
                     typename std::iterator_traits<FwdIter>::reference reference;
 
-                auto f1 = [r, HPX_CAPTURE_FORWARD(conv)](
+                auto f1 = [r, conv = std::forward<Convert>(conv)](
                               FwdIter part_begin, std::size_t part_size) -> T {
                     T val = hpx::util::invoke(conv, *part_begin);
                     return util::accumulate_n(++part_begin, --part_size,
@@ -94,12 +94,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, T>::call(
                     std::forward<ExPolicy>(policy), first,
                     std::distance(first, last), std::move(f1),
-                    hpx::util::unwrapping(
-                        [HPX_CAPTURE_FORWARD(init), HPX_CAPTURE_FORWARD(r)](
-                            std::vector<T>&& results) -> T {
-                            return util::accumulate_n(hpx::util::begin(results),
-                                hpx::util::size(results), init, r);
-                        }));
+                    hpx::util::unwrapping([init = std::forward<T_>(init),
+                                              r = std::forward<Reduce>(r)](
+                                              std::vector<T>&& results) -> T {
+                        return util::accumulate_n(hpx::util::begin(results),
+                            hpx::util::size(results), init, r);
+                    }));
             }
         };
 

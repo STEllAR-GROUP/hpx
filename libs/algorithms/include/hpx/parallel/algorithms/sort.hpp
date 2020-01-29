@@ -82,7 +82,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (std::size_t(N) <= chunk_size)
             {
                 return execution::async_execute(policy.executor(),
-                    [first, last, HPX_CAPTURE_MOVE(comp)]() -> RandomIt {
+                    [first, last, comp = std::move(comp)]() -> RandomIt {
                         std::sort(first, last, comp);
                         return last;
                     });

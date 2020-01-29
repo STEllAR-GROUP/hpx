@@ -70,15 +70,10 @@ namespace hpx { namespace traits
         template <typename Future, typename F>
         struct continuation_not_callable
         {
-#if defined(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
             static auto error(Future future, F& f)
             {
                 f(std::move(future));
             }
-#else
-            static auto error(Future future, F& f)
-             -> decltype(f(std::move(future)));
-#endif
 
             using type = decltype(
                 error(std::declval<Future>(), std::declval<F&>()));

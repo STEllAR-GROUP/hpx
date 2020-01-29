@@ -229,7 +229,7 @@ namespace tag                                                                 \
             {                                                                 \
                 return hpx::util::get<I>(static_cast<Derived&>(*this));       \
             }                                                                 \
-            HPX_CONSTEXPR HPX_FORCEINLINE Type const& NAME() const            \
+            constexpr HPX_FORCEINLINE Type const& NAME() const                \
             {                                                                 \
                 return hpx::util::get<I>(static_cast<Derived const&>(*this)); \
             }                                                                 \

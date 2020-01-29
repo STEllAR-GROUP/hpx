@@ -186,12 +186,7 @@ namespace hpx {
         E&& e, exception_info&& xi = exception_info())
     {
         using ED = typename std::decay<E>::type;
-        static_assert(
-#if defined(HPX_HAVE_CXX14_STD_IS_FINAL)
-            std::is_class<ED>::value && !std::is_final<ED>::value,
-#else
-            std::is_class<ED>::value,
-#endif
+        static_assert(std::is_class<ED>::value && !std::is_final<ED>::value,
             "E shall be a valid base class");
         static_assert(!std::is_base_of<exception_info, ED>::value,
             "E shall not derive from exception_info");

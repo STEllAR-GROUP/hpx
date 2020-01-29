@@ -24,15 +24,14 @@ namespace hpx { namespace util { namespace detail {
     template <typename VTable, typename T>
     struct vtables
     {
-        static HPX_CONSTEXPR_OR_CONST VTable instance =
-            detail::construct_vtable<T>();
+        static constexpr VTable instance = detail::construct_vtable<T>();
     };
 
     template <typename VTable, typename T>
-    HPX_CONSTEXPR_OR_CONST VTable vtables<VTable, T>::instance;
+    constexpr VTable vtables<VTable, T>::instance;
 
     template <typename VTable, typename T>
-    HPX_CONSTEXPR VTable const* get_vtable() noexcept
+    constexpr VTable const* get_vtable() noexcept
     {
         static_assert(
             !std::is_reference<T>::value, "T shall have no ref-qualifiers");
@@ -88,7 +87,7 @@ namespace hpx { namespace util { namespace detail {
         void (*deallocate)(void*, std::size_t storage_size, bool);
 
         template <typename T>
-        HPX_CONSTEXPR vtable(construct_vtable<T>) noexcept
+        constexpr vtable(construct_vtable<T>) noexcept
           : deallocate(&vtable::template _deallocate<T>)
         {
         }

@@ -762,7 +762,7 @@ struct duplicate_mapper
 struct zero_mapper
 {
     template <typename T>
-    auto operator()(T arg) -> decltype(hpx::util::spread_this())
+    decltype(auto) operator()(T arg)
     {
         return hpx::util::spread_this();
     }

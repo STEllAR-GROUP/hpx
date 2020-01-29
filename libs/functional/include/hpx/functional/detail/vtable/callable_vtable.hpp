@@ -54,7 +54,7 @@ namespace hpx { namespace util { namespace detail {
 #endif
 
         template <typename T>
-        HPX_CONSTEXPR callable_info_vtable(construct_vtable<T>) noexcept
+        constexpr callable_info_vtable(construct_vtable<T>) noexcept
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
           : get_function_address(
                 &callable_info_vtable::template _get_function_address<T>)
@@ -68,7 +68,7 @@ namespace hpx { namespace util { namespace detail {
         {
         }
 
-        HPX_CONSTEXPR callable_info_vtable(
+        constexpr callable_info_vtable(
             construct_vtable<empty_function>) noexcept
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
           : get_function_address(nullptr)
@@ -96,7 +96,7 @@ namespace hpx { namespace util { namespace detail {
         R (*invoke)(void*, Ts&&...);
 
         template <typename T>
-        HPX_CONSTEXPR callable_vtable(construct_vtable<T>) noexcept
+        constexpr callable_vtable(construct_vtable<T>) noexcept
           : invoke(&callable_vtable::template _invoke<T>)
         {
         }
@@ -106,7 +106,7 @@ namespace hpx { namespace util { namespace detail {
             return throw_bad_function_call<R>();
         }
 
-        HPX_CONSTEXPR callable_vtable(construct_vtable<empty_function>) noexcept
+        constexpr callable_vtable(construct_vtable<empty_function>) noexcept
           : invoke(&callable_vtable::_empty_invoke)
         {
         }

@@ -28,7 +28,7 @@ namespace hpx { namespace util {
         public:
 #if !defined(HPX_DISABLE_ASSERTS)
             // default constructor is needed for serialization
-            HPX_CONSTEXPR one_shot_wrapper()
+            constexpr one_shot_wrapper()
               : _called(false)
             {
             }
@@ -36,13 +36,13 @@ namespace hpx { namespace util {
             template <typename F_,
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
-            HPX_CONSTEXPR explicit one_shot_wrapper(F_&& f)
+            constexpr explicit one_shot_wrapper(F_&& f)
               : _f(std::forward<F_>(f))
               , _called(false)
             {
             }
 
-            HPX_CXX14_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)
+            constexpr one_shot_wrapper(one_shot_wrapper&& other)
               : _f(std::move(other._f))
               , _called(other._called)
             {
@@ -57,17 +57,17 @@ namespace hpx { namespace util {
             }
 #else
             // default constructor is needed for serialization
-            HPX_CONSTEXPR one_shot_wrapper() {}
+            constexpr one_shot_wrapper() {}
 
             template <typename F_,
                 typename = typename std::enable_if<
                     std::is_constructible<F, F_>::value>::type>
-            HPX_CONSTEXPR explicit one_shot_wrapper(F_&& f)
+            constexpr explicit one_shot_wrapper(F_&& f)
               : _f(std::forward<F_>(f))
             {
             }
 
-            HPX_CONSTEXPR one_shot_wrapper(one_shot_wrapper&& other)
+            constexpr one_shot_wrapper(one_shot_wrapper&& other)
               : _f(std::move(other._f))
             {
             }
@@ -76,7 +76,7 @@ namespace hpx { namespace util {
 #endif
 
             template <typename... Ts>
-            HPX_CXX14_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename util::invoke_result<F, Ts...>::type
                 operator()(Ts&&... vs)
             {
@@ -126,8 +126,8 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename F>
-    HPX_CONSTEXPR detail::one_shot_wrapper<typename std::decay<F>::type>
-    one_shot(F&& f)
+    constexpr detail::one_shot_wrapper<typename std::decay<F>::type> one_shot(
+        F&& f)
     {
         typedef detail::one_shot_wrapper<typename std::decay<F>::type>
             result_type;

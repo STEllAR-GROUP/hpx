@@ -47,7 +47,7 @@ namespace hpx { namespace memory {
     public:
         using element_type = T;
 
-        HPX_CONSTEXPR intrusive_ptr() noexcept
+        constexpr intrusive_ptr() noexcept
           : px(nullptr)
         {
         }

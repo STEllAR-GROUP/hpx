@@ -174,8 +174,10 @@ namespace hpx { namespace parallel { namespace util {
                 return hpx::make_ready_future();
 #else
                 return hpx::dataflow(
-                    [HPX_CAPTURE_MOVE(errors), HPX_CAPTURE_MOVE(scoped_params),
-                        HPX_CAPTURE_FORWARD(f), HPX_CAPTURE_FORWARD(cleanup)](
+                    [errors = std::move(errors),
+                        scoped_params = std::move(scoped_params),
+                        f = std::forward<F>(f),
+                        cleanup = std::forward<Cleanup>(cleanup)](
                         std::vector<hpx::future<Result>>&& r) mutable -> R {
                         HPX_UNUSED(scoped_params);
 

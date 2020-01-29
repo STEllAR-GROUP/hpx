@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        HPX_CXX14_CONSTEXPR static void finalize() {}
+        static constexpr void finalize() {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
@@ -123,7 +123,7 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, load128);
 
         // This component type requires valid id for its actions to be invoked
-        HPX_CONSTEXPR static bool is_target_valid(naming::id_type const&)
+        static constexpr bool is_target_valid(naming::id_type const&)
         {
             return true;
         }

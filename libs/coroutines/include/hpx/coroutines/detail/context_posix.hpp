@@ -170,7 +170,7 @@ namespace hpx { namespace threads { namespace coroutines {
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
-        HPX_CONSTEXPR prepare_main_thread() {}
+        constexpr prepare_main_thread() {}
     };
 
     namespace detail { namespace posix {

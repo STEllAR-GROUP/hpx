@@ -190,7 +190,7 @@ namespace hpx { namespace components
                     id, count, std::forward<Ts>(vs)...);
 
             return f.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(id)](
+                [id = std::move(id)](
                     hpx::future<std::vector<hpx::id_type> > && f
                 ) -> std::vector<bulk_locality_result>
                 {

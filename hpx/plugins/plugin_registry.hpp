@@ -97,10 +97,10 @@ namespace hpx { namespace plugins
     /**/
 #define HPX_REGISTER_PLUGIN_REGISTRY_5(                                        \
         PluginType, pluginname, pluginstring, pluginsection, pluginsuffix)     \
-    HPX_CXX14_CONSTEXPR char __##pluginname##_string[] =                       \
+    constexpr char __##pluginname##_string[] =                                 \
         HPX_PP_STRINGIZE(pluginstring);                                        \
-    HPX_CXX14_CONSTEXPR char __##pluginname##_section[] = pluginsection;       \
-    HPX_CXX14_CONSTEXPR char __##pluginname##_suffix[] = pluginsuffix;         \
+    constexpr char __##pluginname##_section[] = pluginsection;                 \
+    constexpr char __##pluginname##_suffix[] = pluginsuffix;                   \
     typedef hpx::plugins::plugin_registry<PluginType, __##pluginname##_string, \
         __##pluginname##_section, __##pluginname##_suffix>                     \
         __##pluginname##_plugin_registry_type;                                 \

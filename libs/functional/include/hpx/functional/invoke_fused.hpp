@@ -67,9 +67,8 @@ namespace hpx { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t... Is, typename F, typename Tuple>
-        HPX_CONSTEXPR HPX_HOST_DEVICE
-            typename invoke_fused_result<F, Tuple>::type
-            invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t)
+        constexpr HPX_HOST_DEVICE typename invoke_fused_result<F, Tuple>::type
+        invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t)
         {
             return HPX_INVOKE(
                 std::forward<F>(f), util::get<Is>(std::forward<Tuple>(t))...);
@@ -94,7 +93,7 @@ namespace hpx { namespace util {
     ///
     /// \note This function is similar to `std::apply` (C++17)
     template <typename F, typename Tuple>
-    HPX_CONSTEXPR HPX_HOST_DEVICE
+    constexpr HPX_HOST_DEVICE
         typename detail::invoke_fused_result<F, Tuple>::type
         invoke_fused(F&& f, Tuple&& t)
     {
@@ -108,7 +107,7 @@ namespace hpx { namespace util {
     /// \tparam R The result type of the function when it's called
     ///           with the content of the given sequenced type.
     template <typename R, typename F, typename Tuple>
-    HPX_CONSTEXPR HPX_HOST_DEVICE R invoke_fused_r(F&& f, Tuple&& t)
+    constexpr HPX_HOST_DEVICE R invoke_fused_r(F&& f, Tuple&& t)
     {
         using index_pack = typename detail::fused_index_pack<Tuple>::type;
         return util::void_guard<R>(),
@@ -122,7 +121,7 @@ namespace hpx { namespace util {
         struct invoke_fused
         {
             template <typename F, typename Tuple>
-            HPX_CONSTEXPR HPX_HOST_DEVICE
+            constexpr HPX_HOST_DEVICE
                 typename util::detail::invoke_fused_result<F, Tuple>::type
                 operator()(F&& f, Tuple&& t) const
             {
@@ -137,7 +136,7 @@ namespace hpx { namespace util {
         struct invoke_fused_r
         {
             template <typename F, typename Tuple>
-            HPX_CONSTEXPR HPX_HOST_DEVICE R operator()(F&& f, Tuple&& t) const
+            constexpr HPX_HOST_DEVICE R operator()(F&& f, Tuple&& t) const
             {
                 using index_pack =
                     typename util::detail::fused_index_pack<Tuple>::type;

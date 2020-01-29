@@ -735,7 +735,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
-                [HPX_CAPTURE_MOVE(this_), HPX_CAPTURE_FORWARD(init)]() {
+                [this_ = std::move(this_),
+                    init = std::forward<Result_>(init)]() {
                     this_->set_value(init);
                 },
                 "timed_future_data<Result>::timed_future_data",

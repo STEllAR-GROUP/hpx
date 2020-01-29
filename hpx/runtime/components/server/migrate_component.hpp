@@ -307,7 +307,7 @@ namespace hpx { namespace components { namespace server
                     // mark object in AGAS as being migrated first
                     return agas::begin_migration(to_migrate).then(
                         launch::sync,
-                        [HPX_CAPTURE_MOVE(ptr), to_migrate, policy](
+                        [ptr = std::move(ptr), to_migrate, policy](
                             hpx::future<bm_result> && bmf) mutable
                         -> future<id_type>
                     {

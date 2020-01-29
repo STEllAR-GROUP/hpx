@@ -197,7 +197,7 @@ namespace hpx { namespace lcos {
             {
                 std::unique_lock<mutex_type> l(mtx_);
 
-                auto on_ready = [this, HPX_CAPTURE_MOVE(op)](
+                auto on_ready = [this, op = std::move(op)](
                                     hpx::shared_future<void> f) mutable -> T {
                     f.get();    // propagate any exceptions
 
@@ -268,7 +268,7 @@ namespace hpx { namespace lcos {
                 basename, hpx::unmanaged(target), site);
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(target), HPX_CAPTURE_MOVE(basename)](
+                [target = std::move(target), basename = std::move(basename)](
                     hpx::future<bool>&& f) -> hpx::id_type {
                     bool result = f.get();
                     if (!result)
@@ -326,7 +326,7 @@ namespace hpx { namespace lcos {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
 
         auto all_reduce_data =
-            [HPX_CAPTURE_FORWARD(op), this_site](hpx::future<hpx::id_type>&& f,
+            [op = std::forward<F>(op), this_site](hpx::future<hpx::id_type>&& f,
                 hpx::future<T>&& local_result) mutable -> hpx::future<T> {
             using func_type = typename std::decay<F>::type;
             using action_type = typename detail::all_reduce_server<
@@ -338,7 +338,7 @@ namespace hpx { namespace lcos {
                 local_result.get(), std::forward<F>(op));
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(id)](hpx::future<T>&& f) -> T {
+                [id = std::move(id)](hpx::future<T>&& f) -> T {
                     HPX_UNUSED(id);
                     return f.get();
                 });
@@ -390,7 +390,8 @@ namespace hpx { namespace lcos {
 
         using arg_type = typename std::decay<T>::type;
         auto all_reduce_data_direct =
-            [HPX_CAPTURE_FORWARD(op), HPX_CAPTURE_FORWARD(local_result),
+            [op = std::forward<F>(op),
+                local_result = std::forward<T>(local_result),
                 this_site](hpx::future<hpx::id_type>&& f) mutable
             -> hpx::future<arg_type> {
             using func_type = typename std::decay<F>::type;
@@ -403,7 +404,7 @@ namespace hpx { namespace lcos {
                 std::forward<T>(local_result), std::forward<F>(op));
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(id)](hpx::future<arg_type>&& f) -> arg_type {
+                [id = std::move(id)](hpx::future<arg_type>&& f) -> arg_type {
                     HPX_UNUSED(id);
                     return f.get();
                 });

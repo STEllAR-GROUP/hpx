@@ -21,52 +21,10 @@ namespace hpx { namespace util {
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // f(t0, t1, ..., tN)
-#if HPX_HAS_CXX14_LIB_RESULT_OF_SFINAE
         template <typename T>
         struct result_of_function_object : std::result_of<T>
         {
         };
-#else
-        namespace result_of_function_object_impl {
-            struct fallback
-            {
-                template <typename T>
-                fallback(T const&)
-                {
-                }
-            };
-
-            template <typename... Ts>
-            fallback invoke(fallback, Ts&&...);
-
-            template <typename F, typename... Ts>
-            decltype(std::declval<F>()(std::declval<Ts>()...)) invoke(
-                F&&, Ts&&...);
-
-            template <typename T>
-            struct result_of_invoke;
-
-            template <typename F, typename... Ts>
-            struct result_of_invoke<F(Ts...)>
-            {
-                typedef decltype(result_of_function_object_impl::invoke(
-                    std::declval<F>(), std::declval<Ts>()...)) type;
-            };
-
-            template <typename T,
-                typename R = typename result_of_invoke<T>::type>
-            struct result_of_function_object
-            {
-                typedef R type;
-            };
-
-            template <typename T>
-            struct result_of_function_object<T, fallback>
-            {
-            };
-        }    // namespace result_of_function_object_impl
-        using result_of_function_object_impl::result_of_function_object;
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>

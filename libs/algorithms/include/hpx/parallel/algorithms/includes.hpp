@@ -153,7 +153,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, bool>::call(
                     std::forward<ExPolicy>(policy), first2,
                     std::distance(first2, last2),
-                    [first1, last1, first2, last2, tok, HPX_CAPTURE_FORWARD(f)](
+                    [first1, last1, first2, last2, tok, f = std::forward<F>(f)](
                         FwdIter2 part_begin,
                         std::size_t part_count) mutable -> bool {
                         FwdIter2 part_end =

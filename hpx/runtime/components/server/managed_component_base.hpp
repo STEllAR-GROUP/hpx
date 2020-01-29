@@ -46,7 +46,7 @@ namespace hpx { namespace components
         struct init<traits::construct_with_back_ptr>
         {
             template <typename Component, typename Managed>
-            HPX_CXX14_CONSTEXPR static void call(Component* component,
+            static constexpr void call(Component* component,
                 Managed* this_)
             {
             }
@@ -101,7 +101,7 @@ namespace hpx { namespace components
         struct destroy_backptr<traits::managed_object_controls_lifetime>
         {
             template <typename BackPtr>
-            HPX_CXX14_CONSTEXPR static void call(BackPtr*)
+            static constexpr void call(BackPtr*)
             {
                 // The managed_component's lifetime is controlled by the
                 // component implementation. Do nothing.
@@ -118,7 +118,7 @@ namespace hpx { namespace components
         struct manage_lifetime<traits::managed_object_is_lifetime_controlled>
         {
             template <typename Component>
-            HPX_CXX14_CONSTEXPR static void call(Component*)
+            static constexpr void call(Component*)
             {
                 // The managed_component's lifetime is controlled by the
                 // component implementation. Do nothing.
@@ -150,12 +150,12 @@ namespace hpx { namespace components
             }
 
             template <typename Component>
-            HPX_CXX14_CONSTEXPR static void addref(Component*)
+            static constexpr void addref(Component*)
             {
             }
 
             template <typename Component>
-            HPX_CXX14_CONSTEXPR static void release(Component*)
+            static constexpr void release(Component*)
             {
             }
         };
@@ -169,13 +169,13 @@ namespace hpx { namespace components
         {
             /// \brief finalize() will be called just before the instance gets
             ///        destructed
-            HPX_CXX14_CONSTEXPR static void finalize() {}
+            static constexpr void finalize() {}
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-            HPX_CXX14_CONSTEXPR static void mark_as_migrated()
+            static constexpr void mark_as_migrated()
             {
             }
-            HPX_CXX14_CONSTEXPR static void on_migrated()
+            static constexpr void on_migrated()
             {
             }
 #else
@@ -379,7 +379,7 @@ namespace hpx { namespace components
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
         ///
-        HPX_CXX14_CONSTEXPR static void finalize() {}
+        static constexpr void finalize() {}
 
         /// \brief Return a pointer to the wrapped instance
         /// \note  Caller must check validity of returned pointer
@@ -462,8 +462,7 @@ namespace hpx { namespace components
 #endif
 
     private:
-#if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS) && !defined(__NVCC__) && \
-    !defined(__CUDACC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
         // declare friends which are allowed to access get_base_gid()
         friend Component;
 

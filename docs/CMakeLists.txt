@@ -79,10 +79,7 @@ set(doxygen_definition_list
     "HPX_API_EXPORT="
     "HPX_ALWAYS_EXPORT="
     "extern="
-    "HPX_NOEXCEPT="
-    "HPX_CONSTEXPR="
     "HPX_FORCEINLINE="
-    "HPX_INLINE_NAMESPACE(x)=namespace x"
     "HPX_CONCEPT_REQUIRES_(...)=")
 
 # Definitions for autodoc.doxy.in

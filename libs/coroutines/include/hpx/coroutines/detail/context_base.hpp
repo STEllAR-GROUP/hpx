@@ -64,7 +64,7 @@
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     /////////////////////////////////////////////////////////////////////////////
-    HPX_CONSTEXPR std::ptrdiff_t const default_stack_size = -1;
+    constexpr std::ptrdiff_t const default_stack_size = -1;
 
     template <typename CoroutineImpl>
     class context_base : public default_context_impl<CoroutineImpl>

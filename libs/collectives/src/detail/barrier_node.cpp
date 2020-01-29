@@ -143,7 +143,7 @@ namespace hpx { namespace lcos { namespace detail {
         if (rank_ == 0)
         {
             return future.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(this_)](hpx::future<void>&& f) {
+                [this_ = std::move(this_)](hpx::future<void>&& f) {
                     // Trigger possible errors...
                     f.get();
 
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         return future.then(hpx::launch::sync,
-            [HPX_CAPTURE_MOVE(this_)](hpx::future<void>&& f) {
+            [this_ = std::move(this_)](hpx::future<void>&& f) {
                 // Trigger possible errors...
                 f.get();
 
@@ -197,7 +197,7 @@ namespace hpx { namespace lcos { namespace detail {
         hpx::intrusive_ptr<barrier_node> this_(this);
         // Once we know that all our children entered the barrier, we flag ourself
         return hpx::when_all(futures).then(
-            hpx::launch::sync, [HPX_CAPTURE_MOVE(this_)](hpx::future<void> f) {
+            hpx::launch::sync, [this_ = std::move(this_)](hpx::future<void> f) {
                 // Trigger possible errors...
                 f.get();
                 return this_->gather_promise_.get_future();
@@ -226,7 +226,7 @@ namespace hpx { namespace lcos { namespace detail {
         // Once we notified our children, we mark ourself ready.
         hpx::intrusive_ptr<barrier_node> this_(this);
         hpx::when_all(futures).then(
-            hpx::launch::sync, [HPX_CAPTURE_MOVE(this_)](future<void> f) {
+            hpx::launch::sync, [this_ = std::move(this_)](future<void> f) {
                 // Trigger possible errors...
                 f.get();
                 this_->broadcast_promise_.set_value();

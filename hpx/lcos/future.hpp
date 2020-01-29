@@ -1167,10 +1167,8 @@ namespace hpx { namespace lcos
         >::type
         convert_future_helper(Future && f, Conv && conv) //-V659
         {
-            return f.then(
-                hpx::launch::sync,
-                [HPX_CAPTURE_FORWARD(conv)](Future && f) -> T
-                {
+            return f.then(hpx::launch::sync,
+                [conv = std::forward<Conv>(conv)](Future&& f) -> T {
                     return hpx::util::invoke(conv, f.get());
                 });
         }
@@ -1454,10 +1452,8 @@ namespace hpx { namespace lcos
             "the argument type must be convertible to the requested "
             "result type by using the supplied conversion function");
 
-        return f.then(
-                hpx::launch::sync,
-            [HPX_CAPTURE_FORWARD(conv)](hpx::shared_future<U> const& f)
-            {
+        return f.then(hpx::launch::sync,
+            [conv = std::forward<Conv>(conv)](hpx::shared_future<U> const& f) {
                 return hpx::util::invoke(conv, f.get());
             });
     }

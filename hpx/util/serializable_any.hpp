@@ -121,7 +121,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(
                 detail::any::get_table<detail::any::empty>::template get<IArch,
                     OArch, Char, std::true_type>())

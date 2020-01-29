@@ -399,18 +399,14 @@ endif()
 ################################################################################
 # Native TLS configuration
 ################################################################################
-set(HPX_WITH_NATIVE_TLS_DEFAULT ON)
-if(APPLE)
-  set(HPX_WITH_NATIVE_TLS_DEFAULT ${HPX_WITH_CXX11_THREAD_LOCAL})
-endif()
 hpx_option(HPX_WITH_NATIVE_TLS BOOL
   "Use native TLS support if available (default: ${HPX_WITH_NATIVE_TLS_DEFAULT})"
-  ${HPX_WITH_NATIVE_TLS_DEFAULT} ADVANCED)
+  ON ADVANCED)
 if(HPX_WITH_NATIVE_TLS)
   hpx_info("Native TLS is enabled.")
   hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
 else()
-  hpx_info("Native TLS is disabled.")
+  hpx_error("Native TLS is disabled. HPX requires native TLS. This option will be removed in a future release.")
 endif()
 
 ################################################################################
@@ -1139,38 +1135,11 @@ hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS PUBLIC
 include(HPX_DetectCppDialect)
 hpx_detect_cpp_dialect()
 
-# Store option value passed by an user for HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION.
-if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
-  set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_ADVANCED )
-  set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_GIVEN ON)
-else()
-  set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_ADVANCED ADVANCED)
-  set(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_GIVEN OFF)
-endif()
-
 ################################################################################
 # C++ feature tests
 ################################################################################
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
-
-# Exceptional handling for non-clang CUDA.
-if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
-  if(HPX_WITH_CUDA AND NOT HPX_WITH_CUDA_CLANG)
-    # means using default value (given value).
-    unset(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
-  endif()
-endif()
-
-# HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION
-# Default value is used only when HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION is not defined.
-hpx_option(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION BOOL
-  "Enable the use of auto as a return value in some places. Overriding this flag is only necessary if the C++ compiler is not standard compliant, e.g. nvcc."
-  ${HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_GIVEN}
-  ${HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION_ADVANCED})
-if(HPX_WITH_CXX14_RETURN_TYPE_DEDUCTION)
-  hpx_add_config_define(HPX_HAVE_CXX14_RETURN_TYPE_DEDUCTION)
-endif()
 
 ################################################################################
 # Set configuration option to use Boost.Context or not. This depends on the

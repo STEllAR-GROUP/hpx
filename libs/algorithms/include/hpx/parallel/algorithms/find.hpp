@@ -210,7 +210,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                auto f1 = [HPX_CAPTURE_FORWARD(f), tok](FwdIter it,
+                auto f1 = [f = std::forward<F>(f), tok](FwdIter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_size, tok,
@@ -372,7 +372,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                auto f1 = [HPX_CAPTURE_FORWARD(f), tok](FwdIter it,
+                auto f1 = [f = std::forward<F>(f), tok](FwdIter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_size, tok,
@@ -542,8 +542,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::greater<difference_type>>
                     tok(-1);
 
-                auto f1 = [count, diff, tok, first2, HPX_CAPTURE_FORWARD(op),
-                              HPX_CAPTURE_FORWARD(proj)](FwdIter it,
+                auto f1 = [count, diff, tok, first2,
+                              op = std::forward<Pred>(op),
+                              proj = std::forward<Proj>(proj)](FwdIter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     FwdIter curr = it;
@@ -769,9 +770,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<difference_type> tok(count);
 
-                auto f1 = [s_first, s_last, tok, HPX_CAPTURE_FORWARD(op),
-                              HPX_CAPTURE_FORWARD(proj1),
-                              HPX_CAPTURE_FORWARD(proj2)](FwdIter it,
+                auto f1 = [s_first, s_last, tok, op = std::forward<Pred>(op),
+                              proj1 = std::forward<Proj1>(proj1),
+                              proj2 = std::forward<Proj2>(proj2)](FwdIter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     util::loop_idx_n(base_idx, it, part_size, tok,

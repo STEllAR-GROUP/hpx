@@ -272,26 +272,26 @@ namespace util {
                 return *this;
             }
 
-            HPX_CONSTEXPR auto operator*() const noexcept
+            constexpr auto operator*() const noexcept
                 -> decltype(util::get<Begin>(*target_))
             {
                 return util::get<Begin>(*target_);
             }
 
             template <std::size_t Position>
-            HPX_CONSTEXPR static_async_range<Target, Position, End> relocate()
+            constexpr static_async_range<Target, Position, End> relocate()
                 const noexcept
             {
                 return static_async_range<Target, Position, End>{target_};
             }
 
-            HPX_CONSTEXPR static_async_range<Target, Begin + 1, End> next()
+            constexpr static_async_range<Target, Begin + 1, End> next()
                 const noexcept
             {
                 return static_async_range<Target, Begin + 1, End>{target_};
             }
 
-            HPX_CONSTEXPR bool is_finished() const noexcept
+            constexpr bool is_finished() const noexcept
             {
                 return false;
             }
@@ -302,9 +302,9 @@ namespace util {
         template <typename Target, std::size_t Begin>
         struct static_async_range<Target, Begin, Begin>
         {
-            explicit static_async_range(Target*) {}
+            explicit constexpr static_async_range(Target*) {}
 
-            HPX_CONSTEXPR bool is_finished() const noexcept
+            constexpr bool is_finished() const noexcept
             {
                 return true;
             }

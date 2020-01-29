@@ -36,7 +36,7 @@ namespace hpx { namespace components
         virtual ~abstract_base_migration_support() = default;
 
         // This component type supports migration.
-//         HPX_CONSTEXPR static bool supports_migration() { return true; }
+//         static constexpr bool supports_migration() { return true; }
 
         // Pinning functionality
         virtual void pin() = 0;
@@ -104,7 +104,7 @@ namespace hpx { namespace components
 
         ~abstract_migration_support() = default;
 
-        HPX_CXX14_CONSTEXPR void finalize() {}
+        constexpr void finalize() {}
 
         hpx::future<void> mark_as_migrated(
             hpx::id_type const& to_migrate) override

@@ -24,14 +24,14 @@ namespace hpx { namespace traits
             // by default we return 'false' (component does not support
             // migration)
             template <typename Component>
-            static HPX_CONSTEXPR bool call(wrap_int)
+            static constexpr bool call(wrap_int)
             {
                 return false;
             }
 
             // forward the call if the component implements the function
             template <typename Component>
-            static HPX_CONSTEXPR auto call(int)
+            static constexpr auto call(int)
             ->  decltype(Component::supports_migration())
             {
                 return Component::supports_migration();
@@ -39,7 +39,7 @@ namespace hpx { namespace traits
         };
 
         template <typename Component>
-        HPX_CONSTEXPR bool call_supports_migration()
+        constexpr bool call_supports_migration()
         {
             return supports_migration_helper::template call<Component>(0);
         }
@@ -49,7 +49,7 @@ namespace hpx { namespace traits
     struct component_supports_migration
     {
         // returns whether target supports migration
-        static HPX_CONSTEXPR bool call()
+        static constexpr bool call()
         {
             return detail::call_supports_migration<Component>();
         }

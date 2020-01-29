@@ -29,7 +29,7 @@ namespace test
         dummy_parameters() = default;
     };
 
-    static dummy_parameters HPX_CONSTEXPR_OR_CONST dummy{};
+    static constexpr dummy_parameters dummy{};
 }
 
 namespace hpx { namespace parallel { namespace execution

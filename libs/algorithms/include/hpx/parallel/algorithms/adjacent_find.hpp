@@ -70,7 +70,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 difference_type count = std::distance(first, last);
                 util::cancellation_token<difference_type> tok(count);
 
-                auto f1 = [HPX_CAPTURE_FORWARD(op), tok](zip_iterator it,
+                auto f1 = [op = std::forward<Pred>(op), tok](zip_iterator it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable {
                     util::loop_idx_n(base_idx, it, part_size, tok,

@@ -35,7 +35,7 @@ namespace hpx { namespace util { namespace detail {
         using vtable = function_base_vtable;
 
     public:
-        HPX_CONSTEXPR explicit function_base(
+        constexpr explicit function_base(
             function_base_vtable const* empty_vptr) noexcept
           : vptr(empty_vptr)
           , object(nullptr)
@@ -81,13 +81,13 @@ namespace hpx { namespace util { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    HPX_CONSTEXPR bool is_empty_function(F* fp) noexcept
+    constexpr bool is_empty_function(F* fp) noexcept
     {
         return fp == nullptr;
     }
 
     template <typename T, typename C>
-    HPX_CONSTEXPR bool is_empty_function(T C::*mp) noexcept
+    constexpr bool is_empty_function(T C::*mp) noexcept
     {
         return mp == nullptr;
     }
@@ -97,13 +97,13 @@ namespace hpx { namespace util { namespace detail {
         return f->empty();
     }
 
-    inline HPX_CONSTEXPR bool is_empty_function_impl(...) noexcept
+    inline constexpr bool is_empty_function_impl(...) noexcept
     {
         return false;
     }
 
     template <typename F>
-    HPX_CONSTEXPR bool is_empty_function(F const& f) noexcept
+    constexpr bool is_empty_function(F const& f) noexcept
     {
         return detail::is_empty_function_impl(&f);
     }
@@ -120,7 +120,7 @@ namespace hpx { namespace util { namespace detail {
         using vtable = function_vtable<R(Ts...), Copyable>;
 
     public:
-        HPX_CONSTEXPR basic_function() noexcept
+        constexpr basic_function() noexcept
           : base_type(get_empty_vtable())
         {
         }
@@ -234,7 +234,7 @@ namespace hpx { namespace util { namespace detail {
         using base_type::get_function_annotation_itt;
 
     private:
-        static HPX_CONSTEXPR vtable const* get_empty_vtable() noexcept
+        static constexpr vtable const* get_empty_vtable() noexcept
         {
             return detail::get_empty_function_vtable<R(Ts...)>();
         }

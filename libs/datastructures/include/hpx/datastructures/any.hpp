@@ -420,7 +420,7 @@ namespace hpx { namespace util {
 
             // this is constexpr starting C++14 only as older gcc's complain
             // about the constructor not having an empty body
-            HPX_CXX14_CONSTEXPR fxn_ptr()
+            constexpr fxn_ptr()
             {
                 base_type::get_type = Vtable::get_type;
                 base_type::static_delete = Vtable::static_delete;
@@ -444,7 +444,7 @@ namespace hpx { namespace util {
 
             // this is constexpr starting C++14 only as older gcc's complain
             // about the constructor not having an empty body
-            HPX_CXX14_CONSTEXPR fxn_ptr()
+            constexpr fxn_ptr()
             {
                 base_type::get_type = Vtable::get_type;
                 base_type::static_delete = Vtable::static_delete;
@@ -470,7 +470,7 @@ namespace hpx { namespace util {
 
             // this is constexpr starting C++14 only as older gcc's complain
             // about the constructor not having an empty body
-            HPX_CXX14_CONSTEXPR fxn_ptr()
+            constexpr fxn_ptr()
             {
                 base_type::get_type = Vtable::get_type;
                 base_type::static_delete = Vtable::static_delete;
@@ -492,7 +492,7 @@ namespace hpx { namespace util {
 
             // this is constexpr starting C++14 only as older gcc's complain
             // about the constructor not having an empty body
-            HPX_CXX14_CONSTEXPR fxn_ptr()
+            constexpr fxn_ptr()
             {
                 base_type::get_type = Vtable::get_type;
                 base_type::static_delete = Vtable::static_delete;
@@ -530,8 +530,7 @@ namespace hpx { namespace util {
 
             template <typename IArch, typename OArch, typename Char,
                 typename Copyable>
-            HPX_CONSTEXPR static fxn_ptr_table<IArch, OArch, Char, Copyable>*
-            get()
+            static constexpr fxn_ptr_table<IArch, OArch, Char, Copyable>* get()
             {
                 using fxn_type = typename fxns<is_small,
                     Copyable>::template type<T, IArch, OArch, Char>;
@@ -602,7 +601,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::template get<void,
                 void, void, std::true_type>())
           , object(nullptr)
@@ -822,7 +821,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::template get<void,
                 void, Char, std::true_type>())
           , object(nullptr)
@@ -1044,7 +1043,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::template get<void,
                 void, void, std::false_type>())
           , object(nullptr)
@@ -1231,7 +1230,7 @@ namespace hpx { namespace util {
     {
     public:
         // constructors
-        HPX_CONSTEXPR basic_any() noexcept
+        constexpr basic_any() noexcept
           : table(detail::any::get_table<detail::any::empty>::template get<void,
                 void, Char, std::false_type>())
           , object(nullptr)

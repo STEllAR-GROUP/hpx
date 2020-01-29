@@ -253,7 +253,7 @@ namespace hpx { namespace lcos {
                 basename, hpx::unmanaged(target), site);
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(target), HPX_CAPTURE_MOVE(basename)](
+                [target = std::move(target), basename = std::move(basename)](
                     hpx::future<bool>&& f) -> hpx::id_type {
                     bool result = f.get();
                     if (!result)
@@ -321,7 +321,7 @@ namespace hpx { namespace lcos {
                 async(action_type(), id, this_site, local_result.get());
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(id)](
+                [id = std::move(id)](
                     hpx::future<std::vector<T>>&& f) -> std::vector<T> {
                     HPX_UNUSED(id);
                     return f.get();
@@ -373,9 +373,9 @@ namespace hpx { namespace lcos {
 
         using arg_type = typename util::decay<T>::type;
 
-        auto all_to_all_data_direct = [HPX_CAPTURE_FORWARD(local_result),
-                                          this_site](
-                                          hpx::future<hpx::id_type>&& f)
+        auto all_to_all_data_direct =
+            [local_result = std::forward<T>(local_result), this_site](
+                hpx::future<hpx::id_type>&& f)
             -> hpx::future<std::vector<arg_type>> {
             using action_type =
                 typename detail::all_to_all_server<arg_type>::get_result_action;
@@ -386,7 +386,7 @@ namespace hpx { namespace lcos {
                 async(action_type(), id, this_site, std::move(local_result));
 
             return result.then(hpx::launch::sync,
-                [HPX_CAPTURE_MOVE(id)](hpx::future<std::vector<arg_type>>&& f)
+                [id = std::move(id)](hpx::future<std::vector<arg_type>>&& f)
                     -> std::vector<arg_type> {
                     HPX_UNUSED(id);
                     return f.get();

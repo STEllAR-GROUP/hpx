@@ -70,7 +70,7 @@ namespace hpx { namespace util {
                 bool ignore_all_locks_;
             };
 
-            static HPX_NATIVE_TLS held_locks_data held_locks_;
+            static thread_local held_locks_data held_locks_;
 
             static bool lock_detection_enabled_;
 
@@ -100,7 +100,7 @@ namespace hpx { namespace util {
             }
         };
 
-        HPX_NATIVE_TLS register_locks::held_locks_data
+        thread_local register_locks::held_locks_data
             register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
 

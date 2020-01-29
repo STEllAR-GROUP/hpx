@@ -21,13 +21,13 @@ namespace hpx { namespace traits
         struct pin_helper
         {
             template <typename Component>
-            HPX_CXX14_CONSTEXPR static void call(wrap_int, Component* p)
+            static constexpr void call(wrap_int, Component* p)
             {
             }
 
             // forward the call if the component implements the function
             template <typename Component>
-            HPX_CXX14_CONSTEXPR static auto call(int, Component* p)
+            static constexpr auto call(int, Component* p)
             ->  decltype(p->pin())
             {
                 p->pin();
@@ -37,14 +37,14 @@ namespace hpx { namespace traits
         struct unpin_helper
         {
             template <typename Component>
-            HPX_CONSTEXPR static bool call(wrap_int, Component* p)
+            static constexpr bool call(wrap_int, Component* p)
             {
                 return false;
             }
 
             // forward the call if the component implements the function
             template <typename Component>
-            HPX_CONSTEXPR static auto call(int, Component* p)
+            static constexpr auto call(int, Component* p)
             ->  decltype(p->unpin())
             {
                 return p->unpin();
@@ -54,14 +54,14 @@ namespace hpx { namespace traits
         struct pin_count_helper
         {
             template <typename Component>
-            HPX_CONSTEXPR static std::uint32_t call(wrap_int, Component* p)
+            static constexpr std::uint32_t call(wrap_int, Component* p)
             {
                 return 0;
             }
 
             // forward the call if the component implements the function
             template <typename Component>
-            HPX_CONSTEXPR static auto call(int, Component* p)
+            static constexpr auto call(int, Component* p)
             ->  decltype(p->pin_count())
             {
                 return p->pin_count();
@@ -72,17 +72,17 @@ namespace hpx { namespace traits
     template <typename Component, typename Enable = void>
     struct component_pin_support
     {
-        HPX_CXX14_CONSTEXPR static void pin(Component* p)
+        static constexpr void pin(Component* p)
         {
             detail::pin_helper::call(0, p);
         }
 
-        HPX_CONSTEXPR static bool unpin(Component* p)
+        static constexpr bool unpin(Component* p)
         {
             return detail::unpin_helper::call(0, p);
         }
 
-        HPX_CONSTEXPR static std::uint32_t pin_count(Component* p)
+        static constexpr std::uint32_t pin_count(Component* p)
         {
             return detail::pin_count_helper::call(0, p);
         }

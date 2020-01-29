@@ -71,7 +71,7 @@ namespace hpx { namespace components
         }
 
         // This component type supports migration.
-        HPX_CONSTEXPR static bool supports_migration() { return true; }
+        static constexpr bool supports_migration() { return true; }
 
         // Pinning functionality
         void pin()
@@ -188,7 +188,7 @@ namespace hpx { namespace components
 
         /// This hook is invoked on the newly created object after the migration
         /// has been finished
-        HPX_CXX14_CONSTEXPR void on_migrated() {}
+        constexpr void on_migrated() {}
 
         typedef void decorates_action;
 

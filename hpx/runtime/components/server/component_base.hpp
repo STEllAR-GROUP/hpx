@@ -69,7 +69,7 @@ namespace hpx { namespace components
 
             /// \brief finalize() will be called just before the instance gets
             ///        destructed
-            HPX_CXX14_CONSTEXPR static void finalize()
+            static constexpr void finalize()
             {
             }
 
@@ -78,10 +78,10 @@ namespace hpx { namespace components
                 naming::gid_type const& gid) const;
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-            HPX_CXX14_CONSTEXPR static void mark_as_migrated()
+            static constexpr void mark_as_migrated()
             {
             }
-            HPX_CXX14_CONSTEXPR static void on_migrated()
+            static constexpr void on_migrated()
             {
             }
 #else
@@ -145,8 +145,7 @@ namespace hpx { namespace components
         /// \brief Destruct a component
         ~component_base() = default;
 
-#if defined(HPX_HAVE_CXX11_EXTENDED_FRIEND_DECLARATIONS) &&                    \
-    !defined(__NVCC__)
+#if !defined(__NVCC__) && !defined(__CUDACC__)
     protected:
         // declare friends which are allowed to access get_base_gid()
         template <typename Component_, typename...Ts>

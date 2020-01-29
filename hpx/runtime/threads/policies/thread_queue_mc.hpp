@@ -194,7 +194,6 @@ namespace hpx { namespace threads { namespace policies {
             return 0;
         }
 
-        // ----------------------------------------------------------------
         // create a new thread and schedule it if the initial state is equal to
         // pending
         void create_thread(thread_init_data& data, thread_id_type* id,

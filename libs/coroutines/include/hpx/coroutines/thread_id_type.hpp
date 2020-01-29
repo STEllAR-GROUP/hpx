@@ -49,7 +49,7 @@ namespace hpx { namespace threads {
             return thrd_;
         }
 
-        HPX_CXX14_CONSTEXPR void reset() noexcept
+        constexpr void reset() noexcept
         {
             thrd_ = nullptr;
         }
@@ -90,25 +90,25 @@ namespace hpx { namespace threads {
             return lhs.thrd_ != rhs.thrd_;
         }
 
-        friend HPX_CXX14_CONSTEXPR bool operator<(
+        friend constexpr bool operator<(
             thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return std::less<void const*>{}(lhs.thrd_, rhs.thrd_);
         }
 
-        friend HPX_CXX14_CONSTEXPR bool operator>(
+        friend constexpr bool operator>(
             thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return std::less<void const*>{}(rhs.thrd_, lhs.thrd_);
         }
 
-        friend HPX_CXX14_CONSTEXPR bool operator<=(
+        friend constexpr bool operator<=(
             thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return !(rhs > lhs);
         }
 
-        friend HPX_CXX14_CONSTEXPR bool operator>=(
+        friend constexpr bool operator>=(
             thread_id const& lhs, thread_id const& rhs) noexcept
         {
             return !(rhs < lhs);
@@ -126,7 +126,7 @@ namespace hpx { namespace threads {
         thread_id_repr thrd_;
     };
 
-    HPX_CONSTEXPR_OR_CONST thread_id invalid_thread_id;
+    constexpr thread_id invalid_thread_id;
 
 }}    // namespace hpx::threads
 

@@ -52,7 +52,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag1, typename Tag2, typename T1, typename T2>
-    HPX_CONSTEXPR HPX_FORCEINLINE
+    constexpr HPX_FORCEINLINE
     tagged_pair<Tag1(typename decay<T1>::type), Tag2(typename decay<T2>::type)>
     make_tagged_pair(std::pair<T1, T2> && p)
     {
@@ -64,7 +64,7 @@ namespace hpx { namespace util
     }
 
     template <typename Tag1, typename Tag2, typename T1, typename T2>
-    HPX_CONSTEXPR HPX_FORCEINLINE
+    constexpr HPX_FORCEINLINE
     tagged_pair<Tag1(typename decay<T1>::type), Tag2(typename decay<T2>::type)>
     make_tagged_pair(std::pair<T1, T2> const& p)
     {
@@ -76,7 +76,7 @@ namespace hpx { namespace util
     }
 
     template <typename Tag1, typename Tag2, typename ... Ts>
-    HPX_CONSTEXPR HPX_FORCEINLINE
+    constexpr HPX_FORCEINLINE
     tagged_pair<
         Tag1(typename tuple_element<0, tuple<Ts...> >::type),
         Tag2(typename tuple_element<1, tuple<Ts...> >::type)
@@ -94,7 +94,7 @@ namespace hpx { namespace util
     }
 
     template <typename Tag1, typename Tag2, typename ... Ts>
-    HPX_CONSTEXPR HPX_FORCEINLINE
+    constexpr HPX_FORCEINLINE
     tagged_pair<
         Tag1(typename tuple_element<0, tuple<Ts...> >::type),
         Tag2(typename tuple_element<1, tuple<Ts...> >::type)
@@ -162,7 +162,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag1, typename Tag2, typename T1, typename T2>
-    HPX_CONSTEXPR HPX_FORCEINLINE
+    constexpr HPX_FORCEINLINE
     tagged_pair<Tag1(typename decay<T1>::type), Tag2(typename decay<T2>::type)>
     make_tagged_pair(T1 && t1, T2 && t2)
     {

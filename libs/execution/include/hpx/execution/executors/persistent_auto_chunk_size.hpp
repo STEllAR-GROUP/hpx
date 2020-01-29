@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace execution {
         ///       and 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
-        HPX_CONSTEXPR persistent_auto_chunk_size()
+        constexpr persistent_auto_chunk_size()
           : chunk_size_time_(0)
           , min_time_(80000)
         {

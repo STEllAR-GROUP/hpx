@@ -217,7 +217,8 @@ namespace hpx { namespace threads {
         shared_state_type p =
             lcos::detail::make_continuation_exec<result_future_type>(
                 std::forward<Future>(predecessor), std::forward<Executor>(exec),
-                [HPX_CAPTURE_MOVE(func), HPX_CAPTURE_MOVE(exec_current)](
+                [func = std::move(func),
+                    exec_current = std::move(exec_current)](
                     future_type&& predecessor) mutable -> result_future_type {
                     return hpx::dataflow(exec_current,
                         hpx::util::functional::unwrap{},

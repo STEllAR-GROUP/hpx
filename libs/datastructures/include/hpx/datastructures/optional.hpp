@@ -22,14 +22,14 @@ namespace hpx { namespace util {
         struct init
         {
         };
-        HPX_CONSTEXPR explicit nullopt_t(nullopt_t::init) {}
+        constexpr explicit nullopt_t(nullopt_t::init) {}
     };
-    HPX_CONSTEXPR nullopt_t nullopt{nullopt_t::init()};
+    constexpr nullopt_t nullopt{nullopt_t::init()};
 
     struct in_place_t
     {
     };
-    HPX_CONSTEXPR struct in_place_t in_place
+    constexpr struct in_place_t in_place
     {
     };
 
@@ -61,12 +61,12 @@ namespace hpx { namespace util {
     public:
         using value_type = T;
 
-        HPX_CONSTEXPR optional() noexcept
+        constexpr optional() noexcept
           : empty_(true)
         {
         }
 
-        HPX_CONSTEXPR optional(nullopt_t) noexcept
+        constexpr optional(nullopt_t) noexcept
           : empty_(true)
         {
         }
@@ -196,7 +196,7 @@ namespace hpx { namespace util {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CONSTEXPR T const* operator->() const noexcept
+        constexpr T const* operator->() const noexcept
         {
             return reinterpret_cast<T const*>(&storage_);
         }
@@ -206,7 +206,7 @@ namespace hpx { namespace util {
             return reinterpret_cast<T*>(&storage_);
         }
 
-        HPX_CONSTEXPR T const& operator*() const noexcept
+        constexpr T const& operator*() const noexcept
         {
             return *reinterpret_cast<T const*>(&storage_);
         }
@@ -216,12 +216,12 @@ namespace hpx { namespace util {
             return *reinterpret_cast<T*>(&storage_);
         }
 
-        HPX_CONSTEXPR explicit operator bool() const noexcept
+        constexpr explicit operator bool() const noexcept
         {
             return !empty_;
         }
 
-        HPX_CONSTEXPR bool has_value() const
+        constexpr bool has_value() const
         {
             return !empty_;
         }
@@ -247,7 +247,7 @@ namespace hpx { namespace util {
         }
 
         template <typename U>
-        HPX_CXX14_CONSTEXPR T value_or(U&& value) const
+        constexpr T value_or(U&& value) const
         {
             if (empty_)
                 return std::forward<U>(value);
@@ -309,8 +309,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_CONSTEXPR bool operator==(
-        optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator==(optional<T> const& lhs, optional<T> const& rhs)
     {
         return (bool(lhs) != bool(rhs)) ?
             false :
@@ -318,180 +317,177 @@ namespace hpx { namespace util {
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator!=(
-        optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator!=(optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs == rhs);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<(optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator<(optional<T> const& lhs, optional<T> const& rhs)
     {
         return (!bool(rhs)) ? false : (!bool(lhs)) ? true : *rhs < *lhs;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>=(
-        optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator>=(optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs < rhs);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>(optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator>(optional<T> const& lhs, optional<T> const& rhs)
     {
         return (!bool(lhs)) ? false : (!bool(rhs)) ? true : *rhs > *lhs;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<=(
-        optional<T> const& lhs, optional<T> const& rhs)
+    constexpr bool operator<=(optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs > rhs);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_CONSTEXPR bool operator==(optional<T> const& opt, nullopt_t) noexcept
+    constexpr bool operator==(optional<T> const& opt, nullopt_t) noexcept
     {
         return !bool(opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator==(nullopt_t, optional<T> const& opt) noexcept
+    constexpr bool operator==(nullopt_t, optional<T> const& opt) noexcept
     {
         return !bool(opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator!=(optional<T> const& opt, nullopt_t) noexcept
+    constexpr bool operator!=(optional<T> const& opt, nullopt_t) noexcept
     {
         return bool(opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator!=(nullopt_t, optional<T> const& opt) noexcept
+    constexpr bool operator!=(nullopt_t, optional<T> const& opt) noexcept
     {
         return bool(opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<(optional<T> const& opt, nullopt_t) noexcept
+    constexpr bool operator<(optional<T> const& opt, nullopt_t) noexcept
     {
         return false;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<(nullopt_t, optional<T> const& opt) noexcept
+    constexpr bool operator<(nullopt_t, optional<T> const& opt) noexcept
     {
         return bool(opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>=(optional<T> const& opt, nullopt_t) noexcept
+    constexpr bool operator>=(optional<T> const& opt, nullopt_t) noexcept
     {
         return true;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>=(nullopt_t, optional<T> const& opt) noexcept
+    constexpr bool operator>=(nullopt_t, optional<T> const& opt) noexcept
     {
         return !bool(opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>(optional<T> const& opt, nullopt_t) noexcept
+    constexpr bool operator>(optional<T> const& opt, nullopt_t) noexcept
     {
         return bool(opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>(nullopt_t, optional<T> const& opt) noexcept
+    constexpr bool operator>(nullopt_t, optional<T> const& opt) noexcept
     {
         return false;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<=(optional<T> const& opt, nullopt_t) noexcept
+    constexpr bool operator<=(optional<T> const& opt, nullopt_t) noexcept
     {
         return !bool(opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<=(nullopt_t, optional<T> const& opt) noexcept
+    constexpr bool operator<=(nullopt_t, optional<T> const& opt) noexcept
     {
         return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_CONSTEXPR bool operator==(optional<T> const& opt, T const& value)
+    constexpr bool operator==(optional<T> const& opt, T const& value)
     {
         return bool(opt) ? (*opt == value) : false;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator==(T const& value, optional<T> const& opt)
+    constexpr bool operator==(T const& value, optional<T> const& opt)
     {
         return bool(opt) ? (value == *opt) : false;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator!=(optional<T> const& opt, T const& value)
+    constexpr bool operator!=(optional<T> const& opt, T const& value)
     {
         return !(opt == value);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator!=(T const& value, optional<T> const& opt)
+    constexpr bool operator!=(T const& value, optional<T> const& opt)
     {
         return !(value == *opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<(optional<T> const& opt, T const& value)
+    constexpr bool operator<(optional<T> const& opt, T const& value)
     {
         return bool(opt) ? (*opt < value) : true;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<(T const& value, optional<T> const& opt)
+    constexpr bool operator<(T const& value, optional<T> const& opt)
     {
         return bool(opt) ? (value < *opt) : false;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>=(optional<T> const& opt, T const& value)
+    constexpr bool operator>=(optional<T> const& opt, T const& value)
     {
         return !(*opt < value);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>=(T const& value, optional<T> const& opt)
+    constexpr bool operator>=(T const& value, optional<T> const& opt)
     {
         return !(value < *opt);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>(optional<T> const& opt, T const& value)
+    constexpr bool operator>(optional<T> const& opt, T const& value)
     {
         return bool(opt) ? (*opt > value) : false;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator>(T const& value, optional<T> const& opt)
+    constexpr bool operator>(T const& value, optional<T> const& opt)
     {
         return bool(opt) ? (value > *opt) : true;
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<=(optional<T> const& opt, T const& value)
+    constexpr bool operator<=(optional<T> const& opt, T const& value)
     {
         return !(*opt > value);
     }
 
     template <typename T>
-    HPX_CONSTEXPR bool operator<=(T const& value, optional<T> const& opt)
+    constexpr bool operator<=(T const& value, optional<T> const& opt)
     {
         return !(value > *opt);
     }
@@ -505,20 +501,19 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_CONSTEXPR optional<typename std::decay<T>::type> make_optional(T&& v)
+    constexpr optional<typename std::decay<T>::type> make_optional(T&& v)
     {
         return optional<typename std::decay<T>::type>(std::forward<T>(v));
     }
 
     template <typename T, typename... Ts>
-    HPX_CONSTEXPR optional<T> make_optional(Ts&&... ts)
+    constexpr optional<T> make_optional(Ts&&... ts)
     {
         return optional<T>(in_place, std::forward<Ts>(ts)...);
     }
 
     template <typename T, typename U, typename... Ts>
-    HPX_CONSTEXPR optional<T> make_optional(
-        std::initializer_list<U> il, Ts&&... ts)
+    constexpr optional<T> make_optional(std::initializer_list<U> il, Ts&&... ts)
     {
         return optional<T>(in_place, il, std::forward<Ts>(ts)...);
     }
@@ -529,7 +524,7 @@ namespace std {
     template <typename T>
     struct hash<hpx::util::optional<T>>
     {
-        HPX_CONSTEXPR std::size_t operator()(
+        constexpr std::size_t operator()(
             ::hpx::util::optional<T> const& arg) const
         {
             return arg ? std::hash<T>{}(*arg) : std::size_t{};

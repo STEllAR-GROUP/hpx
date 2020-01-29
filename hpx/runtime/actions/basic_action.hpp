@@ -256,7 +256,7 @@ namespace hpx { namespace actions
             hpx::actions::typed_continuation<local_result_type,
                 remote_result_type>;
 
-        static HPX_CONSTEXPR_OR_CONST std::size_t arity = sizeof...(Args);
+        static constexpr std::size_t arity = sizeof...(Args);
 
         using internal_result_type = R;
         using arguments_type = util::tuple<typename std::decay<Args>::type...>;
@@ -468,7 +468,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        HPX_CONSTEXPR static actions::action_flavor get_action_type()
+        static constexpr actions::action_flavor get_action_type()
         {
             return actions::action_flavor::plain_action;
         }
@@ -546,7 +546,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        HPX_CONSTEXPR static actions::action_flavor action_flavor()
+        static constexpr actions::action_flavor action_flavor()
         {
             return actions::action_flavor::direct_action;
         }

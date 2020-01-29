@@ -165,10 +165,10 @@ public:
     }
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-    HPX_CXX14_CONSTEXPR static void mark_as_migrated()
+    static constexpr void mark_as_migrated()
     {
     }
-    HPX_CXX14_CONSTEXPR static void on_migrated()
+    static constexpr void on_migrated()
     {
     }
 #else
@@ -201,11 +201,11 @@ namespace detail
     struct fixed_heap
     {
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-        HPX_CONSTEXPR static void* alloc(std::size_t count)
+        static constexpr void* alloc(std::size_t count)
         {
             return nullptr;
         }
-        HPX_CXX14_CONSTEXPR static void free(void* p, std::size_t count)
+        static constexpr void free(void* p, std::size_t count)
         {
         }
 #else
@@ -233,12 +233,12 @@ class fixed_component : public Component
     typedef detail::fixed_heap heap_type;
 
 #if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
-    HPX_CONSTEXPR static Component* create(std::size_t count)
+    static constexpr Component* create(std::size_t count)
     {
         return nullptr;
     }
 
-    HPX_CXX14_CONSTEXPR static void destroy(Component* p, std::size_t count = 1)
+    static constexpr void destroy(Component* p, std::size_t count = 1)
     {
     }
 #else

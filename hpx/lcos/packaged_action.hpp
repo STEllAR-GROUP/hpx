@@ -139,7 +139,7 @@ namespace hpx { namespace lcos {
             auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [HPX_CAPTURE_MOVE(shared_state)]() {};
+            auto&& f = [shared_state = std::move(shared_state)]() {};
 #endif
             naming::address resolved_addr(this->resolve());
             naming::id_type cont_id(this->get_id(false));
@@ -176,7 +176,7 @@ namespace hpx { namespace lcos {
             auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [HPX_CAPTURE_MOVE(shared_state)]() {};
+            auto&& f = [shared_state = std::move(shared_state)]() {};
 #endif
 
             naming::address resolved_addr(this->resolve());
@@ -206,11 +206,8 @@ namespace hpx { namespace lcos {
                 this->shared_state_, std::forward<Callback>(cb)};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f =
-                [HPX_CAPTURE_MOVE(shared_state), HPX_CAPTURE_FORWARD(cb)]()
-                {
-                    cb();
-                };
+            auto&& f = [shared_state = std::move(shared_state),
+                           cb = std::forward<Callback>(cb)]() { cb(); };
 #endif
 
             naming::address resolved_addr(this->resolve());
@@ -251,11 +248,8 @@ namespace hpx { namespace lcos {
                 this->shared_state_, std::forward<Callback>(cb)};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f =
-                [HPX_CAPTURE_MOVE(shared_state), HPX_CAPTURE_FORWARD(cb)]()
-                {
-                    cb();
-                };
+            auto&& f = [shared_state = std::move(shared_state),
+                           cb = std::forward<Callback>(cb)]() { cb(); };
 #endif
 
             naming::address resolved_addr(this->resolve());
@@ -360,7 +354,7 @@ namespace hpx { namespace lcos {
             auto&& f = detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [HPX_CAPTURE_MOVE(shared_state)]() {};
+            auto&& f = [shared_state = std::move(shared_state)]() {};
 #endif
 
             naming::id_type cont_id(this->get_id(false));
@@ -388,11 +382,8 @@ namespace hpx { namespace lcos {
                 this->shared_state_, std::forward<Callback>(cb)};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f =
-                [HPX_CAPTURE_MOVE(shared_state),HPX_CAPTURE_FORWARD(cb)]()
-                {
-                    cb();
-                };
+            auto&& f = [shared_state = std::move(shared_state),
+                           cb = std::forward<Callback>(cb)]() { cb(); };
 #endif
 
             naming::id_type cont_id(this->get_id(false));

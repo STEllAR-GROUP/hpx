@@ -146,7 +146,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 difference_type count = std::distance(first1, last1);
 
-                auto f1 = [op1, HPX_CAPTURE_FORWARD(op2)](
+                auto f1 = [op1, op2 = std::forward<Op2>(op2)](
                               zip_iterator part_begin,
                               std::size_t part_size) mutable -> T {
                     auto iters = part_begin.get_iterator_tuple();
@@ -206,7 +206,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy, T>::call(
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first1, first2), count, std::move(f1),
-                    [HPX_CAPTURE_FORWARD(init), HPX_CAPTURE_FORWARD(op1)](
+                    [init = std::forward<T_>(init),
+                        op1 = std::forward<Op1>(op1)](
                         std::vector<hpx::future<T>>&& results) -> T {
                         T ret = init;
                         for (auto&& fut : results)

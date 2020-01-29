@@ -633,27 +633,27 @@ namespace hpx { namespace threads { namespace policies {
             stolen_to_staged_.fetch_add(num, std::memory_order_relaxed);
         }
 #else
-        HPX_CXX14_CONSTEXPR void increment_num_pending_misses(
+        constexpr void increment_num_pending_misses(
             std::size_t num = 1)
         {
         }
-        HPX_CXX14_CONSTEXPR void increment_num_pending_accesses(
+        constexpr void increment_num_pending_accesses(
             std::size_t num = 1)
         {
         }
-        HPX_CXX14_CONSTEXPR void increment_num_stolen_from_pending(
+        constexpr void increment_num_stolen_from_pending(
             std::size_t num = 1)
         {
         }
-        HPX_CXX14_CONSTEXPR void increment_num_stolen_from_staged(
+        constexpr void increment_num_stolen_from_staged(
             std::size_t num = 1)
         {
         }
-        HPX_CXX14_CONSTEXPR void increment_num_stolen_to_pending(
+        constexpr void increment_num_stolen_to_pending(
             std::size_t num = 1)
         {
         }
-        HPX_CXX14_CONSTEXPR void increment_num_stolen_to_staged(
+        constexpr void increment_num_stolen_to_staged(
             std::size_t num = 1)
         {
         }

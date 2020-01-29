@@ -35,15 +35,15 @@
 namespace allocator
 {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CONSTEXPR std::size_t BLOCK_ALIGNMENT = 8;
-    HPX_CONSTEXPR std::size_t PAGE_SIZE_ = 16384;
+    constexpr std::size_t BLOCK_ALIGNMENT = 8;
+    constexpr std::size_t PAGE_SIZE_ = 16384;
 
     struct alloc_page;
 
     ///////////////////////////////////////////////////////////////////////////
     struct alloc_block_header
     {
-        HPX_CONSTEXPR HPX_FORCEINLINE alloc_block_header(
+        constexpr HPX_FORCEINLINE alloc_block_header(
                 alloc_page* p = nullptr) noexcept
           : page(p)
         {}
@@ -66,7 +66,7 @@ namespace allocator
             ((sizeof(T) + BLOCK_ALIGNMENT - 1) & ~(BLOCK_ALIGNMENT - 1)) +
             sizeof(alloc_block_header);
 
-        HPX_CONSTEXPR HPX_FORCEINLINE alloc_block(
+        constexpr HPX_FORCEINLINE alloc_block(
                 alloc_page* page = nullptr) noexcept
           : alloc_block_header(page)
           , next_free(nullptr)
@@ -117,7 +117,7 @@ namespace allocator
 
         HPX_FORCEINLINE static free_list_allocator& get_allocator();
 
-        HPX_CONSTEXPR HPX_FORCEINLINE alloc_page const* first_page() const
+        constexpr HPX_FORCEINLINE alloc_page const* first_page() const
         {
             return pages;
         }
@@ -215,13 +215,13 @@ namespace allocator
     };
 
     template <typename T>
-    HPX_CXX14_CONSTEXPR HPX_FORCEINLINE T& get(
+    constexpr HPX_FORCEINLINE T& get(
         alloc_page* page, std::size_t i) noexcept
     {
         return page->template get<T>(i);
     }
     template <typename T>
-    HPX_CXX14_CONSTEXPR HPX_FORCEINLINE T const& get(
+    constexpr HPX_FORCEINLINE T const& get(
         alloc_page const* page, std::size_t i) noexcept
     {
         return page->template get<T>(i);

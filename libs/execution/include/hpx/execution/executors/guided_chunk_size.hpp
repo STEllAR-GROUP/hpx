@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { namespace execution {
         ///                     schedule together.
         ///                     The default minimal chunk size is 1.
         ///
-        HPX_CONSTEXPR explicit guided_chunk_size(std::size_t min_chunk_size = 1)
+        constexpr explicit guided_chunk_size(std::size_t min_chunk_size = 1)
           : min_chunk_size_(min_chunk_size)
         {
         }
@@ -60,7 +60,7 @@ namespace hpx { namespace parallel { namespace execution {
         //         }
 
         template <typename Executor, typename F>
-        HPX_CONSTEXPR std::size_t get_chunk_size(Executor&& exec, F&&,
+        constexpr std::size_t get_chunk_size(Executor&& exec, F&&,
             std::size_t cores, std::size_t num_tasks) const
         {
             return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);

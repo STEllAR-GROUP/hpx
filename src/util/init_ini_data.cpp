@@ -461,14 +461,9 @@ namespace hpx { namespace util
             return plugin_registries;
 
         // make sure each node loads libraries in a different order
-#if defined(HPX_HAVE_CXX11_STD_SHUFFLE)
         std::random_device random_device;
         std::mt19937 generator(random_device());
         std::shuffle(libdata.begin(), libdata.end(), std::move(generator));
-#else
-        std::srand(static_cast<unsigned>(std::time(nullptr)));
-        std::random_shuffle(libdata.begin(), libdata.end());
-#endif
 
         typedef std::pair<fs::path, std::string> libdata_type;
         for (libdata_type const& p : libdata)
