@@ -13,4 +13,4 @@ naming_base
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/naming_base/docs/index.html>`__.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/naming_base/docs/index.html>`__.

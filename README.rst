@@ -8,9 +8,9 @@
 |circleci_status| |zenodo_doi| |codacy|
 
 Documentation: `latest
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/index.html>`_,
+<https://stellar-group.github.io/hpx-docs/latest/html/index.html>`_,
 `development (master)
-<https://stellar-group.github.io/hpx/docs/sphinx/branches/master/html/index.html>`_
+<https://stellar-group.github.io/hpx-docs/branches/master/html/index.html>`_
 
 ===
 HPX
@@ -69,16 +69,16 @@ which can be downloaded `here <https://stellar.cct.lsu.edu/downloads/>`_.
 
 To quickly get started with HPX on most Linux distributions you can read the
 quick start guide `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/quickstart.html>`_.
+<https://stellar-group.github.io/hpx-docs/latest/html/quickstart.html>`_.
 Detailed instructions on building and installing HPX on various platforms can be
 found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/manual/building_hpx.html>`_.
+<https://stellar-group.github.io/hpx-docs/latest/html/manual/building_hpx.html>`_.
 The full documentation for the latest release of HPX can always be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/index.html>`_.
+<https://stellar-group.github.io/hpx-docs/latest/html/index.html>`_.
 
 If you would like to work with the cutting edge version of this repository
 (``master`` branch) the documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/branches/master/html/index.html>`_.
+<https://stellar-group.github.io/hpx-docs/branches/master/html/index.html>`_.
 We strongly recommend that you follow the current health status of the master
 branch by looking at our `continuous integration results website
 <http://rostam.cct.lsu.edu/console>`_. While we try to keep the master branch

@@ -13,4 +13,4 @@ This library is part of HPX. It contains macros that identify features of a comp
 as well as platform independent macros to control inlinining, export sets and more.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/config/docs/index.html>`_.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/config/docs/index.html>`_.

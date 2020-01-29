@@ -13,4 +13,4 @@ This library is part of HPX. It implements ``HPX_ASSERT`` and ``HPX_ASSERT_MSG``
 which are useful to implement error handling for debug builds.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/assert/docs/index.html>`_.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/assert/docs/index.html>`_.

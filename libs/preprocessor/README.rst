@@ -18,4 +18,4 @@ This library contains useful preprocessor macros:
 * ``HPX_PP_STRIP_PARENS``: Strips parenthesis from a token
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/pp/docs/index.html>`__.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/pp/docs/index.html>`__.
