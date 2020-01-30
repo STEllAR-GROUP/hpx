@@ -26,9 +26,13 @@ namespace hpx { namespace threads { namespace detail {
         // verify parameters
         switch (initial_state)
         {
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         case pending:
+            HPX_FALLTHROUGH;
         case pending_do_not_schedule:
+            HPX_FALLTHROUGH;
         case pending_boost:
+            HPX_FALLTHROUGH;
         case suspended:
             break;
 
