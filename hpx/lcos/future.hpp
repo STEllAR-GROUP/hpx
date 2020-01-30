@@ -408,12 +408,6 @@ namespace hpx { namespace lcos { namespace detail
     make_continuation_alloc_nounwrap(Allocator const& a,
         Future const& future, Policy&& policy, F&& f);
 
-    // Dummy struct to call static assert with a false type
-    template <typename T>
-    struct dummy_false_type : std::false_type
-    {
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename FD, typename Enable = void>
     struct future_then_dispatch
@@ -425,7 +419,7 @@ namespace hpx { namespace lcos { namespace detail
         call(Future&& fut, F&& f)
         {
             // dummy impl to fail compilation if this function is called
-            static_assert(dummy_false_type<Future>::value, "Cannot use the \
+            static_assert(sizeof(Future) == 0, "Cannot use the \
                     dummy implementation of future_then_dispatch, please use \
                     one of the template specialization.");
         }
@@ -435,7 +429,7 @@ namespace hpx { namespace lcos { namespace detail
         call(Future && fut, T0 && t, F && f)
         {
             // dummy impl to fail compilation if this function is called
-            static_assert(dummy_false_type<Future>::value, "Cannot use the \
+            static_assert(sizeof(Future) == 0, "Cannot use the \
                     dummy implementation of future_then_dispatch, please use \
                     one of the template specialization.");
         }
@@ -445,7 +439,7 @@ namespace hpx { namespace lcos { namespace detail
         call_alloc(Allocator const& alloc, Future && fut, F && f)
         {
             // dummy impl to fail compilation if this function is called
-            static_assert(dummy_false_type<Future>::value, "Cannot use the \
+            static_assert(sizeof(Future) == 0, "Cannot use the \
                     dummy implementation of future_then_dispatch::call_alloc, \
                     please use one of the template specialization.");
         }
