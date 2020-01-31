@@ -14,9 +14,6 @@
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/util/from_string.hpp>
 
-#include <boost/config.hpp>
-#include <boost/version.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
