@@ -15,8 +15,6 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <boost/utility/swap.hpp>
-
 #include <exception>
 #include <memory>
 #include <type_traits>
@@ -102,9 +100,9 @@ namespace hpx { namespace lcos { namespace local {
 
             void swap(promise_base& other) noexcept
             {
-                boost::swap(shared_state_, other.shared_state_);
-                boost::swap(future_retrieved_, other.future_retrieved_);
-                boost::swap(
+                std::swap(shared_state_, other.shared_state_);
+                std::swap(future_retrieved_, other.future_retrieved_);
+                std::swap(
                     shared_future_retrieved_, other.shared_future_retrieved_);
             }
 

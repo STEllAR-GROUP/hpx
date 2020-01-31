@@ -137,8 +137,6 @@ namespace hpx
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
-#include <boost/utility/swap.hpp>
-
 #include <algorithm>
 #include <atomic>
 #include <cstddef>
