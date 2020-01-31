@@ -122,6 +122,19 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv, std::uint6
     print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
 }
 
+void measure_function_futures_for_loop_seq(std::uint64_t count, bool csv, std::uint64_t iter_length)
+{
+    // start the clock
+    high_resolution_timer walltime;
+    hpx::parallel::for_loop(hpx::parallel::execution::seq,
+        0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
@@ -143,16 +156,25 @@ int hpx_main(variables_map& vm)
 
         const std::uint64_t count = vm["num_iterations"].as<std::uint64_t>();
         bool csv = vm.count("csv") != 0;
+        bool seq = vm.count("seq") != 0;
+
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        //hpx::parallel::execution::default_executor def;
-        //hpx::parallel::execution::parallel_executor par;
-
-        for (int i = 0; i < repetitions; i++)
-        {
-            measure_function_futures_for_loop(count, csv, chunk_size, iter_length);
-        }
+	if (seq) 
+	{		
+	        for (int i = 0; i < repetitions; i++)
+	        {
+	            measure_function_futures_for_loop_seq(count, csv, iter_length);
+	        }
+	}
+	else
+	{
+		for (int i = 0; i < repetitions; i++)
+                {
+                    measure_function_futures_for_loop(count, csv, chunk_size, iter_length);
+                }	
+	}
     }
 
     return hpx::finalize();
@@ -172,7 +194,7 @@ int main(int argc, char* argv[])
         ("csv", "output results as csv (format: count,duration)")
         ("repetitions", value<int>()->default_value(1),
          "number of repetitions of the full benchmark")
-
+        ("seq","run sequqntially or in parallel")
         ("iter_length",value<std::uint64_t>()->default_value(1), "length of each iteration")
     	("chunk_size",value<std::uint64_t>()->default_value(1), "chunk size");
     // clang-format on
