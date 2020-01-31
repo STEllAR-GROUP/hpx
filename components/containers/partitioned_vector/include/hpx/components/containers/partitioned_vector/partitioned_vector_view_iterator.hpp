@@ -11,9 +11,8 @@
 
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
+#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/type_support/pack.hpp>
-
-#include <boost/iterator/iterator_facade.hpp>
 
 #include <array>
 #include <cstddef>
@@ -24,7 +23,7 @@ namespace hpx {
 
     template<typename T, std::size_t N, typename Data>
     class partitioned_vector_view_iterator
-    : public boost::iterator_facade<
+    : public hpx::util::iterator_facade<
                 partitioned_vector_view_iterator<T,N,Data>,
                 hpx::detail::view_element<T,Data>,
                 std::random_access_iterator_tag,
@@ -89,7 +88,7 @@ namespace hpx {
         template<typename, std::size_t, typename>
         friend class const_partitioned_vector_view_iterator;
 
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         void increment()
         {
@@ -134,7 +133,7 @@ namespace hpx {
 
     template<typename T, std::size_t N, typename Data>
     class const_partitioned_vector_view_iterator
-    : public boost::iterator_facade<
+    : public hpx::util::iterator_facade<
                 const_partitioned_vector_view_iterator<T,N,Data>,
                 hpx::detail::const_view_element<T,Data>,
                 std::random_access_iterator_tag,
@@ -211,7 +210,7 @@ namespace hpx {
         operator=(const_partitioned_vector_view_iterator &&) = delete;
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         void increment()
         {
