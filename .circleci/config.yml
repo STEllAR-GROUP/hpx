@@ -258,9 +258,13 @@ jobs:
       - run:
           name: Running codespell
           command: |
-              cd /hpx/source
-              codespell $(git diff --name-only origin/master) > /tmp/spelling_suggestions.txt
-              if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
+              if [ "$CIRCLE_PR_NUMBER" ]; then
+                  cd /hpx/source
+                  codespell --skip='*.h5,*.png' $(git diff --name-only origin/master) > /tmp/spelling_suggestions.txt
+                  if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
+              else
+                  echo "skipping spellcheck on non-PR build"
+              fi
           when: always
       - store_artifacts:
           path: /tmp/spelling_suggestions.txt
