@@ -21,6 +21,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>

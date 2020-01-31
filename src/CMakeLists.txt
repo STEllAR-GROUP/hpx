@@ -346,6 +346,10 @@ foreach(_module ${HPX_LIBS})
 
 endforeach()
 
+if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+  set_target_properties(hpx PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
+
 target_compile_definitions(hpx PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
   HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
@@ -423,7 +427,6 @@ endif()
 
 if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   if(NOT HPX_WITH_STATIC_LINKING)
-    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     if(HPX_WITH_DEFAULT_TARGETS)
       if(HPX_WITH_CUDA)
         cuda_add_library(hpx_wrap STATIC
@@ -441,6 +444,8 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
           ${hpx_wrap_SOURCES})
       endif()
     endif()
+
+    set_target_properties(hpx_wrap PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 
     target_compile_definitions(hpx_wrap PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
       HPX_APPLICATION_EXPORTS)

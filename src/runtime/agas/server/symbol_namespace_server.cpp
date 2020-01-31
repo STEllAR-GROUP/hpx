@@ -21,6 +21,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/scoped_timer.hpp>
