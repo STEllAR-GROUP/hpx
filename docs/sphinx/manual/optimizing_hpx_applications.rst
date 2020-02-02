@@ -15,12 +15,12 @@ Optimizing |hpx| applications
 Performance counters
 ====================
 
-Performance Counters in |hpx| are used to provide information as to how well the
+Performance counters in |hpx| are used to provide information as to how well the
 runtime system or an application is performing. The counter data can help
-determine system bottlenecks and fine-tune system and application performance.
+determine system bottlenecks, and fine-tune system and application performance.
 The |hpx| runtime system, its networking, and other layers provide counter data
-that an application can consume to provide users with information of how well
-the application is performing.
+that an application can consume to provide users with information about how
+well the application is performing.
 
 Applications can also use counter data to determine how much system resources to
 consume. For example, an application that transfers data over the network could
@@ -29,9 +29,9 @@ transfer without competing for network bandwidth with other network traffic. The
 application could use the counter data to adjust its transfer rate as the
 bandwidth usage from other network traffic increases or decreases.
 
-Performance Counters are |hpx| parallel processes which expose a predefined
+Performance counters are |hpx| parallel processes that expose a predefined
 interface. |hpx| exposes special API functions that allow one to create, manage,
-read the counter data, and release instances of Performance Counters.
+and read the counter data, and release instances of performance counters.
 Performance Counter instances are accessed by name, and these names have a
 predefined structure which is described in the section
 :ref:`performance_counter_names`. The advantage of this is that any Performance
@@ -53,7 +53,7 @@ more information, please refer to the section :ref:`commandline`.
 Performance counter names
 -------------------------
 
-All Performance Counter instances have a name uniquely identifying this
+All Performance Counter instances have a name uniquely identifying each
 instance. This name can be used to access the counter, retrieve all related meta
 data, and to query the counter data (as described in the section
 :ref:`consuming`). Counter names are strings with a predefined structure. The
@@ -70,7 +70,7 @@ string formatted as:
 
    parentinstancename#parentindex/instancename#instanceindex
 
-Each separate part of a countername (e.g. ``objectname``, ``countername``
+Each separate part of a countername (e.g., ``objectname``, ``countername``
 ``parentinstancename``, ``instancename``, and ``parameters``) should start with
 a letter (``'a'``\ ...\ ``'z'``, ``'A'``\ ...\ ``'Z'``) or an underscore
 character (``'_'``), optionally followed by letters, digits (``'0'``\ ...\
@@ -80,28 +80,32 @@ inside a counter name. The characters ``'/'``, ``'{'``, ``'}'``, ``'#'`` and
 the counter name.
 
 The parts ``parentinstanceindex`` and ``instanceindex`` are integers. If an
-index is not specified |hpx| will assume a default of ``-1``.
+index is not specified, |hpx| will assume a default of ``-1``.
 
 .. _example:
 
-Two simple examples
+Two counter name examples
 -------------------
 
-An instance for a well formed (and meaningful) simple counter name would be:
+This section gives examples of both simple counter names and aggregate
+counter names. For more information on simple and aggregate counter
+names, please see :ref:`performance_counter_instances`. 
+
+An example of a well-formed (and meaningful) simple counter name would be:
 
 .. code-block:: text
 
    /threads{locality#0/total}/count/cumulative
 
 This counter returns the current cumulative number of executed (retired)
-|hpx|-threads for the :term:`locality` ``0``. The counter type of this counter
+|hpx| threads for the :term:`locality` ``0``. The counter type of this counter
 is ``/threads/count/cumulative`` and the full instance name is
 ``locality#0/total``. This counter type does not require an ``instanceindex`` or
 ``parameters`` to be specified.
 
 In this case, the ``parentindex`` (the ``'0'``) designates the :term:`locality`
 for which the counter instance is created. The counter will return the number of
-|hpx|-threads retired on that particular :term:`locality`.
+|hpx| threads retired on that particular :term:`locality`.
 
 Another example for a well formed (aggregate) counter name is:
 
@@ -122,7 +126,7 @@ milliseconds).
 Performance counter types
 -------------------------
 
-Every Performance Counter belongs to a specific Performance Counter type which
+Every performance counter belongs to a specific performance counter type which
 classifies the counters into groups of common semantics. The type of a counter
 is identified by the ``objectname`` and the ``countername`` parts of the name.
 
@@ -131,8 +135,8 @@ is identified by the ``objectname`` and the ``countername`` parts of the name.
    /objectname/countername
 
 When an application starts |hpx| will register all available counter types on each of
-the localities. These counter types are held in a special Performance Counter
-registration database which can be later used to retrieve the meta data related
+the localities. These counter types are held in a special performance counter
+registration database, which can be used to retrieve the meta data related
 to a counter type and to create counter instances based on a given counter
 instance name.
 
@@ -143,41 +147,41 @@ Performance counter instances
 
 The ``full_instancename`` distinguishes different counter instances of the same
 counter type. The formatting of the ``full_instancename`` depends on the counter
-type. There are two types of counters: simple counters which usually generate
-the counter values based on direct measurements, and aggregate counters which
+type. There are two types of counters: simple counters, which usually generate
+the counter values based on direct measurements, and aggregate counters, which
 take another counter and transform its values before generating their own
 counter values. An example for a simple counter is given :ref:`above <example>`:
-counting retired |hpx|-threads. An aggregate counter is shown as an example
+counting retired |hpx| threads. An aggregate counter is shown as an example
 :ref:`above <example>` as well: calculating the average of the underlying
 counter values sampled at constant time intervals.
 
 While simple counters use instance names formatted as
 ``parentinstancename#parentindex/instancename#instanceindex``, most aggregate
-counters have the full counter name of the embedded counter as its instance
+counters have the full counter name of the embedded counter as their instance
 name.
 
-Not all simple counter types require specifying all 4 elements of a full counter
-instance name, some of the parts (``parentinstancename``, ``parentindex``,
+Not all simple counter types require specifying all four elements of a full counter
+instance name; some of the parts (``parentinstancename``, ``parentindex``,
 ``instancename``, and ``instanceindex``) are optional for specific counters.
 Please refer to the documentation of a particular counter for more information
 about the formatting requirements for the name of this counter (see
 :ref:`counters`).
 
 The ``parameters`` are used to pass additional information to a counter at
-creation time. They are optional and they fully depend on the concrete counter.
+creation time. They are optional, and they fully depend on the concrete counter.
 Even if a specific counter type allows additional parameters to be given, those
 usually are not required as sensible defaults will be chosen. Please refer to
 the documentation of a particular counter for more information about what
 parameters are supported, how to specify them, and what default values are
 assumed (see also :ref:`counters`).
 
-Every :term:`locality` of an application exposes its own set of Performance
-Counter types and Performance Counter instances. The set of exposed counters is
+Every :term:`locality` of an application exposes its own set of performance
+counter types and performance counter instances. The set of exposed counters is
 determined dynamically at application start based on the execution environment
 of the application. For instance, this set is influenced by the current hardware
 environment for the :term:`locality` (such as whether the :term:`locality` has
 access to accelerators), and the software environment of the application (such
-as the number of OS-threads used to execute |hpx|-threads).
+as the number of OS threads used to execute |hpx| threads).
 
 .. _wildcards:
 
@@ -185,12 +189,12 @@ Using wildcards in performance counter names
 --------------------------------------------
 
 It is possible to use wildcard characters when specifying performance counter
-names. Performance counter names can contain 2 types of wildcard characters:
+names. Performance counter names can contain two types of wildcard characters:
 
 * Wildcard characters in the performance counter type
 * Wildcard characters in the performance counter instance name
 
-Wildcard character have a meaning which is very close to usual file name
+A wildcard character has a meaning which is very close to usual file name
 wildcard matching rules implemented by common shells (like bash).
 
 .. list-table:: Wildcard characters in the performance counter type
@@ -221,7 +225,7 @@ wildcard matching rules implemented by common shells (like bash).
 Consuming performance counter data
 ----------------------------------
 
-You can consume performance data using either the command line interface or via
+You can consume performance data using either the command line interface,
 the |hpx| application or the |hpx| API. The command line interface is easier to
 use, but it is less flexible and does not allow one to adjust the behaviour of
 your application at runtime. The command line interface provides a convenience
@@ -234,9 +238,9 @@ Consuming performance counter data from the command line
 --------------------------------------------------------
 
 |hpx| provides a set of predefined command line options for every application
-which uses ``hpx::init`` for its initialization. While there are much more
+that uses ``hpx::init`` for its initialization. While there are many more
 command line options available (see :ref:`commandline`), the set of options related
-to Performance Counters allow one to list existing counters, query existing
+to performance counters allows one to list existing counters, and query existing
 counters once at application termination or repeatedly after a constant time
 interval.
 
@@ -247,56 +251,56 @@ The following table summarizes the available command line options:
    * * Command line option
      * Description
    * * ``--hpx:print-counter``
-     * print the specified performance counter either repeatedly and/or at the
+     * Prints the specified performance counter either repeatedly and/or at the
        times specified by ``--hpx:print-counter-at`` (see also option
        ``--hpx:print-counter-interval``).
    * * ``--hpx:print-counter-reset``
-     * print the specified performance counter either repeatedly and/or at the
-       times specified by ``--hpx:print-counter-at`` reset the counter after the
-       value is queried. (see also option ``--hpx:print-counter-interval``).
+     * Prints the specified performance counter either repeatedly and/or at the
+       times specified by ``--hpx:print-counter-at``. Reset the counter after the
+       value is queried (see also option ``--hpx:print-counter-interval``).
    * * ``--hpx:print-counter-interval``
-     * print the performance counter(s) specified with ``--hpx:print-counter``
+     * Prints the performance counter(s) specified with ``--hpx:print-counter``
        repeatedly after the time interval (specified in milliseconds)
        (default:``0`` which means print once at shutdown).
    * * ``--hpx:print-counter-destination``
-     * print the performance counter(s) specified with ``--hpx:print-counter``
-       to the given file (default: console)).
+     * Prints the performance counter(s) specified with ``--hpx:print-counter``
+       to the given file (default: console).
    * * ``--hpx:list-counters``
-     * list the names of all registered performance counters.
+     * Lists the names of all registered performance counters.
    * * ``--hpx:list-counter-infos``
-     * list the description of all registered performance counters.
+     * Lists the description of all registered performance counters.
    * * ``--hpx:print-counter-format``
-     * print the performance counter(s) specified with ``--hpx:print-counter``
-       possible formats in csv format with header or without any header (see
+     * Prints the performance counter(s) specified with ``--hpx:print-counter``.
+       Possible formats in CVS format with header or without any header (see
        option ``--hpx:no-csv-header``), possible values: ``csv`` (prints counter
        values in CSV format with full names as header) ``csv-short`` (prints
        counter values in CSV format with shortnames provided with
        ``--hpx:print-counter`` as ``--hpx:print-counter
-       shortname,full-countername``)
+       shortname,full-countername``).
    * * ``--hpx:no-csv-header``
-     * print the performance counter(s) specified with ``--hpx:print-counter``
+     * Prints the performance counter(s) specified with ``--hpx:print-counter``
        and ``csv`` or ``csv-short`` format specified with
        ``--hpx:print-counter-format`` without header.
    * * ``--hpx:print-counter-at arg``
-     * print the performance counter(s) specified with ``--hpx:print-counter``
-       (or ``--hpx:print-counter-reset``) at the given point in time, possible
+     * Prints the performance counter(s) specified with ``--hpx:print-counter``
+       (or ``--hpx:print-counter-reset``) at the given point in time. Possible
        argument values: ``startup``, ``shutdown`` (default), ``noshutdown``.
    * * ``--hpx:reset-counters``
-     * reset all performance counter(s) specified with ``--hpx:print-counter``
-       after they have been evaluated)
+     * Resets all performance counter(s) specified with ``--hpx:print-counter``
+       after they have been evaluated.
    * * ``--hpx:print-counter-types``
-     * each locality prints only its own local counters
+     * Appends counter type description to generated output.
    * * ``--hpx:print-counters-locally``
-     * append counter type description to generated output
+     * Each locality prints only its own local counters.
 
 While the options ``--hpx:list-counters`` and ``--hpx:list-counter-infos`` give
-a short listing of all available counters, the full documentation for those can
+a short list of all available counters, the full documentation for those can
 be found in the section :ref:`counters`.
 
 A simple example
 ----------------
 
-All of the commandline options mentioned above can be for instance tested using
+All of the commandline options mentioned above can be tested using
 the ``hello_world_distributed`` example.
 
 Listing all available counters ``hello_world_distributed --hpx:list-counters``
@@ -313,7 +317,7 @@ yields:
    /threads{locality#*/total}/idle-rate
    /threads{locality#*/worker-thread#*}/idle-rate
 
-Providing more information about all available counters
+Providing more information about all available counters,
 ``hello_world_distributed --hpx:list-counter-infos`` yields:
 
 .. code-block:: text
@@ -364,10 +368,10 @@ which yields for instance:
 
 The first line is the normal output generated by ``hello_world_distributed`` and
 has no relation to the counter data listed. The last two lines contain the
-counter data as gathered at application shutdown. These lines have 6 fields, the
+counter data as gathered at application shutdown. These lines have six fields, the
 counter name, the sequence number of the counter invocation, the time stamp at
 which this information has been sampled, the unit of measure for the time stamp,
-the actual counter value, and an optional unit of measure for the counter value.
+the actual counter value and an optional unit of measure for the counter value.
 
 .. note::
 
@@ -415,7 +419,7 @@ wildcards for a (very limited) set of use cases. In particular, all occurrences
 of ``#*`` as in ``locality#*`` and in ``worker-thread#*`` will be automatically
 expanded to the proper set of performance counter names representing the actual
 environment for the executed program. For instance, if your program is utilizing
-4 worker threads for the execution of HPX threads (see command line option
+four worker threads for the execution of |hpx| threads (see command line option
 :option:`--hpx:threads`) the following command line
 
 .. code-block:: bash
@@ -439,7 +443,7 @@ threads:
    /threads{locality#0/worker-thread#3}/count/cumulative,1,0.0025904,[s],33
 
 The command ``--hpx:print-counter-format`` takes values ``csv`` and
-``csv-short`` to generate CSV formatted counter values with header.
+``csv-short`` to generate CSV formatted counter values with a header.
 
 With format as csv:
 
@@ -451,8 +455,8 @@ With format as csv:
        --hpx:print-counter /threads{locality#*/total}/count/cumulative \
        --hpx:print-counter /threads{locality#*/total}/count/cumulative-phases
 
-will print the values of performance counters in CSV format with full
-countername as header:
+will print the values of performance counters in CSV format with the full
+countername as a header:
 
 .. code-block:: text
 
@@ -471,8 +475,8 @@ With format csv-short:
        --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
        --hpx:print-counter phases,/threads{locality#*/total}/count/cumulative-phases
 
-will print the values of performance counters in CSV format with short countername
-as header:
+will print the values of performance counters in CSV format with the short countername
+as a header:
 
 .. code-block:: text
 
@@ -502,7 +506,7 @@ will print the header only once repeating the performance counter value(s) repea
    hello world from OS-thread 0 on locality 0
    44,95
 
-The command ``--hpx:no-csv-header`` to be used with
+The command ``--hpx:no-csv-header`` can be used with
 ``--hpx:print-counter-format`` to print performance counter values in CSV format
 without any header:
 
@@ -528,8 +532,8 @@ will print:
 Consuming performance counter data using the |hpx| API
 ------------------------------------------------------
 
-|hpx| provides an API allowing to discover performance counters and to retrieve
-the current value of any existing performance counter from any application.
+|hpx| provides an API that allows users to discover performance counters and
+to retrieve the current value of any existing performance counter from any application.
 
 Discover existing performance counters
 --------------------------------------
@@ -545,12 +549,12 @@ client component object for this purpose::
 
 Instantiating an instance of this type will create the performance counter
 identified by the given ``name``. Only the first invocation for any given counter
-name will create a new instance of that counter, all following invocations for a
-given counter name will reference the initially created instance. This ensures,
-that at any point in time there is always not more than one active instance of
+name will create a new instance of that counter. All following invocations for a
+given counter name will reference the initially created instance. This ensures
+that at any point in time there is never more than one active instance of
 any of the existing performance counters.
 
-In order to access the counter value (or invoking any of the other functionality
+In order to access the counter value (or to invoke any of the other functionality
 related to a performance counter, like ``start``, ``stop`` or ``reset``) member
 functions of the created client component instance should be called::
 
@@ -559,8 +563,7 @@ functions of the created client component instance should be called::
         "/threads{locality#0/total}/count/cumulative");
     hpx::cout << count.get_value<int>().get() << hpx::endl;
 
-For more information about the client component type see [classref
-hpx::performance_counters::performance_counter].
+For more information about the client component type, see |:cpp:class:`hpx::performance_counters::performance_counter` 
 
 .. note::
 
@@ -581,17 +584,17 @@ Providing performance counter data
 
 |hpx| offers several ways by which you may provide your own data as a
 performance counter. This has the benefit of exposing additional, possibly
-application specific information using the existing Performance Counter
+application-specific information using the existing Performance Counter
 framework, unifying the process of gathering data about your application.
 
-An application that wants to provide counter data can implement a Performance
-Counter to provide the data. When a consumer queries performance data, the |hpx|
+An application that wants to provide counter data can implement a performance
+counter to provide the data. When a consumer queries performance data, the |hpx|
 runtime system calls the provider to collect the data. The runtime system uses
 an internal registry to determine which provider to call.
 
-Generally, there are two ways of exposing your own Performance Counter data: a
-simple, function based way and a more complex, but more powerful way of
-implementing a full Performance Counter. Both alternatives are described in the
+Generally, there are two ways of exposing your own performance counter data: a
+simple, function-based way and a more complex, but more powerful way of
+implementing a full performance counter. Both alternatives are described in the
 following sections.
 
 .. _simple_counters:
@@ -601,7 +604,7 @@ Exposing performance counter data using a simple function
 
 The simplest way to expose arbitrary numeric data is to write a function which
 will then be called whenever a consumer queries this counter. Currently, this
-type of Performance Counter can only be used to expose integer values. The
+type of performance counter can only be used to expose integer values. The
 expected signature of this function is::
 
     std::int64_t some_performance_data(bool reset);
@@ -623,18 +626,18 @@ For instance, here is such a function returning how often it was invoked::
         return result;
     }
 
-This example function exposes a linearly increasing value as our performance
-data. The value is incremented on each invocation, e.g. each time a consumer
-requests the counter data of this Performance Counter.
+This example function exposes a linearly-increasing value as our performance
+data. The value is incremented on each invocation, i.e., each time a consumer
+requests the counter data of this performance counter.
 
 The next step in exposing this counter to the runtime system is to register the
 function as a new raw counter type using the |hpx| API function
 :cpp:func:`hpx::performance_counters::install_counter_type`. A counter type
 represents certain common characteristics of counters, like their counter type
-name, and any associated description information. The following snippet shows an
-example of how to register the function ``some_performance_data`` which is shown
-above for a counter type named ``"/test/data"``. This registration has to be
-executed before any consumer instantiates and queries an instance of this
+name and any associated description information. The following snippet shows an
+example of how to register the function ``some_performance_data``, which is shown
+above, for a counter type named ``"/test/data"``. This registration has to be
+executed before any consumer instantiates, and queries an instance of this
 counter type::
 
     #include <hpx/include/performance_counters.hpp>
@@ -651,12 +654,12 @@ counter type::
     }
 
 Now it is possible to instantiate a new counter instance based on the naming
-scheme ``"/test{locality#*/total}/data"`` where ``*`` is a zero based integer
+scheme ``"/test{locality#*/total}/data"`` where ``*`` is a zero-based integer
 index identifying the :term:`locality` for which the counter instance should be
 accessed. The function
-:cpp:func:`hpx::performance_counters::install_counter_type` enables to
+:cpp:func:`hpx::performance_counters::install_counter_type` enables users to
 instantiate exactly one counter instance for each :term:`locality`. Repeated
-requests to instantiate such a counter will return the same instance, e.g. the
+requests to instantiate such a counter will return the same instance, i.e., the
 instance created for the first request.
 
 If this counter needs to be accessed using the standard |hpx| command line
@@ -680,8 +683,7 @@ initialize the runtime system::
         return hpx::init(argc, argv);
     }
 
-Please see the code in [hpx_link
-examples/performance_counters/simplest_performance_counter.cpp..simplest_performance_counter.cpp]
+Please see the code in :download:`simplest_performance_counter.cpp <../../examples/performance_counters/simplest_performance_counter.cpp>`
 for a full example demonstrating this functionality.
 
 .. _full_counters:
@@ -689,27 +691,27 @@ for a full example demonstrating this functionality.
 Implementing a full performance counter
 ---------------------------------------
 
-Sometimes, the simple way of exposing a single value as a Performance Counter is
+Sometimes, the simple way of exposing a single value as a performance counter is
 not sufficient. For that reason, |hpx| provides a means of implementing full
-Performance Counters which support:
+performance counters which support:
 
-* Retrieving the descriptive information about the Performance Counter
+* Retrieving the descriptive information about the performance counter
 * Retrieving the current counter value
-* Resetting the Performance Counter (value)
-* Starting the Performance Counter
-* Stopping the Performance Counter
-* Setting the (initial) value of the Performance Counter
+* Resetting the performance counter (value)
+* Starting the performance counter
+* Stopping the performance counter
+* Setting the (initial) value of the performance counter
 
-Every full Performance Counter will implement a predefined interface:
+Every full performance counter will implement a predefined interface:
 
 .. literalinclude:: ../../hpx/performance_counters/performance_counter.hpp
    :language: c++
 
-In order to implement a full Performance Counter you have to create an |hpx|
-component exposing this interface. To simplify this task, |hpx| provides a ready
-made base class which handles all the boiler plate of creating a component for
-you. The remainder of this section will explain the process of creating a full
-Performance Counter based on the Sine example which you can find in the
+In order to implement a full performance counter, you have to create an |hpx|
+component exposing this interface. To simplify this task, |hpx| provides a
+ready-made base class which handles all the boiler plate of creating
+a component for you. The remainder of this section will explain the process of creating a full
+performance counter based on the Sine example, which you can find in the
 directory ``examples/performance_counters/sine/``.
 
 The base class is defined in the header file [hpx_link
@@ -720,38 +722,37 @@ as:
    :language: c++
 
 The single template parameter is expected to receive the type of the
-derived class implementing the Performance Counter. In the Sine example
+derived class implementing the performance counter. In the Sine example
 this looks like:
 
 .. literalinclude:: ../../examples/performance_counters/sine/server/sine.hpp
    :language: c++
 
-i.e. the type ``sine_counter`` is derived from the base class passing the type
-as a template argument (please see [hpx_link
-examples/performance_counters/sine/server/sine.hpp..sine.hpp] for the full
-source code of the counter definition). For more information about this
+i.e., the type ``sine_counter`` is derived from the base class passing the type
+as a template argument (please see :download:`simplest_performance_counter.cpp <../../examples/performance_counters/simplest_performance_counter.cpp>`
+for the full source code of the counter definition). For more information about this
 technique (called Curiously Recurring Template Pattern - CRTP), please see for
 instance the corresponding `Wikipedia article
 <http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern>`_. This base
 class itself is derived from the ``performance_counter`` interface described
 above.
 
-Additionally, a full Performance Counter implementation not only exposes the
-actual value but also provides information about
+Additionally, a full performance counter implementation not only exposes the
+actual value but also provides information about:
 
-* The point in time a particular value was retrieved
-* A (sequential) invocation count
-* The actual counter value
-* An optional scaling coefficient
-* Information about the counter status
+* The point in time a particular value was retrieved.
+* A (sequential) invocation count.
+* The actual counter value.
+* An optional scaling coefficient.
+* Information about the counter status.
 
 .. _counters:
 
 Existing |hpx| performance counters
 -----------------------------------
 
-The |hpx| runtime system exposes a wide variety of predefined Performance
-Counters. These counters expose critical information about different modules of
+The |hpx| runtime system exposes a wide variety of predefined performance
+counters. These counters expose critical information about different modules of
 the runtime system. They can help determine system bottlenecks and fine-tune
 system and application performance.
 
@@ -2611,7 +2612,7 @@ system and application performance.
 
    The ``/arithmetics`` counters can consume an arbitrary number of other
    counters. For this reason those have to be specified as parameters (a comma
-   separated list of counters appended after a ``'@'``. For instance:
+   separated list of counters appended after a ``'@'``). For instance:
 
    .. code-block:: bash
 
@@ -2745,7 +2746,7 @@ system and application performance.
    The performance counters related to :term:`parcel` coalescing are available only if
    the configuration time constant ``HPX_WITH_PARCEL_COALESCING`` is set to
    ``ON`` (default: ``ON``). However, even in this case it will be available
-   only for those actions, which are enabled for parcel coalescing (see the
+   only for actions that are enabled for parcel coalescing (see the
    macros :c:macro:`HPX_ACTION_USES_MESSAGE_COALESCING` and
    :c:macro:`HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW`).
 
@@ -2757,10 +2758,10 @@ APEX integration
 |hpx| provides integration with |apex|_, which is a framework for application
 profiling using task timers and various performance counters. It can be added as
 a ``git`` submodule by turning on the option :option:`HPX_WITH_APEX:BOOL` during
-|cmake|_ configuration. |tau|_ is an optional dependency when using |apex|_.
+|cmake| configuration. |tau|_ is an optional dependency when using |apex|.
 
-To build |hpx| with |apex|_ add :option:`HPX_WITH_APEX`\ ``=ON``, and,
-optionally, ``TAU_ROOT=$PATH_TO_TAU`` to your |cmake|_ configuration. In
-addition, you can override the tag used for |apex|_ with the
+To build |hpx| with |apex|, add :option:`HPX_WITH_APEX`\ ``=ON``, and,
+optionally, ``TAU_ROOT=$PATH_TO_TAU`` to your |cmake| configuration. In
+addition, you can override the tag used for |apex| with the
 :option:`HPX_WITH_APEX_TAG` option. Please see the |apex_hpx_doc|_ for detailed
-instructions on using |apex|_ with |hpx|.
+instructions on using |apex| with |hpx|.
