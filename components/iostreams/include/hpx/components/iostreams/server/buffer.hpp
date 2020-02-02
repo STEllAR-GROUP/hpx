@@ -14,8 +14,6 @@
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 
-#include <boost/swap.hpp>
-
 #include <iosfwd>
 #include <memory>
 #include <mutex>
@@ -85,7 +83,7 @@ namespace hpx { namespace iostreams { namespace detail
         buffer init_locked()
         {
             buffer b;
-            boost::swap(b.data_, data_);
+            std::swap(b.data_, data_);
             return b;
         }
 

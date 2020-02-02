@@ -8,11 +8,8 @@
 
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/format.hpp>
-#include <hpx/timing.hpp>
-
-#include <boost/config.hpp>
-#include <boost/thread/tss.hpp>
 #include <hpx/program_options.hpp>
+#include <hpx/timing.hpp>
 
 #include <cstdint>
 #include <functional>
