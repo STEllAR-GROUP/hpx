@@ -19,6 +19,7 @@ endif()
 
 set(datastructures_headers
   hpx/datastructures/any.hpp
+  hpx/datastructures/member_pack.hpp
   hpx/datastructures/optional.hpp
   hpx/datastructures/tuple.hpp
   hpx/datastructures/traits/supports_streaming_with_any.hpp

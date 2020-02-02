@@ -10,7 +10,7 @@
 #define HPX_UTIL_BIND_ACTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
@@ -48,7 +48,7 @@ namespace hpx { namespace util {
 
             template <typename Derived, typename... Ts_>
             explicit bound_action(Derived /*action*/, Ts_&&... vs)
-              : _args(std::forward<Ts_>(vs)...)
+              : _args(std::piecewise_construct, std::forward<Ts_>(vs)...)
             {
             }
 
@@ -73,7 +73,7 @@ namespace hpx { namespace util {
             HPX_FORCEINLINE bool apply(Us&&... vs) const
             {
                 return hpx::apply<Action>(detail::bind_eval<Ts const&>::call(
-                    util::get<Is>(_args), std::forward<Us>(vs)...)...);
+                    _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
@@ -82,7 +82,7 @@ namespace hpx { namespace util {
             {
                 return hpx::apply_c<Action>(cont,
                     detail::bind_eval<Ts const&>::call(
-                        util::get<Is>(_args), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
             template <typename Continuation, typename... Us>
@@ -92,7 +92,7 @@ namespace hpx { namespace util {
             {
                 return hpx::apply<Action>(std::forward<Continuation>(cont),
                     detail::bind_eval<Ts const&>::call(
-                        util::get<Is>(_args), std::forward<Us>(vs)...)...);
+                        _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
@@ -100,7 +100,7 @@ namespace hpx { namespace util {
                 Us&&... vs) const
             {
                 return hpx::async<Action>(detail::bind_eval<Ts const&>::call(
-                    util::get<Is>(_args), std::forward<Us>(vs)...)...);
+                    _args.template get<Is>(), std::forward<Us>(vs)...)...);
             }
 
             template <typename... Us>
@@ -116,7 +116,7 @@ namespace hpx { namespace util {
             }
 
         private:
-            util::tuple<Ts...> _args;
+            util::member_pack_for<Ts...> _args;
         };
     }    // namespace detail
 
