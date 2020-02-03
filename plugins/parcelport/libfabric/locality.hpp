@@ -10,6 +10,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/array.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 //
 #include <utility>
 #include <cstring>
@@ -171,7 +172,7 @@ private:
     }
 
     friend std::ostream & operator<<(std::ostream & os, locality const & loc) {
-        boost::io::ios_flags_saver ifs(os);
+        hpx::util::ios_flags_saver ifs(os);
         for (uint32_t i=0; i<array_length; ++i) {
             os << loc.data_[i];
         }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,9 +13,8 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 #include <hpx/errors.hpp>
-
-#include <boost/io/ios_state.hpp>
 
 #include <cstdint>
 
@@ -160,7 +159,7 @@ template <typename Char, typename Traits>
 inline std::basic_ostream<Char, Traits>&
 operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 {
-    boost::io::ios_flags_saver ifs(os);
+    hpx::util::ios_flags_saver ifs(os);
     os << "(" << addr.prefix << " "
        << components::get_component_type_name(addr.type) << " "
        << addr.count << " "

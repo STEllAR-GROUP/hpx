@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -18,10 +18,10 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/io/ios_state.hpp>
 
 #include <cstdint>
 #include <string>
@@ -87,7 +87,7 @@ namespace hpx { namespace parcelset
 
             friend std::ostream & operator<<(std::ostream & os, locality const & loc)
             {
-                boost::io::ios_flags_saver ifs(os);
+                hpx::util::ios_flags_saver ifs(os);
                 os << loc.address_ << ":" << loc.port_;
 
                 return os;

@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,8 +13,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
-
-#include <boost/io/ios_state.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 
 #include <string>
 
@@ -54,7 +53,7 @@ namespace hpx { namespace parcelset
 
     std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints)
     {
-        boost::io::ios_flags_saver ifs(os);
+        hpx::util::ios_flags_saver ifs(os);
         os << "[ ";
         for (endpoints_type::value_type const& loc : endpoints)
         {

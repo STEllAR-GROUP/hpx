@@ -9,6 +9,7 @@
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 //
 #include <cstdint>
 
@@ -62,7 +63,7 @@ namespace verbs
       }
 
       friend std::ostream & operator<<(std::ostream & os, locality const & loc) {
-        boost::io::ios_flags_saver ifs(os);
+        hpx::util::ios_flags_saver ifs(os);
         os << loc.ip_;
         return os;
       }

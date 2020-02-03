@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,8 +15,7 @@
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/serialization/serialize.hpp>
-
-#include <boost/io/ios_state.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstdint>
 
@@ -73,7 +72,7 @@ namespace hpx { namespace parcelset
 
             friend std::ostream & operator<<(std::ostream & os, locality const & loc)
             {
-                boost::io::ios_flags_saver ifs(os);
+                hpx::util::ios_flags_saver ifs(os);
                 os << loc.rank_;
 
                 return os;
