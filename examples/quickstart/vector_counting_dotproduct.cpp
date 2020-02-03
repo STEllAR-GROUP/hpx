@@ -9,8 +9,7 @@
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
-
-#include <boost/iterator/counting_iterator.hpp>
+#include <hpx/iterator_support.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -29,8 +28,8 @@ int hpx_main()
     double result =
         hpx::parallel::transform_reduce(
             hpx::parallel::execution::par,
-            boost::counting_iterator<size_t>(0),
-            boost::counting_iterator<size_t>(10007),
+            hpx::util::counting_iterator<size_t>(0),
+            hpx::util::counting_iterator<size_t>(10007),
             0.0,
             std::plus<double>(),
             [&xvalues, &yvalues](size_t i)

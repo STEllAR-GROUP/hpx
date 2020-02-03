@@ -15,10 +15,11 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <boost/iterator/counting_iterator.hpp>
+
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/counting_range.hpp>
+
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>

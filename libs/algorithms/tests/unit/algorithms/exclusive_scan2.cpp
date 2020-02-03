@@ -9,8 +9,6 @@
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/testing.hpp>
 
-#include <boost/iterator/counting_iterator.hpp>
-
 #include <cstddef>
 #include <iostream>
 #include <iterator>

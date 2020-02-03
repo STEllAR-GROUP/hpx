@@ -7,9 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_scan.hpp>
+#include <hpx/iterator_support.hpp>
 #include <hpx/testing.hpp>
-
-#include <boost/iterator/counting_iterator.hpp>
 
 #include <iostream>
 #include <iterator>
@@ -54,8 +53,8 @@ void test_exclusive_scan_validate(
 
     // test 1, fill array with numbers counting from 0, then run scan algorithm
     a.clear();
-    std::copy(boost::counting_iterator<int>(0),
-        boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
+    std::copy(hpx::util::counting_iterator<int>(0),
+        hpx::util::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
 #ifdef DUMP_VALUES
     std::cout << "\nValidating counting from 0 "
               << "\nInput : ";
@@ -88,8 +87,8 @@ void test_exclusive_scan_validate(
 
     // test 2, fill array with numbers counting from 1, then run scan algorithm
     a.clear();
-    std::copy(boost::counting_iterator<int>(1),
-        boost::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
+    std::copy(hpx::util::counting_iterator<int>(1),
+        hpx::util::counting_iterator<int>(ARRAY_SIZE), std::back_inserter(a));
 #ifdef DUMP_VALUES
     std::cout << "\nValidating counting from 1 "
               << "\nInput : ";

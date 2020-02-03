@@ -304,11 +304,10 @@ namespace tests {
     void random_access_iterator_test(Iterator i, int N, TrueVals vals)
     {
         bidirectional_iterator_test(i, vals[0], vals[1]);
-        const Iterator j = i;
+        Iterator const j = i;
         int c;
 
-        typedef typename boost::detail::iterator_traits<Iterator>::value_type
-            value_type;
+        using value_type = typename std::iterator_traits<Iterator>::value_type;
 
         for (c = 0; c < N - 1; ++c)
         {
