@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -24,7 +24,9 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/functional/deferred_call.hpp>
 
+#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -250,11 +252,13 @@ namespace hpx { namespace parcelset
                     << e.what();
                 hpx::report_error(std::current_exception());
             }
+#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
             catch (boost::exception const&) {
                 LPT_(error)
                     << "decode_message: caught boost::exception.";
                 hpx::report_error(std::current_exception());
             }
+#endif
             catch (std::exception const& e) {
                 // We have to repackage all exceptions thrown by the
                 // serialization library as otherwise we will loose the

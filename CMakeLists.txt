@@ -288,7 +288,7 @@ endif()
 hpx_option(HPX_WITH_DYNAMIC_HPX_MAIN BOOL
   "Enable dynamic overload of system ``main()`` (Linux only, default: ON)"
   ON ADVANCED)
-if(HPX_WITH_DYNAMIC_HPX_MAIN)
+if(HPX_WITH_DYNAMIC_HPX_MAIN AND (NOT MSVC))
   hpx_add_config_cond_define(HPX_HAVE_DYNAMIC_HPX_MAIN 1)
 endif()
 
@@ -1307,9 +1307,6 @@ if(WIN32)
   ##############################################################################
 
   hpx_add_config_cond_define(BOOST_USE_WINDOWS_H)
-  if (NOT Boost_USE_STATIC_LIBS)
-    hpx_add_config_cond_define(BOOST_SERIALIZATION_DYN_LINK)
-  endif()
   if(NOT CMAKE_CL_64)
     hpx_add_config_cond_define(BOOST_NO_ALIGNMENT)
   endif()

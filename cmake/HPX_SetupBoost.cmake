@@ -105,6 +105,11 @@ if (NOT TARGET hpx::boost)
     target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
   endif()
 
+  include(HPX_AddDefinitions)
+
+  # Boost Asio should not use Boost exceptions
+  hpx_add_config_cond_define(BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION 0)
+
   find_package(Threads QUIET REQUIRED)
   if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
     set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)
@@ -112,7 +117,6 @@ if (NOT TARGET hpx::boost)
     target_link_libraries(hpx::boost INTERFACE Threads::Threads)
   endif()
 
-  include(HPX_AddDefinitions)
   # Boost preprocessor definitions
   if(NOT Boost_USE_STATIC_LIBS)
     hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
