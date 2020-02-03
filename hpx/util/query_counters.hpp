@@ -70,7 +70,7 @@ namespace hpx { namespace util
 
         template <typename Stream, typename Future>
         void print_values(Stream* output, std::vector<Future> &&,
-            std::vector<std::size_t> && indicies,
+            std::vector<std::size_t> && indices,
             std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream>
