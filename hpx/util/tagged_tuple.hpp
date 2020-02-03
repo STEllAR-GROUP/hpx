@@ -88,7 +88,7 @@ namespace hpx { namespace util
             typedef typename hpx::util::identity<Tag(element_type)>::type type;
         };
 
-        template <typename Tuple, typename Indicies, typename ...Tags>
+        template <typename Tuple, typename Indices, typename ...Tags>
         struct tagged_tuple_helper;
 
         template <typename ...Ts, std::size_t ...Is, typename ...Tags>

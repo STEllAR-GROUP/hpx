@@ -319,7 +319,7 @@ namespace hpx { namespace util
 
     template <typename Stream, typename Value>
     void query_counters::print_values(Stream* output,
-        std::vector<Value> && values, std::vector<std::size_t> && indicies,
+        std::vector<Value> && values, std::vector<std::size_t> && indices,
         std::vector<performance_counters::counter_info> const& infos)
     {
         if (format_ == "csv" || format_ == "csv-short")
@@ -338,7 +338,7 @@ namespace hpx { namespace util
         else
         {
             std::size_t idx = 0;
-            for (std::size_t i : indicies)
+            for (std::size_t i : indices)
             {
                 print_value(output, infos[i].fullname_, values[idx],
                     infos[i].unit_of_measure_);
@@ -430,8 +430,8 @@ namespace hpx { namespace util
         error_code& ec)
     {
         // Query the performance counters.
-        std::vector<std::size_t> indicies;
-        indicies.reserve(infos.size());
+        std::vector<std::size_t> indices;
+        indices.reserve(infos.size());
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
@@ -441,10 +441,10 @@ namespace hpx { namespace util
                 continue;
             }
 
-            indicies.push_back(i);
+            indices.push_back(i);
         }
 
-        if (indicies.empty())
+        if (indices.empty())
             return false;
 
         std::ostringstream output;
@@ -454,13 +454,13 @@ namespace hpx { namespace util
         std::vector<performance_counters::counter_value> values =
              counters_.get_counter_values(launch::sync, reset, ec);
 
-        HPX_ASSERT(values.size() == indicies.size());
+        HPX_ASSERT(values.size() == indices.size());
 
         // Output the performance counter value.
         if (!no_output)
             print_headers(output, infos);
         print_values(no_output ? nullptr : &output, std::move(values),
-            std::move(indicies), infos);
+            std::move(indices), infos);
 
         if (!no_output)
         {
@@ -484,8 +484,8 @@ namespace hpx { namespace util
         error_code& ec)
     {
         // Query the performance counters.
-        std::vector<std::size_t> indicies;
-        indicies.reserve(infos.size());
+        std::vector<std::size_t> indices;
+        indices.reserve(infos.size());
 
         for (std::size_t i = 0; i != infos.size(); ++i)
         {
@@ -495,10 +495,10 @@ namespace hpx { namespace util
                 continue;
             }
 
-            indicies.push_back(i);
+            indices.push_back(i);
         }
 
-        if (indicies.empty())
+        if (indices.empty())
             return false;
 
         std::ostringstream output;
@@ -508,13 +508,13 @@ namespace hpx { namespace util
         std::vector<performance_counters::counter_values_array> values =
              counters_.get_counter_values_array(launch::sync, reset, ec);
 
-        HPX_ASSERT(values.size() == indicies.size());
+        HPX_ASSERT(values.size() == indices.size());
 
         // Output the performance counter value.
         if (!no_output)
             print_headers(output, infos);
         print_values(no_output ? nullptr : &output, std::move(values),
-            std::move(indicies), infos);
+            std::move(indices), infos);
 
         if (!no_output)
         {

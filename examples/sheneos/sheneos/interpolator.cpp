@@ -311,7 +311,7 @@ namespace sheneos
     // context data and callback function for asynchronous bulk operations
     struct context_data
     {
-        std::vector<std::size_t> indicies_;
+        std::vector<std::size_t> indices_;
         std::vector<sheneos_coord> coords_;
     };
 
@@ -331,17 +331,17 @@ namespace sheneos
         void operator()(hpx::future<std::vector<double> > f)
         {
             std::vector<double> result = f.get();
-            std::vector<std::size_t> const& indicies = data_.get().indicies_;
+            std::vector<std::size_t> const& indices = data_.get().indices_;
 
-            if (result.size() != indicies.size()) {
+            if (result.size() != indices.size()) {
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
                     "interpolator::on_completed_bulk_one",
                     "inconsistent sizes of result and index arrays");
             }
 
             std::vector<double>& overall_result = overall_result_.get();
-            for (std::size_t i = 0; i < indicies.size(); ++i)
-                overall_result[indicies[i]] = result[i];
+            for (std::size_t i = 0; i < indices.size(); ++i)
+                overall_result[indices[i]] = result[i];
         }
 
         std::reference_wrapper<context_data const> data_;
@@ -412,7 +412,7 @@ namespace sheneos
         {
             context_data& d = parts[get_partition(c).get_id()];
 
-            d.indicies_.push_back(index++);
+            d.indices_.push_back(index++);
             d.coords_.push_back(c);
         }
 
@@ -435,9 +435,9 @@ namespace sheneos
         void operator()(hpx::future<std::vector<std::vector<double> > > f)
         {
             std::vector<std::vector<double> > result = f.get();
-            std::vector<std::size_t> const& indicies = data_.get().indicies_;
+            std::vector<std::size_t> const& indices = data_.get().indices_;
 
-            if (result.size() != indicies.size()) {
+            if (result.size() != indices.size()) {
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
                     "interpolator::on_completed_bulk",
                     "inconsistent sizes of result and index arrays");
@@ -445,8 +445,8 @@ namespace sheneos
 
             std::vector<std::vector<double> >& overall_results =
                 overall_results_.get();
-            for (std::size_t i = 0; i < indicies.size(); ++i)
-                overall_results[indicies[i]] = result[i];
+            for (std::size_t i = 0; i < indices.size(); ++i)
+                overall_results[indices[i]] = result[i];
         }
 
         std::reference_wrapper<context_data const> data_;
@@ -519,7 +519,7 @@ namespace sheneos
         {
             context_data& d = parts[get_partition(c).get_id()];
 
-            d.indicies_.push_back(index++);
+            d.indices_.push_back(index++);
             d.coords_.push_back(c);
         }
 
