@@ -31,7 +31,7 @@ using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 // thread local globals
-static thread_local double* global_scratch;
+static boost::thread_specific_ptr<double> global_scratch;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
@@ -43,11 +43,11 @@ inline void worker(
 
     for (double i = 0.; i < updates; ++i)
     {
-        global_scratch = new double;
+        global_scratch.reset(new double);
 
         *global_scratch += 1. / (2. * i * (*global_scratch) + 1.);
 
-        delete global_scratch;
+        global_scratch.reset();
     }
 }
 
@@ -63,18 +63,19 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    std::uint32_t threads, updates;
+    unsigned threads = 1;
+    std::uint64_t updates = 1 << 22;
 
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<std::uint32_t>(&threads)->default_value(1),
+        , value<unsigned>(&threads)->default_value(1),
          "number of OS-threads")
 
         ( "updates,u"
-        , value<std::uint32_t>(&updates)->default_value(1 << 22)
+        , value<std::uint64_t>(&updates)->default_value(1 << 22)
         , "updates made to the TLS variable per OS-thread")
 
         ( "csv"
@@ -102,7 +103,7 @@ int main(
 
     high_resolution_timer t;
 
-    for (std::uint32_t i = 0; i != threads; ++i)
+    for (unsigned i = 0; i != threads; ++i)
         workers.push_back(std::thread(worker, std::ref(b), updates));
 
     for (std::thread& thread : workers)

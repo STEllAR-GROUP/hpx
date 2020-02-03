@@ -12,6 +12,8 @@
 #include <hpx/synchronization/detail/sliding_semaphore.hpp>
 #include <hpx/testing.hpp>
 
+#include <boost/assert.hpp>
+
 #include <algorithm>
 #include <array>
 #include <atomic>

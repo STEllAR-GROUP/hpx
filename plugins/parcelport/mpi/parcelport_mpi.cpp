@@ -35,6 +35,8 @@
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <boost/archive/basic_archive.hpp>
+
 #include <atomic>
 #include <cstddef>
 #include <exception>

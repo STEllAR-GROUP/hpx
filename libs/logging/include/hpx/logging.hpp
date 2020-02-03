@@ -14,9 +14,10 @@
 
 #if defined(HPX_HAVE_LOGGING)
 
-#include <hpx/assertion/current_function.hpp>
 #include <hpx/logging/format_fwd.hpp>
 #include <hpx/logging/logging.hpp>
+
+#include <boost/current_function.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 // specific logging
@@ -68,8 +69,8 @@ namespace hpx { namespace util {
         << hpx::util::levelname(::hpx::util::logging::level::lvl) << " " /**/
 #define LPROGRESS_                                                             \
     HPX_LOG_USE_LOG(hpx::util::timing, ::hpx::util::logging::level::fatal)     \
-        << " " << __FILE__ << ":" << __LINE__ << " "                           \
-        << HPX_ASSERTION_CURRENT_FUNCTION << " " /**/
+        << " " << __FILE__ << ":" << __LINE__ << " " << BOOST_CURRENT_FUNCTION \
+        << " " /**/
 
 #define LTIM_ENABLED(lvl)                                                      \
     hpx::util::timing_logger()->is_enabled(                                    \

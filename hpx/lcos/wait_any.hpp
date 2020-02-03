@@ -170,6 +170,8 @@ namespace hpx
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/datastructures/tuple.hpp>
 
+#include <boost/utility/swap.hpp>
+
 #include <array>
 #include <cstddef>
 #include <utility>

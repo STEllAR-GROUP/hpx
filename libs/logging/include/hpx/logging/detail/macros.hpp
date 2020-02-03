@@ -21,6 +21,7 @@
 #ifndef JT28092007_macros_HPP_DEFINED
 #define JT28092007_macros_HPP_DEFINED
 
+#include <boost/current_function.hpp>
 #include <string>
 
 namespace hpx { namespace util { namespace logging {
