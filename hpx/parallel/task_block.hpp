@@ -26,6 +26,7 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
+#include <boost/utility/addressof.hpp>      // boost::addressof
 #include <memory>                           // std::addressof
 
 #include <exception>
@@ -523,6 +524,12 @@ namespace hpx { namespace parallel { inline namespace v2
 
 /// \cond NOINTERNAL
 namespace std
+{
+    template <typename ExPolicy>
+    hpx::parallel::v2::task_block<ExPolicy>*
+    addressof(hpx::parallel::v2::task_block<ExPolicy>&) = delete;
+}
+namespace boost
 {
     template <typename ExPolicy>
     hpx::parallel::v2::task_block<ExPolicy>*

@@ -7,8 +7,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:nodeprecatedname:BOOST_ASSERT
+
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+
+#include <boost/assert.hpp>
 
 #include <chrono>
 #include <cmath>
@@ -41,7 +44,7 @@ struct clocksource
         duration d = std::chrono::duration_cast<duration>(
             base_clock::now().time_since_epoch());
         rep t = d.count();
-        HPX_ASSERT(t >= 0);
+        BOOST_ASSERT(t >= 0);
         return t;
     }
 
