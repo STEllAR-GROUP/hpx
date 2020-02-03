@@ -11,8 +11,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
-
-#include <boost/iterator/iterator_adaptor.hpp>
+#include <hpx/iterator_support/iterator_adaptor.hpp>
 
 #include <utility>
 
@@ -20,7 +19,7 @@ namespace hpx {
 
     template <typename DataType, typename BaseIter>
     class partitioned_vector_local_view_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             partitioned_vector_local_view_iterator<DataType, BaseIter>,
             BaseIter,
             DataType,
@@ -29,7 +28,7 @@ namespace hpx {
     {
     private:
         using base_type
-            = boost::iterator_adaptor<
+            = hpx::util::iterator_adaptor<
                 partitioned_vector_local_view_iterator<DataType, BaseIter>,
                 BaseIter,
                 DataType,
@@ -54,7 +53,7 @@ namespace hpx {
         }
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         template <typename, typename>
         friend class const_partitioned_vector_local_view_iterator;
@@ -86,7 +85,7 @@ namespace hpx {
 
     template <typename DataType, typename BaseIter>
     class const_partitioned_vector_local_view_iterator
-      : public boost::iterator_adaptor<
+      : public hpx::util::iterator_adaptor<
             const_partitioned_vector_local_view_iterator<DataType, BaseIter>,
             BaseIter,
             DataType,
@@ -95,7 +94,7 @@ namespace hpx {
     {
     private:
         using base_type
-            = boost::iterator_adaptor<
+            = hpx::util::iterator_adaptor<
                 const_partitioned_vector_local_view_iterator<DataType, BaseIter>,
                 BaseIter,
                 DataType,
@@ -127,7 +126,7 @@ namespace hpx {
         }
 
     private:
-        friend class boost::iterator_core_access;
+        friend class hpx::util::iterator_core_access;
 
         DataType const & dereference() const
         {
