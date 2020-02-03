@@ -24,10 +24,8 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/decay.hpp>
-
 
 #if defined(HPX_HAVE_AWAIT)
     #include <hpx/lcos/detail/future_await_traits.hpp>
