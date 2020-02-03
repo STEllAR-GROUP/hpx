@@ -12,7 +12,7 @@ Resiliency
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/resiliency/docs/index.html>`__.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/resiliency/docs/index.html>`__.
 
 Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 LLC (NTESS). Under the terms of the Contract DE-NA0003525 with NTESS, the

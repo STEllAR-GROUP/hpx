@@ -13,4 +13,4 @@ local_lcos
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/local_lcos/docs/index.html>`__.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/local_lcos/docs/index.html>`__.

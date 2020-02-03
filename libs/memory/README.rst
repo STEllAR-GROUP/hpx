@@ -13,4 +13,4 @@ memory
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/memory/docs/index.html>`__.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/memory/docs/index.html>`__.
