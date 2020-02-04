@@ -339,7 +339,7 @@ namespace hpx { namespace threads { namespace policies {
                             // pool - we can schedule on any thread available
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
-                                    static_cast<unsigned int>(num_workers_));
+                                    static_cast<std::size_t>(num_workers_));
                         }
                         else if (!round_robin_) /* thread parent */
                         {
@@ -368,7 +368,7 @@ namespace hpx { namespace threads { namespace policies {
                                 numa_holder_[domain_num]
                                     .thread_queue(
                                         static_cast<std::uint16_t>(q_index))
-                                    ->worker_next(static_cast<unsigned int>(
+                                    ->worker_next(static_cast<std::size_t>(
                                         num_workers_));
                         }
                         thread_num = select_active_pu(l, thread_num);
@@ -396,9 +396,8 @@ namespace hpx { namespace threads { namespace policies {
                         // Create thread on requested NUMA domain
                         debug::set(msg, "HINT_NUMA  ");
                         // TODO: This case does not handle suspended PUs.
-                        domain_num = fast_mod(
-                            static_cast<unsigned int>(data.schedulehint.hint),
-                            static_cast<unsigned int>(num_domains_));
+                        domain_num =
+                            fast_mod(data.schedulehint.hint, num_domains_);
                         // if the thread creating the new task is on the domain
                         // assigned to the new task - try to reuse the core as well
                         thread_num = local_num;
@@ -487,14 +486,13 @@ namespace hpx { namespace threads { namespace policies {
                     // High priority tasks first
                     else if (steal_hp_first_)
                     {
-                        for (std::uint16_t d = 0; d < num_domains_; ++d)
+                        for (std::size_t d = 0; d < num_domains_; ++d)
                         {
-                            std::uint16_t dom =
-                                fast_mod(static_cast<unsigned int>(domain + d),
-                                    static_cast<unsigned int>(num_domains_));
+                            std::size_t dom =
+                                fast_mod(domain + d, num_domains_);
                             q_index =
-                                fast_mod(static_cast<unsigned int>(q_index),
-                                    static_cast<unsigned int>(q_counts_[dom]));
+                                fast_mod(static_cast<std::size_t>(q_index),
+                                    static_cast<std::size_t>(q_counts_[dom]));
                             result = operation_HP(
                                 dom, q_index, origin, var, (d > 0), true);
                             if (result)
@@ -510,14 +508,12 @@ namespace hpx { namespace threads { namespace policies {
                             if (!steal_numa)
                                 break;
                         }
-                        for (std::uint16_t d = 0; d < num_domains_; ++d)
+                        for (std::size_t d = 0; d < num_domains_; ++d)
                         {
-                            std::uint16_t dom =
-                                fast_mod(static_cast<unsigned int>(domain + d),
-                                    static_cast<unsigned int>(num_domains_));
-                            q_index =
-                                fast_mod(static_cast<unsigned int>(q_index),
-                                    static_cast<unsigned int>(q_counts_[dom]));
+                            std::size_t dom =
+                                fast_mod(domain + d, num_domains_);
+                            q_index = fast_mod(q_index,
+                                static_cast<std::size_t>(q_counts_[dom]));
                             result = operation(
                                 dom, q_index, origin, var, (d > 0), true);
                             if (result)
@@ -576,14 +572,12 @@ namespace hpx { namespace threads { namespace policies {
                         else
                         {
                             // try other numa domains BP/HP
-                            for (std::uint16_t d = 1; d < num_domains_; ++d)
+                            for (std::size_t d = 1; d < num_domains_; ++d)
                             {
-                                std::uint16_t dom = fast_mod(
-                                    static_cast<unsigned int>(domain + d),
-                                    static_cast<unsigned int>(num_domains_));
-                                q_index = fast_mod(
-                                    static_cast<unsigned int>(q_index),
-                                    static_cast<unsigned int>(q_counts_[dom]));
+                                std::size_t dom =
+                                    fast_mod(domain + d, num_domains_);
+                                q_index = fast_mod(q_index,
+                                    static_cast<std::size_t>(q_counts_[dom]));
                                 result = operation_HP(
                                     dom, q_index, origin, var, true, true);
                                 if (result)
@@ -597,14 +591,12 @@ namespace hpx { namespace threads { namespace policies {
                                 }
                             }
                             // try other numa domains NP/LP
-                            for (std::uint16_t d = 1; d < num_domains_; ++d)
+                            for (std::size_t d = 1; d < num_domains_; ++d)
                             {
-                                std::uint16_t dom = fast_mod(
-                                    static_cast<unsigned int>(domain + d),
-                                    static_cast<unsigned int>(num_domains_));
-                                q_index = fast_mod(
-                                    static_cast<unsigned int>(q_index),
-                                    static_cast<unsigned int>(q_counts_[dom]));
+                                std::size_t dom =
+                                    fast_mod(domain + d, num_domains_);
+                                q_index = fast_mod(q_index,
+                                    static_cast<std::size_t>(q_counts_[dom]));
                                 result = operation(
                                     dom, q_index, origin, var, true, true);
                                 if (result)
@@ -766,7 +758,7 @@ namespace hpx { namespace threads { namespace policies {
                             // pool - we can schedule on any thread available
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
-                                    static_cast<unsigned int>(num_workers_));
+                                    static_cast<std::size_t>(num_workers_));
                             q_index = 0;
                             // clang-format off
                             using namespace hpx::threads::detail;
@@ -799,7 +791,7 @@ namespace hpx { namespace threads { namespace policies {
                                 numa_holder_[domain_num]
                                     .thread_queue(
                                         static_cast<std::uint16_t>(q_index))
-                                    ->worker_next(static_cast<unsigned int>(
+                                    ->worker_next(static_cast<std::size_t>(
                                         num_workers_));
                             spq_deb.debug(debug::str<>("schedule_thread"),
                                 "assign_work_round_robin", "thread_num",
@@ -829,8 +821,8 @@ namespace hpx { namespace threads { namespace policies {
                         debug::set(msg, "HINT_NUMA  ");
                         // TODO: This case does not handle suspended PUs.
                         domain_num = fast_mod(
-                            static_cast<unsigned int>(schedulehint.mode),
-                            static_cast<unsigned int>(num_domains_));
+                            static_cast<std::size_t>(schedulehint.mode),
+                            static_cast<std::size_t>(num_domains_));
                         // if the thread creating the new task is on the domain
                         // assigned to the new task - try to reuse the core as well
                         if (d_lookup_[thread_num] == domain_num)

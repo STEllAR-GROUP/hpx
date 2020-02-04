@@ -526,6 +526,7 @@ namespace hpx { namespace util {
         struct get_table
         {
             using is_small =
+                // NOLINTNEXTLINE(bugprone-sizeof-expression)
                 std::integral_constant<bool, (sizeof(T) <= sizeof(void*))>;
 
             template <typename IArch, typename OArch, typename Char,
@@ -943,6 +944,7 @@ namespace hpx { namespace util {
 
     public:
         // copy assignment operator
+        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
         basic_any& operator=(basic_any const& x)
         {
             basic_any(x).swap(*this);
@@ -950,6 +952,7 @@ namespace hpx { namespace util {
         }
 
         // move assignment
+        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
         basic_any& operator=(basic_any&& rhs) noexcept
         {
             rhs.swap(*this);

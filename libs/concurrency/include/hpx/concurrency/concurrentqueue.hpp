@@ -1611,6 +1611,7 @@ private:
         // arrays of Blocks all be properly aligned (not just the first one). We use a union to force
         // this.
         union {
+            // NOLINTNEXTLINE(bugprone-sizeof-expression)
             char elements[sizeof(T) * BLOCK_SIZE];
             details::max_align_t dummy;
         };
@@ -2898,6 +2899,7 @@ private:
             auto raw = static_cast<char*>((Traits::malloc)(
                 sizeof(BlockIndexHeader) +
                 std::alignment_of<BlockIndexEntry>::value - 1 + sizeof(BlockIndexEntry) * entryCount +
+                // NOLINTNEXTLINE(bugprone-sizeof-expression)
                 std::alignment_of<BlockIndexEntry*>::value - 1 + sizeof(BlockIndexEntry*) * nextBlockIndexCapacity));
             if (raw == nullptr) {
                 return false;

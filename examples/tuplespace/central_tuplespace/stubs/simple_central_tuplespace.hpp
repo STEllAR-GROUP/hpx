@@ -55,8 +55,8 @@ namespace examples { namespace stubs
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         static hpx::lcos::future<tuple_type>
-        read_async(hpx::naming::id_type const& gid, const tuple_type& tp,
-            long const timeout)
+        read_async(hpx::naming::id_type const& gid, tuple_type const& tp,
+            double const timeout)
         {
             typedef server::simple_central_tuplespace::read_action action_type;
             return hpx::async<action_type>(gid, tp, timeout);
@@ -68,7 +68,7 @@ namespace examples { namespace stubs
         //[simple_central_tuplespace_stubs_read_sync
         static tuple_type
         read(hpx::launch::sync_policy, hpx::naming::id_type const& gid,
-            const tuple_type& tp, long const timeout)
+            tuple_type const& tp, double const timeout)
         {
             typedef server::simple_central_tuplespace::read_action action_type;
             return hpx::async<action_type>(gid, tp, timeout).get();
@@ -86,7 +86,7 @@ namespace examples { namespace stubs
         //[simple_central_tuplespace_stubs_take_async
         static hpx::lcos::future<tuple_type>
         take(hpx::launch::async_policy, hpx::naming::id_type const& gid,
-            const tuple_type& tp, long const timeout)
+            tuple_type const& tp, double const timeout)
         {
             typedef server::simple_central_tuplespace::take_action action_type;
             return hpx::async<action_type>(gid, tp, timeout);
@@ -97,8 +97,8 @@ namespace examples { namespace stubs
         ///
         /// \note This function is fully synchronous.
         static tuple_type take(hpx::launch::sync_policy,
-            hpx::naming::id_type const& gid, const tuple_type& tp,
-            const long timeout)
+            hpx::naming::id_type const& gid, tuple_type const& tp,
+            double const timeout)
         {
             // The following get yields control while the action is executed.
             return take(hpx::launch::async, gid, tp, timeout).get();

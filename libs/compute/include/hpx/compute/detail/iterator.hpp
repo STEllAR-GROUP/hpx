@@ -63,6 +63,7 @@ namespace hpx { namespace compute { namespace detail {
         {
         }
 
+        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
         HPX_HOST_DEVICE iterator& operator=(iterator const& other)
         {
             this->base_type::operator=(other);

@@ -53,7 +53,7 @@ namespace examples { namespace server {
             return tuple_fields_[0].empty();
         }
 
-        int insert(const tuple_type& tp)
+        int insert(tuple_type const& tp)
         {
             if (tp.empty())    // empty tuple
                 return -1;
@@ -76,7 +76,7 @@ namespace examples { namespace server {
             return 0;
         }
 
-        tuple_type match(const tuple_type& tp) const
+        tuple_type match(tuple_type const& tp) const
         {
             tuple_type result;
 
@@ -99,7 +99,7 @@ namespace examples { namespace server {
             return result;
         }
 
-        tuple_type match_and_erase(const tuple_type& tp)
+        tuple_type match_and_erase(tuple_type const& tp)
         {
             tuple_type result;
 
@@ -123,7 +123,7 @@ namespace examples { namespace server {
         }
 
     private:    // private member functions
-        matched_indices_type find_matched_indices(const tuple_type& tp) const
+        matched_indices_type find_matched_indices(tuple_type const& tp) const
         {
             tuple_type::const_iterator it;
             unsigned int pos;
@@ -198,7 +198,7 @@ namespace examples { namespace server {
             return read_tuple_at(tuple_fields_[0].random_index());
         }
 
-        tuple_type read_tuple_at(const index_type& id) const
+        tuple_type read_tuple_at(index_type const& id) const
         {
             tuple_type result;
 
@@ -235,7 +235,7 @@ namespace examples { namespace server {
             return take_tuple_at(tuple_fields_[0].random_index());
         }
 
-        tuple_type take_tuple_at(const index_type& id)
+        tuple_type take_tuple_at(index_type const& id)
         {
             tuple_type result;
 
@@ -297,7 +297,7 @@ namespace examples { namespace server {
                 return field_index_map_.empty();
             }
 
-            int insert(const index_type& id, const elem_type& elem)
+            int insert(index_type const& id, elem_type const& elem)
             {
                 field_index_map_iterator_type it;
 

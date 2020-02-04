@@ -33,6 +33,7 @@ struct MaybeThrowOnCopy
             throw tried_to_copy();
     }
 
+    // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
     MaybeThrowOnCopy& operator=(const MaybeThrowOnCopy& other)
     {
         if (throwOnCopy)

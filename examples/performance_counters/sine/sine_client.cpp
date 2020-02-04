@@ -94,7 +94,7 @@ int monitor(std::uint64_t pause, std::uint64_t values)
                 start_time = value2.time_;
 
             hpx::util::format_to(std::cout, "{:.3}: {:.4}, {:.4}, {:.4}\n",
-                (value2.time_ - start_time) * 1e-9,
+                static_cast<double>(value2.time_ - start_time) * 1e-9,
                 value1.get_value<double>(),
                 value2.get_value<double>() / 100000.,
                 value3.get_value<double>());
@@ -103,8 +103,11 @@ int monitor(std::uint64_t pause, std::uint64_t values)
         // stop/restart the sine_explicit counter after every 5 seconds of
         // evaluation
         bool should_run =
-            (int((value2.time_ - start_time) * 1e-9) / 5) % 2 != 0;
-        if (should_run == started) {
+            (int(static_cast<double>(value2.time_ - start_time) * 1e-9) / 5) %
+                2 !=
+            0;
+        if (should_run == started)
+        {
             if (started) {
                 sine_explicit.stop();
                 started = false;

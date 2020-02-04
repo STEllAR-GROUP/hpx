@@ -182,13 +182,10 @@ namespace hpx { namespace naming
                     // This request might come in too late and the thread manager
                     // was already stopped. We ignore the request if that's the
                     // case.
-                    if (e.get_error() != invalid_status)
+                    if (e.get_error() != invalid_status ||
+                        !threads::threadmanager_is(hpx::state_stopping))
                     {
-                        throw;    // rethrow if not invalid_status
-                    }
-                    else if (!threads::threadmanager_is(hpx::state_stopping))
-                    {
-                        throw;    // rethrow if not stopping
+                        throw;
                     }
                 }
             }

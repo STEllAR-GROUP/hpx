@@ -111,7 +111,7 @@ namespace examples
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         //[simple_central_tuplespace_client_write_async
-        hpx::lcos::future<int> write_async(const tuple_type& tuple)
+        hpx::lcos::future<int> write_async(tuple_type const& tuple)
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::write_async(this->get_id(), tuple);
@@ -121,7 +121,7 @@ namespace examples
         /// put \p tuple into tuplespace.
         ///
         /// \note This function is fully synchronous.
-        int write(hpx::launch::sync_policy, const tuple_type& tuple)
+        int write(hpx::launch::sync_policy, tuple_type const& tuple)
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::write(hpx::launch::sync, this->get_id(), tuple);
@@ -134,7 +134,7 @@ namespace examples
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         hpx::lcos::future<tuple_type>
-            read_async(const tuple_type& tp, long const timeout)
+            read_async(tuple_type const& tp, double const timeout)
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::read_async(this->get_id(), tp, timeout);
@@ -144,8 +144,8 @@ namespace examples
         ///
         /// \note This function is fully synchronous.
         //[simple_central_tuplespace_client_read_sync
-        tuple_type read(hpx::launch::sync_policy, const tuple_type& tp,
-            long const timeout)
+        tuple_type read(hpx::launch::sync_policy, tuple_type const& tp,
+            double const timeout)
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::read(hpx::launch::sync, this->get_id(),
@@ -163,7 +163,7 @@ namespace examples
         ///          until the value is ready.
         //[simple_central_tuplespace_client_take_async
         hpx::lcos::future<tuple_type>
-            take_async(const tuple_type& tp, long const timeout)
+            take_async(tuple_type const& tp, double const timeout)
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::take(hpx::launch::async, this->get_id(),
@@ -174,8 +174,8 @@ namespace examples
         /// take matching tuple from tuplespace within \p timeout.
         ///
         /// \note This function is fully synchronous.
-        tuple_type take(hpx::launch::sync_policy, const tuple_type& tp,
-            long const timeout)
+        tuple_type take(hpx::launch::sync_policy, tuple_type const& tp,
+            double const timeout)
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::take(hpx::launch::sync, this->get_id(),

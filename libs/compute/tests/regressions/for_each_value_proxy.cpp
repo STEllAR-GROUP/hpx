@@ -39,6 +39,7 @@ public:
         return *this;
     }
 
+    // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
     test_value_proxy& operator=(test_value_proxy const& other)
     {
         p_ = other.p_;

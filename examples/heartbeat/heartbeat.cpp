@@ -87,11 +87,9 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
             if (!zero_time)
                 zero_time = value.time_;
 
-            hpx::util::format_to(std::cout,
-                "  {},{},{}[s],{}\n",
-                name,
+            hpx::util::format_to(std::cout, "  {},{},{}[s],{}\n", name,
                 value.count_,
-                double((value.time_ - zero_time) * 1e-9),
+                double(static_cast<double>(value.time_ - zero_time) * 1e-9),
                 value.value_);
 
 #if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0

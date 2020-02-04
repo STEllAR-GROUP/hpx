@@ -50,7 +50,7 @@ namespace hpx { namespace util
 
         std::int64_t elapsed_microseconds() const
         {
-            return std::int64_t((take_time_stamp() - start_time_) * 1e-3);
+            return std::int64_t((take_time_stamp() - start_time_) / 1000);
         }
 
         std::int64_t elapsed_nanoseconds() const

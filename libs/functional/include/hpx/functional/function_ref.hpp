@@ -96,6 +96,7 @@ namespace hpx { namespace util {
             return *this;
         }
 
+        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
         function_ref& operator=(function_ref const& other) noexcept
         {
             vptr = other.vptr;

@@ -84,7 +84,7 @@ int hpx_main (int argc, char *argv[])
     originalA.resize(size*size); //-V106
     for(int i = 0; i < size * size; i++)
         originalA[i] = A[i];
-    printf("init done, time = %f\n", (t2-t1)/1000000.0);
+    printf("init done, time = %f\n", static_cast<double>(t2 - t1) / 1000000.0);
 
     t1 = get_tick_count();
     if(numBlocks == 1)
@@ -94,7 +94,8 @@ int hpx_main (int argc, char *argv[])
     else
         printf("Error: numBlocks must be greater than 0.\n");
     t2 = get_tick_count();
-    printf("Time for LU-decomposition in secs: %f \n", (t2-t1)/1000000.0);
+    printf("Time for LU-decomposition in secs: %f \n",
+        static_cast<double>(t2 - t1) / 1000000.0);
 
     checkResult( originalA );
 

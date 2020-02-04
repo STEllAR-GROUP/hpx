@@ -55,8 +55,8 @@ namespace hpx { namespace threads { namespace policies {
     // apply the modulo operator only when needed
     // (i.e. when the input is greater than the ceiling)
     // NB: the numbers must be positive
-    HPX_FORCEINLINE int fast_mod(
-        const unsigned int input, const unsigned int ceil)
+    HPX_FORCEINLINE std::size_t fast_mod(
+        std::size_t const input, std::size_t const ceil)
     {
         return input >= ceil ? input % ceil : input;
     }
@@ -290,7 +290,7 @@ namespace hpx { namespace threads { namespace policies {
         // ------------------------------------------------------------
         // return the next round robin thread index across all workers
         // using a batching of N per worker before incrementing
-        inline unsigned int worker_next(const unsigned int workers) const
+        inline std::size_t worker_next(std::size_t const workers) const
         {
             tq_deb.debug(debug::str<>("worker_next"), "Rollover counter ",
                 debug::dec<4>(std::get<0>(rollover_counters_.data_)),

@@ -889,7 +889,7 @@ bool BMP::ReadFromFile( const char* FileName )
 
  // skip blank data if bfOffBits so indicates
 
- int BytesToSkip = bmfh.bfOffBits - 54;;
+ int BytesToSkip = static_cast<int>(bmfh.bfOffBits) - 54;;
  if( BitDepth < 16 )
  { BytesToSkip -= 4*IntPow(2,BitDepth); }
  if( BitDepth == 16 && bmih.biCompression == 3 )

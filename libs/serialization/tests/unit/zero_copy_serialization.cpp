@@ -108,8 +108,8 @@ std::size_t get_archive_size(hpx::parcelset::parcel const& p,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_parcel_serialization(
-    hpx::parcelset::parcel outp, int out_archive_flags, bool zero_copy)
+void test_parcel_serialization(hpx::parcelset::parcel outp,
+    std::uint32_t out_archive_flags, bool zero_copy)
 {
     // serialize data
     std::vector<hpx::serialization::serialization_chunk> out_chunks;
@@ -181,7 +181,7 @@ void test_normal_serialization(T& arg)
         reinterpret_cast<std::uint64_t>(&test_function1));
 
     // compose archive flags
-    unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
+    std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
 #if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
@@ -209,7 +209,7 @@ void test_normal_serialization(T1& arg1, T2& arg2)
         reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
-    unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
+    std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
 #if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
@@ -238,7 +238,7 @@ void test_normal_serialization(
         reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
-    unsigned out_archive_flags = hpx::serialization::disable_data_chunking;
+    std::uint32_t out_archive_flags = hpx::serialization::disable_data_chunking;
 #if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
@@ -267,7 +267,7 @@ void test_zero_copy_serialization(T& arg)
         reinterpret_cast<std::uint64_t>(&test_function1));
 
     // compose archive flags
-    unsigned out_archive_flags = 0U;
+    std::uint32_t out_archive_flags = 0U;
 #if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
@@ -295,7 +295,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
         reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
-    unsigned out_archive_flags = 0U;
+    std::uint32_t out_archive_flags = 0U;
 #if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else
@@ -324,7 +324,7 @@ void test_zero_copy_serialization(
         reinterpret_cast<std::uint64_t>(&test_function2));
 
     // compose archive flags
-    unsigned out_archive_flags = 0U;
+    std::uint32_t out_archive_flags = 0U;
 #if BOOST_ENDIAN_BIG_BYTE
     out_archive_flags |= hpx::serialization::endian_big;
 #else

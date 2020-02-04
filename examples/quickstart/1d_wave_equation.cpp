@@ -206,8 +206,8 @@ int hpx_main(variables_map& vm)
 
     c = 1.0;
 
-    dt = 1.0 / (nt - 1);
-    dx = 1.0 / (nx - 1);
+    dt = 1.0 / static_cast<double>(nt - 1);
+    dx = 1.0 / static_cast<double>(nx - 1);
     alpha_squared = (c * dt / dx) * (c * dt / dx);
 
     // check that alpha_squared satisfies the stability condition

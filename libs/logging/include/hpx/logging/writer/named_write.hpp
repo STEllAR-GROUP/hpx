@@ -329,6 +329,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
                         m_manipulator = '%';
                 }
                 else if (m_manipulator.empty())
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 {
                     ;    // ignore this char - not from a manipulator
                 }

@@ -204,6 +204,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 OutIter>::is_segmented_iterator is_out_seg;
 
             // check if OutIter is segmented in the same way as SegIter
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (is_segmented_the_same(first, last, dest, is_out_seg()))
             {
                 return segmented_inclusive_scan_seq(
@@ -232,6 +233,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 OutIter>::is_segmented_iterator is_out_seg;
 
             // check if OutIter is segmented in the same way as SegIter
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (is_segmented_the_same(first, last, dest, is_out_seg()))
             {
                 return segmented_inclusive_scan_par(
