@@ -9,7 +9,6 @@
 #define HPX_SERIALIZATION_DETAIL_POINTER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/basic_archive.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
