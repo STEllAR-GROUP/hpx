@@ -127,7 +127,7 @@ jobs:
           name: Check that the modules are well clang-formatted
           command: |
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
-              clang-format-8 -i **/*.{cpp,hpp}
+              clang-format -i **/*.{cpp,hpp}
               git diff --exit-code > /tmp/modified_format_files.txt
       - store_artifacts:
           path: /tmp/modified_format_files.txt
