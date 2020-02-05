@@ -1,4 +1,4 @@
-#! /usr/bin/env python 
+#! /usr/bin/env python3
 #
 # Copyright (c) 2011 Bryce Lelbach
 # Copyright (c) 2019 Patrick Diehl
@@ -22,9 +22,9 @@ from re import compile
 def make_component(raw, type):
   """
   Transliterate characters from an element returned by platform.uname() to
-  match the regex ``^[a-z0-9\-.]+$``. Returns ``"unknown-%s" % type`` if 
-  the transliterated string doesn't match the regex pattern. 
-  """ 
+  match the regex ``^[a-z0-9\-.]+$``. Returns ``"unknown-%s" % type`` if
+  the transliterated string doesn't match the regex pattern.
+  """
   from string import lower
 
   comp = compile(r'\s|_').sub('-', lower(raw))
@@ -39,7 +39,7 @@ def make_compiler_component(driver):
   Given the name of a compiler driver, generate a string describing the compiler
   suite and version. Returns ``"unknown-compiler"`` if the compiler cannot be
   identified.
-  """ 
+  """
   from hpx.process import process
 
   windows = 0
@@ -54,21 +54,21 @@ def make_compiler_component(driver):
     proc = process("%s --version" % driver)
 
   proc.wait()
-  raw = proc.read() 
+  raw = proc.read()
 
   if (windows):
-    compiler = compile(r'Version ([0-9.]+)').match(raw) 
- 
+    compiler = compile(r'Version ([0-9.]+)').match(raw)
+
     if (compiler):
       compiler = compiler.expand(r'msvc-\2')
       if compile(r'^[a-z0-9\-.]+$').match(compiler):
         return compiler
       else:
-        return "msvc" 
+        return "msvc"
 
   # handle GNU GCC and Intel
   compiler = compile(r'^(icc|icpc|gcc|g[+][+])[^ ]* [(][^)]+[)] ([0-9.]+)').match(raw)
-  
+
   if (compiler):
     unescaped = compiler.expand(r'\1-\2')
     compiler = compile(r'[+]').sub("x", unescaped)
@@ -78,10 +78,10 @@ def make_compiler_component(driver):
     else:
       unescaped = compile(r'^(icc|icpc|gcc|g[+][+])').match(raw).expand(r'\1')
       return compile(r'[+]').sub("x", unescaped)
- 
+
   # handle Clang
   compiler = compile(r'(clang) version ([0-9.]+)').match(raw)
-  
+
   if (compiler):
     compiler = compiler.expand(r'\1-\2')
     if compile(r'^[a-z0-9\-.]+$').match(compiler):
@@ -105,5 +105,5 @@ def identify(driver):
   return "%s_%s-%s_%s" % (make_component(machine, "processor"),
                           make_component(system, "kernel"),
                           make_component(release, "version"),
-                          make_compiler_component(absolute_path(driver))) 
+                          make_compiler_component(absolute_path(driver)))
 
