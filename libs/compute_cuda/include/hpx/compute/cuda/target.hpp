@@ -33,6 +33,11 @@
 
 namespace hpx { namespace compute { namespace cuda {
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+        HPX_API_EXPORT hpx::future<void> get_future(cudaStream_t);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     struct target
     {
     public:
@@ -204,6 +209,7 @@ namespace hpx { namespace compute { namespace cuda {
         hpx::id_type locality_;
     };
 
+    using detail::get_future;
     HPX_API_EXPORT target& get_default_target();
 }}}    // namespace hpx::compute::cuda
 

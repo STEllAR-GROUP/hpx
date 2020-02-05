@@ -138,6 +138,18 @@ namespace hpx { namespace compute { namespace cuda {
                         cudaGetErrorString(error));
             }
         }
+
+        hpx::future<void> get_future(cudaStream_t stream)
+        {
+            typedef detail::future_data shared_state_type;
+
+            // make sure shared state stays alive even if the callback is invoked
+            // during initialization
+            hpx::intrusive_ptr<shared_state_type> p(new shared_state_type());
+            p->init(stream);
+            return hpx::traits::future_access<hpx::future<void>>::create(
+                std::move(p));
+        }
     }    // namespace detail
 
     void target::native_handle_type::init_processing_units()
@@ -304,14 +316,7 @@ namespace hpx { namespace compute { namespace cuda {
 
     hpx::future<void> target::get_future() const
     {
-        typedef detail::future_data shared_state_type;
-
-        // make sure shared state stays alive even if the callback is invoked
-        // during initialization
-        hpx::intrusive_ptr<shared_state_type> p(new shared_state_type());
-        p->init(handle_.get_stream());
-        return hpx::traits::future_access<hpx::future<void>>::create(
-            std::move(p));
+        return detail::get_future(handle_.get_stream());
     }
 
     target& get_default_target()
