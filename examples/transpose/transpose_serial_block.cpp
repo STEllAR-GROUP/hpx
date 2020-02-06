@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
         ( "verbose", "Verbose output")
     ;
 
-    // Initialize and run HPX, this example is serial and therefor only needs
+    // Initialize and run HPX, this example is serial and therefore only needs
     // on thread. We just use hpx::init to parse our command line arguments
     std::vector<std::string> const cfg = {
         "hpx.os_threads!=1"

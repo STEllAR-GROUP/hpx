@@ -314,7 +314,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "queing thread_priority_bound");
+                    "queueing thread_priority_bound");
                 bp_queue_->schedule_work(thrd, other_end);
             }
             else if (hp_queue_ &&
@@ -325,7 +325,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "queing thread_priority_high");
+                    "queueing thread_priority_high");
                 hp_queue_->schedule_work(thrd, other_end);
             }
             else if (lp_queue_ && (priority == thread_priority_low))
@@ -333,7 +333,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "queing thread_priority_low");
+                    "queueing thread_priority_low");
                 lp_queue_->schedule_work(thrd, other_end);
             }
             else
@@ -341,7 +341,7 @@ namespace hpx { namespace threads { namespace policies {
                 tq_deb.debug(debug::str<>("schedule_thread"),
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_data*>(thrd),
-                    "queing thread_priority_normal");
+                    "queueing thread_priority_normal");
                 np_queue_->schedule_work(thrd, other_end);
             }
         }
