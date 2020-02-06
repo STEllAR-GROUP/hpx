@@ -305,7 +305,7 @@ jobs:
       - run:
           name: Building Core
           command: |
-              ninja -j2 core
+              ninja -j2 -k 0 core
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -930,7 +930,7 @@ jobs:
       - run:
           name: Building Performance Tests
           command: |
-              ninja -j2 tests.performance
+              ninja -j2 -k 0 tests.performance
 
   examples:
     <<: *defaults
@@ -940,7 +940,7 @@ jobs:
       - run:
           name: Building Examples
           command: |
-              ninja -j2 examples
+              ninja -j2 -k 0 examples
       - persist_to_workspace:
           root: /hpx
           paths:

@@ -43,7 +43,7 @@ namespace hpx { namespace serialization
         std::string throw_function_;
         std::string throw_file_;
         std::string throw_back_trace_;
-        int throw_line_ = 0;
+        long throw_line_ = 0;
         std::string throw_env_;
         std::string throw_config_;
         std::string throw_state_;

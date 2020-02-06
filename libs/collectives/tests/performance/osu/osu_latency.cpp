@@ -93,7 +93,7 @@ double receive_double(
     }
 
     double elapsed = t.elapsed();
-    return (elapsed * 1e6) / (2 * loop * window_size);
+    return (elapsed * 1e6) / static_cast<double>(2 * loop * window_size);
 }
 double receive(hpx::naming::id_type dest, char* send_buffer, std::size_t size,
     std::size_t loop, std::size_t window_size)
@@ -124,7 +124,7 @@ double receive(hpx::naming::id_type dest, char* send_buffer, std::size_t size,
     }
 
     double elapsed = t.elapsed();
-    return (elapsed * 1e6) / (2 * loop * window_size);
+    return (elapsed * 1e6) / static_cast<double>(2 * loop * window_size);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

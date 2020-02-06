@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 # Copyright (c) 2012 Bryce Adelstein-Lelbach
 # Copyright (c) 2019 Patrick Diehl

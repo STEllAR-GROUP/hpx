@@ -34,7 +34,7 @@ void bulk_test( hpx::lcos::spmd_block block,
 
     hpx::coarray<double,3> a(block, name, {height,width,_}, elt_size);
 
-    int idx = block.this_image() * height * width;
+    std::size_t idx = block.this_image() * height * width;
 
     for (std::size_t j = 0; j<width; j++)
     for (std::size_t i = 0; i<height; i++)
@@ -48,7 +48,7 @@ void bulk_test( hpx::lcos::spmd_block block,
 
     if(block.this_image() == 0)
     {
-        int idx = 0;
+        std::size_t idx = 0;
 
         for (std::size_t k = 0; k<numlocs; k++)
         for (std::size_t j = 0; j<width; j++)

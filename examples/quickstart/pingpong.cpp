@@ -93,26 +93,25 @@ int hpx_main(hpx::program_options::variables_map &b_arg)
         }
 
         double time = timer1.elapsed();
-
+        double bandwidth =
+            ((static_cast<double>(vsize * sizeof(double) * numiter) / time) /
+                1024) /
+            1024;
         if (verbose) {
             std::cout << "[hpx_pingpong]" << std::endl
-                    << "total_time(secs)=" << time << std::endl
-                    << "vsize=" << vsize << " = " << vsize * sizeof(double)
-                    << " Bytes" << std::endl
-                    << "bandwidth(MiB/s)="
-                    << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024
-                    << std::endl
-                    << "localities=" << localities.size() << std::endl
-                    << "numiter=" << numiter << std::endl;
+                      << "total_time(secs)=" << time << std::endl
+                      << "vsize=" << vsize << " = " << vsize * sizeof(double)
+                      << " Bytes" << std::endl
+                      << "bandwidth(MiB/s)=" << bandwidth << std::endl
+                      << "localities=" << localities.size() << std::endl
+                      << "numiter=" << numiter << std::endl;
         }
         else {
             std::cout << "[hpx_pingpong]"
-                    << ":total_time(secs)=" << time
-                    << ":vsize=" << vsize
-                    << ":bandwidth(MiB/s)="
-                    << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024
-                    << ":localities=" << localities.size()
-                    << ":numiter=" << numiter << std::endl;
+                      << ":total_time(secs)=" << time << ":vsize=" << vsize
+                      << ":bandwidth(MiB/s)=" << bandwidth
+                      << ":localities=" << localities.size()
+                      << ":numiter=" << numiter << std::endl;
         }
     }
 

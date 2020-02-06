@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 # Copyright (c) 2009 Maciej Brodowicz
 # Copyright (c) 2011 Bryce Lelbach
@@ -48,7 +48,7 @@ def rstrip_last(s, chars):
     return s
 
 # {{{ main
-usage = "Usage: %prog [options]" 
+usage = "Usage: %prog [options]"
 
 parser = OptionParser(usage=usage)
 
@@ -60,7 +60,7 @@ parser.add_option("--timeout",
 parser.add_option("--program",
                   action="store", type="string",
                   dest="program",
-                  help="Program to invoke") 
+                  help="Program to invoke")
 
 (options, cmd) = parser.parse_args()
 
@@ -75,7 +75,7 @@ if not 0 == len(output):
 
 if timed_out:
   print ("Program timed out")
-  
+
 exit(returncode)
 # }}}
 

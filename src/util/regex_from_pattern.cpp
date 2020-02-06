@@ -88,6 +88,7 @@ namespace hpx { namespace util
                 break;
 
             // escape regex special characters
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             case '+':
                 HPX_FALLTHROUGH;
             case '.':

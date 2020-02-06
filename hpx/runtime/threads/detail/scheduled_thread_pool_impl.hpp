@@ -1796,11 +1796,8 @@ namespace hpx { namespace threads { namespace detail {
         switch (p)
         {
         case threads::detail::min_concurrency:
-            //             return min_punits_;
-            break;
-
+            HPX_FALLTHROUGH;
         case threads::detail::max_concurrency:
-            //             return max_punits_;
             break;
 
         case threads::detail::current_concurrency:

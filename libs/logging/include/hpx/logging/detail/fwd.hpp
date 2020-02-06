@@ -94,6 +94,7 @@ file f("out.txt", file_settings.initial_overwrite(true).do_append(false) );
                 m_val = other.m_val;
                 return *this;
             }
+            // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
             flag_with_self_type& operator=(flag_with_self_type const& other)
             {
                 m_val = other.m_val;

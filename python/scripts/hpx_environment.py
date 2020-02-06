@@ -1,4 +1,4 @@
-#! /usr/bin/env python 
+#! /usr/bin/env python3
 #
 # Copyright (c) 2011 Bryce Lelbach
 # Copyright (c) 2019 Patrick Diehl
@@ -20,7 +20,7 @@ if exists(join(path[0], "../share/hpx/python/hpx")):
 
 from hpx.environment import identify
 
-usage = "Usage: %prog [options] compiler-driver" 
+usage = "Usage: %prog [options] compiler-driver"
 
 parser = OptionParser(usage=usage)
 
@@ -28,7 +28,7 @@ parser = OptionParser(usage=usage)
 
 if 0 == len(driver):
   print ("No compiler driver specified.")
-  exit(1) 
+  exit(1)
 elif 1 != len(driver):
   print ("More than one compiler driver specified.")
   exit(1)

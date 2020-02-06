@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
@@ -41,7 +41,7 @@ def kill_process_tree(parent_pid, signal=SIGKILL):
 
     if OS_MAC:
       cmd = "ps -o pid,ppid -ax | egrep ' %d$' | awk '{print $1}'" % pid
-    else: 
+    else:
       cmd = "ps -o pid --ppid %d --noheaders" % pid
 
     ps_command = Popen(cmd, shell=True, stdout=PIPE)

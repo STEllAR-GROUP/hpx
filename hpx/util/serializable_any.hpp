@@ -246,6 +246,7 @@ namespace hpx { namespace util {
 
     public:
         // copy assignment operator
+        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
         basic_any& operator=(basic_any const& x)
         {
             basic_any(x).swap(*this);
@@ -253,6 +254,7 @@ namespace hpx { namespace util {
         }
 
         // move assignment
+        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
         basic_any& operator=(basic_any&& rhs) noexcept
         {
             rhs.swap(*this);

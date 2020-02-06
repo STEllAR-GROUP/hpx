@@ -62,7 +62,7 @@ double thread_func_0(hpx::lcos::local::channel_mpmc<data>& c)
 
     std::uint64_t end = hpx::util::high_resolution_clock::now();
 
-    return (end - start) / 1e9;
+    return static_cast<double>(end - start) / 1e9;
 }
 
 // Consume
@@ -81,7 +81,7 @@ double thread_func_1(hpx::lcos::local::channel_mpmc<data>& c)
 
     std::uint64_t end = hpx::util::high_resolution_clock::now();
 
-    return (end - start) / 1e9;
+    return static_cast<double>(end - start) / 1e9;
 }
 
 int main(int argc, char* argv[])

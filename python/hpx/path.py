@@ -1,4 +1,4 @@
-#! /usr/bin/env python 
+#! /usr/bin/env python3
 #
 # Copyright (c) 2011 Bryce Lelbach
 #
@@ -16,5 +16,5 @@ def absolute_path(p):
     candidate = join(dirname, p)
     if isfile(candidate):
       return realpath(candidate)
-  return realpath(p) 
+  return realpath(p)
 

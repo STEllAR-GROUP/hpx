@@ -84,11 +84,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         std::uint64_t end = hpx::util::high_resolution_clock::now();
 
-        seqential_time_per_task = (end - start) / 1e9 / num_tasks;
+        seqential_time_per_task =
+            static_cast<double>(end - start) / 1e9 / num_tasks;
         std::cout << "Elapsed sequential time: "
-                  << (end - start) / 1e9 << " [s], ("
-                  << seqential_time_per_task << " [s])"
-                  << std::endl;
+                  << static_cast<double>(end - start) / 1e9 << " [s], ("
+                  << seqential_time_per_task << " [s])" << std::endl;
         hpx::util::print_cdash_timing("AsyncSequential", seqential_time_per_task);
     }
 
@@ -102,11 +102,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         std::uint64_t end = hpx::util::high_resolution_clock::now();
 
-        hierarchical_time_per_task = (end - start) / 1e9 / num_tasks;
+        hierarchical_time_per_task =
+            static_cast<double>(end - start) / 1e9 / num_tasks;
         std::cout << "Elapsed hierarchical time: "
-                  << (end - start) / 1e9 << " [s], ("
-                  << hierarchical_time_per_task << " [s])"
-                  << std::endl;
+                  << static_cast<double>(end - start) / 1e9 << " [s], ("
+                  << hierarchical_time_per_task << " [s])" << std::endl;
         hpx::util::print_cdash_timing("AsyncHierarchical", hierarchical_time_per_task);
     }
 

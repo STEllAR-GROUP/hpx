@@ -14,17 +14,17 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/testing.hpp>
 
-void do_sum_avg(int values[], int n, int& sum, float& avg)
+void do_sum_avg(int values[], int n, int& sum, double& avg)
 {
     sum = 0;
     for (int i = 0; i < n; i++)
         sum += values[i];
-    avg = (float) sum / n;
+    avg = (double) sum / n;
 }
 
 int main()
 {
-    hpx::util::function_nonser<void(int values[], int n, int& sum, float& avg)>
+    hpx::util::function_nonser<void(int values[], int n, int& sum, double& avg)>
         sum_avg;
     sum_avg = &do_sum_avg;
 

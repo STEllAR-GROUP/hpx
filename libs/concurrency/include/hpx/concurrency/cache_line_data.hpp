@@ -45,6 +45,7 @@ namespace hpx {
             template <typename Data>
             struct needs_padding
               : std::integral_constant<bool,
+                    // NOLINTNEXTLINE(bugprone-sizeof-expression)
                     detail::get_cache_line_padding_size(sizeof(Data)) != 0>
             {
             };
@@ -84,6 +85,7 @@ namespace hpx {
 
             //  cppcheck-suppress unusedVariable
             char cacheline_pad[detail::get_cache_line_padding_size(
+                // NOLINTNEXTLINE(bugprone-sizeof-expression)
                 sizeof(Data))];
         };
 

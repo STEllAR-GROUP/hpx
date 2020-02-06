@@ -51,7 +51,7 @@ std::string search(int start, int end, std::string const &word)
             bool sub = true;
             for (int i = 0; i < size; i++)
             {
-                char check_char = tolower(check[i]);
+                char check_char = static_cast<char>(tolower(check[i]));
                 char word_char = word[i];
                 if (word_char != check_char)
                 {
@@ -84,7 +84,7 @@ std::string search(int start, int end, std::string const &word)
         size = word.length();
     for (int i = 0; i < size; i++)
     {
-        char check_char = tolower(check[i]);
+        char check_char = static_cast<char>(tolower(check[i]));
         char word_char = word[i];
         if (check_char != word_char)
         {
@@ -129,7 +129,7 @@ int hpx_main()
             {
                 getline(fin, temp);
                 for (string::size_type i = 0; i < temp.length(); i++)
-                temp[i] = tolower(temp[i]);
+                temp[i] = static_cast<char>(tolower(temp[i]));
                 words.push_back(temp);
                 wordcount++;
             }
@@ -170,7 +170,7 @@ int hpx_main()
                     }
                     //remove any garbage characters
                     if (toupper(temp[i][j]) >= 'A' && toupper(temp[i][j]) <= 'Z')
-                        holder.push_back(tolower(temp[i][j]));
+                        holder.push_back(static_cast<char>(tolower(temp[i][j])));
                 }
                 if (holder.size() > 0)
                 {

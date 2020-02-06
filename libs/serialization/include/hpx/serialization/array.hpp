@@ -82,6 +82,7 @@ namespace hpx { namespace serialization {
             bool archive_endianess_differs = ar.endian_big();
 #endif
 
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (ar.disable_array_optimization() || archive_endianess_differs)
                 serialize_optimized(ar, v, std::false_type());
             else

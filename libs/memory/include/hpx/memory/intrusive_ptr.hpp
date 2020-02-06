@@ -121,6 +121,7 @@ namespace hpx { namespace memory {
             return *this;
         }
 
+        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
         intrusive_ptr& operator=(intrusive_ptr const& rhs)
         {
             this_type(rhs).swap(*this);

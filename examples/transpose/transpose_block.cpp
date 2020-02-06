@@ -260,8 +260,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 {
                     for(std::uint64_t j = 0; j != block_order; ++j)
                     {
-                        double col_val = COL_SHIFT * (b*block_order + j);
-                        A_ptr->data_[i * block_order + j] = col_val + ROW_SHIFT * i;
+                        double col_val = COL_SHIFT *
+                            static_cast<double>(b * block_order + j);
+                        A_ptr->data_[i * block_order + j] =
+                            col_val + ROW_SHIFT * i;
                         B_ptr->data_[i * block_order + j] = -1.0;
                     }
                 }
@@ -474,7 +476,9 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
                     for(std::uint64_t j = 0; j < block_order; ++j)
                     {
                         double diff = trans_block[i * block_order + j] -
-                            (col_val + ROW_SHIFT * (b * block_order + j));
+                            (col_val +
+                                ROW_SHIFT *
+                                    static_cast<double>(b * block_order + j));
                         errsq += diff * diff;
                     }
                 }

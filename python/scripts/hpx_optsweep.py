@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 # Copyright (c) 2009 Maciej Brodowicz
 # Copyright (c) 2011 Bryce Lelbach
@@ -45,7 +45,7 @@ Options:
  -x list      : exclude cases with argument tuples matching any item in the
                 "list" (python expression)
  -w seconds   : kill runs that take longer than "seconds" to complete (default
-                360). 
+                360).
  -b command   : run preprocessing "command" before starting test sequence for
                 each configuration, applying option substitution
  -p command   : run postprocessing "command" after test sequence for each
@@ -72,11 +72,11 @@ def next(ixd, opts, optv):
         if ixd[k] >= len(optv[k]): ixd[k] = 0
         else: return ixd
     return None
-        
+
 
 # run the application and optionally capture its output and error streams
 def run(cmd, outfl = None, timeout = 360):
-    start = datetime.now() 
+    start = datetime.now()
     proc = process(cmd)
     (timed_out, returncode) = proc.wait(timeout)
     now = datetime.now()
@@ -86,7 +86,7 @@ def run(cmd, outfl = None, timeout = 360):
         if s: writeres(s, outfl)
         else: break
 
-    if timed_out: 
+    if timed_out:
       writeres('Command timed out.\n', outfl)
 
     return (returncode, now - start)
@@ -145,7 +145,7 @@ def runscript(cmdlst, options, ofhs, timeout):
         if rc:
             writeres('Warning: command: "'+scr+'" returned '+str(rc)+'\n', ofhs)
 
-    
+
 if __name__ == '__main__':
     # parse command line
     try:
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     runs, configs, erruns, excnt = 0, 0, 0, 0
     # separator length for pretty printing
     seplen = 78
-    # timeout 
+    # timeout
     timeout = 360
     # non-quotable characters
     nonquot = string.ascii_letters+string.digits+'-+='
@@ -252,7 +252,7 @@ if __name__ == '__main__':
       results['header']['start_date'] = start_date
       results['header']['command'] = tuple(sys.argv)
 
-    try: 
+    try:
     # test loop
       while optix != None:
         configs += 1
@@ -274,7 +274,7 @@ if __name__ == '__main__':
         if before: runscript(before, optd, ofhs)
         # build command line
         cmd = map(lambda x: x%optd, cmdproto)
- 
+
         # second pass - eval
         p = compile(r'eval\("([^"]*)"\)')
 
@@ -297,7 +297,7 @@ if __name__ == '__main__':
             outs = sepstr('-', txt)
             outs += '\nReturn code: '+str(rc)+'\n'+sepstr()+'\n'
             writeres(outs, ofhs)
-            if rf:   
+            if rf:
               if not results['data'].has_key(tuple(vallst)):
                 results['data'][tuple(vallst)] = [(walltime, rc)]
               else:
@@ -306,13 +306,13 @@ if __name__ == '__main__':
         # run postprocessor
         # TODO: add timeout options
         if after: runscript(after, optd, ofhs)
-     
+
         optix = next(optix, optnames, options)
-        
-    except: 
+
+    except:
         from traceback import print_exc
         print_exc()
-     
+
     end_date = datetime.now()
 
     # final banner
@@ -326,7 +326,7 @@ if __name__ == '__main__':
 
     if rf:
       results['header']['end_date'] = end_date
-      results['header']['configurations'] = configs 
+      results['header']['configurations'] = configs
       results['header']['exclusions'] = excnt
       results['header']['total_runs'] = runs
       results['header']['failed_runs'] = erruns

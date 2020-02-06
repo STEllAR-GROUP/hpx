@@ -34,6 +34,7 @@ namespace hpx { namespace util { namespace integer
 
         while (!!ii && i) {
             ii = ii.div (radix, r);
+            // NOLINTNEXTLINE(bugprone-narrowing-conversions)
             sz[--i] = r.toUint() + ((r.toUint() > 9) ? 'A' - 10 : '0');
         };
 

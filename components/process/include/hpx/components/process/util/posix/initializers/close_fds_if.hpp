@@ -66,7 +66,7 @@ private:
         } while (up == -1 && errno == EINTR);
         if (up == -1)
 #endif
-            up = ::sysconf(_SC_OPEN_MAX);
+            up = static_cast<int>(::sysconf(_SC_OPEN_MAX));
         if (up == -1)
             up = HPX_PROCESS_POSIX_MAX_FD;
         return up;

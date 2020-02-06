@@ -106,7 +106,7 @@ double ireceive(
     }
 
     double elapsed = t.elapsed();
-    return (elapsed * 1e6) / (2 * loop * window_size);
+    return (elapsed * 1e6) / static_cast<double>(2 * loop * window_size);
 }
 HPX_PLAIN_ACTION(ireceive);
 
