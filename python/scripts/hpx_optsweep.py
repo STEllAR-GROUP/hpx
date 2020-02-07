@@ -131,7 +131,7 @@ def sepstr(sepch = '-', s = ''):
 
 # substitute all option ids in string with formatting keys
 def optidsub(optids, s):
-    # first pass - option subsitution
+    # first pass - option substitution
     for o in optids:
       s = s.replace(o, '%('+o+')s')
     return s
