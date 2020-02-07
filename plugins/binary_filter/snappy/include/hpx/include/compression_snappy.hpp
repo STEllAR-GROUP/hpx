@@ -10,5 +10,17 @@
 #include <hpx/config.hpp>
 #include <hpx/plugins/binary_filter/snappy_serialization_filter.hpp>
 
+#if defined(HPX_HAVE_DEPRECATION_WARNINGS)
+  #if defined(HPX_MSVC)
+  #pragma message("The header hpx/include/compression_snappy.hpp is deprecated, \
+    please include \
+    hpx/plugins/binary_filter/snappy_serialization_filter.hpp instead")
+  #else
+  #warning "The header hpx/include/compression_snappy.hpp is deprecated, \
+    please include \
+   hpx/plugins/binary_filter/snappy_serialization_filter.hpp instead"
+  #endif
+#endif
+
 #endif
 
