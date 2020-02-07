@@ -86,6 +86,7 @@ namespace hpx { namespace components
             template <typename F, typename Enable = typename
                 std::enable_if<!std::is_same<typename hpx::util::decay<F>::type,
                     decorate_wrapper>::value>::type>
+            // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
             decorate_wrapper(F && f)
             {
                 threads::get_self().decorate_yield(std::forward<F>(f));
