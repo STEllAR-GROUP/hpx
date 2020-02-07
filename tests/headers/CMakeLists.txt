@@ -13,9 +13,11 @@ set(exclude_from_all_headers)
 # These files are either known to expose incomplete types or are known to
 # require special handling to avoid circular #include dependencies.
 set(exclude_from_headers
+  "${PROJECT_SOURCE_DIR}/hpx/include/compression.hpp"
+  "${PROJECT_SOURCE_DIR}/hpx/include/compression_registration.hpp"
+  "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
   "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/timed_execution_fwd.hpp"
   "${PROJECT_SOURCE_DIR}/hpx/parallel/executors/parallel_executor.hpp"
-  "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
   "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_stackful.hpp"
   "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_stackless.hpp"
 )
