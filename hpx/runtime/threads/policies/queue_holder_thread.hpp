@@ -87,11 +87,11 @@ namespace hpx { namespace threads { namespace policies {
         QueueType* const lp_queue_;
 
         // these are the domain and local thread queue ids for the container
-        const std::uint16_t domain_index_;
-        const std::uint16_t queue_index_;
-        const std::uint16_t thread_num_;
+        const std::size_t domain_index_;
+        const std::size_t queue_index_;
+        const std::size_t thread_num_;
         // a mask that hold a bit per queue to indicate ownership of the queue
-        const std::uint16_t owner_mask_;
+        const std::size_t owner_mask_;
 
         // we must use OS mutexes here because we cannot suspend an HPX
         // thread whilst processing the Queues for that thread, this code
@@ -114,16 +114,17 @@ namespace hpx { namespace threads { namespace policies {
         thread_heap_type thread_heap_nostack_;
 
         // number of terminated threads to discard
-        const int min_delete_count_;
-        const int max_delete_count_;
+        int const min_delete_count_;
+        int const max_delete_count_;
 
         // number of terminated threads to collect before cleaning them up
-        const int max_terminated_threads_;
+        int const max_terminated_threads_;
 
         // these ought to be atomic, but if we get a race and assign a thread
         // to queue N instead of N+1 it doesn't really matter
 
-        mutable util::cache_line_data<std::tuple<int, int>> rollover_counters_;
+        mutable util::cache_line_data<std::tuple<std::size_t, std::size_t>>
+            rollover_counters_;
 
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
@@ -199,8 +200,8 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
         queue_holder_thread(QueueType* bp_queue, QueueType* hp_queue,
-            QueueType* np_queue, QueueType* lp_queue, std::uint16_t domain,
-            std::uint16_t queue, std::uint16_t thread_num, std::uint16_t owner,
+            QueueType* np_queue, QueueType* lp_queue, std::size_t domain,
+            std::size_t queue, std::size_t thread_num, std::size_t owner,
             const thread_queue_init_parameters& init)
           : bp_queue_(bp_queue)
           , hp_queue_(hp_queue)
@@ -411,7 +412,7 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         void create_thread(thread_init_data& data, thread_id_type* tid,
-            thread_state_enum state, bool run_now, std::uint16_t thread_num,
+            thread_state_enum state, bool run_now, std::size_t thread_num,
             error_code& ec)
         {
             if (thread_num != thread_num_)
@@ -899,7 +900,7 @@ namespace hpx { namespace threads { namespace policies {
         // ------------------------------------------------------------
         /// Destroy the passed thread as it has been terminated
         void destroy_thread(
-            threads::thread_data* thrd, std::uint16_t thread_num, bool xthread)
+            threads::thread_data* thrd, std::size_t thread_num, bool xthread)
         {
             // the thread must be destroyed by the same queue holder that created it
             HPX_ASSERT(&thrd->get_queue<queue_holder_thread>() == this);
