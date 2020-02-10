@@ -144,6 +144,6 @@ int main(int argc, char* argv[])
     }
 
     // now run the test
-    HPX_TEST_EQ(hpx::init(), 0);
+    HPX_TEST_EQ(hpx::init(rp), 0);
     return hpx::util::report_errors();
 }

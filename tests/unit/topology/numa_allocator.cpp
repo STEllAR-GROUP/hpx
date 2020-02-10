@@ -284,6 +284,6 @@ int main(int argc, char* argv[])
             return pool;
         });
 
-    hpx::init();
+    hpx::init(rp);
     return hpx::util::report_errors();
 }

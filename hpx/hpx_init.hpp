@@ -780,6 +780,40 @@ namespace hpx
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
 /// \cond NOINTERNAL
+    namespace resource {
+
+        // forward declaration only
+        class partitioner;
+    }
+/// \endcond
+
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main entry point, which can be used to set up the
+    /// runtime for an HPX application. All initialization parameters for the
+    /// runtime are taken from the resource partitioner object provided.
+    ///
+    /// \param rp           [in] The resource partitioner object to use for
+    ///                     initializing the runtime.
+    /// \param startup      [in] A function to be executed inside a HPX
+    ///                     thread before \p f is called. If this parameter
+    ///                     is not given no function will be executed.
+    /// \param shutdown     [in] A function to be executed inside an HPX
+    ///                     thread while hpx::finalize is executed. If this
+    ///                     parameter is not given no function will be
+    ///                     executed.
+    ///
+    /// \returns            The function returns the value, which has been
+    ///                     returned from the user supplied function \p f.
+    ///
+    /// \note               The created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     configuration passed in `cfg`.
+    inline int init(resource::partitioner& rp,
+        startup_function_type startup = startup_function_type(),
+        shutdown_function_type shutdown = shutdown_function_type());
+
+/// \cond NOINTERNAL
     inline int init(std::nullptr_t f, std::string const& app_name, int argc,
         char** argv, hpx::runtime_mode mode = hpx::runtime_mode_default);
 
