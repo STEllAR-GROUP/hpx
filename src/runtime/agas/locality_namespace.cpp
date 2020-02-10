@@ -13,6 +13,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/serialization/vector.hpp>
 
@@ -30,43 +31,34 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(
     hpx::actions::base_lco_with_value_parcelset_endpoints_get,
     hpx::actions::base_lco_with_value_parcelset_endpoints_set)
 
-HPX_REGISTER_ACTION_ID(
-    locality_namespace::allocate_action,
+HPX_REGISTER_ACTION_ID(locality_namespace::allocate_action,
     locality_namespace_allocate_action,
     hpx::actions::locality_namespace_allocate_action_id)
 
-HPX_REGISTER_ACTION_ID(
-    locality_namespace::free_action,
+HPX_REGISTER_ACTION_ID(locality_namespace::free_action,
     locality_namespace_free_action,
     hpx::actions::locality_namespace_free_action_id)
 
-HPX_REGISTER_ACTION_ID(
-    locality_namespace::localities_action,
+HPX_REGISTER_ACTION_ID(locality_namespace::localities_action,
     locality_namespace_localities_action,
     hpx::actions::locality_namespace_localities_action_id)
 
-HPX_REGISTER_ACTION_ID(
-    locality_namespace::resolve_locality_action,
+HPX_REGISTER_ACTION_ID(locality_namespace::resolve_locality_action,
     locality_namespace_resolve_locality_action,
     hpx::actions::locality_namespace_resolve_locality_action_id)
 
-HPX_REGISTER_ACTION_ID(
-    locality_namespace::get_num_localities_action,
+HPX_REGISTER_ACTION_ID(locality_namespace::get_num_localities_action,
     locality_namespace_get_num_localities_action,
     hpx::actions::locality_namespace_get_num_localities_action_id)
 
-HPX_REGISTER_ACTION_ID(
-    locality_namespace::get_num_threads_action,
+HPX_REGISTER_ACTION_ID(locality_namespace::get_num_threads_action,
     locality_namespace_get_num_threads_action,
     hpx::actions::locality_namespace_get_num_threads_action_id)
 
-HPX_REGISTER_ACTION_ID(
-    locality_namespace::get_num_overall_threads_action,
+HPX_REGISTER_ACTION_ID(locality_namespace::get_num_overall_threads_action,
     locality_namespace_get_num_overall_threads_action,
     hpx::actions::locality_namespace_get_num_overall_threads_action_id)
 
-HPX_REGISTER_ACTION_ID(
-    locality_namespace::statistics_counter_action,
+HPX_REGISTER_ACTION_ID(locality_namespace::statistics_counter_action,
     locality_namespace_statistics_counter_action,
     hpx::actions::locality_namespace_statistics_counter_action_id)
-
