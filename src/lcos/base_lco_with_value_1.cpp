@@ -7,6 +7,7 @@
 
 #include <hpx/apply.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 
 #include <cstdint>
 
