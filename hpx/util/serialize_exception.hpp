@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,15 +31,17 @@ namespace hpx { namespace util
         std_bad_exception = 8,
         std_exception = 9,
 
-        // boost exceptions
-        boost_exception = 10,
-
         // boost::system::system_error
-        boost_system_error = 11,
+        boost_system_error = 10,
 
         // hpx::exception
-        hpx_exception = 12,
-        hpx_thread_interrupted_exception = 13
+        hpx_exception = 11,
+        hpx_thread_interrupted_exception = 12,
+
+#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+        // boost exceptions
+        boost_exception = 13
+#endif
     };
 }}  // namespace hpx::util
 

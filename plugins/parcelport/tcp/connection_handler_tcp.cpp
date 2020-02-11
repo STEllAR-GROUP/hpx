@@ -23,7 +23,6 @@
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/io/ios_state.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 #include <thread>

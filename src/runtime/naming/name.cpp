@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,8 +28,7 @@
 #include <hpx/state.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-
-#include <boost/io/ios_state.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -685,7 +684,7 @@ namespace hpx { namespace naming
 
     std::ostream& operator<<(std::ostream& os, gid_type const& id)
     {
-        boost::io::ios_flags_saver ifs(os);
+        hpx::util::ios_flags_saver ifs(os);
         if (id != naming::invalid_gid)
         {
             os << std::hex

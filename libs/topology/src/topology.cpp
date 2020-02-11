@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -12,8 +12,7 @@
 #include <hpx/logging.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-
-#include <boost/io/ios_state.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>
 #include <iomanip>
@@ -924,7 +923,7 @@ namespace hpx { namespace threads {
     void topology::print_affinity_mask(std::ostream& os, std::size_t num_thread,
         mask_cref_type m, const std::string& pool_name) const
     {
-        boost::io::ios_flags_saver ifs(os);
+        hpx::util::ios_flags_saver ifs(os);
         bool first = true;
 
         for (std::size_t i = 0; i != num_of_pus_; ++i)

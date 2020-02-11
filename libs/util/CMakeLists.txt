@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@ set(util_headers
   hpx/util/calculate_fanout.hpp
   hpx/util/get_and_reset_value.hpp
   hpx/util/insert_checked.hpp
+  hpx/util/ios_flags_saver.hpp
   hpx/util/manage_config.hpp
 )
 

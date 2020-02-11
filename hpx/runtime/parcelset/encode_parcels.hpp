@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2011-2015 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -29,7 +29,9 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/util/integer/endian.hpp>
 
+#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -244,6 +246,7 @@ namespace hpx
                     hpx::report_error(std::current_exception());
                     return 0;
                 }
+#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
                 catch (boost::exception const&) {
                     LPT_(fatal)
                         << "encode_parcels: "
@@ -251,6 +254,7 @@ namespace hpx
                     hpx::report_error(std::current_exception());
                     return 0;
                 }
+#endif
                 catch (std::exception const& e) {
                     // We have to repackage all exceptions thrown by the
                     // serialization library as otherwise we will loose the

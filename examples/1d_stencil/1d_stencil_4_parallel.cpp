@@ -17,8 +17,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
-
-#include <boost/iterator/counting_iterator.hpp>
+#include <hpx/iterator_support.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -98,7 +97,7 @@ struct stepper
         std::size_t size = middle.size();
         partition_data next(size);
 
-        typedef boost::counting_iterator<std::size_t> iterator;
+        typedef hpx::util::counting_iterator<std::size_t> iterator;
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
 
@@ -140,7 +139,7 @@ struct stepper
             space const& current = U[t % 2];
             space& next = U[(t + 1) % 2];
 
-            typedef boost::counting_iterator<std::size_t> iterator;
+            typedef hpx::util::counting_iterator<std::size_t> iterator;
 
             for_each(par, iterator(0), iterator(np),
                 [&next, &current, np, &Op](std::size_t i)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,8 +9,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/serialization/serialize.hpp>
-
-#include <boost/io/ios_state.hpp>
+#include <hpx/util/ios_flags_saver.hpp>
 
 #include <iomanip>
 #include <iostream>
@@ -38,7 +37,7 @@ namespace hpx { namespace naming
 
     std::ostream& operator<<(std::ostream& os, address const& addr)
     {
-        boost::io::ios_flags_saver ifs(os);
+        hpx::util::ios_flags_saver ifs(os);
         os << "(" << addr.locality_ << ":"
            << components::get_component_type_name(addr.type_)
            << ":" << std::showbase << std::hex << addr.address_ << ")";

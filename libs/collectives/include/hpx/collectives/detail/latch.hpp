@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #define HPX_LCOS_SERVER_LATCH_APR_19_2015_0956AM
 
 #include <hpx/config.hpp>
+#include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -15,9 +16,6 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/synchronization/latch.hpp>
-
-#include <boost/exception/diagnostic_information.hpp>
-#include <boost/exception/exception.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -112,11 +110,11 @@ namespace hpx { namespace lcos { namespace server {
                 latch_.abort_all();
                 std::rethrow_exception(e);
             }
-            catch (boost::exception const& be)
+            catch (std::exception const& e)
             {
                 // rethrow again, but this time using the native hpx mechanics
                 HPX_THROW_EXCEPTION(hpx::no_success, "latch::set_exception",
-                    boost::diagnostic_information(be));
+                    hpx::diagnostic_information(e));
             }
         }
 

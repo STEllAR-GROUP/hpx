@@ -158,6 +158,7 @@ namespace hpx { namespace util {
             }
         };
 
+        ////////////////////////////////////////////////////////////////////////
         // Implementation for bidirectional iterators
         template <typename Derived, typename T, typename Reference,
             typename Distance, typename Pointer>
@@ -199,7 +200,75 @@ namespace hpx { namespace util {
             }
         };
 
+        ////////////////////////////////////////////////////////////////////////
         // Implementation for random access iterators
+
+        // A proxy return type for operator[], needed to deal with
+        // iterators that may invalidate referents upon destruction.
+        // Consider the temporary iterator in *(a + n)
+        template <typename Iterator>
+        class operator_brackets_proxy
+        {
+            // Iterator is actually an iterator_facade, so we do not have to
+            // go through iterator_traits to access the traits.
+            using reference = typename Iterator::reference;
+            using value_type = typename Iterator::value_type;
+
+        public:
+            HPX_HOST_DEVICE explicit operator_brackets_proxy(
+                Iterator const& iter) noexcept
+              : iter_(iter)
+            {
+            }
+
+            HPX_HOST_DEVICE operator reference() const
+            {
+                return *iter_;
+            }
+
+            HPX_HOST_DEVICE operator_brackets_proxy& operator=(
+                value_type const& val)
+            {
+                *iter_ = val;
+                return *this;
+            }
+
+        private:
+            Iterator iter_;
+        };
+
+        // A meta-function that determines whether operator[] must return a
+        // proxy, or whether it can simply return a copy of the value_type.
+        template <typename ValueType>
+        struct use_operator_brackets_proxy
+          : std::integral_constant<bool,
+                !(std::is_copy_constructible<ValueType>::value &&
+                    std::is_const<ValueType>::value)>
+        {
+        };
+
+        template <typename Iterator, typename Value>
+        struct operator_brackets_result
+        {
+            using type = typename std::conditional<
+                use_operator_brackets_proxy<Value>::value,
+                operator_brackets_proxy<Iterator>, Value>::type;
+        };
+
+        template <typename Iterator>
+        HPX_HOST_DEVICE operator_brackets_proxy<Iterator>
+        make_operator_brackets_result(Iterator const& iter, std::true_type)
+        {
+            return operator_brackets_proxy<Iterator>(iter);
+        }
+
+        template <typename Iterator>
+        HPX_HOST_DEVICE typename Iterator::value_type
+        make_operator_brackets_result(Iterator const& iter, std::false_type)
+        {
+            return *iter;
+        }
+
         template <typename Derived, typename T, typename Reference,
             typename Distance, typename Pointer>
         class iterator_facade_base<Derived, T, std::random_access_iterator_tag,
@@ -225,9 +294,14 @@ namespace hpx { namespace util {
             {
             }
 
-            HPX_HOST_DEVICE reference operator[](difference_type n) const
+            HPX_HOST_DEVICE
+            typename operator_brackets_result<Derived, T>::type operator[](
+                difference_type n) const
             {
-                return *(this->derived() + n);
+                using use_proxy = use_operator_brackets_proxy<T>;
+
+                return make_operator_brackets_result<Derived>(
+                    this->derived() + n, use_proxy{});
             }
 
             HPX_HOST_DEVICE Derived& operator+=(difference_type n)

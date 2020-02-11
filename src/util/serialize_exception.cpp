@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,9 +10,10 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
+#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/exception/exception.hpp>
-#include <boost/version.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -181,10 +182,12 @@ namespace hpx { namespace serialization
             type = hpx::util::std_exception;
             what = e.what();
         }
+#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
         catch (boost::exception const& e) {
             type = hpx::util::boost_exception;
             what = boost::diagnostic_information(e);
         }
+#endif
         catch (...) {
             type = hpx::util::unknown_exception;
             what = "unknown exception";
@@ -327,10 +330,12 @@ namespace hpx { namespace serialization
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
+#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
         // boost exceptions
         case hpx::util::boost_exception:
             HPX_ASSERT(false);    // shouldn't happen
             break;
+#endif
 
         // boost::system::system_error
         case hpx::util::boost_system_error:

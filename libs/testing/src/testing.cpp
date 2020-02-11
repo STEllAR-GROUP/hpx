@@ -9,14 +9,13 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/util.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <iostream>
 #include <sstream>
-
-#include <boost/io/ios_state.hpp>
 
 namespace hpx { namespace util {
     static test_failure_handler_type test_failure_handler;
@@ -76,7 +75,7 @@ namespace hpx { namespace util {
 
         else
         {
-            boost::io::ios_flags_saver ifs(stream);
+            hpx::util::ios_flags_saver ifs(stream);
             stream << sanity << " sanity check"    //-V128
                    << ((sanity == 1) ? " and " : "s and ") << test << " test"
                    << ((test == 1) ? " failed." : "s failed.") << std::endl;
