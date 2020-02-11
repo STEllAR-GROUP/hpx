@@ -1,4 +1,5 @@
-# Copyright (c) 2007-2019 Hartmut Kaiser
+# Copyright (c)      2020 Mikael Simberg
+# Copyright (c) 2007-2020 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -38,7 +39,9 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
 # Build type (needs to be handled before project command below)
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+    "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)"
+    FORCE)
 endif()
 
 ################################################################################
@@ -46,6 +49,20 @@ endif()
 ################################################################################
 project(HPX CXX C)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+################################################################################
+# Special handling for building tests/examples against a previously installed
+# version of HPX
+################################################################################
+if(HPX_WITH_INSTALLED_VERSION)
+  include(cmake/installed_hpx.cmake)
+  return()
+endif()
+
+################################################################################
+# Build all of HPX
+################################################################################
 set(HPX_VERSION_MAJOR 1)
 set(HPX_VERSION_MINOR 4)
 set(HPX_VERSION_SUBMINOR 0)
@@ -59,8 +76,6 @@ set(HPX_PACKAGE_NAME HPX)
 # To keep track of the hpx_root when other subprojects are declared
 set(HPX_SOURCE_DIR "${PROJECT_SOURCE_DIR}")
 set(HPX_BINARY_DIR "${PROJECT_BINARY_DIR}")
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 ################################################################################
 # CMake configuration
@@ -2006,3 +2021,4 @@ include(HPX_GeneratePackage)
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
 message("")
+

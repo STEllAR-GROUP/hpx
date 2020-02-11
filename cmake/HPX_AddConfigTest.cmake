@@ -403,11 +403,15 @@ function(hpx_check_for_cxx11_std_atomic)
     unset(HPX_HAVE_LIBATOMIC CACHE)
   endif()
 
-  # Sometimes linking against libatomic is required for atomic ops, if
-  # the platform doesn't support lock-free atomics.
-  check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
-  if(HPX_HAVE_LIBATOMIC)
-    set(HPX_CXX11_STD_ATOMIC_LIBRARIES atomic CACHE BOOL "std::atomics need separate library" FORCE)
+  if(NOT MSVC)
+    # Sometimes linking against libatomic is required for atomic ops, if
+    # the platform doesn't support lock-free atomics.
+    # We know, it's not needed for MSVC
+    check_library_exists(atomic __atomic_fetch_add_4 "" HPX_HAVE_LIBATOMIC)
+    if(HPX_HAVE_LIBATOMIC)
+      set(HPX_CXX11_STD_ATOMIC_LIBRARIES atomic CACHE BOOL
+        "std::atomics need separate library" FORCE)
+    endif()
   endif()
 
   add_hpx_config_test(HPX_WITH_CXX11_ATOMIC

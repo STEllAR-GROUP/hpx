@@ -9,7 +9,7 @@
 
 #include <hpx/include/components.hpp>
 
-#include <tests/regressions/actions/components/server/action_move_semantics.hpp>
+#include "server/action_move_semantics.hpp"
 
 #include <utility>
 

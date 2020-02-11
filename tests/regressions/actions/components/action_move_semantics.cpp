@@ -8,7 +8,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
 
-#include <tests/regressions/actions/components/server/action_move_semantics.hpp>
+#include "server/action_move_semantics.hpp"
 
 HPX_REGISTER_COMPONENT_MODULE()
 

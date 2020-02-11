@@ -20,7 +20,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      EXCLUDE_FROM_ALL
                      HPX_PREFIX ${HPX_BUILD_PREFIX}
-                     FOLDER "Tests/Unit/Util/")
+                     FOLDER "Tests/Unit/Modules/Util")
 
   add_hpx_unit_test("modules.batch_environments" ${test} ${${test}_PARAMETERS})
 endforeach()

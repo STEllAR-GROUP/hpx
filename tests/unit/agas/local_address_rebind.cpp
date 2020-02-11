@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include <tests/unit/agas/components/simple_mobile_object.hpp>
+#include "components/simple_mobile_object.hpp"
 
 using hpx::program_options::variables_map;
 using hpx::program_options::options_description;

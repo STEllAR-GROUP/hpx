@@ -16,8 +16,8 @@
 #include <string>
 #include <vector>
 
-#include <tests/unit/agas/components/simple_refcnt_checker.hpp>
-#include <tests/unit/agas/components/managed_refcnt_checker.hpp>
+#include "components/simple_refcnt_checker.hpp"
+#include "components/managed_refcnt_checker.hpp"
 
 using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
