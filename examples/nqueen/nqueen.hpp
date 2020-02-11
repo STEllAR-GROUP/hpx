@@ -11,7 +11,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/include/client.hpp>
 
-#include <examples/nqueen/server/nqueen.hpp>
+#include "server/nqueen.hpp"
 
 #include <cstddef>
 #include <utility>

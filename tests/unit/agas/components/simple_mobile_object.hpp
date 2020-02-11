@@ -14,7 +14,7 @@
 
 #include <cstdint>
 
-#include <tests/unit/agas/components/server/simple_mobile_object.hpp>
+#include "server/simple_mobile_object.hpp"
 
 namespace hpx { namespace test
 {

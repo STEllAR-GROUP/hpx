@@ -12,7 +12,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <tests/unit/agas/components/server/managed_refcnt_checker.hpp>
+
+#include "../server/managed_refcnt_checker.hpp"
 
 namespace hpx { namespace test { namespace stubs
 {

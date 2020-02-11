@@ -14,7 +14,7 @@
 #include <sstream>
 #include <string>
 
-#include <tests/unit/agas/components/server/managed_refcnt_checker.hpp>
+#include "managed_refcnt_checker.hpp"
 
 namespace hpx { namespace test { namespace server
 {

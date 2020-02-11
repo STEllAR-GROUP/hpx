@@ -10,7 +10,7 @@
 #include <hpx/include/process.hpp>
 #include <hpx/testing.hpp>
 
-#include <tests/unit/component/components/launch_process_test_server.hpp>
+#include "components/launch_process_test_server.hpp"
 
 #include <cstddef>
 #include <iostream>
