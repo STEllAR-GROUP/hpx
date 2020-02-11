@@ -25,8 +25,8 @@ namespace hpx { namespace threads { namespace detail {
     // associated with the thread
     struct thread_pool
     {
-        std::uint16_t local_thread_num;
-        std::uint16_t pool_index;
+        std::size_t local_thread_num;
+        std::size_t pool_index;
     };
     HPX_EXPORT void set_thread_pool_tss(const thread_pool&);
     HPX_EXPORT thread_pool get_thread_pool_tss();

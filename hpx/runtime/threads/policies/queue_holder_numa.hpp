@@ -76,7 +76,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        void init(std::uint16_t domain, std::uint16_t queues)
+        void init(std::size_t domain, std::size_t queues)
         {
             num_queues_ = queues;
             domain_ = domain;
@@ -91,18 +91,18 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        inline ThreadQueue* thread_queue(std::uint16_t id) const
+        inline ThreadQueue* thread_queue(std::size_t id) const
         {
             return queues_[id];
         }
 
         // ----------------------------------------------------------------
-        inline bool get_next_thread_HP(std::uint16_t qidx,
+        inline bool get_next_thread_HP(std::size_t qidx,
             threads::thread_data*& thrd, bool stealing, bool core_stealing)
         {
             // loop over queues and take one task,
-            std::uint16_t q = qidx;
-            for (std::uint16_t i = 0; i < num_queues_;
+            std::size_t q = qidx;
+            for (std::size_t i = 0; i < num_queues_;
                  ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 if (queues_[q]->get_next_thread_HP(
@@ -127,13 +127,13 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        inline bool get_next_thread(std::uint16_t qidx,
+        inline bool get_next_thread(std::size_t qidx,
             threads::thread_data*& thrd, bool stealing, bool core_stealing)
         {
             // loop over queues and take one task,
             // starting with the requested queue
-            std::uint16_t q = qidx;
-            for (std::uint16_t i = 0; i < num_queues_;
+            std::size_t q = qidx;
+            for (std::size_t i = 0; i < num_queues_;
                  ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 // if we got a thread, return it, only allow stealing if i>0
@@ -155,12 +155,12 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        bool add_new_HP(ThreadQueue* receiver, std::uint16_t qidx,
+        bool add_new_HP(ThreadQueue* receiver, std::size_t qidx,
             std::size_t& added, bool stealing, bool allow_stealing)
         {
             // loop over queues and take one task,
-            std::uint16_t q = qidx;
-            for (std::uint16_t i = 0; i < num_queues_;
+            std::size_t q = qidx;
+            for (std::size_t i = 0; i < num_queues_;
                  ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 std::size_t added =
@@ -186,12 +186,12 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        bool add_new(ThreadQueue* receiver, std::uint16_t qidx,
+        bool add_new(ThreadQueue* receiver, std::size_t qidx,
             std::size_t& added, bool stealing, bool allow_stealing)
         {
             // loop over queues and take one task,
-            std::uint16_t q = qidx;
-            for (std::uint16_t i = 0; i < num_queues_;
+            std::size_t q = qidx;
+            for (std::size_t i = 0; i < num_queues_;
                  ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 std::size_t added =
@@ -256,8 +256,8 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
         // ----------------------------------------------------------------
-        std::uint16_t num_queues_;
-        std::uint16_t domain_;
+        std::size_t num_queues_;
+        std::size_t domain_;
         std::vector<ThreadQueue*> queues_;
 
     public:

@@ -119,58 +119,81 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     // format as zero padded hex
     // ------------------------------------------------------------------
-    template <int N = 4, typename T = int, typename Enable = void>
-    struct hex;
+    namespace detail {
 
-    template <int N, typename T>
-    struct hex<N, T, typename std::enable_if<!std::is_pointer<T>::value>::type>
-    {
-        hex(const T& v)
-          : data(v)
-        {
-        }
-        const T& data;
-        friend std::ostream& operator<<(std::ostream& os, const hex<N, T>& d)
-        {
-            os << std::right << "0x" << std::setfill('0') << std::setw(N)
-               << std::noshowbase << std::hex << d.data;
-            return os;
-        }
-    };
+        template <int N = 4, typename T = int, typename Enable = void>
+        struct hex;
 
-    template <int N, typename T>
-    struct hex<N, T, typename std::enable_if<std::is_pointer<T>::value>::type>
+        template <int N, typename T>
+        struct hex<N, T,
+            typename std::enable_if<!std::is_pointer<T>::value>::type>
+        {
+            hex(const T& v)
+              : data(v)
+            {
+            }
+            const T& data;
+            friend std::ostream& operator<<(
+                std::ostream& os, const hex<N, T>& d)
+            {
+                os << std::right << "0x" << std::setfill('0') << std::setw(N)
+                   << std::noshowbase << std::hex << d.data;
+                return os;
+            }
+        };
+
+        template <int N, typename T>
+        struct hex<N, T,
+            typename std::enable_if<std::is_pointer<T>::value>::type>
+        {
+            hex(const T& v)
+              : data(v)
+            {
+            }
+            const T& data;
+            friend std::ostream& operator<<(
+                std::ostream& os, const hex<N, T>& d)
+            {
+                os << std::right << std::setw(N) << std::noshowbase << std::hex
+                   << d.data;
+                return os;
+            }
+        };
+    }    // namespace detail
+
+    template <int N = 4, typename T>
+    detail::hex<N, T> hex(T const& v)
     {
-        hex(const T& v)
-          : data(v)
-        {
-        }
-        const T& data;
-        friend std::ostream& operator<<(std::ostream& os, const hex<N, T>& d)
-        {
-            os << std::right << std::setw(N) << std::noshowbase << std::hex
-               << d.data;
-            return os;
-        }
-    };
+        return detail::hex<N, T>(v);
+    }
 
     // ------------------------------------------------------------------
     // format as binary bits
     // ------------------------------------------------------------------
-    template <int N = 8, typename T = int>
-    struct bin
+    namespace detail {
+
+        template <int N = 8, typename T = int>
+        struct bin
+        {
+            bin(const T& v)
+              : data(v)
+            {
+            }
+            const T& data;
+            friend std::ostream& operator<<(
+                std::ostream& os, const bin<N, T>& d)
+            {
+                os << std::bitset<N>(d.data);
+                return os;
+            }
+        };
+    }    // namespace detail
+
+    template <int N = 8, typename T>
+    detail::bin<N, T> bin(T const& v)
     {
-        bin(const T& v)
-          : data(v)
-        {
-        }
-        const T& data;
-        friend std::ostream& operator<<(std::ostream& os, const bin<N, T>& d)
-        {
-            os << std::bitset<N>(d.data);
-            return os;
-        }
-    };
+        return detail::bin<N, T>(v);
+    }
 
     // ------------------------------------------------------------------
     // format as padded string
