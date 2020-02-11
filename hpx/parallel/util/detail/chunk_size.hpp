@@ -106,8 +106,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
         // we should not make chunks smaller than what's determined by the
         // max chunk size
-        chunk_size = (std::max)(chunk_size,
-            (count + max_chunks - 1) / max_chunks);
+        //chunk_size = (std::max)(chunk_size,
+        //    (count + max_chunks - 1) / max_chunks);
 
         if (stride != 1)
         {
@@ -309,8 +309,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail
 
             // we should not make chunks smaller than what's determined by the
             // max chunk size
-            chunk_size = (std::max)(chunk_size,
-                (count + max_chunks - 1) / max_chunks);
+            //chunk_size = (std::max)(chunk_size,
+            //    (count + max_chunks - 1) / max_chunks);
 
             if (stride != 1)
             {
