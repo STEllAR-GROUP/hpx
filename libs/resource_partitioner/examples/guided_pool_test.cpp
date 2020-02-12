@@ -85,7 +85,7 @@ namespace hpx { namespace threads { namespace executors {
 
     // ------------------------------------------------------------------------
     template <>
-    struct HPX_EXPORT pool_numa_hint<guided_test_tag>
+    struct pool_numa_hint<guided_test_tag>
     {
         // ------------------------------------------------------------------------
         // specialize the hint operator for params

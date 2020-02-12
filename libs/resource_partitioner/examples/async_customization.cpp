@@ -468,7 +468,7 @@ struct dummy_tag
 
 namespace hpx { namespace threads { namespace executors {
     template <>
-    struct HPX_EXPORT pool_numa_hint<dummy_tag>
+    struct pool_numa_hint<dummy_tag>
     {
         int operator()(const int, const double, const char*) const
         {
