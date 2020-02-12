@@ -33,6 +33,7 @@ set(HPX_CANDIDATE_LIBS
     config
     config_registry
     coroutines
+    cuda_support
     datastructures
     debugging
     distributed_executors

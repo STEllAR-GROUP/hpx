@@ -36,6 +36,7 @@ All modules
    /libs/config/docs/index.rst
    /libs/config_registry/docs/index.rst
    /libs/coroutines/docs/index.rst
+   /libs/cuda_support/docs/index.rst
    /libs/datastructures/docs/index.rst
    /libs/debugging/docs/index.rst
    /libs/distributed_executors/docs/index.rst
