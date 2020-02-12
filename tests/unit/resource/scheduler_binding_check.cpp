@@ -9,19 +9,27 @@
 // Tasks should always report the right core number when they run.
 
 #include <hpx/async.hpp>
+#include <hpx/debugging/print.hpp>
+#include <hpx/execution/executors/execution.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/parallel/executors/thread_pool_executors.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp>
 #include <hpx/testing.hpp>
 
+#include <atomic>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <string>
-#include <cstdint>
-#include <cstddef>
-#include <atomic>
+
+namespace hpx {
+    // use <true>/<false> to enable/disable debug printing
+    using sbc_print_on = hpx::debug::enable_print<false>;
+    static sbc_print_on deb_schbin("SCHBIND");
+}    // namespace hpx
 
 // counts down on destruction
 struct dec_counter
@@ -40,16 +48,21 @@ struct dec_counter
 
 void threadLoop()
 {
-    const unsigned iterations = 256;
+    const unsigned iterations = 2048;
     std::atomic<int> count_down(iterations);
 
-    auto f = [&count_down](std::size_t threadnum) {
+    auto f = [&count_down](std::size_t thread_expected) {
         dec_counter dec(count_down);
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        std::size_t thread_num = hpx::get_worker_thread_num();
-        std::cout << "Running on thread num: " << thread_num << " Expected  "
-                  << threadnum << std::endl;
-        HPX_TEST_EQ(thread_num, threadnum);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::size_t thread_actual = hpx::get_worker_thread_num();
+        hpx::deb_schbin.debug(hpx::debug::str<>("Running on thread"),
+            thread_actual, "Expected", thread_expected);
+        if (thread_actual != thread_expected)
+        {
+            hpx::deb_schbin.error(hpx::debug::str<>("actual!=expected"), "Got",
+                thread_actual, "Expected", thread_expected);
+        }
+        HPX_TEST_EQ(thread_actual, thread_expected);
     };
 
     std::size_t threads = hpx::get_num_worker_threads();
@@ -78,7 +91,7 @@ int hpx_main(boost::program_options::variables_map&)
     if (std::string("core-shared_priority_queue_scheduler") !=
         current->get_description())
     {
-        std::cout << "The scheduler won't work properly " << std::endl;
+        std::cout << "The scheduler might not work properly " << std::endl;
     }
 
     threadLoop();
