@@ -37,6 +37,7 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`4376` - Attempt to fix some test build errors on Windows
 * :hpx-pr:`4357` - Adding missing ``#include``\ s to fix gcc V10 linker problems
 * :hpx-pr:`4353` - Skip ``MPI_Finalize`` if ``MPI_Init`` is not called from HPX
 * :hpx-pr:`4343` - Give a hard error if IO counters are enabled on non-Linux
