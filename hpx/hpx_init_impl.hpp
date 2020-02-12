@@ -46,6 +46,10 @@ namespace hpx
             startup_function_type startup, shutdown_function_type shutdown,
             hpx::runtime_mode mode, bool blocking);
 
+        HPX_EXPORT int run_or_start(resource::partitioner& rp,
+            startup_function_type startup, shutdown_function_type shutdown,
+            bool blocking);
+
 #if defined(HPX_WINDOWS)
         void init_winsocket();
 #endif
@@ -396,9 +400,32 @@ namespace hpx
     init(std::nullptr_t, std::vector<std::string> const& cfg,
          hpx::runtime_mode mode)
     {
-      char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
+        char* dummy_argv[2] = {
+            const_cast<char*>(HPX_APPLICATION_STRING), nullptr};
 
-      return init(nullptr, 1, dummy_argv, cfg, mode);
+        return init(nullptr, 1, dummy_argv, cfg, mode);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    inline int init(resource::partitioner& rp, startup_function_type startup,
+        shutdown_function_type shutdown)
+    {
+#if defined(HPX_WINDOWS)
+        detail::init_winsocket();
+#endif
+        util::set_hpx_prefix(HPX_PREFIX);
+#if defined(__FreeBSD__)
+        freebsd_environ = environ;
+#endif
+        // set a handler for std::abort
+        std::signal(SIGABRT, detail::on_abort);
+        std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+        std::at_quick_exit(detail::on_exit);
+#endif
+
+        return detail::run_or_start(
+            rp, std::move(startup), std::move(shutdown), true);
     }
 }
 

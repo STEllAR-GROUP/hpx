@@ -337,5 +337,5 @@ int main(int argc, char* argv[])
         std::cout << "[main] resources added to thread_pools \n";
     }
 
-    return hpx::init();
+    return hpx::init(rp);
 }

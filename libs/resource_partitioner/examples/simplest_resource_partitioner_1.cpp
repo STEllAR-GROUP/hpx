@@ -19,6 +19,6 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char** argv)
 {
     hpx::resource::partitioner rp(argc, argv);
-    hpx::init();
+    hpx::init(rp);
 }
 //body]

@@ -271,6 +271,13 @@ namespace hpx { namespace resource {
         // return the topology object managed by the internal partitioner
         HPX_EXPORT hpx::threads::topology const& get_topology() const;
 
+        // access the command line options
+        HPX_EXPORT util::command_line_handling& get_command_line_switches();
+
+        // Does initialization of all resources and internal data of the
+        // resource partitioner called in hpx_init
+        HPX_EXPORT void configure_pools();
+
     private:
         detail::partitioner& partitioner_;
     };
