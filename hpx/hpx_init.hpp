@@ -786,13 +786,20 @@ namespace hpx
         std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-/// \cond NOINTERNAL
+    /// \cond NOINTERNAL
     namespace resource {
 
         // forward declaration only
         class partitioner;
-    }
-/// \endcond
+
+        // Utilities to init the thread_pools of the resource partitioner
+        using rp_callback_type = hpx::util::function_nonser<void(
+                hpx::resource::partitioner&)>;
+        HPX_EXPORT void set_rp_callback(rp_callback_type f);
+
+    }   // namespace resource
+    /// \endcond
+
 
     /// \brief Main entry point for launching the HPX runtime system.
     ///

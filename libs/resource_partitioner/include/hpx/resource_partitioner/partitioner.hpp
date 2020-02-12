@@ -285,6 +285,7 @@ namespace hpx { namespace resource {
     private:
         detail::partitioner& partitioner_;
     };
+
 }}    // namespace hpx::resource
 
 #endif

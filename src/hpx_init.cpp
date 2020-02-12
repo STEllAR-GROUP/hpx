@@ -297,6 +297,20 @@ namespace hpx { namespace detail
     }
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace resource
+{
+    // Handling resource partitioner init callback
+    static rp_callback_type rp_callback;
+
+    void set_rp_callback(rp_callback_type f)
+    {
+        rp_callback = f;
+    }
+
+}}  // namespace hpx::resource
+
+
 #if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
     (defined(__linux) || defined(__linux__) || defined(linux) || \
     defined(__APPLE__))
@@ -808,7 +822,7 @@ namespace hpx
             return default_;
         }
 
-        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(resource::partitioner& rp,
             startup_function_type startup, shutdown_function_type shutdown,
             bool blocking)
@@ -831,6 +845,11 @@ namespace hpx
                 if ((result = ensure_no_runtime_is_up()) != 0)
                 {
                     return result;
+                }
+
+                // If thread_pools initialization in user main
+                if (hpx::resource::rp_callback) {
+                    hpx::resource::rp_callback(rp);
                 }
 
                 // Setup all internal parameters of the resource_partitioner
