@@ -1,0 +1,42 @@
+# Copyright (c) 2020 Mikael Simberg
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: macOS CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        brew update && \
+            brew install boost hwloc gperftools ninja && \
+            brew upgrade cmake
+    - name: Configure
+      shell: bash
+      run: |
+          cmake \
+              -H. \
+              -Bbuild \
+              -GNinja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DHPX_WITH_EXAMPLES=ON \
+              -DHPX_WITH_TESTS=ON
+    - name: Build
+      shell: bash
+      run: |
+          cmake --build build --target all
+          cmake --build build --target tests
+    - name: Test
+      shell: bash
+      run: |
+          cd build
+          ctest --output-on-failure
