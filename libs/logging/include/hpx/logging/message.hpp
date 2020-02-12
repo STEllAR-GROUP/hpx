@@ -54,15 +54,25 @@ namespace hpx { namespace util { namespace logging {
         @param msg - the message that is originally cached
          */
         explicit message(std::stringstream msg)
-          : m_str(std::move(msg))
-          , m_full_msg_computed(false)
+          :
+#if !defined(HPX_COMPUTE_HOST_CODE)
+          m_str(std::move(msg))
+          ,
+#endif
+          m_full_msg_computed(false)
         {
         }
 
         message(message&& other) noexcept
-          : m_str(std::move(other.m_str))
-          , m_full_msg_computed(other.m_full_msg_computed)
+          :
+#if !defined(HPX_COMPUTE_HOST_CODE)
+          m_str(std::move(other.m_str))
+          ,
+#endif
+          m_full_msg_computed(other.m_full_msg_computed)
+#if !defined(HPX_COMPUTE_HOST_CODE)
           , m_full_msg(std::move(other.m_full_msg))
+#endif
         {
             other.m_full_msg_computed = false;
         }

@@ -399,8 +399,10 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
             std::stringstream out;
             m_format(out, msg);
 
+#if !defined(HPX_COMPUTE_HOST_CODE)
             message formatted(std::move(out));
             m_destination(formatted);
+#endif
         }
 
         /** @brief Replaces a formatter from the named formatter.
