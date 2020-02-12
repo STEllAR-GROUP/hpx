@@ -335,8 +335,8 @@ foreach(_module ${HPX_LIBS})
     endif(APPLE)
   endif(UNIX)
 
-  # add module binaries as PRIVATE dependencies to the core hpx library to
-  # avoid dependent applications have to link against those
+  # add module binaries as PRIVATE dependencies to the core hpx library to avoid
+  # dependent applications have to link against those
   target_link_libraries(hpx PRIVATE ${_module_target})
 
   # add module include directories as PUBLIC to core hpx library to enable

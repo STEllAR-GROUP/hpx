@@ -185,7 +185,8 @@ function(hpx_construct_library_list link_libraries link_options library_list)
 endfunction(hpx_construct_library_list)
 
 
-# Configure the corresponding package config template for the specified ${template}
+# Configure the corresponding package config template for the specified
+# ${template}
 function(hpx_generate_pkgconfig_from_target target template is_build)
   cmake_parse_arguments(pkgconfig "" "" "EXCLUDE" ${ARGN})
 
