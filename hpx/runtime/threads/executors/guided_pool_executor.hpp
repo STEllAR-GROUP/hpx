@@ -79,13 +79,13 @@ namespace hpx { namespace threads { namespace executors {
     // --------------------------------------------------------------------
     // Template type for a numa domain scheduling hint
     template <typename... Args>
-    struct HPX_EXPORT pool_numa_hint
+    struct pool_numa_hint
     {
     };
 
     // Template type for a core scheduling hint
     template <typename... Args>
-    struct HPX_EXPORT pool_core_hint
+    struct pool_core_hint
     {
     };
 
@@ -200,7 +200,7 @@ namespace hpx { namespace threads { namespace executors {
 
     // --------------------------------------------------------------------
     template <typename H>
-    struct HPX_EXPORT guided_pool_executor
+    struct guided_pool_executor
     {
     };
 
@@ -210,7 +210,7 @@ namespace hpx { namespace threads { namespace executors {
     // for an async function or continuation. This makes it possible to
     // guide a lambda rather than a full function.
     template <typename Tag>
-    struct HPX_EXPORT guided_pool_executor<pool_numa_hint<Tag>>
+    struct guided_pool_executor<pool_numa_hint<Tag>>
     {
     public:
         guided_pool_executor(const std::string& pool_name, bool hp_sync = false)
@@ -455,7 +455,7 @@ namespace hpx { namespace threads { namespace executors {
     // an executor compatible with scheduled executor API
     // --------------------------------------------------------------------
     template <typename H>
-    struct HPX_EXPORT guided_pool_executor_shim
+    struct guided_pool_executor_shim
     {
     public:
         guided_pool_executor_shim(
