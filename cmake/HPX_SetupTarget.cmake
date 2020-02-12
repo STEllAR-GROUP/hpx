@@ -149,9 +149,7 @@ function(hpx_setup_target target)
       $<TARGET_NAME_IF_EXISTS:HPX::component>)
   endif()
 
-  if(target_NOLIBS)
-    target_compile_options(${target} ${__tll_public} ${CXX_FLAG})
-  else()
+  if(NOT target_NOLIBS)
     target_link_libraries(${target} ${__tll_public}
       $<TARGET_NAME_IF_EXISTS:hpx>
       $<TARGET_NAME_IF_EXISTS:HPX::hpx>)
