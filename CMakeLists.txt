@@ -1836,52 +1836,6 @@ install( # Install all HPX cmake utility files
   PATTERN "packaging" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
-install( # Install HPX Python scripts
-  DIRECTORY python/scripts/
-  DESTINATION ${CMAKE_INSTALL_BINDIR}
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                   GROUP_READ GROUP_EXECUTE
-                   WORLD_READ WORLD_EXECUTE
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.py"
-  PATTERN ".git" EXCLUDE)
-
-#   if(UNIX)
-#     file(GLOB scripts "${PROJECT_SOURCE_DIR}/python/scripts/*.py")
-#     execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory
-#       "${PROJECT_BINARY_DIR}/python/scripts" )
-#     foreach(script ${scripts})
-#       get_filename_component(script_name ${script} NAME)
-#       get_filename_component(script_name_we ${script} NAME_WE)
-#
-#       #make copy, so that we have intact symlink in PROJECT_BINARY_DIR
-#       execute_process(
-#         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${script}" "${script_name}"
-#   WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/python/scripts")
-#
-#       execute_process(
-#         COMMAND "${CMAKE_COMMAND}" -E create_symlink "${script_name}" "${script_name_we}"
-#   WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/python/scripts")
-#
-#       install(FILES "${PROJECT_BINARY_DIR}/python/scripts/${script_name_we}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
-#     endforeach()
-#   endif()
-#
-#   install( # Install HPX Python module (TODO: this is a temporary hack)
-#     DIRECTORY python/hpx
-#     DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx-${HPX_VERSION}/python
-#     COMPONENT core
-#     FILES_MATCHING PATTERN "*.py"
-#     PATTERN ".git" EXCLUDE)
-#
-#   execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${PROJECT_BINARY_DIR}/python" )
-#   #make symlink, so that we have intact hpx symlink in PROJECT_BINARY_DIR
-#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "${PROJECT_SOURCE_DIR}/python/hpx"
-#     "hpx-${HPX_VERSION}" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/python")
-#   # create a symlink in share pointing to the latest HPX installation
-#   execute_process(COMMAND "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx" WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/python")
-#   install(DIRECTORY "${PROJECT_BINARY_DIR}/python/hpx" DESTINATION "${CMAKE_INSTALL_DATADIR}")
-
 if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
   # FIXME: push changes upstream
   install(
