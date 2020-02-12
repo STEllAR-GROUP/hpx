@@ -1025,9 +1025,9 @@ namespace hpx { namespace threads { namespace policies {
                             std::size_t domain =
                                 topo.get_numa_node_number(pu_num);
 #if defined(SHARED_PRIORITY_SCHEDULER_DEBUG_NUMA)
-                            if (pu_num > (num_workers_ / 2))
+                            if (local_id >= (num_workers_ + 1) / 2)
                             {
-                                domain++;
+                                domain += 1;
                             }
 #endif
                             d_lookup_[local_id] =

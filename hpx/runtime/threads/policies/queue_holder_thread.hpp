@@ -697,7 +697,7 @@ namespace hpx { namespace threads { namespace policies {
             std::int64_t add_count, thread_holder_type* addfrom, bool stealing)
         {
             std::size_t added;
-            if (owns_bp_queue())
+            if (owns_bp_queue() && !stealing)
             {
                 added =
                     bp_queue_->add_new(add_count, addfrom->bp_queue_, stealing);
