@@ -16,7 +16,7 @@ General changes
 
 This is a bugfix release. It contains the following changes:
 
-* Fix compilation issues on Windows, FreeBSD, and gcc 10
+* Fix compilation issues on Windows, macOS, FreeBSD, and with gcc 10
 * Install missing ``pdb`` files on Windows
 * Allow running tests using an installed version of |hpx|
 * Skip MPI finalization if HPX has not initialized MPI
