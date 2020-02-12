@@ -23,6 +23,7 @@
 #include <atomic>
 #include <cstddef>
 #include <iosfwd>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -416,6 +417,7 @@ namespace hpx { namespace resource { namespace detail {
         if (check_empty_pools())
         {
             l.unlock();
+            print_init_pool_data(std::cout);
             throw_runtime_error("partitioner::setup_pools",
                 "Pools empty of resources are not allowed. Please re-run this "
                 "application with allow-empty-pool-policy (not implemented "
