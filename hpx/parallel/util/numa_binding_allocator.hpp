@@ -58,7 +58,7 @@ namespace hpx { namespace threads { namespace executors {
     {
         // The call operator () must return an int type
         // The arguments must be const ref versions of the equivalent task arguments
-        int operator()(const int& domain) const
+        int operator()(int const& domain) const
         {
             nba_deb.debug(debug::str<>("pool_numa_hint"),
                 "allocator returns domain ", domain);
@@ -79,8 +79,8 @@ namespace hpx { namespace compute { namespace host {
         // should touch this page. The thread with the matching domain will
         // perform a memory read/write on the page.
         virtual std::size_t operator()(const T* const /*base_ptr*/,
-            const T* const /*page_ptr*/, const std::size_t /*page_size*/,
-            const std::size_t /*domains*/) const
+            const T* const /*page_ptr*/, std::size_t const /*page_size*/,
+            std::size_t const /*domains*/) const
         {
             return 0;
         }
@@ -570,11 +570,11 @@ namespace hpx { namespace compute { namespace host {
 
         void touch_pages(pointer p, size_t n, numa_binding_helper_ptr helper,
             size_type numa_domain,
-            const std::vector<threads::hwloc_bitmap_ptr>& nodesets) const
+            std::vector<threads::hwloc_bitmap_ptr> const& nodesets) const
         {
-            const size_type pagesize = threads::get_memory_page_size();
-            const size_type pageN = pagesize / sizeof(T);
-            const size_type num_pages =
+            size_type const pagesize = threads::get_memory_page_size();
+            size_type const pageN = pagesize / sizeof(T);
+            size_type const num_pages =
                 (n * sizeof(T) + pagesize - 1) / pagesize;
             pointer page_ptr = p;
             HPX_ASSERT(reinterpret_cast<std::intptr_t>(p) % pagesize == 0);
@@ -615,11 +615,11 @@ namespace hpx { namespace compute { namespace host {
         // This is obsolete but kept for possible future use
         void bind_pages(pointer p, size_t n, numa_binding_helper_ptr helper,
             size_type numa_domain,
-            const std::vector<threads::hwloc_bitmap_ptr>& nodesets) const
+            std::vector<threads::hwloc_bitmap_ptr> const& nodesets) const
         {
-            const size_type pagesize = threads::get_memory_page_size();
-            const size_type pageN = pagesize / sizeof(T);
-            const size_type num_pages =
+            size_type const pagesize = threads::get_memory_page_size();
+            size_type const pageN = pagesize / sizeof(T);
+            size_type const num_pages =
                 (n * sizeof(T) + pagesize - 1) / pagesize;
             pointer page_ptr = p;
             HPX_ASSERT(reinterpret_cast<std::intptr_t>(p) % pagesize == 0);

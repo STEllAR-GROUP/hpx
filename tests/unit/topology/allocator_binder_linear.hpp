@@ -24,9 +24,9 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     explicit linear_numa_binder(std::size_t num_pages)
       : hpx::compute::host::numa_binding_helper<T>()
     {
-        const std::size_t cache_line_size = hpx::threads::get_cache_line_size();
-        const std::size_t page_size = hpx::threads::get_memory_page_size();
-        const std::size_t alignment = (std::max)(page_size, cache_line_size);
+        std::size_t const cache_line_size = hpx::threads::get_cache_line_size();
+        std::size_t const page_size = hpx::threads::get_memory_page_size();
+        std::size_t const alignment = (std::max)(page_size, cache_line_size);
         elements_page_ = (alignment / sizeof(T));
         N_ = num_pages * elements_page_;
     }
@@ -34,8 +34,8 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     // return the domain that a given page should be bound to
     virtual std::size_t operator()(const T* const base_ptr,
         const T* const page_ptr,
-        const std::size_t pagesize,
-        const std::size_t domains) const override
+        std::size_t const pagesize,
+        std::size_t const domains) const override
     {
         std::intptr_t offset = page_ptr - base_ptr;
         std::size_t index = (offset / elements_page_);
