@@ -19,10 +19,8 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
-int main(int argc, char* argv[])
+void init_resource_partitioner_handler(hpx::resource::detail::partitioner& rp)
 {
-    hpx::resource::partitioner rp(argc, argv);
-
     rp.create_thread_pool("my-thread-pool");
 
     bool one_numa_domain = rp.numa_domains().size() == 1;
@@ -43,7 +41,21 @@ int main(int argc, char* argv[])
             rp.add_resource(p, "my-thread-pool");
         }
     }
+}
 
-    hpx::init(rp);
+int main(int argc, char* argv[])
+{
+    // Setup the init parameters
+    hpx::init_params init_args;
+    init_args.argc = argc;
+    init_args.argv = argv;
+    init_args.desc_cmdline_ptr = std::make_shared<
+        hpx::program_options::options_description>(desc_cmdline);
+    init_args.f = static_cast<hpx_main_type>(::hpx_main);
+
+    // Set the callback to init the thread_pools
+    hpx::resource::set_rp_callback(&init_resource_partitioner_handler);
+
+    hpx::init(init_args);
 }
 //body]

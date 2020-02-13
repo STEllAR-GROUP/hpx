@@ -219,46 +219,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     return hpx::finalize();
 }
 
-// ------------------------------------------------------------------------
-// the normal int main function that is called at startup and runs on an OS thread
-// the user must call hpx::init to start the hpx runtime which will execute hpx_main
-// on an hpx thread
-int main(int argc, char* argv[])
+void init_resource_partitioner_handler(hpx::resource::detail::partitioner& rp)
 {
-    hpx::program_options::options_description desc_cmdline("Test options");
-    desc_cmdline.add_options()(
-        "use-pools,u", "Enable advanced HPX thread pools and executors")(
-        "use-scheduler,s", "Enable custom priority scheduler")("pool-threads,m",
-        hpx::program_options::value<int>()->default_value(1),
-        "Number of threads to assign to custom pool");
-
-    // HPX uses a boost program options variable map, but we need it before
-    // hpx-main, so we will create another one here and throw it away after use
-    hpx::program_options::variables_map vm;
-    hpx::program_options::store(
-        hpx::program_options::command_line_parser(argc, argv)
-            .allow_unregistered()
-            .options(desc_cmdline)
-            .run(),
-        vm);
-
-    if (vm.count("use-pools"))
-    {
-        use_pools = true;
-    }
-    if (vm.count("use-scheduler"))
-    {
-        use_scheduler = true;
-    }
-
-    pool_threads = vm["pool-threads"].as<int>();
-
-    // Create the resource partitioner
-    hpx::resource::partitioner rp(desc_cmdline, argc, argv);
-
-    //    auto &topo = rp.get_topology();
-    std::cout << "[main] obtained reference to the resource_partitioner\n";
-
     // create a thread pool and supply a lambda that returns a new pool with
     // the a user supplied scheduler attached
     rp.create_thread_pool("default",
@@ -334,8 +296,54 @@ int main(int argc, char* argv[])
             }
         }
 
-        std::cout << "[main] resources added to thread_pools \n";
+        std::cout << "[rp_callback] resources added to thread_pools \n";
+    }
+}
+
+// ------------------------------------------------------------------------
+// the normal int main function that is called at startup and runs on an OS thread
+// the user must call hpx::init to start the hpx runtime which will execute hpx_main
+// on an hpx thread
+int main(int argc, char* argv[])
+{
+    hpx::program_options::options_description desc_cmdline("Test options");
+    desc_cmdline.add_options()(
+        "use-pools,u", "Enable advanced HPX thread pools and executors")(
+        "use-scheduler,s", "Enable custom priority scheduler")("pool-threads,m",
+        hpx::program_options::value<int>()->default_value(1),
+        "Number of threads to assign to custom pool");
+
+    // HPX uses a boost program options variable map, but we need it before
+    // hpx-main, so we will create another one here and throw it away after use
+    hpx::program_options::variables_map vm;
+    hpx::program_options::store(
+        hpx::program_options::command_line_parser(argc, argv)
+            .allow_unregistered()
+            .options(desc_cmdline)
+            .run(),
+        vm);
+
+    if (vm.count("use-pools"))
+    {
+        use_pools = true;
+    }
+    if (vm.count("use-scheduler"))
+    {
+        use_scheduler = true;
     }
 
-    return hpx::init(rp);
+    pool_threads = vm["pool-threads"].as<int>();
+
+    // Setup the init parameters
+    hpx::init_params init_args;
+    init_args.argc = argc;
+    init_args.argv = argv;
+    init_args.desc_cmdline_ptr = std::make_shared<
+        hpx::program_options::options_description>(desc_cmdline);
+    init_args.f = static_cast<hpx_main_type>(::hpx_main);
+
+    // Set the callback to init the thread_pools
+    hpx::resource::set_rp_callback(&init_resource_partitioner_handler);
+
+    return hpx::init(init_args);
 }

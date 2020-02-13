@@ -18,7 +18,11 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char** argv)
 {
-    hpx::resource::partitioner rp(argc, argv);
-    hpx::init(rp);
+    // Setup the init parameters
+    hpx::init_params init_args;
+    init_args.argc = argc;
+    init_args.argv = argv;
+    init_args.f = static_cast<hpx_main_type>(::hpx_main);
+    hpx::init(init_args);
 }
 //body]
