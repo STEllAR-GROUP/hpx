@@ -62,5 +62,7 @@ if(HPX_WITH_CUDA AND NOT TARGET hpx::cuda)
     target_link_libraries(hpx::cuda INTERFACE cudart)
   endif()
 
-  target_link_libraries(hpx_base_libraries INTERFACE hpx::cuda)
+  if(NOT HPX_FIND_PACKAGE)
+    target_link_libraries(hpx_base_libraries INTERFACE hpx::cuda)
+  endif()
 endif()
