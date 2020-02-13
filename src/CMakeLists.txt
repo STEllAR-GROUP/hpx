@@ -508,6 +508,7 @@ foreach(_keyword PUBLIC;PRIVATE)
 endforeach()
 
 target_compile_features(hpx_internal_flags INTERFACE cxx_std_${HPX_CXX_STANDARD})
+target_compile_features(hpx PUBLIC cxx_std_${HPX_CXX_STANDARD})
 
 set(_optional)
 if(HPX_WITH_DEFAULT_TARGETS)
