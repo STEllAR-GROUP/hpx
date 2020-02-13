@@ -49,8 +49,7 @@
 //        auto fut = helper.async(&call_trivial_kernel, 3.1415);
 //
 // -------------------------------------------------------------------------
-namespace hpx { namespace cuda
-{
+namespace hpx { namespace cuda {
 
     // -------------------------------------------------------------------------
     // Forward declare these error utility functions
@@ -63,29 +62,30 @@ namespace hpx { namespace cuda
         // Error handling in cublas calls
         // not all of these are supported by all cuda/cublas versions
         // (comment them out if they cause compiler errors)
-        const char *_cublasGetErrorEnum(cublasStatus_t error)
+        const char* _cublasGetErrorEnum(cublasStatus_t error)
         {
-            switch (error) {
-                case CUBLAS_STATUS_SUCCESS:
-                    return "CUBLAS_STATUS_SUCCESS";
-                case CUBLAS_STATUS_NOT_INITIALIZED:
-                    return "CUBLAS_STATUS_NOT_INITIALIZED";
-                case CUBLAS_STATUS_ALLOC_FAILED:
-                    return "CUBLAS_STATUS_ALLOC_FAILED";
-                case CUBLAS_STATUS_INVALID_VALUE:
-                    return "CUBLAS_STATUS_INVALID_VALUE";
-                case CUBLAS_STATUS_ARCH_MISMATCH:
-                    return "CUBLAS_STATUS_ARCH_MISMATCH";
-                case CUBLAS_STATUS_MAPPING_ERROR:
-                    return "CUBLAS_STATUS_MAPPING_ERROR";
-                case CUBLAS_STATUS_EXECUTION_FAILED:
-                    return "CUBLAS_STATUS_EXECUTION_FAILED";
-                case CUBLAS_STATUS_INTERNAL_ERROR:
-                    return "CUBLAS_STATUS_INTERNAL_ERROR";
-                case CUBLAS_STATUS_NOT_SUPPORTED:
-                    return "CUBLAS_STATUS_NOT_SUPPORTED";
-                case CUBLAS_STATUS_LICENSE_ERROR:
-                    return "CUBLAS_STATUS_LICENSE_ERROR";
+            switch (error)
+            {
+            case CUBLAS_STATUS_SUCCESS:
+                return "CUBLAS_STATUS_SUCCESS";
+            case CUBLAS_STATUS_NOT_INITIALIZED:
+                return "CUBLAS_STATUS_NOT_INITIALIZED";
+            case CUBLAS_STATUS_ALLOC_FAILED:
+                return "CUBLAS_STATUS_ALLOC_FAILED";
+            case CUBLAS_STATUS_INVALID_VALUE:
+                return "CUBLAS_STATUS_INVALID_VALUE";
+            case CUBLAS_STATUS_ARCH_MISMATCH:
+                return "CUBLAS_STATUS_ARCH_MISMATCH";
+            case CUBLAS_STATUS_MAPPING_ERROR:
+                return "CUBLAS_STATUS_MAPPING_ERROR";
+            case CUBLAS_STATUS_EXECUTION_FAILED:
+                return "CUBLAS_STATUS_EXECUTION_FAILED";
+            case CUBLAS_STATUS_INTERNAL_ERROR:
+                return "CUBLAS_STATUS_INTERNAL_ERROR";
+            case CUBLAS_STATUS_NOT_SUPPORTED:
+                return "CUBLAS_STATUS_NOT_SUPPORTED";
+            case CUBLAS_STATUS_LICENSE_ERROR:
+                return "CUBLAS_STATUS_LICENSE_ERROR";
             }
             return "<unknown>";
         }
@@ -98,24 +98,31 @@ namespace hpx { namespace cuda
 
         // default implementation
         template <typename R, typename... Args>
-        struct async_helper {
-            inline R operator()(R(*f)(Args...), Args... args) {
+        struct async_helper
+        {
+            inline R operator()(R (*f)(Args...), Args... args)
+            {
                 return f(args...);
             }
         };
 
         // specialize invoker helper for return type void
         template <typename... Args>
-        struct async_helper<void, Args...> {
-            inline void operator()(void(*f)(Args...), Args... args) {
+        struct async_helper<void, Args...>
+        {
+            inline void operator()(void (*f)(Args...), Args... args)
+            {
                 f(args...);
             }
         };
 
         // specialize invoker helper for return type of cudaError_t
         template <typename... Args>
-        struct async_helper<cudaError_t, Args...> {
-            inline cudaError_t operator()(cudaError_t(*f)(Args...), Args... args) {
+        struct async_helper<cudaError_t, Args...>
+        {
+            inline cudaError_t operator()(
+                cudaError_t (*f)(Args...), Args... args)
+            {
                 cudaError_t err = f(args...);
                 cuda_error(err);
                 return err;
@@ -124,20 +131,25 @@ namespace hpx { namespace cuda
 
         // specialize invoker helper for return type of cublasStatus_t
         template <typename... Args>
-        struct async_helper<cublasStatus_t, Args...> {
-            inline cublasStatus_t operator()(cublasStatus_t(*f)(Args...), Args... args) {
+        struct async_helper<cublasStatus_t, Args...>
+        {
+            inline cublasStatus_t operator()(
+                cublasStatus_t (*f)(Args...), Args... args)
+            {
                 cublasStatus_t err = f(args...);
                 cublas_error(err);
                 return err;
             }
         };
-    }
+    }    // namespace detail
 
     // -------------------------------------------------------------------------
     // Error message handling for cuda and cublas
     // -------------------------------------------------------------------------
-    void cuda_error(cudaError_t err) {
-        if (err != cudaSuccess) {
+    void cuda_error(cudaError_t err)
+    {
+        if (err != cudaSuccess)
+        {
             std::stringstream temp;
             temp << "cuda function returned error code "
                  << cudaGetErrorString(err);
@@ -145,8 +157,10 @@ namespace hpx { namespace cuda
         }
     }
 
-    void cublas_error(cublasStatus_t err) {
-        if (err != CUBLAS_STATUS_SUCCESS) {
+    void cublas_error(cublasStatus_t err)
+    {
+        if (err != CUBLAS_STATUS_SUCCESS)
+        {
             std::stringstream temp;
             temp << "cublas function returned error code "
                  << detail::_cublasGetErrorEnum(err);
@@ -165,15 +179,13 @@ namespace hpx { namespace cuda
 
         // construct - create a cuda stream that all tasks invoked by
         // this helper will use
-        cuda_future_helper(std::size_t device = 0) : target_(device) {
+        cuda_future_helper(std::size_t device = 0)
+          : target_(device)
+        {
             stream_ = target_.native_handle().get_stream();
         }
 
         ~cuda_future_helper() {}
-
-        cuda_future_helper(cuda_future_helper& other) = delete;
-        cuda_future_helper(const cuda_future_helper& other) = delete;
-        cuda_future_helper operator=(const cuda_future_helper& other) = delete;
 
         // -------------------------------------------------------------------------
         // launch a kernel on our stream - this does not require a c++ wrapped
@@ -183,7 +195,7 @@ namespace hpx { namespace cuda
         // Typically, one must pass ...
         // const void* func, dim3 gridDim, dim3 blockDim, void** args, size_t sharedMem)
         template <typename R, typename... Params, typename... Args>
-        R device_launch_apply(R(*cuda_kernel)(Params...), Args &&... args)
+        R device_launch_apply(R (*cuda_kernel)(Params...), Args&&... args)
         {
             // make sure we run on the correct device
             cuda_error(cudaSetDevice(target_.native_handle().get_device()));
@@ -219,7 +231,8 @@ namespace hpx { namespace cuda
         // when the task completes, this allows integregration of GPU kernels with
         // hpx::futures and the tasking DAG.
         template <typename R, typename... Params, typename... Args>
-        hpx::future<void> async(R(*cuda_kernel)(Params...), Args &&... args) {
+        hpx::future<void> async(R (*cuda_kernel)(Params...), Args&&... args)
+        {
             // make sure we run on the correct device
             cuda_error(cudaSetDevice(target_.native_handle().get_device()));
             // insert the stream handle in the arg list and call the cuda function
@@ -231,7 +244,8 @@ namespace hpx { namespace cuda
         // -------------------------------------------------------------------------
         // launch a kernel on our stream and return without a future
         template <typename R, typename... Params, typename... Args>
-        R apply(R(*cuda_kernel)(Params...), Args &&... args) {
+        R apply(R (*cuda_kernel)(Params...), Args&&... args)
+        {
             // make sure we run on the correct device
             cuda_error(cudaSetDevice(target_.native_handle().get_device()));
             // insert the stream handle in the arg list and call the cuda function
@@ -244,7 +258,8 @@ namespace hpx { namespace cuda
         // cuda back to the caller, otherwise this function mimics the
         // behaviour of apply.
         template <typename Func, typename... Args>
-        cudaError_t apply_pass_through(Func&& cuda_function, Args&&... args) {
+        cudaError_t apply_pass_through(Func&& cuda_function, Args&&... args)
+        {
             // make sure we run on the correct device
             cuda_error(cudaSetDevice(target_.native_handle().get_device()));
             // insert the stream handle in the arg list and call the cuda function
@@ -254,7 +269,8 @@ namespace hpx { namespace cuda
         // -------------------------------------------------------------------------
         // utility function for memory copies to/from the GPU, async and apply versions
         template <typename... Args>
-        hpx::future<void> memcpy_async(Args&&... args) {
+        hpx::future<void> memcpy_async(Args&&... args)
+        {
             return async(cudaMemcpyAsync, std::forward<Args>(args)...);
         }
 
@@ -267,7 +283,8 @@ namespace hpx { namespace cuda
         // -------------------------------------------------------------------------
         // utility function for setting memory on the GPU, async and apply versions
         template <typename... Args>
-        hpx::future<void> memset_async(Args&&... args) {
+        hpx::future<void> memset_async(Args&&... args)
+        {
             return async(cudaMemsetAsync, std::forward<Args>(args)...);
         }
 
@@ -279,40 +296,44 @@ namespace hpx { namespace cuda
 
         // -------------------------------------------------------------------------
         // get the future to synchronize this cublas stream with
-        future_type get_future() {
+        future_type get_future()
+        {
             return target_.get_future();
         }
 
         // -------------------------------------------------------------------------
         // return a reference to the compute::cuda object owned by this class
-        hpx::cuda::target& get_target() {
+        hpx::cuda::target& get_target()
+        {
             return target_;
         }
 
         // -------------------------------------------------------------------------
-        cudaStream_t get_stream() {
+        cudaStream_t get_stream()
+        {
             return stream_;
         }
 
         // -------------------------------------------------------------------------
         // utility function to print target information for this helper object
-        static void print_local_targets(void) {
+        static void print_local_targets(void)
+        {
             auto targets = hpx::cuda::target::get_local_targets();
-            for (auto target : targets) {
-                std::cout << "GPU Device " << target.native_handle().get_device()
-                          << ": \""
+            for (auto target : targets)
+            {
+                std::cout << "GPU Device "
+                          << target.native_handle().get_device() << ": \""
                           << target.native_handle().processor_name() << "\" "
                           << "with compute capability "
-                          << target.native_handle().processor_family()
-                          << "\n";
+                          << target.native_handle().processor_family() << "\n";
             }
         }
 
     protected:
-        cudaStream_t      stream_;
+        cudaStream_t stream_;
         hpx::cuda::target target_;
     };
 
-}} // namespace
+}}    // namespace hpx::cuda
 
 //#endif

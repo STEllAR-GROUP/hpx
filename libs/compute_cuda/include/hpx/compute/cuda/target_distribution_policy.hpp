@@ -21,8 +21,8 @@
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
-#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/detail/target_distribution_policy.hpp>
+#include <hpx/cuda_support/target.hpp>
 
 #include <algorithm>
 #include <cstddef>

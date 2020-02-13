@@ -21,11 +21,11 @@
 
 #include <hpx/execution/executors/execution.hpp>
 
-#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/cuda/default_executor_parameters.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
 #include <hpx/compute/vector.hpp>
+#include <hpx/cuda_support/target.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -10,12 +10,10 @@
 
 #if defined(HPX_CUDA_SUPPORT_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message(                                                \
-    "The header hpx/compute/cuda/get_targets.hpp is deprecated, \
+#pragma message("The header hpx/compute/cuda/get_targets.hpp is deprecated, \
     please include hpx/cuda_support/get_targets.hpp instead")
 #else
-#warning                                                        \
-    "The header hpx/compute/cuda/get_targets.hpp is deprecated, \
+#warning "The header hpx/compute/cuda/get_targets.hpp is deprecated, \
     please include hpx/cuda_support/get_targets.hpp instead"
 #endif
 #endif

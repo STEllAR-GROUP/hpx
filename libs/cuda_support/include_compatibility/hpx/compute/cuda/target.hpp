@@ -10,17 +10,14 @@
 
 #if defined(HPX_CUDA_SUPPORT_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message(                                           \
-    "The header hpx/compute/cuda/target.hpp is deprecated, \
+#pragma message("The header hpx/compute/cuda/target.hpp is deprecated, \
     please include hpx/cuda_support/target.hpp instead")
 #else
-#warning                                                   \
-    "The header hpx/compute/cuda/target.hpp is deprecated, \
+#warning "The header hpx/compute/cuda/target.hpp is deprecated, \
     please include hpx/cuda_support/target.hpp instead"
 #endif
 #endif
 
 namespace hpx { namespace compute { namespace cuda {
-  using target = hpx::cuda::target;
-}}}
-
+    using target = hpx::cuda::target;
+}}}    // namespace hpx::compute::cuda

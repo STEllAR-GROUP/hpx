@@ -15,9 +15,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 
-#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
 #include <hpx/compute/detail/get_proxy_type.hpp>
+#include <hpx/cuda_support/target.hpp>
 
 #include <cstddef>
 

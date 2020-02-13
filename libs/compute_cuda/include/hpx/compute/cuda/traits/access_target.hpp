@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/traits/access_target.hpp>
+#include <hpx/cuda_support/target.hpp>
 
 #include <cuda_runtime.h>
 

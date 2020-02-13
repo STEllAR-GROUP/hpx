@@ -14,8 +14,8 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 //
-#include <hpx/cuda_support/target.hpp>
 #include <hpx/cuda_support/cuda_future_helper.hpp>
+#include <hpx/cuda_support/target.hpp>
 
 // CUDA runtime
 #include <cuda_runtime.h>
@@ -49,11 +49,9 @@ int test_saxpy(hpx::cuda::cuda_future_helper& helper)
     std::vector<float> h_B(N);
 
     float *d_A, *d_B;
-    hpx::cuda::cuda_error(
-        cudaMalloc((void**) &d_A, N * sizeof(float)));
+    hpx::cuda::cuda_error(cudaMalloc((void**) &d_A, N * sizeof(float)));
 
-    hpx::cuda::cuda_error(
-        cudaMalloc((void**) &d_B, N * sizeof(float)));
+    hpx::cuda::cuda_error(cudaMalloc((void**) &d_B, N * sizeof(float)));
 
     // init host data
     for (int idx = 0; idx < N; idx++)

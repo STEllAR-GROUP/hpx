@@ -73,8 +73,7 @@ namespace hpx { namespace cuda {
         if (error != cudaSuccess)
         {
             // report error
-            HPX_THROW_EXCEPTION(kernel_error,
-                "cuda::default_executor::processing_units_count()",
+            HPX_THROW_EXCEPTION(kernel_error, "cuda::init_processing_unit()",
                 std::string("cudaGetDeviceProperties failed: ") +
                     cudaGetErrorString(error));
         }
@@ -253,6 +252,6 @@ namespace hpx { namespace cuda {
         ar << handle_.device_ << locality_;
     }
 #endif
-}}    // namespace hpx::compute::cuda
+}}    // namespace hpx::cuda
 
 #endif

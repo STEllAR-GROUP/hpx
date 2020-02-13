@@ -53,11 +53,10 @@ namespace hpx { namespace cuda {
 
         return targets;
     }
-}}    // namespace
+}}    // namespace hpx::cuda
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-HPX_PLAIN_ACTION(
-    hpx::cuda::get_local_targets, cuda_get_targets_action);
+HPX_PLAIN_ACTION(hpx::cuda::get_local_targets, cuda_get_targets_action);
 
 namespace hpx { namespace cuda {
     hpx::future<std::vector<target>> get_targets(hpx::id_type const& locality)
