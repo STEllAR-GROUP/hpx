@@ -60,7 +60,7 @@ endif()
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/hpx_*.cpp"
-  EXCLUDE "hpx_init[.]cpp|hpx_wrap.cpp")
+  EXCLUDE "hpx_init*[.]cpp|hpx_wrap.cpp")
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/main.cpp" APPEND)
 

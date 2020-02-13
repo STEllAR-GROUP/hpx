@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
+#include <hpx/hpx_init_params.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
@@ -22,40 +23,10 @@
 #include <string>
 #include <vector>
 
-#ifndef DOXYGEN
-///////////////////////////////////////////////////////////////////////////////
-// One of these functions must be implemented by the application for the
-// console locality.
-int hpx_main();
-int hpx_main(int argc, char** argv);
-int hpx_main(hpx::program_options::variables_map& vm);
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// \cond NOINTERNAL
-namespace hpx_startup
-{
-    // As an alternative, the user can provide a function hpx_startup::user_main,
-    // which is semantically equivalent to the plain old C-main.
-    int user_main();
-    int user_main(int argc, char** argv);
-}
-/// \endcond
-
 ///////////////////////////////////////////////////////////////////////////////
 /// \namespace hpx
 namespace hpx
 {
-    namespace detail
-    {
-        HPX_EXPORT void on_exit() noexcept;
-        HPX_EXPORT void on_abort(int signal) noexcept;
-    }
-
-#ifndef DOXYGEN
-    typedef int (*hpx_main_type)(hpx::program_options::variables_map&);
-#endif
-
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is the main, non-blocking entry point for any HPX application.
