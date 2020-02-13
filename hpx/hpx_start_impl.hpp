@@ -131,8 +131,19 @@ namespace hpx
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
         std::vector<std::string> cfg;
-        return start(f, desc_cmdline, argc, argv, cfg, std::move(startup),
-            std::move(shutdown), mode);
+        using hpx::program_options::options_description;
+
+        hpx::init_params iparams;
+        iparams.f = f;
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_cmdline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.cfg = cfg;
+        iparams.startup = std::move(startup);
+        iparams.shutdown = std::move(shutdown);
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -147,8 +158,18 @@ namespace hpx
         int argc, char** argv, startup_function_type startup,
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
-        return start(static_cast<hpx_main_type>(::hpx_main), desc_cmdline,
-            argc, argv, std::move(startup), std::move(shutdown), mode);
+        using hpx::program_options::options_description;
+
+        hpx::init_params iparams;
+        iparams.f = static_cast<hpx_main_type>(::hpx_main);
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_cmdline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.startup = std::move(startup);
+        iparams.shutdown = std::move(shutdown);
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -164,8 +185,19 @@ namespace hpx
         startup_function_type startup, shutdown_function_type shutdown,
         hpx::runtime_mode mode)
     {
-        return start(static_cast<hpx_main_type>(::hpx_main), desc_cmdline,
-            argc, argv, cfg, std::move(startup), std::move(shutdown), mode);
+        using hpx::program_options::options_description;
+
+        hpx::init_params iparams;
+        iparams.f = static_cast<hpx_main_type>(::hpx_main);
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_cmdline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.cfg = cfg;
+        iparams.startup = std::move(startup);
+        iparams.shutdown = std::move(shutdown);
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -179,13 +211,13 @@ namespace hpx
     start(int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        using hpx::program_options::options_description;
-
-        options_description desc_commandline(
-            "Usage: " HPX_APPLICATION_STRING " [options]");
-
-        return start(desc_commandline, argc, argv, cfg, startup_function_type(),
-            shutdown_function_type(), mode);
+        hpx::init_params iparams;
+        iparams.f = static_cast<hpx_main_type>(::hpx_main);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.cfg = cfg;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -199,8 +231,16 @@ namespace hpx
     start(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, hpx::runtime_mode mode)
     {
-        return start(static_cast<hpx_main_type>(::hpx_main), desc_cmdline,
-            argc, argv, startup_function_type(), shutdown_function_type(), mode);
+        using hpx::program_options::options_description;
+
+        hpx::init_params iparams;
+        iparams.f = static_cast<hpx_main_type>(::hpx_main);
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_cmdline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -215,8 +255,17 @@ namespace hpx
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        return start(desc_cmdline, argc, argv, cfg, startup_function_type(),
-            shutdown_function_type(), mode);
+        using hpx::program_options::options_description;
+
+        hpx::init_params iparams;
+        iparams.f = static_cast<hpx_main_type>(::hpx_main);
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_cmdline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.cfg = cfg;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -230,8 +279,16 @@ namespace hpx
     start(std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
-        return start(static_cast<hpx_main_type>(::hpx_main), app_name, argc,
-            argv, startup_function_type(), shutdown_function_type(), mode);
+        using hpx::program_options::options_description;
+        options_description desc = options_description("Usage: " + app_name +
+                " [options]");
+        hpx::init_params iparams;
+        iparams.f = static_cast<hpx_main_type>(::hpx_main);
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(desc);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -243,8 +300,12 @@ namespace hpx
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline bool start(int argc, char** argv, hpx::runtime_mode mode)
     {
-        return start(static_cast<hpx_main_type>(::hpx_main),
-            HPX_APPLICATION_STRING, argc, argv, mode);
+        hpx::init_params iparams;
+        iparams.f = static_cast<hpx_main_type>(::hpx_main);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -257,16 +318,11 @@ namespace hpx
     inline bool start(std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        using hpx::program_options::options_description;
-
-        options_description desc_commandline(
-            std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
-
-        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
-
-        return start(static_cast<hpx_main_type>(::hpx_main), desc_commandline,
-            1, dummy_argv, cfg, startup_function_type(),
-            shutdown_function_type(), mode);
+        hpx::init_params iparams;
+        iparams.f = static_cast<hpx_main_type>(::hpx_main);
+        iparams.cfg = cfg;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -285,22 +341,40 @@ namespace hpx
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
 
+        hpx::init_params iparams;
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_commandline);
+        iparams.mode = mode;
+
         if (argc == 0 || argv == nullptr)
         {
-            char *dummy_argv[2] = { const_cast<char*>(app_name.c_str()), nullptr };
-            return start(desc_commandline, 1, dummy_argv, mode);
+            iparams.f = static_cast<hpx_main_type>(::hpx_main);
+            return start(iparams);
         }
 
-        return start(f, desc_commandline, argc, argv, startup_function_type(),
-            shutdown_function_type(), mode);
+        iparams.f = f;
+        iparams.argc = argc;
+        iparams.argv = argv;
+        return start(iparams);
     }
 
     // Main non-blocking entry point for launching the HPX runtime system.
     inline bool start(int (*f)(hpx::program_options::variables_map& vm),
         int argc, char** argv, hpx::runtime_mode mode)
     {
-        std::string app_name(HPX_APPLICATION_STRING);
-        return start(f, app_name, argc, argv, mode);
+        hpx::init_params iparams;
+
+        if (argc == 0 || argv == nullptr)
+        {
+            iparams.f = static_cast<hpx_main_type>(::hpx_main);
+            return start(iparams);
+        }
+
+        iparams.f = f;
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     /// \cond NOINTERNAL
@@ -318,106 +392,126 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         using hpx::program_options::options_description;
-
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
 
-        util::function_nonser<int(hpx::program_options::variables_map& vm)>
-            main_f = util::bind_back(detail::init_helper, f);
-        std::vector<std::string> cfg;
-
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
-        return start(main_f, desc_commandline, argc, argv, cfg,
-            startup_function_type(), shutdown_function_type(), mode);
+        hpx::init_params iparams;
+        iparams.f = util::bind_back(detail::init_helper, f);
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_commandline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     // Main non-blocking entry point for launching the HPX runtime system.
     inline bool start(util::function_nonser<int(int, char**)> const& f,
         int argc, char** argv, hpx::runtime_mode mode)
     {
-        std::string app_name(HPX_APPLICATION_STRING);
-        return start(f, app_name, argc, argv, mode);
+        HPX_ASSERT(argc != 0 && argv != nullptr);
+
+        hpx::init_params iparams;
+        iparams.f = util::bind_back(detail::init_helper, f);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     inline bool start(util::function_nonser<int(int, char**)> const& f,
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        std::string app_name(HPX_APPLICATION_STRING);
-        using hpx::program_options::options_description;
-
-        options_description desc_commandline(
-            "Usage: " + app_name +  " [options]");
-
-        util::function_nonser<int(hpx::program_options::variables_map& vm)>
-            main_f = util::bind_back(detail::init_helper, f);
-
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
-        return start(main_f, desc_commandline, argc, argv, cfg,
-            startup_function_type(), shutdown_function_type(), mode);
+        hpx::init_params iparams;
+        iparams.f = util::bind_back(detail::init_helper, f);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.cfg = cfg;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     inline bool start(util::function_nonser<int(int, char**)> const& f,
         std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
-
-        return start(f, 1, dummy_argv, cfg, mode);
+        hpx::init_params iparams;
+        iparams.f = util::bind_back(detail::init_helper, f);
+        iparams.cfg = cfg;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     inline bool start(std::nullptr_t f, std::string const& app_name, int argc,
         char** argv, hpx::runtime_mode mode)
     {
         using hpx::program_options::options_description;
-
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
-
         util::function_nonser<int(hpx::program_options::variables_map& vm)>
             main_f;
-        std::vector<std::string> cfg;
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
-        return start(main_f, desc_commandline, argc, argv, cfg,
-            startup_function_type(), shutdown_function_type(), mode);
+        hpx::init_params iparams;
+        iparams.f = main_f;
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_commandline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     inline bool start(std::nullptr_t f, int argc, char** argv,
         hpx::runtime_mode mode)
     {
-        std::string app_name(HPX_APPLICATION_STRING);
-        return start(f, app_name, argc, argv, mode);
+        util::function_nonser<int(hpx::program_options::variables_map& vm)>
+            main_f;
+
+        HPX_ASSERT(argc != 0 && argv != nullptr);
+
+        hpx::init_params iparams;
+        iparams.f = main_f;
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     inline bool start(std::nullptr_t f, int argc, char** argv,
         std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
-        std::string app_name(HPX_APPLICATION_STRING);
-        using hpx::program_options::options_description;
-
-        options_description desc_commandline(
-            "Usage: " + app_name +  " [options]");
-
         util::function_nonser<int(hpx::program_options::variables_map& vm)>
             main_f;
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
-        return start(main_f, desc_commandline, argc, argv, cfg,
-            startup_function_type(), shutdown_function_type(), mode);
+        hpx::init_params iparams;
+        iparams.f = main_f;
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.cfg = cfg;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     inline bool start(std::nullptr_t f, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        char* dummy_argv[2] = {
-            const_cast<char*>(HPX_APPLICATION_STRING), nullptr};
+        util::function_nonser<int(hpx::program_options::variables_map& vm)>
+            main_f;
 
-        return start(nullptr, 1, dummy_argv, cfg, mode);
+        hpx::init_params iparams;
+        iparams.f = main_f;
+        iparams.cfg = cfg;
+        iparams.mode = mode;
+        return start(iparams);
     }
 
     ////////////////////////////////////////////////////////////////////////////
