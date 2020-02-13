@@ -19,7 +19,7 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
-void init_resource_partitioner_handler(hpx::resource::detail::partitioner& rp)
+void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
 {
     rp.create_thread_pool("my-thread-pool");
 

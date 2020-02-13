@@ -232,7 +232,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     return hpx::finalize();
 }
 
-void init_resource_partitioner_handler(hpx::resource::detail::partitioner& rp)
+void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
 {
     // create a thread pool and supply a lambda that returns a new pool with
     // a user supplied scheduler attached

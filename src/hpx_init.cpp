@@ -28,7 +28,6 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
-#include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
@@ -759,9 +758,8 @@ namespace hpx
                     // Construct resource partitioner if this has not been done yet
                     // and get a handle to it
                     // (if the command-line parsing has not yet been done, do it now)
-                    auto& rp = hpx::resource::detail::create_partitioner(f,
-                        desc_cmdline, argc, argv, std::move(ini_config),
-                        rp_mode, mode, false, &result);
+                    hpx::resource::partitioner rp(f, desc_cmdline, argc, argv,
+                        std::move(ini_config), rp_mode, mode, false, &result);
 
                     activate_global_options(rp.get_command_line_switches(),
                         argc, argv);

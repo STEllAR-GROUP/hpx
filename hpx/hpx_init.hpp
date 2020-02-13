@@ -797,7 +797,7 @@ namespace hpx
 
         // Utilities to init the thread_pools of the resource partitioner
         using rp_callback_type = hpx::util::function_nonser<void(
-                hpx::resource::detail::partitioner&)>;
+                hpx::resource::partitioner&)>;
         HPX_EXPORT void set_rp_callback(rp_callback_type f);
 
     }   // namespace resource
