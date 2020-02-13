@@ -816,6 +816,17 @@ namespace hpx { namespace util
                  vm.count("hpx:ignore-batch-env")) == 0) &&
             !use_process_mask_;
 
+#if defined(__APPLE__)
+        if (use_process_mask_)
+        {
+            std::cerr
+                << "Warning: enabled process mask for thread binding, but "
+                   "thread binding is not supported on macOS. Ignoring option."
+                << std::endl;
+            use_process_mask_ = false;
+        }
+#endif
+
         bool have_mpi = detail::check_mpi_environment(rtcfg_);
 
         util::batch_environment env(nodelist, have_mpi, debug_clp,
@@ -1020,16 +1031,49 @@ namespace hpx { namespace util
 
         affinity_bind_ = detail::handle_affinity_bind(cfgmap, vm, "");
         if (!affinity_bind_.empty())
+        {
+#if defined(__APPLE__)
+            std::cerr << "Warning: thread binding set to \"" << affinity_bind_
+                      << "\" but thread binding is not supported on macOS. "
+                         "Ignoring option."
+                      << std::endl;
+            affinity_bind_ = "";
+#else
             ini_config.emplace_back("hpx.bind!=" + affinity_bind_);
+#endif
+        }
 
         pu_step_ = detail::handle_pu_step(cfgmap, vm, 1);
+#if defined(__APPLE__)
+        if (pu_step_ != 1)
+        {
+            std::cerr << "Warning: PU step set to \"" << pu_step_
+                      << "\" but thread binding is not supported on macOS. "
+                         "Ignoring option."
+                      << std::endl;
+            pu_step_ = 1;
+        }
+#endif
         ini_config.emplace_back("hpx.pu_step=" + std::to_string(pu_step_));
 
         pu_offset_ = detail::handle_pu_offset(cfgmap, vm, std::size_t(-1));
         if (pu_offset_ != std::size_t(-1))
-            ini_config.emplace_back("hpx.pu_offset=" + std::to_string(pu_offset_));
-        else
+        {
+#if defined(__APPLE__)
+            std::cerr << "Warning: PU offset set to \"" << pu_offset_
+                      << "\" but thread binding is not supported on macOS. "
+                         "Ignoring option."
+                      << std::endl;
+            pu_offset_ = std::size_t(-1);
             ini_config.emplace_back("hpx.pu_offset=0");
+#else
+            ini_config.emplace_back("hpx.pu_offset=" + std::to_string(pu_offset_));
+#endif
+        }
+        else
+        {
+            ini_config.emplace_back("hpx.pu_offset=0");
+        }
 
         numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm,
             affinity_bind_.empty() ? 0 : 1);
@@ -1040,7 +1084,11 @@ namespace hpx { namespace util
         // pu-offset is given)
         if (pu_step_ == 1 && pu_offset_ == std::size_t(-1) && affinity_bind_.empty())
         {
+#if defined(__APPLE__)
+            affinity_bind_ = "none";
+#else
             affinity_bind_ = "balanced";
+#endif
             ini_config.emplace_back("hpx.bind!=" + affinity_bind_);
         }
 
