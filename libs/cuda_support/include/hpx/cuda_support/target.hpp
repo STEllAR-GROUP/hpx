@@ -9,12 +9,13 @@
 
 #pragma once
 
+// must be before HPX_HAVE_CUDA - it's defined in the config
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/compute/cuda/get_targets.hpp>
+#include <hpx/cuda_support/get_targets.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/runtime/find_here.hpp>
@@ -34,7 +35,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -342,7 +343,7 @@ namespace hpx { namespace compute { namespace cuda {
 
     using detail::get_future;
     HPX_EXPORT target& get_default_target();
-}}}    // namespace hpx::compute::cuda
+}}    // namespace hpx::cuda
 
 #include <hpx/config/warnings_suffix.hpp>
 

@@ -21,7 +21,7 @@
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
-#include <hpx/compute/cuda/target.hpp>
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/detail/target_distribution_policy.hpp>
 
 #include <algorithm>
@@ -34,9 +34,9 @@
 namespace hpx { namespace compute { namespace cuda {
     /// A target_distribution_policy used for CPU bound localities.
     struct target_distribution_policy
-      : compute::detail::target_distribution_policy<cuda::target>
+      : compute::detail::target_distribution_policy<hpx::cuda::target>
     {
-        typedef compute::detail::target_distribution_policy<cuda::target>
+        typedef compute::detail::target_distribution_policy<hpx::cuda::target>
             base_type;
 
         /// Default-construct a new instance of a \a target_distribution_policy.

@@ -11,9 +11,9 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/execution/traits/executor_traits.hpp>
 
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/cuda/concurrent_executor_parameters.hpp>
 #include <hpx/compute/cuda/default_executor.hpp>
-#include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/host/block_executor.hpp>
 #include <hpx/compute/host/target.hpp>
 
@@ -39,7 +39,7 @@ namespace hpx { namespace compute { namespace cuda {
         // bulk-shape ranges for the accelerator.
         typedef concurrent_executor_parameters executor_parameters_type;
 
-        concurrent_executor(cuda::target const& cuda_target,
+        concurrent_executor(hpx::cuda::target const& cuda_target,
             std::vector<host::target> const& host_targets)
           : host_executor_(host_targets)
           , current_(0)
@@ -48,7 +48,7 @@ namespace hpx { namespace compute { namespace cuda {
             cuda_executors_.reserve(num_targets);
             for (std::size_t i = 0; i != num_targets; ++i)
             {
-                cuda::target t(cuda_target.native_handle().get_device());
+              hpx::cuda::target t(cuda_target.native_handle().get_device());
                 t.native_handle().get_stream();
                 cuda_executors_.emplace_back(std::move(t));
             }

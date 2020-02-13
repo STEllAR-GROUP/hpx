@@ -18,7 +18,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::size_t iterations = vm["iterations"].as<std::size_t>();
 
     // Get the cuda targets we want to run on
-    hpx::compute::cuda::target target;
+    hpx::cuda::target target;
 
     // Create the executor
     hpx::compute::cuda::default_executor executor(target);

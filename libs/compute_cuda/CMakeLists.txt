@@ -17,11 +17,9 @@ if(HPX_WITH_CUDA)
       hpx/compute/cuda/default_executor_parameters.hpp
       hpx/compute/cuda/detail/launch.hpp
       hpx/compute/cuda/detail/scoped_active_target.hpp
-      hpx/compute/cuda/get_targets.hpp
       hpx/compute/cuda.hpp
       hpx/compute/cuda/serialization/value_proxy.hpp
       hpx/compute/cuda/target_distribution_policy.hpp
-      hpx/compute/cuda/target.hpp
       hpx/compute/cuda/target_ptr.hpp
       hpx/compute/cuda/traits/access_target.hpp
       hpx/compute/cuda/transfer.hpp
@@ -33,7 +31,7 @@ if(HPX_WITH_CUDA)
 
   set(compute_cuda_compat_headers)
 
-  set(compute_cuda_sources cuda_target.cpp get_cuda_targets.cpp)
+  set(compute_cuda_sources)
 endif()
 
 include(HPX_AddModule)
@@ -47,6 +45,7 @@ add_hpx_module(
     hpx_allocator_support
     hpx_assertion
     hpx_compute
+    hpx_cuda_support
     hpx_config
     hpx_errors
     hpx_execution

@@ -6,11 +6,10 @@
 
 #pragma once
 
-#define BOOST_NO_CXX11_ALLOCATOR
+// #define BOOST_NO_CXX11_ALLOCATOR
 #define CUDA_API_PER_THREAD_DEFAULT_STREAM
 //
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/include/compute.hpp>
+#include <hpx/cuda_support/target.hpp>
 
 // CUDA runtime
 #include <cuda_runtime.h>
@@ -50,7 +49,7 @@
 //        auto fut = helper.async(&call_trivial_kernel, 3.1415);
 //
 // -------------------------------------------------------------------------
-namespace hpx { namespace compute { namespace util
+namespace hpx { namespace cuda
 {
 
     // -------------------------------------------------------------------------
@@ -286,7 +285,7 @@ namespace hpx { namespace compute { namespace util
 
         // -------------------------------------------------------------------------
         // return a reference to the compute::cuda object owned by this class
-        hpx::compute::cuda::target& get_target() {
+        hpx::cuda::target& get_target() {
             return target_;
         }
 
@@ -298,7 +297,7 @@ namespace hpx { namespace compute { namespace util
         // -------------------------------------------------------------------------
         // utility function to print target information for this helper object
         static void print_local_targets(void) {
-            auto targets = hpx::compute::cuda::target::get_local_targets();
+            auto targets = hpx::cuda::target::get_local_targets();
             for (auto target : targets) {
                 std::cout << "GPU Device " << target.native_handle().get_device()
                           << ": \""
@@ -310,10 +309,10 @@ namespace hpx { namespace compute { namespace util
         }
 
     protected:
-        cudaStream_t               stream_;
-        hpx::compute::cuda::target target_;
+        cudaStream_t      stream_;
+        hpx::cuda::target target_;
     };
 
-}}} // namespace
+}} // namespace
 
 //#endif

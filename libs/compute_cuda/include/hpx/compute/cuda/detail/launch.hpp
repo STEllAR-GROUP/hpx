@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
-#include <hpx/compute/cuda/target.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -84,8 +84,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
         }
 
         template <typename DimType>
-        HPX_HOST_DEVICE static void call(target const& tgt, DimType gridDim,
-            DimType blockDim, fun_type f, args_type args)
+        HPX_HOST_DEVICE static void call(hpx::cuda::target const& tgt,
+            DimType gridDim, DimType blockDim, fun_type f, args_type args)
         {
             // This is needed for the device code to make sure the kernel
             // is instantiated correctly.
@@ -127,7 +127,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
     // does not involve any device synchronization.
     template <typename DimType, typename F, typename... Ts>
     HPX_HOST_DEVICE void launch(
-        target const& t, DimType gridDim, DimType blockDim, F&& f, Ts&&... vs)
+        hpx::cuda::target const& t, DimType gridDim, DimType blockDim, 
+        F&& f, Ts&&... vs)
     {
         typedef closure<F, Ts...> closure_type;
         launch_helper<closure_type>::call(t, gridDim, blockDim,

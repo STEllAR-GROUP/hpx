@@ -14,8 +14,9 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 //
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/include/compute.hpp>
+#include <hpx/cuda_support/target.hpp>
+#include <hpx/cuda_support/cuda_future_helper.hpp>
+
 // CUDA runtime
 #include <cuda_runtime.h>
 //
@@ -26,8 +27,6 @@
 #include <sstream>
 #include <utility>
 #include <vector>
-//
-#include "cuda_future_helper.h"
 
 // -------------------------------------------------------------------------
 // This example uses the normal C++ compiler to compile all the HPX stuff
@@ -41,7 +40,7 @@ extern void cuda_trivial_kernel(T, cudaStream_t stream);
 extern __global__ void saxpy(int n, float a, float* x, float* y);
 
 // -------------------------------------------------------------------------
-int test_saxpy(hpx::compute::util::cuda_future_helper& helper)
+int test_saxpy(hpx::cuda::cuda_future_helper& helper)
 {
     int N = 1 << 20;
 
@@ -50,10 +49,10 @@ int test_saxpy(hpx::compute::util::cuda_future_helper& helper)
     std::vector<float> h_B(N);
 
     float *d_A, *d_B;
-    hpx::compute::util::cuda_error(
+    hpx::cuda::cuda_error(
         cudaMalloc((void**) &d_A, N * sizeof(float)));
 
-    hpx::compute::util::cuda_error(
+    hpx::cuda::cuda_error(
         cudaMalloc((void**) &d_B, N * sizeof(float)));
 
     // init host data
@@ -117,9 +116,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    hpx::compute::cuda::target target(device);
+    hpx::cuda::target target(device);
     //
-    hpx::compute::util::cuda_future_helper helper(device);
+    hpx::cuda::cuda_future_helper helper(device);
     helper.print_local_targets();
     //
     float testf = 2.345;

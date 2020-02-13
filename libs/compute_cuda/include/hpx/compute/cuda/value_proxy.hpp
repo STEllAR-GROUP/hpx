@@ -13,8 +13,8 @@
 #if defined(HPX_HAVE_CUDA)
 
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
-#include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
+#include <hpx/cuda_support/target.hpp>
 
 #include <type_traits>
 
@@ -22,10 +22,10 @@ namespace hpx { namespace compute { namespace cuda {
     template <typename T>
     class value_proxy
     {
-        typedef traits::access_target<cuda::target> access_target;
+        typedef traits::access_target<hpx::cuda::target> access_target;
 
     public:
-        value_proxy(T* p, cuda::target& tgt) noexcept
+        value_proxy(T* p, hpx::cuda::target& tgt) noexcept
           : p_(p)
           , target_(&tgt)
         {
@@ -73,25 +73,25 @@ namespace hpx { namespace compute { namespace cuda {
             return p_;
         }
 
-        cuda::target& target() const noexcept
+        hpx::cuda::target& target() const noexcept
         {
             return *target_;
         }
 
     private:
         T* p_;
-        cuda::target* target_;
+        hpx::cuda::target* target_;
     };
 
     template <typename T>
     class value_proxy<T const>
     {
-        typedef traits::access_target<cuda::target> access_target;
+        typedef traits::access_target<hpx::cuda::target> access_target;
 
     public:
         typedef T const proxy_type;
 
-        value_proxy(T* p, cuda::target& tgt) noexcept
+        value_proxy(T* p, hpx::cuda::target& tgt) noexcept
           : p_(p)
           , target_(tgt)
         {
@@ -113,14 +113,14 @@ namespace hpx { namespace compute { namespace cuda {
             return p_;
         }
 
-        cuda::target& target() const noexcept
+        hpx::cuda::target& target() const noexcept
         {
             return target_;
         }
 
     private:
         T* p_;
-        cuda::target& target_;
+        hpx::cuda::target& target_;
     };
 }}}    // namespace hpx::compute::cuda
 

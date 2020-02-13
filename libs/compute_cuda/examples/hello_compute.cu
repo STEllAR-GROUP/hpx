@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_copy.hpp>
 
@@ -40,7 +41,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     typedef hpx::compute::cuda::allocator<int> allocator_type;
 
-    hpx::compute::cuda::target target;
+    hpx::cuda::target target;
     allocator_type alloc(target);
     hpx::compute::vector<int, allocator_type> d_A(N, alloc);
     hpx::compute::vector<int, allocator_type> d_B(N, alloc);

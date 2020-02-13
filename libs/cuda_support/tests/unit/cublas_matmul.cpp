@@ -35,7 +35,8 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 //
-#include <hpx/compute/cuda/target.hpp>
+#include <hpx/cuda_support/target.hpp>
+#include <hpx/cuda_support/cuda_future_helper.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/modules/timing.hpp>
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
@@ -53,8 +54,6 @@
 #include <utility>
 #include <vector>
 //
-#include "cuda_future_helper.h"
-//
 std::mt19937 gen;
 
 // -------------------------------------------------------------------------
@@ -62,7 +61,7 @@ std::mt19937 gen;
 // cublas calls with an hpx future.
 // -------------------------------------------------------------------------
 template <typename T>
-struct cublas_helper : hpx::compute::util::cuda_future_helper
+struct cublas_helper : hpx::cuda::cuda_future_helper
 {
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     using allocator_type = typename hpx::compute::cuda::allocator<T>;
@@ -71,10 +70,10 @@ struct cublas_helper : hpx::compute::util::cuda_future_helper
 
     // construct a cublas stream
     cublas_helper(std::size_t device = 0)
-      : hpx::compute::util::cuda_future_helper(device)
+      : hpx::cuda::cuda_future_helper(device)
     {
         handle_ = 0;
-        hpx::compute::util::cublas_error(cublasCreate(&handle_));
+        hpx::cuda::cublas_error(cublasCreate(&handle_));
     }
 
     cublas_helper(cublas_helper& other) = delete;
@@ -83,7 +82,7 @@ struct cublas_helper : hpx::compute::util::cuda_future_helper
 
     ~cublas_helper()
     {
-        hpx::compute::util::cublas_error(cublasDestroy(handle_));
+        hpx::cuda::cublas_error(cublasDestroy(handle_));
     }
 
     // -------------------------------------------------------------------------
@@ -94,12 +93,12 @@ struct cublas_helper : hpx::compute::util::cuda_future_helper
     hpx::future<void> async(R (*cublas_function)(Params...), Args&&... args)
     {
         // make sue we run on the correct device
-        hpx::compute::util::cuda_error(
+        hpx::cuda::cuda_error(
             cudaSetDevice(target_.native_handle().get_device()));
         // make sure this operation takes place on our stream
-        hpx::compute::util::cublas_error(cublasSetStream(handle_, stream_));
+        hpx::cuda::cublas_error(cublasSetStream(handle_, stream_));
         // insert the cublas handle in the arg list and call the cublas function
-        hpx::compute::util::detail::async_helper<R, Params...> helper;
+        hpx::cuda::detail::async_helper<R, Params...> helper;
         helper(cublas_function, handle_, std::forward<Args>(args)...);
         return get_future();
     }
@@ -111,12 +110,12 @@ struct cublas_helper : hpx::compute::util::cuda_future_helper
     R apply(R (*cublas_function)(Params...), Args&&... args)
     {
         // make sue we run on the correct device
-        hpx::compute::util::cuda_error(
+        hpx::cuda::cuda_error(
             cudaSetDevice(target_.native_handle().get_device()));
         // make sure this operation takes place on our stream
-        hpx::compute::util::cublas_error(cublasSetStream(handle_, stream_));
+        hpx::cuda::cublas_error(cublasSetStream(handle_, stream_));
         // insert the cublas handle in the arg list and call the cublas function
-        hpx::compute::util::detail::async_helper<R, Params...> helper;
+        hpx::cuda::detail::async_helper<R, Params...> helper;
         return helper(cublas_function, handle_, std::forward<Args>(args)...);
     }
 
@@ -247,13 +246,13 @@ void matrixMultiply(
 
 #else
     T *d_A, *d_B, *d_C;
-    hpx::compute::util::cuda_error(
+    hpx::cuda::cuda_error(
         cudaMalloc((void**) &d_A, size_A * sizeof(T)));
 
-    hpx::compute::util::cuda_error(
+    hpx::cuda::cuda_error(
         cudaMalloc((void**) &d_B, size_B * sizeof(T)));
 
-    hpx::compute::util::cuda_error(
+    hpx::cuda::cuda_error(
         cudaMalloc((void**) &d_C, size_C * sizeof(T)));
 
     // adding async copy operations into the stream before cublas calls puts
@@ -393,7 +392,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     sizeMult = (std::max)(sizeMult, std::size_t(1));
     //
     // use a larger block size for Fermi and above, query default cuda target properties
-    hpx::compute::cuda::target target(device);
+    hpx::cuda::target target(device);
 
     std::cout << "GPU Device " << target.native_handle().get_device() << ": \""
               << target.native_handle().processor_name() << "\" "

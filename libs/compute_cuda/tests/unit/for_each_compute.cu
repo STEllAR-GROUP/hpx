@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_copy.hpp>
@@ -67,7 +68,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::iota(h_A.begin(), h_A.end(), dis(gen));
 
     // define execution target (here device 0)
-    hpx::compute::cuda::target target;
+    hpx::cuda::target target;
 
     // allocate data on the device
     target_allocator alloc(target);

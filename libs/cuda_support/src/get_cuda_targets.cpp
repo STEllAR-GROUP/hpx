@@ -8,7 +8,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/compute/cuda/target.hpp>
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
@@ -24,12 +24,14 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #endif
 
+#include <hpx/cuda_support/target.hpp>
+
 #include <string>
 #include <vector>
 
 #include <cuda_runtime.h>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda {
     std::vector<target> get_local_targets()
     {
         int device_count = 0;
@@ -51,21 +53,21 @@ namespace hpx { namespace compute { namespace cuda {
 
         return targets;
     }
-}}}    // namespace hpx::compute::cuda
+}}    // namespace
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION(
-    hpx::compute::cuda::get_local_targets, compute_cuda_get_targets_action);
+    hpx::cuda::get_local_targets, cuda_get_targets_action);
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda {
     hpx::future<std::vector<target>> get_targets(hpx::id_type const& locality)
     {
         if (locality == hpx::find_here())
             return hpx::make_ready_future(get_local_targets());
 
-        return hpx::async(compute_cuda_get_targets_action(), locality);
+        return hpx::async(cuda_get_targets_action(), locality);
     }
-}}}    // namespace hpx::compute::cuda
+}}    // namespace hpx::cuda
 #endif
 
 #endif

@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_copy.hpp>
 
@@ -30,7 +31,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::vector<int> h_B(N);
     std::iota(h_A.begin(), h_A.end(), dis(gen));
 
-    hpx::compute::cuda::target target;
+    hpx::cuda::target target;
 
     // create data vector on device
     typedef hpx::compute::cuda::allocator<int> allocator_type;

@@ -9,19 +9,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_CUDA)
 #include <hpx/modules/futures.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda {
     struct HPX_EXPORT target;
 
     HPX_EXPORT std::vector<target> get_local_targets();
     HPX_EXPORT hpx::future<std::vector<target>> get_targets(
         hpx::id_type const& locality);
-}}}    // namespace hpx::compute::cuda
+}}    // namespace hpx::cuda
 
-#endif

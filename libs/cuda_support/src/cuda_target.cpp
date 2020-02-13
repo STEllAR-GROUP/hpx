@@ -10,7 +10,7 @@
 
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/compute/cuda/target.hpp>
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
@@ -37,7 +37,7 @@
 
 #include <cuda_runtime.h>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda {
     namespace detail {
         runtime_registration_wrapper::runtime_registration_wrapper(
             hpx::runtime* rt)
@@ -253,6 +253,6 @@ namespace hpx { namespace compute { namespace cuda {
         ar << handle_.device_ << locality_;
     }
 #endif
-}}}    // namespace hpx::compute::cuda
+}}    // namespace hpx::compute::cuda
 
 #endif

@@ -15,7 +15,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 
-#include <hpx/compute/cuda/target.hpp>
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
 #include <hpx/compute/detail/get_proxy_type.hpp>
 
@@ -58,7 +58,7 @@ namespace hpx { namespace compute { namespace cuda {
         {
         }
 
-        target_ptr(T* p, target& tgt)
+        target_ptr(T* p, hpx::cuda::target& tgt)
           : base_type(p)
           , tgt_(&tgt)
         {
@@ -139,7 +139,7 @@ namespace hpx { namespace compute { namespace cuda {
         }
 
     private:
-        target* tgt_;
+        hpx::cuda::target* tgt_;
     };
 }}}    // namespace hpx::compute::cuda
 

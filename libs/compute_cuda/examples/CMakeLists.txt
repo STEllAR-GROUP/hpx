@@ -25,15 +25,13 @@ else()
   return()
 endif()
 
-set(example_programs cublas_matmul cuda_future data_copy)
+set(example_programs data_copy)
 
 if(NOT HPX_WITH_CUDA_CLANG)
   # This example does not compile with the Cray clang compiler
   set(example_programs ${example_programs} hello_compute)
 endif()
 
-set(cublas_matmul_PARAMETERS THREADS_PER_LOCALITY 4)
-set(cuda_future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(data_copy_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_compute_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -43,13 +41,8 @@ set(hello_compute_PARAMETERS THREADS_PER_LOCALITY 4)
 
 include_directories(${CUDA_INCLUDE_DIRS})
 
-set(cublas_matmul_FLAGS DEPENDENCIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
-
-set(cublas_matmul_CUDA OFF)
 set(data_copy_CUDA ON)
 set(hello_compute_CUDA ON)
-set(cuda_future_CUDA OFF)
-set(cuda_future_CUDA_SOURCE saxpy trivial_demo)
 set(partitioned_vector_CUDA ON)
 set(partitioned_vector_FLAGS DEPENDENCIES partitioned_vector_component)
 

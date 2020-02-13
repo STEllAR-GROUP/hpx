@@ -11,19 +11,19 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/compute/cuda/target.hpp>
+#include <hpx/cuda_support/target.hpp>
 #include <hpx/compute/traits/access_target.hpp>
 
 #include <cuda_runtime.h>
 
 namespace hpx { namespace compute { namespace traits {
     template <>
-    struct access_target<cuda::target>
+    struct access_target<hpx::cuda::target>
     {
-        typedef cuda::target target_type;
+        typedef hpx::cuda::target target_type;
 
         template <typename T>
-        HPX_HOST_DEVICE static T read(cuda::target const& tgt, T const* t)
+        HPX_HOST_DEVICE static T read(hpx::cuda::target const& tgt, T const* t)
         {
 #if defined(__CUDA_ARCH__)
             return *t;
@@ -38,7 +38,7 @@ namespace hpx { namespace compute { namespace traits {
 
         template <typename T>
         HPX_HOST_DEVICE static void write(
-            cuda::target const& tgt, T* dst, T const* src)
+            hpx::cuda::target const& tgt, T* dst, T const* src)
         {
 #if defined(__CUDA_ARCH__)
             *dst = *src;
