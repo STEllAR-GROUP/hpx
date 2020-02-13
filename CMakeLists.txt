@@ -299,10 +299,18 @@ else()
     ON CATEGORY "Build Targets")
 endif()
 
+set(HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT OFF)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR APPLE)
+  set(HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT ON)
+endif()
+
 hpx_option(HPX_WITH_DYNAMIC_HPX_MAIN BOOL
-  "Enable dynamic overload of system ``main()`` (Linux only, default: ON)"
-  ON ADVANCED)
-if(HPX_WITH_DYNAMIC_HPX_MAIN AND (NOT MSVC))
+  "Enable dynamic overload of system ``main()`` (Linux and Apple only, default: ON)"
+  ${HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT} ADVANCED)
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+  if(NOT HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT)
+    hpx_error("HPX_WITH_DYNAMIC_HPX_MAIN was set to ON, but the option is only available on Linux and Apple (this is \"${CMAKE_SYSTEM_NAME}\").")
+  endif()
   hpx_add_config_cond_define(HPX_HAVE_DYNAMIC_HPX_MAIN 1)
 endif()
 
@@ -371,7 +379,7 @@ hpx_option(HPX_WITH_IO_COUNTERS BOOL
   ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets")
 if(HPX_WITH_IO_COUNTERS)
   if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-    hpx_error("HPX_WITH_IO_COUNTERS was set to ON, but IO counters are only available on Linux (this is \"${CMAKE_SYSTEM_NAME}\")")
+    hpx_error("HPX_WITH_IO_COUNTERS was set to ON, but IO counters are only available on Linux (this is \"${CMAKE_SYSTEM_NAME}\").")
   endif()
   hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
 endif()
