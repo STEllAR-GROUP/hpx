@@ -23,6 +23,7 @@
 #include <csignal>
 #include <cstddef>
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -62,14 +63,7 @@ namespace hpx
     /// (or one of its overloads below) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
-    inline int init(
-        util::function_nonser<
-            int(hpx::program_options::variables_map& vm)
-        > const& f,
-        hpx::program_options::options_description const& desc_cmdline,
-        int argc, char** argv, std::vector<std::string> const& cfg,
-        startup_function_type startup, shutdown_function_type shutdown,
-        hpx::runtime_mode mode)
+    inline int init(hpx::init_params& params)
     {
 #if defined(HPX_WINDOWS)
         detail::init_winsocket();
@@ -85,9 +79,39 @@ namespace hpx
         std::at_quick_exit(detail::on_exit);
 #endif
 
-        return detail::run_or_start(f, desc_cmdline, argc, argv,
-            hpx_startup::user_main_config(cfg),
-            std::move(startup), std::move(shutdown), mode, true);
+        return detail::run_or_start(params.f, (*params.desc_cmdline_ptr),
+            params.argc, params.argv, hpx_startup::user_main_config(params.cfg),
+            std::move(params.startup), std::move(params.shutdown), params.mode,
+            true);
+    }
+
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is the main entry point for any HPX application. This function
+    /// (or one of its overloads below) should be called from the users `main()`
+    /// function. It will set up the HPX runtime environment and schedule the
+    /// function given by \p f as a HPX thread.
+    inline int init(
+        util::function_nonser<
+            int(hpx::program_options::variables_map& vm)
+        > const& f,
+        hpx::program_options::options_description const& desc_cmdline,
+        int argc, char** argv, std::vector<std::string> const& cfg,
+        startup_function_type startup, shutdown_function_type shutdown,
+        hpx::runtime_mode mode)
+    {
+        using hpx::program_options::options_description;
+        hpx::init_params iparams;
+        iparams.f = f;
+        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
+            desc_cmdline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.cfg = cfg;
+        iparams.startup = std::move(startup);
+        iparams.shutdown = std::move(shutdown);
+        iparams.mode = mode;
+        return init(iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -102,9 +126,18 @@ namespace hpx
         int argc, char** argv, startup_function_type startup,
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
-        std::vector<std::string> cfg;
-        return init(f, desc_cmdline, argc, argv, cfg, std::move(startup),
-            std::move(shutdown), mode);
+        using options_desc_type = hpx::program_options::options_description;
+
+        hpx::init_params iparams;
+        iparams.f = f;
+        iparams.desc_cmdline_ptr = std::make_shared<options_desc_type>(
+            desc_cmdline);
+        iparams.argc = argc;
+        iparams.argv = argv;
+        iparams.startup = std::move(startup);
+        iparams.shutdown = std::move(shutdown);
+        iparams.mode = mode;
+        return init(iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.

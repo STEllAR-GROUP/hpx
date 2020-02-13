@@ -32,6 +32,44 @@
 /// \namespace hpx
 namespace hpx
 {
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is the main entry point for any HPX application. This function
+    /// (or one of its overloads below) should be called from the users `main()`
+    /// function. It will set up the HPX runtime environment and schedule the
+    /// function given by \p f as a HPX thread. This overload will not call
+    /// `hpx_main`.
+    ///
+    ///
+    /// \param params       [in] The parameters to the init function of type
+    ///                     `hpx::init_params`. Usually the
+    ///                     function \p f which is the main entry point of any
+    ///                     HPX application, the description of the additional
+    ///                     command line arguments (prepended to the default
+    ///                     command line options understood by \a hpx::init),
+    ///                     the number of command line arguments for this
+    ///                     application, the command line arguments for this
+    ///                     application, a list of configuration settings which
+    ///                     will be added to te system configuration before the
+    ///                     runtime instance is run, a startup function to be
+    ///                     exeuted inside a HPX thread before \p f is called, a
+    ///                     shutdown function  to be executed inside an HPX
+    ///                     thread while hpx::finalize is executed, the mode the
+    ///                     created runtime environment should be initialized
+    ///                     in (there has to be exactly one locality in each HPX
+    ///                     application which is executed in console mode all
+    ///                     other localities have to be run in worker mode)
+    ///
+    /// \returns            The function returns the value, which has been
+    ///                     returned from the user supplied \p f.
+    ///
+    /// \note               If the parameter \p mode is not given (defaulted),
+    ///                     the created runtime system instance will be
+    ///                     executed in console or worker mode depending on the
+    ///                     command line arguments passed in `argc`/`argv`.
+    ///                     Otherwise it will be executed as specified by the
+    ///                     parameter\p mode.
+    inline int init(hpx::init_params& params);
 
     /// \brief Main entry point for launching the HPX runtime system.
     ///
