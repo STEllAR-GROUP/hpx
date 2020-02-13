@@ -1,4 +1,4 @@
-* Wed Feb 12 2020 STE||AR Group <contact@stellar-group.org> 1.4.1-1
+* Wed Feb 13 2020 STE||AR Group <contact@stellar-group.org> 1.4.1-1
 - HPX Release 1.4.1 (https://stellar-group.github.io/hpx-docs/tags/1.4.1/html/releases/whats_new_1_4_1.html)
 
 * Wed Jan 15 2020 STE||AR Group <contact@stellar-group.org> 1.4.0-1
