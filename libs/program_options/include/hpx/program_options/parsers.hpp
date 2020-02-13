@@ -280,18 +280,18 @@ namespace hpx { namespace program_options {
 
     /** Splits a given string to a collection of single strings which
         can be passed to command_line_parser. The second parameter is
-        used to specify a collection of possible seperator chars used
-        for splitting. The seperator is defaulted to space " ".
+        used to specify a collection of possible separator chars used
+        for splitting. The separator is defaulted to space " ".
         Splitting is done in a unix style way, with respect to quotes '"'
         and escape characters '\'
     */
     HPX_EXPORT std::vector<std::string> split_unix(const std::string& cmdline,
-        const std::string& seperator = " \t", const std::string& quote = "'\"",
+        const std::string& separator = " \t", const std::string& quote = "'\"",
         const std::string& escape = "\\");
 
     /** @overload */
     HPX_EXPORT std::vector<std::wstring> split_unix(const std::wstring& cmdline,
-        const std::wstring& seperator = L" \t",
+        const std::wstring& separator = L" \t",
         const std::wstring& quote = L"'\"", const std::wstring& escape = L"\\");
 
 #ifdef HPX_WINDOWS

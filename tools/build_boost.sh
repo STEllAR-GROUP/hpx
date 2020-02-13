@@ -17,8 +17,8 @@ usage()
     echo "  -v    Version of Boost to build (format: X.YY.Z)"
     echo "  -n    Don't download Boost (expects tarball named boost_X.YY.Z.tar.bz2 in the -d directory) [default: 1.55.0]"
     echo "  -x    Libraries to exclude (format: exclude0,exclude1...) [default: mpi,graph_parallel,python]"
-    echo "  -t    Number of threads to use while building [default: number of processors]" 
-    echo "  -c    Compiler [default: automatically detected]" 
+    echo "  -t    Number of threads to use while building [default: number of processors]"
+    echo "  -c    Compiler [default: automatically detected]"
 }
 
 DIRECTORY=
@@ -58,14 +58,14 @@ while getopts "hnt:d:v:c:x:" OPTION; do case $OPTION in
            [[ -d $OPTARG/debug   && -w $OPTARG/debug   ]];
         then
             DIRECTORY=$OPTARG
-        else  
+        else
             echo "ERROR: -d argument was invalid"; echo
             usage
             exit 1
         fi
         ;;
     v)
-        if [[ $OPTARG =~ ^[0-9][.][0-9][0-9][.][0-9]$ ]]; then 
+        if [[ $OPTARG =~ ^[0-9][.][0-9][0-9][.][0-9]$ ]]; then
             DOT_VERSION=$OPTARG
             US_VERSION=${OPTARG//./_}
         else
@@ -75,11 +75,11 @@ while getopts "hnt:d:v:c:x:" OPTION; do case $OPTION in
         fi
         ;;
     x)
-        EXCLUDES=$OPTARG 
+        EXCLUDES=$OPTARG
         ;;
     t)
-        if [[ $OPTARG =~ ^[0-9]+$ ]]; then 
-            THREADS=$OPTARG 
+        if [[ $OPTARG =~ ^[0-9]+$ ]]; then
+            THREADS=$OPTARG
         else
             echo "ERROR: -t argument was invalid"; echo
             usage
@@ -141,10 +141,10 @@ mv boost_$US_VERSION source
 
 cd $DIRECTORY/source
 
-# Boostrap the Boost build system, Boost.Build. 
+# Bootstrap the Boost build system, Boost.Build.
 $DIRECTORY/source/bootstrap.sh $EXCLUDES $COMPILER
 
-$BJAM --stagedir=$DIRECTORY/debug/stage variant=debug -j${THREADS} 
+$BJAM --stagedir=$DIRECTORY/debug/stage variant=debug -j${THREADS}
 if ! [[ $? == "0" ]]; then echo "ERROR: Debug build of Boost failed"; error; fi
 
 $BJAM --stagedir=$DIRECTORY/release/stage variant=release -j${THREADS}
@@ -166,7 +166,7 @@ $BJAM dist-share-boostbook
 cd $DIRECTORY/source/tools/auto_index/build
 $BJAM i -j${THREADS} variant=release
 
-# These links are necessary to ensure that the stage directories are usable 
+# These links are necessary to ensure that the stage directories are usable
 # Boost source trees.
 create_links()
 {

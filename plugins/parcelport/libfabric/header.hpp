@@ -50,7 +50,7 @@ namespace libfabric
         };
 
         // data we send if both message and chunk data are -not- piggybacked
-        // to store the rma information for the message (that otherwise whould be in
+        // to store the rma information for the message (that otherwise would be in
         // the chunk data)
         struct message_chunk {
             chunktype message_rma;

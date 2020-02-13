@@ -83,7 +83,7 @@ There are two types of options allowed, ones that control general operation and 
     [The default report style can be rather verobse. This generates a more condesed report, for example suitable to send as an email.] ]
 
   [ [[^-license]]
-    [Checks for presense of approved license text.] ]
+    [Checks for presence of approved license text.] ]
 
   [ [[^-copyright]]
     [Checks that files are copyright assigned to someone.] ]

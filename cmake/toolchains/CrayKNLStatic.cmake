@@ -1,5 +1,5 @@
 # Copyright (c) 2014-2017 Thomas Heller
-# Copyright (c) 2017      Bryce Adelstein Lelbach 
+# Copyright (c) 2017      Bryce Adelstein Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -52,7 +52,7 @@ set(HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE OFF CACHE BOOL
 set(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING  OFF CACHE BOOL
   "Libfabric parcelport logging on/off flag")
 set(HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD "4096" CACHE STRING
-  "The threshhold in bytes to when perform zero copy optimizations (default: 128)")
+  "The threshold in bytes to when perform zero copy optimizations (default: 128)")
 
 # Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the
 # right hints

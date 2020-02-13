@@ -7,7 +7,7 @@
 // Test for compatibility with Boost.ProgramOptions
 // hpxinspect:nodeprecatedinclude:boost/program_options.hpp
 
-// We use boost::program_options here, so surpress the deprecation warning.
+// We use boost::program_options here, so suppress the deprecation warning.
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #elif defined(__GNUC__)
