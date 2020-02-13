@@ -85,6 +85,9 @@ function(add_hpx_config_test variable)
             "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
             "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
             "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
+          CXX_STANDARD ${HPX_CXX_STANDARD}
+          CXX_STANDARD_REQUIRED ON
+          CXX_EXTENSIONS FALSE
           RUN_OUTPUT_VARIABLE ${variable}_OUTPUT
           ARGS ${${variable}_ARGS})
         if(${variable}_COMPILE_RESULT AND NOT ${variable}_RUN_RESULT)
@@ -105,6 +108,9 @@ function(add_hpx_config_test variable)
           "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
           "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
         OUTPUT_VARIABLE ${variable}_OUTPUT
+        CXX_STANDARD ${HPX_CXX_STANDARD}
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS FALSE
         COPY_FILE ${test_binary})
        hpx_debug("Compile test: ${variable}")
        hpx_debug("Compilation output: ${${variable}_OUTPUT}")
