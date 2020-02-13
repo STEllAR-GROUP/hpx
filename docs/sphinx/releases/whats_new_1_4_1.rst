@@ -21,6 +21,7 @@ This is a bugfix release. It contains the following changes:
 * Allow running tests using an installed version of |hpx|
 * Skip MPI finalization if HPX has not initialized MPI
 * Give a hard error when attempting to use IO counters on Windows
+* Fix |cmake| configuration using older |cmake| versions with CUDA enabled
 
 Closed issues
 =============
