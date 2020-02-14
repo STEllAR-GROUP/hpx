@@ -19,7 +19,7 @@
 namespace po = hpx::program_options;
 using namespace std;
 
-const double FLOAT_SEPERATION = 0.00000000001;
+const double FLOAT_SEPARATION = 0.00000000001;
 
 template <typename Double1, typename Double2>
 bool check_float(Double1 test, Double2 expected)
@@ -27,9 +27,9 @@ bool check_float(Double1 test, Double2 expected)
     double test_d = double(test);
     double expected_d = double(expected);
 
-    double seperation = expected_d * (1. + FLOAT_SEPERATION) / expected_d;
-    if ((test_d < expected_d + seperation) &&
-        (test_d > expected_d - seperation))
+    double separation = expected_d * (1. + FLOAT_SEPARATION) / expected_d;
+    if ((test_d < expected_d + separation) &&
+        (test_d > expected_d - separation))
     {
         return true;
     }

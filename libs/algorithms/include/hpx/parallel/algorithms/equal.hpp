@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 difference_type1 count1 = std::distance(first1, last1);
 
-                // The specifcation of std::equal(_binary) states that if FwdIter1
+                // The specification of std::equal(_binary) states that if FwdIter1
                 // and FwdIter2 meet the requirements of RandomAccessIterator and
                 // last1 - first1 != last2 - first2 then no applications of the
                 // predicate p are made.

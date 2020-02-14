@@ -54,16 +54,16 @@ struct NetworkOpts
     unsigned short port;
 };
 
-class OptionsHeirarchy
+class OptionsHierarchy
 {
 public:
     // The constructor sets up all the various options that will be parsed
-    OptionsHeirarchy()
+    OptionsHierarchy()
     {
         SetOptions();
     }
 
-    // Parse options runs through the heirarchy doing all the parsing
+    // Parse options runs through the hierarchy doing all the parsing
     void ParseOptions(int argc, char* argv[])
     {
         ParseCommandLine(argc, argv);
@@ -253,7 +253,7 @@ private:
     void ParseEnvironment()
     {
         store(po::parse_environment(common_options,
-                  std::bind(&OptionsHeirarchy::EnvironmentMapper, this,
+                  std::bind(&OptionsHierarchy::EnvironmentMapper, this,
                       std::placeholders::_1)),
             results);
         notify(results);
@@ -317,7 +317,7 @@ private:
 
 void get_env_options() {}
 
-void PrintOptions(OptionsHeirarchy options)
+void PrintOptions(OptionsHierarchy options)
 {
     auto path = options.Path();
     if (path.length())
@@ -358,7 +358,7 @@ void PrintOptions(OptionsHeirarchy options)
 
 int main(int ac, char* av[])
 {
-    OptionsHeirarchy options;
+    OptionsHierarchy options;
     try
     {
         options.ParseOptions(ac, av);
@@ -549,8 +549,8 @@ However, if the --verboseity flag is also set, it will override the env
 variable. This illustrates an important example, the way program_options works,
 is that a parser will not override a value that has previously been set by
 another parser. Thus the env parser doesn't override the command line parser.
-(We will see this again in config files.) Default values are seperate from this
-heirarcy, they only apply if no parser has set the value and it is being read.
+(We will see this again in config files.) Default values are separate from this
+hierarchy, they only apply if no parser has set the value and it is being read.
 
     > set EXAMPLE_VERBOSE=DEBUG
     > example.exe --verbosity=WARN
@@ -699,7 +699,7 @@ Results in a combination of all three config files:
     Network Address: 5.6.7.8
     Network Port: 3000
 
-Incidently the boolean run-gui option could have been set a number of ways
+Incidentally the boolean run-gui option could have been set a number of ways
 that all result in the C++ boolean value of true:
 
     run-gui=true

@@ -503,7 +503,7 @@ void test_style_parser()
 
 void test_unregistered()
 {
-    // Check unregisted option when no options are registed at all.
+    // Check unregistered option when no options are registered at all.
     options_description desc;
 
     vector<string> input;
@@ -542,7 +542,7 @@ void test_unregistered()
     HPX_TEST_EQ(result[4].unregistered, true);
     HPX_TEST_EQ(result[4].value[0], "iz");
 
-    // Check sticky short options together with unregisted options.
+    // Check sticky short options together with unregistered options.
 
     desc.add_options()("help,h", "")("magic,m", value<string>(), "");
 

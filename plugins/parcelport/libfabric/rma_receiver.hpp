@@ -55,7 +55,7 @@ namespace libfabric
 
         // --------------------------------------------------------------------
         // the main entry point when a message is received, this function
-        // will despatch to either read with or without rma depending on
+        // will dispatch to either read with or without rma depending on
         // whether there are zero copy chunks to handle
         void read_message(region_type* region, fi_addr_t const& src_addr);
 

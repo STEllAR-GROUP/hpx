@@ -350,7 +350,7 @@ namespace hpx
         std::unique_ptr<components::server::memory> memory_;
         std::unique_ptr<components::server::runtime_support> runtime_support_;
 
-        // support tieing in external functions to be called for thread events
+        // support tying in external functions to be called for thread events
         notification_policy_type::on_startstop_type on_start_func_;
         notification_policy_type::on_startstop_type on_stop_func_;
         notification_policy_type::on_error_type on_error_func_;

@@ -40,7 +40,7 @@ namespace hpx { namespace serialization {
 
     ///////////////////////////////////////////////////////////////////////////
     // This trait must live outside of 'class access' below as otherwise MSVC
-    // will find the serialize() function in 'class access' as a dependend class
+    // will find the serialize() function in 'class access' as a dependent class
     // (which is an MS extension)
     template <typename T>
     class has_serialize_adl

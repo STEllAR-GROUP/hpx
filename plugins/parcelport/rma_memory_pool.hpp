@@ -249,7 +249,7 @@ namespace parcelset
         }
 
         // ------------------------------------------------------------------------
-        // at shutdown we can disregrad any bocks still prepoted as we can't
+        // at shutdown we can disregard any bocks still prepoted as we can't
         // unpost them
         void decrement_used_count(uint32_t N) {
             in_use_ -= N;

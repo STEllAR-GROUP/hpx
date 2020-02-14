@@ -260,7 +260,7 @@ jobs:
           command: |
               if [ "$CIRCLE_PR_NUMBER" ]; then
                   cd /hpx/source
-                  codespell --ignore-words-list $(cat tools/.codespell_whitelist) --skip='*.h5,*.png' $(git diff --name-only origin/master) > /tmp/spelling_suggestions.txt
+                  codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' $(git diff --name-only origin/master) > /tmp/spelling_suggestions.txt
                   if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
               else
                   echo "skipping spellcheck on non-PR build"
@@ -1134,10 +1134,7 @@ workflows:
           <<: *gh_pages_filter
       - install:
           requires:
-            - inspect
-            - spellcheck
             - core
-            - docs
             - tests.examples
             - tests.unit.actions
             - tests.unit.agas

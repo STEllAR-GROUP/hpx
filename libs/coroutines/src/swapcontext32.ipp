@@ -52,7 +52,7 @@
    load the new stack pointer,
    pop registers from the new stack
    and returns to new caller.
-   EAX is simpy passed to the function it returns to.
+   EAX is simply passed to the function it returns to.
    The first time EAX is the first parameter of the trampoline.
    Otherwise it is simply discarded.
    NOTE: This function should work on any IA32 CPU.

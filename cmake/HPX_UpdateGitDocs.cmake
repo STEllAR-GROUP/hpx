@@ -144,7 +144,7 @@ if(NOT "${git_diff_index_result}" EQUAL "0")
     WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
     RESULT_VARIABLE git_commit_result)
   if(NOT "${git_commit_result}" EQUAL "0")
-    message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
+    message(FATAL_ERROR "Committing to the GitHub pages branch failed.")
   endif()
 
   # push everything up to github
