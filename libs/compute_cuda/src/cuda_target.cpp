@@ -9,6 +9,7 @@
 #if defined(HPX_HAVE_CUDA)
 
 #include <hpx/assertion.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
@@ -16,6 +17,7 @@
 #include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/traits/future_access.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS)
@@ -29,6 +31,7 @@
 #endif
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -61,14 +64,24 @@ namespace hpx { namespace compute { namespace cuda {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        struct future_data : lcos::detail::future_data<void>
+        template <typename Allocator>
+        struct future_data
+          : lcos::detail::future_data_allocator<void, Allocator>
         {
         private:
+            using init_no_addref =
+                typename lcos::detail::future_data_allocator<void,
+                    Allocator>::init_no_addref;
+            using other_allocator = typename std::allocator_traits<
+                Allocator>::template rebind_alloc<future_data>;
+
             static void CUDART_CB stream_callback(
                 cudaStream_t stream, cudaError_t error, void* user_data);
 
         public:
             future_data();
+            future_data(init_no_addref no_addref, other_allocator const& alloc,
+                cudaStream_t stream);
 
             void init(cudaStream_t stream);
 
@@ -118,6 +131,15 @@ namespace hpx { namespace compute { namespace cuda {
         {
         }
 
+        future_data::future_data(init_no_addref no_addref,
+            other_allocator const& alloc, cudaStream_t stream)
+          : lcos::detail::future_data_allocator<void>(
+                no_addref, lcos::detail::in_place{}, alloc)
+          , rt_(hpx::get_runtime_ptr())
+        {
+            init(stream);
+        }
+
         void future_data::init(cudaStream_t stream)
         {
             // Hold on to the shared state on behalf of the cuda runtime
@@ -141,14 +163,7 @@ namespace hpx { namespace compute { namespace cuda {
 
         hpx::future<void> get_future(cudaStream_t stream)
         {
-            typedef detail::future_data shared_state_type;
-
-            // make sure shared state stays alive even if the callback is invoked
-            // during initialization
-            hpx::intrusive_ptr<shared_state_type> p(new shared_state_type());
-            p->init(stream);
-            return hpx::traits::future_access<hpx::future<void>>::create(
-                std::move(p));
+            return get_future(hpx::util::internal_allocator<>{}, stream);
         }
     }    // namespace detail
 

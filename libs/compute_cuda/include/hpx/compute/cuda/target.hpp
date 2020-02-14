@@ -13,17 +13,20 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
+#include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/compute/cuda/get_targets.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/traits/future_access.hpp>
 
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cuda_runtime.h>
 
 #include <cstddef>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -32,9 +35,38 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace compute { namespace cuda {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         HPX_API_EXPORT hpx::future<void> get_future(cudaStream_t);
+
+        template <typename Allocator>
+        hpx::future<void> get_future(Allocator const& a, cudaStream_t stream)
+        {
+            using shared_state =
+                typename traits::detail::shared_state_allocator<
+                    lcos::detail::future_data, Allocator>::type;
+
+            using other_allocator =
+                typename std::allocator_traits<Allocator>::
+                    template rebind_alloc<shared_state>;
+            using traits = std::allocator_traits<other_allocator>;
+
+            using init_no_addref = typename shared_state::init_no_addref;
+
+            using unique_ptr = std::unique_ptr<shared_state,
+                util::allocator_deleter<other_allocator>>;
+
+            other_allocator alloc(a);
+            unique_ptr p(traits::allocate(alloc, 1),
+                hpx::util::allocator_deleter<other_allocator>{alloc});
+
+            traits::construct(alloc, p.get(), init_no_addref{}, alloc, stream);
+
+            return hpx::traits::future_access<future<void>>::create(
+                p.release(), false);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -180,6 +212,12 @@ namespace hpx { namespace compute { namespace cuda {
         }
 
         hpx::future<void> get_future() const;
+
+        template <typename Allocator>
+        hpx::future<void> get_future(Allocator const& alloc) const
+        {
+            return detail::get_future(alloc, handle_.get_stream());
+        }
 
         static std::vector<target> get_local_targets()
         {
