@@ -62,6 +62,7 @@ git config user.name "STE||AR Group"
 echo ""
 echo "Tagging release."
 git tag -s -a "${VERSION_FULL_TAG}" -m "${VERSION_DESCRIPTION}"
+git push origin "${VERSION_FULL_TAG}"
 
 echo ""
 echo "Creating release."
