@@ -333,8 +333,7 @@ if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") 
   set_target_properties(hpx PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
-target_compile_definitions(hpx PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
-  HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
+target_compile_definitions(hpx PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
 ################################################################################
 # Emulation of SwapContext on Windows
@@ -385,8 +384,7 @@ if(NOT HPX_WITH_STATIC_LINKING)
   target_link_libraries(hpx_init PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
   target_link_libraries(hpx_init PRIVATE hpx::boost)
 
-  target_compile_definitions(hpx_init PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
-    HPX_APPLICATION_EXPORTS)
+  target_compile_definitions(hpx_init PRIVATE HPX_APPLICATION_EXPORTS)
 
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
@@ -427,8 +425,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
 
     set_target_properties(hpx_wrap PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-    target_compile_definitions(hpx_wrap PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
-      HPX_APPLICATION_EXPORTS)
+    target_compile_definitions(hpx_wrap PRIVATE HPX_APPLICATION_EXPORTS)
 
     # Set the basic search paths for the generated HPX headers
     target_include_directories(hpx_wrap
