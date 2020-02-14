@@ -389,8 +389,6 @@ namespace hpx
         options_description desc_commandline(
             "Usage: " + app_name + " [options]");
 
-        util::function_nonser<void()> const empty;
-
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
@@ -399,8 +397,8 @@ namespace hpx
             desc_commandline);
         iparams.argc = argc;
         iparams.argv = argv;
-        iparams.startup = empty;
-        iparams.shutdown = empty;
+        iparams.startup = {};
+        iparams.shutdown = {};
         iparams.mode = mode;
         return init(iparams);
     }
@@ -410,16 +408,14 @@ namespace hpx
     init(util::function_nonser<int(int, char**)> const& f,
         int argc, char** argv, hpx::runtime_mode mode)
     {
-        util::function_nonser<void()> const empty;
-
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
         iparams.f = util::bind_back(detail::init_helper, f);
         iparams.argc = argc;
         iparams.argv = argv;
-        iparams.startup = empty;
-        iparams.shutdown = empty;
+        iparams.startup = {};
+        iparams.shutdown = {};
         iparams.mode = mode;
         return init(iparams);
     }
@@ -445,13 +441,11 @@ namespace hpx
         std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        util::function_nonser<void()> const empty;
-
         hpx::init_params iparams;
         iparams.f = util::bind_back(detail::init_helper, f);
         iparams.cfg = cfg;
-        iparams.startup = empty;
-        iparams.shutdown = empty;
+        iparams.startup = {};
+        iparams.shutdown = {};
         iparams.mode = mode;
         return init(iparams);
     }
@@ -463,20 +457,17 @@ namespace hpx
         using hpx::program_options::options_description;
         options_description desc_commandline(
             "Usage: " + app_name +  " [options]");
-        util::function_nonser<int(hpx::program_options::variables_map& vm)>
-            main_f;
-        util::function_nonser<void()> const empty;
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
-        iparams.f = main_f;
+        iparams.f = {};
         iparams.desc_cmdline_ptr = std::make_shared<options_description>(
             desc_commandline);
         iparams.argc = argc;
         iparams.argv = argv;
-        iparams.startup = empty;
-        iparams.shutdown = empty;
+        iparams.startup = {};
+        iparams.shutdown = {};
         iparams.mode = mode;
         return init(iparams);
     }
@@ -485,18 +476,14 @@ namespace hpx
     init(std::nullptr_t const& f,
         int argc, char** argv, hpx::runtime_mode mode)
     {
-        util::function_nonser<int(hpx::program_options::variables_map& vm)>
-            main_f;
-        util::function_nonser<void()> const empty;
-
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
-        iparams.f = main_f;
+        iparams.f = {};
         iparams.argc = argc;
         iparams.argv = argv;
-        iparams.startup = empty;
-        iparams.shutdown = empty;
+        iparams.startup = {};
+        iparams.shutdown = {};
         iparams.mode = mode;
         return init(iparams);
     }
@@ -506,13 +493,10 @@ namespace hpx
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        util::function_nonser<int(hpx::program_options::variables_map& vm)>
-            main_f;
-
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
-        iparams.f = main_f;
+        iparams.f = {};
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.cfg = cfg;
@@ -524,11 +508,8 @@ namespace hpx
     init(std::nullptr_t, std::vector<std::string> const& cfg,
          hpx::runtime_mode mode)
     {
-        util::function_nonser<int(hpx::program_options::variables_map& vm)>
-            main_f;
-
         hpx::init_params iparams;
-        iparams.f = main_f;
+        iparams.f = {};
         iparams.cfg = cfg;
         iparams.mode = mode;
         return init(iparams);
