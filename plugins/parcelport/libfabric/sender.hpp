@@ -109,7 +109,7 @@ namespace libfabric
         void handle_send_completion();
 
         // --------------------------------------------------------------------
-        // Triggered when the remote end has finished RMA opreations and
+        // Triggered when the remote end has finished RMA operations and
         // we can release resources
         void handle_message_completion_ack();
 

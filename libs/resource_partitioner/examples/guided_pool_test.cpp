@@ -85,7 +85,7 @@ namespace hpx { namespace threads { namespace executors {
 
     // ------------------------------------------------------------------------
     template <>
-    struct HPX_EXPORT pool_numa_hint<guided_test_tag>
+    struct pool_numa_hint<guided_test_tag>
     {
         // ------------------------------------------------------------------------
         // specialize the hint operator for params
@@ -304,5 +304,5 @@ int main(int argc, char* argv[])
 
     std::cout << "[main] resources added to thread_pools \n";
 
-    return hpx::init();
+    return hpx::init(rp);
 }

@@ -44,6 +44,6 @@ int main(int argc, char* argv[])
         }
     }
 
-    hpx::init();
+    hpx::init(rp);
 }
 //body]

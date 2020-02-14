@@ -1,25 +1,25 @@
-//  (C) Copyright Giovanni P. Deretta 2005. 
+//  (C) Copyright Giovanni P. Deretta 2005.
 //  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0. 
-//  (See accompanying file LICENSE_1_0.txt or copy at 
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
-/* 
+/*
     EAX is &from.sp
     EDX is to.sp
     This is the simplest version of swapcontext
     It saves registers on the old stack,
-    saves the old stack pointer, 
+    saves the old stack pointer,
     load the new stack pointer,
     pop registers from the new stack
      and returns to new caller.
-    EAX is simpy passed to the function it returns to.
+    EAX is simply passed to the function it returns to.
     The first time EAX is the first parameter of the trampoline.
     Otherwise it is simply discarded.
     NOTE: This function should work on any IA32 CPU.
-    NOTE: The biggest penality is the last jump that
+    NOTE: The biggest penalty is the last jump that
     will be always mispredicted (~50 cycles on P4).
     We try to make its address available as soon as possible
-    to try to reduce the penality. Doing a ret instead of a 
+    to try to reduce the penalty. Doing a ret instead of a
     'add $4, %esp'
     'jmp *%ecx'
     really kills performance.
@@ -58,7 +58,7 @@ swapcontext_stack:
   This optimization gives a 50% performance bonus on a plain
   'invoke and yield' test.
   NOTE: both subroutines work even if they are used in the
-   wrong place. 
+   wrong place.
  */
     .align 16
     .globl swapcontext_stack2,

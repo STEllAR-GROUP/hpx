@@ -243,7 +243,7 @@ class HPXThread():
 
       self.pc_string = "0x%x in " % frame.pc() + "%s at " % function_name + "%s:" % filename + "%d" % line
     except:
-      self.pc_string = "0x%x in " % frame.pc() + "<unkown>"
+      self.pc_string = "0x%x in " % frame.pc() + "<unknown>"
 
     self.frame = frame
 
@@ -401,7 +401,7 @@ def restore_context(event):
   state.restore()
 
 class HPXContinue(gdb.Command):
-  "Similiar to 'continue' but restores any selected HPX threads before continuing."
+  "Similar to 'continue' but restores any selected HPX threads before continuing."
   def __init__(self):
     super(HPXContinue, self).__init__("hpx continue", gdb.COMMAND_USER, gdb.COMPLETE_NONE, False)
 

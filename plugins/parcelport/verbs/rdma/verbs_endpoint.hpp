@@ -476,7 +476,7 @@ namespace verbs
         int reject(rdma_cm_id *id)
         {
             //
-            // Debugging code to get ip address of soure/dest of event
+            // Debugging code to get ip address of source/dest of event
             // NB: The src and dest fields refer to the message - not the connect request
             // so we are actually receiving a request from dest (but src of the msg)
             //

@@ -27,6 +27,7 @@
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
+#include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
@@ -555,14 +556,15 @@ namespace hpx
             util::command_line_handling& cfg,
             startup_function_type startup, shutdown_function_type shutdown)
         {
-            if (blocking) {
+            if (blocking)
+            {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_,
                     std::move(startup), std::move(shutdown));
             }
 
             // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_, std::move(startup),
-                std::move(shutdown));
+            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_,
+                std::move(startup), std::move(shutdown));
 
             // pointer to runtime is stored in TLS
             hpx::runtime* p = rt.release();
@@ -571,15 +573,8 @@ namespace hpx
             return 0;
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT int run_or_start(
-            util::function_nonser<
-                int(hpx::program_options::variables_map& vm)
-            > const& f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> && ini_config,
-            startup_function_type startup, shutdown_function_type shutdown,
-            hpx::runtime_mode mode, bool blocking)
+        ////////////////////////////////////////////////////////////////////////
+        void init_environment()
         {
             HPX_UNUSED(hpx::filesystem::initial_path());
 
@@ -621,29 +616,52 @@ namespace hpx
             unsetenv("LC_IDENTIFICATION");
             unsetenv("LC_ALL");
 #endif
+        }
+
+        // make sure the runtime system is not active yet
+        int ensure_no_runtime_is_up()
+        {
+            // make sure the runtime system is not active yet
+            if (get_runtime_ptr() != nullptr)
+            {
+#if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) &&                                        \
+    (defined(__linux) || defined(__linux__) || defined(linux) ||               \
+        defined(__APPLE__))
+                // make sure the runtime system is not initialized
+                // after its activation from int main()
+                if(hpx_start::include_libhpx_wrap)
+                {
+                    std::cerr << "hpx is already initialized from main.\n"
+                        "Note: Delete hpx_main.hpp to initialize hpx system "
+                        "using hpx::init. Exiting...\n";
+                    return -1;
+                }
+#endif
+                std::cerr << "hpx::init: can't initialize runtime system "
+                    "more than once! Exiting...\n";
+                return -1;
+            }
+            return 0;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        HPX_EXPORT int run_or_start(
+            util::function_nonser<
+                int(hpx::program_options::variables_map& vm)
+            > const& f,
+            hpx::program_options::options_description const& desc_cmdline,
+            int argc, char** argv, std::vector<std::string> && ini_config,
+            startup_function_type startup, shutdown_function_type shutdown,
+            hpx::runtime_mode mode, bool blocking)
+        {
+            init_environment();
 
             int result = 0;
             try {
                 // make sure the runtime system is not active yet
-                if (get_runtime_ptr() != nullptr)
+                if ((result = ensure_no_runtime_is_up()) != 0)
                 {
-                #if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) && \
-                (defined(__linux) || defined(__linux__) || defined(linux) || \
-                defined(__APPLE__))
-                    // make sure the runtime system is not initialized
-                    // after its activation from int main()
-                    if(hpx_start::include_libhpx_wrap)
-                    {
-                        std::cerr << "hpx is already initialized from main.\n"
-                            "Note: Delete hpx_main.hpp to initialize hpx system "
-                            "using hpx::init. Exiting...\n";
-                        return -1;
-                    }
-                #endif
-
-                    std::cerr << "hpx::init: can't initialize runtime system "
-                        "more than once! Exiting...\n";
-                    return -1;
+                    return result;
                 }
 
                 // scope exception handling to resource partitioner initialization
@@ -697,6 +715,7 @@ namespace hpx
             return result;
         }
 
+        ////////////////////////////////////////////////////////////////////////
         template <typename T>
         inline T
         get_option(std::string const& config, T default_ = T())
@@ -711,6 +730,47 @@ namespace hpx
                 }
             }
             return default_;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////
+        HPX_EXPORT int run_or_start(resource::partitioner& rp,
+            startup_function_type startup, shutdown_function_type shutdown,
+            bool blocking)
+        {
+            init_environment();
+
+            int result = 0;
+            try
+            {
+                // make sure the runtime system is not active yet
+                if ((result = ensure_no_runtime_is_up()) != 0)
+                {
+                    return result;
+                }
+
+                // Setup all internal parameters of the resource_partitioner
+                rp.configure_pools();
+
+                // Initialize and start the HPX runtime.
+                LPROGRESS_ << "run_local: create runtime";
+
+                // Build and configure this runtime instance.
+                typedef hpx::runtime_impl runtime_type;
+
+                util::command_line_handling& cms =
+                    rp.get_command_line_switches();
+
+                std::unique_ptr<hpx::runtime> rt(new runtime_type(cms.rtcfg_));
+                result = run_or_start(blocking, std::move(rt), cms,
+                    std::move(startup), std::move(shutdown));
+            }
+            catch (detail::command_line_error const& e)
+            {
+                std::cerr << "hpx::init: std::exception caught: " << e.what()
+                          << "\n";
+                return -1;
+            }
+            return result;
         }
     }
 

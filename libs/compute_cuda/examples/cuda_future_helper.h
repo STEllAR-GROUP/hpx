@@ -243,7 +243,7 @@ namespace hpx { namespace compute { namespace util
 
         // -------------------------------------------------------------------------
         // launch a task on our stream and pass the error code through from
-        // cuda back to te caller, otherwise this function mimics the
+        // cuda back to the caller, otherwise this function mimics the
         // behaviour of apply.
         template <typename Func, typename... Args>
         cudaError_t apply_pass_through(Func&& cuda_function, Args&&... args) {

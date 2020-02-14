@@ -257,4 +257,16 @@ namespace hpx { namespace resource {
         return partitioner_.threads_needed();
     }
 
+    util::command_line_handling& partitioner::get_command_line_switches()
+    {
+        return partitioner_.get_command_line_switches();
+    }
+
+    // Does initialization of all resources and internal data of the
+    // resource partitioner called in hpx_init
+    void partitioner::configure_pools()
+    {
+        partitioner_.configure_pools();
+    }
+
 }}    // namespace hpx::resource

@@ -35,7 +35,7 @@ namespace hpx { namespace program_options {
         HPX_ASSERT(options.description);
         const options_description& desc = *options.description;
 
-        // We need to access map's operator[], not the overriden version
+        // We need to access map's operator[], not the overridden version
         // variables_map. Ehmm.. messy.
         std::map<std::string, variable_value>& m = xm;
 

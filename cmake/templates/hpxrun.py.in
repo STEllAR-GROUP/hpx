@@ -119,7 +119,7 @@ def build_cmd(options, args):
         cmd += [arg]
 
     if options.localities > 1:
-        # Selecting the parcelport for hpx via hpx ini confifuration
+        # Selecting the parcelport for hpx via hpx ini configuration
         select_parcelport = (lambda pp:
             ['--hpx:ini=hpx.parcel.verbs.enable=1'] if pp == 'verbs'
             else ['--hpx:ini=hpx.parcel.ipc.enable=1'] if pp == 'ipc'
