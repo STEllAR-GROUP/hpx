@@ -119,6 +119,11 @@ unset(HPX_LIBS CACHE)
 unset(HPX_STATIC_PARCELPORT_PLUGINS CACHE)
 
 ################################################################################
+# Set up dummy compiler flags targets
+################################################################################
+include(HPX_CompilerFlagsTargets)
+
+################################################################################
 # Fortran compiler detection
 #
 hpx_option(HPX_WITH_FORTRAN
@@ -1710,11 +1715,6 @@ endif()
 ################################################################################
 set(CMAKE_DEBUG_POSTFIX "d")
 set(HPX_DEBUG_POSTFIX "d")
-
-################################################################################
-# Set up dummy compiler flags target
-################################################################################
-include(HPX_CompilerFlagsTarget)
 
 if(HPX_WITH_COMPRESSION_BZIP2)
   hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
