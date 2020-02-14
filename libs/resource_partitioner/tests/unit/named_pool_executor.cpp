@@ -142,7 +142,8 @@ int main(int argc, char* argv[])
 {
     hpx::init_params init_args;
     init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
-    hpx::resource::set_rp_callback(&init_resource_partitioner_handler);
+    // Set the callback to init the thread_pools
+    init_args.rp_callback = &init_resource_partitioner_handler;
 
     // now run the test
     HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);

@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
     // Setup the init parameters
     hpx::init_params init_args;
     // set the resource partitioner callback
-    hpx::resource::set_rp_callback(&init_resource_partitioner_handler);
+    init_args.rp_callback = &init_resource_partitioner_handler;
     // now run the test
     HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
     return hpx::util::report_errors();

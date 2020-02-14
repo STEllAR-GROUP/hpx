@@ -45,6 +45,14 @@ namespace hpx_startup
 /// \namespace hpx
 namespace hpx
 {
+    /// \cond NOINTERNAL
+    namespace resource {
+        // Utilities to init the thread_pools of the resource partitioner
+        using rp_callback_type = hpx::util::function_nonser<void(
+                hpx::resource::partitioner&)>;
+    }
+    /// \endcond
+
     namespace detail
     {
         HPX_EXPORT void on_exit() noexcept;
@@ -78,6 +86,7 @@ namespace hpx
         shutdown_function_type& shutdown = detail::default_startup;
         hpx::runtime_mode mode = ::hpx::runtime_mode_default;
         hpx::resource::partitioner_mode rp_mode = ::hpx::resource::mode_default;
+        hpx::resource::rp_callback_type rp_callback;
     };
 }
 

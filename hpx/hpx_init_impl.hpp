@@ -46,7 +46,7 @@ namespace hpx
             int argc, char** argv, std::vector<std::string>&& ini_config,
             startup_function_type startup, shutdown_function_type shutdown,
             hpx::runtime_mode mode, hpx::resource::partitioner_mode rp_mode,
-            bool blocking);
+            hpx::resource::rp_callback_type rp_callback, bool blocking);
 
 #if defined(HPX_WINDOWS)
         void init_winsocket();
@@ -84,7 +84,7 @@ namespace hpx
         return detail::run_or_start(f, params.desc_cmdline, argc, argv,
             hpx_startup::user_main_config(params.cfg),
             std::move(params.startup), std::move(params.shutdown), params.mode,
-            params.rp_mode, true);
+            params.rp_mode, params.rp_callback, true);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.

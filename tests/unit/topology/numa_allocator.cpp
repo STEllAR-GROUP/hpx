@@ -287,9 +287,8 @@ int main(int argc, char* argv[])
     // Setup the init parameters
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_cmdline;
-
     // Set the callback to init the thread_pools
-    hpx::resource::set_rp_callback(&init_resource_partitioner_handler);
+    init_args.rp_callback = &init_resource_partitioner_handler;
 
     hpx::init(argc, argv, init_args);
     return hpx::util::report_errors();

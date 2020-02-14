@@ -271,17 +271,6 @@ namespace hpx
 #endif
     int init(init_params const& params = init_params());
 
-    /// \cond NOINTERNAL
-    namespace resource {
-
-        // Utilities to init the thread_pools of the resource partitioner
-        using rp_callback_type = hpx::util::function_nonser<void(
-                hpx::resource::partitioner&)>;
-        HPX_EXPORT void set_rp_callback(rp_callback_type f);
-
-    }   // namespace resource
-    /// \endcond
-
 #if defined(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
     /// \brief Main entry point for launching the HPX runtime system.
     ///
