@@ -160,7 +160,7 @@ function(add_hpx_module name)
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
-  target_link_libraries(hpx_${name} PRIVATE hpx_internal_flags)
+  target_link_libraries(hpx_${name} PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
 
   if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
     target_include_directories(hpx_${name} PUBLIC
