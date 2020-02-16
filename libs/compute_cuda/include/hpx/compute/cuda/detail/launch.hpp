@@ -85,7 +85,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
 
         template <typename DimType>
         HPX_HOST_DEVICE static void call(hpx::cuda::target const& tgt,
-            DimType gridDim, DimType blockDim, fun_type f, args_type args)
+            DimType grid_dim, DimType block_dim, fun_type f, args_type args)
         {
             // This is needed for the device code to make sure the kernel
             // is instantiated correctly.
@@ -99,7 +99,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
 #if defined(HPX_COMPUTE_HOST_CODE)
             detail::scoped_active_target active(tgt);
 
-            launch_function<<<gridDim, blockDim, 0, active.stream()>>>(
+            launch_function<<<grid_dim, block_dim, 0, active.stream()>>>(
                 std::move(c));
 
             cudaError_t error = cudaGetLastError();
@@ -114,10 +114,10 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
                 std::alignment_of<Closure>::value, sizeof(Closure));
             std::memcpy(param_buffer, &c, sizeof(Closure));
             //             cudaLaunchKernel(reinterpret_cast<void*>(launcher),
-            //                 dim3(gridDim), dim3(blockDim), param_buffer, 0,
+            //                 dim3(grid_dim), dim3(block_dim), param_buffer, 0,
             //                 tgt.native_handle().get_stream());
             cudaLaunchDevice(reinterpret_cast<void*>(launcher), param_buffer,
-                dim3(gridDim), dim3(blockDim), 0,
+                dim3(grid_dim), dim3(block_dim), 0,
                 tgt.native_handle().get_stream());
 #endif
         }
@@ -126,12 +126,11 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
     // Launch any given function F with the given parameters. This function
     // does not involve any device synchronization.
     template <typename DimType, typename F, typename... Ts>
-    HPX_HOST_DEVICE void launch(
-        hpx::cuda::target const& t, DimType gridDim, DimType blockDim, 
-        F&& f, Ts&&... vs)
+    HPX_HOST_DEVICE void launch(hpx::cuda::target const& t, DimType grid_dim,
+        DimType block_dim, F&& f, Ts&&... vs)
     {
         typedef closure<F, Ts...> closure_type;
-        launch_helper<closure_type>::call(t, gridDim, blockDim,
+        launch_helper<closure_type>::call(t, grid_dim, block_dim,
             std::forward<F>(f),
             util::forward_as_tuple(std::forward<Ts>(vs)...));
     }
