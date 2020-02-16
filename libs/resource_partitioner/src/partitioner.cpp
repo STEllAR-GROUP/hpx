@@ -269,4 +269,10 @@ namespace hpx { namespace resource {
         partitioner_.configure_pools();
     }
 
+    // Return the initialization result for this resource_partitioner
+    int partitioner::parse_result() const
+    {
+        return partitioner_.parse_result();
+    }
+
 }}    // namespace hpx::resource
