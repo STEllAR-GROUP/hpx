@@ -19,10 +19,15 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Default location is $HPX_ROOT/libs/cuda_support/include
 set(cuda_support_headers
   hpx/cuda_support/cuda_future_helper.hpp  
+  hpx/cuda_support/get_targets.hpp
+  hpx/cuda_support/target.hpp
 )
 
 # Default location is $HPX_ROOT/libs/cuda_support/include_compatibility
-set(cuda_support_compat_headers)
+set(cuda_support_compat_headers
+  hpx/compute/cuda/get_targets.hpp
+  hpx/compute/cuda/target.hpp
+)
 
 set(cuda_support_sources
   cuda_target.cpp
@@ -31,10 +36,10 @@ set(cuda_support_sources
 
 include(HPX_AddModule)
 add_hpx_module(cuda_support
-  COMPATIBILITY_HEADERS OFF
+  COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
   SOURCES ${cuda_support_sources}
   HEADERS ${cuda_support_headers}
   COMPAT_HEADERS ${cuda_support_compat_headers}
@@ -54,6 +59,6 @@ add_hpx_module(cuda_support
     hpx_synchronization
     hpx_static_reinit
     hpx_type_support
-    ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES}
+    Cuda::cuda
   CMAKE_SUBDIRS examples tests
 )
