@@ -120,7 +120,7 @@ namespace hpx { namespace compute { namespace cuda {
             future_data(init_no_addref no_addref, other_allocator const& alloc,
                 cudaStream_t stream)
               : lcos::detail::future_data_allocator<void, Allocator>(
-                    no_addref, lcos::detail::in_place{}, alloc)
+                    no_addref, alloc)
               , rt_(hpx::get_runtime_ptr())
             {
                 init(stream);
