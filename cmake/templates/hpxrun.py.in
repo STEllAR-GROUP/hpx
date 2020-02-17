@@ -91,7 +91,7 @@ def run_srun(cmd, localities, verbose):
     subproc(exec_cmd)
 
 # Run with jsrun
-# This is executing srun with the '-n' option set to the number of localities
+# This is executing jsrun with the '-n' option set to the number of localities
 def run_jsrun(cmd, localities, verbose):
     exec_cmd = ['jsrun', '-n', str(localities)] + cmd
     if verbose:
