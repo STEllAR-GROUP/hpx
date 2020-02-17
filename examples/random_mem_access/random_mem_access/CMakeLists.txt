@@ -28,6 +28,7 @@ source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
 add_hpx_component(random_mem_access
+  INTERNAL_FLAGS
   MODULE random_mem_access
   SOURCES ${client_sources}
   HEADERS ${headers}

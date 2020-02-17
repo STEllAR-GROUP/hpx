@@ -21,6 +21,7 @@ foreach(example_program ${example_programs})
 
   # add example executable
   add_hpx_executable(${example_program}_client
+    INTERNAL_FLAGS
     SOURCES ${sources}
     COMPONENT_DEPENDENCIES ${example_program} iostreams
     FOLDER "Examples/TupleSpace/${example_program}")

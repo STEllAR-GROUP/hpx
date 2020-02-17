@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_component(cancelable_action
+    INTERNAL_FLAGS
     AUTOGLOB
     HEADER_GLOB "cancelable_action.h*"
     SOURCE_GLOB "cancelable_action.c*"

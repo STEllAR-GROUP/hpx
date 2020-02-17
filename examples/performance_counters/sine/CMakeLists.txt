@@ -9,6 +9,7 @@ set(root "${PROJECT_SOURCE_DIR}/examples/performance_counters/sine")
 ###############################################################################
 # add component
 add_hpx_component(sine
+  INTERNAL_FLAGS
   FOLDER "Examples/PerformanceCounters/Sine"
   HEADER_GLOB "${root}/*.h*"
   SOURCE_GLOB "${root}/sine.c*"
@@ -18,6 +19,7 @@ add_hpx_component(sine
 ###############################################################################
 # add example executable
 add_hpx_executable(sine_client
+  INTERNAL_FLAGS
   SOURCES sine_client.cpp
   DEPENDENCIES sine_component
   FOLDER "Examples/PerformanceCounters/Sine")

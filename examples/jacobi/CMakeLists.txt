@@ -15,10 +15,11 @@ set(jacobi_FLAGS
 
 # add jacobi executable
 add_hpx_executable(jacobi_simple
-MODULE jacobi
-SOURCES ${jacobi_sources}
-${jacobi_FLAGS}
-FOLDER "Examples/Jacobi")
+  INTERNAL_FLAGS
+  MODULE jacobi
+  SOURCES ${jacobi_sources}
+  ${jacobi_FLAGS}
+  FOLDER "Examples/Jacobi")
 
 add_hpx_example_target_dependencies("jacobi" jacobi_simple)
 

@@ -21,6 +21,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
   ###############################################################################
   # add example executable
   add_hpx_executable(sheneos_client
+    INTERNAL_FLAGS
     SOURCES sheneos_client.cpp
     DEPENDENCIES sheneos_component
     FOLDER "Examples/ShenEOS")
@@ -29,6 +30,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
   add_hpx_pseudo_dependencies(examples.sheneos sheneos_client)
 
   add_hpx_executable(sheneos_test
+    INTERNAL_FLAGS
     SOURCES sheneos_test.cpp
     DEPENDENCIES sheneos_component
     FOLDER "Examples/ShenEOS")
@@ -41,6 +43,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
   if(HPX_WITH_FORTRAN)
     if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
       add_hpx_executable(sheneos_compare
+        INTERNAL_FLAGS
         SOURCES
             sheneos_compare.cpp
             eos_driver/read_nuc_table.F90

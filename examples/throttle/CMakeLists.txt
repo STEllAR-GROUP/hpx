@@ -22,6 +22,7 @@ foreach(subdir ${subdirs})
 
   # add example executable
   add_hpx_executable(${subdir}_client
+    INTERNAL_FLAGS
     SOURCES ${sources}
     DEPENDENCIES ${subdir}_component
     FOLDER "Examples/Throttle")
@@ -31,6 +32,7 @@ foreach(subdir ${subdirs})
 endforeach()
 
 add_hpx_executable(spin
+  INTERNAL_FLAGS
   SOURCES spin.cpp
   FOLDER "Examples/Throttle")
 

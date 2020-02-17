@@ -23,12 +23,14 @@ foreach(example_program ${example_programs})
 
   # add example components
   add_hpx_component(${example_program}
+    INTERNAL_FLAGS
     SOURCES ${component_sources}
     HEADERS ${component_headers}
     FOLDER "Examples/Quickstart/Accumulators/${example_program}")
 
   # add example executable
   add_hpx_executable(${example_program}
+    INTERNAL_FLAGS
     SOURCES ${client_sources}
     DEPENDENCIES ${example_program}_component
     FOLDER "Examples/Quickstart/Accumulators/${example_program}")

@@ -21,6 +21,7 @@ foreach(subdir ${subdirs})
 
   # add example executable
   add_hpx_executable(${subdir}_client
+    INTERNAL_FLAGS
     MODULE random_mem_access
     SOURCES ${sources}
     DEPENDENCIES ${subdir}_component
