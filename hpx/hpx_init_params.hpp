@@ -49,6 +49,7 @@ namespace hpx
     {
         HPX_EXPORT void on_exit() noexcept;
         HPX_EXPORT void on_abort(int signal) noexcept;
+        static char app_name[] = HPX_APPLICATION_STRING;
     }
 
 #ifndef DOXYGEN
@@ -60,7 +61,7 @@ namespace hpx
     /// \brief A struct to contain the hpx::init() parameters
     struct init_params {
         // Default args
-        char *dummy_argv[2] = { const_cast<char*>(HPX_APPLICATION_STRING), nullptr };
+        char *dummy_argv[2] = { detail::app_name , nullptr };
         using options_description = hpx::program_options::options_description;
         options_description default_desc = options_description("Usage: " HPX_APPLICATION_STRING " [options]");
         // Parameters
