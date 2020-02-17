@@ -46,7 +46,7 @@ namespace hpx { namespace threads { namespace policies {
             HPX_UNUSED(running);    //-V601
             return false;
 #else
-            if (!minimal_deadlock_detection)
+            if (!get_minimal_deadlock_detection_enabled())
                 return false;
 
             // attempt to output possibly deadlocked threads occasionally only

@@ -363,8 +363,8 @@ namespace hpx
             }
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-            threads::policies::minimal_deadlock_detection =
-                cms.rtcfg_.enable_minimal_deadlock_detection();
+            threads::policies::set_minimal_deadlock_detection_enabled(
+                cms.rtcfg_.enable_minimal_deadlock_detection());
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
             util::detail::spinlock_break_on_deadlock =

@@ -38,7 +38,7 @@ namespace hpx { namespace threads {
                 tm, total_func, pool_func, info, ec);
 
             if (!ec)
-                policies::maintain_queue_wait_times = true;
+                policies::set_maintain_queue_wait_times_enabled(true);
 
             return gid;
         }

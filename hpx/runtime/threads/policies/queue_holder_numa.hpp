@@ -302,17 +302,6 @@ namespace hpx { namespace threads { namespace policies {
         void on_stop_thread(std::size_t num_thread) {}
         void on_error(std::size_t num_thread, std::exception_ptr const& e) {}
     };
-
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    // ------------------------------------------------------------////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    extern bool minimal_deadlock_detection;
-#endif
-
-    // ------------------------------------------------------------////////
-
 }}}    // namespace hpx::threads::policies
 
 #endif    // HPX_F0153C92_99B1_4F31_8FA9_4208DB2F26CE

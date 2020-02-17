@@ -10,10 +10,16 @@
 
 namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to collect wait times using this global bool.
-    // It will be set by any of the related performance counters. Once set it
-    // stays set, thus no race conditions will occur.
-    HPX_EXPORT bool maintain_queue_wait_times = false;
+    static bool maintain_queue_wait_times_enabled = false;
+
+    void set_maintain_queue_wait_times_enabled(bool enabled)
+    {
+        maintain_queue_wait_times_enabled = enabled;
+    }
+
+    bool get_maintain_queue_wait_times_enabled()
+    {
+        return maintain_queue_wait_times_enabled;
+    }
 #endif
 }}}    // namespace hpx::threads::policies

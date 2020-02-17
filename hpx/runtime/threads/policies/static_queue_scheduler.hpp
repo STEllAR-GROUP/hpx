@@ -127,7 +127,8 @@ namespace hpx { namespace threads { namespace policies
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
-            if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
+            if (HPX_UNLIKELY(get_minimal_deadlock_detection_enabled() &&
+                    LHPX_ENABLED(error)))
             {
                 bool suspended_only = true;
 

@@ -10,10 +10,16 @@
 
 namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    HPX_EXPORT bool minimal_deadlock_detection = true;
+    static bool minimal_deadlock_detection_enabled = false;
+
+    void set_minimal_deadlock_detection_enabled(bool enabled)
+    {
+        minimal_deadlock_detection_enabled = enabled;
+    }
+
+    bool get_minimal_deadlock_detection_enabled()
+    {
+        return minimal_deadlock_detection_enabled;
+    }
 #endif
 }}}    // namespace hpx::threads::policies

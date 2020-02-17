@@ -12,7 +12,8 @@
 
 namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    extern bool minimal_deadlock_detection;
+    HPX_EXPORT void set_minimal_deadlock_detection_enabled(bool enabled);
+    HPX_EXPORT bool get_minimal_deadlock_detection_enabled();
 #endif
 }}}    // namespace hpx::threads::policies
 

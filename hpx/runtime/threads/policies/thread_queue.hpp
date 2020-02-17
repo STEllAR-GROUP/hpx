@@ -205,7 +205,7 @@ namespace hpx { namespace threads { namespace policies {
             while (add_count-- && addfrom->new_tasks_.pop(task, steal))
             {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-                if (maintain_queue_wait_times)
+                if (get_maintain_queue_wait_times_enabled())
                 {
                     addfrom->new_tasks_wait_ +=
                         util::high_resolution_clock::now() -
@@ -730,7 +730,7 @@ namespace hpx { namespace threads { namespace policies {
                 --src->work_items_count_.data_;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-                if (maintain_queue_wait_times)
+                if (get_maintain_queue_wait_times_enabled())
                 {
                     std::uint64_t now = util::high_resolution_clock::now();
                     src->work_items_wait_ += now - util::get<1>(*trd);
@@ -752,7 +752,7 @@ namespace hpx { namespace threads { namespace policies {
             while (src->new_tasks_.pop(task))
             {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-                if (maintain_queue_wait_times)
+                if (get_maintain_queue_wait_times_enabled())
                 {
                     std::int64_t now = util::high_resolution_clock::now();
                     src->new_tasks_wait_ += now - util::get<2>(*task);
@@ -799,7 +799,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 --work_items_count_.data_;
 
-                if (maintain_queue_wait_times)
+                if (get_maintain_queue_wait_times_enabled())
                 {
                     work_items_wait_ += util::high_resolution_clock::now() -
                         util::get<1>(*tdesc);
@@ -1047,7 +1047,7 @@ namespace hpx { namespace threads { namespace policies {
 #ifndef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             return false;
 #else
-            if (minimal_deadlock_detection)
+            if (get_minimal_deadlock_detection_enabled())
             {
                 std::lock_guard<mutex_type> lk(mtx_);
                 return detail::dump_suspended_threads(
