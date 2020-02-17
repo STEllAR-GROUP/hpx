@@ -127,8 +127,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         std::advance(last, count);
 
         Stride stride = parallel::v1::detail::abs(s);
-        auto test_function = [&]() -> std::size_t {
-            std::size_t test_chunk_size = count / 100;
+        auto test_function = [&](std::size_t test_chunk_size) -> std::size_t {
             if (test_chunk_size == 0)
                 return 0;
 
@@ -197,8 +196,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         while (count != 0)
         {
             std::size_t chunk_size = execution::get_chunk_size(
-                policy.parameters(), policy.executor(), []() { return 0; },
-                cores, count);
+                policy.parameters(), policy.executor(),
+                [](std::size_t) { return 0; }, cores, count);
 
             // make sure, chunk size and max_chunks are consistent
             adjust_chunk_size_and_max_chunks(
@@ -267,8 +266,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         Stride stride = parallel::v1::detail::abs(s);
         std::size_t base_idx = 0;
-        auto test_function = [&]() -> std::size_t {
-            std::size_t test_chunk_size = count / 100;
+        auto test_function = [&](std::size_t test_chunk_size) -> std::size_t {
             if (test_chunk_size == 0)
                 return 0;
 
@@ -340,8 +338,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         while (count != 0)
         {
             std::size_t chunk_size = execution::get_chunk_size(
-                policy.parameters(), policy.executor(), []() { return 0; },
-                cores, count);
+                policy.parameters(), policy.executor(),
+                [](std::size_t) { return 0; }, cores, count);
 
             // make sure, chunk size and max_chunks are consistent
             adjust_chunk_size_and_max_chunks(

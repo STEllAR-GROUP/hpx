@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                         std::size_t chunk_size = execution::get_chunk_size(
                             policy.parameters(), policy.executor(),
-                            [] { return 0; }, cores, size);
+                            [](std::size_t) { return 0; }, cores, size);
 
                         std::size_t max_chunks =
                             execution::maximal_number_of_chunks(
