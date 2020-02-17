@@ -22,6 +22,7 @@ This is a bugfix release. It contains the following changes:
 * Skip MPI finalization if HPX has not initialized MPI
 * Give a hard error when attempting to use IO counters on Windows
 * Fix |cmake| configuration using older |cmake| versions with CUDA enabled
+* Add ``jsrun`` option to ``hpxrun.py``
 
 Closed issues
 =============
@@ -38,6 +39,7 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`4389` - Add jsrun in hpx run wrapper
 * :hpx-pr:`4376` - Attempt to fix some test build errors on Windows
 * :hpx-pr:`4357` - Adding missing ``#include``\ s to fix gcc V10 linker problems
 * :hpx-pr:`4353` - Skip ``MPI_Finalize`` if ``MPI_Init`` is not called from HPX
