@@ -985,6 +985,11 @@ hpx_option(HPX_WITH_TESTS_DEBUG_LOG_DESTINATION STRING
   "cout"
   CATEGORY "Debugging" ADVANCED)
 
+hpx_option(HPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY STRING
+  "Maximum number of threads to use for tests (default: 0, use the number of threads specified by the test)"
+  0
+  CATEGORY "Debugging" ADVANCED)
+
 # If APEX is defined, the action timers need thread debug info.
 if(HPX_WITH_APEX)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)

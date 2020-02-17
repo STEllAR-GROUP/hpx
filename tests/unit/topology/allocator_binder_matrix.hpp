@@ -33,20 +33,21 @@ struct matrix_numa_binder : hpx::compute::host::numa_binding_helper<T>
       , colprocs_(Ncolprocs)
       , rowprocs_(Nrowprocs)
     {
-        const int CACHE_LINE_SIZE = hpx::threads::get_cache_line_size();
-        const int PAGE_SIZE       = hpx::threads::get_memory_page_size();
-        const int ALIGNMENT       = (std::max)(PAGE_SIZE, CACHE_LINE_SIZE);
-        const int ELEMS_ALIGN     = (ALIGNMENT/sizeof(T));
-        rows_page_   = ELEMS_ALIGN;
-        leading_dim_ = ELEMS_ALIGN*((rows_*sizeof(T) + ALIGNMENT-1)/ALIGNMENT);
+        int const cache_line_size = hpx::threads::get_cache_line_size();
+        int const page_size = hpx::threads::get_memory_page_size();
+        int const alignment = (std::max)(page_size, cache_line_size);
+        int const elems_align = (alignment / sizeof(T));
+        rows_page_ = elems_align;
+        leading_dim_ =
+            elems_align * ((rows_ * sizeof(T) + alignment - 1) / alignment);
         // @TODO : put tiles_per_domain_ back in
     }
 
     // return the domain that a given page should be bound to
     virtual std::size_t operator()(const T* const base_ptr,
         const T* const page_ptr,
-        const std::size_t pagesize,
-        const std::size_t domains) const override
+        std::size_t const pagesize,
+        std::size_t const domains) const override
     {
         std::intptr_t offset = page_ptr - base_ptr;
         std::size_t col = (offset / leading_dim_);
