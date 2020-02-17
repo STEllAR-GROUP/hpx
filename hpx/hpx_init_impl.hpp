@@ -76,7 +76,7 @@ namespace hpx
         std::at_quick_exit(detail::on_exit);
 #endif
 
-        return detail::run_or_start(params.f, (*params.desc_cmdline_ptr),
+        return detail::run_or_start(params.f, params.desc_cmdline,
             params.argc, params.argv, hpx_startup::user_main_config(params.cfg),
             std::move(params.startup), std::move(params.shutdown), params.mode,
             params.rp_mode, true);
@@ -97,11 +97,9 @@ namespace hpx
         startup_function_type startup, shutdown_function_type shutdown,
         hpx::runtime_mode mode)
     {
-        using hpx::program_options::options_description;
         hpx::init_params iparams;
         iparams.f = f;
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_cmdline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.cfg = cfg;
@@ -123,11 +121,9 @@ namespace hpx
         int argc, char** argv, startup_function_type startup,
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
-        using hpx::program_options::options_description;
         hpx::init_params iparams;
         iparams.f = f;
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_cmdline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.startup = std::move(startup);
@@ -149,12 +145,9 @@ namespace hpx
         int argc, char** argv, startup_function_type startup,
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
-        using hpx::program_options::options_description;
-
         hpx::init_params iparams;
         iparams.f = static_cast<hpx_main_type>(::hpx_main);
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_cmdline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.startup = std::move(startup);
@@ -177,12 +170,9 @@ namespace hpx
         startup_function_type startup, shutdown_function_type shutdown,
         hpx::runtime_mode mode)
     {
-        using hpx::program_options::options_description;
-
         hpx::init_params iparams;
         iparams.f = static_cast<hpx_main_type>(::hpx_main);
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_cmdline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.cfg = cfg;
@@ -225,12 +215,9 @@ namespace hpx
     init(hpx::program_options::options_description const& desc_cmdline,
         int argc, char** argv, hpx::runtime_mode mode)
     {
-        using hpx::program_options::options_description;
-
         hpx::init_params iparams;
         iparams.f = static_cast<hpx_main_type>(::hpx_main);
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_cmdline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.mode = mode;
@@ -250,12 +237,9 @@ namespace hpx
         int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
-        using hpx::program_options::options_description;
-
         hpx::init_params iparams;
         iparams.f = static_cast<hpx_main_type>(::hpx_main);
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_cmdline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.cfg = cfg;
@@ -279,7 +263,7 @@ namespace hpx
                 " [options]");
         hpx::init_params iparams;
         iparams.f = static_cast<hpx_main_type>(::hpx_main);
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(desc);
+        iparams.desc_cmdline = desc;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.mode = mode;
@@ -327,12 +311,10 @@ namespace hpx
     {
         using hpx::program_options::options_description;
 
-        options_description desc_commandline(
-            "Usage: " + app_name +  " [options]");
+        options_description desc_cmdline("Usage: " + app_name +  " [options]");
 
         hpx::init_params iparams;
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_commandline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.mode = mode;
 
         if (argc == 0 || argv == nullptr)
@@ -386,15 +368,13 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         using hpx::program_options::options_description;
-        options_description desc_commandline(
-            "Usage: " + app_name + " [options]");
+        options_description desc_cmdline("Usage: " + app_name + " [options]");
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
         iparams.f = util::bind_back(detail::init_helper, f);
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_commandline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.startup = {};
@@ -455,15 +435,13 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         using hpx::program_options::options_description;
-        options_description desc_commandline(
-            "Usage: " + app_name +  " [options]");
+        options_description desc_cmdline("Usage: " + app_name +  " [options]");
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
         iparams.f = {};
-        iparams.desc_cmdline_ptr = std::make_shared<options_description>(
-            desc_commandline);
+        iparams.desc_cmdline = desc_cmdline;
         iparams.argc = argc;
         iparams.argv = argv;
         iparams.startup = {};

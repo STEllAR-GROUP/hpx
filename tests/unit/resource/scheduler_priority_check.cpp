@@ -208,7 +208,7 @@ int main(int argc, char* argv[])
     hpx::init_params init_args;
     init_args.argc = argc;
     init_args.argv = argv;
-    init_args.desc_cmdline_ptr = std::make_shared<options_description>(cmdline);
+    init_args.desc_cmdline = cmdline;
     init_args.f = static_cast<hpx_main_type>(::hpx_main);
 
     HPX_TEST_EQ(hpx::init(init_args), 0);

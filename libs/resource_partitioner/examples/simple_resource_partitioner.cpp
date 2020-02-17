@@ -338,8 +338,7 @@ int main(int argc, char* argv[])
     hpx::init_params init_args;
     init_args.argc = argc;
     init_args.argv = argv;
-    init_args.desc_cmdline_ptr = std::make_shared<
-        hpx::program_options::options_description>(desc_cmdline);
+    init_args.desc_cmdline = desc_cmdline;
     init_args.f = static_cast<hpx_main_type>(::hpx_main);
 
     // Set the callback to init the thread_pools

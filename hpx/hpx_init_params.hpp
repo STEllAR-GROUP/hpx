@@ -49,7 +49,11 @@ namespace hpx
     {
         HPX_EXPORT void on_exit() noexcept;
         HPX_EXPORT void on_abort(int signal) noexcept;
+        // Default params to initialize the init_params struct
         static char app_name[] = HPX_APPLICATION_STRING;
+        static const hpx::program_options::options_description default_desc =
+            hpx::program_options::options_description(
+                "Usage: " HPX_APPLICATION_STRING " [options]");
     }
 
 #ifndef DOXYGEN
@@ -60,14 +64,11 @@ namespace hpx
     /// \struct init_params
     /// \brief A struct to contain the hpx::init() parameters
     struct init_params {
-        // Default args
         char *dummy_argv[2] = { detail::app_name , nullptr };
-        using options_description = hpx::program_options::options_description;
-        options_description default_desc = options_description("Usage: " HPX_APPLICATION_STRING " [options]");
         // Parameters
         util::function_nonser<int(hpx::program_options::variables_map& vm)> f;
-        std::shared_ptr<options_description const>
-            desc_cmdline_ptr = std::make_shared<options_description>(default_desc);
+        std::reference_wrapper<hpx::program_options::options_description const>
+            desc_cmdline = detail::default_desc;
         int argc = 1;
         char** argv = dummy_argv;
         std::vector<std::string> cfg;
