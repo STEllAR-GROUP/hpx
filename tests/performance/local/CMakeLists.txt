@@ -180,7 +180,7 @@ set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
 
-if(HPX_WITH_CUDA)
+if(HPX_WITH_CUDA_COMPUTE)
   set_source_files_properties(
     stream.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ
   )

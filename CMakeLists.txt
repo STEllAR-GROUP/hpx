@@ -485,14 +485,27 @@ hpx_option(
   ADVANCED
 )
 
-# ##############################################################################
-# HPX Compute configuration
-# ##############################################################################
-hpx_option(HPX_WITH_CUDA BOOL "Enable CUDA support (default: OFF)" OFF ADVANCED)
-hpx_option(
-  HPX_WITH_CUDA_CLANG BOOL "Use clang to compile CUDA code (default: OFF)" OFF
-  ADVANCED
-)
+################################################################################
+# HPX CUDA Compute configuration
+################################################################################
+hpx_option(HPX_WITH_CUDA BOOL
+  "Enable both CUDA compute+support modules (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_WITH_CUDA_CLANG BOOL
+  "Use clang to compile CUDA code (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_WITH_CUDA_COMPUTE BOOL
+  "Enable CUDA compute module (default: OFF) - "
+  "note: enabling this also enables HPX_WITH_CUDA_SUPPORT" OFF ADVANCED)
+hpx_option(HPX_WITH_CUDA_SUPPORT BOOL
+  "Enable basic support for CUDA futures (default: OFF)" OFF ADVANCED)
+if(HPX_WITH_CUDA)
+  set(HPX_WITH_CUDA_COMPUTE ON CACHE INTERNAL "" FORCE)
+  set(HPX_WITH_CUDA_SUPPORT ON CACHE INTERNAL "" FORCE)
+endif()
+if (HPX_WITH_CUDA_COMPUTE)
+  set(HPX_WITH_CUDA ON CACHE INTERNAL "" FORCE)
+else()
+  set(HPX_WITH_CUDA OFF CACHE INTERNAL "" FORCE)
+endif()
 
 # ##############################################################################
 # HPX datapar configuration

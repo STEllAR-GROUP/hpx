@@ -7,10 +7,6 @@
 include(HPX_Message)
 include(HPX_Option)
 
-if(NOT HPX_WITH_CUDA)
-  return()
-endif()
-
 if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
   hpx_set_option(
     HPX_COMPUTE_CUDA_WITH_TESTS

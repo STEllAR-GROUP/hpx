@@ -6,6 +6,10 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+if (NOT HPX_WITH_CUDA_COMPUTE)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if(HPX_WITH_CUDA)
@@ -28,11 +32,11 @@ if(HPX_WITH_CUDA)
       hpx/compute/detail/iterator.hpp
       hpx/compute/detail/target_distribution_policy.hpp
   )
-
-  set(compute_cuda_compat_headers)
-
-  set(compute_cuda_sources)
 endif()
+
+set(compute_cuda_compat_headers)
+
+set(compute_cuda_sources)
 
 include(HPX_AddModule)
 add_hpx_module(

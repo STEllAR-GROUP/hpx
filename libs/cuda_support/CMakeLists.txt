@@ -6,6 +6,10 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+if (NOT HPX_WITH_CUDA_SUPPORT)
+  return()
+endif()
+
 if (NOT TARGET Cuda::cuda)
     message(FATAL_ERROR "Cuda future support has been enabled, but the Cuda installation is not setup")
 endif()

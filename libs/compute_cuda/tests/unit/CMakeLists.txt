@@ -6,15 +6,16 @@
 
 set(tests)
 
-if(HPX_WITH_CUDA)
-  set(tests ${tests} default_executor for_each_compute for_loop_compute
-            transform_compute
-  )
-  set(default_executor_CUDA On)
-  set(for_each_compute_CUDA On)
-  set(for_loop_compute_CUDA On)
-  set(transform_compute_CUDA On)
-endif()
+set(tests ${tests}
+    default_executor
+    for_each_compute
+    for_loop_compute
+    transform_compute
+   )
+set(default_executor_CUDA On)
+set(for_each_compute_CUDA On)
+set(for_loop_compute_CUDA On)
+set(transform_compute_CUDA On)
 
 foreach(test ${tests})
   if(${${test}_CUDA})
