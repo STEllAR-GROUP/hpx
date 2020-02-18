@@ -271,6 +271,18 @@ namespace hpx
 #endif
     int init(init_params const& params = init_params());
 
+    /// \cond NOINTERNAL
+    namespace resource {
+
+        // Utilities to init the thread_pools of the resource partitioner
+        using rp_callback_type = hpx::util::function_nonser<void(
+                hpx::resource::partitioner&)>;
+        HPX_EXPORT void set_rp_callback(rp_callback_type f);
+
+    }   // namespace resource
+    /// \endcond
+
+#if defined(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function
@@ -908,21 +920,6 @@ namespace hpx
         std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \cond NOINTERNAL
-    namespace resource {
-
-        // forward declaration only
-        class partitioner;
-
-        // Utilities to init the thread_pools of the resource partitioner
-        using rp_callback_type = hpx::util::function_nonser<void(
-                hpx::resource::partitioner&)>;
-        HPX_EXPORT void set_rp_callback(rp_callback_type f);
-
-    }   // namespace resource
-    /// \endcond
-
-
 /// \cond NOINTERNAL
     inline int init(std::nullptr_t f, std::string const& app_name, int argc,
         char** argv, hpx::runtime_mode mode = hpx::runtime_mode_default);
@@ -937,6 +934,8 @@ namespace hpx
     inline int init(std::nullptr_t f, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 /// \endcond
+#endif
+
 }
 
 #ifndef DOXYGEN

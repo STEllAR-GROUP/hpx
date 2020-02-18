@@ -266,6 +266,7 @@ namespace hpx
     ///                     'HPX Command Line Options'.
     inline bool start(init_params const& params = init_params());
 
+#if defined(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is the main, non-blocking entry point for any HPX application.
@@ -908,6 +909,7 @@ namespace hpx
     inline bool start(std::nullptr_t f, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 /// \endcond
+#endif
 }
 
 #ifndef DOXYGEN

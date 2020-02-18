@@ -162,6 +162,7 @@ namespace hpx
         return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
     }
 
+#if defined(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is the main, non-blocking entry point for any HPX application.
@@ -469,7 +470,7 @@ namespace hpx
         iparams.mode = mode;
         return start(f, detail::dummy_argc, detail::dummy_argv, iparams);
     }
-
+#endif
 }
 
 #endif /*HPX_HPX_START_IMPL_HPP*/

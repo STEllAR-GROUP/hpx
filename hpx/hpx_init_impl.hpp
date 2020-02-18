@@ -150,9 +150,7 @@ namespace hpx
         return init(main_f, detail::dummy_argc, detail::dummy_argv, params);
     }
 
-    /* We keep the other overloads to preserve compatibility but they will be
-    removed in the future */
-
+#if defined(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function
@@ -471,6 +469,7 @@ namespace hpx
         iparams.mode = mode;
         return init(main_f, detail::dummy_argc, detail::dummy_argv, iparams);
     }
+#endif
 
 }
 
