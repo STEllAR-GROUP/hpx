@@ -243,7 +243,7 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     INPUT ${OUTPUT_DIR}${template}_${build_type}.pc.in
     )
   # Temporary (to deprecate gradually)
-  if ("${CMAKE_BUILD_TYPE}" MATCHES "Rel")
+  if ("${build_type}" MATCHES "rel")
     file(GENERATE
       OUTPUT ${OUTPUT_DIR}/${template}.pc
       INPUT ${OUTPUT_DIR}${template}_${build_type}.pc.in
