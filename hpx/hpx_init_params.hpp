@@ -56,6 +56,10 @@ namespace hpx
                 "Usage: " HPX_APPLICATION_STRING " [options]");
         static startup_function_type default_startup = startup_function_type();
         static shutdown_function_type default_shutdown = shutdown_function_type();
+        static int dummy_argc = 1;
+        // TODO: make it only one parameter, probably add a cast
+        static char *default_argv[2] = { detail::app_name , nullptr };
+        static char **dummy_argv = default_argv;
     }
 
 #ifndef DOXYGEN
@@ -66,12 +70,9 @@ namespace hpx
     /// \struct init_params
     /// \brief A struct to contain the hpx::init() parameters
     struct init_params {
-        char *dummy_argv[2] = { detail::app_name , nullptr };
         // Parameters
         std::reference_wrapper<hpx::program_options::options_description const>
             desc_cmdline = detail::default_desc;
-        int argc = 1;
-        char** argv = dummy_argv;
         std::vector<std::string> cfg;
         startup_function_type& startup = detail::default_startup;
         shutdown_function_type& shutdown = detail::default_startup;

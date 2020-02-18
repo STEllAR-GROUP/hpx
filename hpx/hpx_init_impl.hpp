@@ -98,6 +98,10 @@ namespace hpx
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f
             = util::bind_back(detail::init_helper, f);
+        if (argc == 0 || argv == nullptr)
+        {
+            return init(main_f, detail::dummy_argc, detail::dummy_argv, params);
+        }
         return init(main_f, argc, argv, params);
     }
 
@@ -111,6 +115,10 @@ namespace hpx
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f
             = static_cast<hpx_main_type>(::hpx_main);
+        if (argc == 0 || argv == nullptr)
+        {
+            return init(main_f, detail::dummy_argc, detail::dummy_argv, params);
+        }
         return init(main_f, argc, argv, params);
     }
 
@@ -123,6 +131,10 @@ namespace hpx
     inline int init(std::nullptr_t f, int argc, char** argv, init_params const& params)
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
+        if (argc == 0 || argv == nullptr)
+        {
+            return init(main_f, detail::dummy_argc, detail::dummy_argv, params);
+        }
         return init(main_f, argc, argv, params);
     }
 
@@ -135,7 +147,7 @@ namespace hpx
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f
             = static_cast<hpx_main_type>(::hpx_main);
-        return init(main_f, 1, params.dummy_argv, params);
+        return init(main_f, detail::dummy_argc, detail::dummy_argv, params);
     }
 
     /* We keep the other overloads to preserve compatibility but they will be
@@ -316,7 +328,7 @@ namespace hpx
         hpx::init_params iparams;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(1, iparams.dummy_argv, iparams);
+        return init(detail::dummy_argc, detail::dummy_argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -338,7 +350,7 @@ namespace hpx
 
         if (argc == 0 || argv == nullptr)
         {
-            return init(1, iparams.dummy_argv, iparams);
+            return init(detail::dummy_argc, detail::dummy_argv, iparams);
         }
 
         return init(f, argc, argv, iparams);
@@ -352,7 +364,7 @@ namespace hpx
 
         if (argc == 0 || argv == nullptr)
         {
-            return init(1, iparams.dummy_argv, iparams);
+            return init(detail::dummy_argc, detail::dummy_argv, iparams);
         }
 
         iparams.mode = mode;
@@ -401,7 +413,7 @@ namespace hpx
         hpx::init_params iparams;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(f, 1, iparams.dummy_argv, iparams);
+        return init(f, detail::dummy_argc, detail::dummy_argv, iparams);
     }
 
     inline int
@@ -457,7 +469,7 @@ namespace hpx
         hpx::init_params iparams;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(main_f, 1, iparams.dummy_argv, iparams);
+        return init(main_f, detail::dummy_argc, detail::dummy_argv, iparams);
     }
 
 }

@@ -102,6 +102,10 @@ namespace hpx
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f
             = util::bind_back(detail::init_helper, f);
+        if (argc == 0 || argv == nullptr)
+        {
+            return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
+        }
         return start(main_f, argc, argv, params);
     }
 
@@ -117,6 +121,10 @@ namespace hpx
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f
             = static_cast<hpx_main_type>(::hpx_main);
+        if (argc == 0 || argv == nullptr)
+        {
+            return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
+        }
         return start(main_f, argc, argv, params);
     }
 
@@ -132,6 +140,10 @@ namespace hpx
         init_params const& params)
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
+        if (argc == 0 || argv == nullptr)
+        {
+            return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
+        }
         return start(main_f, argc, argv, params);
     }
 
@@ -147,7 +159,7 @@ namespace hpx
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f
             = static_cast<hpx_main_type>(::hpx_main);
-        return start(main_f, 1, params.argv, params);
+        return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -353,7 +365,7 @@ namespace hpx
         hpx::init_params iparams;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return start(1, iparams.dummy_argv, iparams);
+        return start(detail::dummy_argc, detail::dummy_argv, iparams);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -378,7 +390,7 @@ namespace hpx
 
         if (argc == 0 || argv == nullptr)
         {
-            return start(1, iparams.dummy_argv, iparams);
+            return start(detail::dummy_argc, detail::dummy_argv, iparams);
         }
 
         return start(f, argc, argv, iparams);
@@ -420,7 +432,7 @@ namespace hpx
         hpx::init_params iparams;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return start(f, 1, iparams.dummy_argv, iparams);
+        return start(f, detail::dummy_argc, detail::dummy_argv, iparams);
     }
 
     inline bool start(std::nullptr_t f, std::string const& app_name, int argc,
@@ -455,7 +467,7 @@ namespace hpx
         hpx::init_params iparams;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return start(f, 1, iparams.dummy_argv, iparams);
+        return start(f, detail::dummy_argc, detail::dummy_argv, iparams);
     }
 
 }
