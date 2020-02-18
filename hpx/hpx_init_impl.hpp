@@ -51,6 +51,10 @@ namespace hpx
 #if defined(HPX_WINDOWS)
         void init_winsocket();
 #endif
+
+        HPX_EXPORT int init_helper(
+            hpx::program_options::variables_map&,
+            util::function_nonser<int(int, char**)> const&);
     }
     /// \endcond
 
@@ -60,7 +64,9 @@ namespace hpx
     /// (or one of its overloads below) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread.
-    inline int init(hpx::init_params& params)
+    inline int init(util::function_nonser<
+        int(hpx::program_options::variables_map&)> const& f,
+        int argc, char** argv, init_params const& params)
     {
 #if defined(HPX_WINDOWS)
         detail::init_winsocket();
@@ -75,12 +81,65 @@ namespace hpx
 #if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
         std::at_quick_exit(detail::on_exit);
 #endif
-
-        return detail::run_or_start(params.f, params.desc_cmdline,
-            params.argc, params.argv, hpx_startup::user_main_config(params.cfg),
+        return detail::run_or_start(f, params.desc_cmdline, argc, argv,
+            hpx_startup::user_main_config(params.cfg),
             std::move(params.startup), std::move(params.shutdown), params.mode,
             params.rp_mode, true);
     }
+
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is the main entry point for any HPX application. This function
+    /// (or one of its overloads below) should be called from the users `main()`
+    /// function. It will set up the HPX runtime environment and schedule the
+    /// function given by \p f as a HPX thread.
+    inline int init(util::function_nonser<int(int, char**)> const& f, int argc,
+        char** argv, init_params const& params)
+    {
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f
+            = util::bind_back(detail::init_helper, f);
+        return init(main_f, argc, argv, params);
+    }
+
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is the main entry point for any HPX application. This function
+    /// (or one of its overloads below) should be called from the users `main()`
+    /// function. It will set up the HPX runtime environment and schedule the
+    /// function given by \p f as a HPX thread.
+    inline int init(int argc, char** argv, init_params const& params)
+    {
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f
+            = static_cast<hpx_main_type>(::hpx_main);
+        return init(main_f, argc, argv, params);
+    }
+
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is the main entry point for any HPX application. This function
+    /// (or one of its overloads below) should be called from the users `main()`
+    /// function. It will set up the HPX runtime environment and schedule the
+    /// function given by \p f as a HPX thread.
+    inline int init(std::nullptr_t f, int argc, char** argv, init_params const& params)
+    {
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
+        return init(main_f, argc, argv, params);
+    }
+
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main entry point, which can be used to set up the
+    /// runtime for an HPX application (the runtime system will be set up in
+    /// console mode or worker mode depending on the command line settings).
+    inline int init(init_params const& params)
+    {
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f
+            = static_cast<hpx_main_type>(::hpx_main);
+        return init(main_f, 1, params.dummy_argv, params);
+    }
+
+    /* We keep the other overloads to preserve compatibility but they will be
+    removed in the future */
 
     /// \brief Main entry point for launching the HPX runtime system.
     ///
@@ -98,15 +157,12 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = f;
         iparams.desc_cmdline = desc_cmdline;
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.cfg = cfg;
         iparams.startup = std::move(startup);
         iparams.shutdown = std::move(shutdown);
         iparams.mode = mode;
-        return init(iparams);
+        return init(f, argc, argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -122,14 +178,11 @@ namespace hpx
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = f;
         iparams.desc_cmdline = desc_cmdline;
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.startup = std::move(startup);
         iparams.shutdown = std::move(shutdown);
         iparams.mode = mode;
-        return init(iparams);
+        return init(f, argc, argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -146,14 +199,11 @@ namespace hpx
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = static_cast<hpx_main_type>(::hpx_main);
         iparams.desc_cmdline = desc_cmdline;
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.startup = std::move(startup);
         iparams.shutdown = std::move(shutdown);
         iparams.mode = mode;
-        return init(iparams);
+        return init(argc, argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -171,15 +221,12 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = static_cast<hpx_main_type>(::hpx_main);
         iparams.desc_cmdline = desc_cmdline;
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.cfg = cfg;
         iparams.startup = std::move(startup);
         iparams.shutdown = std::move(shutdown);
         iparams.mode = mode;
-        return init(iparams);
+        return init(argc, argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -195,12 +242,9 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = static_cast<hpx_main_type>(::hpx_main);
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(iparams);
+        return init(argc, argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -216,12 +260,9 @@ namespace hpx
         int argc, char** argv, hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = static_cast<hpx_main_type>(::hpx_main);
         iparams.desc_cmdline = desc_cmdline;
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.mode = mode;
-        return init(iparams);
+        return init(argc, argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -238,13 +279,10 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = static_cast<hpx_main_type>(::hpx_main);
         iparams.desc_cmdline = desc_cmdline;
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(iparams);
+        return init(argc, argv, iparams);
     }
 
     /// \fn int init(std::string const& app_name, int argc = 0, char** argv = nullptr)
@@ -262,27 +300,9 @@ namespace hpx
         options_description desc = options_description("Usage: " + app_name +
                 " [options]");
         hpx::init_params iparams;
-        iparams.f = static_cast<hpx_main_type>(::hpx_main);
         iparams.desc_cmdline = desc;
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.mode = mode;
-        return init(iparams);
-    }
-
-    /// \brief Main entry point for launching the HPX runtime system.
-    ///
-    /// This is a simplified main entry point, which can be used to set up the
-    /// runtime for an HPX application (the runtime system will be set up in
-    /// console mode or worker mode depending on the command line settings).
-    inline int init(int argc, char** argv, hpx::runtime_mode mode)
-    {
-        hpx::init_params iparams;
-        iparams.f = static_cast<hpx_main_type>(::hpx_main);
-        iparams.argc = argc;
-        iparams.argv = argv;
-        iparams.mode = mode;
-        return init(iparams);
+        return init(argc, argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -294,10 +314,9 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = static_cast<hpx_main_type>(::hpx_main);
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(iparams);
+        return init(1, iparams.dummy_argv, iparams);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -319,14 +338,10 @@ namespace hpx
 
         if (argc == 0 || argv == nullptr)
         {
-            iparams.f = static_cast<hpx_main_type>(::hpx_main);
-            return init(iparams);
+            return init(1, iparams.dummy_argv, iparams);
         }
 
-        iparams.f = f;
-        iparams.argc = argc;
-        iparams.argv = argv;
-        return init(iparams);
+        return init(f, argc, argv, iparams);
     }
 
     // Main entry point for launching the HPX runtime system.
@@ -337,25 +352,12 @@ namespace hpx
 
         if (argc == 0 || argv == nullptr)
         {
-            iparams.f = static_cast<hpx_main_type>(::hpx_main);
-            return init(iparams);
+            return init(1, iparams.dummy_argv, iparams);
         }
 
-        iparams.f = f;
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.mode = mode;
-        return init(iparams);
+        return init(f, argc, argv, iparams);
     }
-
-    /// \cond NOINTERNAL
-    namespace detail
-    {
-        HPX_EXPORT int init_helper(
-            hpx::program_options::variables_map&,
-            util::function_nonser<int(int, char**)> const&);
-    }
-    /// \endcond
 
     /// \brief Main entry point for launching the HPX runtime system.
     ///
@@ -373,31 +375,9 @@ namespace hpx
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
-        iparams.f = util::bind_back(detail::init_helper, f);
         iparams.desc_cmdline = desc_cmdline;
-        iparams.argc = argc;
-        iparams.argv = argv;
-        iparams.startup = {};
-        iparams.shutdown = {};
         iparams.mode = mode;
-        return init(iparams);
-    }
-
-    // Main entry point for launching the HPX runtime system.
-    inline int
-    init(util::function_nonser<int(int, char**)> const& f,
-        int argc, char** argv, hpx::runtime_mode mode)
-    {
-        HPX_ASSERT(argc != 0 && argv != nullptr);
-
-        hpx::init_params iparams;
-        iparams.f = util::bind_back(detail::init_helper, f);
-        iparams.argc = argc;
-        iparams.argv = argv;
-        iparams.startup = {};
-        iparams.shutdown = {};
-        iparams.mode = mode;
-        return init(iparams);
+        return init(f, argc, argv, iparams);
     }
 
     inline int
@@ -408,12 +388,9 @@ namespace hpx
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
-        iparams.f = util::bind_back(detail::init_helper, f);
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(iparams);
+        return init(f, argc, argv, iparams);
     }
 
     inline int
@@ -422,12 +399,9 @@ namespace hpx
         hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
-        iparams.f = util::bind_back(detail::init_helper, f);
         iparams.cfg = cfg;
-        iparams.startup = {};
-        iparams.shutdown = {};
         iparams.mode = mode;
-        return init(iparams);
+        return init(f, 1, iparams.dummy_argv, iparams);
     }
 
     inline int
@@ -437,17 +411,14 @@ namespace hpx
         using hpx::program_options::options_description;
         options_description desc_cmdline("Usage: " + app_name +  " [options]");
 
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
+
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
         hpx::init_params iparams;
-        iparams.f = {};
         iparams.desc_cmdline = desc_cmdline;
-        iparams.argc = argc;
-        iparams.argv = argv;
-        iparams.startup = {};
-        iparams.shutdown = {};
         iparams.mode = mode;
-        return init(iparams);
+        return init(main_f, argc, argv, iparams);
     }
 
     inline int
@@ -456,14 +427,11 @@ namespace hpx
     {
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
+
         hpx::init_params iparams;
-        iparams.f = {};
-        iparams.argc = argc;
-        iparams.argv = argv;
-        iparams.startup = {};
-        iparams.shutdown = {};
         iparams.mode = mode;
-        return init(iparams);
+        return init(main_f, argc, argv, iparams);
     }
 
     inline int
@@ -473,24 +441,23 @@ namespace hpx
     {
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
+
         hpx::init_params iparams;
-        iparams.f = {};
-        iparams.argc = argc;
-        iparams.argv = argv;
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(iparams);
+        return init(main_f, argc, argv, iparams);
     }
 
     inline int
     init(std::nullptr_t, std::vector<std::string> const& cfg,
          hpx::runtime_mode mode)
     {
+        util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
         hpx::init_params iparams;
-        iparams.f = {};
         iparams.cfg = cfg;
         iparams.mode = mode;
-        return init(iparams);
+        return init(main_f, 1, iparams.dummy_argv, iparams);
     }
 
 }

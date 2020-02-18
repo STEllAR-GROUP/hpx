@@ -54,6 +54,8 @@ namespace hpx
         static const hpx::program_options::options_description default_desc =
             hpx::program_options::options_description(
                 "Usage: " HPX_APPLICATION_STRING " [options]");
+        static startup_function_type default_startup = startup_function_type();
+        static shutdown_function_type default_shutdown = shutdown_function_type();
     }
 
 #ifndef DOXYGEN
@@ -66,14 +68,13 @@ namespace hpx
     struct init_params {
         char *dummy_argv[2] = { detail::app_name , nullptr };
         // Parameters
-        util::function_nonser<int(hpx::program_options::variables_map& vm)> f;
         std::reference_wrapper<hpx::program_options::options_description const>
             desc_cmdline = detail::default_desc;
         int argc = 1;
         char** argv = dummy_argv;
         std::vector<std::string> cfg;
-        startup_function_type startup = startup_function_type();
-        shutdown_function_type shutdown = shutdown_function_type();
+        startup_function_type& startup = detail::default_startup;
+        shutdown_function_type& shutdown = detail::default_startup;
         hpx::runtime_mode mode = ::hpx::runtime_mode_default;
         hpx::resource::partitioner_mode rp_mode = ::hpx::resource::mode_default;
     };
