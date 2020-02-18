@@ -23,13 +23,7 @@ if(HPX_WITH_GOOGLE_PERFTOOLS AND NOT TARGET hpx::gperftools)
   endif()
 
   add_library(hpx::gperftools INTERFACE IMPORTED)
-  set_property(TARGET hpx::gperftools PROPERTY
-    INTERFACE_INCLUDE_DIRECTORIES ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    set_property(TARGET hpx::gperftools PROPERTY
-      INTERFACE_LINK_LIBRARIES ${GOOGLE_PERFTOOLS_LIBRARIES})
-  else()
-    target_link_libraries(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_LIBRARIES})
-  endif()
+  target_include_directories(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+  target_link_libraries(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_LIBRARIES})
 
 endif()

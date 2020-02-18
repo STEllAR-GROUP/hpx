@@ -95,18 +95,11 @@ function(hpx_setup_target target)
     endif()
   endif()
 
-  if(HPX_INCLUDE_DIRS)
-    set_property(TARGET ${target} APPEND
-      PROPERTY INCLUDE_DIRECTORIES
-      "${HPX_INCLUDE_DIRS}"
-    )
-  endif()
-
   if("${_type}" STREQUAL "EXECUTABLE")
-    set_property(TARGET ${target} APPEND
-                 PROPERTY COMPILE_DEFINITIONS
-                 "HPX_APPLICATION_NAME=${name}"
-                 "HPX_APPLICATION_STRING=\"${name}\"")
+    target_compile_definitions(${target}
+      PRIVATE
+      "HPX_APPLICATION_NAME=${name}"
+      "HPX_APPLICATION_STRING=\"${name}\"")
 
     if(target_HPX_PREFIX)
       set(_prefix ${target_HPX_PREFIX})
@@ -115,9 +108,8 @@ function(hpx_setup_target target)
         string(REPLACE ";" ":" _prefix "${_prefix}")
       endif()
 
-      set_property(TARGET ${target} APPEND
-                   PROPERTY COMPILE_DEFINITIONS
-                   "HPX_PREFIX=\"${_prefix}\"")
+      target_compile_definitions(${target} PRIVATE
+        "HPX_PREFIX=\"${_prefix}\"")
     endif()
   endif()
 
@@ -148,10 +140,10 @@ function(hpx_setup_target target)
   endif()
 
   if("${_type}" STREQUAL "COMPONENT")
-    set_property(TARGET ${target} APPEND
-                 PROPERTY COMPILE_DEFINITIONS
-                 "HPX_COMPONENT_NAME=hpx_${name}"
-                 "HPX_COMPONENT_STRING=\"hpx_${name}\"")
+    target_compile_definitions(${target}
+      PRIVATE
+      "HPX_COMPONENT_NAME=hpx_${name}"
+      "HPX_COMPONENT_STRING=\"hpx_${name}\"")
     target_link_libraries(${target} ${__tll_public}
       $<TARGET_NAME_IF_EXISTS:component>
       $<TARGET_NAME_IF_EXISTS:HPX::component>)

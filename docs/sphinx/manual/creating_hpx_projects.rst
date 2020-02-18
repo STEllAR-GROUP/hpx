@@ -185,7 +185,7 @@ The basic structure to include |hpx| into your CMakeLists.txt is shown here:
 .. code-block:: cmake
 
    # Require a recent version of cmake
-   cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+   cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
    # This project is C++ based.
    project(your_app CXX)

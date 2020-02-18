@@ -22,7 +22,7 @@ lib_name_upper = lib_name.upper()
 header_str = '=' * len(lib_name)
 
 # CMake minimum version
-cmake_version = '3.3.2'
+cmake_version = '3.13'
 
 cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
 #

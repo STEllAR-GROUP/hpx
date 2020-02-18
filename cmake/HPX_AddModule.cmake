@@ -78,11 +78,10 @@ function(add_hpx_module name)
   endif()
 
   # Write full path for the sources files
-  include(HPX_CMakeUtils)
-  prepend(sources ${SOURCE_ROOT} ${${name}_SOURCES})
-  prepend(headers ${HEADER_ROOT} ${${name}_HEADERS})
+  list(TRANSFORM ${name}_SOURCES PREPEND ${SOURCE_ROOT}/ OUTPUT_VARIABLE sources)
+  list(TRANSFORM ${name}_HEADERS PREPEND ${HEADER_ROOT}/ OUTPUT_VARIABLE headers)
   if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
-    prepend(compat_headers ${COMPAT_HEADER_ROOT} ${${name}_COMPAT_HEADERS})
+    list(TRANSFORM ${name}_COMPAT_HEADERS PREPEND ${COMPAT_HEADER_ROOT}/ OUTPUT_VARIABLE compat_headers)
   endif()
 
   # This header generation is disabled for config module specific generated

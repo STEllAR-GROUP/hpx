@@ -70,12 +70,11 @@ function(add_hpx_component name)
       ROOT ${${name}_HEADER_ROOT}
       TARGETS ${${name}_component_HEADERS})
   else()
-    include(HPX_CMakeUtils)
     if(${name}_PREPEND_SOURCE_ROOT)
-      prepend(${name}_SOURCES ${${name}_SOURCE_ROOT} ${${name}_SOURCES})
+      list(TRANSFORM ${name}_SOURCES PREPEND ${${name}_SOURCE_ROOT}/)
     endif()
     if(${name}_PREPEND_HEADER_ROOT)
-      prepend(${name}_HEADERS ${${name}_HEADER_ROOT} ${${name}_HEADERS})
+      list(TRANSFORM ${name}_HEADERS PREPEND ${${name}_HEADER_ROOT}/)
     endif()
 
     add_hpx_library_sources_noglob(${name}_component
