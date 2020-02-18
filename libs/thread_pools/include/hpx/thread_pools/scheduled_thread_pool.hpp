@@ -9,14 +9,14 @@
 #define HPX_SCHEDULED_THREAD_POOL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
-#include <hpx/threading_base/network_background_callback.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
@@ -34,8 +34,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     struct init_tss_helper;
@@ -73,7 +72,8 @@ namespace hpx { namespace threads { namespace detail
         }
 
         void create_thread(thread_init_data& data, thread_id_type& id,
-            thread_state_enum initial_state, bool run_now, error_code& ec) override;
+            thread_state_enum initial_state, bool run_now,
+            error_code& ec) override;
 
         void create_work(thread_init_data& data,
             thread_state_enum initial_state, error_code& ec) override;
@@ -82,12 +82,13 @@ namespace hpx { namespace threads { namespace detail
             thread_state_enum new_state, thread_state_ex_enum new_state_ex,
             thread_priority priority, error_code& ec) override;
 
-        thread_id_type set_state(
-            util::steady_time_point const& abs_time, thread_id_type const& id,
-            thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority, error_code& ec) override;
+        thread_id_type set_state(util::steady_time_point const& abs_time,
+            thread_id_type const& id, thread_state_enum newstate,
+            thread_state_ex_enum newstate_ex, thread_priority priority,
+            error_code& ec) override;
 
-        void report_error(std::size_t num, std::exception_ptr const& e) override;
+        void report_error(
+            std::size_t num, std::exception_ptr const& e) override;
 
         void abort_all_suspended_threads() override
         {
@@ -124,8 +125,8 @@ namespace hpx { namespace threads { namespace detail
         }
 
         ///////////////////////////////////////////////////////////////////
-        bool run(std::unique_lock<std::mutex>& l,
-            std::size_t pool_threads) override;
+        bool run(
+            std::unique_lock<std::mutex>& l, std::size_t pool_threads) override;
 
         template <typename Lock>
         void stop_locked(Lock& l, bool blocking = true);
@@ -135,10 +136,10 @@ namespace hpx { namespace threads { namespace detail
         void suspend_direct(error_code& ec = throws) override;
         void resume_direct(error_code& ec = throws) override;
 
-        void suspend_processing_unit_direct(std::size_t virt_core,
-            error_code& = hpx::throws) override;
-        void resume_processing_unit_direct(std::size_t virt_core,
-            error_code& = hpx::throws) override;
+        void suspend_processing_unit_direct(
+            std::size_t virt_core, error_code& = hpx::throws) override;
+        void resume_processing_unit_direct(
+            std::size_t virt_core, error_code& = hpx::throws) override;
 
         ///////////////////////////////////////////////////////////////////
         std::thread& get_os_thread_handle(
@@ -162,7 +163,7 @@ namespace hpx { namespace threads { namespace detail
         {
             std::size_t active_os_thread_count = 0;
             for (std::size_t thread_num = 0; thread_num < threads_.size();
-                ++thread_num)
+                 ++thread_num)
             {
                 if (sched_->Scheduler::get_state(thread_num).load() ==
                     state_running)
@@ -248,15 +249,18 @@ namespace hpx { namespace threads { namespace detail
 
         std::int64_t get_cumulative_duration(std::size_t, bool) override;
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
         std::int64_t get_background_work_duration(std::size_t, bool) override;
         std::int64_t get_background_overhead(std::size_t, bool) override;
 
         std::int64_t get_background_send_duration(std::size_t, bool) override;
         std::int64_t get_background_send_overhead(std::size_t, bool) override;
 
-        std::int64_t get_background_receive_duration(std::size_t, bool) override;
-        std::int64_t get_background_receive_overhead(std::size_t, bool) override;
+        std::int64_t get_background_receive_duration(
+            std::size_t, bool) override;
+        std::int64_t get_background_receive_overhead(
+            std::size_t, bool) override;
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -284,8 +288,8 @@ namespace hpx { namespace threads { namespace detail
         void get_statistics(executor_statistics& s, error_code&) const override;
 
         // Provide the given processing unit to the scheduler.
-        void add_processing_unit(std::size_t virt_core,
-            std::size_t thread_num, error_code&  = hpx::throws) override;
+        void add_processing_unit(std::size_t virt_core, std::size_t thread_num,
+            error_code& = hpx::throws) override;
 
         // Remove the given processing unit from the scheduler.
         void remove_processing_unit(
@@ -304,7 +308,7 @@ namespace hpx { namespace threads { namespace detail
             error_code& ec = hpx::throws);
 
     private:
-        std::vector<std::thread> threads_;           // vector of OS-threads
+        std::vector<std::thread> threads_;    // vector of OS-threads
 
         // hold the used scheduler
         std::unique_ptr<Scheduler> sched_;
@@ -366,7 +370,8 @@ namespace hpx { namespace threads { namespace detail
             std::int64_t tfunc_times_;
             std::int64_t reset_tfunc_times_;
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
             // overall counters for background work
             std::int64_t background_duration_;
             std::int64_t reset_background_duration_;

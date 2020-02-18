@@ -33,8 +33,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     /// A pool of io_service objects.
     class HPX_EXPORT io_service_pool
     {
@@ -92,17 +91,23 @@ namespace hpx { namespace util
         std::thread& get_os_thread_handle(std::size_t thread_num);
 
         /// \brief Get number of threads associated with this I/O service.
-        std::size_t size() const { return pool_size_; }
+        std::size_t size() const
+        {
+            return pool_size_;
+        }
 
         /// \brief Activate the thread \a index for this thread pool
         void thread_run(std::size_t index, barrier* startup = nullptr);
 
         /// \brief Return name of this pool
-        char const* get_name() const { return pool_name_; }
+        char const* get_name() const
+        {
+            return pool_name_;
+        }
 
     protected:
-        bool run_locked(std::size_t num_threads, bool join_threads,
-            barrier* startup);
+        bool run_locked(
+            std::size_t num_threads, bool join_threads, barrier* startup);
         void stop_locked();
         void join_locked();
         void clear_locked();
@@ -113,57 +118,58 @@ namespace hpx { namespace util
 
 // FIXME: Intel compilers don't like this
 #if defined(HPX_NATIVE_MIC)
-        typedef std::unique_ptr<boost::asio::io_service::work> work_type;
+            typedef std::unique_ptr<boost::asio::io_service::work> work_type;
 #else
-        using work_type = boost::asio::io_service::work;
+            using work_type = boost::asio::io_service::work;
 #endif
 
-        HPX_FORCEINLINE work_type initialize_work(boost::asio::io_service& io_service)
-        {
-            return work_type(
+            HPX_FORCEINLINE work_type initialize_work(
+                boost::asio::io_service& io_service)
+            {
+                return work_type(
 // FIXME: Intel compilers don't like this
 #if defined(HPX_NATIVE_MIC)
                     new boost::asio::io_service::work(io_service)
 #else
                     io_service
 #endif
-            );
-        }
+                );
+            }
 
-        std::mutex mtx_;
+            std::mutex mtx_;
 
-        /// The pool of io_services.
-        std::vector<io_service_ptr> io_services_;
-        std::vector<std::thread> threads_;
+            /// The pool of io_services.
+            std::vector<io_service_ptr> io_services_;
+            std::vector<std::thread> threads_;
 
-        /// The work that keeps the io_services running.
-        std::vector<work_type> work_;
+            /// The work that keeps the io_services running.
+            std::vector<work_type> work_;
 
-        /// The next io_service to use for a connection.
-        std::size_t next_io_service_;
+            /// The next io_service to use for a connection.
+            std::size_t next_io_service_;
 
-        /// set to true if stopped
-        bool stopped_;
+            /// set to true if stopped
+            bool stopped_;
 
-        /// initial number of OS threads to execute in this pool
-        std::size_t pool_size_;
+            /// initial number of OS threads to execute in this pool
+            std::size_t pool_size_;
 
-        /// call this for each thread start/stop
-        threads::policies::callback_notifier const& notifier_;
+            /// call this for each thread start/stop
+            threads::policies::callback_notifier const& notifier_;
 
-        char const* pool_name_;
-        char const* pool_name_postfix_;
+            char const* pool_name_;
+            char const* pool_name_postfix_;
 
-        /// Set to true if waiting for work to finish
-        bool waiting_;
+            /// Set to true if waiting for work to finish
+            bool waiting_;
 
-        // Barriers for waiting for work to finish on all worker threads
-        barrier wait_barrier_;
-        barrier continue_barrier_;
-    };
+            // Barriers for waiting for work to finish on all worker threads
+            barrier wait_barrier_;
+            barrier continue_barrier_;
+        };
 
-///////////////////////////////////////////////////////////////////////////////
-}}  // namespace hpx::util
+        ///////////////////////////////////////////////////////////////////////////////
+}}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
 

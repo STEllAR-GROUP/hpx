@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/lcos_fwd.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -23,14 +23,13 @@
 #include <exception>
 #include <iosfwd>
 #include <mutex>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     using thread_termination_handler_type =
         std::function<void(std::exception_ptr const& e)>;
@@ -47,9 +46,9 @@ namespace hpx
 
         thread() noexcept;
 
-        template <typename F, typename Enable = typename
-            std::enable_if<!std::is_same<typename hpx::util::decay<F>::type,
-                thread>::value>::type>
+        template <typename F,
+            typename Enable = typename std::enable_if<!std::is_same<
+                typename hpx::util::decay<F>::type, thread>::value>::type>
         explicit thread(F&& f)
         {
             auto thrd_data = threads::get_self_id_data();
@@ -104,7 +103,7 @@ namespace hpx
 
         id get_id() const noexcept;
 
-        native_handle_type native_handle() const //-V659
+        native_handle_type native_handle() const    //-V659
         {
             std::lock_guard<mutex_type> l(mtx_);
             return id_;
@@ -152,75 +151,88 @@ namespace hpx
     private:
         threads::thread_id_type id_;
 
-        friend bool operator== (thread::id const& x, thread::id const& y) noexcept;
-        friend bool operator!= (thread::id const& x, thread::id const& y) noexcept;
-        friend bool operator< (thread::id const& x, thread::id const& y) noexcept;
-        friend bool operator> (thread::id const& x, thread::id const& y) noexcept;
-        friend bool operator<= (thread::id const& x, thread::id const& y) noexcept;
-        friend bool operator>= (thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator==(
+            thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator!=(
+            thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator<(
+            thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator>(
+            thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator<=(
+            thread::id const& x, thread::id const& y) noexcept;
+        friend bool operator>=(
+            thread::id const& x, thread::id const& y) noexcept;
 
         template <typename Char, typename Traits>
-        friend std::basic_ostream<Char, Traits>&
-        operator<< (std::basic_ostream<Char, Traits>&, thread::id const&);
+        friend std::basic_ostream<Char, Traits>& operator<<(
+            std::basic_ostream<Char, Traits>&, thread::id const&);
 
         friend class thread;
 
     public:
-        id() noexcept : id_(threads::invalid_thread_id) {}
+        id() noexcept
+          : id_(threads::invalid_thread_id)
+        {
+        }
         explicit id(threads::thread_id_type const& i) noexcept
           : id_(i)
-        {}
-        explicit id(threads::thread_id_type && i) noexcept
+        {
+        }
+        explicit id(threads::thread_id_type&& i) noexcept
           : id_(std::move(i))
-        {}
+        {
+        }
 
-        threads::thread_id_type const& native_handle() const { return id_; }
+        threads::thread_id_type const& native_handle() const
+        {
+            return id_;
+        }
     };
 
-    inline bool operator== (thread::id const& x, thread::id const& y) noexcept
+    inline bool operator==(thread::id const& x, thread::id const& y) noexcept
     {
         return x.id_ == y.id_;
     }
 
-    inline bool operator!= (thread::id const& x, thread::id const& y) noexcept
+    inline bool operator!=(thread::id const& x, thread::id const& y) noexcept
     {
         return !(x == y);
     }
 
-    inline bool operator< (thread::id const& x, thread::id const& y) noexcept
+    inline bool operator<(thread::id const& x, thread::id const& y) noexcept
     {
         return x.id_ < y.id_;
     }
 
-    inline bool operator> (thread::id const& x, thread::id const& y) noexcept
+    inline bool operator>(thread::id const& x, thread::id const& y) noexcept
     {
         return y < x;
     }
 
-    inline bool operator<= (thread::id const& x, thread::id const& y) noexcept
+    inline bool operator<=(thread::id const& x, thread::id const& y) noexcept
     {
         return !(x > y);
     }
 
-    inline bool operator>= (thread::id const& x, thread::id const& y) noexcept
+    inline bool operator>=(thread::id const& x, thread::id const& y) noexcept
     {
         return !(x < y);
     }
 
     template <typename Char, typename Traits>
-    std::basic_ostream<Char, Traits>&
-    operator<< (std::basic_ostream<Char, Traits>& out, thread::id const& id)
+    std::basic_ostream<Char, Traits>& operator<<(
+        std::basic_ostream<Char, Traits>& out, thread::id const& id)
     {
         out << id.id_;
         return out;
     }
 
-//     template <class T> struct hash;
-//     template <> struct hash<thread::id>;
+    //     template <class T> struct hash;
+    //     template <> struct hash<thread::id>;
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace this_thread
-    {
+    namespace this_thread {
         HPX_API_EXPORT thread::id get_id() noexcept;
 
         HPX_API_EXPORT void yield() noexcept;
@@ -236,7 +248,8 @@ namespace hpx
 
         HPX_API_EXPORT void interrupt();
 
-        HPX_API_EXPORT void sleep_until(util::steady_time_point const& abs_time);
+        HPX_API_EXPORT void sleep_until(
+            util::steady_time_point const& abs_time);
 
         inline void sleep_for(util::steady_duration const& rel_time)
         {
@@ -272,8 +285,8 @@ namespace hpx
             explicit restore_interruption(disable_interruption& d);
             ~restore_interruption();
         };
-    }
-}
+    }    // namespace this_thread
+}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
 

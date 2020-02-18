@@ -14,10 +14,10 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/thread.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
@@ -81,7 +81,8 @@ namespace hpx {
                 }
                 catch (...)
                 {
-                    detail::thread_termination_handler(std::current_exception());
+                    detail::thread_termination_handler(
+                        std::current_exception());
                 }
             }
             else

@@ -10,7 +10,8 @@
 
 #if defined(HPX_IO_SERVICE_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message("The header hpx/util/io_service_thread_pool.hpp is deprecated, \
+#pragma message(                                                               \
+    "The header hpx/util/io_service_thread_pool.hpp is deprecated, \
     please include hpx/io_service/io_service_thread_pool.hpp instead")
 #else
 #warning "The header hpx/util/io_service_thread_pool.hpp is deprecated, \

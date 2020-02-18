@@ -20,11 +20,11 @@
 #include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
@@ -620,30 +620,12 @@ namespace hpx { namespace threads { namespace policies {
             stolen_to_staged_.fetch_add(num, std::memory_order_relaxed);
         }
 #else
-        constexpr void increment_num_pending_misses(
-            std::size_t num = 1)
-        {
-        }
-        constexpr void increment_num_pending_accesses(
-            std::size_t num = 1)
-        {
-        }
-        constexpr void increment_num_stolen_from_pending(
-            std::size_t num = 1)
-        {
-        }
-        constexpr void increment_num_stolen_from_staged(
-            std::size_t num = 1)
-        {
-        }
-        constexpr void increment_num_stolen_to_pending(
-            std::size_t num = 1)
-        {
-        }
-        constexpr void increment_num_stolen_to_staged(
-            std::size_t num = 1)
-        {
-        }
+        constexpr void increment_num_pending_misses(std::size_t num = 1) {}
+        constexpr void increment_num_pending_accesses(std::size_t num = 1) {}
+        constexpr void increment_num_stolen_from_pending(std::size_t num = 1) {}
+        constexpr void increment_num_stolen_from_staged(std::size_t num = 1) {}
+        constexpr void increment_num_stolen_to_pending(std::size_t num = 1) {}
+        constexpr void increment_num_stolen_to_staged(std::size_t num = 1) {}
 #endif
 
         ///////////////////////////////////////////////////////////////////////

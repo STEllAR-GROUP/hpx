@@ -12,18 +12,18 @@
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
 #include <hpx/assertion.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/logging.hpp>
 
-#include <mutex>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -32,8 +32,7 @@
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies
-{
+namespace hpx { namespace threads { namespace policies {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     using default_static_queue_scheduler_terminated_queue = lockfree_lifo;
@@ -55,15 +54,16 @@ namespace hpx { namespace threads { namespace policies
             TerminatedQueuing>
     {
     public:
-        typedef local_queue_scheduler<
-            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
-        > base_type;
+        typedef local_queue_scheduler<Mutex, PendingQueuing, StagedQueuing,
+            TerminatedQueuing>
+            base_type;
 
         static_queue_scheduler(
-                typename base_type::init_parameter_type const& init,
-                bool deferred_initialization = true)
+            typename base_type::init_parameter_type const& init,
+            bool deferred_initialization = true)
           : base_type(init, deferred_initialization)
-        {}
+        {
+        }
 
         static std::string get_scheduler_name()
         {
@@ -117,7 +117,8 @@ namespace hpx { namespace threads { namespace policies
             result =
                 this->queues_[num_thread]->wait_or_add_new(running, added) &&
                 result;
-            if (0 != added) return result;
+            if (0 != added)
+                return result;
 
             // Check if we have been disabled
             if (!running)
@@ -139,8 +140,9 @@ namespace hpx { namespace threads { namespace policies
                         i, idle_loop_count, running);
                 }
 
-                if (HPX_UNLIKELY(suspended_only)) {
-                    LTM_(error) //-V128
+                if (HPX_UNLIKELY(suspended_only))
+                {
+                    LTM_(error)    //-V128
                         << "queue(" << num_thread << "): "
                         << "no new work available, are we deadlocked?";
                 }
@@ -150,10 +152,9 @@ namespace hpx { namespace threads { namespace policies
             return result;
         }
     };
-}}}
+}}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
 #endif
-

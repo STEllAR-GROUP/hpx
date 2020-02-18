@@ -9,9 +9,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/barrier.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/logging.hpp>
@@ -26,8 +26,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     io_service_pool::io_service_pool(std::size_t pool_size,
         threads::policies::callback_notifier const& notifier,
         char const* pool_name, char const* name_postfix)
@@ -97,7 +96,7 @@ namespace hpx { namespace util
         // use this thread for the given io service
         while (true)
         {
-            io_services_[index]->run();   // run io service
+            io_services_[index]->run();    // run io service
 
             if (waiting_)
             {
@@ -113,13 +112,13 @@ namespace hpx { namespace util
         notifier_.on_stop_thread(index, index, pool_name_, pool_name_postfix_);
     }
 
-    bool io_service_pool::run(std::size_t num_threads, bool join_threads,
-        util::barrier* startup)
+    bool io_service_pool::run(
+        std::size_t num_threads, bool join_threads, util::barrier* startup)
     {
         std::lock_guard<std::mutex> l(mtx_);
 
         // Create a pool of threads to run all of the io_services.
-        if (!threads_.empty())   // should be called only once
+        if (!threads_.empty())    // should be called only once
         {
             HPX_ASSERT(pool_size_ == io_services_.size());
             HPX_ASSERT(threads_.size() == io_services_.size());
@@ -144,7 +143,7 @@ namespace hpx { namespace util
         std::lock_guard<std::mutex> l(mtx_);
 
         // Create a pool of threads to run all of the io_services.
-        if (!threads_.empty())   // should be called only once
+        if (!threads_.empty())    // should be called only once
         {
             HPX_ASSERT(pool_size_ == io_services_.size());
             HPX_ASSERT(threads_.size() == io_services_.size());
@@ -164,8 +163,8 @@ namespace hpx { namespace util
         return run_locked(pool_size_, join_threads, startup);
     }
 
-    bool io_service_pool::run_locked(std::size_t num_threads, bool join_threads,
-        util::barrier* startup)
+    bool io_service_pool::run_locked(
+        std::size_t num_threads, bool join_threads, util::barrier* startup)
     {
         if (io_services_.empty())
         {
@@ -182,8 +181,7 @@ namespace hpx { namespace util
 
         for (std::size_t i = 0; i < num_threads; ++i)
         {
-            std::thread t(
-                &io_service_pool::thread_run, this, i, startup);
+            std::thread t(&io_service_pool::thread_run, this, i, startup);
             threads_.emplace_back(std::move(t));
         }
 
@@ -222,7 +220,8 @@ namespace hpx { namespace util
 
     void io_service_pool::stop_locked()
     {
-        if (!stopped_) {
+        if (!stopped_)
+        {
             // Explicitly inform all work to exit.
             work_.clear();
 
@@ -242,7 +241,8 @@ namespace hpx { namespace util
 
     void io_service_pool::wait_locked()
     {
-        if (!stopped_) {
+        if (!stopped_)
+        {
             // Clear work so that the run functions return when all work is done
             waiting_ = true;
             work_.clear();
@@ -268,7 +268,8 @@ namespace hpx { namespace util
 
     void io_service_pool::clear_locked()
     {
-        if (stopped_) {
+        if (stopped_)
+        {
             next_io_service_ = 0;
             threads_.clear();
             work_.clear();
@@ -287,18 +288,20 @@ namespace hpx { namespace util
         // use this function for single group io_service pools only
         std::lock_guard<std::mutex> l(mtx_);
 
-        if (index == -1) {
+        if (index == -1)
+        {
             if (++next_io_service_ == pool_size_)
                 next_io_service_ = 0;
 
             // Use a round-robin scheme to choose the next io_service to use.
             index = static_cast<int>(next_io_service_);
         }
-        else {
+        else
+        {
             next_io_service_ = static_cast<std::size_t>(index);
         }
 
-        return *io_services_[static_cast<std::size_t>(index)]; //-V108
+        return *io_services_[static_cast<std::size_t>(index)];    //-V108
     }
 
     std::thread& io_service_pool::get_os_thread_handle(std::size_t thread_num)
@@ -307,5 +310,4 @@ namespace hpx { namespace util
         return threads_[thread_num];
     }
 
-}}  // namespace hpx::util
-
+}}    // namespace hpx::util

@@ -16,16 +16,15 @@
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 
-#include <mutex>
 #include <cstddef>
 #include <cstdint>
+#include <mutex>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies
-{
+namespace hpx { namespace threads { namespace policies {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     using default_static_priority_queue_scheduler_terminated_queue =
@@ -50,10 +49,8 @@ namespace hpx { namespace threads { namespace policies
         typename TerminatedQueuing =
             default_static_priority_queue_scheduler_terminated_queue>
     class HPX_EXPORT static_priority_queue_scheduler
-      : public local_priority_queue_scheduler<Mutex,
-            PendingQueuing,
-            StagedQueuing,
-            TerminatedQueuing>
+      : public local_priority_queue_scheduler<Mutex, PendingQueuing,
+            StagedQueuing, TerminatedQueuing>
     {
     public:
         using base_type = local_priority_queue_scheduler<Mutex, PendingQueuing,
@@ -62,13 +59,12 @@ namespace hpx { namespace threads { namespace policies
         using init_parameter_type = typename base_type::init_parameter_type;
 
         static_priority_queue_scheduler(init_parameter_type const& init,
-                bool deferred_initialization = true)
+            bool deferred_initialization = true)
           : base_type(init, deferred_initialization)
         {
             // disable thread stealing to begin with
-            this->remove_scheduler_mode(
-                scheduler_mode(policies::enable_stealing |
-                               policies::enable_stealing_numa));
+            this->remove_scheduler_mode(scheduler_mode(
+                policies::enable_stealing | policies::enable_stealing_numa));
         }
 
         void set_scheduler_mode(scheduler_mode mode) override
@@ -84,10 +80,9 @@ namespace hpx { namespace threads { namespace policies
             return "static_priority_queue_scheduler";
         }
     };
-}}}
+}}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
 #endif
-

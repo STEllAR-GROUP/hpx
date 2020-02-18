@@ -8,23 +8,22 @@
 #define HPX_IO_SERVICE_THREAD_POOL_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/state.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/state.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
 
-#include <mutex>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <iosfwd>
+#include <mutex>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT io_service_thread_pool : public thread_pool_base
     {
@@ -61,7 +60,7 @@ namespace hpx { namespace threads { namespace detail
         bool run(std::unique_lock<std::mutex>& l, std::size_t pool_threads);
 
         ///////////////////////////////////////////////////////////////////////
-        void stop (std::unique_lock<std::mutex>& l, bool blocking = true);
+        void stop(std::unique_lock<std::mutex>& l, bool blocking = true);
 
         ///////////////////////////////////////////////////////////////////////
         void resume_direct(error_code& ec = throws);
@@ -69,11 +68,11 @@ namespace hpx { namespace threads { namespace detail
         void suspend_direct(error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
-        void suspend_processing_unit_direct(std::size_t virt_core,
-            error_code& ec = throws);
+        void suspend_processing_unit_direct(
+            std::size_t virt_core, error_code& ec = throws);
 
-        void resume_processing_unit_direct(std::size_t virt_core,
-            error_code& ec = throws);
+        void resume_processing_unit_direct(
+            std::size_t virt_core, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         std::thread& get_os_thread_handle(std::size_t global_thread_num);
@@ -91,8 +90,8 @@ namespace hpx { namespace threads { namespace detail
         void get_statistics(executor_statistics& stats, error_code& ec) const;
 
         // Provide the given processing unit to the scheduler.
-        void add_processing_unit(std::size_t virt_core, std::size_t thread_num,
-            error_code& ec);
+        void add_processing_unit(
+            std::size_t virt_core, std::size_t thread_num, error_code& ec);
 
         // Remove the given processing unit from the scheduler.
         void remove_processing_unit(std::size_t thread_num, error_code& ec);
@@ -100,7 +99,7 @@ namespace hpx { namespace threads { namespace detail
     private:
         util::io_service_pool threads_;
     };
-}}}
+}}}    // namespace hpx::threads::detail
 
 #include <hpx/config/warnings_suffix.hpp>
 

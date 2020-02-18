@@ -11,16 +11,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util_fwd.hpp>
 
@@ -349,7 +349,8 @@ namespace hpx { namespace threads { namespace policies {
                 return false;
             }
 
-            bool numa_stealing = has_scheduler_mode(policies::enable_stealing_numa);
+            bool numa_stealing =
+                has_scheduler_mode(policies::enable_stealing_numa);
             if (!numa_stealing)
             {
                 // steal work items: first try to steal from other cores in
@@ -699,7 +700,8 @@ namespace hpx { namespace threads { namespace policies {
                 return true;
             }
 
-            bool numa_stealing_ = has_scheduler_mode(policies::enable_stealing_numa);
+            bool numa_stealing_ =
+                has_scheduler_mode(policies::enable_stealing_numa);
             // limited or no stealing across domains
             if (!numa_stealing_)
             {
@@ -874,7 +876,8 @@ namespace hpx { namespace threads { namespace policies {
             else
                 first_mask = core_mask;
 
-            bool numa_stealing = has_scheduler_mode(policies::enable_stealing_numa);
+            bool numa_stealing =
+                has_scheduler_mode(policies::enable_stealing_numa);
             if (numa_stealing && any(first_mask & core_mask))
             {
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only

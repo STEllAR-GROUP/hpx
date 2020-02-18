@@ -5,19 +5,18 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/barrier.hpp>
-#include <hpx/affinity/affinity_data.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/io_service/io_service_thread_pool.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <cstddef>
 #include <exception>
 
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     io_service_thread_pool::io_service_thread_pool(
         hpx::threads::thread_pool_init_parameters const& init)
       : thread_pool_base(init)
@@ -57,7 +56,8 @@ namespace hpx { namespace threads { namespace detail
         thread_state_ex_enum new_state_ex, thread_priority priority,
         error_code& ec)
     {
-        return threads::thread_state(threads::terminated, threads::wait_unknown);
+        return threads::thread_state(
+            threads::terminated, threads::wait_unknown);
     }
 
     threads::thread_id_type io_service_thread_pool::set_state(
@@ -74,8 +74,8 @@ namespace hpx { namespace threads { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool io_service_thread_pool::run(std::unique_lock<std::mutex>& l,
-        std::size_t num_threads)
+    bool io_service_thread_pool::run(
+        std::unique_lock<std::mutex>& l, std::size_t num_threads)
     {
         HPX_ASSERT(l.owns_lock());
         util::barrier startup(1);
@@ -89,14 +89,14 @@ namespace hpx { namespace threads { namespace detail
 
     void io_service_thread_pool::resume_direct(error_code& ec)
     {
-        HPX_ASSERT_MSG(false,
-            "Resuming io_service_thread_pool is not supported");
+        HPX_ASSERT_MSG(
+            false, "Resuming io_service_thread_pool is not supported");
     }
 
     void io_service_thread_pool::suspend_direct(error_code& ec)
     {
-        HPX_ASSERT_MSG(false,
-            "Suspending io_service_thread_pool is not supported");
+        HPX_ASSERT_MSG(
+            false, "Suspending io_service_thread_pool is not supported");
     }
 
     void io_service_thread_pool::suspend_processing_unit_direct(
@@ -147,4 +147,4 @@ namespace hpx { namespace threads { namespace detail
         std::size_t thread_num, error_code& ec)
     {
     }
-}}}
+}}}    // namespace hpx::threads::detail

@@ -10,17 +10,17 @@
 #define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIORITY_QUEUE_MAR_15_2011_0926AM
 
 #include <hpx/config.hpp>
+#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util_fwd.hpp>
 

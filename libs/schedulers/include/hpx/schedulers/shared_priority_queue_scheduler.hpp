@@ -13,19 +13,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/queue_holder_numa.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
+#include <hpx/threading_base/print.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <array>
@@ -369,8 +369,8 @@ namespace hpx { namespace threads { namespace policies {
                                 numa_holder_[domain_num]
                                     .thread_queue(
                                         static_cast<std::size_t>(q_index))
-                                    ->worker_next(static_cast<std::size_t>(
-                                        num_workers_));
+                                    ->worker_next(
+                                        static_cast<std::size_t>(num_workers_));
                         }
                         thread_num = select_active_pu(l, thread_num);
                         // cppcheck-suppress redundantAssignment
@@ -455,8 +455,8 @@ namespace hpx { namespace threads { namespace policies {
                 }
 
                 template <typename T>
-                bool steal_by_function(std::size_t domain,
-                    std::size_t q_index, bool steal_numa, bool steal_core,
+                bool steal_by_function(std::size_t domain, std::size_t q_index,
+                    bool steal_numa, bool steal_core,
                     thread_holder_type* origin, T& var, const char* prefix,
                     std::function<bool(std::size_t, std::size_t,
                         thread_holder_type*, T&, bool, bool)>
@@ -1091,8 +1091,7 @@ namespace hpx { namespace threads { namespace policies {
                     // store local thread number and pool index in thread local storage
                     hpx::threads::detail::set_thread_pool_tss(
                         {std::size_t(local_thread),
-                            std::size_t(
-                                parent_pool_->get_pool_id().index())});
+                            std::size_t(parent_pool_->get_pool_id().index())});
 
                     // one thread holder per core (shared by PUs)
                     thread_holder_type* thread_holder = nullptr;
@@ -1152,12 +1151,11 @@ namespace hpx { namespace threads { namespace policies {
                                 {
                                     // share the queue with our next lowest neighbor
                                     HPX_ASSERT(index != 0);
-                                    hp_queue =
-                                        numa_holder_[domain]
-                                            .thread_queue(
-                                                static_cast<std::size_t>(
-                                                    index - 1))
-                                            ->hp_queue_;
+                                    hp_queue = numa_holder_[domain]
+                                                   .thread_queue(
+                                                       static_cast<std::size_t>(
+                                                           index - 1))
+                                                   ->hp_queue_;
                                 }
                             }
                             // Normal priority
@@ -1172,11 +1170,11 @@ namespace hpx { namespace threads { namespace policies {
                             {
                                 // share the queue with our next lowest neighbor
                                 HPX_ASSERT(index != 0);
-                                np_queue = numa_holder_[domain]
-                                               .thread_queue(
-                                                   static_cast<std::size_t>(
-                                                       index - 1))
-                                               ->np_queue_;
+                                np_queue =
+                                    numa_holder_[domain]
+                                        .thread_queue(
+                                            static_cast<std::size_t>(index - 1))
+                                        ->np_queue_;
                             }
                             // Low priority
                             if (cores_per_queue_.low_priority > 0)
@@ -1193,12 +1191,11 @@ namespace hpx { namespace threads { namespace policies {
                                 {
                                     // share the queue with our next lowest neighbor
                                     HPX_ASSERT(index != 0);
-                                    lp_queue =
-                                        numa_holder_[domain]
-                                            .thread_queue(
-                                                static_cast<std::size_t>(
-                                                    index - 1))
-                                            ->lp_queue_;
+                                    lp_queue = numa_holder_[domain]
+                                                   .thread_queue(
+                                                       static_cast<std::size_t>(
+                                                           index - 1))
+                                                   ->lp_queue_;
                                 }
                             }
 

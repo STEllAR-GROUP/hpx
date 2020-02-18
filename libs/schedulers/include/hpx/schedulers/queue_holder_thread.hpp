@@ -13,10 +13,10 @@
 #include <hpx/debugging/print.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cmath>

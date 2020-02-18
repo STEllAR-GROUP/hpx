@@ -13,9 +13,9 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads
-{
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+namespace hpx { namespace threads {
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
     ////////////////////////////////////////////////////////////////////////////
     struct background_work_duration_counter
     {
@@ -39,9 +39,10 @@ namespace hpx { namespace threads
     struct background_exec_time_wrapper
     {
         background_exec_time_wrapper(
-                background_work_duration_counter& background_work_duration)
+            background_work_duration_counter& background_work_duration)
           : timestamp_(background_work_duration.background_exec_time_ != -1 ?
-                    util::hardware::timestamp() : -1)
+                    util::hardware::timestamp() :
+                    -1)
           , background_work_duration_(background_work_duration)
         {
         }
@@ -55,7 +56,6 @@ namespace hpx { namespace threads
         background_work_duration_counter& background_work_duration_;
     };
 #endif
-}}
+}}    // namespace hpx::threads
 
 #endif
-

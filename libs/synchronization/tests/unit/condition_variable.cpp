@@ -10,9 +10,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/thread.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <hpx/testing.hpp>
