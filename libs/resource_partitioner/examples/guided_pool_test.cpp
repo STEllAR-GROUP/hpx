@@ -11,7 +11,7 @@
 #include <hpx/parallel/algorithms/for_loop.hpp>
 //
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/topology/cpu_mask.hpp>

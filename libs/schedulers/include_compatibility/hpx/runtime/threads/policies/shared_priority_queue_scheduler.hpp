@@ -16,6 +16,6 @@
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp is deprecated, \
-    please include hpx/shared_priority_queue_scheduler.hpp instead"
+    please include hpx/schedulers/shared_priority_queue_scheduler.hpp instead"
 #endif
 #endif

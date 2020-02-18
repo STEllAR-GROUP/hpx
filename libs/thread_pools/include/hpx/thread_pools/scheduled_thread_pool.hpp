@@ -13,7 +13,7 @@
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>

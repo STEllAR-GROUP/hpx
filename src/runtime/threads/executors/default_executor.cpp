@@ -78,7 +78,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (&ec != &throws)
             ec = make_success_code();
 
-        return get_thread_count() - get_thread_count(terminated);
+        threads::thread_pool_base* pool = threads::detail::get_self_or_default_pool();
+        HPX_ASSERT(pool);
+        threads::policies::scheduler_base* scheduler = pool->get_scheduler();
+        HPX_ASSERT(scheduler);
+        return scheduler->get_thread_count() - scheduler->get_thread_count(terminated);
     }
 
     // Reset internal (round robin) thread distribution scheme
@@ -99,11 +103,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     std::size_t default_executor::get_policy_element(
         threads::detail::executor_parameter p, error_code& ec) const
     {
+        thread_pool_base* pool = threads::detail::get_self_or_default_pool();
+        HPX_ASSERT(pool);
         switch(p) {
         case threads::detail::min_concurrency:
         case threads::detail::max_concurrency:
         case threads::detail::current_concurrency:
-            return hpx::get_os_thread_count();
+            return pool->get_os_thread_count();
 
         default:
             break;

@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 

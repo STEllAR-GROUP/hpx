@@ -16,9 +16,9 @@
 #include <hpx/logging.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/deadlock_detection.hpp>
-#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/schedulers/thread_queue.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/topology/topology.hpp>

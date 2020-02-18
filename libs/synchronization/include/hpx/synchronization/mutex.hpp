@@ -14,7 +14,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_data/scheduler_base_fwd.hpp>
+#include <hpx/threading_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 namespace hpx { namespace threads {

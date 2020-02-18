@@ -12,7 +12,7 @@
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 
 #include <mutex>
 #include <cstddef>

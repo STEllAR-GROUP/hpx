@@ -13,7 +13,7 @@
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/execution/traits/is_executor.hpp>

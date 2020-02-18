@@ -23,12 +23,12 @@
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 

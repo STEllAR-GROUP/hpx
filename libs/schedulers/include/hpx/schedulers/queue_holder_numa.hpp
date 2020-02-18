@@ -8,8 +8,8 @@
 #define HPX_THREADMANAGER_SCHEDULING_QUEUE_HELPER
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
-#include <hpx/runtime/threads/policies/thread_queue_mc.hpp>
+#include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/thread_queue_mc.hpp>
 #include <hpx/threading_base/print.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 //
@@ -17,7 +17,7 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/unused.hpp>
 //
-#include <hpx/runtime/threads/policies/queue_holder_thread.hpp>
+#include <hpx/schedulers/queue_holder_thread.hpp>
 //
 #include <cmath>
 #include <cstddef>

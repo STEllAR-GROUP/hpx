@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/coroutines/thread_enums.hpp>

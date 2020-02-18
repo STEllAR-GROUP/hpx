@@ -14,13 +14,13 @@
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/state.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/util/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -16,6 +16,6 @@
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/local_queue_scheduler.hpp is deprecated, \
-    please include hpx/local_queue_scheduler.hpp instead"
+    please include hpx/schedulers/local_queue_scheduler.hpp instead"
 #endif
 #endif

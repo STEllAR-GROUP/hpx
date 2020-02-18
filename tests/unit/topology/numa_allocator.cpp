@@ -19,7 +19,7 @@
 #include <hpx/execution/executors.hpp>
 //
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 #include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/topology/cpu_mask.hpp>
@@ -42,7 +42,7 @@
 #include "allocator_binder_linear.hpp"
 #include "allocator_binder_matrix.hpp"
 // Scheduler that honours numa placement hints for tasks
-#include <hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
 
 // ------------------------------------------------------------------------
 // allocator maker for this test

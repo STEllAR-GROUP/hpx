@@ -32,7 +32,7 @@
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/schedulers.hpp>
 #include <hpx/runtime_handlers.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/string_util/split.hpp>

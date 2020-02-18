@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/thread_data/scheduler_base_fwd.hpp>
+#include <hpx/threading_base.hpp>
 
 #include <vector>
 #include <string>

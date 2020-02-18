@@ -13,8 +13,8 @@
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/lockfree_queue_backends.hpp>
 
 #include <mutex>
 #include <cstddef>

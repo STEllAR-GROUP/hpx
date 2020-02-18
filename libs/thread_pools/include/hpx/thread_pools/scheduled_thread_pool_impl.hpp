@@ -16,13 +16,13 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/create_work.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
-#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool.hpp>
+#include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/schedulers.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>

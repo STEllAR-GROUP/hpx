@@ -36,7 +36,7 @@ add_hpx_module(io_service
     hpx_errors
     hpx_functional
     hpx_logging
-    hpx_thread_data
+    hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )
 

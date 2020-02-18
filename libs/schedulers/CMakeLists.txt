@@ -40,7 +40,7 @@ add_hpx_module(schedulers
   GLOBAL_HEADER_GEN OFF
   HEADERS ${schedulers_headers}
   COMPAT_HEADERS ${schedulers_compat_headers}
-  DEPENDENCIES hpx_thread_data
+  DEPENDENCIES hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )
 

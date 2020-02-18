@@ -13,7 +13,7 @@
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/util/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/logging.hpp>
 
 #include <boost/asio/io_service.hpp>

@@ -17,7 +17,7 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 

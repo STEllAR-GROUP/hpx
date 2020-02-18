@@ -16,6 +16,6 @@
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/static_queue_scheduler.hpp is deprecated, \
-    please include hpx/static_queue_scheduler.hpp instead"
+    please include hpx/schedulers/static_queue_scheduler.hpp instead"
 #endif
 #endif

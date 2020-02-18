@@ -20,10 +20,10 @@
 #include <hpx/logging.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/schedulers.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_fwd.hpp>

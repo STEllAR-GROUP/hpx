@@ -32,9 +32,8 @@ add_hpx_module(thread
     hpx_coroutines
     hpx_errors
     hpx_execution
-    # hpx_local_lcos
     hpx_functional
-    hpx_thread_data
+    hpx_threading_base
     hpx_timing
   CMAKE_SUBDIRS examples tests
 )

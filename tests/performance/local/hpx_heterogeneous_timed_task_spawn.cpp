@@ -9,6 +9,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/threadmanager.hpp>
 #include <hpx/timing.hpp>
 
 #include <cstdint>

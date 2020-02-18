@@ -11,7 +11,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/thread_data/scheduler_base_fwd.hpp>
+#include <hpx/threading_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <algorithm>

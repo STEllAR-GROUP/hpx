@@ -16,6 +16,6 @@
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/lockfree_queue_backends.hpp is deprecated, \
-    please include hpx/lockfree_queue_backends.hpp instead"
+    please include hpx/schedulers/lockfree_queue_backends.hpp instead"
 #endif
 #endif

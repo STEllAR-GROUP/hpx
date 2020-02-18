@@ -16,6 +16,6 @@
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/thread_queue.hpp is deprecated, \
-    please include hpx/thread_queue.hpp instead"
+    please include hpx/schedulers/thread_queue.hpp instead"
 #endif
 #endif

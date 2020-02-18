@@ -15,10 +15,10 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime/threads/policies/deadlock_detection.hpp>
-#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
-#include <hpx/runtime/threads/policies/queue_holder_thread.hpp>
-#include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/queue_holder_thread.hpp>
+#include <hpx/schedulers/thread_queue.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

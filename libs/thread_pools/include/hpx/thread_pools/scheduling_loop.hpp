@@ -18,7 +18,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
-#include <hpx/runtime/threads/scoped_background_timer.hpp>
+#include <hpx/thread_pools/detail/scoped_background_timer.hpp>
 #endif
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/hardware/timestamp.hpp>

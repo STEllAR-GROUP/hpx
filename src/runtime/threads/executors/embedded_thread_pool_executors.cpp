@@ -8,14 +8,14 @@
 
 #include <hpx/runtime/threads/resource_manager.hpp>
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#include <hpx/schedulers/local_queue_scheduler.hpp>
 #endif
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
-#include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
+#include <hpx/schedulers/static_queue_scheduler.hpp>
 #endif
-#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-#include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
@@ -23,7 +23,7 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/threading_base/create_thread.hpp>
-#include <hpx/runtime/threads/detail/scheduling_loop.hpp>
+#include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
