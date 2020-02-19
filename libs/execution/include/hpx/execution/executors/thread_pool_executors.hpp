@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
+#include <hpx/execution/executors/thread_execution.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp>
 

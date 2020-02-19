@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+#include <hpx/execution/executors/thread_execution.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/executors/this_thread_executors.hpp>
 
