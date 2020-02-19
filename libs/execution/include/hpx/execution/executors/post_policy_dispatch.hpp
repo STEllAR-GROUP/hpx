@@ -70,7 +70,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, threads::thread_priority priority,
             threads::thread_stacksize stacksize,
-            threads::thread_schedule_hint /*hint*/, F&& f, Ts&&... ts)
+            threads::thread_schedule_hint hint, F&& f, Ts&&... ts)
         {
             hint.mode = threads::thread_schedule_hint_mode_thread;
             hint.hint = static_cast<std::int16_t>(get_worker_thread_num());

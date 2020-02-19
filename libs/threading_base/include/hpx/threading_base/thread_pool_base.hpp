@@ -161,7 +161,7 @@ namespace hpx { namespace threads {
     /// \brief The base class used to manage a pool of OS threads.
     class thread_pool_base
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-        : public detail::manage_executor
+      : public detail::manage_executor
 #endif
     {
     public:

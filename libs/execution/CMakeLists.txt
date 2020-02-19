@@ -66,6 +66,8 @@ set(execution_headers
   hpx/execution/traits/is_timed_executor.hpp
 )
 
+set(execution_sources current_executor.cpp)
+
 set(execution_compat_headers
   hpx/parallel/algorithms/detail/is_negative.hpp
   hpx/parallel/algorithms/detail/predicates.hpp
@@ -126,6 +128,7 @@ set(execution_compat_headers
 include(HPX_AddModule)
 add_hpx_module(execution
   FORCE_LINKING_GEN
+  SOURCES ${execution_sources}
   HEADERS ${execution_headers}
   COMPATIBILITY_HEADERS ON    # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}

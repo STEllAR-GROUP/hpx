@@ -26,9 +26,8 @@
 #include <vector>
 
 namespace hpx { namespace compute { namespace cuda {
-    template <
-        typename Executor =
-            hpx::parallel::execution::restricted_thread_pool_executor>
+    template <typename Executor =
+                  hpx::parallel::execution::restricted_thread_pool_executor>
     struct concurrent_executor
     {
     private:

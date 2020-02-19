@@ -17,6 +17,7 @@
 #include <hpx/lcos/dataflow.hpp>
 #endif
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/executors/current_executor.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/functional/bind.hpp>
@@ -25,7 +26,6 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
-#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -213,7 +213,7 @@ namespace hpx { namespace threads {
         typedef typename std::decay<Future>::type future_type;
 
         thread_id_type id = hpx::threads::get_self_id();
-        executors::current_executor exec_current =
+        parallel::execution::current_executor exec_current =
             hpx::threads::get_executor(id);
 
         shared_state_type p =
