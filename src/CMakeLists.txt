@@ -531,6 +531,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
 endif()
 target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>")
 target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">")
+target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>")
 target_compile_definitions(hpx_interface INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>")
 target_link_libraries(hpx INTERFACE hpx_interface)
 
