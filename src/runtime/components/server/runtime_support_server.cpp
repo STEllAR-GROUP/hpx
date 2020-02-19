@@ -46,7 +46,6 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
-#include <hpx/util/yield_while.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
