@@ -278,6 +278,9 @@ namespace hpx { namespace resource {
         // resource partitioner called in hpx_init
         HPX_EXPORT void configure_pools();
 
+        // Return the initialization result for this resource_partitioner
+        HPX_EXPORT int parse_result() const;
+
     private:
         detail::partitioner& partitioner_;
     };
