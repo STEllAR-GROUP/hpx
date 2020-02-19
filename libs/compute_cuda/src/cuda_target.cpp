@@ -39,6 +39,27 @@
 
 namespace hpx { namespace compute { namespace cuda {
     namespace detail {
+        runtime_registration_wrapper::runtime_registration_wrapper(
+            hpx::runtime* rt)
+          : rt_(rt)
+        {
+            HPX_ASSERT(rt);
+
+            // Register this thread with HPX, this should be done once for
+            // each external OS-thread intended to invoke HPX functionality.
+            // Calling this function more than once on the same thread will
+            // report an error.
+            hpx::error_code ec(hpx::lightweight);    // ignore errors
+            hpx::register_thread(rt_, "cuda", ec);
+        }
+
+        runtime_registration_wrapper::~runtime_registration_wrapper()
+        {
+            // Unregister the thread from HPX, this should be done once in
+            // the end before the external thread exists.
+            hpx::unregister_thread(rt_);
+        }
+
         hpx::future<void> get_future(cudaStream_t stream)
         {
             return get_future(hpx::util::internal_allocator<>{}, stream);
