@@ -9,6 +9,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_to_storage.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/hpx_init_params.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_suspend.hpp"

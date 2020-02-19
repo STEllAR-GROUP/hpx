@@ -48,22 +48,8 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to `main()`).
-    /// \param params       [in] The parameters to the start function of type
-    ///                     `hpx::init_params`. Usually the description of the
-    ///                     additional command line arguments (prepended to the
-    ///                     default command line options understood by
-    ///                     \a hpx::init), a list of configuration settings
-    ///                     which will be added to the system configuration
-    ///                     before the runtime instance is run, a startup
-    ///                     function to be executed inside a HPX thread before
-    ///                     \p f is called, a shutdown function  to be executed
-    ///                     inside an HPX thread while hpx::finalize is
-    ///                     executed, the mode the created runtime environment
-    ///                     should be initialized in (there has to be exactly
-    ///                     one locality in each HPX application which is
-    ///                     executed in console mode all other localities have
-    ///                     to be run in worker mode), and the mode the
-    ///                     resource partitioner should be initialized in.
+    /// \param params       [in] The parameters to the \a hpx::start function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns \a true if command line processing
     ///                     succeeded and the runtime system was started successfully.
@@ -100,22 +86,8 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to `main()`).
-    /// \param params       [in] The parameters to the start function of type
-    ///                     `hpx::init_params`. Usually the description of the
-    ///                     additional command line arguments (prepended to the
-    ///                     default command line options understood by
-    ///                     \a hpx::init), a list of configuration settings
-    ///                     which will be added to the system configuration
-    ///                     before the runtime instance is run, a startup
-    ///                     function to be executed inside a HPX thread before
-    ///                     \p f is called, a shutdown function  to be executed
-    ///                     inside an HPX thread while hpx::finalize is
-    ///                     executed, the mode the created runtime environment
-    ///                     should be initialized in (there has to be exactly
-    ///                     one locality in each HPX application which is
-    ///                     executed in console mode all other localities have
-    ///                     to be run in worker mode), and the mode the
-    ///                     resource partitioner should be initialized in.
+    /// \param params       [in] The parameters to the \a hpx::start function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns \a true if command line processing
     ///                     succeeded and the runtime system was started successfully.
@@ -146,22 +118,8 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to `main()`).
-    /// \param params       [in] The parameters to the start function of type
-    ///                     `hpx::init_params`. Usually the description of the
-    ///                     additional command line arguments (prepended to the
-    ///                     default command line options understood by
-    ///                     \a hpx::init), a list of configuration settings
-    ///                     which will be added to the system configuration
-    ///                     before the runtime instance is run, a startup
-    ///                     function to be executed inside a HPX thread before
-    ///                     \p f is called, a shutdown function  to be executed
-    ///                     inside an HPX thread while hpx::finalize is
-    ///                     executed, the mode the created runtime environment
-    ///                     should be initialized in (there has to be exactly
-    ///                     one locality in each HPX application which is
-    ///                     executed in console mode all other localities have
-    ///                     to be run in worker mode), and the mode the
-    ///                     resource partitioner should be initialized in.
+    /// \param params       [in] The parameters to the \a hpx::start function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns \a true if command line processing
     ///                     succeeded and the runtime system was started successfully.
@@ -197,22 +155,8 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to `main()`).
-    /// \param params       [in] The parameters to the start function of type
-    ///                     `hpx::init_params`. Usually the description of the
-    ///                     additional command line arguments (prepended to the
-    ///                     default command line options understood by
-    ///                     \a hpx::init), a list of configuration settings
-    ///                     which will be added to the system configuration
-    ///                     before the runtime instance is run, a startup
-    ///                     function to be executed inside a HPX thread before
-    ///                     \p f is called, a shutdown function  to be executed
-    ///                     inside an HPX thread while hpx::finalize is
-    ///                     executed, the mode the created runtime environment
-    ///                     should be initialized in (there has to be exactly
-    ///                     one locality in each HPX application which is
-    ///                     executed in console mode all other localities have
-    ///                     to be run in worker mode), and the mode the
-    ///                     resource partitioner should be initialized in.
+    /// \param params       [in] The parameters to the \a hpx::start function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns \a true if command line processing
     ///                     succeeded and the runtime system was started successfully.
@@ -235,20 +179,8 @@ namespace hpx
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     ///
-    /// \param argc         [in] The number of command line arguments passed
-    ///                     in \p argv. This is usually the unchanged value as
-    ///                     passed by the operating system (to `main()`).
-    /// \param argv         [in] The command line arguments for this
-    ///                     application, usually that is the value as passed
-    ///                     by the operating system (to `main()`).
-    /// \param mode         [in] The mode the created runtime environment
-    ///                     should be initialized in. There has to be exactly
-    ///                     one locality in each HPX application which is
-    ///                     executed in console mode (\a hpx::runtime_mode_console),
-    ///                     all other localities have to be run in worker mode
-    ///                     (\a hpx::runtime_mode_worker). Normally this is
-    ///                     set up automatically, but sometimes it is necessary
-    ///                     to explicitly specify the mode.
+    /// \param params       [in] The parameters to the \a hpx::start function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns \a true if command line processing
     ///                     succeeded and the runtime system was started successfully.

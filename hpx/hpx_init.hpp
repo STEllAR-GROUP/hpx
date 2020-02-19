@@ -53,24 +53,8 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to `main()`).
-    /// \param params       [in] The parameters to the init function of type
-    ///                     `hpx::init_params`. Usually the
-    ///                     function \p f which is the main entry point of any
-    ///                     HPX application, the description of the additional
-    ///                     command line arguments (prepended to the default
-    ///                     command line options understood by \a hpx::init),
-    ///                     a list of configuration settings which will be added
-    ///                     to the system configuration before the runtime
-    ///                     instance is run, a startup function to be executed
-    ///                     inside a HPX thread before \p f is called, a
-    ///                     shutdown function  to be executed inside an HPX
-    ///                     thread while hpx::finalize is executed, the mode the
-    ///                     created runtime environment should be initialized
-    ///                     in (there has to be exactly one locality in each HPX
-    ///                     application which is executed in console mode all
-    ///                     other localities have to be run in worker mode), and
-    ///                     the mode the resource partitioner should be
-    ///                     initialized in.
+    /// \param params       [in] The parameters to the \a hpx::init function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns the value, which has been
     ///                     returned from the user supplied \p f.
@@ -104,24 +88,8 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to `main()`).
-    /// \param params       [in] The parameters to the init function of type
-    ///                     `hpx::init_params`. Usually the
-    ///                     function \p f which is the main entry point of any
-    ///                     HPX application, the description of the additional
-    ///                     command line arguments (prepended to the default
-    ///                     command line options understood by \a hpx::init),
-    ///                     a list of configuration settings which will be added
-    ///                     to the system configuration before the runtime
-    ///                     instance is run, a startup function to be executed
-    ///                     inside a HPX thread before \p f is called, a
-    ///                     shutdown function  to be executed inside an HPX
-    ///                     thread while hpx::finalize is executed, the mode the
-    ///                     created runtime environment should be initialized
-    ///                     in (there has to be exactly one locality in each HPX
-    ///                     application which is executed in console mode all
-    ///                     other localities have to be run in worker mode), and
-    ///                     the mode the resource partitioner should be
-    ///                     initialized in.
+    /// \param params       [in] The parameters to the \a hpx::init function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns the value, which has been
     ///                     returned from the user supplied \p f.
@@ -150,24 +118,8 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to `main()`).
-    /// \param params       [in] The parameters to the init function of type
-    ///                     `hpx::init_params`. Usually the
-    ///                     function \p f which is the main entry point of any
-    ///                     HPX application, the description of the additional
-    ///                     command line arguments (prepended to the default
-    ///                     command line options understood by \a hpx::init),
-    ///                     a list of configuration settings which will be added
-    ///                     to the system configuration before the runtime
-    ///                     instance is run, a startup function to be executed
-    ///                     inside a HPX thread before \p f is called, a
-    ///                     shutdown function  to be executed inside an HPX
-    ///                     thread while hpx::finalize is executed, the mode the
-    ///                     created runtime environment should be initialized
-    ///                     in (there has to be exactly one locality in each HPX
-    ///                     application which is executed in console mode all
-    ///                     other localities have to be run in worker mode), and
-    ///                     the mode the resource partitioner should be
-    ///                     initialized in.
+    /// \param params       [in] The parameters to the \a hpx::init function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns the value, which has been
     ///                     returned from the user supplied \p f.
@@ -200,24 +152,8 @@ namespace hpx
     /// \param argv         [in] The command line arguments for this
     ///                     application, usually that is the value as passed
     ///                     by the operating system (to `main()`).
-    /// \param params       [in] The parameters to the init function of type
-    ///                     `hpx::init_params`. Usually the
-    ///                     function \p f which is the main entry point of any
-    ///                     HPX application, the description of the additional
-    ///                     command line arguments (prepended to the default
-    ///                     command line options understood by \a hpx::init),
-    ///                     a list of configuration settings which will be added
-    ///                     to the system configuration before the runtime
-    ///                     instance is run, a startup function to be executed
-    ///                     inside a HPX thread before \p f is called, a
-    ///                     shutdown function  to be executed inside an HPX
-    ///                     thread while hpx::finalize is executed, the mode the
-    ///                     created runtime environment should be initialized
-    ///                     in (there has to be exactly one locality in each HPX
-    ///                     application which is executed in console mode all
-    ///                     other localities have to be run in worker mode), and
-    ///                     the mode the resource partitioner should be
-    ///                     initialized in.
+    /// \param params       [in] The parameters to the \a hpx::init function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns the value, which has been
     ///                     returned from the user supplied \p f.
@@ -237,20 +173,8 @@ namespace hpx
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
     ///
-    /// \param argc         [in] The number of command line arguments passed
-    ///                     in \p argv. This is usually the unchanged value as
-    ///                     passed by the operating system (to `main()`).
-    /// \param argv         [in] The command line arguments for this
-    ///                     application, usually that is the value as passed
-    ///                     by the operating system (to `main()`).
-    /// \param mode         [in] The mode the created runtime environment
-    ///                     should be initialized in. There has to be exactly
-    ///                     one locality in each HPX application which is
-    ///                     executed in console mode (\a hpx::runtime_mode_console),
-    ///                     all other localities have to be run in worker mode
-    ///                     (\a hpx::runtime_mode_worker). Normally this is
-    ///                     set up automatically, but sometimes it is necessary
-    ///                     to explicitly specify the mode.
+    /// \param params       [in] The parameters to the \a hpx::init function
+    ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns the value, which has been
     ///                     returned from `hpx_main` (or 0 when executed in
@@ -884,7 +808,7 @@ namespace hpx
     ///                     entry point of any HPX application. If \p f is
     ///                     `nullptr` the HPX runtime environment will be started
     ///                     without invoking \p f.
-    /// \param cfg          A list of configuration settings which will be added
+    /// \param cfg          [in] A list of configuration settings which will be added
     ///                     to the system configuration before the runtime
     ///                     instance is run. Each of the entries in this list
     ///                     must have the format of a fully defined key/value
