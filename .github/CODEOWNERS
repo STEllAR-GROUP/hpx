@@ -1,0 +1,7 @@
+* @aurianer @biddisco @hkaiser @msimberg
+
+/docs/ @msimberg
+/libs/**/*.txt @aurianer @msimberg
+/libs/**/*.rst @aurianer @msimberg
+/libs/**/*.py @aurianer @msimberg
+/libs/**/*.sh @aurianer @msimberg
