@@ -37,6 +37,7 @@ set(execution_headers
   hpx/execution/executors/pool_executor.hpp
   hpx/execution/executors/post_policy_dispatch.hpp
   hpx/execution/executors/rebind_executor.hpp
+  hpx/execution/executors/restricted_thread_pool_executor.hpp
   hpx/execution/executors/sequenced_executor.hpp
   hpx/execution/executors/service_executors.hpp
   hpx/execution/executors/static_chunk_size.hpp
@@ -94,7 +95,6 @@ set(execution_compat_headers
   hpx/parallel/executors/pool_executor.hpp
   hpx/parallel/executors/post_policy_dispatch.hpp
   hpx/parallel/executors/rebind_executor.hpp
-  hpx/parallel/executors/restricted_thread_pool_executor.hpp
   hpx/parallel/executors/sequenced_executor.hpp
   hpx/parallel/executors/service_executors.hpp
   hpx/parallel/executors/static_chunk_size.hpp
