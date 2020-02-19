@@ -35,7 +35,7 @@ int hpx_main()
     // Wait for all threads to finish executing.
     sem.wait(19);
 
-    HPX_TEST(count == 10);
+    HPX_TEST_EQ(count, 10);
 
     return hpx::finalize();
 }

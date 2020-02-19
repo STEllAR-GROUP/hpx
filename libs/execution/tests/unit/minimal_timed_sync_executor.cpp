@@ -55,7 +55,7 @@ void test_timed_apply(Executor& exec)
 
         l.count_down_and_wait();
 
-        HPX_TEST(id == hpx::this_thread::get_id());
+        HPX_TEST_EQ(id, hpx::this_thread::get_id());
     }
 
     {
@@ -70,7 +70,7 @@ void test_timed_apply(Executor& exec)
 
         l.count_down_and_wait();
 
-        HPX_TEST(id == hpx::this_thread::get_id());
+        HPX_TEST_EQ(id, hpx::this_thread::get_id());
     }
 }
 

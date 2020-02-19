@@ -110,7 +110,7 @@ void test_initial_state()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST(e.get_error() == hpx::no_state);
+        HPX_TEST_EQ(e.get_error(), hpx::no_state);
     }
     catch (...) {
         HPX_TEST(false);
@@ -143,7 +143,7 @@ void test_cannot_get_future_twice()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST(e.get_error() == hpx::future_already_retrieved);
+        HPX_TEST_EQ(e.get_error(), hpx::future_already_retrieved);
     }
     catch (...) {
         HPX_TEST(false);
@@ -237,7 +237,7 @@ void test_invoking_a_packaged_task_twice_throws()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST(e.get_error() == hpx::promise_already_satisfied);
+        HPX_TEST_EQ(e.get_error(), hpx::promise_already_satisfied);
     }
     catch (...) {
         HPX_TEST(false);
@@ -259,7 +259,7 @@ void test_cannot_get_future_twice_from_task()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST(e.get_error() == hpx::future_already_retrieved);
+        HPX_TEST_EQ(e.get_error(), hpx::future_already_retrieved);
     }
     catch (...) {
         HPX_TEST(false);
@@ -472,7 +472,7 @@ void test_packaged_task_can_be_moved()
         HPX_TEST(!"Can invoke moved task!");
     }
     catch (hpx::exception const& e) {
-      HPX_TEST(e.get_error() == hpx::no_state);
+      HPX_TEST_EQ(e.get_error(), hpx::no_state);
     }
     catch (...) {
         HPX_TEST(false);
@@ -501,7 +501,7 @@ void test_destroying_a_promise_stores_broken_promise()
         HPX_TEST(false);    // shouldn't get here
     }
     catch (hpx::exception const& e) {
-        HPX_TEST(e.get_error() == hpx::broken_promise);
+        HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
     }
     catch (...) {
         HPX_TEST(false);
@@ -524,7 +524,7 @@ void test_destroying_a_packaged_task_stores_broken_task()
         HPX_TEST(false);    // shouldn't get here
     }
     catch (hpx::exception const& e) {
-      HPX_TEST(e.get_error() == hpx::broken_promise);
+      HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
     }
     catch (...) {
         HPX_TEST(false);

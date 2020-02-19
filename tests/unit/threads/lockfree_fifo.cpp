@@ -121,7 +121,7 @@ int main(int argc, char** argv)
     }
 
     for (std::uint64_t i = 0; i < threads; ++i)
-        HPX_TEST(stolen[i] == 0);
+        HPX_TEST_EQ(stolen[i], std::uint64_t(0));
 
     for (std::uint64_t i = 0; i < threads; ++i)
         delete queues[i];

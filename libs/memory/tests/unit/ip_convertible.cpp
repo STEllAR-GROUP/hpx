@@ -44,6 +44,6 @@ int f(hpx::intrusive_ptr<Y>)
 
 int main()
 {
-    HPX_TEST(1 == f(hpx::intrusive_ptr<Z>()));
+    HPX_TEST_EQ(1, f(hpx::intrusive_ptr<Z>()));
     return hpx::util::report_errors();
 }

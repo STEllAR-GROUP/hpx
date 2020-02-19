@@ -16,6 +16,7 @@
 #include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <cstdlib>    // for putenv
 #include <fstream>
 #include <functional>
@@ -43,9 +44,9 @@ pair<string, vector<vector<string>>> msp(const string& s1, const string& s2)
 
 void check_value(const option& option, const char* name, const char* value)
 {
-    HPX_TEST(option.string_key == name);
-    HPX_TEST(option.value.size() == 1);
-    HPX_TEST(option.value.front() == value);
+    HPX_TEST_EQ(option.string_key, name);
+    HPX_TEST_EQ(option.value.size(), std::size_t(1));
+    HPX_TEST_EQ(option.value.front(), value);
 }
 
 vector<string> sv(const char* array[], unsigned size)
@@ -132,7 +133,7 @@ namespace command_line {
                 .options;
         HPX_TEST_EQ(a5.size(), 3u);
         check_value(a5[0], "-p", "7");
-        HPX_TEST(a5[1].value.size() == 3);
+        HPX_TEST_EQ(a5[1].value.size(), std::size_t(3));
         HPX_TEST_EQ(a5[1].string_key, "-o");
         HPX_TEST_EQ(a5[1].value[0], "1");
         HPX_TEST_EQ(a5[1].value[1], "2");
@@ -160,7 +161,7 @@ namespace command_line {
         check_value(parsed_options[0], "foo", "one");
         check_value(parsed_options[1], "bar", "two");
         HPX_TEST_EQ(parsed_options[2].string_key, "foo");
-        HPX_TEST(parsed_options[2].value.size() == 2);
+        HPX_TEST_EQ(parsed_options[2].value.size(), std::size_t(2));
         HPX_TEST_EQ(parsed_options[2].value[0], "three");
         HPX_TEST_EQ(parsed_options[2].value[1], "four");
         check_value(parsed_options[3], "fizbaz", "five");
@@ -178,7 +179,7 @@ namespace command_line {
         check_value(parsed_options[0], "foo", "one");
         check_value(parsed_options[1], "bar", "two");
         HPX_TEST_EQ(parsed_options[2].string_key, "foo");
-        HPX_TEST(parsed_options[2].value.size() == 2);
+        HPX_TEST_EQ(parsed_options[2].value.size(), std::size_t(2));
         HPX_TEST_EQ(parsed_options[2].value[0], "three");
         HPX_TEST_EQ(parsed_options[2].value[1], "four");
         check_value(parsed_options[3], "fizbaz", "five");
@@ -207,12 +208,12 @@ namespace command_line {
                 .run()
                 .options;
         HPX_TEST_EQ(a6.size(), 2u);
-        HPX_TEST(a6[0].value.size() == 2);
+        HPX_TEST_EQ(a6[0].value.size(), std::size_t(2));
         HPX_TEST_EQ(a6[0].string_key, "multitoken");
         HPX_TEST_EQ(a6[0].value[0], "token1");
         HPX_TEST_EQ(a6[0].value[1], "token2");
         HPX_TEST_EQ(a6[1].string_key, "file");
-        HPX_TEST(a6[1].value.size() == 1);
+        HPX_TEST_EQ(a6[1].value.size(), std::size_t(1));
         HPX_TEST_EQ(a6[1].value[0], "some_file");
 #endif
     }
@@ -252,7 +253,7 @@ void test_config_file(const char* config_file)
 
     stringstream ss(content1);
     vector<option> a1 = parse_config_file(ss, desc).options;
-    HPX_TEST(a1.size() == 7);
+    HPX_TEST_EQ(a1.size(), std::size_t(7));
     check_value(a1[0], "gv1", "0");
     check_value(a1[1], "empty_value", "");
     check_value(a1[2], "plug3", "7");
@@ -263,7 +264,7 @@ void test_config_file(const char* config_file)
 
     // same test, but now options come from file
     vector<option> a2 = parse_config_file<char>(config_file, desc).options;
-    HPX_TEST(a2.size() == 7);
+    HPX_TEST_EQ(a2.size(), std::size_t(7));
     check_value(a2[0], "gv1", "0");
     check_value(a2[1], "empty_value", "");
     check_value(a2[2], "plug3", "7");
@@ -287,10 +288,10 @@ void test_environment()
 #endif
     parsed_options p = parse_environment(desc, "PO_TEST_");
 
-    HPX_TEST(p.options.size() == 1);
-    HPX_TEST(p.options[0].string_key == "foo");
-    HPX_TEST(p.options[0].value.size() == 1);
-    HPX_TEST(p.options[0].value[0] == "1");
+    HPX_TEST_EQ(p.options.size(), std::size_t(1));
+    HPX_TEST_EQ(p.options[0].string_key, "foo");
+    HPX_TEST_EQ(p.options[0].value.size(), std::size_t(1));
+    HPX_TEST_EQ(p.options[0].value[0], "1");
 
     //TODO: since 'bar' does not allow a value, it cannot appear in environment,
     // which already has a value.
@@ -309,20 +310,20 @@ void test_unregistered()
                             .run()
                             .options;
 
-    HPX_TEST(a1.size() == 3);
-    HPX_TEST(a1[0].string_key == "foo");
-    HPX_TEST(a1[0].unregistered == true);
-    HPX_TEST(a1[0].value.size() == 1);
-    HPX_TEST(a1[0].value[0] == "12");
-    HPX_TEST(a1[1].string_key == "bar");
-    HPX_TEST(a1[1].unregistered == true);
-    HPX_TEST(a1[2].string_key == "");
-    HPX_TEST(a1[2].unregistered == false);
+    HPX_TEST_EQ(a1.size(), std::size_t(3));
+    HPX_TEST_EQ(a1[0].string_key, "foo");
+    HPX_TEST_EQ(a1[0].unregistered, true);
+    HPX_TEST_EQ(a1[0].value.size(), std::size_t(1));
+    HPX_TEST_EQ(a1[0].value[0], "12");
+    HPX_TEST_EQ(a1[1].string_key, "bar");
+    HPX_TEST_EQ(a1[1].unregistered, true);
+    HPX_TEST_EQ(a1[2].string_key, "");
+    HPX_TEST_EQ(a1[2].unregistered, false);
 
     vector<string> a2 = collect_unrecognized(a1, include_positional);
-    HPX_TEST(a2[0] == "--foo=12");
-    HPX_TEST(a2[1] == "--bar");
-    HPX_TEST(a2[2] == "1");
+    HPX_TEST_EQ(a2[0], "--foo=12");
+    HPX_TEST_EQ(a2[1], "--bar");
+    HPX_TEST_EQ(a2[2], "1");
 
     // Test that storing unregistered options has no effect
     variables_map vm;
@@ -339,7 +340,7 @@ void test_unregistered()
 
     stringstream ss(content1);
     vector<option> a3 = parse_config_file(ss, desc, true).options;
-    HPX_TEST(a3.size() == 2);
+    HPX_TEST_EQ(a3.size(), std::size_t(2));
     check_value(a3[0], "gv1", "0");
     check_value(a3[1], "m1.v1", "1");
 }

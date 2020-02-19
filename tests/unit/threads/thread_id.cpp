@@ -72,9 +72,9 @@ void test_thread_ids_have_a_total_order()
     hpx::thread::id t2_id = t2.get_id();
     hpx::thread::id t3_id = t3.get_id();
 
-    HPX_TEST(t1_id != t2_id);
-    HPX_TEST(t1_id != t3_id);
-    HPX_TEST(t2_id != t3_id);
+    HPX_TEST_NEQ(t1_id, t2_id);
+    HPX_TEST_NEQ(t1_id, t3_id);
+    HPX_TEST_NEQ(t2_id, t3_id);
 
     HPX_TEST((t1_id < t2_id) != (t2_id < t1_id));
     HPX_TEST((t1_id < t3_id) != (t3_id < t1_id));
@@ -107,27 +107,27 @@ void test_thread_ids_have_a_total_order()
 
     if((t1_id < t2_id) && (t2_id < t3_id))
     {
-        HPX_TEST(t1_id < t3_id);
+        HPX_TEST_LT(t1_id, t3_id);
     }
     else if((t1_id < t3_id) && (t3_id < t2_id))
     {
-        HPX_TEST(t1_id < t2_id);
+        HPX_TEST_LT(t1_id, t2_id);
     }
     else if((t2_id < t3_id) && (t3_id < t1_id))
     {
-        HPX_TEST(t2_id < t1_id);
+        HPX_TEST_LT(t2_id, t1_id);
     }
     else if((t2_id < t1_id) && (t1_id < t3_id))
     {
-        HPX_TEST(t2_id < t3_id);
+        HPX_TEST_LT(t2_id, t3_id);
     }
     else if((t3_id < t1_id) && (t1_id < t2_id))
     {
-        HPX_TEST(t3_id < t2_id);
+        HPX_TEST_LT(t3_id, t2_id);
     }
     else if((t3_id < t2_id) && (t2_id < t1_id))
     {
-        HPX_TEST(t3_id < t1_id);
+        HPX_TEST_LT(t3_id, t1_id);
     }
     else
     {
@@ -136,13 +136,13 @@ void test_thread_ids_have_a_total_order()
 
     hpx::thread::id default_id;
 
-    HPX_TEST(default_id < t1_id);
-    HPX_TEST(default_id < t2_id);
-    HPX_TEST(default_id < t3_id);
+    HPX_TEST_LT(default_id, t1_id);
+    HPX_TEST_LT(default_id, t2_id);
+    HPX_TEST_LT(default_id, t3_id);
 
-    HPX_TEST(default_id <= t1_id);
-    HPX_TEST(default_id <= t2_id);
-    HPX_TEST(default_id <= t3_id);
+    HPX_TEST_LTE(default_id, t1_id);
+    HPX_TEST_LTE(default_id, t2_id);
+    HPX_TEST_LTE(default_id, t3_id);
 
     HPX_TEST(!(default_id > t1_id));
     HPX_TEST(!(default_id > t2_id));

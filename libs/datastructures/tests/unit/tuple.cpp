@@ -33,6 +33,7 @@
 // clang-format on
 
 #include <array>
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
@@ -145,32 +146,32 @@ hpx::util::tuple<char (&)[10]> v2(cs);    // ok
 void construction_test()
 {
     hpx::util::tuple<int> t1;
-    HPX_TEST(hpx::util::get<0>(t1) == int());
+    HPX_TEST_EQ(hpx::util::get<0>(t1), int());
 
     hpx::util::tuple<float> t2(5.5f);
-    HPX_TEST(hpx::util::get<0>(t2) > 5.4f && hpx::util::get<0>(t2) < 5.6f);
+    HPX_TEST_RANGE(hpx::util::get<0>(t2), 5.4f, 5.6f);
 
     hpx::util::tuple<foo> t3(foo(12));
     HPX_TEST(hpx::util::get<0>(t3) == foo(12));
 
     hpx::util::tuple<double> t4(t2);
-    HPX_TEST(hpx::util::get<0>(t4) > 5.4 && hpx::util::get<0>(t4) < 5.6);
+    HPX_TEST_RANGE(hpx::util::get<0>(t4), 5.4f, 5.6f);
 
     hpx::util::tuple<int, float> t5;
-    HPX_TEST(hpx::util::get<0>(t5) == int());
-    HPX_TEST(hpx::util::get<1>(t5) == float());
+    HPX_TEST_EQ(hpx::util::get<0>(t5), int());
+    HPX_TEST_EQ(hpx::util::get<1>(t5), float());
 
     hpx::util::tuple<int, float> t6(12, 5.5f);
-    HPX_TEST(hpx::util::get<0>(t6) == 12);
-    HPX_TEST(hpx::util::get<1>(t6) > 5.4f && hpx::util::get<1>(t6) < 5.6f);
+    HPX_TEST_EQ(hpx::util::get<0>(t6), 12);
+    HPX_TEST_RANGE(hpx::util::get<1>(t6), 5.4f, 5.6f);
 
     hpx::util::tuple<int, float> t7(t6);
-    HPX_TEST(hpx::util::get<0>(t7) == 12);
-    HPX_TEST(hpx::util::get<1>(t7) > 5.4f && hpx::util::get<1>(t7) < 5.6f);
+    HPX_TEST_EQ(hpx::util::get<0>(t7), 12);
+    HPX_TEST_RANGE(hpx::util::get<1>(t7), 5.4f, 5.6f);
 
     hpx::util::tuple<long, double> t8(t6);
-    HPX_TEST(hpx::util::get<0>(t8) == 12);
-    HPX_TEST(hpx::util::get<1>(t8) > 5.4 && hpx::util::get<1>(t8) < 5.6);
+    HPX_TEST_EQ(hpx::util::get<0>(t8), 12);
+    HPX_TEST_RANGE(hpx::util::get<1>(t8), 5.4f, 5.6f);
 
     dummy(hpx::util::tuple<no_def_constructor, no_def_constructor,
         no_def_constructor>(std::string("Jaba"),    // ok, since the default
@@ -210,23 +211,23 @@ void element_access_test()
     HPX_TEST(i == 1 && i2 == 2);
 
     int j = hpx::util::get<0>(ct);
-    HPX_TEST(j == 1);
+    HPX_TEST_EQ(j, 1);
 
     HPX_TEST(hpx::util::get<0>(t) = 5);
 
     //hpx::util::get<0>(ct) = 5; // can't assign to const
 
     double e = hpx::util::get<1>(t);
-    HPX_TEST(e > 2.69 && e < 2.71);
+    HPX_TEST_RANGE(e, 2.69, 2.71);
 
     hpx::util::get<1>(t) = 3.14 + i;
-    HPX_TEST(hpx::util::get<1>(t) > 4.13 && hpx::util::get<1>(t) < 4.15);
+    HPX_TEST_RANGE(hpx::util::get<1>(t), 4.13, 4.15);
 
     //hpx::util::get<2>(t) = A(); // can't assign to const
     //dummy(hpx::util::get<4>(ct)); // illegal index
 
     ++hpx::util::get<0>(t);
-    HPX_TEST(hpx::util::get<0>(t) == 6);
+    HPX_TEST_EQ(hpx::util::get<0>(t), 6);
 
     HPX_TEST((std::is_const<hpx::util::tuple_element<0,
                   hpx::util::tuple<int, float>>::type>::value != true));
@@ -257,13 +258,13 @@ void copy_test()
     hpx::util::tuple<int, char> t1(4, 'a');
     hpx::util::tuple<int, char> t2(5, 'b');
     t2 = t1;
-    HPX_TEST(hpx::util::get<0>(t1) == hpx::util::get<0>(t2));
-    HPX_TEST(hpx::util::get<1>(t1) == hpx::util::get<1>(t2));
+    HPX_TEST_EQ(hpx::util::get<0>(t1), hpx::util::get<0>(t2));
+    HPX_TEST_EQ(hpx::util::get<1>(t1), hpx::util::get<1>(t2));
 
     hpx::util::tuple<long, std::string> t3(2, "a");
     t3 = t1;
-    HPX_TEST((double) hpx::util::get<0>(t1) == hpx::util::get<0>(t3));
-    HPX_TEST(hpx::util::get<1>(t1) == hpx::util::get<1>(t3)[0]);
+    HPX_TEST_EQ((double) hpx::util::get<0>(t1), hpx::util::get<0>(t3));
+    HPX_TEST_EQ(hpx::util::get<1>(t1), hpx::util::get<1>(t3)[0]);
 
     // testing copy and assignment with implicit conversions between elements
     // testing tie
@@ -277,9 +278,9 @@ void copy_test()
     double d;
     hpx::util::tie(i, c, d) = hpx::util::make_tuple(1, 'a', 5.5);
 
-    HPX_TEST(i == 1);
-    HPX_TEST(c == 'a');
-    HPX_TEST(d > 5.4 && d < 5.6);
+    HPX_TEST_EQ(i, 1);
+    HPX_TEST_EQ(c, 'a');
+    HPX_TEST_RANGE(d, 5.4, 5.6);
 }
 
 void mutate_test()
@@ -290,9 +291,9 @@ void mutate_test()
     hpx::util::get<2>(t1) = false;
     hpx::util::get<3>(t1) = foo(5);
 
-    HPX_TEST(hpx::util::get<0>(t1) == 6);
-    HPX_TEST(hpx::util::get<1>(t1) > 2.1f && hpx::util::get<1>(t1) < 2.3f);
-    HPX_TEST(hpx::util::get<2>(t1) == false);
+    HPX_TEST_EQ(hpx::util::get<0>(t1), 6);
+    HPX_TEST_RANGE(hpx::util::get<1>(t1), 2.1f, 2.3f);
+    HPX_TEST_EQ(hpx::util::get<2>(t1), false);
     HPX_TEST(hpx::util::get<3>(t1) == foo(5));
 }
 
@@ -303,13 +304,13 @@ void mutate_test()
 void make_tuple_test()
 {
     hpx::util::tuple<int, char> t1 = hpx::util::make_tuple(5, 'a');
-    HPX_TEST(hpx::util::get<0>(t1) == 5);
-    HPX_TEST(hpx::util::get<1>(t1) == 'a');
+    HPX_TEST_EQ(hpx::util::get<0>(t1), 5);
+    HPX_TEST_EQ(hpx::util::get<1>(t1), 'a');
 
     hpx::util::tuple<int, std::string> t2;
     t2 = hpx::util::make_tuple((short int) 2, std::string("Hi"));
-    HPX_TEST(hpx::util::get<0>(t2) == 2);
-    HPX_TEST(hpx::util::get<1>(t2) == "Hi");
+    HPX_TEST_EQ(hpx::util::get<0>(t2), 2);
+    HPX_TEST_EQ(hpx::util::get<1>(t2), "Hi");
 
     A a = A();
     B b;
@@ -352,14 +353,14 @@ void tie_test()
     foo c(5);
 
     hpx::util::tie(a, b, c) = hpx::util::make_tuple(2, 'a', foo(3));
-    HPX_TEST(a == 2);
-    HPX_TEST(b == 'a');
+    HPX_TEST_EQ(a, 2);
+    HPX_TEST_EQ(b, 'a');
     HPX_TEST(c == foo(3));
 
     hpx::util::tie(a, hpx::util::ignore, c) =
         hpx::util::make_tuple((short int) 5, false, foo(5));
-    HPX_TEST(a == 5);
-    HPX_TEST(b == 'a');
+    HPX_TEST_EQ(a, 5);
+    HPX_TEST_EQ(b, 'a');
     HPX_TEST(c == foo(5));
 
     // testing assignment from std::pair
@@ -387,7 +388,7 @@ void tuple_cat_test()
 
         auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f);
 
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     // Cat multiple tuples
@@ -397,7 +398,7 @@ void tuple_cat_test()
 
         auto expected = hpx::util::make_tuple(1, 2.f, 1, 2.f, 1, 2.f);
 
-        HPX_TEST((res == expected));
+        HPX_TEST(res == expected);
     }
 
     // Cat move only types
@@ -491,8 +492,8 @@ void ordering_test()
 void const_tuple_test()
 {
     const hpx::util::tuple<int, float> t1(5, 3.3f);
-    HPX_TEST(hpx::util::get<0>(t1) == 5);
-    HPX_TEST(hpx::util::get<1>(t1) == 3.3f);
+    HPX_TEST_EQ(hpx::util::get<0>(t1), 5);
+    HPX_TEST_EQ(hpx::util::get<1>(t1), 3.3f);
 }
 
 // ----------------------------------------------------------------------------
@@ -503,12 +504,12 @@ void tuple_length_test()
     typedef hpx::util::tuple<int, float, double> t1;
     typedef hpx::util::tuple<> t2;
 
-    HPX_TEST(hpx::util::tuple_size<t1>::value == 3);
-    HPX_TEST(hpx::util::tuple_size<t2>::value == 0);
+    HPX_TEST_EQ(hpx::util::tuple_size<t1>::value, std::size_t(3));
+    HPX_TEST_EQ(hpx::util::tuple_size<t2>::value, std::size_t(0));
 
     {
         using t3 = std::array<int, 4>;
-        HPX_TEST(hpx::util::tuple_size<t3>::value == 4);
+        HPX_TEST_EQ(hpx::util::tuple_size<t3>::value, std::size_t(4));
     }
 }
 
@@ -519,21 +520,21 @@ void tuple_swap_test()
 {
     hpx::util::tuple<int, float, double> t1(1, 2.0f, 3.0), t2(4, 5.0f, 6.0);
     boost::swap(t1, t2);
-    HPX_TEST(hpx::util::get<0>(t1) == 4);
-    HPX_TEST(hpx::util::get<1>(t1) == 5.0f);
-    HPX_TEST(hpx::util::get<2>(t1) == 6.0);
-    HPX_TEST(hpx::util::get<0>(t2) == 1);
-    HPX_TEST(hpx::util::get<1>(t2) == 2.0f);
-    HPX_TEST(hpx::util::get<2>(t2) == 3.0);
+    HPX_TEST_EQ(hpx::util::get<0>(t1), 4);
+    HPX_TEST_EQ(hpx::util::get<1>(t1), 5.0f);
+    HPX_TEST_EQ(hpx::util::get<2>(t1), 6.0);
+    HPX_TEST_EQ(hpx::util::get<0>(t2), 1);
+    HPX_TEST_EQ(hpx::util::get<1>(t2), 2.0f);
+    HPX_TEST_EQ(hpx::util::get<2>(t2), 3.0);
 
     int i = 1, j = 2;
 
     hpx::util::tuple<int&> t3(i), t4(j);
     boost::swap(t3, t4);
-    HPX_TEST(hpx::util::get<0>(t3) == 2);
-    HPX_TEST(hpx::util::get<0>(t4) == 1);
-    HPX_TEST(i == 2);
-    HPX_TEST(j == 1);
+    HPX_TEST_EQ(hpx::util::get<0>(t3), 2);
+    HPX_TEST_EQ(hpx::util::get<0>(t4), 1);
+    HPX_TEST_EQ(i, 2);
+    HPX_TEST_EQ(j, 1);
 }
 
 void tuple_std_test()
@@ -542,29 +543,29 @@ void tuple_std_test()
     hpx::util::tuple<int, float, double> t1(1, 2.0f, 3.0);
     std::tuple<int, float, double> t2 = t1;
     hpx::util::tuple<int, float, double> t3 = t2;
-    HPX_TEST(std::get<0>(t1) == 1);
-    HPX_TEST(std::get<0>(t2) == 1);
-    HPX_TEST(std::get<0>(t3) == 1);
+    HPX_TEST_EQ(std::get<0>(t1), 1);
+    HPX_TEST_EQ(std::get<0>(t2), 1);
+    HPX_TEST_EQ(std::get<0>(t3), 1);
 
-    HPX_TEST(hpx::util::get<0>(t1) == 1);
-    HPX_TEST(hpx::util::get<0>(t2) == 1);
-    HPX_TEST(hpx::util::get<0>(t3) == 1);
+    HPX_TEST_EQ(hpx::util::get<0>(t1), 1);
+    HPX_TEST_EQ(hpx::util::get<0>(t2), 1);
+    HPX_TEST_EQ(hpx::util::get<0>(t3), 1);
 
-    HPX_TEST(std::get<1>(t1) == 2.0f);
-    HPX_TEST(std::get<1>(t2) == 2.0f);
-    HPX_TEST(std::get<1>(t3) == 2.0f);
+    HPX_TEST_EQ(std::get<1>(t1), 2.0f);
+    HPX_TEST_EQ(std::get<1>(t2), 2.0f);
+    HPX_TEST_EQ(std::get<1>(t3), 2.0f);
 
-    HPX_TEST(hpx::util::get<1>(t1) == 2.0f);
-    HPX_TEST(hpx::util::get<1>(t2) == 2.0f);
-    HPX_TEST(hpx::util::get<1>(t3) == 2.0f);
+    HPX_TEST_EQ(hpx::util::get<1>(t1), 2.0f);
+    HPX_TEST_EQ(hpx::util::get<1>(t2), 2.0f);
+    HPX_TEST_EQ(hpx::util::get<1>(t3), 2.0f);
 
-    HPX_TEST(std::get<2>(t1) == 3.0);
-    HPX_TEST(std::get<2>(t2) == 3.0);
-    HPX_TEST(std::get<2>(t3) == 3.0);
+    HPX_TEST_EQ(std::get<2>(t1), 3.0);
+    HPX_TEST_EQ(std::get<2>(t2), 3.0);
+    HPX_TEST_EQ(std::get<2>(t3), 3.0);
 
-    HPX_TEST(hpx::util::get<2>(t1) == 3.0);
-    HPX_TEST(hpx::util::get<2>(t2) == 3.0);
-    HPX_TEST(hpx::util::get<2>(t3) == 3.0);
+    HPX_TEST_EQ(hpx::util::get<2>(t1), 3.0);
+    HPX_TEST_EQ(hpx::util::get<2>(t2), 3.0);
+    HPX_TEST_EQ(hpx::util::get<2>(t3), 3.0);
 #endif
 }
 

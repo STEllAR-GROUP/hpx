@@ -51,7 +51,7 @@ void test_create_single_instance()
         hpx::id_type target = hpx::new_<test_server>(loc).get();
         hpx::id_type id = hpx::new_<test_server>(hpx::colocated(target)).get();
 
-        HPX_TEST(hpx::async<call_action>(id).get() == loc);
+        HPX_TEST_EQ(hpx::async<call_action>(id).get(), loc);
     }
 
     for (hpx::id_type const& loc: hpx::find_all_localities())
@@ -59,7 +59,7 @@ void test_create_single_instance()
         test_client target = hpx::new_<test_client>(loc);
         hpx::id_type id = hpx::new_<test_server>(hpx::colocated(target)).get();
 
-        HPX_TEST(hpx::async<call_action>(id).get() == loc);
+        HPX_TEST_EQ(hpx::async<call_action>(id).get(), loc);
     }
 
     for (hpx::id_type const& loc: hpx::find_all_localities())
@@ -67,7 +67,7 @@ void test_create_single_instance()
         test_client target = hpx::new_<test_client>(loc);
         test_client t1 = hpx::new_<test_client>(hpx::colocated(target));
 
-        HPX_TEST(t1.call() == loc);
+        HPX_TEST_EQ(t1.call(), loc);
     }
 
     for (hpx::id_type const& loc: hpx::find_all_localities())
@@ -75,7 +75,7 @@ void test_create_single_instance()
         test_client target = hpx::new_<test_client>(loc);
         test_client t2 = hpx::new_<test_client>(hpx::colocated(target));
 
-        HPX_TEST(t2.call() == loc);
+        HPX_TEST_EQ(t2.call(), loc);
     }
 }
 

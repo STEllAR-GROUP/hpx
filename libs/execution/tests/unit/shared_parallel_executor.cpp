@@ -61,13 +61,13 @@ void test_async()
     hpx::shared_future<hpx::thread::id> fut =
         hpx::parallel::execution::async_execute(exec, &test, 42);
 
-    HPX_TEST(fut.get() != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(fut.get(), hpx::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test(int value, hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 

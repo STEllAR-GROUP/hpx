@@ -22,11 +22,11 @@ int main(int argc, char **argv)
 {
     // Everything is fine on the first call
     hpx::init(argc, argv);
-    HPX_TEST(invoked_init == 1);
+    HPX_TEST_EQ(invoked_init, 1);
 
     // Segfault on the call, now fixed
     hpx::init(argc, argv);
-    HPX_TEST(invoked_init == 2);
+    HPX_TEST_EQ(invoked_init, 2);
 
     return hpx::util::report_errors();
 }

@@ -68,7 +68,7 @@ void test_for_each(ExPolicy&& policy, IteratorTag)
     iterator result = hpx::parallel::for_each(std::forward<ExPolicy>(policy),
         iterator(std::begin(c)), iterator(std::end(c)), set_42());
 
-    HPX_TEST(result == iterator(std::end(c)));
+    HPX_TEST_EQ(result, iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;
@@ -92,7 +92,7 @@ void test_for_each_async(ExPolicy&& p, IteratorTag)
         iterator(std::begin(c)), iterator(std::end(c)), set_42());
     f.wait();
 
-    HPX_TEST(f.get() == iterator(std::end(c)));
+    HPX_TEST_EQ(f.get(), iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;
@@ -256,7 +256,7 @@ void test_for_each_n(ExPolicy policy, IteratorTag)
     iterator result = hpx::parallel::for_each_n(
         policy, iterator(std::begin(c)), c.size(), set_42());
     iterator end = iterator(std::end(c));
-    HPX_TEST(result == end);
+    HPX_TEST_EQ(result, end);
 
     // verify values
     std::size_t count = 0;
@@ -278,7 +278,7 @@ void test_for_each_n_async(ExPolicy p, IteratorTag)
 
     hpx::future<iterator> f = hpx::parallel::for_each_n(
         p, iterator(std::begin(c)), c.size(), set_42());
-    HPX_TEST(f.get() == iterator(std::end(c)));
+    HPX_TEST_EQ(f.get(), iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;

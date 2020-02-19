@@ -14,6 +14,7 @@
 #include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <locale>
 #include <sstream>
 #include <string>
@@ -39,7 +40,7 @@ void test_unicode_to_unicode()
     store(parsed, vm);
 
     HPX_TEST(vm["foo"].as<wstring>() == L"\x044F");
-    HPX_TEST(parsed.options[0].original_tokens.size() == 1);
+    HPX_TEST_EQ(parsed.options[0].original_tokens.size(), std::size_t(1));
     HPX_TEST(parsed.options[0].original_tokens[0] == L"--foo=\x044F");
 }
 
@@ -62,7 +63,7 @@ void test_unicode_to_native()
     variables_map vm;
     store(wcommand_line_parser(args).options(desc).run(), vm);
 
-    HPX_TEST(vm["foo"].as<string>() == "\xD1\x8F");
+    HPX_TEST_EQ(vm["foo"].as<string>(), "\xD1\x8F");
 }
 
 void test_native_to_unicode()
@@ -94,8 +95,8 @@ vector<wstring> sv(const wchar_t* array[], unsigned size)
 
 void check_value(const woption& option, const char* name, const wchar_t* value)
 {
-    HPX_TEST(option.string_key == name);
-    HPX_TEST(option.value.size() == 1);
+    HPX_TEST_EQ(option.string_key, name);
+    HPX_TEST_EQ(option.value.size(), std::size_t(1));
     HPX_TEST(option.value.front() == value);
 }
 
@@ -117,7 +118,7 @@ void test_command_line()
     vector<woption> a4 =
         wcommand_line_parser(cmdline4).options(desc).run().options;
 
-    HPX_TEST(a4.size() == 5);
+    HPX_TEST_EQ(a4.size(), std::size_t(5));
 
     check_value(a4[0], "foo", L"1\u0FF52");
     check_value(a4[1], "foo", L"4");
@@ -144,7 +145,7 @@ void test_config_file()
     variables_map vm;
     store(parse_config_file(stream, desc), vm);
 
-    HPX_TEST(vm["foo"].as<string>() == "\xD1\x8F");
+    HPX_TEST_EQ(vm["foo"].as<string>(), "\xD1\x8F");
 }
 
 int main(int, char*[])

@@ -15,6 +15,7 @@
 #include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
 
+#include <cstddef>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -51,12 +52,12 @@ void test_variable_map()
     variables_map vm;
     store(a3, vm);
     notify(vm);
-    HPX_TEST(vm.size() == 4);
-    HPX_TEST(vm["foo"].as<string>() == "'12'");
-    HPX_TEST(vm["bar"].as<string>() == "11");
-    HPX_TEST(vm.count("biz") == 1);
-    HPX_TEST(vm["biz"].as<string>() == "3");
-    HPX_TEST(vm["output"].as<string>() == "foo");
+    HPX_TEST_EQ(vm.size(), std::size_t(4));
+    HPX_TEST_EQ(vm["foo"].as<string>(), "'12'");
+    HPX_TEST_EQ(vm["bar"].as<string>(), "11");
+    HPX_TEST_EQ(vm.count("biz"), std::size_t(1));
+    HPX_TEST_EQ(vm["biz"].as<string>(), "3");
+    HPX_TEST_EQ(vm["output"].as<string>(), "foo");
 
     int i;
     // clang-format off
@@ -75,11 +76,11 @@ void test_variable_map()
     variables_map vm2;
     store(a4, vm2);
     notify(vm2);
-    HPX_TEST(vm2.size() == 3);
-    HPX_TEST(vm2["zee"].as<bool>() == true);
-    HPX_TEST(vm2["zak"].as<int>() == 13);
-    HPX_TEST(vm2["opt"].as<bool>() == false);
-    HPX_TEST(i == 13);
+    HPX_TEST_EQ(vm2.size(), std::size_t(3));
+    HPX_TEST_EQ(vm2["zee"].as<bool>(), true);
+    HPX_TEST_EQ(vm2["zak"].as<int>(), 13);
+    HPX_TEST_EQ(vm2["opt"].as<bool>(), false);
+    HPX_TEST_EQ(i, 13);
 
     options_description desc2;
     // clang-format off
@@ -98,10 +99,10 @@ void test_variable_map()
     variables_map vm3;
     store(a5, vm3);
     notify(vm3);
-    HPX_TEST(vm3.size() == 3);
-    HPX_TEST(vm3["vee"].as<string>() == "42");
-    HPX_TEST(vm3["voo"].as<string>() == "1");
-    HPX_TEST(vm3["iii"].as<int>() == 123);
+    HPX_TEST_EQ(vm3.size(), std::size_t(3));
+    HPX_TEST_EQ(vm3["vee"].as<string>(), "42");
+    HPX_TEST_EQ(vm3["voo"].as<string>(), "1");
+    HPX_TEST_EQ(vm3["iii"].as<int>(), 123);
 
     options_description desc3;
     // clang-format off
@@ -123,10 +124,10 @@ void test_variable_map()
     variables_map vm4;
     store(a6, vm4);
     notify(vm4);
-    HPX_TEST(vm4.size() == 4);
-    HPX_TEST(vm4["imp"].as<int>() == 1);
-    HPX_TEST(vm4["iim"].as<int>() == 201);
-    HPX_TEST(vm4["mmp"].as<int>() == 123);
+    HPX_TEST_EQ(vm4.size(), std::size_t(4));
+    HPX_TEST_EQ(vm4["imp"].as<int>(), 1);
+    HPX_TEST_EQ(vm4["iim"].as<int>(), 201);
+    HPX_TEST_EQ(vm4["mmp"].as<int>(), 123);
 }
 
 int stored_value;
@@ -164,8 +165,8 @@ void test_semantic_values()
     variables_map vm;
     store(parsed, vm);
     notify(vm);
-    HPX_TEST(vm.count("biz") == 1);
-    HPX_TEST(vm.count("baz") == 1);
+    HPX_TEST_EQ(vm.count("biz"), std::size_t(1));
+    HPX_TEST_EQ(vm.count("baz"), std::size_t(1));
     const vector<string> av = vm["biz"].as<vector<string>>();
     const vector<string> av2 = vm["baz"].as<vector<string>>();
     string exp1[] = {"a", "b x"};
@@ -178,7 +179,7 @@ void test_semantic_values()
     variables_map vm2;
     store(parsed, vm2);
     notify(vm2);
-    HPX_TEST(vm2.count("int") == 1);
+    HPX_TEST_EQ(vm2.count("int"), std::size_t(1));
     HPX_TEST(vm2["int"].as<vector<int>>() == vector<int>(1, 13));
     HPX_TEST_EQ(stored_value, 13);
 
@@ -226,30 +227,30 @@ void test_priority()
     variables_map vm;
     store(p1, vm);
 
-    HPX_TEST(vm.count("first") == 1);
-    HPX_TEST(vm["first"].as<vector<int>>().size() == 2);
+    HPX_TEST_EQ(vm.count("first"), std::size_t(1));
+    HPX_TEST_EQ(vm["first"].as<vector<int>>().size(), std::size_t(2));
     HPX_TEST_EQ(vm["first"].as<vector<int>>()[0], 1);
     HPX_TEST_EQ(vm["first"].as<vector<int>>()[1], 3);
 
-    HPX_TEST(vm.count("second") == 1);
-    HPX_TEST(vm["second"].as<vector<int>>().size() == 1);
+    HPX_TEST_EQ(vm.count("second"), std::size_t(1));
+    HPX_TEST_EQ(vm["second"].as<vector<int>>().size(), std::size_t(1));
     HPX_TEST_EQ(vm["second"].as<vector<int>>()[0], 1);
 
     store(p2, vm);
 
     // Value should not change.
-    HPX_TEST(vm.count("first") == 1);
-    HPX_TEST(vm["first"].as<vector<int>>().size() == 2);
+    HPX_TEST_EQ(vm.count("first"), std::size_t(1));
+    HPX_TEST_EQ(vm["first"].as<vector<int>>().size(), std::size_t(2));
     HPX_TEST_EQ(vm["first"].as<vector<int>>()[0], 1);
     HPX_TEST_EQ(vm["first"].as<vector<int>>()[1], 3);
 
     // Value should change to 7
-    HPX_TEST(vm.count("second") == 1);
-    HPX_TEST(vm["second"].as<vector<int>>().size() == 1);
+    HPX_TEST_EQ(vm.count("second"), std::size_t(1));
+    HPX_TEST_EQ(vm["second"].as<vector<int>>().size(), std::size_t(1));
     HPX_TEST_EQ(vm["second"].as<vector<int>>()[0], 7);
 
-    HPX_TEST(vm.count("include") == 1);
-    HPX_TEST(vm["include"].as<vector<int>>().size() == 2);
+    HPX_TEST_EQ(vm.count("include"), std::size_t(1));
+    HPX_TEST_EQ(vm["include"].as<vector<int>>().size(), std::size_t(2));
     HPX_TEST_EQ(vm["include"].as<vector<int>>()[0], 1);
     HPX_TEST_EQ(vm["include"].as<vector<int>>()[1], 7);
 }
@@ -286,8 +287,8 @@ void test_multiple_assignments_with_different_option_description()
     store(p2, vm);
     store(p3, vm);
 
-    HPX_TEST(vm.count("help") == 1);
-    HPX_TEST(vm.count("includes") == 1);
+    HPX_TEST_EQ(vm.count("help"), std::size_t(1));
+    HPX_TEST_EQ(vm.count("includes"), std::size_t(1));
     HPX_TEST_EQ(vm["includes"].as<vector<string>>()[0], "a");
     HPX_TEST_EQ(vm["includes"].as<vector<string>>()[1], "b");
 }

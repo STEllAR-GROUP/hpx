@@ -15,6 +15,7 @@
 #include <hpx/program_options/positional_options.hpp>
 #include <hpx/program_options/value_semantic.hpp>
 
+#include <cstddef>
 #include <limits>
 #include <vector>
 
@@ -72,7 +73,7 @@ void test_parsing()
     parsed_options parsed =
         command_line_parser(args).options(desc).positional(p).run();
 
-    HPX_TEST(parsed.options.size() == 5);
+    HPX_TEST_EQ(parsed.options.size(), std::size_t(5));
     HPX_TEST_EQ(parsed.options[1].string_key, "input-file");
     HPX_TEST_EQ(parsed.options[1].value[0], "file1");
     HPX_TEST_EQ(parsed.options[3].string_key, "input-file");

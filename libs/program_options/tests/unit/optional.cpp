@@ -50,10 +50,10 @@ void test_optional()
     po::notify(vm);
 
     HPX_TEST(!!foo);
-    HPX_TEST(*foo == 12);
+    HPX_TEST_EQ(*foo, 12);
 
     HPX_TEST(!!bar);
-    HPX_TEST(*bar == 1);
+    HPX_TEST_EQ(*bar, 1);
 
     HPX_TEST(!baz);
 #endif

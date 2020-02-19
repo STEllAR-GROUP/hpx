@@ -141,7 +141,7 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset() method
     v1.reset();
@@ -164,7 +164,7 @@ static void test_zero_args()
 #endif
 
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a non-empty function
     v1 = five;
@@ -182,7 +182,7 @@ static void test_zero_args()
 #endif
 
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // clear
     void (*fpv1)() = 0;    // NOLINT
@@ -200,7 +200,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Assignment to a non-empty function from a free function
     v1 = write_three;
@@ -209,7 +209,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment
     v1 = five;
@@ -218,7 +218,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Assignment to a non-empty function from a free function
     v1 = &write_three;
@@ -227,7 +227,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Construction from another function (that is empty)
     v1.reset();
@@ -241,7 +241,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a non-empty function
     v2 = (five);
@@ -249,7 +249,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     v2.reset();
     HPX_TEST(v2.empty());
@@ -261,7 +261,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Assignment to a non-empty function from a free function
     v2 = write_three;
@@ -270,15 +270,15 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Swapping
     v1 = five;
     std::swap(v1, v2);
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
     std::swap(v1, v2);
     v1.reset();
 
@@ -289,7 +289,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Assignment to a non-empty function from a free function
     v2 = &write_three;
@@ -298,7 +298,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a function from an empty function
     v2 = v1;
@@ -313,10 +313,10 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assign to a function from a function with a function
     v2 = write_five;
@@ -325,10 +325,10 @@ static void test_zero_args()
     HPX_TEST(!v2.empty());
     global_int = 0;
     v1();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
     global_int = 0;
     v2();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Construct a function given another function containing a function
     func_void_type v3(v1);
@@ -336,7 +336,7 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset() method
     v3.reset();
@@ -349,7 +349,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a non-empty function
     v3 = five;
@@ -357,7 +357,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset()
     v3.reset();
@@ -370,7 +370,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Assignment to a non-empty function from a free function
     v3 = &write_three;
@@ -379,7 +379,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment
     v3 = five;
@@ -388,7 +388,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v3();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Construction of a function from a function containing a functor
     func_void_type v4(v3);
@@ -396,7 +396,7 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset() method
     v4.reset();
@@ -409,7 +409,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a non-empty function
     v4 = five;
@@ -417,7 +417,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset()
     v4.reset();
@@ -430,7 +430,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Assignment to a non-empty function from a free function
     v4 = &write_three;
@@ -439,7 +439,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment
     v4 = five;
@@ -448,7 +448,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v4();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Construction of a function from a functor
     func_void_type v5(five);
@@ -456,7 +456,7 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset() method
     v5.reset();
@@ -469,7 +469,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a non-empty function
     v5 = five;
@@ -477,7 +477,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset()
     v5.reset();
@@ -490,7 +490,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Assignment to a non-empty function from a free function
     v5 = &write_three;
@@ -499,7 +499,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment
     v5 = five;
@@ -508,7 +508,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v5();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Construction of a function from a function
     func_void_type v6(&write_five);
@@ -516,7 +516,7 @@ static void test_zero_args()
     // Invocation of a function
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset() method
     v6.reset();
@@ -529,7 +529,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment to a non-empty function
     v6 = five;
@@ -537,7 +537,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // reset()
     v6.reset();
@@ -550,7 +550,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Assignment to a non-empty function from a free function
     v6 = &write_three;
@@ -559,7 +559,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Assignment
     v6 = five;
@@ -568,7 +568,7 @@ static void test_zero_args()
     // Invocation
     global_int = 0;
     v6();
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
 
     // Const vs. non-const
     write_const_1_nonconst_2 one_or_two;
@@ -577,11 +577,11 @@ static void test_zero_args()
 
     global_int = 0;
     v7();
-    HPX_TEST(global_int == 2);
+    HPX_TEST_EQ(global_int, 2);
 
     global_int = 0;
     v8();
-    HPX_TEST(global_int == 2);
+    HPX_TEST_EQ(global_int, 2);
 
     // Test construction from 0
     void (*fpv9)() = 0;    // NOLINT
@@ -599,13 +599,13 @@ static void test_zero_args()
 
     func_int_type i0(gen_five);
 
-    HPX_TEST(i0() == 5);
+    HPX_TEST_EQ(i0(), 5);
     i0 = gen_three;
-    HPX_TEST(i0() == 3);
+    HPX_TEST_EQ(i0(), 3);
     i0 = &generate_five;
-    HPX_TEST(i0() == 5);
+    HPX_TEST_EQ(i0(), 5);
     i0 = &generate_three;
-    HPX_TEST(i0() == 3);
+    HPX_TEST_EQ(i0(), 3);
     HPX_TEST(!i0.empty());
     i0.reset();
     HPX_TEST(!i0);
@@ -614,13 +614,13 @@ static void test_zero_args()
     typedef hpx::util::function_nonser<long()> func_long_type;
     func_long_type i1(gen_five);
 
-    HPX_TEST(i1() == 5);
+    HPX_TEST_EQ(i1(), 5);
     i1 = gen_three;
-    HPX_TEST(i1() == 3);
+    HPX_TEST_EQ(i1(), 3);
     i1 = &generate_five;
-    HPX_TEST(i1() == 5);
+    HPX_TEST_EQ(i1(), 5);
     i1 = &generate_three;
-    HPX_TEST(i1() == 3);
+    HPX_TEST_EQ(i1(), 3);
     HPX_TEST(!i1.empty());
     i1.reset();
     HPX_TEST(!i1);
@@ -631,30 +631,30 @@ static void test_one_arg()
     std::negate<int> neg;
 
     hpx::util::function_nonser<int(int)> f1(neg);
-    HPX_TEST(f1(5) == -5);
+    HPX_TEST_EQ(f1(5), -5);
 
     hpx::util::function_nonser<string(string)> id(&identity_str);
-    HPX_TEST(id("str") == "str");
+    HPX_TEST_EQ(id("str"), "str");
 
     hpx::util::function_nonser<string(const char*)> id2(&identity_str);
-    HPX_TEST(id2("foo") == "foo");
+    HPX_TEST_EQ(id2("foo"), "foo");
 
     add_to_obj add_to(5);
     hpx::util::function_nonser<int(int)> f2(add_to);
-    HPX_TEST(f2(3) == 8);
+    HPX_TEST_EQ(f2(3), 8);
 
     const hpx::util::function_nonser<int(int)> cf2(add_to);
-    HPX_TEST(cf2(3) == 8);
+    HPX_TEST_EQ(cf2(3), 8);
 }
 
 static void test_two_args()
 {
     hpx::util::function_nonser<string(const string&, const string&)> cat(
         &string_cat);
-    HPX_TEST(cat("str", "ing") == "string");
+    HPX_TEST_EQ(cat("str", "ing"), "string");
 
     hpx::util::function_nonser<int(short, short)> sum(&sum_ints);
-    HPX_TEST(sum(2, 3) == 5);
+    HPX_TEST_EQ(sum(2, 3), 5);
 }
 
 static void test_emptiness()
@@ -697,18 +697,18 @@ static void test_member_functions()
     X one(1);
     X five(5);
 
-    HPX_TEST(f1(&one) == 2);
-    HPX_TEST(f1(&five) == 10);
+    HPX_TEST_EQ(f1(&one), 2);
+    HPX_TEST_EQ(f1(&five), 10);
 
     hpx::util::function_nonser<int(X*)> f1_2;
     f1_2 = &X::twice;
 
-    HPX_TEST(f1_2(&one) == 2);
-    HPX_TEST(f1_2(&five) == 10);
+    HPX_TEST_EQ(f1_2(&one), 2);
+    HPX_TEST_EQ(f1_2(&five), 10);
 
     hpx::util::function_nonser<int(X&, int)> f2(&X::plus);
-    HPX_TEST(f2(one, 3) == 4);
-    HPX_TEST(f2(five, 4) == 9);
+    HPX_TEST_EQ(f2(one, 3), 4);
+    HPX_TEST_EQ(f2(five, 4), 9);
 }
 
 struct add_with_throw_on_copy
@@ -737,7 +737,7 @@ static void test_ref()
     try
     {
         hpx::util::function_nonser<int(int, int)> f(std::ref(atc));
-        HPX_TEST(f(1, 3) == 4);
+        HPX_TEST_EQ(f(1, 3), 4);
     }
     catch (std::runtime_error const& /*e*/)
     {
@@ -855,23 +855,23 @@ static void test_move_semantics()
     f1();
 
     HPX_TEST(!f1.empty());
-    HPX_TEST(global_int == 1);
+    HPX_TEST_EQ(global_int, 1);
 
     // Testing rvalue constructors
     f1_type f2(static_cast<f1_type&&>(f1));
     HPX_TEST(f1.empty());
     HPX_TEST(!f2.empty());
-    HPX_TEST(global_int == 1);
+    HPX_TEST_EQ(global_int, 1);
     f2();
-    HPX_TEST(global_int == 2);
+    HPX_TEST_EQ(global_int, 2);
 
     f1_type f3(static_cast<f1_type&&>(f2));
     HPX_TEST(f1.empty());
     HPX_TEST(f2.empty());
     HPX_TEST(!f3.empty());
-    HPX_TEST(global_int == 2);
+    HPX_TEST_EQ(global_int, 2);
     f3();
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
 
     // Testing move assignment
     f1_type f4;
@@ -881,23 +881,23 @@ static void test_move_semantics()
     HPX_TEST(f2.empty());
     HPX_TEST(f3.empty());
     HPX_TEST(!f4.empty());
-    HPX_TEST(global_int == 3);
+    HPX_TEST_EQ(global_int, 3);
     f4();
-    HPX_TEST(global_int == 4);
+    HPX_TEST_EQ(global_int, 4);
 
     // Testing self move assignment
     f4 = static_cast<f1_type&&>(f4);
     HPX_TEST(!f4.empty());
-    HPX_TEST(global_int == 4);
+    HPX_TEST_EQ(global_int, 4);
 
     // Testing, that no memory leaked when assigning to nonempty function
     f4 = obj;
     HPX_TEST(!f4.empty());
-    HPX_TEST(global_int == 4);
+    HPX_TEST_EQ(global_int, 4);
     f1_type f5 = obj;
-    HPX_TEST(global_int == 5);
+    HPX_TEST_EQ(global_int, 5);
     f4 = static_cast<f1_type&&>(f5);
-    HPX_TEST(global_int == 4);
+    HPX_TEST_EQ(global_int, 4);
 }
 
 int main(int, char*[])

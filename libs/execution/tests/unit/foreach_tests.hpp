@@ -278,7 +278,7 @@ void test_for_each_n_async(ExPolicy p, IteratorTag)
 
     hpx::future<iterator> f = hpx::parallel::for_each_n(
         p, iterator(std::begin(c)), c.size(), set_42());
-    HPX_TEST(f.get() == iterator(std::end(c)));
+    HPX_TEST_EQ(f.get(), iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;

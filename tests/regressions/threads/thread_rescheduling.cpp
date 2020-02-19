@@ -160,7 +160,7 @@ int hpx_main(variables_map& vm)
     {
         thread_id_type thread_id = register_thread_nullary(
             hpx::util::deferred_call(&test_dummy_thread, futures));
-        HPX_TEST(thread_id != hpx::threads::invalid_thread_id);
+        HPX_TEST_NEQ(thread_id, hpx::threads::invalid_thread_id);
 
         // Flood the queues with suspension operations before the rescheduling
         // attempt.

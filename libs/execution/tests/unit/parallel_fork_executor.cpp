@@ -67,7 +67,7 @@ void test_then()
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test(int value, hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -118,7 +118,7 @@ void bulk_test_f(int value, hpx::shared_future<void> f, hpx::thread::id tid,
 
     f.get();    // propagate exceptions
 
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 

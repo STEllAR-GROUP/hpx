@@ -63,7 +63,7 @@ std::vector<hpx::id_type> test_binpacking_multiple()
         targets.push_back(hpx::new_<test_server[]>(loc, i + 1).get());
         for (hpx::id_type const& id: targets.back())
         {
-            HPX_TEST(hpx::async<call_action>(id).get() == loc);
+            HPX_TEST_EQ(hpx::async<call_action>(id).get(), loc);
             keep_alive.push_back(id);
         }
     }
@@ -123,7 +123,7 @@ void test_binpacking_single()
         targets.push_back(hpx::new_<test_server[]>(loc, i+1).get());
         for (hpx::id_type const& id: targets.back())
         {
-            HPX_TEST(hpx::async<call_action>(id).get() == loc);
+            HPX_TEST_EQ(hpx::async<call_action>(id).get(), loc);
         }
     }
 

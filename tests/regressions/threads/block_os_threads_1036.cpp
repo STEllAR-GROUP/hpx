@@ -106,7 +106,7 @@ int hpx_main()
         started.fetch_add(1);
 
         for (std::uint64_t i = 0; i < os_thread_count; ++i)
-            HPX_TEST(blocked_threads[i].load() <= 1);
+            HPX_TEST_LTE(blocked_threads[i].load(), std::uint64_t(1));
     }
 
     return hpx::finalize();

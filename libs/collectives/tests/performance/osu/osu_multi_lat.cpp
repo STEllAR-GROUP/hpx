@@ -77,7 +77,7 @@ double ireceive(
 
     // align used buffers on page boundaries
     unsigned long align_size = getpagesize();
-    HPX_TEST(align_size <= MAX_ALIGNMENT);
+    HPX_TEST_LTE(align_size, static_cast<unsigned long>(MAX_ALIGNMENT));
 
     char* aligned_send_buffer = align_buffer(send_buffer, align_size);
     std::memset(aligned_send_buffer, 'a', size);

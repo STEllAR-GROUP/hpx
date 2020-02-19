@@ -59,13 +59,13 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 void test_create_single_instance()
 {
     hpx::id_type id = hpx::local_new<test_server>().get();
-    HPX_TEST(hpx::async<call_action>(id).get() == hpx::find_here());
+    HPX_TEST_EQ(hpx::async<call_action>(id).get(), hpx::find_here());
 
     hpx::id_type id1 = hpx::local_new<test_server>(hpx::launch::sync);
-    HPX_TEST(hpx::async<call_action>(id1).get() == hpx::find_here());
+    HPX_TEST_EQ(hpx::async<call_action>(id1).get(), hpx::find_here());
 
     test_client t1 = hpx::local_new<test_client>();
-    HPX_TEST(t1.call() == hpx::find_here());
+    HPX_TEST_EQ(t1.call(), hpx::find_here());
 }
 
 void test_create_single_instance_non_copyable_arg()
@@ -73,13 +73,13 @@ void test_create_single_instance_non_copyable_arg()
     A a;
 
     hpx::id_type id = hpx::local_new<test_server>(a).get();
-    HPX_TEST(hpx::async<call_action>(id).get() == hpx::find_here());
+    HPX_TEST_EQ(hpx::async<call_action>(id).get(), hpx::find_here());
 
     hpx::id_type id1 = hpx::local_new<test_server>(hpx::launch::sync, a);
-    HPX_TEST(hpx::async<call_action>(id1).get() == hpx::find_here());
+    HPX_TEST_EQ(hpx::async<call_action>(id1).get(), hpx::find_here());
 
     test_client t1 = hpx::local_new<test_client>(a);
-    HPX_TEST(t1.call() == hpx::find_here());
+    HPX_TEST_EQ(t1.call(), hpx::find_here());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ void test_create_multiple_instances()
 
         for (hpx::id_type const& id: ids)
         {
-            HPX_TEST(hpx::async<call_action>(id).get() == hpx::find_here());
+            HPX_TEST_EQ(hpx::async<call_action>(id).get(), hpx::find_here());
         }
     }
 
@@ -103,7 +103,7 @@ void test_create_multiple_instances()
 
         for (hpx::id_type const& id: ids)
         {
-            HPX_TEST(hpx::async<call_action>(id).get() == hpx::find_here());
+            HPX_TEST_EQ(hpx::async<call_action>(id).get(), hpx::find_here());
         }
     }
 
@@ -113,7 +113,7 @@ void test_create_multiple_instances()
 
         for (test_client const& c: ids)
         {
-            HPX_TEST(c.call() == hpx::find_here());
+            HPX_TEST_EQ(c.call(), hpx::find_here());
         }
     }
 }

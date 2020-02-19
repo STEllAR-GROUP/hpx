@@ -19,28 +19,28 @@ void test_make_ready_future()
 {
     hpx::future<int&> f =
         hpx::make_ready_future(std::ref(global));
-    HPX_TEST(&f.get() == &global);
+    HPX_TEST_EQ(&f.get(), &global);
 
     hpx::future<int&> f_at =
         hpx::make_ready_future_at(
             std::chrono::system_clock::now() + std::chrono::seconds(1)
           , std::ref(global));
-    HPX_TEST(&f_at.get() == &global);
+    HPX_TEST_EQ(&f_at.get(), &global);
 
     hpx::future<int&> f_after =
         hpx::make_ready_future_after(
             std::chrono::seconds(1)
           , std::ref(global));
-    HPX_TEST(&f_after.get() == &global);
+    HPX_TEST_EQ(&f_after.get(), &global);
 }
 
 void test_async()
 {
     hpx::future<int&> f = hpx::async(&foo);
-    HPX_TEST(&f.get() == &global);
+    HPX_TEST_EQ(&f.get(), &global);
 
     hpx::future<int&> f_sync = hpx::async(hpx::launch::sync, &foo);
-    HPX_TEST(&f_sync.get() == &global);
+    HPX_TEST_EQ(&f_sync.get(), &global);
 }
 
 int main()

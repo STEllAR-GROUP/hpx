@@ -148,8 +148,8 @@ struct X
 template<class F> void test(F f, int r)
 {
     F const & cf = f;
-    HPX_TEST( cf() == -r );
-    HPX_TEST( f() == r );
+    HPX_TEST_EQ( cf(), -r );
+    HPX_TEST_EQ( f(), r );
 }
 
 int main()

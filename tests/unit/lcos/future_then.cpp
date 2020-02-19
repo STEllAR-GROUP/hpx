@@ -56,7 +56,7 @@ void test_return_int()
     hpx::future<int> f2 = f1.then(&p2);
     HPX_TEST(f2.valid());
     try {
-        HPX_TEST(f2.get() == 2);
+        HPX_TEST_EQ(f2.get(), 2);
     }
     catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
@@ -73,7 +73,7 @@ void test_return_int_launch()
     hpx::future<int> f2 = f1.then(hpx::launch::async, &p2);
     HPX_TEST(f2.valid());
     try {
-        HPX_TEST(f2.get() == 2);
+        HPX_TEST_EQ(f2.get(), 2);
     }
     catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
@@ -155,7 +155,7 @@ void test_complex_then()
     hpx::future<int> f1 = hpx::async(p1);
     hpx::future<int> f21 = f1.then(&p2);
     hpx::future<int> f2= f21.then(&p2);
-    HPX_TEST(f2.get() == 4);
+    HPX_TEST_EQ(f2.get(), 4);
 }
 
 void test_complex_then_launch()
@@ -169,7 +169,7 @@ void test_complex_then_launch()
     hpx::future<int> f1 = hpx::async(p1);
     hpx::future<int> f21 = f1.then(policy, &p2);
     hpx::future<int> f2= f21.then(policy, &p2);
-    HPX_TEST(f2.get() == 4);
+    HPX_TEST_EQ(f2.get(), 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

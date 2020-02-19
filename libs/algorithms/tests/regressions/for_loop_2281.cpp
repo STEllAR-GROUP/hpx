@@ -26,7 +26,7 @@ int hpx_main()
         thread_ids.insert(hpx::this_thread::get_id());
     });
 
-    HPX_TEST(thread_ids.size() > std::size_t(1));
+    HPX_TEST_LT(std::size_t(1), thread_ids.size());
 
     thread_ids.clear();
 
@@ -36,7 +36,7 @@ int hpx_main()
             thread_ids.insert(hpx::this_thread::get_id());
         });
 
-    HPX_TEST(thread_ids.size() > std::size_t(1));
+    HPX_TEST_LT(std::size_t(1), thread_ids.size());
 
     return hpx::finalize();
 }

@@ -55,7 +55,7 @@ void for_each_zipiter_test(ExPolicy&& policy, IteratorTag)
     auto result = hpx::parallel::for_each(
         std::forward<ExPolicy>(policy), begin, end, set_42());
 
-    HPX_TEST(result == end);
+    HPX_TEST_EQ(result, end);
 
     // verify values
     std::size_t count = 0;

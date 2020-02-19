@@ -39,7 +39,7 @@ int main()
     hpx::future<void> fut2 = std::move(fut);
     fut2.get();
 
-    HPX_TEST(t.elapsed() > 1.0);
+    HPX_TEST_LT(1.0, t.elapsed());
     HPX_TEST(was_run.load());
 
     return hpx::util::report_errors();

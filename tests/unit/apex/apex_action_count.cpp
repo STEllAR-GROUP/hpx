@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 
     std::cout << "Calls to fibonacci_action: " << count << std::endl;
     apex_profile * prof = apex::get_profile("fibonacci_action");
-    HPX_TEST(prof != 0);
+    HPX_TEST(prof != nullptr);
 
     // for some reason, the APEX count is off by 3, regardless of the N value.
     // This can be tested by running fibonacci of 0, 1, 2, and 3

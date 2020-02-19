@@ -38,17 +38,17 @@ void test_lru_insert()
 
     cache_type c(3);
 
-    HPX_TEST(3 == c.capacity());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.capacity());
 
     // insert all items into the cache
     for (data* d = &cache_entries[0]; d->key != nullptr; ++d)
     {
         HPX_TEST(c.insert(d->key, d->value));
-        HPX_TEST(3 >= c.size());
+        HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));
     }
 
     // there should be 3 items in the cache
-    HPX_TEST(3 == c.size());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ void test_lru_insert_with_touch()
 
     cache_type c(3);
 
-    HPX_TEST(3 == c.capacity());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.capacity());
 
     // insert 3 items into the cache
     int i = 0;
@@ -68,25 +68,25 @@ void test_lru_insert_with_touch()
     for (/**/; i < 3 && d->key != nullptr; ++d, ++i)
     {
         HPX_TEST(c.insert(d->key, d->value));
-        HPX_TEST(3 >= c.size());
+        HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));
     }
 
-    HPX_TEST(3 == c.size());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
 
     // now touch the first item
     std::string white;
     HPX_TEST(c.get_entry("white", white));
-    HPX_TEST(white == "255,255,255");
+    HPX_TEST_EQ(white, "255,255,255");
 
     // add two more items
     for (i = 0; i < 2 && d->key != nullptr; ++d, ++i)
     {
         HPX_TEST(c.insert(d->key, d->value));
-        HPX_TEST(3 == c.size());
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
     }
 
     // there should be 3 items in the cache, and white should be there as well
-    HPX_TEST(3 == c.size());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
     HPX_TEST(c.holds_key("white"));
 }
 
@@ -98,19 +98,19 @@ void test_lru_clear()
 
     cache_type c(3);
 
-    HPX_TEST(3 == c.capacity());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.capacity());
 
     // insert all items into the cache
     for (data* d = &cache_entries[0]; d->key != nullptr; ++d)
     {
         HPX_TEST(c.insert(d->key, d->value));
-        HPX_TEST(3 >= c.size());
+        HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));
     }
 
     c.clear();
 
     // there should be no items in the cache
-    HPX_TEST(0 == c.size());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(0), c.size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,13 +137,13 @@ void test_lru_erase_one()
 
     cache_type c(3);
 
-    HPX_TEST(3 == c.capacity());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.capacity());
 
     // insert all items into the cache
     for (data* d = &cache_entries[0]; d->key != nullptr; ++d)
     {
         HPX_TEST(c.insert(d->key, d->value));
-        HPX_TEST(3 >= c.size());
+        HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));
     }
 
     entry_type blue;
@@ -153,7 +153,7 @@ void test_lru_erase_one()
 
     // there should be 2 items in the cache
     HPX_TEST(!c.get_entry("blue", blue));
-    HPX_TEST(2 == c.size());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(2), c.size());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ void test_lru_update()
 
     cache_type c(4);    // this time we can hold 4 items
 
-    HPX_TEST(4 == c.capacity());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(4), c.capacity());
 
     // insert 3 items into the cache
     int i = 0;
@@ -173,22 +173,22 @@ void test_lru_update()
     for (/**/; i < 3 && d->key != nullptr; ++d, ++i)
     {
         HPX_TEST(c.insert(d->key, d->value));
-        HPX_TEST(3 >= c.size());
+        HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));
     }
 
     // there should be 3 items in the cache
-    HPX_TEST(3 == c.size());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
 
     // now update some items
     HPX_TEST(c.update("black", "255,0,0"));    // isn't in the cache
-    HPX_TEST(4 == c.size());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(4), c.size());
 
     HPX_TEST(c.update("yellow", "255,0,0"));
-    HPX_TEST(4 == c.size());
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(4), c.size());
 
     std::string yellow;
     HPX_TEST(c.get_entry("yellow", yellow));
-    HPX_TEST(yellow == "255,0,0");
+    HPX_TEST_EQ(yellow, "255,0,0");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

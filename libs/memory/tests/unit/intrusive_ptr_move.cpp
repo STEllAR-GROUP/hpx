@@ -89,90 +89,90 @@ struct Y : public X
 
 int main()
 {
-    HPX_TEST(N::base::instances == 0);
+    HPX_TEST_EQ(N::base::instances, 0);
 
     {
         hpx::intrusive_ptr<X> p(new X);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
 
         hpx::intrusive_ptr<X> p2(std::move(p));
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(p.get() == nullptr);
 
         p2.reset();
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
     {
         hpx::intrusive_ptr<Y> p(new Y);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
 
         hpx::intrusive_ptr<X> p2(std::move(p));
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(p.get() == nullptr);
 
         p2.reset();
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
     {
         hpx::intrusive_ptr<X> p(new X);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
 
         hpx::intrusive_ptr<X> p2;
         p2 = std::move(p);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(p.get() == nullptr);
 
         p2.reset();
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
     {
         hpx::intrusive_ptr<X> p(new X);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
 
         hpx::intrusive_ptr<X> p2(new X);
-        HPX_TEST(N::base::instances == 2);
+        HPX_TEST_EQ(N::base::instances, 2);
         p2 = std::move(p);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(p.get() == nullptr);
 
         p2.reset();
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
     {
         hpx::intrusive_ptr<Y> p(new Y);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
 
         hpx::intrusive_ptr<X> p2;
         p2 = std::move(p);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(p.get() == nullptr);
 
         p2.reset();
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
     {
         hpx::intrusive_ptr<Y> p(new Y);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
 
         hpx::intrusive_ptr<X> p2(new X);
-        HPX_TEST(N::base::instances == 2);
+        HPX_TEST_EQ(N::base::instances, 2);
         p2 = std::move(p);
-        HPX_TEST(N::base::instances == 1);
+        HPX_TEST_EQ(N::base::instances, 1);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(p.get() == nullptr);
 
         p2.reset();
-        HPX_TEST(N::base::instances == 0);
+        HPX_TEST_EQ(N::base::instances, 0);
     }
 
     {
@@ -181,13 +181,13 @@ int main()
         X* px2 = px.get();
 
         hpx::intrusive_ptr<Y> py = hpx::static_pointer_cast<Y>(std::move(px));
-        HPX_TEST(py.get() == px2);
+        HPX_TEST_EQ(py.get(), px2);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(px.get() == nullptr);
-        HPX_TEST(py->use_count() == 1);
+        HPX_TEST_EQ(py->use_count(), 1);
     }
 
-    HPX_TEST(N::base::instances == 0);
+    HPX_TEST_EQ(N::base::instances, 0);
 
     {
         hpx::intrusive_ptr<X const> px(new X);
@@ -195,13 +195,13 @@ int main()
         X const* px2 = px.get();
 
         hpx::intrusive_ptr<X> px3 = hpx::const_pointer_cast<X>(std::move(px));
-        HPX_TEST(px3.get() == px2);
+        HPX_TEST_EQ(px3.get(), px2);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(px.get() == nullptr);
-        HPX_TEST(px3->use_count() == 1);
+        HPX_TEST_EQ(px3->use_count(), 1);
     }
 
-    HPX_TEST(N::base::instances == 0);
+    HPX_TEST_EQ(N::base::instances, 0);
 
     {
         hpx::intrusive_ptr<X> px(new Y);
@@ -209,13 +209,13 @@ int main()
         X* px2 = px.get();
 
         hpx::intrusive_ptr<Y> py = hpx::dynamic_pointer_cast<Y>(std::move(px));
-        HPX_TEST(py.get() == px2);
+        HPX_TEST_EQ(py.get(), px2);
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(px.get() == nullptr);
-        HPX_TEST(py->use_count() == 1);
+        HPX_TEST_EQ(py->use_count(), 1);
     }
 
-    HPX_TEST(N::base::instances == 0);
+    HPX_TEST_EQ(N::base::instances, 0);
 
     {
         hpx::intrusive_ptr<X> px(new X);
@@ -225,11 +225,11 @@ int main()
         hpx::intrusive_ptr<Y> py = hpx::dynamic_pointer_cast<Y>(std::move(px));
         HPX_TEST(py.get() == nullptr);
         // NOLINTNEXTLINE(bugprone-use-after-move)
-        HPX_TEST(px.get() == px2);
-        HPX_TEST(px->use_count() == 1);
+        HPX_TEST_EQ(px.get(), px2);
+        HPX_TEST_EQ(px->use_count(), 1);
     }
 
-    HPX_TEST(N::base::instances == 0);
+    HPX_TEST_EQ(N::base::instances, 0);
 
     return hpx::util::report_errors();
 }

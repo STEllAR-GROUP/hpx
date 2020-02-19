@@ -69,11 +69,11 @@ int hpx_main()
         {
             any any1(7), any2(7), any3(10), any4(std::string("seven"));
 
-            HPX_TEST(any_cast<int>(any1) == 7);
-            HPX_TEST(any_cast<int>(any1) != 10);
-            HPX_TEST(any_cast<int>(any1) != 10.0f);
-            HPX_TEST(any_cast<int>(any1) == any_cast<int>(any1));
-            HPX_TEST(any_cast<int>(any1) == any_cast<int>(any2));
+            HPX_TEST_EQ(any_cast<int>(any1), 7);
+            HPX_TEST_NEQ(any_cast<int>(any1), 10);
+            HPX_TEST_NEQ(any_cast<int>(any1), 10.0f);
+            HPX_TEST_EQ(any_cast<int>(any1), any_cast<int>(any1));
+            HPX_TEST_EQ(any_cast<int>(any1), any_cast<int>(any2));
             HPX_TEST(any1.type() == any3.type());
             HPX_TEST(any1.type() != any4.type());
 
@@ -85,8 +85,8 @@ int hpx_main()
             any3 = other_str;
             any4 = 10.0f;
 
-            HPX_TEST(any_cast<std::string>(any1) == long_str);
-            HPX_TEST(any_cast<std::string>(any1) != other_str);
+            HPX_TEST_EQ(any_cast<std::string>(any1), long_str);
+            HPX_TEST_NEQ(any_cast<std::string>(any1), other_str);
             HPX_TEST(any1.type() == typeid(std::string));
             HPX_TEST(
                 any_cast<std::string>(any1) == any_cast<std::string>(any1));

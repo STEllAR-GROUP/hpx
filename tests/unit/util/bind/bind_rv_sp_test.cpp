@@ -55,7 +55,7 @@ int main()
 {
     Y y;
 
-    HPX_TEST( hpx::util::bind( &X::f, hpx::util::bind( &Y::f, &y ) )() == 42 );
+    HPX_TEST_EQ( hpx::util::bind( &X::f, hpx::util::bind( &Y::f, &y ) )(), 42 );
 
     return hpx::util::report_errors();
 }

@@ -71,7 +71,7 @@ void test_is_heap(ExPolicy policy, DataType)
     bool result = hpx::parallel::is_heap(policy, c);
     bool solution = std::is_heap(std::begin(c), std::end(c));
 
-    HPX_TEST(result == solution);
+    HPX_TEST_EQ(result, solution);
 }
 
 template <typename ExPolicy, typename DataType>
@@ -94,7 +94,7 @@ void test_is_heap_async(ExPolicy policy, DataType)
     bool result = f.get();
     bool solution = std::is_heap(std::begin(c), std::end(c));
 
-    HPX_TEST(result == solution);
+    HPX_TEST_EQ(result, solution);
 }
 
 template <typename DataType>

@@ -40,7 +40,7 @@ void apply_test(
 void async_bulk_test(
     int value, hpx::thread::id tid, int passed_through)    //-V813
 {
-    HPX_TEST(tid != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -55,7 +55,7 @@ void test_apply(Executor& exec)
         exec, &apply_test, std::ref(l), std::ref(id), 42);
     l.count_down_and_wait();
 
-    HPX_TEST(id != hpx::this_thread::get_id());
+    HPX_TEST_NEQ(id, hpx::this_thread::get_id());
 }
 
 template <typename Executor>

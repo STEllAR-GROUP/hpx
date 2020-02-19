@@ -165,9 +165,9 @@ int main()
     int a8_2, b8_2, c8_2;
     restore_checkpoint(archive8, a8_2, b8_2, c8_2);
 
-    HPX_TEST(a8 == a8_2);
-    HPX_TEST(b8 == b8_2);
-    HPX_TEST(c8 == c8_2);
+    HPX_TEST_EQ(a8, a8_2);
+    HPX_TEST_EQ(b8, b8_2);
+    HPX_TEST_EQ(c8, c8_2);
 
     // Cleanup
     std::remove("checkpoint_test_file.txt");
@@ -188,9 +188,9 @@ int main()
     restore_checkpoint(archive9, a9_1, b9_1, c9_1);
     //]
 
-    HPX_TEST(a9 == a9_1);
-    HPX_TEST(b9 == b9_1);
-    HPX_TEST(c9 == c9_1);
+    HPX_TEST_EQ(a9, a9_1);
+    HPX_TEST_EQ(b9, b9_1);
+    HPX_TEST_EQ(c9, c9_1);
 
     // Cleanup
     std::remove("test_file_9.txt");

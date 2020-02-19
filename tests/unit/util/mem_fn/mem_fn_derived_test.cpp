@@ -173,8 +173,8 @@ int main()
     hpx::util::mem_fn(&X::g8)(pcx, 1, 2, 3, 4, 5, 6, 7, 8);
     hpx::util::mem_fn(&X::g8)(sp, 1, 2, 3, 4, 5, 6, 7, 8);
 
-    HPX_TEST(hpx::util::mem_fn(&X::hash)(x) == 17610);
-    HPX_TEST(hpx::util::mem_fn(&X::hash)(sp) == 2155);
+    HPX_TEST_EQ(hpx::util::mem_fn(&X::hash)(x), 17610u);
+    HPX_TEST_EQ(hpx::util::mem_fn(&X::hash)(sp), 2155u);
 
     return hpx::util::report_errors();
 }

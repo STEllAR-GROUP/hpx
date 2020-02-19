@@ -550,8 +550,8 @@ if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   endif()
 
   hpx_option(HPX_WITH_THREAD_BACKTRACE_DEPTH STRING
-    "Thread stack back trace depth being captured (default: 5)"
-    "5"
+    "Thread stack back trace depth being captured (default: 20)"
+    "20"
     CATEGORY "Thread Manager" ADVANCED)
   hpx_add_config_define(HPX_HAVE_THREAD_BACKTRACE_DEPTH
     ${HPX_WITH_THREAD_BACKTRACE_DEPTH})

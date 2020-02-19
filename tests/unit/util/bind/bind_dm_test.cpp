@@ -45,23 +45,23 @@ int main()
     X x = { 17041 };
     X * px = &x;
 
-    HPX_TEST( hpx::util::bind( &X::m, placeholders::_1 )( x ) == 17041 );
-    HPX_TEST( hpx::util::bind( &X::m, placeholders::_1 )( px ) == 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, placeholders::_1 )( x ), 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, placeholders::_1 )( px ), 17041 );
 
-    HPX_TEST( hpx::util::bind( &X::m, x )() == 17041 );
-    HPX_TEST( hpx::util::bind( &X::m, px )() == 17041 );
-    HPX_TEST( hpx::util::bind( &X::m, std::ref(x) )() == 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, x )(), 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, px )(), 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, std::ref(x) )(), 17041 );
 
 
     X const cx = x;
     X const * pcx = &cx;
 
-    HPX_TEST( hpx::util::bind( &X::m, placeholders::_1 )( cx ) == 17041 );
-    HPX_TEST( hpx::util::bind( &X::m, placeholders::_1 )( pcx ) == 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, placeholders::_1 )( cx ), 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, placeholders::_1 )( pcx ), 17041 );
 
-    HPX_TEST( hpx::util::bind( &X::m, cx )() == 17041 );
-    HPX_TEST( hpx::util::bind( &X::m, pcx )() == 17041 );
-    HPX_TEST( hpx::util::bind( &X::m, std::ref(cx) )() == 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, cx )(), 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, pcx )(), 17041 );
+    HPX_TEST_EQ( hpx::util::bind( &X::m, std::ref(cx) )(), 17041 );
 
     return hpx::util::report_errors();
 }

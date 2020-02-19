@@ -397,7 +397,7 @@ void test_inclusive_scan_validate(
         // counting from zero,
         int value = b[i];    //-V108
         int expected_value = check_n_triangle(i);
-        if (!HPX_TEST(value == expected_value))
+        if (!HPX_TEST_EQ(value, expected_value))
             break;
     }
 
@@ -415,7 +415,7 @@ void test_inclusive_scan_validate(
         // counting from 1, use i+1
         int value = b[i];    //-V108
         int expected_value = check_n_triangle(i + 1);
-        HPX_TEST(value == expected_value);
+        HPX_TEST_EQ(value, expected_value);
         if (value != expected_value)
             break;
     }
@@ -432,7 +432,7 @@ void test_inclusive_scan_validate(
     {
         int value = b[i];    //-V108
         int expected_value = check_n_const(i + 1, FILL_VALUE);
-        HPX_TEST(value == expected_value);
+        HPX_TEST_EQ(value, expected_value);
         if (value != expected_value)
             break;
     }

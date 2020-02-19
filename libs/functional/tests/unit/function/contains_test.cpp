@@ -59,7 +59,7 @@ static void target_test()
     hpx::util::function_nonser<int()> f;
 
     f = &forty_two;
-    HPX_TEST(*f.target<int (*)()>() == &forty_two);
+    HPX_TEST_EQ(*f.target<int (*)()>(), &forty_two);
     HPX_TEST(!f.target<Seventeen>());
 
     f = Seventeen();

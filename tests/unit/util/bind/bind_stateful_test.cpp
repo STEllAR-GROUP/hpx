@@ -150,9 +150,9 @@ int f8(int & state_, int x1, int x2, int x3, int x4, int x5, int x6, int x7, int
 
 template<class F> void test(F f, int a, int b)
 {
-    HPX_TEST( f() == a +   b );
-    HPX_TEST( f() == a + 2*b );
-    HPX_TEST( f() == a + 3*b );
+    HPX_TEST_EQ( f(), a +   b );
+    HPX_TEST_EQ( f(), a + 2*b );
+    HPX_TEST_EQ( f(), a + 3*b );
 }
 
 void stateful_function_object_test()
@@ -204,7 +204,7 @@ void stateful_function_object_test()
         6, 7, 8, 9 ), n, 1+2+3+4+5+6+7+8+9 );
     n += 3*(1+2+3+4+5+6+7+8+9);
 
-    HPX_TEST( x.state() == n );
+    HPX_TEST_EQ( x.state(), n );
 }
 
 void stateful_function_test()
