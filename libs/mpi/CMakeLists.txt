@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 
 # if networking is off, or MPI parcelport is not being used
 # then allow the option of using an MPI
-if (${HPX_WITH_NETWORKING} AND ${HPX_WITH_PARCELPORT_MPI})
+if ("${HPX_WITH_NETWORKING}" AND "${HPX_WITH_PARCELPORT_MPI}")
   hpx_option(HPX_WITH_MPI_FUTURES BOOL
     "Enable support for returning futures from MPI asynchronous calls"
     " (default: ON if networking+MPI already enabled)"
