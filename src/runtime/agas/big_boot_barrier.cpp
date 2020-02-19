@@ -41,7 +41,6 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/synchronization/detail/yield_k.hpp>
 #include <hpx/format.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>

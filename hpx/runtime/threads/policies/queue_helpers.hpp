@@ -13,7 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/threading_base/deadlock_detection.hpp>
+#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/unused.hpp>
