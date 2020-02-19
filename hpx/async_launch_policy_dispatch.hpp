@@ -20,8 +20,8 @@
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <exception>
 #include <type_traits>

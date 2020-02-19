@@ -16,8 +16,8 @@
 #include <hpx/config.hpp>
 
 #include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/synchronization/detail/yield_k.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -71,8 +71,7 @@ namespace hpx { namespace lcos { namespace local {
 
             for (std::size_t k = 0; !acquire_lock(); ++k)
             {
-                util::detail::yield_k(k, "hpx::lcos::local::spinlock::lock",
-                    hpx::threads::pending_boost);
+                util::detail::yield_k(k, "hpx::lcos::local::spinlock::lock");
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);

@@ -16,18 +16,12 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/util_fwd.hpp>
+#include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <utility>
-
-#if defined(HPX_HAVE_APEX)
-namespace hpx { namespace util { namespace external_timer {
-    struct task_wrapper;
-}}}
-#endif
 
 namespace hpx {
     /// \cond NOINTERNAL
@@ -36,97 +30,11 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx { namespace threads {
-
-    class thread_data;
-    class thread_data_stackful;
-    class thread_data_stackless;
-
     /// \cond NOINTERNAL
     struct HPX_EXPORT topology;
 
     class HPX_EXPORT executor;
-
-    using thread_id_type = thread_id;
-
-    using coroutine_type = coroutines::coroutine;
-    using stackless_coroutine_type = coroutines::stackless_coroutine;
-
-    using thread_self = coroutines::detail::coroutine_self;
-    using thread_self_impl_type =
-        coroutines::detail::coroutine_impl;
-
-    using thread_result_type = std::pair<thread_state_enum, thread_id_type>;
-    using thread_arg_type = thread_state_ex_enum;
-
-    using thread_function_sig = thread_result_type(thread_arg_type);
-    using thread_function_type =
-        util::unique_function_nonser<thread_function_sig>;
     /// \endcond
-
-    ///////////////////////////////////////////////////////////////////////
-    /// The function \a get_self returns a reference to the (OS thread
-    /// specific) self reference to the current HPX thread.
-    HPX_API_EXPORT thread_self& get_self();
-
-    /// The function \a get_self_ptr returns a pointer to the (OS thread
-    /// specific) self reference to the current HPX thread.
-    HPX_API_EXPORT thread_self* get_self_ptr();
-
-    /// The function \a get_ctx_ptr returns a pointer to the internal data
-    /// associated with each coroutine.
-    HPX_API_EXPORT thread_self_impl_type* get_ctx_ptr();
-
-    /// The function \a get_self_ptr_checked returns a pointer to the (OS
-    /// thread specific) self reference to the current HPX thread.
-    HPX_API_EXPORT thread_self* get_self_ptr_checked(error_code& ec = throws);
-
-    /// The function \a get_self_id returns the HPX thread id of the current
-    /// thread (or zero if the current thread is not a HPX thread).
-    HPX_API_EXPORT thread_id_type get_self_id();
-
-    /// The function \a get_self_id_data returns the data of the HPX thread id
-    /// associated with the current thread (or nullptr if the current thread is
-    /// not a HPX thread).
-    HPX_API_EXPORT thread_data* get_self_id_data();
-
-    /// The function \a get_parent_id returns the HPX thread id of the
-    /// current thread's parent (or zero if the current thread is not a
-    /// HPX thread).
-    ///
-    /// \note This function will return a meaningful value only if the
-    ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
-    ///       being defined.
-    HPX_API_EXPORT thread_id_type get_parent_id();
-
-    /// The function \a get_parent_phase returns the HPX phase of the
-    /// current thread's parent (or zero if the current thread is not a
-    /// HPX thread).
-    ///
-    /// \note This function will return a meaningful value only if the
-    ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
-    ///       being defined.
-    HPX_API_EXPORT std::size_t get_parent_phase();
-
-    /// The function \a get_self_stacksize returns the stack size of the
-    /// current thread (or zero if the current thread is not a HPX thread).
-    HPX_API_EXPORT std::size_t get_self_stacksize();
-
-    /// The function \a get_parent_locality_id returns the id of the locality of
-    /// the current thread's parent (or zero if the current thread is not a
-    /// HPX thread).
-    ///
-    /// \note This function will return a meaningful value only if the
-    ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
-    ///       being defined.
-    HPX_API_EXPORT std::uint32_t get_parent_locality_id();
-
-    /// The function \a get_self_component_id returns the lva of the
-    /// component the current thread is acting on
-    ///
-    /// \note This function will return a meaningful value only if the
-    ///       code was compiled with HPX_HAVE_THREAD_TARGET_ADDRESS
-    ///       being defined.
-    HPX_API_EXPORT std::uint64_t get_self_component_id();
 
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
@@ -167,13 +75,6 @@ namespace hpx { namespace threads {
     HPX_API_EXPORT bool enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
         thread_state_enum state = unknown);
-
-#if defined(HPX_HAVE_APEX)
-    HPX_API_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>
-        get_self_timer_data(void);
-    HPX_API_EXPORT void set_self_timer_data(
-        std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
-#endif
 }}    // namespace hpx::threads
 
 namespace std {

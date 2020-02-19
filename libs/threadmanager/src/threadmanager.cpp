@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/hardware/timestamp.hpp>
@@ -19,15 +20,15 @@
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
-#include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
-#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
-#include <hpx/synchronization/detail/yield_k.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/command_line_handling.hpp>

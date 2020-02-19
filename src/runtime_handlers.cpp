@@ -15,8 +15,8 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/runtime_handlers.hpp>
 #include <hpx/threadmanager.hpp>
 #include <hpx/util/backtrace.hpp>
@@ -117,5 +117,18 @@ namespace hpx { namespace detail {
         }
 
         return &rt->get_thread_manager().default_pool();
+    }
+
+    boost::asio::io_service* get_default_timer_service()
+    {
+        hpx::runtime* rt = get_runtime_ptr();
+        if (rt == nullptr)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::detail::get_default_timer_service",
+                "The runtime system is not active");
+        }
+
+        return &get_thread_pool("timer-pool")->get_io_service();
     }
 }}    // namespace hpx::detail

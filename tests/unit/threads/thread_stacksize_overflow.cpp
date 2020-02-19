@@ -8,7 +8,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/testing.hpp>
 
 #include <cstring>

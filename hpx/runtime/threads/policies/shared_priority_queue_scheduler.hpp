@@ -15,16 +15,17 @@
 #include <hpx/assertion.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
+#include <hpx/threading_base/print.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_holder_numa.hpp>
 #include <hpx/runtime/threads/policies/queue_holder_thread.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/runtime/threads/policies/thread_queue_mc.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <array>

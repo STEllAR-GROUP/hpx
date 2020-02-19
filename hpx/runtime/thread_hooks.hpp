@@ -8,7 +8,7 @@
 #define HPX_THREAD_HOOKS_JUN_06_2018_0514PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
 
 namespace hpx
 {

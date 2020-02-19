@@ -16,7 +16,9 @@ set(basic_execution_headers
 )
 
 set(basic_execution_compat_headers
+  hpx/synchronization/detail/yield_k.hpp
   hpx/util/register_locks.hpp
+  hpx/util/yield_while.hpp
 )
 
 set(basic_execution_sources

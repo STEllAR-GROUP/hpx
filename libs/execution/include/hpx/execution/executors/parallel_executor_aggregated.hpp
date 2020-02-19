@@ -22,9 +22,9 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/synchronization/latch.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/future_traits.hpp>
 
 #include <algorithm>

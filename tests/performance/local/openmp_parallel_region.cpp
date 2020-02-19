@@ -11,7 +11,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <hpx/program_options.hpp>
 #include <omp.h>

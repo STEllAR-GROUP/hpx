@@ -19,7 +19,8 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -27,7 +28,7 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/annotated_function.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 
 #include <boost/container/small_vector.hpp>
 

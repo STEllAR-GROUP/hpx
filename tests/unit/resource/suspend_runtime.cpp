@@ -14,7 +14,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <cstddef>
 #include <string>

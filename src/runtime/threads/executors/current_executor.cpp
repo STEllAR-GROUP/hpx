@@ -12,10 +12,10 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime/threads/detail/create_thread.hpp>
-#include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/detail/thread_num_tss.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+#include <hpx/threading_base/create_thread.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -179,3 +179,29 @@ namespace hpx { namespace threads { namespace executors
             ->get_state();
     }
 }}}
+
+namespace hpx { namespace threads {
+    executors::current_executor get_executor(
+        thread_id_type const& id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_executor",
+                "null thread id encountered");
+            return executors::current_executor(nullptr);
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return executors::current_executor(
+            get_thread_id_data(id)->get_scheduler_base());
+    }
+}}
+
+namespace hpx { namespace this_thread {
+    threads::executors::current_executor get_executor(error_code& ec)
+    {
+        return threads::get_executor(threads::get_self_id(), ec);
+    }
+}}

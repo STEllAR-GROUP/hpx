@@ -26,13 +26,13 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/synchronization/latch.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/util/unwrap.hpp>
 

@@ -12,7 +12,7 @@
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <hpx/program_options.hpp>
 

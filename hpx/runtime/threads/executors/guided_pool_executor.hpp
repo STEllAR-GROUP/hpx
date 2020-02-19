@@ -15,10 +15,10 @@
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
 #include <hpx/util/pack_traversal.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 
 #include <cstddef>
 #include <cstdint>

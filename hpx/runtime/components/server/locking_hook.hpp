@@ -14,6 +14,7 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 
 #include <mutex>

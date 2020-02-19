@@ -27,7 +27,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/thread_hooks.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
@@ -1254,16 +1254,6 @@ namespace hpx
         error_code ec(lightweight);
         return exec.executor_data_->get_policy_element(
             threads::detail::current_concurrency, ec);
-    }
-
-    std::size_t get_worker_thread_num()
-    {
-        return get_worker_thread_num(throws);
-    }
-
-    std::size_t get_worker_thread_num(error_code& ec)
-    {
-        return threads::detail::get_thread_num_tss();
     }
 
     std::size_t get_num_worker_threads()

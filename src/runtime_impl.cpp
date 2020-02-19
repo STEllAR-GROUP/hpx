@@ -31,10 +31,10 @@
 #include <hpx/runtime_impl.hpp>
 #include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/thread_mapper.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <condition_variable>
 #include <cstddef>

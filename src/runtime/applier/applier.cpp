@@ -18,9 +18,9 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 
 #include <cstddef>
 #include <cstdint>

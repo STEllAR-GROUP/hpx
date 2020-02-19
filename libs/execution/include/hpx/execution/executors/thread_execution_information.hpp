@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 

@@ -15,7 +15,7 @@
 #if defined(HPX_DEBUG)
 #include <hpx/logging.hpp>
 #endif
-#include <hpx/runtime/threads/register_thread.hpp>
+#include <hpx/threading_base/register_thread.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>

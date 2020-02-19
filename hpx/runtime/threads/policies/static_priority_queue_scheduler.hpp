@@ -15,7 +15,6 @@
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 
 #include <mutex>
 #include <cstddef>

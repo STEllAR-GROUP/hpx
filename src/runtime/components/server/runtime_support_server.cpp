@@ -45,7 +45,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/parse_command_line.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
@@ -387,8 +387,7 @@ namespace hpx { namespace components { namespace server
                 tm.cleanup_terminated(true);
                 return tm.get_thread_count() >
                     std::int64_t(1) + tm.get_background_thread_count();
-            }, "runtime_support::dijkstra_termination", hpx::threads::pending,
-            false); // Don't allow timed suspension
+            }, "runtime_support::dijkstra_termination", false);
 
         // Now this locality has become passive, thus we can send the token
         // to the next locality.
@@ -426,8 +425,7 @@ namespace hpx { namespace components { namespace server
                     tm.cleanup_terminated(true);
                     return tm.get_thread_count() >
                         std::int64_t(1) + tm.get_background_thread_count();
-                }, "runtime_support::dijkstra_termination",
-                hpx::threads::pending, false); // Don't allow timed suspension
+                }, "runtime_support::dijkstra_termination", false);
 
             return 0;
         }
@@ -487,8 +485,7 @@ namespace hpx { namespace components { namespace server
                 tm.cleanup_terminated(true);
                 return tm.get_thread_count() >
                     std::int64_t(1) + tm.get_background_thread_count();
-            }, "runtime_support::dijkstra_termination", hpx::threads::pending,
-            false); // Don't allow timed suspension
+            }, "runtime_support::dijkstra_termination", false);
 
         // Now this locality has become passive, thus we can send the token
         // to the next locality.
@@ -567,8 +564,7 @@ namespace hpx { namespace components { namespace server
                     tm.cleanup_terminated(true);
                     return tm.get_thread_count() >
                         std::int64_t(1) + tm.get_background_thread_count();
-                }, "runtime_support::dijkstra_termination",
-                hpx::threads::pending, false); // Don't allow timed suspension
+                }, "runtime_support::dijkstra_termination", false);
 
             return 0;
         }
@@ -842,8 +838,7 @@ namespace hpx { namespace components { namespace server
 
                         return tm.get_thread_count() >
                             std::int64_t(1) + tm.get_background_thread_count();
-                    }, "runtime_support::stop", hpx::threads::pending,
-                    false); // Don't allow timed suspension
+                    }, "runtime_support::stop", false);
 
                 // If it took longer than expected, kill all suspended threads as
                 // well.
@@ -866,9 +861,7 @@ namespace hpx { namespace components { namespace server
                             return tm.get_thread_count() >
                                 std::int64_t(1) +
                                 tm.get_background_thread_count();
-                        }, "runtime_support::dijkstra_termination",
-                        hpx::threads::pending,
-                        false); // Don't allow timed suspension
+                        }, "runtime_support::dijkstra_termination", false);
                 }
 
                 // Drop the locality from the partition table.

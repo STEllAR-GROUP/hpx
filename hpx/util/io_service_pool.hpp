@@ -14,7 +14,7 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
 
 #include <boost/asio/io_service.hpp>
 /* The boost asio support includes termios.h.

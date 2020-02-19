@@ -22,7 +22,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/functional/bind.hpp>

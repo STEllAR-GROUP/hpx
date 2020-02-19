@@ -12,11 +12,11 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 
 #include <boost/asio/basic_waitable_timer.hpp>
 

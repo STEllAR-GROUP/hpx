@@ -15,9 +15,8 @@
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/logging.hpp>
 
 #include <mutex>

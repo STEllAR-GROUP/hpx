@@ -31,7 +31,7 @@
 #include <hpx/plugins/parcelport/mpi/sender.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
-#include <hpx/synchronization/detail/yield_k.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 

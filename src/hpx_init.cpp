@@ -39,7 +39,7 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>
 
@@ -599,6 +599,10 @@ namespace hpx
 #endif
             hpx::threads::detail::set_get_default_pool(
                 &detail::get_default_pool);
+            hpx::threads::detail::set_get_default_timer_service(
+                &hpx::detail::get_default_timer_service);
+            hpx::threads::detail::set_get_locality_id(
+                &get_locality_id);
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");

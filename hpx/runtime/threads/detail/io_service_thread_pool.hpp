@@ -8,9 +8,9 @@
 #define HPX_IO_SERVICE_THREAD_POOL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/io_service_pool.hpp>
 

@@ -32,12 +32,12 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/io_service_pool.hpp>

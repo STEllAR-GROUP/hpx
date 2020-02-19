@@ -36,7 +36,7 @@
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
-#include <hpx/synchronization/detail/yield_k.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>

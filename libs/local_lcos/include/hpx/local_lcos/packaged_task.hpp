@@ -14,7 +14,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
-#include <hpx/util/annotated_function.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 
 #include <exception>
 #include <memory>

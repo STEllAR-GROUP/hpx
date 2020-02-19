@@ -18,10 +18,11 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
-#include <hpx/runtime/threads/policies/thread_queue_init_parameters.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/thread_data_stackful.hpp>
-#include <hpx/runtime/threads/thread_data_stackless.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_data_stackful.hpp>
+#include <hpx/threading_base/thread_data_stackless.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

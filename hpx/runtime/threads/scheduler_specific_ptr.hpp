@@ -14,7 +14,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/detail/tss.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 
 #include <memory>
 

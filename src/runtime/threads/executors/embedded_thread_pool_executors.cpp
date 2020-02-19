@@ -22,13 +22,13 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/runtime/threads/detail/create_thread.hpp>
+#include <hpx/threading_base/create_thread.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
-#include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/manage_thread_executor.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/thread_description.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <atomic>
 #include <chrono>

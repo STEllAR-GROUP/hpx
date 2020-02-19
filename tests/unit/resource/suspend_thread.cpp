@@ -11,7 +11,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing.hpp>

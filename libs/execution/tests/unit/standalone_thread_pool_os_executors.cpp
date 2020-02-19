@@ -11,12 +11,12 @@
 // pools, schedulers etc. assume that the global runtime (configuration, thread
 // manager, etc.) always exists.
 
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/yield_while.hpp>
 
 #include <algorithm>
 #include <cstddef>

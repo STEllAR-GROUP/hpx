@@ -25,7 +25,7 @@
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/pack.hpp>

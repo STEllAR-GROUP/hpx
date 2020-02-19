@@ -19,7 +19,7 @@
 #include <hpx/program_options.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/annotated_function.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 
 #include <atomic>
 #include <cstddef>

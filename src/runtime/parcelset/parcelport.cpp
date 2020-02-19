@@ -19,7 +19,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/errors.hpp>
 #if defined(HPX_HAVE_APEX)
-#include <hpx/util/external_timer.hpp>
+#include <hpx/threading_base/external_timer.hpp>
 #endif
 #include <hpx/assertion.hpp>
 

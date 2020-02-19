@@ -30,7 +30,8 @@ namespace hpx { namespace compute { namespace host {
         struct native_handle_type
         {
             native_handle_type()
-              : mask_(hpx::threads::get_topology().get_machine_affinity_mask())
+              : mask_(
+                    hpx::threads::create_topology().get_machine_affinity_mask())
             {
             }
 

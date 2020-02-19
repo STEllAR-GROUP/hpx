@@ -30,7 +30,7 @@
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/yield_while.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 
 #include <boost/predef/other/endian.h>
 

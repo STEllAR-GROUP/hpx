@@ -20,8 +20,8 @@
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/traits/action_remote_result.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)

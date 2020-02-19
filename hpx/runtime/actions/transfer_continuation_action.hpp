@@ -21,8 +21,8 @@
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>

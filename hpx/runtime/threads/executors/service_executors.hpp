@@ -13,7 +13,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util/thread_description.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #include <hpx/functional/unique_function.hpp>
 
 #include <atomic>

@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/functional/bind.hpp>

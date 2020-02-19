@@ -13,8 +13,8 @@
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/command_line_handling.hpp>

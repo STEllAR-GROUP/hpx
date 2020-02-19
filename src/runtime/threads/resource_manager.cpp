@@ -10,8 +10,9 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/topology.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -34,7 +35,7 @@ namespace hpx { namespace threads
     resource_manager::resource_manager()
       : next_cookie_(0),
         punits_(get_os_thread_count()),
-        topology_(get_topology())
+        topology_(create_topology())
     {}
 
     // Request an initial resource allocation

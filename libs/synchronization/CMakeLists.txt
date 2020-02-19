@@ -30,7 +30,6 @@ set(synchronization_headers
   hpx/synchronization/spinlock.hpp
   hpx/synchronization/spinlock_no_backoff.hpp
   hpx/synchronization/spinlock_pool.hpp
-  hpx/synchronization/detail/yield_k.hpp
   )
 
 # Default location is $HPX_ROOT/libs/synchronization/include_compatibility
@@ -52,7 +51,6 @@ set(synchronization_compat_headers
   hpx/lcos/local/spinlock.hpp
   hpx/lcos/local/spinlock_no_backoff.hpp
   hpx/lcos/local/spinlock_pool.hpp
-  hpx/util/detail/yield_k.hpp
   )
 
 set(synchronization_sources
@@ -83,6 +81,7 @@ add_hpx_module(synchronization
     hpx_errors
     hpx_functional
     hpx_hashing
+    hpx_threading_base
     hpx_thread_support
     hpx_timing
   CMAKE_SUBDIRS examples tests

@@ -8,6 +8,6 @@
 #define HPX_THREADS_THREAD_POOLS_AUG_08_2017_1110AM
 
 #include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
-#include <hpx/runtime/threads/thread_pool_base.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 
 #endif

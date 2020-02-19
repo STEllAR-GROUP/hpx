@@ -18,10 +18,10 @@
 #endif
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/type_support/identity.hpp>
-#include <hpx/util/annotated_function.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/execution_policy.hpp>

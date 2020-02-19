@@ -9,8 +9,8 @@
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/runtime/threads/detail/io_service_thread_pool.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <cstddef>
