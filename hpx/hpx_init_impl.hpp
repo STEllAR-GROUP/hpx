@@ -432,8 +432,7 @@ namespace hpx
     }
 
     inline int
-    init(std::nullptr_t const& f,
-        int argc, char** argv, hpx::runtime_mode mode)
+    init(std::nullptr_t f, int argc, char** argv, hpx::runtime_mode mode)
     {
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
