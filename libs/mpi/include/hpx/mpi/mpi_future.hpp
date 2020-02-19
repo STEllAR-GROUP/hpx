@@ -191,7 +191,7 @@ namespace hpx { namespace mpi {
                                , "list size", detail::active_futures_.size());
 
                 // mark the future as ready by setting the shared_state
-                (*i)->set_data(hpx::util::unused);
+                (*i)->set_data(MPI_SUCCESS /*hpx::util::unused*/);
                 i = detail::active_futures_.erase(i);
             }
             else {
