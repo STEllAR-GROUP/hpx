@@ -23,6 +23,7 @@ This is a bugfix release. It contains the following changes:
 * Give a hard error when attempting to use IO counters on Windows
 * Fix |cmake| configuration using older |cmake| versions with CUDA enabled
 * Add ``jsrun`` option to ``hpxrun.py``
+* Fix cases of scheduling hints not being taken into account
 
 Closed issues
 =============
@@ -51,3 +52,4 @@ Closed pull requests
 * :hpx-pr:`4315` - Forcing exported symbols from composable_guard to be linked
   into core library
 * :hpx-pr:`4310` - Remove environment handling from ``exception.cpp``
+* :hpx-pr:`4306` - Fix schedule hint not being taken from executor
