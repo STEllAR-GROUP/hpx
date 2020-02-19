@@ -38,9 +38,11 @@ namespace hpx { namespace parallel { namespace execution {
         ///       and 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
-        constexpr persistent_auto_chunk_size()
+        constexpr persistent_auto_chunk_size(
+            std::uint64_t num_iters_for_timing = 0)
           : chunk_size_time_(0)
-          , min_time_(80000)
+          , min_time_(200000)
+          , num_iters_for_timing_(num_iters_for_timing)
         {
         }
 
@@ -49,9 +51,11 @@ namespace hpx { namespace parallel { namespace execution {
         /// \param time_cs      The execution time for each chunk.
         ///
         explicit persistent_auto_chunk_size(
-            hpx::util::steady_duration const& time_cs)
+            hpx::util::steady_duration const& time_cs,
+            std::uint64_t num_iters_for_timing = 0)
           : chunk_size_time_(time_cs.value().count())
-          , min_time_(80000)
+          , min_time_(200000)
+          , num_iters_for_timing_(num_iters_for_timing)
         {
         }
 
@@ -63,9 +67,11 @@ namespace hpx { namespace parallel { namespace execution {
         /// \param time_cs       The execution time for each chunk.
         ///
         persistent_auto_chunk_size(hpx::util::steady_duration const& time_cs,
-            hpx::util::steady_duration const& rel_time)
+            hpx::util::steady_duration const& rel_time,
+            std::uint64_t num_iters_for_timing = 0)
           : chunk_size_time_(time_cs.value().count())
           , min_time_(rel_time.value().count())
+          , num_iters_for_timing_(num_iters_for_timing)
         {
         }
 
@@ -75,12 +81,19 @@ namespace hpx { namespace parallel { namespace execution {
         std::size_t get_chunk_size(
             Executor& exec, F&& f, std::size_t cores, std::size_t count)
         {
-            if (count > 100 * cores)
+            // by default use 1% of the iterations
+            if (num_iters_for_timing_ == 0)
+            {
+                num_iters_for_timing_ = count / 100;
+            }
+
+            // perform measurements only if necessary
+            if (num_iters_for_timing_ > 0)
             {
                 using hpx::util::high_resolution_clock;
                 std::uint64_t t = high_resolution_clock::now();
 
-                std::size_t test_chunk_size = f();
+                std::size_t test_chunk_size = f(num_iters_for_timing_);
                 if (test_chunk_size != 0)
                 {
                     if (chunk_size_time_ == 0)
@@ -114,7 +127,9 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int version)
         {
-            ar& chunk_size_time_& min_time_;
+            // clang-format off
+            ar & chunk_size_time_ & min_time_ & num_iters_for_timing_;
+            // clang-format on
         }
         /// \endcond
 
@@ -122,6 +137,8 @@ namespace hpx { namespace parallel { namespace execution {
         /// \cond NOINTERNAL
         std::uint64_t chunk_size_time_;    // nanoseconds
         std::uint64_t min_time_;           // nanoseconds
+        // number of iteration to use for timing
+        std::uint64_t num_iters_for_timing_;
         /// \endcond
     };
 }}}    // namespace hpx::parallel::execution
