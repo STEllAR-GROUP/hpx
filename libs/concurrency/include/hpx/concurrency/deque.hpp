@@ -27,8 +27,7 @@
 
 #include <atomic>
 #include <cstddef>
-#include <iostream>
-#include <thread>
+#include <memory>
 #include <type_traits>
 
 namespace boost { namespace lockfree {
@@ -81,14 +80,15 @@ namespace boost { namespace lockfree {
     template <typename T>
     struct deque_anchor    //-V690
     {
-        typedef deque_node<T> node;
-        typedef typename node::pointer node_pointer;
-        typedef typename node::atomic_pointer atomic_node_pointer;
+        using node = deque_node<T>;
+        using node_pointer = typename node::pointer;
+        using atomic_node_pointer = typename node::atomic_pointer;
 
-        typedef typename node::tag_t tag_t;
+        using tag_t = typename node::tag_t;
 
-        typedef tagged_ptr_pair<node, node> pair;
-        typedef std::atomic<pair> atomic_pair;
+        using anchor = deque_anchor<T>;
+        using pair = tagged_ptr_pair<node, node>;
+        using atomic_pair = std::atomic<pair>;
 
     private:
         atomic_pair pair_;
@@ -197,22 +197,24 @@ namespace boost { namespace lockfree {
         HPX_NON_COPYABLE(deque);
 
     public:
-        typedef deque_node<T> node;
-        typedef typename node::pointer node_pointer;
-        typedef typename node::atomic_pointer atomic_node_pointer;
+        using node = deque_node<T>;
 
-        typedef typename node::tag_t tag_t;
+        using node_pointer = typename node::pointer;
+        using atomic_node_pointer = typename node::atomic_pointer;
 
-        typedef deque_anchor<T> anchor;
-        typedef typename anchor::pair anchor_pair;
-        typedef typename anchor::atomic_pair atomic_anchor_pair;
+        using tag_t = typename node::tag_t;
 
-        typedef typename Alloc::template rebind<node>::other node_allocator;
+        using anchor = deque_anchor<T>;
+        using anchor_pair = typename anchor::pair;
+        using atomic_anchor_pair = typename anchor::atomic_pair;
 
-        typedef typename std::conditional<
+        using node_allocator =
+            typename std::allocator_traits<Alloc>::template rebind_alloc<node>;
+
+        using pool = typename std::conditional<
             std::is_same<freelist_t, caching_freelist_t>::value,
             caching_freelist<node, node_allocator>,
-            static_freelist<node, node_allocator>>::type pool;
+            static_freelist<node, node_allocator>>::type;
 
     private:
         anchor anchor_;
