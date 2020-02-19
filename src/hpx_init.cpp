@@ -336,7 +336,8 @@ namespace hpx
         };
 
         ///////////////////////////////////////////////////////////////////////
-        void activate_global_options(util::command_line_handling& cms)
+        void activate_global_options(util::command_line_handling& cms,
+            int argc, char** argv)
         {
 #if defined(__linux) || defined(linux) || defined(__linux__) ||                \
     defined(__FreeBSD__)
@@ -744,7 +745,8 @@ namespace hpx
                         desc_cmdline, argc, argv, std::move(ini_config),
                         resource::mode_default, mode, false, &result);
 
-                    activate_global_options(rp.get_command_line_switches());
+                    activate_global_options(rp.get_command_line_switches(),
+                        argc, argv);
 
                     // check whether HPX should be exited at this point
                     // (parse_result is returning a result > 0, if the program options
