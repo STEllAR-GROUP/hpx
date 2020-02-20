@@ -721,12 +721,8 @@ namespace hpx
         HPX_EXPORT int run_or_start(
             util::function_nonser<
                 int(hpx::program_options::variables_map& vm)
-            > const& f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> && ini_config,
-            startup_function_type startup, shutdown_function_type shutdown,
-            hpx::runtime_mode mode, hpx::resource::partitioner_mode rp_mode,
-            hpx::resource::rp_callback_type rp_callback, bool blocking)
+            > const& f, int argc, char** argv,
+            init_params const& params, bool blocking)
         {
             init_environment();
 
@@ -742,11 +738,12 @@ namespace hpx
                 // any exception thrown during run_or_start below are handled
                 // separately
                 try {
-                    // Construct resource partitioner if this has not been done yet
-                    // and get a handle to it
-                    // (if the command-line parsing has not yet been done, do it now)
-                    hpx::resource::partitioner rp(f, desc_cmdline, argc, argv,
-                        std::move(ini_config), rp_mode, mode, false, &result);
+                    // Construct resource partitioner if this has not been done
+                    // yet and get a handle to it (if the command-line parsing
+                    // has not yet been done, do it now)
+                    hpx::resource::partitioner rp(f, params.desc_cmdline, argc,
+                        argv, hpx_startup::user_main_config(params.cfg),
+                        params.rp_mode, params.mode, false, &result);
 
                     activate_global_options(rp.get_command_line_switches(),
                         argc, argv);
@@ -762,8 +759,8 @@ namespace hpx
                     }
 
                     // If thread_pools initialization in user main
-                    if (rp_callback) {
-                        rp_callback(rp);
+                    if (params.rp_callback) {
+                        params.rp_callback(rp);
                     }
 
                     // Setup all internal parameters of the resource_partitioner
@@ -786,7 +783,7 @@ namespace hpx
                 std::unique_ptr<hpx::runtime> rt(new runtime_type(cms.rtcfg_));
 
                 result = run_or_start(blocking, std::move(rt),
-                    cms, std::move(startup), std::move(shutdown));
+                    cms, std::move(params.startup), std::move(params.shutdown));
             }
             catch (detail::command_line_error const& e) {
                 std::cerr << "hpx::init: std::exception caught: " << e.what()

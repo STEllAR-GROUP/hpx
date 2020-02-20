@@ -39,12 +39,8 @@ namespace hpx
         HPX_EXPORT int run_or_start(
             util::function_nonser<
                 int(hpx::program_options::variables_map& vm)
-            > const& f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string>&& ini_config,
-            startup_function_type startup, shutdown_function_type shutdown,
-            hpx::runtime_mode mode, hpx::resource::partitioner_mode rp_mode,
-            hpx::resource::rp_callback_type rp_callback, bool blocking);
+            > const& f, int argc, char** argv,
+            init_params const& params, bool blocking);
 
 #if defined(HPX_WINDOWS)
         void init_winsocket();
@@ -82,11 +78,7 @@ namespace hpx
 #if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
         std::at_quick_exit(detail::on_exit);
 #endif
-
-        return 0 == detail::run_or_start(f, params.desc_cmdline, argc, argv,
-            hpx_startup::user_main_config(params.cfg),
-            std::move(params.startup), std::move(params.shutdown), params.mode,
-            params.rp_mode, params.rp_callback, false);
+        return 0 == detail::run_or_start(f, argc, argv, params, false);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
