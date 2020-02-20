@@ -219,7 +219,7 @@ There are a few different ways of invoking actions:
    :lines: 115-121
 
 * **Synchronous**: To invoke an action in a fully synchronous manner, we can
-  simply call :cpp:func:`hpx::async`\ ``().get()`` (e.g., create a future and
+  simply call :cpp:func:`hpx::async`\ ``().get()`` (i.e., create a future and
   immediately wait on it to be ready). Here's an example from the accumulator
   client class:
 
