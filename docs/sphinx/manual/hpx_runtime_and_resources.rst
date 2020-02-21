@@ -15,7 +15,7 @@
 |hpx| thread scheduling policies
 ================================
 
-The HPX runtime has five thread scheduling policies: local-priority,
+The |hpx| runtime has five thread scheduling policies: local-priority,
 static-priority, local, static and abp-priority. These policies can be specified
 from the command line using the command line option :option:`--hpx:queuing`. In
 order to use a particular scheduling policy, the runtime system must be built
@@ -26,20 +26,20 @@ information).
 Priority local scheduling policy (default policy)
 -------------------------------------------------
 
-* default or invoke using: :option:`--hpx:queuing`\ ``local-priority-fifo``
+*default or invoke using: :option:`--hpx:queuing`\ ``local-priority-fifo``
 
 The priority local scheduling policy maintains one queue per operating system
 (OS) thread. The OS thread pulls its work from this queue. By default the number
 of high priority queues is equal to the number of OS threads; the number of high
 priority queues can be specified on the command line using
 :option:`--hpx:high-priority-threads`. High priority threads are executed by any
-of the OS threads before any other work is executed. When a queue is empty work
+of the OS threads before any other work is executed. When a queue is empty, work
 will be taken from high priority queues first. There is one low priority queue
 from which threads will be scheduled only when there is no other work.
 
 For this scheduling policy there is an option to turn on NUMA sensitivity using
 the command line option :option:`--hpx:numa-sensitive`. When NUMA sensitivity is
-turned on work stealing is done from queues associated with the same NUMA domain
+turned on, work stealing is done from queues associated with the same NUMA domain
 first, only after that work is stolen from other NUMA domains.
 
 This scheduler is enabled at build time by default and will be available always.
@@ -165,7 +165,7 @@ Creating custom thread pools is useful for cases where you have tasks which
 absolutely need to run without interference from other tasks. An example of this
 is when using |mpi|_ for distribution instead of the built-in mechanisms in
 |hpx| (useful in legacy applications). In this case one can create a thread pool
-containing a single thread for |mpi|_ communication. |mpi|_ tasks will then
+containing a single thread for |mpi| communication. |mpi| tasks will then
 always run on the same thread, instead of potentially being stuck in a queue
 behind other threads.
 
@@ -182,7 +182,7 @@ thread pool.
 Using the resource partitioner
 ------------------------------
 
-In order to create custom thread pools the resource partitioner needs to be set
+In order to create custom thread pools, the resource partitioner needs to be set
 up before |hpx| is initialized by creating an instance of
 :cpp:class:`hpx::resource::partitioner`:
 
@@ -195,7 +195,7 @@ be able to parse thread binding options passed on the command line. You should
 pass the same arguments to the :cpp:class:`hpx::resource::partitioner`
 constructor as you would to :cpp:func:`hpx::init` or :cpp:func:`hpx::start`.
 Running the above code will have the same effect as not initializing it at all,
-i.e. a default thread pool will be created with the type and number of threads
+i.e., a default thread pool will be created with the type and number of threads
 specified on the command line.
 
 The resource partitioner class is the interface to add thread pools to the |hpx|
@@ -203,7 +203,7 @@ runtime and to assign resources to the thread pools.
 
 To add a thread pool use the
 :cpp:member:`hpx::resource::partitioner::create_thread_pool` method. If you
-simply want to use the default scheduler and scheduler options it is enough to
+simply want to use the default scheduler and scheduler options, it is enough to
 call ``rp.create_thread_pool("my-thread-pool")``.
 
 Then, to add resources to the thread pool you can use the
@@ -220,7 +220,7 @@ case we leave the first processing unit for the default thread pool:
 
 .. note::
 
-   Whatever processing units not assigned to a thread pool by the time
+   Whatever processing units are not assigned to a thread pool by the time
    :cpp:func:`hpx::init` is called will be added to the default thread pool. It
    is also possible to explicitly add processing units to the default thread
    pool, and to create the default thread pool manually (in order to e.g. set
@@ -245,7 +245,7 @@ to create and use custom schedulers.
    users via the standard mechanisms of choosing a scheduler (command line
    options). If you would like to experiment with a custom scheduler the
    resource partitioner example ``shared_priority_queue_scheduler.cpp`` contains
-   a fully implemented scheduler with logging etc. to make exploration easier.
+   a fully implemented scheduler with logging, etc. to make exploration easier.
 
 To choose a scheduler and custom mode for a thread pool, pass additional options
 when creating the thread pool like this::
