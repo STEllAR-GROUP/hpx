@@ -25,7 +25,8 @@ namespace hpx { namespace threads {
                 "cannot call resume_processing_unit from outside HPX, use"
                 "resume_processing_unit_cb instead");
         }
-        else if (!pool.get_scheduler()->has_scheduler_mode(threads::policies::enable_elasticity))
+        else if (!pool.get_scheduler()->has_scheduler_mode(
+                  policies::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "resume_processing_unit",

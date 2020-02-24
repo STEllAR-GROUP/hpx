@@ -565,7 +565,8 @@ namespace hpx { namespace threads { namespace detail
         std::shared_ptr<bool> background_running = nullptr;
         thread_id_type background_thread;
 
-        if (scheduler.SchedulingPolicy::has_scheduler_mode(policies::do_background_work) &&
+        if (scheduler.SchedulingPolicy::has_scheduler_mode(
+            policies::do_background_work) &&
             num_thread < params.max_background_threads_ &&
             !params.background_.empty())
         {
@@ -846,7 +847,8 @@ namespace hpx { namespace threads { namespace detail
 
                         if (can_exit)
                         {
-                            if (!scheduler.SchedulingPolicy::has_scheduler_mode(policies::delay_exit))
+                            if (!scheduler.SchedulingPolicy::has_scheduler_mode(
+                                policies::delay_exit))
                             {
                                 // If this is an inner scheduler, try to exit immediately
 #if defined(HPX_HAVE_NETWORKING)
@@ -888,7 +890,8 @@ namespace hpx { namespace threads { namespace detail
                     }
                 }
                 else if (!may_exit && added == 0 &&
-                    (scheduler.SchedulingPolicy::has_scheduler_mode(policies::fast_idle_mode)))
+                    (scheduler.SchedulingPolicy::has_scheduler_mode(
+                        policies::fast_idle_mode)))
                 {
                     // speed up idle suspend if no work was stolen
                     idle_loop_count -= params.max_idle_loop_count_ / 256;
