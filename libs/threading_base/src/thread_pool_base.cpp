@@ -27,7 +27,6 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     thread_pool_base::thread_pool_base(thread_pool_init_parameters const& init)
       : id_(init.index_, init.name_)
-      , mode_(init.mode_)
       , thread_offset_(init.thread_offset_)
       , affinity_data_(init.affinity_data_)
       , timestamp_scale_(1.0)

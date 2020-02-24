@@ -271,7 +271,7 @@ namespace hpx { namespace threads {
         {
             for (auto& pool_iter : pools_)
             {
-                pool_iter->set_scheduler_mode(mode);
+                pool_iter->get_scheduler()->set_scheduler_mode(mode);
             }
         }
 
@@ -279,7 +279,7 @@ namespace hpx { namespace threads {
         {
             for (auto& pool_iter : pools_)
             {
-                pool_iter->add_scheduler_mode(mode);
+                pool_iter->get_scheduler()->add_scheduler_mode(mode);
             }
         }
 
@@ -289,7 +289,7 @@ namespace hpx { namespace threads {
         {
             for (auto& pool_iter : pools_)
             {
-                pool_iter->add_remove_scheduler_mode(
+                pool_iter->get_scheduler()->add_remove_scheduler_mode(
                     to_add_mode, to_remove_mode);
             }
         }
@@ -298,7 +298,7 @@ namespace hpx { namespace threads {
         {
             for (auto& pool_iter : pools_)
             {
-                pool_iter->remove_scheduler_mode(mode);
+                pool_iter->get_scheduler()->remove_scheduler_mode(mode);
             }
         }
 
