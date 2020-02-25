@@ -7,18 +7,17 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/mpi.hpp>
+#include <hpx/program_options.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/program_options.hpp>
-//
-#include <hpx/mpi/mpi_future.hpp>
-//
-#include <iostream>
-#include <sstream>
+#include <hpx/runtime/threads/thread_data.hpp>
+
 #include <array>
 #include <atomic>
-//
+#include <iostream>
+#include <sstream>
+
 #include <mpi.h>
 
 void msg_recv(int rank, int size, int /*to*/, int from, int token, unsigned tag)
@@ -51,10 +50,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (size<2) {
-        std::cout << "This test requires N>1 ranks" << std::endl;
+    if (size < 2)
+    {
+        std::cout << "This test requires N > 1 ranks" << std::endl;
         return hpx::finalize();
     }
+
     //
     // tell the scheduler that we want to handle mpi in the background
     // here we use the provided hpx::mpi::poll function but a user
@@ -75,18 +76,20 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Rank 0      : Send then Recv
     // Rank 1->N-1 : Recv then Send
 
-    const int n_loops = 20;
+    hpx::mpi::executor exec(MPI_COMM_WORLD);
+
+    unsigned int const n_loops = 20;
     std::atomic<int> counter(n_loops);
     std::array<int, n_loops> tokens;
-    for (unsigned int i = 0; i < n_loops; ++i)
+    for (unsigned int i = 0; i != n_loops; ++i)
     {
         tokens[i] = (rank == 0) ? 1 : -1;
         int rank_from = (size + rank - 1) % size;
         int rank_to = (rank + 1) % size;
 
         // all ranks pre-post a receive
-        hpx::future<int> f_recv = hpx::mpi::detail::async(
-            MPI_Irecv, &tokens[i], 1, MPI_INT, rank_from, i, MPI_COMM_WORLD);
+        hpx::future<int> f_recv =
+            hpx::async(exec, MPI_Irecv, &tokens[i], 1, MPI_INT, rank_from, i);
 
         // when the recv completes,
         f_recv.then([=, &tokens, &counter](auto&&) {
@@ -95,8 +98,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             {
                 // send the incremented token to the next rank
                 ++tokens[i];
-                hpx::future<void> f_send = hpx::mpi::detail::async(MPI_Isend,
-                    &tokens[i], 1, MPI_INT, rank_to, i, MPI_COMM_WORLD);
+                hpx::future<void> f_send = hpx::async(
+                    exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
                 // when the send completes
                 f_send.then([=, &tokens, &counter](auto&&) {
                     msg_send(rank, size, rank_to, rank_from, tokens[i], i);
@@ -110,11 +113,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 --counter;
             }
         });
+
         // rank 0 starts the process with a send
         if (rank == 0)
         {
-            auto f_send = hpx::mpi::detail::async(
-                MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i, MPI_COMM_WORLD);
+            auto f_send =
+                hpx::async(exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
             f_send.then([=, &tokens, &counter](auto&&) {
                 msg_send(rank, size, rank_to, rank_from, tokens[i], i);
             });
@@ -143,9 +147,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 // on an hpx thread
 int main(int argc, char* argv[])
 {
-    //
     // Init MPI
-    //
     int provided = MPI_THREAD_MULTIPLE;
     MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
     if (provided != MPI_THREAD_MULTIPLE)
@@ -153,9 +155,11 @@ int main(int argc, char* argv[])
         std::cout << "Provided MPI is not : MPI_THREAD_MULTIPLE " << provided
                   << std::endl;
     }
-    return hpx::init(argc, argv);
-    //
+
+    int result = hpx::init(argc, argv);
+
     // Finalize MPI
-    //
     MPI_Finalize();
+
+    return result;
 }

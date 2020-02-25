@@ -6,10 +6,13 @@
 
 set(tests
   mpi_ring_async
+  mpi_ring_async_executor
 #  mpi_simple_async
   )
 
 set(mpi_ring_async_PARAMETERS THREADS_PER_LOCALITY 4)
+set(mpi_ring_async_executor_PARAMETERS THREADS_PER_LOCALITY 4)
+set(mpi_ring_async_executor_PARAMETERS LOCALITIES 2)
 #set(mpi_simple_async_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
