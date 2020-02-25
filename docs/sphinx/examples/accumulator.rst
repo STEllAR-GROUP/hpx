@@ -18,8 +18,8 @@ classes that expose methods as a type of |hpx| action. These actions are called
 component actions.
 
 Components are globally named, meaning that a component action can be called
-remotely (e.g.  from another machine). There are two accumulator examples in
-|hpx|;.
+remotely (e.g.,  from another machine). There are two accumulator examples in
+|hpx|.
 
 In the :ref:`examples_fibonacci` and the :ref:`examples_hello_world`, we
 introduced plain actions, which wrapped global functions. The target of a plain
@@ -93,11 +93,11 @@ application can be found here: :download:`accumulator_client.cpp
 
 An |hpx| component is represented by two C++ classes:
 
-* **A server class** - The implementation of the components functionality.
+* **A server class** - The implementation of the component's functionality.
 * **A client class** - A high-level interface that acts as a proxy for an
   instance of the component.
 
-Typically, these two classes all have the same name, but the server class
+Typically, these two classes both have the same name, but the server class
 usually lives in different sub-namespaces (``server``). For example, the full
 names of the two classes in accumulator are:
 
@@ -118,7 +118,7 @@ The accumulator component inherits from
 ensure that all action invocations are serialized. That means that the system
 ensures that no two actions are invoked at the same time on a given component
 instance. This makes the component thread safe and no additional locking has to
-be implemented by the user. Moreover, accumulator component is a component,
+be implemented by the user. Moreover, an accumulator component is a component
 because it also inherits from :cpp:class:`hpx::components::component_base` (the
 template argument passed to locking_hook is used as its base class). The
 following snippet shows the corresponding code:
@@ -201,7 +201,7 @@ Here are examples of how to expose actions through a client class:
 
 There are a few different ways of invoking actions:
 
-* **Non-blocking**: For actions which don't have return types, or when we do not
+* **Non-blocking**: For actions that don't have return types, or when we do not
   care about the result of an action, we can invoke the action using
   fire-and-forget semantics. This means that once we have asked |hpx| to compute
   the action, we forget about it completely and continue with our computation.
@@ -219,7 +219,7 @@ There are a few different ways of invoking actions:
    :lines: 115-121
 
 * **Synchronous**: To invoke an action in a fully synchronous manner, we can
-  simply call :cpp:func:`hpx::async`\ ``().get()`` (e.g., create a future and
+  simply call :cpp:func:`hpx::async`\ ``().get()`` (i.e., create a future and
   immediately wait on it to be ready). Here's an example from the accumulator
   client class:
 
