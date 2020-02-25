@@ -8,6 +8,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/errors.hpp>
@@ -16,6 +17,7 @@
 #include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/traits/future_access.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS)
@@ -29,6 +31,7 @@
 #endif
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -36,107 +39,30 @@
 
 namespace hpx { namespace compute { namespace cuda {
     namespace detail {
-        struct runtime_registration_wrapper
+        runtime_registration_wrapper::runtime_registration_wrapper(
+            hpx::runtime* rt)
+          : rt_(rt)
         {
-            runtime_registration_wrapper(hpx::runtime* rt)
-              : rt_(rt)
-            {
-                HPX_ASSERT(rt);
+            HPX_ASSERT(rt);
 
-                // Register this thread with HPX, this should be done once for
-                // each external OS-thread intended to invoke HPX functionality.
-                // Calling this function more than once on the same thread will
-                // report an error.
-                hpx::error_code ec(hpx::lightweight);    // ignore errors
-                hpx::register_thread(rt_, "cuda", ec);
-            }
-            ~runtime_registration_wrapper()
-            {
-                // Unregister the thread from HPX, this should be done once in
-                // the end before the external thread exists.
-                hpx::unregister_thread(rt_);
-            }
-
-            hpx::runtime* rt_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        struct future_data : lcos::detail::future_data<void>
-        {
-        private:
-            static void CUDART_CB stream_callback(
-                cudaStream_t stream, cudaError_t error, void* user_data);
-
-        public:
-            future_data();
-
-            void init(cudaStream_t stream);
-
-        private:
-            hpx::runtime* rt_;
-        };
-
-        struct release_on_exit
-        {
-            release_on_exit(future_data* data)
-              : data_(data)
-            {
-            }
-
-            ~release_on_exit()
-            {
-                // release the shared state
-                lcos::detail::intrusive_ptr_release(data_);
-            }
-
-            future_data* data_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        void CUDART_CB future_data::stream_callback(
-            cudaStream_t stream, cudaError_t error, void* user_data)
-        {
-            future_data* this_ = static_cast<future_data*>(user_data);
-
-            runtime_registration_wrapper wrap(this_->rt_);
-            release_on_exit on_exit(this_);
-
-            if (error != cudaSuccess)
-            {
-                this_->set_exception(HPX_GET_EXCEPTION(kernel_error,
-                    "cuda::detail::future_data::stream_callback()",
-                    std::string("cudaStreamAddCallback failed: ") +
-                        cudaGetErrorString(error)));
-                return;
-            }
-
-            this_->set_data(hpx::util::unused);
+            // Register this thread with HPX, this should be done once for
+            // each external OS-thread intended to invoke HPX functionality.
+            // Calling this function more than once on the same thread will
+            // report an error.
+            hpx::error_code ec(hpx::lightweight);    // ignore errors
+            hpx::register_thread(rt_, "cuda", ec);
         }
 
-        future_data::future_data()
-          : rt_(hpx::get_runtime_ptr())
+        runtime_registration_wrapper::~runtime_registration_wrapper()
         {
+            // Unregister the thread from HPX, this should be done once in
+            // the end before the external thread exists.
+            hpx::unregister_thread(rt_);
         }
 
-        void future_data::init(cudaStream_t stream)
+        hpx::future<void> get_future(cudaStream_t stream)
         {
-            // Hold on to the shared state on behalf of the cuda runtime
-            // right away as the callback could be called immediately.
-            lcos::detail::intrusive_ptr_add_ref(this);
-
-            cudaError_t error =
-                cudaStreamAddCallback(stream, stream_callback, this, 0);
-            if (error != cudaSuccess)
-            {
-                // callback was not called, release object
-                lcos::detail::intrusive_ptr_release(this);
-
-                // report error
-                HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::detail::future_data::future_data()",
-                    std::string("cudaStreamAddCallback failed: ") +
-                        cudaGetErrorString(error));
-            }
+            return get_future(hpx::util::internal_allocator<>{}, stream);
         }
     }    // namespace detail
 
@@ -304,14 +230,7 @@ namespace hpx { namespace compute { namespace cuda {
 
     hpx::future<void> target::get_future() const
     {
-        typedef detail::future_data shared_state_type;
-
-        // make sure shared state stays alive even if the callback is invoked
-        // during initialization
-        hpx::intrusive_ptr<shared_state_type> p(new shared_state_type());
-        p->init(handle_.get_stream());
-        return hpx::traits::future_access<hpx::future<void>>::create(
-            std::move(p));
+        return detail::get_future(handle_.get_stream());
     }
 
     target& get_default_target()

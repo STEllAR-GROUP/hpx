@@ -680,6 +680,13 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
 
+        future_data_allocator(
+            init_no_addref no_addref, other_allocator const& alloc)
+          : future_data<Result>(no_addref)
+          , alloc_(alloc)
+        {
+        }
+
         template <typename... T>
         future_data_allocator(init_no_addref no_addref, in_place in_place,
             other_allocator const& alloc, T&&... ts)
