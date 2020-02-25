@@ -17,19 +17,19 @@ Dataflow: Interest calculator
 concepts. One of these tools is a :term:`local control object` (:term:`LCO`)
 called dataflow. An :term:`LCO` is a type of component that can spawn a new
 thread when triggered. They are also distinguished from other components by a
-standard interface which allow users to understand and use them easily.
+standard interface that allow users to understand and use them easily.
 A Dataflow, being an :term:`LCO`, is triggered when the values it depends on
 become available. For instance, if you have a calculation X that depends on the
 results of three other calculations, you could set up a dataflow that would begin
 the calculation X as soon as the other three calculations have returned their
 values. Dataflows are set up to depend on other dataflows. It is this property
 that makes dataflow a powerful parallelization tool. If you understand the
-dependencies of your calculation, you can devise a simple algorithm which sets
+dependencies of your calculation, you can devise a simple algorithm that sets
 up a dependency tree to be executed. In this example, we calculate compound
 interest. To calculate compound interest, one must calculate the interest made
 in each compound period, and then add that interest back to the principal before
-calculating the interest made in the next period. A practical person would of
-course use the formula for compound interest:
+calculating the interest made in the next period. A practical person would, of
+course, use the formula for compound interest:
 
 .. math::
 
@@ -38,7 +38,7 @@ course use the formula for compound interest:
 where :math:`F` is the future value, :math:`P` is the principal value, :math:`i`
 is the interest rate, and :math:`n` is the number of compound periods.
 
-Nevertheless, we have chosen for the sake of example to manually calculate the
+However, for the sake of this example, we have chosen to manually calculate the
 future value by iterating:
 
 .. math::
@@ -82,7 +82,7 @@ This should print:
 Walkthrough
 ===========
 
-Let us begin with main, here we can see that we again are using
+Let us begin with main. Here we can see that we again are using
 |boost_program_options| to set our command line variables (see
 :ref:`examples_fibonacci` for more details). These options set the principal,
 rate, compound period, and time. It is important to note that the units of time
@@ -111,7 +111,7 @@ reassignment of ``principal`` using a :cpp:class:`hpx::dataflow`. A dataflow
 will first wait for its arguments to be ready before launching any callbacks, so
 ``add`` in this case will not begin until both ``principal`` and ``interest``
 are ready. This loop continues for each compound period that must be calculated.
-To see how ``interest`` and ``principal`` are calculated in the loop let us look
+To see how ``interest`` and ``principal`` are calculated in the loop, let us look
 at ``calc_action`` and ``add_action``:
 
 .. literalinclude:: ../../examples/quickstart/interest_calculator.cpp
