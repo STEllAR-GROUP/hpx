@@ -66,6 +66,7 @@ endif()
 
 # Default location is $HPX_ROOT/libs/mpi/include
 set(mpi_headers
+    hpx/mpi/mpi_executor.hpp
     hpx/mpi/mpi_future.hpp
 )
 
@@ -79,13 +80,14 @@ add_hpx_module(mpi
   COMPATIBILITY_HEADERS OFF
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_sources}
   HEADERS ${mpi_headers}
   COMPAT_HEADERS ${mpi_compat_headers}
   DEPENDENCIES
     hpx_config
     hpx_assertion
+    hpx_execution
     hpx_local_lcos
     hpx::mpi
   CMAKE_SUBDIRS examples tests

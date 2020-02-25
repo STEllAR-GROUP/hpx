@@ -196,21 +196,23 @@ namespace hpx { namespace mpi {
 
     // -----------------------------------------------------------------
     // return a future from an async call to MPI_Ixxx function
-    template <typename F, typename... Ts>
-    hpx::future<int> async(F f, Ts &&...ts)
-    {
-        // create a future data shared state
-        detail::future_data_ptr data =
-            new detail::future_data(detail::future_data::init_no_addref{});
-        // invoke the call to MPI_Ixxx, ignore the returned result for now
-        int result = f(std::forward<Ts>(ts)..., &data->request_);
-        (void)result; // silence unused var warning
-        // queue the future state internally for processing
-        detail::add_to_request_queue(data);
-        // return a future bound to the shared state
-        using traits::future_access;
-        return future_access<hpx::future<int>>::create(std::move(data));
-    }
+    namespace detail {
+        template <typename F, typename... Ts>
+        hpx::future<int> async(F f, Ts&&... ts)
+        {
+            // create a future data shared state
+            detail::future_data_ptr data =
+                new detail::future_data(detail::future_data::init_no_addref{});
+            // invoke the call to MPI_Ixxx, ignore the returned result for now
+            int result = f(std::forward<Ts>(ts)..., &data->request_);
+            (void) result;    // silence unused var warning
+            // queue the future state internally for processing
+            detail::add_to_request_queue(data);
+            // return a future bound to the shared state
+            using traits::future_access;
+            return future_access<hpx::future<int>>::create(std::move(data));
+        }
+    }    // namespace detail
 
     // -----------------------------------------------------------------
     // Background progress function for MPI async operations
@@ -341,7 +343,8 @@ namespace hpx { namespace mpi {
         };
         // if there are more than 25% NULL request handles in our lists, compact them
         if (detail::active_futures_.size()>0) {
-            unsigned nulls = std::count(detail::active_requests_.begin(), detail::active_requests_.end(), MPI_REQUEST_NULL);
+            std::size_t nulls = std::count(detail::active_requests_.begin(),
+                detail::active_requests_.end(), MPI_REQUEST_NULL);
             if (nulls>detail::active_requests_.size()/4) {
                 // compact away any requests that have been replaced by MPI_REQUEST_NULL
                 auto end1 = std::remove(detail::active_requests_.begin(), detail::active_requests_.end(), MPI_REQUEST_NULL);
