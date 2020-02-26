@@ -25,8 +25,8 @@ namespace hpx { namespace threads {
                 "cannot call resume_processing_unit from outside HPX, use"
                 "resume_processing_unit_cb instead");
         }
-        else if (!(pool.get_scheduler_mode() &
-                     threads::policies::enable_elasticity))
+        else if (!pool.get_scheduler()->has_scheduler_mode(
+                  policies::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "resume_processing_unit",
@@ -43,7 +43,7 @@ namespace hpx { namespace threads {
         std::function<void(void)> callback, std::size_t virt_core,
         error_code& ec)
     {
-        if (!(pool.get_scheduler_mode() & threads::policies::enable_elasticity))
+        if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
         {
             HPX_THROWS_IF(ec, invalid_status, "resume_processing_unit_cb",
                 "this thread pool does not support suspending "
@@ -76,15 +76,14 @@ namespace hpx { namespace threads {
                 "cannot call suspend_processing_unit from outside HPX, use"
                 "suspend_processing_unit_cb instead");
         }
-        else if (!(pool.get_scheduler_mode() &
-                     threads::policies::enable_elasticity))
+        else if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
                     "this thread pool does not support suspending "
                     "processing units"));
         }
-        else if (!pool.get_scheduler()->has_work_stealing() &&
+        else if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_stealing) &&
             hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
@@ -102,7 +101,7 @@ namespace hpx { namespace threads {
         std::function<void(void)> callback, std::size_t virt_core,
         error_code& ec)
     {
-        if (!(pool.get_scheduler_mode() & threads::policies::enable_elasticity))
+        if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
         {
             HPX_THROWS_IF(ec, invalid_status, "suspend_processing_unit_cb",
                 "this thread pool does not support suspending processing "
@@ -118,7 +117,7 @@ namespace hpx { namespace threads {
 
         if (threads::get_self_ptr())
         {
-            if (!pool.get_scheduler()->has_work_stealing() &&
+            if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_stealing) &&
                 hpx::this_thread::get_pool() == &pool)
             {
                 HPX_THROW_EXCEPTION(invalid_status,

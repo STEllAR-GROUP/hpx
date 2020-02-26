@@ -493,16 +493,6 @@ namespace hpx { namespace threads {
 
         virtual void reset_thread_distribution() {}
 
-        virtual void set_scheduler_mode(threads::policies::scheduler_mode) {}
-        virtual void add_scheduler_mode(threads::policies::scheduler_mode) {}
-        virtual void add_remove_scheduler_mode(
-            threads::policies::scheduler_mode,
-            threads::policies::scheduler_mode)
-        {
-        }
-        virtual void remove_scheduler_mode(threads::policies::scheduler_mode) {}
-
-        //
         virtual void abort_all_suspended_threads() {}
         virtual bool cleanup_terminated(bool /*delete_all*/)
         {
@@ -546,13 +536,6 @@ namespace hpx { namespace threads {
 
         /// \endcond
 
-        /// \cond NOINTERNAL
-        policies::scheduler_mode get_scheduler_mode() const
-        {
-            return mode_;
-        }
-        /// \endcond
-
     protected:
         /// \cond NOINTERNAL
         void init_pool_time_scale();
@@ -561,9 +544,6 @@ namespace hpx { namespace threads {
     protected:
         /// \cond NOINTERNAL
         pool_id_type id_;
-
-        // Mode of operation of the pool
-        policies::scheduler_mode mode_;
 
         // The thread_offset is equal to the accumulated number of
         // threads in all pools preceding this pool

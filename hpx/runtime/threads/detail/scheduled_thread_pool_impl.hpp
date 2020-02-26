@@ -420,7 +420,7 @@ namespace hpx { namespace threads { namespace detail {
         // needs to
         // be done in order to give the parcel pool threads higher
         // priority
-        if (mode_ & policies::reduce_thread_priority)
+        if (get_scheduler()->has_scheduler_mode(policies::reduce_thread_priority))
         {
             topo.reduce_thread_priority(ec);
             if (ec)
@@ -490,7 +490,7 @@ namespace hpx { namespace threads { namespace detail {
                     nullptr, nullptr, max_background_threads_,
                     max_idle_loop_count_, max_busy_loop_count_);
 
-                if ((mode_ & policies::do_background_work) &&
+                if (get_scheduler()->has_scheduler_mode(policies::do_background_work) &&
                     network_background_callback_)
                 {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
@@ -505,7 +505,6 @@ namespace hpx { namespace threads { namespace detail {
 #endif
                 }
 
-                sched_->Scheduler::set_scheduler_mode(mode_);
                 detail::scheduling_loop(
                     thread_num, *sched_, counters, callbacks);
 
@@ -1862,7 +1861,7 @@ namespace hpx { namespace threads { namespace detail {
     void scheduled_thread_pool<Scheduler>::add_processing_unit(
         std::size_t virt_core, std::size_t thread_num, error_code& ec)
     {
-        if (!(mode_ & threads::policies::enable_elasticity))
+        if (!get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::add_processing_unit",
@@ -1882,7 +1881,7 @@ namespace hpx { namespace threads { namespace detail {
     void scheduled_thread_pool<Scheduler>::remove_processing_unit(
         std::size_t virt_core, error_code& ec)
     {
-        if (!(mode_ & threads::policies::enable_elasticity))
+        if (!get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
         {
             HPX_THROW_EXCEPTION(invalid_status,
                 "scheduled_thread_pool<Scheduler>::remove_processing_unit",

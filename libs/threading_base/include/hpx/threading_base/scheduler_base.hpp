@@ -105,20 +105,16 @@ namespace hpx { namespace threads { namespace policies {
         std::pair<hpx::state, hpx::state> get_minmax_state() const;
 
         ///////////////////////////////////////////////////////////////////////
-        bool has_work_stealing() const
-        {
-            return (get_scheduler_mode() & policies::enable_stealing);
-        }
-
-        bool has_work_stealing_numa() const
-        {
-            return (get_scheduler_mode() & policies::enable_stealing_numa);
-        }
-
         // get/set scheduler mode
         scheduler_mode get_scheduler_mode() const
         {
             return mode_.data_.load(std::memory_order_relaxed);
+        }
+
+        // get/set scheduler mode
+        bool has_scheduler_mode(scheduler_mode mode) const
+        {
+            return (mode_.data_.load(std::memory_order_relaxed) & mode) != 0;
         }
 
         // set mode flags that control scheduler behaviour

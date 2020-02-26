@@ -1244,7 +1244,8 @@ namespace hpx { namespace threads { namespace policies {
             });
 
             // check for the rest and if we are NUMA aware
-            if (has_work_stealing_numa() && any(first_mask & pu_mask))
+            if (has_scheduler_mode(policies::enable_stealing_numa) &&
+                any(first_mask & pu_mask))
             {
                 iterate([&](std::size_t other_num_thread) {
                     return !any(numa_mask & numa_masks[other_num_thread]);
