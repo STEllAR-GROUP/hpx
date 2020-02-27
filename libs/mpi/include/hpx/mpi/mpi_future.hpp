@@ -9,17 +9,17 @@
 
 #include <mpi.h>
 //
-#include <cstdio>
-#include <iostream>
 #include <array>
-#include <utility>
-#include <tuple>
+#include <cstdio>
+#include <exception>
+#include <iostream>
 #include <list>
 #include <mutex>
-#include <exception>
-//
+#include <string>
+#include <tuple>
+#include <utility>
+
 #include <hpx/concurrency/concurrentqueue.hpp>
-#include <hpx/local_lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
@@ -72,13 +72,13 @@ namespace hpx { namespace mpi {
         using  future_data_ptr = memory::intrusive_ptr<future_data>;
 
         // -----------------------------------------------------------------
-        // a convenince structure to hold state vars
+        // a convenience structure to hold state vars
         // used extensivey with debug::print to display rank etc
         struct mpi_info {
-            bool mpi_initialized_;
-            bool error_handler_initialized_;
-            int  rank_;
-            int  size_;
+            bool mpi_initialized_ = false;
+            bool error_handler_initialized_ = false;
+            int rank_ = -1;
+            int size_ = -1;
         };
 
         // an instance of mpi_info that we store data in
@@ -170,7 +170,7 @@ namespace hpx { namespace mpi {
 
     // -----------------------------------------------------------------
     // set an error handler for communicators that will be called
-    // on any error instead of the default behaviour of program termination
+    // on any error instead of the default behavior of program termination
     void set_error_handler() {
         mpi_debug.debug(debug::str<>("set_error_handler"));
         MPI_Comm_create_errhandler(detail::hpx_MPI_Handler, &detail::hpx_mpi_errhandler);
@@ -197,6 +197,7 @@ namespace hpx { namespace mpi {
     // -----------------------------------------------------------------
     // return a future from an async call to MPI_Ixxx function
     namespace detail {
+
         template <typename F, typename... Ts>
         hpx::future<int> async(F f, Ts&&... ts)
         {
@@ -375,12 +376,37 @@ namespace hpx { namespace mpi {
         });
     }
 
+    template <typename F>
+    void wait(F&& f) {
+        hpx::util::yield_while([&]() {
+            std::lock_guard<std::mutex> lk(detail::list_mtx_);
+            return (detail::active_futures_.size() > 0) && f();
+        });
+    }
+
     // -----------------------------------------------------------------
+    namespace detail {
+
+        void register_polling(hpx::threads::thread_pool_base& pool)
+        {
+            auto* sched = pool.get_scheduler();
+
+            mpi_debug.debug(debug::str<>("Setting mode"), detail::mpi_info_,
+                "enable_user_polling");
+
+            // always set polling function before enabling polling
+            sched->set_user_polling_function(&hpx::mpi::poll);
+            sched->add_remove_scheduler_mode(
+                threads::policies::enable_user_polling,
+                threads::policies::do_background_work);
+        }
+    }    // namespace detail
+
     // initialize the hpx::mpi background request handler
     // All ranks should call this function,
     // but only one thread per rank needs to do so
-    void init(const std::string &pool_name,
-              bool init_mpi, bool init_errorhandler)
+    void init(bool init_mpi = false, std::string const& pool_name = "",
+        bool init_errorhandler = false)
     {
         // Check if MPI_Init has been called previously
         int is_initialized_=0;
@@ -410,35 +436,73 @@ namespace hpx { namespace mpi {
         }
 
         // install polling loop on requested thread pool
-        auto const &pool = hpx::resource::get_thread_pool(pool_name);
-        auto *sched = pool.get_scheduler();
+        if (pool_name.empty())
         {
-            mpi_debug.debug(debug::str<>("Setting mode")
-                  , detail::mpi_info_, "enable_user_polling");
-            // always set polling function before enabling polling
-            sched->set_user_polling_function(&hpx::mpi::poll);
-            sched->add_remove_scheduler_mode(
-                        threads::policies::enable_user_polling,
-                        threads::policies::do_background_work);
+            detail::register_polling(hpx::resource::get_thread_pool(0));
+        }
+        else
+        {
+            detail::register_polling(hpx::resource::get_thread_pool(pool_name));
         }
     }
 
     // -----------------------------------------------------------------
-    void finalize(const std::string &pool_name)
+    namespace detail
+    {
+        void unregister_polling(hpx::threads::thread_pool_base& pool)
+        {
+            auto* sched = pool.get_scheduler();
+            sched->remove_scheduler_mode(threads::policies::enable_user_polling);
+        }
+    }    // namespace detail
+
+    void finalize(std::string const& pool_name = "")
     {
         if (detail::mpi_info_.mpi_initialized_) {
             MPI_Finalize();
         }
         if (detail::mpi_info_.error_handler_initialized_) {
-            mpi_debug.debug("errhandler deletion not implemented");
+            mpi_debug.debug("error handler deletion not implemented");
         }
         //
         mpi_debug.debug(debug::str<>("Clearing mode")
-              , detail::mpi_info_, "enable_user_polling");
-        auto const &pool = resource::get_thread_pool(pool_name);
-        auto *sched = pool.get_scheduler();
-        sched->remove_scheduler_mode(threads::policies::enable_user_polling);
+              , detail::mpi_info_, "disable_user_polling");
+        if (pool_name.empty())
+        {
+            detail::unregister_polling(hpx::resource::get_thread_pool(0));
+        }
+        else
+        {
+            detail::unregister_polling(
+                hpx::resource::get_thread_pool(pool_name));
+        }
     }
+
+    // -----------------------------------------------------------------
+    // This RAII helper class assumes that MPI initialization/finalization is
+    // handled elsewhere
+    struct enable_user_polling
+    {
+        enable_user_polling(std::string const& pool_name = "")
+          : pool_name_(pool_name)
+        {
+            mpi::init(false, pool_name);
+        }
+
+        ~enable_user_polling()
+        {
+            mpi::finalize(pool_name_);
+        }
+
+        template <typename F>
+        void wait(F&& f)
+        {
+            return mpi::wait(std::forward<F>(f));
+        }
+
+    private:
+        std::string pool_name_;
+    };
 
     // -----------------------------------------------------------------
     template <typename... Args>
