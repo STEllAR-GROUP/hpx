@@ -29,7 +29,7 @@ get support for using HPX.
 
 ### Mailing Lists/Groups
 
-* [hpx-users group](email:hpx-users@stellar.cct.lsu.edu), see
+* [hpx-users group](email:hpx-users@stellar-group.org), see
   [here](https://www.mail-archive.com/hpx-users@stellar.cct.lsu.edu) for past
   conversations.
 
