@@ -64,8 +64,8 @@ endif()
 # Build all of HPX
 ################################################################################
 set(HPX_VERSION_MAJOR 1)
-set(HPX_VERSION_MINOR 4)
-set(HPX_VERSION_SUBMINOR 1)
+set(HPX_VERSION_MINOR 5)
+set(HPX_VERSION_SUBMINOR 0)
 set(HPX_VERSION_DATE 20200212)
 set(HPX_VERSION_TAG "-trunk")
 
