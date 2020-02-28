@@ -297,6 +297,28 @@ variable to point to the installation of |hpx|.
    in your targets. The |hpx| include directories are available with the
    ``HPX_INCLUDE_DIRS`` CMake variable.
 
+.. _hpxcxx_documentation:
+
+Building |hpx| Components and Applications
+----------------------------------------
+The ``hpxcxx.in`` compiler wrapper in ``hpx/cmake/templates/`` directory helps to build a |hpx| component, an application or generate a ``<file-name>.o`` file, based on the arguments passed to it.
+
+.. code-block :: bash
+
+   hpxcxx [--exe=<APPLICATION_NAME> | --comp=<COMPONENT_NAME> | -c] FLAGS FILES
+
+The ``hpxcxx`` command **requires** that either an application or a component is built or ``-c`` flag is specified. If the build is against a debug build, the ``-g`` is to be specified while building.
+
+Optional ``FLAGS``
+##################
+
+* ``-l <LIBRARY> | -l<LIBRARY>``: Links ``<LIBRARY>`` to the build
+* ``-g``: Specifies that the application or component build is against a debug build
+* ``-rd``: Sets ``release-with-debug-info`` option
+* ``-mr``: Sets ``minsize-release`` option
+
+All other flags (like ``-o OUTPUT_FILE``) are directly passed to the underlying C++ compiler.
+ 
 .. _cmake_integrate_hpx:
 
 CMake macros to integrate |hpx| into existing applications
@@ -346,7 +368,7 @@ to the section on :ref:`comps`.
 .. _makefile:
 
 Using |hpx| with Makefile
-=======================
+=========================
 
 A basic project building with |hpx| is through creating makefiles. The process
 of creating one can get complex depending upon the use of cmake parameter
