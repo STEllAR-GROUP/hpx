@@ -5,18 +5,18 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    bulk_new_3054
     client_base_registration
     create_n_components_2323
     moveonly_constructor_arguments_1405
+    new_2848
+    new_4369
     returned_client_2150
    )
 
 if(HPX_WITH_NETWORKING)
   set(tests ${tests}
-    bulk_new_3054
     create_remote_component_2334
-    new_2848
-    new_4369
   )
   set(bulk_new_3054_PARAMETERS LOCALITIES 2)
   set(create_remote_component_2334_PARAMETERS LOCALITIES 2)
