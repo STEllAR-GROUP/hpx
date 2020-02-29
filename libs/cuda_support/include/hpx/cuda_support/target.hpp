@@ -12,7 +12,6 @@
 // must be before HPX_HAVE_CUDA - it's defined in the config
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/cuda_support/get_targets.hpp>
@@ -347,4 +346,3 @@ namespace hpx { namespace cuda {
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
