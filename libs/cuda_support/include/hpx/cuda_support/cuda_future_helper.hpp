@@ -62,7 +62,7 @@ namespace hpx { namespace cuda {
         // Error handling in cublas calls
         // not all of these are supported by all cuda/cublas versions
         // (comment them out if they cause compiler errors)
-        const char* _cublasGetErrorEnum(cublasStatus_t error)
+        inline const char* _cublasGetErrorEnum(cublasStatus_t error)
         {
             switch (error)
             {
@@ -146,7 +146,7 @@ namespace hpx { namespace cuda {
     // -------------------------------------------------------------------------
     // Error message handling for cuda and cublas
     // -------------------------------------------------------------------------
-    void cuda_error(cudaError_t err)
+    inline void cuda_error(cudaError_t err)
     {
         if (err != cudaSuccess)
         {
@@ -157,7 +157,7 @@ namespace hpx { namespace cuda {
         }
     }
 
-    void cublas_error(cublasStatus_t err)
+    inline void cublas_error(cublasStatus_t err)
     {
         if (err != CUBLAS_STATUS_SUCCESS)
         {
