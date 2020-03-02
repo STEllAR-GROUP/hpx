@@ -64,9 +64,9 @@ endif()
 # Build all of HPX
 ################################################################################
 set(HPX_VERSION_MAJOR 1)
-set(HPX_VERSION_MINOR 4)
+set(HPX_VERSION_MINOR 5)
 set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20200115)
+set(HPX_VERSION_DATE 20200212)
 set(HPX_VERSION_TAG "-trunk")
 
 set(HPX_VERSION "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}")
@@ -379,7 +379,7 @@ hpx_option(HPX_WITH_IO_COUNTERS BOOL
   ${HPX_WITH_IO_COUNTERS_DEFAULT} ADVANCED CATEGORY "Build Targets")
 if(HPX_WITH_IO_COUNTERS)
   if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-    hpx_error("HPX_WITH_IO_COUNTERS was set to ON, but IO counters are only available on Linux (this is \"${CMAKE_SYSTEM_NAME}\").")
+    hpx_error("HPX_WITH_IO_COUNTERS was set to ON, but IO counters are only available on Linux (this is \"${CMAKE_SYSTEM_NAME}\")")
   endif()
   hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
 endif()
