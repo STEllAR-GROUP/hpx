@@ -1497,8 +1497,7 @@ namespace hpx { namespace util
             // command line handling.
             hpx::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args,
-                    prevm, std::size_t(-1), error_mode,
-                    rtcfg_.mode_))
+                    prevm, std::size_t(-1), error_mode, rtcfg_.mode_))
             {
                 return -1;
             }
@@ -1579,9 +1578,9 @@ namespace hpx { namespace util
         hpx::program_options::options_description help;
         std::vector<std::string> unregistered_options;
 
-        if (!util::parse_commandline(rtcfg_, desc_cmdline,
-                argv[0], args, vm_, node_, error_mode, rtcfg_.mode_,
-                &help, &unregistered_options))
+        if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args, vm_,
+                node_, error_mode | util::report_missing_config_file,
+                rtcfg_.mode_, &help, &unregistered_options))
         {
             return -1;
         }
