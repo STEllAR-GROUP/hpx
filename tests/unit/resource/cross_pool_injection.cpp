@@ -238,13 +238,8 @@ int main(int argc, char* argv[])
                         st_rand(
                             0, ((std::max)(std::size_t(1), max_threads / 2)));
                     pool_name = "pool-" + std::to_string(num_pools);
-#if defined(HPX_HAVE_SHARED_PRIORITY_SCHEDULER)
                     rp.create_thread_pool(pool_name,
                         hpx::resource::scheduling_policy::shared_priority);
-#else
-                    rp.create_thread_pool(pool_name,
-                        hpx::resource::scheduling_policy::local_priority_fifo);
-#endif
                     num_pools++;
                 }
                 std::cout << "Added pu " << p.id() << " to " << pool_name
