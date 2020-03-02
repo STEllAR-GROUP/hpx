@@ -2,96 +2,93 @@
 //  troy d. straszheim <troy@resophonic.com>
 //  http://www.resophonic.com
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_SERIALIZATION_VARIANT_HPP
-#define HPX_SERIALIZATION_VARIANT_HPP
+#ifndef HPX_SERIALIZATION_BOOST_VARIANT_HPP
+#define HPX_SERIALIZATION_BOOST_VARIANT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/boost_variant.hpp>  // for backwards compatibility
 
-#if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 
 #include <hpx/errors.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
-#include <cstddef>
 #include <utility>
-#include <variant>
+
+#include <boost/variant.hpp>
 
 namespace hpx { namespace serialization {
 
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
-        struct std_variant_save_visitor
+        struct boost_variant_save_visitor : boost::static_visitor<>
         {
-            std_variant_save_visitor(output_archive& ar)
-              : ar_(ar)
+            boost_variant_save_visitor(output_archive& ar)
+              : m_ar(ar)
             {
             }
 
             template <typename T>
             void operator()(T const& value) const
             {
-                ar_ << value;
+                m_ar << value;
             }
 
         private:
-            output_archive& ar_;
+            output_archive& m_ar;
         };
 
         ////////////////////////////////////////////////////////////////////////
         template <typename... Ts>
-        struct std_variant_impl;
+        struct boost_variant_impl;
 
         template <typename T, typename... Ts>
-        struct std_variant_impl<T, Ts...>
+        struct boost_variant_impl<T, Ts...>
         {
             template <typename V>
-            static void load(input_archive& ar, std::size_t which, V& v)
+            static void load(input_archive& ar, int which, V& v)
             {
                 if (which == 0)
                 {
                     T value;
                     ar >> value;
-                    v.template emplace<T>(std::move(value));
+                    v = std::move(value);
                     return;
                 }
-                std_variant_impl<Ts...>::load(ar, which - 1, v);
+                boost_variant_impl<Ts...>::load(ar, which - 1, v);
             }
         };
 
         template <>
-        struct std_variant_impl<>
+        struct boost_variant_impl<>
         {
             template <typename V>
-            static void load(
-                input_archive& /*ar*/, std::size_t /*which*/, V& /*v*/)
+            static void load(input_archive& /*ar*/, int /*which*/, V& /*v*/)
             {
             }
         };
     }    // namespace detail
 
-    template <typename... Ts>
-    void save(output_archive& ar, std::variant<Ts...> const& v, unsigned)
+    template <typename... T>
+    void save(output_archive& ar, boost::variant<T...> const& v, unsigned)
     {
-        std::size_t which = v.index();
+        int which = v.which();
         ar << which;
-        detail::std_variant_save_visitor visitor(ar);
-        std::visit(visitor, v);
+        detail::boost_variant_save_visitor visitor(ar);
+        v.apply_visitor(visitor);
     }
 
-    template <typename... Ts>
-    void load(input_archive& ar, std::variant<Ts...>& v, unsigned)
+    template <typename... T>
+    void load(input_archive& ar, boost::variant<T...>& v, unsigned)
     {
-        std::size_t which;
+        int which;
         ar >> which;
-        if (which >= sizeof...(Ts))
+        if (which >= static_cast<int>(sizeof...(T)))
         {
             // this might happen if a type was removed from the list of variant
             // types
@@ -99,13 +96,13 @@ namespace hpx { namespace serialization {
                 "load<Archive, Variant, version>",
                 "type was removed from the list of variant types");
         }
-        detail::std_variant_impl<Ts...>::load(ar, which, v);
+        detail::boost_variant_impl<T...>::load(ar, which, v);
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename... Ts>), (std::variant<Ts...>) );
+        (template <typename... T>), (boost::variant<T...>) );
 }}    // namespace hpx::serialization
 
-#endif    // HPX_HAVE_CXX17_STD_VARIANT
+#endif    // HPX_SERIALIZATION_HAVE_BOOST_TYPES
 
-#endif    // HPX_SERIALIZATION_VARIANT_HPP
+#endif    // HPX_SERIALIZATION_BOOST_VARIANT_HPP

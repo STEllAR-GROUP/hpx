@@ -331,6 +331,13 @@ function(hpx_check_for_cxx17_noexcept_functions_as_nontype_template_arguments)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx17_std_variant)
+  add_hpx_config_test(HPX_WITH_CXX17_VARIANT
+    SOURCE cmake/tests/cxx17_std_variant.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_builtin_integer_pack)
   add_hpx_config_test(HPX_WITH_BUILTIN_INTEGER_PACK
     SOURCE cmake/tests/builtin_integer_pack.cpp
