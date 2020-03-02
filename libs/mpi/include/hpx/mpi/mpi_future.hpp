@@ -24,6 +24,7 @@
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/threading_base/print.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 
 // The preferred mode of operation uses a std::vector and MPI_Testany
 // but the use of a list and individual tests is supported for legacy
@@ -380,7 +381,7 @@ namespace hpx { namespace mpi {
     void wait(F&& f) {
         hpx::util::yield_while([&]() {
             std::lock_guard<std::mutex> lk(detail::list_mtx_);
-            return (detail::active_futures_.size() > 0) && f();
+            return (detail::active_futures_.size() > 0) || f();
         });
     }
 
