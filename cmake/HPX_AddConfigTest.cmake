@@ -309,6 +309,13 @@ function(hpx_check_for_cxx17_std_in_place_type_t)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx17_maybe_unused)
+  add_hpx_config_test(HPX_HAVE_CXX17_MAYBE_UNUSED
+    SOURCE cmake/tests/cxx17_maybe_unused.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx17_structured_bindings)
   add_hpx_config_test(HPX_WITH_CXX17_STRUCTURED_BINDINGS
     SOURCE cmake/tests/cxx17_structured_bindings.cpp

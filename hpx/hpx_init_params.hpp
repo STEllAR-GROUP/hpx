@@ -16,6 +16,7 @@
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <functional>
 #include <string>
@@ -64,10 +65,10 @@ namespace hpx
                 "Usage: " HPX_APPLICATION_STRING " [options]");
         static startup_function_type default_startup = startup_function_type();
         static shutdown_function_type default_shutdown = shutdown_function_type();
-        static int dummy_argc = 1;
+        HPX_MAYBE_UNUSED static int dummy_argc = 1;
         // TODO: make it only one parameter, probably add a cast
         static char *default_argv[2] = { detail::app_name , nullptr };
-        static char **dummy_argv = default_argv;
+        HPX_MAYBE_UNUSED static char **dummy_argv = default_argv;
     }
 
 #ifndef DOXYGEN
