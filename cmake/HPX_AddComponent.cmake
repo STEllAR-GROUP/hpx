@@ -103,7 +103,6 @@ function(add_hpx_component name)
   hpx_print_list("DEBUG" "Add component ${name}: Configuration files for ${name}" ${name}_INI)
 
   set(exclude_from_all)
-  set(install_options)
   if(${name}_EXCLUDE_FROM_ALL)
     set(exclude_from_all EXCLUDE_FROM_ALL)
   else()
@@ -236,7 +235,6 @@ function(add_hpx_component name)
     DEPENDENCIES ${${name}_DEPENDENCIES}
     COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
     ${_target_flags}
-    ${install_optional}
   )
 endfunction()
 
