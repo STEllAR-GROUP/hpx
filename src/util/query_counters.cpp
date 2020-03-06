@@ -105,9 +105,9 @@ namespace hpx { namespace util
         timer_.start();
     }
 
-    void query_counters::stop_evaluating_counters()
+    void query_counters::stop_evaluating_counters(bool terminate)
     {
-        timer_.stop();
+        timer_.stop(terminate);
         counters_.stop(launch::sync);
     }
 

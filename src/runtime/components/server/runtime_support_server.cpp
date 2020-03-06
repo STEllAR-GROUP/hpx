@@ -134,7 +134,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 namespace hpx
 {
     // helper function to stop evaluating counters during shutdown
-    void stop_evaluating_counters();
+    void stop_evaluating_counters(bool terminate = false);
 }
 
 namespace hpx { namespace components
@@ -636,7 +636,7 @@ namespace hpx { namespace components { namespace server
 
         agas_client.start_shutdown();
 
-        stop_evaluating_counters();
+        stop_evaluating_counters(true);
 
         // wake up suspended pus
         threads::threadmanager& tm = appl.get_thread_manager();

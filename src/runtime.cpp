@@ -398,10 +398,10 @@ namespace hpx
             active_counters_->evaluate_counters(reset, description, ec);
     }
 
-    void runtime::stop_evaluating_counters()
+    void runtime::stop_evaluating_counters(bool terminate)
     {
         if (active_counters_.get())
-            active_counters_->stop_evaluating_counters();
+            active_counters_->stop_evaluating_counters(terminate);
     }
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -1588,10 +1588,11 @@ namespace hpx
 #endif
 
     // helper function to stop evaluating counters during shutdown
-    void stop_evaluating_counters()
+    void stop_evaluating_counters(bool terminate)
     {
         runtime* rt = get_runtime_ptr();
-        if (nullptr != rt) rt->stop_evaluating_counters();
+        if (nullptr != rt)
+            rt->stop_evaluating_counters(terminate);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -41,7 +41,7 @@ namespace hpx { namespace util
             bool csv_header, bool print_counters_locally);
 
         void start();
-        void stop_evaluating_counters();
+        void stop_evaluating_counters(bool terminate = false);
         bool evaluate();
         void terminate();
 
