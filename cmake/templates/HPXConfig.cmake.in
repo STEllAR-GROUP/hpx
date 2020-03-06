@@ -122,7 +122,7 @@ endif()
 
 # Set legacy variables for linking and include directories
 set(HPX_LIBRARIES "hpx;hpx_init;")
-set(HPX_INCLUDE_DIRS "")
+set(HPX_INCLUDE_DIRS "@HPX_INCLUDE_DIRS@")
 set(HPX_LIBRARY_DIR "")
 if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   set(HPX_LINK_LIBRARIES "hpx_wrap;")

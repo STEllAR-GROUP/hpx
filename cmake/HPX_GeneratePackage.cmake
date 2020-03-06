@@ -48,6 +48,20 @@ if (NOT MSVC)
   hpx_generate_pkgconfig_from_target(hpx::component hpx_component FALSE)
 endif()
 
+if (NOT HPX_INCLUDE_DIRS)
+  hpx_collect_usage_requirements(hpx
+    _hpx_compile_definitions
+    _hpx_compile_options
+    _hpx_pic_option
+    _hpx_include_directories
+    _hpx_system_include_directories
+    _hpx_link_libraries
+    _hpx_link_options
+    _processed_targets
+    FALSE)
+  set(HPX_INCLUDE_DIRS ${_hpx_include_directories}
+    ${_hpx_system_include_directories})
+endif()
 # Install dir
 configure_file(cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}Config.cmake"
