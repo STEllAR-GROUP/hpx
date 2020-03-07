@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2017 Hartmut Kaiser
+//  Copyright (c) 2005-2020 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -601,10 +601,14 @@ namespace hpx { namespace util
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
+        else
+            util::disable_lock_detection();
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
         if (enable_global_lock_detection())
             util::enable_global_lock_detection();
+        else
+            util::disable_global_lock_detection();
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
@@ -662,10 +666,14 @@ namespace hpx { namespace util
 #ifdef HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
+        else
+            util::disable_lock_detection();
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
         if (enable_global_lock_detection())
             util::enable_global_lock_detection();
+        else
+            util::disable_global_lock_detection();
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
