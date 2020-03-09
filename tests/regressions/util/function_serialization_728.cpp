@@ -11,7 +11,9 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/compression_zlib.hpp>
+#ifdef HPX_HAVE_COMPRESSION_ZLIB
+  #include <hpx/include/compression_zlib.hpp>
+#endif
 #include <hpx/include/parcel_coalescing.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/testing.hpp>
@@ -39,7 +41,9 @@ int pass_functor(hpx::util::function<int()> const& f)
 
 
 HPX_DECLARE_PLAIN_ACTION(pass_functor, pass_functor_action);
-HPX_ACTION_USES_ZLIB_COMPRESSION(pass_functor_action);
+#ifdef HPX_HAVE_COMPRESSION_ZLIB
+  HPX_ACTION_USES_ZLIB_COMPRESSION(pass_functor_action);
+#endif
 HPX_ACTION_USES_MESSAGE_COALESCING(pass_functor_action);
 HPX_PLAIN_ACTION(pass_functor, pass_functor_action);
 
