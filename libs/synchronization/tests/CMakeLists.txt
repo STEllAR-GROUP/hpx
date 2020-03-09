@@ -39,6 +39,5 @@ if (HPX_WITH_TESTS_HEADERS)
     modules.synchronization
     HEADERS ${synchronization_headers}
     HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-    NOLIBS
     DEPENDENCIES hpx_synchronization)
 endif()

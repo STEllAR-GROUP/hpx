@@ -14,6 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/topology.hpp>
 
 #include <cstddef>
 #include <type_traits>

@@ -36,7 +36,6 @@ if (HPX_SCHEDULERS_WITH_TESTS)
         modules.schedulers
         HEADERS ${schedulers_headers}
         HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-        NOLIBS
         DEPENDENCIES hpx_schedulers)
     endif()
 endif()
