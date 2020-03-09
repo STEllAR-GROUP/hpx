@@ -79,6 +79,7 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
       hpx_execution
       hpx_hardware
       hpx_memory
+      hpx_performance_counters
       hpx_plugin
       hpx_program_options
       hpx_serialization

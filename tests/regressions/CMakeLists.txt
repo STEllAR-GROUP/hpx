@@ -12,7 +12,6 @@ set(subdirs
     block_matrix
     component
     lcos
-    performance_counters
     threads
     traits
     util
@@ -25,7 +24,6 @@ foreach(subdir ${subdirs})
 endforeach()
 
 set(tests
-    dynamic_counters_loaded_1508
     id_type_ref_counting_1032
     multiple_init
     multiple_init_2918
@@ -35,7 +33,6 @@ set(tests
 
 set(id_type_ref_counting_1032_PARAMETERS THREADS_PER_LOCALITY 1)
 set(unhandled_exception_582_PARAMETERS THREADS_PER_LOCALITY 1)
-set(dynamic_counters_loaded_1508_FLAGS DEPENDENCIES memory_component)
 
 foreach(test ${tests})
   set(sources

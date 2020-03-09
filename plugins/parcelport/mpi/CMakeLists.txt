@@ -37,6 +37,7 @@ if(HPX_WITH_PARCELPORT_MPI)
       hpx_filesystem
       hpx_hardware
       hpx_memory
+      hpx_performance_counters
       hpx_plugin
       hpx_program_options
       hpx_serialization
