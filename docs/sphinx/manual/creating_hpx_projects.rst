@@ -299,9 +299,10 @@ variable to point to the installation of |hpx|.
 
 .. _hpxcxx_documentation:
 
-Building |hpx| Components and Applications
+Building |hpx| components and applications
 ------------------------------------------
-The ``hpxcxx.in`` compiler wrapper in ``hpx/cmake/templates/`` directory helps to build a |hpx| component, an application or generate a ``<file-name>.o`` file, based on the arguments passed to it.
+
+The ``hpxcxx`` compiler wrapper helps to build a |hpx| component, an application or generate a ``<file-name>.o`` file, based on the arguments passed to it.
 
 .. code-block :: bash
 
