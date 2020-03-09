@@ -43,7 +43,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/new.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/threads/thread_data_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/split_future.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_all.hpp"
