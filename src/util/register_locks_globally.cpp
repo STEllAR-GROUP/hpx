@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -77,6 +77,11 @@ namespace hpx { namespace util
     void enable_global_lock_detection()
     {
         detail::register_locks_globally::lock_detection_enabled_ = true;
+    }
+
+    void disable_global_lock_detection()
+    {
+        detail::register_locks_globally::lock_detection_enabled_ = false;
     }
 
     ///////////////////////////////////////////////////////////////////////////

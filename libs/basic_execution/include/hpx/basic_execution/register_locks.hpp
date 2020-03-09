@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -38,6 +38,7 @@ namespace hpx { namespace util {
     HPX_API_EXPORT void verify_no_locks();
     HPX_API_EXPORT void force_error_on_lock();
     HPX_API_EXPORT void enable_lock_detection();
+    HPX_API_EXPORT void disable_lock_detection();
     HPX_API_EXPORT void ignore_lock(void const* lock);
     HPX_API_EXPORT void reset_ignored(void const* lock);
     HPX_API_EXPORT void ignore_all_locks();
@@ -123,6 +124,7 @@ namespace hpx { namespace util {
     inline void verify_no_locks() {}
     inline void force_error_on_lock() {}
     inline void enable_lock_detection() {}
+    inline void disable_lock_detection() {}
     inline void ignore_lock(void const* /*lock*/) {}
     inline void reset_ignored(void const* /*lock*/) {}
 

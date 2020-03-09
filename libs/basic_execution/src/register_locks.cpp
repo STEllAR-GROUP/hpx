@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -124,6 +124,11 @@ namespace hpx { namespace util {
     void enable_lock_detection()
     {
         detail::register_locks::lock_detection_enabled_ = true;
+    }
+
+    void disable_lock_detection()
+    {
+        detail::register_locks::lock_detection_enabled_ = false;
     }
 
     static registered_locks_error_handler_type registered_locks_error_handler;
