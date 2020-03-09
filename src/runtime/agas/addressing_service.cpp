@@ -51,7 +51,7 @@
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/insert_checked.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <cstddef>
 #include <cstdint>

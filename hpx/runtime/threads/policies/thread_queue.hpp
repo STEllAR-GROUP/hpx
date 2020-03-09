@@ -16,7 +16,9 @@
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
+#include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
@@ -47,21 +49,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-    ///////////////////////////////////////////////////////////////////////////
-    // We control whether to collect queue wait times using this global bool.
-    // It will be set by any of the related performance counters. Once set it
-    // stays set, thus no race conditions will occur.
-    extern HPX_EXPORT bool maintain_queue_wait_times;
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    extern bool minimal_deadlock_detection;
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     // // Queue back-end interface:
     //
@@ -218,7 +205,7 @@ namespace hpx { namespace threads { namespace policies {
             while (add_count-- && addfrom->new_tasks_.pop(task, steal))
             {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-                if (maintain_queue_wait_times)
+                if (get_maintain_queue_wait_times_enabled())
                 {
                     addfrom->new_tasks_wait_ +=
                         util::high_resolution_clock::now() -
@@ -743,7 +730,7 @@ namespace hpx { namespace threads { namespace policies {
                 --src->work_items_count_.data_;
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-                if (maintain_queue_wait_times)
+                if (get_maintain_queue_wait_times_enabled())
                 {
                     std::uint64_t now = util::high_resolution_clock::now();
                     src->work_items_wait_ += now - util::get<1>(*trd);
@@ -765,7 +752,7 @@ namespace hpx { namespace threads { namespace policies {
             while (src->new_tasks_.pop(task))
             {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-                if (maintain_queue_wait_times)
+                if (get_maintain_queue_wait_times_enabled())
                 {
                     std::int64_t now = util::high_resolution_clock::now();
                     src->new_tasks_wait_ += now - util::get<2>(*task);
@@ -812,7 +799,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 --work_items_count_.data_;
 
-                if (maintain_queue_wait_times)
+                if (get_maintain_queue_wait_times_enabled())
                 {
                     work_items_wait_ += util::high_resolution_clock::now() -
                         util::get<1>(*tdesc);
@@ -1060,7 +1047,7 @@ namespace hpx { namespace threads { namespace policies {
 #ifndef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             return false;
 #else
-            if (minimal_deadlock_detection)
+            if (get_minimal_deadlock_detection_enabled())
             {
                 std::lock_guard<mutex_type> lk(mtx_);
                 return detail::dump_suspended_threads(

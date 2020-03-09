@@ -12,6 +12,7 @@
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
 #include <hpx/assertion.hpp>
+#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
@@ -33,14 +34,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    extern bool minimal_deadlock_detection;
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     using default_static_queue_scheduler_terminated_queue = lockfree_lifo;
@@ -134,7 +127,8 @@ namespace hpx { namespace threads { namespace policies
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
-            if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
+            if (HPX_UNLIKELY(get_minimal_deadlock_detection_enabled() &&
+                    LHPX_ENABLED(error)))
             {
                 bool suspended_only = true;
 

@@ -19,8 +19,8 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/get_entry_as.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/init_logging.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>
@@ -915,162 +915,6 @@ namespace hpx { namespace util
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    // the logging_configuration type will be instantiated exactly once
-    struct logging_configuration
-    {
-        logging_configuration();
-        std::vector<std::string> prefill_;
-    };
-
-// define the format for the generated time stamps
-#define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
-
-    logging_configuration::logging_configuration()
-    {
-        try {
-            // add default logging configuration as defaults to the ini data
-            // this will be overwritten by related entries in the read hpx.ini
-            prefill_ = {
-                // general logging
-                "[hpx.logging]",
-                "level = ${HPX_LOGLEVEL:0}",
-                "destination = ${HPX_LOGDESTINATION:console}",
-                "format = ${HPX_LOGFORMAT:"
-                    "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%]|\\n}",
-
-                // general console logging
-                "[hpx.logging.console]",
-                "level = ${HPX_LOGLEVEL:$[hpx.logging.level]}",
-#if defined(ANDROID) || defined(__ANDROID__)
-                "destination = ${HPX_CONSOLE_LOGDESTINATION:android_log}",
-#else
-                "destination = ${HPX_CONSOLE_LOGDESTINATION:"
-                    "file(hpx.$[system.pid].log)}",
-#endif
-                "format = ${HPX_CONSOLE_LOGFORMAT:|}",
-
-                // logging related to timing
-                "[hpx.logging.timing]",
-                "level = ${HPX_TIMING_LOGLEVEL:-1}",
-                "destination = ${HPX_TIMING_LOGDESTINATION:console}",
-                "format = ${HPX_TIMING_LOGFORMAT:"
-                    "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
-
-                // console logging related to timing
-                "[hpx.logging.console.timing]",
-                "level = ${HPX_TIMING_LOGLEVEL:$[hpx.logging.timing.level]}",
-#if defined(ANDROID) || defined(__ANDROID__)
-                "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:android_log}",
-#else
-                "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:"
-                    "file(hpx.timing.$[system.pid].log)}",
-#endif
-                "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
-
-                // logging related to AGAS
-                "[hpx.logging.agas]",
-                "level = ${HPX_AGAS_LOGLEVEL:-1}",
-//                     "destination = ${HPX_AGAS_LOGDESTINATION:console}",
-                "destination = ${HPX_AGAS_LOGDESTINATION:"
-                    "file(hpx.agas.$[system.pid].log)}",
-                "format = ${HPX_AGAS_LOGFORMAT:"
-                    "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
-
-                // console logging related to AGAS
-                "[hpx.logging.console.agas]",
-                "level = ${HPX_AGAS_LOGLEVEL:$[hpx.logging.agas.level]}",
-#if defined(ANDROID) || defined(__ANDROID__)
-                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:android_log}",
-#else
-                "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:"
-                    "file(hpx.agas.$[system.pid].log)}",
-#endif
-                "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
-
-                // logging related to the parcel transport
-                "[hpx.logging.parcel]",
-                "level = ${HPX_PARCEL_LOGLEVEL:-1}",
-                "destination = ${HPX_PARCEL_LOGDESTINATION:"
-                    "file(hpx.parcel.$[system.pid].log)}",
-                "format = ${HPX_PARCEL_LOGFORMAT:"
-                    "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%][  PT] |\\n}",
-
-                // console logging related to the parcel transport
-                "[hpx.logging.console.parcel]",
-                "level = ${HPX_PARCEL_LOGLEVEL:$[hpx.logging.parcel.level]}",
-#if defined(ANDROID) || defined(__ANDROID__)
-                "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:android_log}",
-#else
-                "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:"
-                    "file(hpx.parcel.$[system.pid].log)}",
-#endif
-                "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
-
-                // logging related to applications
-                "[hpx.logging.application]",
-                "level = ${HPX_APP_LOGLEVEL:-1}",
-                "destination = ${HPX_APP_LOGDESTINATION:console}",
-                "format = ${HPX_APP_LOGFORMAT:"
-                    "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
-
-                // console logging related to applications
-                "[hpx.logging.console.application]",
-                "level = ${HPX_APP_LOGLEVEL:$[hpx.logging.application.level]}",
-#if defined(ANDROID) || defined(__ANDROID__)
-                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:android_log}",
-#else
-                "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:"
-                    "file(hpx.application.$[system.pid].log)}",
-#endif
-                "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
-
-                // logging of debug channel
-                "[hpx.logging.debuglog]",
-                "level = ${HPX_DEB_LOGLEVEL:-1}",
-                "destination = ${HPX_DEB_LOGDESTINATION:console}",
-                "format = ${HPX_DEB_LOGFORMAT:"
-                    "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
-                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
-                    HPX_TIMEFORMAT ") [%idx%] [DEB] |\\n}",
-
-                "[hpx.logging.console.debuglog]",
-                "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",
-#if defined(ANDROID) || defined(__ANDROID__)
-                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:android_log}",
-#else
-                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:"
-                    "file(hpx.debuglog.$[system.pid].log)}",
-#endif
-                "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
-            };
-        }
-        catch (std::exception const&) {
-            // just in case something goes wrong
-            std::cerr << "caught std::exception during initialization"
-                      << std::endl;
-        }
-    }
-
-#undef HPX_TIMEFORMAT
-
-    struct init_logging_tag {};
-    std::vector<std::string> const& get_logging_data()
-    {
-        static_<logging_configuration, init_logging_tag> init;
-        return init.get().prefill_;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     void init_logging(runtime_configuration& ini, bool isconsole)
     {
         // initialize normal logs
@@ -1097,7 +941,7 @@ namespace hpx { namespace util { namespace detail
 
 #else  // HPX_HAVE_LOGGING
 
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/init_logging.hpp>
@@ -1108,12 +952,6 @@ namespace hpx { namespace util { namespace detail
 
 namespace hpx { namespace util { namespace detail
 {
-    std::vector<std::string> const& get_logging_data()
-    {
-        static std::vector<std::string> dummy_data;
-        return dummy_data;
-    }
-
     void init_logging(runtime_configuration& ini, bool)
     {
         // warn if logging is requested

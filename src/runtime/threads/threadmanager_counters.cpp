@@ -17,23 +17,13 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <utility>
-
-#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
-    ///////////////////////////////////////////////////////////////////////////
-    // We control whether to collect queue wait times using this global bool.
-    // It will be set by any of the related performance counters. Once set it
-    // stays set, thus no race conditions will occur.
-    HPX_EXPORT bool maintain_queue_wait_times = false;
-}}}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {
@@ -48,7 +38,7 @@ namespace hpx { namespace threads {
                 tm, total_func, pool_func, info, ec);
 
             if (!ec)
-                policies::maintain_queue_wait_times = true;
+                policies::set_maintain_queue_wait_times_enabled(true);
 
             return gid;
         }

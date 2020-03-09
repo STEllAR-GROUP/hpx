@@ -1029,17 +1029,6 @@ namespace hpx { namespace threads { namespace policies {
     template <typename QueueType>
     util::internal_allocator<threads::thread_data>
         queue_holder_thread<QueueType>::thread_alloc_;
-
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    // ------------------------------------------------------------
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    extern bool minimal_deadlock_detection;
-#endif
-
-    // ------------------------------------------------------------
-
 }}}    // namespace hpx::threads::policies
 
 #endif

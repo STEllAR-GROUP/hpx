@@ -21,7 +21,7 @@
 #include <hpx/util/detail/pp/stringize.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 // The memory pool specialization need to be pulled in before encode_parcels
 #include <hpx/runtime.hpp>

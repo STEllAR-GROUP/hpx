@@ -73,6 +73,7 @@ add_hpx_module(collectives
       hpx_memory
       hpx_preprocessor
       hpx_program_options
+      hpx_runtime_configuration
       hpx_serialization
       hpx_synchronization
       hpx_timing

@@ -5,14 +5,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if!defined(HPX_INIT_INI_DATA_SEP_26_2008_0344PM)
+#if !defined(HPX_INIT_INI_DATA_SEP_26_2008_0344PM)
 #define HPX_INIT_INI_DATA_SEP_26_2008_0344PM
 
 #include <hpx/filesystem.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/component_registry_base.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
 
 #include <map>
 #include <memory>
@@ -20,12 +20,11 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    bool handle_ini_file (section& ini, std::string const& loc);
-    bool handle_ini_file_env (section& ini, char const* env_var,
-        char const* file_suffix = nullptr);
+    bool handle_ini_file(section& ini, std::string const& loc);
+    bool handle_ini_file_env(
+        section& ini, char const* env_var, char const* file_suffix = nullptr);
 
     ///////////////////////////////////////////////////////////////////////////
     // read system and user specified ini files
@@ -48,12 +47,11 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
-    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     init_ini_data_default(std::string const& libs, section& ini,
         std::map<std::string, filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules);
 
-}}
+}}    // namespace hpx::util
 
 #endif
-

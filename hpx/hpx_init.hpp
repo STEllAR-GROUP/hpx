@@ -16,7 +16,7 @@
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/functional/function.hpp>

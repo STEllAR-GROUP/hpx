@@ -8,7 +8,7 @@
 #define HPX_COMPONENT_FACTORY_BASE_SEP_26_2008_0446PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/runtime_configuration/component_registry_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used to register the given component factory with

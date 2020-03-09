@@ -5,21 +5,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/util/runtime_configuration.hpp>
-
-// TODO: move parcel ports into plugins
 #include <hpx/assertion.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/util/find_prefix.hpp>
+#include <hpx/runtime_configuration/agas_service_mode.hpp>
+#include <hpx/runtime_configuration/component_registry_base.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/runtime_configuration/init_ini_data.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/init_ini_data.hpp>
-#include <hpx/util/init_logging.hpp>
-#include <hpx/util/register_locks_globally.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/predef/other/endian.h>
@@ -43,74 +41,38 @@
 #include <vector>
 
 #if defined(HPX_WINDOWS)
-#  include <process.h>
+#include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)
-#  include <unistd.h>
+#include <unistd.h>
 #endif
 
 #if (defined(__linux) || defined(linux) || defined(__linux__))
+#include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <sys/types.h>
 #endif
 
 #if !defined(HPX_WINDOWS)
-#  if defined(HPX_DEBUG)
-#    define HPX_DLL_STRING  "libhpxd" HPX_SHARED_LIB_EXTENSION
-#  else
-#    define HPX_DLL_STRING  "libhpx" HPX_SHARED_LIB_EXTENSION
-#  endif
-#elif defined(HPX_DEBUG)
-#  define HPX_DLL_STRING   "hpxd" HPX_SHARED_LIB_EXTENSION
+#if defined(HPX_DEBUG)
+#define HPX_DLL_STRING "libhpxd" HPX_SHARED_LIB_EXTENSION
 #else
-#  define HPX_DLL_STRING   "hpx" HPX_SHARED_LIB_EXTENSION
+#define HPX_DLL_STRING "libhpx" HPX_SHARED_LIB_EXTENSION
+#endif
+#elif defined(HPX_DEBUG)
+#define HPX_DLL_STRING "hpxd" HPX_SHARED_LIB_EXTENSION
+#else
+#define HPX_DLL_STRING "hpx" HPX_SHARED_LIB_EXTENSION
 #endif
 
 #include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(__linux) || defined(linux) || defined(__linux__)\
-         || defined(__FreeBSD__) || defined(__APPLE__)
-namespace hpx { namespace threads { namespace coroutines { namespace detail
-{
-    namespace posix
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // this global (urghhh) variable is used to control whether guard pages
-        // will be used or not
-        HPX_EXPORT bool use_guard_pages = true;
-    }
-}}}}
-#endif
+namespace hpx { namespace parcelset {
+    std::vector<std::string> load_runtime_configuration();
+}}    // namespace hpx::parcelset
 
-namespace hpx { namespace threads { namespace policies
-{
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    HPX_EXPORT bool minimal_deadlock_detection = true;
-#endif
-}}}
-
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-namespace hpx { namespace util { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection in
-    // spin-locks using this global bool variable. It will be set once by the
-    // runtime configuration startup code
-    bool spinlock_break_on_deadlock = false;
-    std::size_t spinlock_deadlock_detection_limit =
-        HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
-}}}
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     // pre-initialize entries with compile time based values
     void runtime_configuration::pre_initialize_ini()
     {
@@ -118,6 +80,7 @@ namespace hpx { namespace util
             return;
 
         std::vector<std::string> lines = {
+            // clang-format off
             // create an empty application section
             "[application]",
 
@@ -209,8 +172,8 @@ namespace hpx { namespace util
 #endif
             "default_scheduler_mode = ${HPX_DEFAULT_SCHEDULER_MODE}",
 
-            /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
-            /// then apply the test-failure value as default.
+        /// If HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE is set,
+        /// then apply the test-failure value as default.
 #if defined(HPX_HAVE_ATTACH_DEBUGGER_ON_TEST_FAILURE)
             "attach_debugger = ${HPX_ATTACH_DEBUGGER:test-failure}",
 #else
@@ -241,7 +204,8 @@ namespace hpx { namespace util
                 HPX_PP_EXPAND(HPX_LARGE_STACK_SIZE)) "}",
             "huge_size = ${HPX_HUGE_STACK_SIZE:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_HUGE_STACK_SIZE)) "}",
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__FreeBSD__)
             "use_guard_pages = ${HPX_USE_GUARD_PAGES:1}",
 #endif
 
@@ -363,11 +327,12 @@ namespace hpx { namespace util
             "name = hpx",
             "path = $[hpx.location]/bin/" HPX_DLL_STRING,
             "enabled = 1"
+            // clang-format on
         };
 
 #if defined(HPX_HAVE_NETWORKING)
         std::vector<std::string> lines_pp =
-            hpx::parcelset::parcelhandler::load_runtime_configuration();
+            hpx::parcelset::load_runtime_configuration();
 
         lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
 #endif
@@ -378,32 +343,171 @@ namespace hpx { namespace util
         need_to_call_pre_initialize = false;
     }
 
-    void runtime_configuration::post_initialize_ini(
-        std::string& hpx_ini_file_,
+    void runtime_configuration::post_initialize_ini(std::string& hpx_ini_file_,
         std::vector<std::string> const& cmdline_ini_defs_)
     {
         util::init_ini_data_base(*this, hpx_ini_file_);
         need_to_call_pre_initialize = true;
 
         // let the command line override the config file.
-        if (!cmdline_ini_defs_.empty()) {
+        if (!cmdline_ini_defs_.empty())
+        {
             // do not weed out comments
-            this->parse("<command line definitions>", cmdline_ini_defs_,
-                true, false);
+            this->parse(
+                "<command line definitions>", cmdline_ini_defs_, true, false);
             need_to_call_pre_initialize = true;
         }
     }
 
+    void runtime_configuration::pre_initialize_logging_ini()
+    {
+        std::vector<std::string> lines = {
+        // clang-format off
+#if defined(HPX_HAVE_LOGGING)
+#define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
+            // general logging
+            "[hpx.logging]",
+            "level = ${HPX_LOGLEVEL:0}",
+            "destination = ${HPX_LOGDESTINATION:console}",
+            "format = ${HPX_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%]|\\n}",
+
+            // general console logging
+            "[hpx.logging.console]",
+            "level = ${HPX_LOGLEVEL:$[hpx.logging.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_LOGDESTINATION:"
+                "file(hpx.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_LOGFORMAT:|}",
+
+            // logging related to timing
+            "[hpx.logging.timing]",
+            "level = ${HPX_TIMING_LOGLEVEL:-1}",
+            "destination = ${HPX_TIMING_LOGDESTINATION:console}",
+            "format = ${HPX_TIMING_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [TIM] |\\n}",
+
+            // console logging related to timing
+            "[hpx.logging.console.timing]",
+            "level = ${HPX_TIMING_LOGLEVEL:$[hpx.logging.timing.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_TIMING_LOGDESTINATION:"
+                "file(hpx.timing.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_TIMING_LOGFORMAT:|}",
+
+            // logging related to AGAS
+            "[hpx.logging.agas]",
+            "level = ${HPX_AGAS_LOGLEVEL:-1}",
+            "destination = ${HPX_AGAS_LOGDESTINATION:"
+                "file(hpx.agas.$[system.pid].log)}",
+            "format = ${HPX_AGAS_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                    HPX_TIMEFORMAT ") [%idx%][AGAS] |\\n}",
+
+            // console logging related to AGAS
+            "[hpx.logging.console.agas]",
+            "level = ${HPX_AGAS_LOGLEVEL:$[hpx.logging.agas.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_AGAS_LOGDESTINATION:"
+                "file(hpx.agas.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_AGAS_LOGFORMAT:|}",
+
+            // logging related to the parcel transport
+            "[hpx.logging.parcel]",
+            "level = ${HPX_PARCEL_LOGLEVEL:-1}",
+            "destination = ${HPX_PARCEL_LOGDESTINATION:"
+                "file(hpx.parcel.$[system.pid].log)}",
+            "format = ${HPX_PARCEL_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%][  PT] |\\n}",
+
+            // console logging related to the parcel transport
+            "[hpx.logging.console.parcel]",
+            "level = ${HPX_PARCEL_LOGLEVEL:$[hpx.logging.parcel.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_PARCEL_LOGDESTINATION:"
+                "file(hpx.parcel.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_PARCEL_LOGFORMAT:|}",
+
+            // logging related to applications
+            "[hpx.logging.application]",
+            "level = ${HPX_APP_LOGLEVEL:-1}",
+            "destination = ${HPX_APP_LOGDESTINATION:console}",
+            "format = ${HPX_APP_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [APP] |\\n}",
+
+            // console logging related to applications
+            "[hpx.logging.console.application]",
+            "level = ${HPX_APP_LOGLEVEL:$[hpx.logging.application.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:"
+                "file(hpx.application.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
+
+            // logging of debug channel
+            "[hpx.logging.debuglog]",
+            "level = ${HPX_DEB_LOGLEVEL:-1}",
+            "destination = ${HPX_DEB_LOGDESTINATION:console}",
+            "format = ${HPX_DEB_LOGFORMAT:"
+                "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                "P%parentloc%/%hpxparent%.%hpxparentphase% %time%("
+                HPX_TIMEFORMAT ") [%idx%] [DEB] |\\n}",
+
+            "[hpx.logging.console.debuglog]",
+            "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+            "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:android_log}",
+#else
+            "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:"
+                "file(hpx.debuglog.$[system.pid].log)}",
+#endif
+            "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
+
+#undef HPX_TIMEFORMAT
+#endif
+            // clang-format on
+        };
+
+        // don't overload user overrides
+        this->parse("<static logging defaults>", lines, false, false);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // load information about statically known components
-    void runtime_configuration::load_components_static(std::vector<
-        components::static_factory_load_data_type> const& static_modules)
+    void runtime_configuration::load_components_static(
+        std::vector<components::static_factory_load_data_type> const&
+            static_modules)
     {
-        std::vector<std::shared_ptr<components::component_registry_base>> registries;
-        for (components::static_factory_load_data_type const& d : static_modules)
+        std::vector<std::shared_ptr<components::component_registry_base>>
+            registries;
+        for (components::static_factory_load_data_type const& d :
+            static_modules)
         {
-            auto new_registries =
-                util::load_component_factory_static(*this, d.name, d.get_factory);
+            auto new_registries = util::load_component_factory_static(
+                *this, d.name, d.get_factory);
             registries.reserve(registries.size() + new_registries.size());
             std::copy(new_registries.begin(), new_registries.end(),
                 std::back_inserter(registries));
@@ -424,7 +528,7 @@ namespace hpx { namespace util
 
         // invoke last reconfigure
         reconfigure();
-        for (auto& registry: registries)
+        for (auto& registry : registries)
         {
             registry->register_component_type();
         }
@@ -435,8 +539,7 @@ namespace hpx { namespace util
     void runtime_configuration::load_component_path(
         std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
             plugin_registries,
-        std::string const& path,
-        std::set<std::string>& component_paths,
+        std::string const& path, std::set<std::string>& component_paths,
         std::map<std::string, filesystem::path>& basenames)
     {
         namespace fs = filesystem;
@@ -459,12 +562,11 @@ namespace hpx { namespace util
             if (p.second)
             {
                 // have all path elements, now find ini files in there...
-                fs::path this_path (*p.first);
+                fs::path this_path(*p.first);
                 if (fs::exists(this_path, fsec) && !fsec)
                 {
-                    plugin_list_type tmp_regs =
-                        util::init_ini_data_default(this_path.string(),
-                            *this, basenames, modules_);
+                    plugin_list_type tmp_regs = util::init_ini_data_default(
+                        this_path.string(), *this, basenames, modules_);
 
                     std::copy(tmp_regs.begin(), tmp_regs.end(),
                         std::back_inserter(plugin_registries));
@@ -487,9 +589,9 @@ namespace hpx { namespace util
         // installation location, this allows to install simple components
         // without the need to install an ini file
         // split of the separate paths from the given path list
-        typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;
+        typedef boost::tokenizer<boost::char_separator<char>> tokenizer_type;
 
-        boost::char_separator<char> sep (HPX_INI_PATH_DELIMITER);
+        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
         tokenizer_type tok_path(component_base_paths, sep);
         tokenizer_type tok_suffixes(component_path_suffixes, sep);
         tokenizer_type::iterator end_path = tok_path.end();
@@ -502,7 +604,7 @@ namespace hpx { namespace util
             if (tok_suffixes.begin() != tok_suffixes.end())
             {
                 for (tokenizer_type::iterator jt = tok_suffixes.begin();
-                    jt != end_suffixes; ++jt)
+                     jt != end_suffixes; ++jt)
                 {
                     std::string p = path;
                     p += *jt;
@@ -519,10 +621,10 @@ namespace hpx { namespace util
     }
 
     // load information about dynamically discovered plugins
-    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     runtime_configuration::load_modules()
     {
-        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base> >
+        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
             plugin_list_type;
 
         // protect against duplicate paths
@@ -568,16 +670,17 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_configuration::runtime_configuration(char const* argv0_, runtime_mode mode)
-      : mode_(mode),
-        num_localities(0),
-        small_stacksize(HPX_SMALL_STACK_SIZE),
-        medium_stacksize(HPX_MEDIUM_STACK_SIZE),
-        large_stacksize(HPX_LARGE_STACK_SIZE),
-        huge_stacksize(HPX_HUGE_STACK_SIZE),
-        need_to_call_pre_initialize(true)
+    runtime_configuration::runtime_configuration(
+        char const* argv0_, runtime_mode mode)
+      : mode_(mode)
+      , num_localities(0)
+      , small_stacksize(HPX_SMALL_STACK_SIZE)
+      , medium_stacksize(HPX_MEDIUM_STACK_SIZE)
+      , large_stacksize(HPX_LARGE_STACK_SIZE)
+      , huge_stacksize(HPX_HUGE_STACK_SIZE)
+      , need_to_call_pre_initialize(true)
 #if defined(__linux) || defined(linux) || defined(__linux__)
-        , argv0(argv0_)
+      , argv0(argv0_)
 #endif
     {
         pre_initialize_ini();
@@ -593,38 +696,10 @@ namespace hpx { namespace util
         large_stacksize = init_large_stack_size();
         HPX_ASSERT(init_huge_stack_size() <= HPX_HUGE_STACK_SIZE);
         huge_stacksize = init_huge_stack_size();
-
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        threads::coroutines::detail::posix::use_guard_pages =
-            init_use_stack_guard_pages();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS
-        if (enable_lock_detection())
-            util::enable_lock_detection();
-        else
-            util::disable_lock_detection();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-        if (enable_global_lock_detection())
-            util::enable_global_lock_detection();
-        else
-            util::disable_global_lock_detection();
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        threads::policies::minimal_deadlock_detection =
-            enable_minimal_deadlock_detection();
-#endif
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        util::detail::spinlock_break_on_deadlock =
-            enable_spinlock_deadlock_detection();
-        util::detail::spinlock_deadlock_detection_limit =
-            get_spinlock_deadlock_detection_limit();
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime_configuration::reconfigure(
-        std::string const& hpx_ini_file_)
+    void runtime_configuration::reconfigure(std::string const& hpx_ini_file_)
     {
         hpx_ini_file = hpx_ini_file_;
         reconfigure();
@@ -640,12 +715,7 @@ namespace hpx { namespace util
     void runtime_configuration::reconfigure()
     {
         pre_initialize_ini();
-
-        std::vector<std::string> const& prefill =
-            util::detail::get_logging_data();
-        if (!prefill.empty())
-            this->parse("<static prefill defaults>", prefill, false, false);
-
+        pre_initialize_logging_ini();
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
@@ -658,44 +728,17 @@ namespace hpx { namespace util
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
         huge_stacksize = init_huge_stack_size();
-
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-        threads::coroutines::detail::posix::use_guard_pages =
-            init_use_stack_guard_pages();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS
-        if (enable_lock_detection())
-            util::enable_lock_detection();
-        else
-            util::disable_lock_detection();
-#endif
-#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-        if (enable_global_lock_detection())
-            util::enable_global_lock_detection();
-        else
-            util::disable_global_lock_detection();
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        threads::policies::minimal_deadlock_detection =
-            enable_minimal_deadlock_detection();
-#endif
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        util::detail::spinlock_break_on_deadlock =
-            enable_spinlock_deadlock_detection();
-        util::detail::spinlock_deadlock_detection_limit =
-            get_spinlock_deadlock_detection_limit();
-#endif
     }
 
     std::size_t runtime_configuration::get_ipc_data_buffer_cache_size() const
     {
         if (has_section("hpx.parcel"))
         {
-            util::section const * sec = get_section("hpx.parcel.ipc");
-            if(nullptr != sec)
+            util::section const* sec = get_section("hpx.parcel.ipc");
+            if (nullptr != sec)
             {
-                return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "data_buffer_cache_size",
+                return hpx::util::get_entry_as<std::size_t>(*sec,
+                    "data_buffer_cache_size",
                     HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE);
             }
         }
@@ -716,7 +759,8 @@ namespace hpx { namespace util
                     return agas::service_mode_hosted;
                 else if (m == "bootstrap")
                     return agas::service_mode_bootstrap;
-                else {
+                else
+                {
                     // REVIEW: exception type is overused
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "runtime_configuration::get_agas_service_mode",
@@ -729,10 +773,13 @@ namespace hpx { namespace util
 
     std::uint32_t runtime_configuration::get_num_localities() const
     {
-        if (num_localities == 0) {
-            if (has_section("hpx")) {
+        if (num_localities == 0)
+        {
+            if (has_section("hpx"))
+            {
                 util::section const* sec = get_section("hpx");
-                if (nullptr != sec) {
+                if (nullptr != sec)
+                {
                     num_localities = hpx::util::get_entry_as<std::uint32_t>(
                         *sec, "localities", 1);
                 }
@@ -743,17 +790,19 @@ namespace hpx { namespace util
         return num_localities;
     }
 
-    void runtime_configuration::set_num_localities(std::uint32_t num_localities_)
+    void runtime_configuration::set_num_localities(
+        std::uint32_t num_localities_)
     {
         // this function should not be called on the AGAS server
         HPX_ASSERT(agas::service_mode_bootstrap != get_agas_service_mode());
         num_localities = num_localities_;
 
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section* sec = get_section("hpx");
-            if (nullptr != sec) {
-                sec->add_entry("localities",
-                    std::to_string(num_localities));
+            if (nullptr != sec)
+            {
+                sec->add_entry("localities", std::to_string(num_localities));
             }
         }
     }
@@ -769,7 +818,7 @@ namespace hpx { namespace util
             {
                 // get the number of initial localities
                 if (hpx::util::get_entry_as<std::uint32_t>(
-                      *sec, "localities", 1) > 1)
+                        *sec, "localities", 1) > 1)
                 {
                     return true;
                 }
@@ -803,9 +852,11 @@ namespace hpx { namespace util
 
     std::uint32_t runtime_configuration::get_first_used_core() const
     {
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<std::uint32_t>(
                     *sec, "first_used_core", 0);
             }
@@ -816,39 +867,46 @@ namespace hpx { namespace util
     void runtime_configuration::set_first_used_core(
         std::uint32_t first_used_core)
     {
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section* sec = get_section("hpx");
-            if (nullptr != sec) {
-                sec->add_entry("first_used_core",
-                    std::to_string(first_used_core));
+            if (nullptr != sec)
+            {
+                sec->add_entry(
+                    "first_used_core", std::to_string(first_used_core));
             }
         }
     }
 
-    std::size_t runtime_configuration::get_agas_local_cache_size(std::size_t dflt) const
+    std::size_t runtime_configuration::get_agas_local_cache_size(
+        std::size_t dflt) const
     {
         std::size_t cache_size = dflt;
 
-        if (has_section("hpx.agas")) {
+        if (has_section("hpx.agas"))
+        {
             util::section const* sec = get_section("hpx.agas");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 cache_size = hpx::util::get_entry_as<std::size_t>(
                     *sec, "local_cache_size", cache_size);
             }
         }
 
         if (cache_size != std::size_t(~0x0ul) && cache_size < 16ul)
-            cache_size = 16;      // limit lower bound
+            cache_size = 16;    // limit lower bound
         return cache_size;
     }
 
     bool runtime_configuration::get_agas_caching_mode() const
     {
-        if (has_section("hpx.agas")) {
+        if (has_section("hpx.agas"))
+        {
             util::section const* sec = get_section("hpx.agas");
-            if (nullptr != sec) {
-                return hpx::util::get_entry_as<int>(
-                    *sec, "use_caching", 1) != 0;
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<int>(*sec, "use_caching", 1) !=
+                    0;
             }
         }
         return false;
@@ -856,24 +914,28 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_agas_range_caching_mode() const
     {
-        if (has_section("hpx.agas")) {
+        if (has_section("hpx.agas"))
+        {
             util::section const* sec = get_section("hpx.agas");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "use_range_caching", 1) != 0;
+                           *sec, "use_range_caching", 1) != 0;
             }
         }
         return false;
     }
 
-    std::size_t
-    runtime_configuration::get_agas_max_pending_refcnt_requests() const
+    std::size_t runtime_configuration::get_agas_max_pending_refcnt_requests()
+        const
     {
-        if (has_section("hpx.agas")) {
+        if (has_section("hpx.agas"))
+        {
             util::section const* sec = get_section("hpx.agas");
-            if (nullptr != sec) {
-                return hpx::util::get_entry_as<std::size_t>(
-                    *sec, "max_pending_refcnt_requests",
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<std::size_t>(*sec,
+                    "max_pending_refcnt_requests",
                     HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS);
             }
         }
@@ -883,11 +945,13 @@ namespace hpx { namespace util
     bool runtime_configuration::get_itt_notify_mode() const
     {
 #if HPX_HAVE_ITTNOTIFY != 0
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "use_itt_notify", 0) != 0;
+                           *sec, "use_itt_notify", 0) != 0;
             }
         }
 #endif
@@ -898,11 +962,13 @@ namespace hpx { namespace util
     bool runtime_configuration::enable_lock_detection() const
     {
 #ifdef HPX_HAVE_VERIFY_LOCKS
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "lock_detection", 0) != 0;
+                           *sec, "lock_detection", 0) != 0;
             }
         }
 #endif
@@ -913,11 +979,13 @@ namespace hpx { namespace util
     bool runtime_configuration::enable_global_lock_detection() const
     {
 #ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "global_lock_detection", 0) != 0;
+                           *sec, "global_lock_detection", 0) != 0;
             }
         }
 #endif
@@ -928,15 +996,17 @@ namespace hpx { namespace util
     bool runtime_configuration::enable_minimal_deadlock_detection() const
     {
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
 #ifdef HPX_DEBUG
                 return hpx::util::get_entry_as<int>(
-                    *sec, "minimal_deadlock_detection", 1) != 0;
+                           *sec, "minimal_deadlock_detection", 1) != 0;
 #else
                 return hpx::util::get_entry_as<int>(
-                    *sec, "minimal_deadlock_detection", 0) != 0;
+                           *sec, "minimal_deadlock_detection", 0) != 0;
 #endif
             }
         }
@@ -956,15 +1026,17 @@ namespace hpx { namespace util
     bool runtime_configuration::enable_spinlock_deadlock_detection() const
     {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
 #ifdef HPX_DEBUG
                 return hpx::util::get_entry_as<int>(
-                    *sec, "spinlock_deadlock_detection", 1) != 0;
+                           *sec, "spinlock_deadlock_detection", 1) != 0;
 #else
                 return hpx::util::get_entry_as<int>(
-                    *sec, "spinlock_deadlock_detection", 0) != 0;
+                           *sec, "spinlock_deadlock_detection", 0) != 0;
 #endif
             }
         }
@@ -981,12 +1053,15 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t runtime_configuration::get_spinlock_deadlock_detection_limit() const
+    std::size_t runtime_configuration::get_spinlock_deadlock_detection_limit()
+        const
     {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<std::size_t>(*sec,
                     "spinlock_deadlock_detection_limit",
                     HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT);
@@ -1000,9 +1075,11 @@ namespace hpx { namespace util
 
     std::size_t runtime_configuration::get_os_thread_count() const
     {
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<std::size_t>(
                     *sec, "os_threads", 1);
             }
@@ -1012,9 +1089,11 @@ namespace hpx { namespace util
 
     std::string runtime_configuration::get_cmd_line() const
     {
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return sec->get_entry("cmd_line", "");
             }
         }
@@ -1022,24 +1101,29 @@ namespace hpx { namespace util
     }
 
     // Return the configured sizes of any of the know thread pools
-    std::size_t runtime_configuration::get_thread_pool_size(char const* poolname) const
+    std::size_t runtime_configuration::get_thread_pool_size(
+        char const* poolname) const
     {
-        if (has_section("hpx.threadpools")) {
+        if (has_section("hpx.threadpools"))
+        {
             util::section const* sec = get_section("hpx.threadpools");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<std::size_t>(
                     *sec, std::string(poolname) + "_size", 2);
             }
         }
-        return 2;     // the default size for all pools is 2
+        return 2;    // the default size for all pools is 2
     }
 
     // Return the endianness to be used for out-serialization
     std::string runtime_configuration::get_endian_out() const
     {
-        if (has_section("hpx.parcel")) {
+        if (has_section("hpx.parcel"))
+        {
             util::section const* sec = get_section("hpx.parcel");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
 #if BOOST_ENDIAN_BIG_BYTE
                 return sec->get_entry("endian_out", "big");
 #else
@@ -1055,13 +1139,14 @@ namespace hpx { namespace util
     }
 
     // Will return the stack size to use for all HPX-threads.
-    std::ptrdiff_t runtime_configuration::init_stack_size(
-        char const* entryname, char const* defaultvaluestr,
-        std::ptrdiff_t defaultvalue) const
+    std::ptrdiff_t runtime_configuration::init_stack_size(char const* entryname,
+        char const* defaultvaluestr, std::ptrdiff_t defaultvalue) const
     {
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx.stacks");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 std::string entry = sec->get_entry(entryname, defaultvaluestr);
                 std::ptrdiff_t val = defaultvalue;
 
@@ -1074,14 +1159,17 @@ namespace hpx { namespace util
         return defaultvalue;
     }
 
-#if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-    bool runtime_configuration::init_use_stack_guard_pages() const
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__FreeBSD__)
+    bool runtime_configuration::use_stack_guard_pages() const
     {
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx.stacks");
-            if (nullptr != sec) {
+            if (nullptr != sec)
+            {
                 return hpx::util::get_entry_as<int>(
-                    *sec, "use_guard_pages", 1) != 0;
+                           *sec, "use_guard_pages", 1) != 0;
             }
         }
         return true;    // default is true
@@ -1116,12 +1204,13 @@ namespace hpx { namespace util
     // Return maximally allowed message size
     std::uint64_t runtime_configuration::get_max_inbound_message_size() const
     {
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx.parcel");
-            if (nullptr != sec) {
-                std::uint64_t maxsize =
-                    hpx::util::get_entry_as<std::uint64_t>(
-                        *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
+            if (nullptr != sec)
+            {
+                std::uint64_t maxsize = hpx::util::get_entry_as<std::uint64_t>(
+                    *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
                 if (maxsize > 0)
                     return maxsize;
             }
@@ -1131,13 +1220,14 @@ namespace hpx { namespace util
 
     std::uint64_t runtime_configuration::get_max_outbound_message_size() const
     {
-        if (has_section("hpx")) {
+        if (has_section("hpx"))
+        {
             util::section const* sec = get_section("hpx.parcel");
-            if (nullptr != sec) {
-                std::uint64_t maxsize =
-                    hpx::util::get_entry_as<std::uint64_t>(
-                        *sec, "max_outbound_message_size",
-                        HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE);
+            if (nullptr != sec)
+            {
+                std::uint64_t maxsize = hpx::util::get_entry_as<std::uint64_t>(
+                    *sec, "max_outbound_message_size",
+                    HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE);
                 if (maxsize > 0)
                     return maxsize;
             }
@@ -1149,13 +1239,15 @@ namespace hpx { namespace util
     bool runtime_configuration::load_application_configuration(
         char const* filename, error_code& ec)
     {
-        try {
+        try
+        {
             section appcfg(filename);
             section applroot;
             applroot.add_section("application", appcfg);
             this->section::merge(applroot);
         }
-        catch (hpx::exception const& e) {
+        catch (hpx::exception const& e)
+        {
             // file doesn't exist or is ill-formed
             if (&ec == &throws)
                 throw;
@@ -1169,7 +1261,8 @@ namespace hpx { namespace util
     std::ptrdiff_t runtime_configuration::get_stack_size(
         threads::thread_stacksize stacksize) const
     {
-        switch (stacksize) {
+        switch (stacksize)
+        {
         case threads::thread_stacksize_medium:
             return medium_stacksize;
 
@@ -1188,5 +1281,4 @@ namespace hpx { namespace util
         }
         return small_stacksize;
     }
-}}
-
+}}    // namespace hpx::util

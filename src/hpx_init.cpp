@@ -12,6 +12,8 @@
 #include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
@@ -39,9 +41,9 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
-#include <hpx/threading_base/external_timer.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/register_locks_globally.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -331,6 +333,46 @@ namespace hpx
 
             std::reference_wrapper<hpx::runtime const> rt_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        void activate_global_options(util::command_line_handling& cms)
+        {
+#if defined(__linux) || defined(linux) || defined(__linux__) ||                \
+    defined(__FreeBSD__)
+            threads::coroutines::detail::posix::use_guard_pages =
+                cms.rtcfg_.use_stack_guard_pages();
+#endif
+#ifdef HPX_HAVE_VERIFY_LOCKS
+            if (cms.rtcfg_.enable_lock_detection())
+            {
+                util::enable_lock_detection();
+            }
+            else
+            {
+                util::disable_lock_detection();
+            }
+#endif
+#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+            if (cms.rtcfg_.enable_global_lock_detection())
+            {
+                util::enable_global_lock_detection();
+            }
+            else
+            {
+                util::disable_global_lock_detection();
+            }
+#endif
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+            threads::policies::set_minimal_deadlock_detection_enabled(
+                cms.rtcfg_.enable_minimal_deadlock_detection());
+#endif
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
+            util::detail::spinlock_break_on_deadlock =
+                cms.rtcfg_.enable_spinlock_deadlock_detection();
+            util::detail::spinlock_deadlock_detection_limit =
+                cms.rtcfg_.get_spinlock_deadlock_detection_limit();
+#endif
+        }
 
         ///////////////////////////////////////////////////////////////////////
         void handle_list_and_print_options(hpx::runtime& rt,
@@ -678,6 +720,8 @@ namespace hpx
                     auto& rp = hpx::resource::detail::create_partitioner(f,
                         desc_cmdline, argc, argv, std::move(ini_config),
                         resource::mode_default, mode, false, &result);
+
+                    activate_global_options(rp.get_command_line_switches());
 
                     // check whether HPX should be exited at this point
                     // (parse_result is returning a result > 0, if the program options

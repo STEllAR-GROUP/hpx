@@ -17,7 +17,7 @@
 #include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/type_support/static.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 
 #include <cstddef>
 #include <mutex>

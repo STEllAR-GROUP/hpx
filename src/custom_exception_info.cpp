@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
@@ -19,6 +20,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -164,6 +166,47 @@ namespace hpx
         return strm.str();
     }
 }
+
+namespace hpx { namespace util {
+    // This is a local helper used to get the backtrace on a new new stack if
+    // possible.
+    std::string trace_on_new_stack(
+        std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
+    {
+#if defined(HPX_HAVE_STACKTRACES)
+        if(frames_no == 0)
+        {
+            return std::string();
+        }
+
+        backtrace bt(frames_no);
+
+        auto* self = threads::get_self_ptr();
+        if (nullptr == self ||
+            self->get_thread_id() == threads::invalid_thread_id)
+        {
+            return bt.trace();
+        }
+
+        lcos::local::futures_factory<std::string()> p([&bt]() { return bt.trace(); });
+
+        error_code ec(lightweight);
+        threads::thread_id_type tid = p.apply("hpx::util::trace_on_new_stack",
+            launch::fork, threads::thread_priority_default,
+            threads::thread_stacksize_medium, threads::thread_schedule_hint(),
+            ec);
+        if (ec)
+            return "<couldn't retrieve stack backtrace>";
+
+        // make sure this thread is executed last
+        hpx::this_thread::yield_to(thread::id(std::move(tid)));
+
+        return p.get_future().get(ec);
+#else
+        return "";
+#endif
+    }
+}}
 
 namespace hpx { namespace detail
 {

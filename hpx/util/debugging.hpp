@@ -13,9 +13,6 @@
 
 namespace hpx {
 namespace util {
-    /// Tries to break an attached debugger, if not supported a loop is
-    /// invoked which gives enough time to attach a debugger manually.
-    void HPX_EXPORT attach_debugger();
     /// Attaches a debugger if \c category is equal to the configuration entry
     /// hpx.attach-debugger.
     void HPX_EXPORT may_attach_debugger(std::string const& category);

@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
 set(debugging_headers
   hpx/debugging/demangle_helper.hpp
   hpx/debugging/print.hpp
+  hpx/debugging/attach_debugger.hpp
   )
 
 set(debugging_compat_headers
@@ -16,6 +17,7 @@ set(debugging_compat_headers
   )
 
 set(debugging_sources
+  attach_debugger.cpp
   )
 
 include(HPX_AddModule)

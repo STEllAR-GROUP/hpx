@@ -12,9 +12,9 @@
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
 #include <boost/tokenizer.hpp>

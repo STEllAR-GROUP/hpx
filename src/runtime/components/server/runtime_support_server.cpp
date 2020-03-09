@@ -13,9 +13,9 @@
 #include <hpx/runtime.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/util/find_prefix.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -28,7 +28,7 @@
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/static_factory_data.hpp>
+#include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

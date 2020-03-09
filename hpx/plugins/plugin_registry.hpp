@@ -10,7 +10,7 @@
 #define HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM
 
 #include <hpx/config.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/plugins/unique_plugin_name.hpp>
 
 #include <hpx/plugin/traits/plugin_config_data.hpp>
@@ -18,8 +18,8 @@
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/util/find_prefix.hpp>
-#include <hpx/util/ini.hpp>
+#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/runtime_configuration/ini.hpp>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>

@@ -40,7 +40,10 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/format.hpp>
+#include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <cstddef>
 #include <cstdint>

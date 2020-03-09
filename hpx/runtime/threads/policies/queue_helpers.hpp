@@ -13,6 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -25,14 +26,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies {
-
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-    ///////////////////////////////////////////////////////////////////////////
-    // We globally control whether to do minimal deadlock detection using this
-    // global bool variable. It will be set once by the runtime configuration
-    // startup code
-    extern bool minimal_deadlock_detection;
-#endif
 
     ///////////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -53,7 +46,7 @@ namespace hpx { namespace threads { namespace policies {
             HPX_UNUSED(running);    //-V601
             return false;
 #else
-            if (!minimal_deadlock_detection)
+            if (!get_minimal_deadlock_detection_enabled())
                 return false;
 
             // attempt to output possibly deadlocked threads occasionally only

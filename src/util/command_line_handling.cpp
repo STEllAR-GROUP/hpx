@@ -12,7 +12,7 @@
 #include <hpx/format.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
-#include <hpx/plugins/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
