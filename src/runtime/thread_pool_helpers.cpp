@@ -11,6 +11,7 @@
 #include <hpx/threadmanager.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <stdexcept>

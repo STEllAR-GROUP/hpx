@@ -13,6 +13,7 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace hpx { namespace resource

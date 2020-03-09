@@ -674,7 +674,7 @@ namespace hpx { namespace threads { namespace detail {
                                     counters.is_active_);
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
-                                //                                 util::itt::undo_frame_context undoframe(fctx);
+                                // util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task =
                                     thrd->get_description().get_task_itt(
                                         thread_domain);

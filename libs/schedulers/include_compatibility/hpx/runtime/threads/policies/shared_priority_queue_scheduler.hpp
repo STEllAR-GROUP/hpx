@@ -11,11 +11,13 @@
 #if defined(HPX_SCHEDULERS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
-    "The header hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp is deprecated, \
-    please include hpx/schedulers/shared_priority_queue_scheduler.hpp instead")
+    "The header hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp \
+    is deprecated, please include \
+    hpx/schedulers/shared_priority_queue_scheduler.hpp instead")
 #else
 #warning                                                                       \
-    "The header hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp is deprecated, \
-    please include hpx/schedulers/shared_priority_queue_scheduler.hpp instead"
+    "The header hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp \
+    is deprecated, please include \
+    hpx/schedulers/shared_priority_queue_scheduler.hpp instead"
 #endif
 #endif
