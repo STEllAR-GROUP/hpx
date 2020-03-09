@@ -20,7 +20,7 @@ endforeach()
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE "(.*(hpx_main|hpx_user).*[.]cpp)|main.cpp|hpx_wrap.cpp"
+  EXCLUDE "(.*(hpx_init_params|hpx_main|hpx_user).*[.]cpp)|main.cpp|hpx_wrap.cpp"
   APPEND)
 add_hpx_library_sources(hpx
   GLOB GLOBS "${PROJECT_SOURCE_DIR}/src/pre_main.cpp"
