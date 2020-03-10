@@ -46,6 +46,10 @@
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+#endif
+
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
@@ -382,11 +386,11 @@ namespace hpx
 #if defined(HPX_HAVE_NETWORKING)
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             // getting localities from MPI environment (support mpirun)
-            if (detail::check_mpi_environment(cms.rtcfg_))
+            if (util::detail::check_mpi_environment(cms.rtcfg_))
             {
-                mpi_environment::init(&argc, &argv, *this);
-                num_localities_ =
-                    static_cast<std::size_t>(mpi_environment::size());
+                util::mpi_environment::init(&argc, &argv, cms);
+                cms.num_localities_ =
+                    static_cast<std::size_t>(util::mpi_environment::size());
             }
 #endif
 
