@@ -18,19 +18,19 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server
-{
+namespace hpx { namespace performance_counters { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     // This counter exposes the result of an arithmetic operation The counter
     // relies on querying two base counters.
     template <typename Statistic>
     class arithmetics_counter_extended
-      : public base_performance_counter,
-        public components::component_base<
-            arithmetics_counter_extended<Statistic> >
+      : public base_performance_counter
+      , public components::component_base<
+            arithmetics_counter_extended<Statistic>>
     {
         typedef components::component_base<
-            arithmetics_counter_extended<Statistic> > base_type;
+            arithmetics_counter_extended<Statistic>>
+            base_type;
 
     public:
         typedef arithmetics_counter_extended type_holder;
@@ -42,8 +42,8 @@ namespace hpx { namespace performance_counters { namespace server
             std::vector<std::string> const& base_counter_names);
 
         /// Overloads from the base_counter base class.
-        hpx::performance_counters::counter_value
-            get_counter_value(bool reset = false);
+        hpx::performance_counters::counter_value get_counter_value(
+            bool reset = false);
 
         bool start();
         bool stop();
@@ -59,6 +59,6 @@ namespace hpx { namespace performance_counters { namespace server
         // base counters to be queried
         performance_counter_set counters_;
     };
-}}}
+}}}    // namespace hpx::performance_counters::server
 
 #endif

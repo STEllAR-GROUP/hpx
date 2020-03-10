@@ -8,18 +8,17 @@
 #define HPX_PERFORMANCE_COUNTERS_SERVER_RAW_COUNTER_MAR_03_2009_0743M
 
 #include <hpx/config.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/functional/function.hpp>
 
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server
-{
+namespace hpx { namespace performance_counters { namespace server {
     class HPX_EXPORT raw_counter
-      : public base_performance_counter,
-        public components::component_base<raw_counter>
+      : public base_performance_counter
+      , public components::component_base<raw_counter>
     {
         typedef components::component_base<raw_counter> base_type;
 
@@ -29,13 +28,14 @@ namespace hpx { namespace performance_counters { namespace server
 
         raw_counter()
           : reset_(false)
-        {}
+        {
+        }
 
         raw_counter(counter_info const& info,
             hpx::util::function_nonser<std::int64_t(bool)> f);
 
-        hpx::performance_counters::counter_value
-            get_counter_value(bool reset = false);
+        hpx::performance_counters::counter_value get_counter_value(
+            bool reset = false);
         void reset_counter_value();
 
         /// \brief finalize() will be called just before the instance gets
@@ -50,6 +50,6 @@ namespace hpx { namespace performance_counters { namespace server
         hpx::util::function_nonser<std::int64_t(bool)> f_;
         bool reset_;
     };
-}}}
+}}}    // namespace hpx::performance_counters::server
 
 #endif

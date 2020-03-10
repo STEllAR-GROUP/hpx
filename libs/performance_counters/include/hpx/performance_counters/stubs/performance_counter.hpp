@@ -13,8 +13,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace stubs
-{
+namespace hpx { namespace performance_counters { namespace stubs {
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT performance_counter
       : components::stub_base<
@@ -27,11 +26,11 @@ namespace hpx { namespace performance_counters { namespace stubs
             naming::id_type const& targetid, bool reset = false,
             error_code& ec = throws);
         static counter_values_array get_values_array(launch::sync_policy,
-            naming::id_type const& targetid,
-            bool reset = false, error_code& ec = throws);
+            naming::id_type const& targetid, bool reset = false,
+            error_code& ec = throws);
 
-        static lcos::future<counter_info> get_info(launch::async_policy,
-            naming::id_type const& targetid);
+        static lcos::future<counter_info> get_info(
+            launch::async_policy, naming::id_type const& targetid);
         static lcos::future<counter_value> get_value(launch::async_policy,
             naming::id_type const& targetid, bool reset = false);
         static lcos::future<counter_values_array> get_values_array(
@@ -39,14 +38,14 @@ namespace hpx { namespace performance_counters { namespace stubs
             bool reset = false);
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<bool> start(launch::async_policy,
-            naming::id_type const& targetid);
-        static lcos::future<bool> stop(launch::async_policy,
-            naming::id_type const& targetid);
-        static lcos::future<void> reset(launch::async_policy,
-            naming::id_type const& targetid);
-        static lcos::future<void> reinit(launch::async_policy,
-            naming::id_type const& targetid, bool reset);
+        static lcos::future<bool> start(
+            launch::async_policy, naming::id_type const& targetid);
+        static lcos::future<bool> stop(
+            launch::async_policy, naming::id_type const& targetid);
+        static lcos::future<void> reset(
+            launch::async_policy, naming::id_type const& targetid);
+        static lcos::future<void> reinit(
+            launch::async_policy, naming::id_type const& targetid, bool reset);
 
         static bool start(launch::sync_policy, naming::id_type const& targetid,
             error_code& ec = throws);
@@ -58,14 +57,13 @@ namespace hpx { namespace performance_counters { namespace stubs
             bool reset, error_code& ec = throws);
 
         template <typename T>
-        static T
-        get_typed_value(naming::id_type const& targetid, bool reset = false,
-            error_code& ec = throws)
+        static T get_typed_value(naming::id_type const& targetid,
+            bool reset = false, error_code& ec = throws)
         {
             counter_value value = get_value(launch::sync, targetid, reset);
             return value.get_value<T>(ec);
         }
     };
-}}}
+}}}    // namespace hpx::performance_counters::stubs
 
 #endif

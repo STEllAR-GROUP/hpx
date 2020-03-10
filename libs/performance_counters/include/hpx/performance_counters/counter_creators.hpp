@@ -9,16 +9,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters
-{
+namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     // Discoverer functions to be registered with counter types
 
@@ -71,8 +70,8 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>{locality#<locality_id>/pool#<poolname>/thread#<threadnum>}/<instancename>
     ///
     bool locality_pool_thread_counter_discoverer(counter_info const& info,
-        discover_counter_func const& f,
-        discover_counters_mode mode, error_code& ec);
+        discover_counter_func const& f, discover_counters_mode mode,
+        error_code& ec);
 
     /// Default discoverer function for performance counters; to be registered
     /// with the counter types. It is suitable to be used for all counters
@@ -103,8 +102,8 @@ namespace hpx { namespace performance_counters
     ///   /<objectname>(locality#<locality_id>/total)/<instancename>
     ///
     HPX_API_EXPORT naming::gid_type locality_raw_counter_creator(
-        counter_info const&, hpx::util::function_nonser<std::int64_t(bool)> const&,
-        error_code&);
+        counter_info const&,
+        hpx::util::function_nonser<std::int64_t(bool)> const&, error_code&);
 
     HPX_API_EXPORT naming::gid_type locality_raw_values_counter_creator(
         counter_info const&,
@@ -154,9 +153,8 @@ namespace hpx { namespace performance_counters
     // Creation function for per-action parcel data counters
     HPX_API_EXPORT naming::gid_type per_action_data_counter_creator(
         counter_info const& info,
-        hpx::util::function_nonser<
-            std::int64_t(std::string const&, bool)
-        > const& f,
+        hpx::util::function_nonser<std::int64_t(
+            std::string const&, bool)> const& f,
         error_code& ec);
 
     // Discoverer function for per-action parcel data counters
@@ -165,7 +163,6 @@ namespace hpx { namespace performance_counters
         discover_counters_mode mode, error_code& ec);
 #endif
 #endif
-}}
+}}    // namespace hpx::performance_counters
 
 #endif
-

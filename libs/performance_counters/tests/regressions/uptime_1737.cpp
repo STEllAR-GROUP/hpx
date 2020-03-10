@@ -13,7 +13,7 @@
 
 #include <chrono>
 
-int hpx_main(int argc, char ** argv)
+int hpx_main(int argc, char** argv)
 {
     using hpx::performance_counters::performance_counter;
 
@@ -22,11 +22,13 @@ int hpx_main(int argc, char ** argv)
     // verify that attempts to reset the uptime counter fail
     {
         bool exception_thrown = false;
-        try {
+        try
+        {
             uptime.reset(hpx::launch::sync);
             HPX_TEST(false);
         }
-        catch (hpx::exception const&) {
+        catch (hpx::exception const&)
+        {
             exception_thrown = true;
         }
         HPX_TEST(exception_thrown);
@@ -34,11 +36,13 @@ int hpx_main(int argc, char ** argv)
 
     {
         bool exception_thrown = false;
-        try {
+        try
+        {
             uptime.get_value<double>(hpx::launch::sync, true);
             HPX_TEST(false);
         }
-        catch (hpx::exception const&) {
+        catch (hpx::exception const&)
+        {
             exception_thrown = true;
         }
         HPX_TEST(exception_thrown);
@@ -58,7 +62,7 @@ int hpx_main(int argc, char ** argv)
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
     return hpx::util::report_errors();

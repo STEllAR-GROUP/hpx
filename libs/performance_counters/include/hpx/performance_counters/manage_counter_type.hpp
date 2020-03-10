@@ -14,16 +14,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
 
-namespace hpx { namespace performance_counters
-{
+namespace hpx { namespace performance_counters {
     /// \brief Install a new generic performance counter type in a way, which
     ///        will uninstall it automatically during shutdown.
     ///
@@ -145,8 +144,8 @@ namespace hpx { namespace performance_counters
     /// \note As long as \a ec is not pre-initialized to \a hpx#throws this
     ///       function doesn't throw but returns the result code using the
     ///       parameter \a ec. Otherwise it throws an instance of hpx#exception.
-    HPX_EXPORT void install_counter_type(std::string const& name,
-        counter_type type, error_code& ec = throws);
+    HPX_EXPORT void install_counter_type(
+        std::string const& name, counter_type type, error_code& ec = throws);
 
     /// \brief Install a new performance counter type in a way, which will
     ///        uninstall it automatically during shutdown.
@@ -235,21 +234,21 @@ namespace hpx { namespace performance_counters
     /// A small data structure holding all data needed to install a counter type
     struct generic_counter_type_data
     {
-        std::string name_;          ///< Name of the counter type
-        counter_type type_;         ///< Type of the counter instances of this
-                                    ///< counter type
-        std::string helptext_;      ///< Longer descriptive text explaining the
-                                    ///< counter type
-        std::uint32_t version_;   ///< Version of this counter type definition
-                                    ///< (default: HPX_PERFORMANCE_COUNTER_V1)
+        std::string name_;         ///< Name of the counter type
+        counter_type type_;        ///< Type of the counter instances of this
+                                   ///< counter type
+        std::string helptext_;     ///< Longer descriptive text explaining the
+                                   ///< counter type
+        std::uint32_t version_;    ///< Version of this counter type definition
+                                   ///< (default: HPX_PERFORMANCE_COUNTER_V1)
         create_counter_func create_counter_;
-            ///< Function used to create a counter instance of this type.
+        ///< Function used to create a counter instance of this type.
         discover_counters_func discover_counters_;
-            ///< Function used to discover all supported counter instances of
-            ///< this type.
+        ///< Function used to discover all supported counter instances of
+        ///< this type.
         std::string unit_of_measure_;
-            ///< The textual representation of the unit of measure for counter
-            ///< instances of this type. Use ISO unit names.
+        ///< The textual representation of the unit of measure for counter
+        ///< instances of this type. Use ISO unit names.
     };
 
     /// Install several new performance counter types in a way, which will
@@ -258,7 +257,6 @@ namespace hpx { namespace performance_counters
         std::size_t count, error_code& ec = throws);
 
     /// \endcond
-}}
+}}    // namespace hpx::performance_counters
 
-#endif // HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F
-
+#endif    // HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F

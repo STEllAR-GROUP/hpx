@@ -5,15 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/util.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/testing.hpp>
 
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace test
-{
+namespace test {
     ///////////////////////////////////////////////////////////////////////////
     struct data_good
     {
@@ -22,6 +21,7 @@ namespace test
         hpx::performance_counters::counter_path_elements path_;
     };
 
+    // clang-format off
     data_good data[] =
     {
         {   "/objectname{parentinstancename#2/instancename#1}/countername",
@@ -389,6 +389,7 @@ namespace test
         },
         {   "", "", hpx::performance_counters::counter_path_elements() }
     };
+    // clang-format on
 
     void good()
     {
@@ -398,7 +399,8 @@ namespace test
             using namespace hpx::performance_counters;
 
             std::string fullname;
-            HPX_TEST_EQ(status_valid_data, get_counter_name(t->path_, fullname, ec));
+            HPX_TEST_EQ(
+                status_valid_data, get_counter_name(t->path_, fullname, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(fullname, t->fullname_);
 
@@ -435,7 +437,8 @@ namespace test
             HPX_TEST_EQ(tp1.countername_, t->path_.countername_);
 
             type_name.erase();
-            HPX_TEST_EQ(status_valid_data, get_counter_type_name(tp1, type_name, ec));
+            HPX_TEST_EQ(
+                status_valid_data, get_counter_type_name(tp1, type_name, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(type_name, t->typename_);
 
@@ -443,11 +446,14 @@ namespace test
             HPX_TEST(status_valid_data ==
                 get_full_counter_type_name(tp1, type_name, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
-            if (t->path_.parameters_.empty()) {
+            if (t->path_.parameters_.empty())
+            {
                 HPX_TEST_EQ(type_name, t->typename_);
             }
-            else {
-                HPX_TEST_EQ(type_name, t->typename_ + '@' + t->path_.parameters_);
+            else
+            {
+                HPX_TEST_EQ(
+                    type_name, t->typename_ + '@' + t->path_.parameters_);
             }
 
             HPX_TEST(status_valid_data ==
@@ -457,13 +463,15 @@ namespace test
             HPX_TEST_EQ(tp2.countername_, t->path_.countername_);
 
             type_name.erase();
-            HPX_TEST_EQ(status_valid_data, get_counter_type_name(tp2, type_name, ec));
+            HPX_TEST_EQ(
+                status_valid_data, get_counter_type_name(tp2, type_name, ec));
             HPX_TEST_EQ(ec.value(), hpx::success);
             HPX_TEST_EQ(type_name, t->typename_);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // clang-format off
     char const* const data_bad[] =
     {
         "/{parentinstancename/instancename#1}/countername",
@@ -480,6 +488,7 @@ namespace test
         "/objectname{parentinstancename/instancename#1}/",
         nullptr
     };
+    // clang-format on
 
     void bad()
     {
@@ -491,7 +500,8 @@ namespace test
         for (char const* t = data_bad[0]; nullptr != t; t = data_bad[++i])
         {
             hpx::error_code ec;
-            HPX_TEST_EQ(status_invalid_data, get_counter_path_elements(t, p, ec));
+            HPX_TEST_EQ(
+                status_invalid_data, get_counter_path_elements(t, p, ec));
             HPX_TEST_EQ(ec.value(), hpx::bad_parameter);
         }
 
@@ -501,18 +511,20 @@ namespace test
         {
             hpx::error_code ec;
             bool caught_exception = false;
-            try {
+            try
+            {
                 get_counter_path_elements(t, p);
                 HPX_TEST(false);
             }
-            catch (hpx::exception const& e) {
+            catch (hpx::exception const& e)
+            {
                 HPX_TEST_EQ(e.get_error(), hpx::bad_parameter);
                 caught_exception = true;
             }
             HPX_TEST(caught_exception);
         }
     }
-}
+}    // namespace test
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -528,6 +540,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    return hpx::init(HPX_APPLICATION_STRING, argc, argv);   // Initialize and run HPX.
+    return hpx::init(
+        HPX_APPLICATION_STRING, argc, argv);    // Initialize and run HPX.
 }
-

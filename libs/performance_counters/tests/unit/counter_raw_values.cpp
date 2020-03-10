@@ -39,8 +39,7 @@ void register_counter_type()
         // function providing counter data
         &get_values,
         // description text
-        "returns an array of linearly increasing counter values"
-    );
+        "returns an array of linearly increasing counter values");
 }
 
 int hpx_main(int argc, char* argv[])
@@ -74,11 +73,8 @@ int main(int argc, char* argv[])
     hpx::register_startup_function(&register_counter_type);
 
     // Initialize and run HPX.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=1"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=1"};
     HPX_TEST_EQ(hpx::init(argc, argv, cfg), 0);
 
     return hpx::util::report_errors();
 }
-

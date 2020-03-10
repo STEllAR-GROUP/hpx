@@ -4,7 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_SERVER_ELAPSED_TIME_COUNTER_SEP_18_2011_1133AM)
+#if !defined(                                                                  \
+    HPX_PERFORMANCE_COUNTERS_SERVER_ELAPSED_TIME_COUNTER_SEP_18_2011_1133AM)
 #define HPX_PERFORMANCE_COUNTERS_SERVER_ELAPSED_TIME_COUNTER_SEP_18_2011_1133AM
 
 #include <hpx/config.hpp>
@@ -13,11 +14,10 @@
 #include <hpx/timing/high_resolution_timer.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server
-{
+namespace hpx { namespace performance_counters { namespace server {
     class HPX_EXPORT elapsed_time_counter
-      : public base_performance_counter,
-        public components::component_base<elapsed_time_counter>
+      : public base_performance_counter
+      , public components::component_base<elapsed_time_counter>
     {
         typedef components::component_base<elapsed_time_counter> base_type;
 
@@ -31,8 +31,14 @@ namespace hpx { namespace performance_counters { namespace server
         hpx::performance_counters::counter_value get_counter_value(bool reset);
         void reset_counter_value();
 
-        bool start() { return false; }
-        bool stop() { return false; }
+        bool start()
+        {
+            return false;
+        }
+        bool stop()
+        {
+            return false;
+        }
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
@@ -42,6 +48,6 @@ namespace hpx { namespace performance_counters { namespace server
             base_type::finalize();
         }
     };
-}}}
+}}}    // namespace hpx::performance_counters::server
 
 #endif

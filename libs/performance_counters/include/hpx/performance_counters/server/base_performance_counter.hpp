@@ -18,11 +18,10 @@
 #include <hpx/thread_support/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server
-{
+namespace hpx { namespace performance_counters { namespace server {
     class base_performance_counter
-        : public hpx::performance_counters::performance_counter_base,
-          public hpx::traits::detail::component_tag
+      : public hpx::performance_counters::performance_counter_base
+      , public hpx::traits::detail::component_tag
     {
     protected:
         /// the following functions are not implemented by default, they will
@@ -65,9 +64,7 @@ namespace hpx { namespace performance_counters { namespace server
             return false;    // nothing to do
         }
 
-        virtual void reinit(bool /*reset*/) override
-        {
-        }
+        virtual void reinit(bool /*reset*/) override {}
 
         virtual counter_info get_counter_info() const override
         {
@@ -88,15 +85,12 @@ namespace hpx { namespace performance_counters { namespace server
         // components must contain a typedef for wrapping_type defining the
         // component type used to encapsulate instances of this
         // component
-        typedef components::component<base_performance_counter>
-            wrapping_type;
+        typedef components::component<base_performance_counter> wrapping_type;
         typedef base_performance_counter base_type_holder;
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        void finalize()
-        {
-        }
+        void finalize() {}
 
         static components::component_type get_component_type()
         {
@@ -165,8 +159,7 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            get_counter_values_array_nonvirt,
-            get_counter_values_array_action);
+            get_counter_values_array_nonvirt, get_counter_values_array_action);
 
         /// The \a set_counter_value_action
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
@@ -192,46 +185,41 @@ namespace hpx { namespace performance_counters { namespace server
         hpx::performance_counters::counter_info info_;
         util::atomic_count invocation_count_;
     };
-}}}
+}}}    // namespace hpx::performance_counters::server
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter
-    ::get_counter_info_action)
+HPX_ACTION_HAS_CRITICAL_PRIORITY(hpx::performance_counters::server::
+        base_performance_counter ::get_counter_info_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter
-    ::get_counter_info_action,
+    hpx::performance_counters::server::base_performance_counter ::
+        get_counter_info_action,
     performance_counter_get_counter_info_action)
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter
-    ::get_counter_value_action)
+HPX_ACTION_HAS_CRITICAL_PRIORITY(hpx::performance_counters::server::
+        base_performance_counter ::get_counter_value_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter
-    ::get_counter_value_action,
+    hpx::performance_counters::server::base_performance_counter ::
+        get_counter_value_action,
     performance_counter_get_counter_value_action)
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter
-    ::get_counter_values_array_action)
+HPX_ACTION_HAS_CRITICAL_PRIORITY(hpx::performance_counters::server::
+        base_performance_counter ::get_counter_values_array_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter
-    ::get_counter_values_array_action,
+    hpx::performance_counters::server::base_performance_counter ::
+        get_counter_values_array_action,
     performance_counter_get_counter_values_array_action)
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter
-    ::set_counter_value_action)
+HPX_ACTION_HAS_CRITICAL_PRIORITY(hpx::performance_counters::server::
+        base_performance_counter ::set_counter_value_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter
-    ::set_counter_value_action,
+    hpx::performance_counters::server::base_performance_counter ::
+        set_counter_value_action,
     performance_counter_set_counter_value_action)
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::performance_counters::server::base_performance_counter
-    ::reset_counter_value_action)
+HPX_ACTION_HAS_CRITICAL_PRIORITY(hpx::performance_counters::server::
+        base_performance_counter ::reset_counter_value_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::performance_counters::server::base_performance_counter
-    ::reset_counter_value_action,
+    hpx::performance_counters::server::base_performance_counter ::
+        reset_counter_value_action,
     performance_counter_reset_counter_value_action)
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
@@ -254,4 +242,3 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::performance_counters::counter_values_array, hpx_counter_values_array)
 
 #endif
-

@@ -12,8 +12,7 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters
-{
+namespace hpx { namespace performance_counters {
     struct instance_name
     {
         std::string name_;
@@ -38,6 +37,6 @@ namespace hpx { namespace performance_counters
 
     HPX_API_EXPORT bool parse_counter_name(
         std::string const& name, path_elements& elements);
-}}
+}}    // namespace hpx::performance_counters
 
 #endif /*HPX_PERFORMANCE_COUNTERS_PARSER_HPP*/

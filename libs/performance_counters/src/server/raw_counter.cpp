@@ -5,47 +5,46 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/components/derived_component_factory.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::component<
-    hpx::performance_counters::server::raw_counter
-> raw_counter_type;
+    hpx::performance_counters::server::raw_counter>
+    raw_counter_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    raw_counter_type, raw_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
-HPX_DEFINE_GET_COMPONENT_TYPE(
-    hpx::performance_counters::server::raw_counter)
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(raw_counter_type, raw_counter,
+    "base_performance_counter", hpx::components::factory_enabled)
+HPX_DEFINE_GET_COMPONENT_TYPE(hpx::performance_counters::server::raw_counter)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server
-{
+namespace hpx { namespace performance_counters { namespace server {
     raw_counter::raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::int64_t(bool)> f)
-      : base_type_holder(info), f_(std::move(f)), reset_(false)
+        hpx::util::function_nonser<std::int64_t(bool)> f)
+      : base_type_holder(info)
+      , f_(std::move(f))
+      , reset_(false)
     {
-        if (info.type_ != counter_raw) {
-            HPX_THROW_EXCEPTION(bad_parameter,
-                "raw_counter::raw_counter",
+        if (info.type_ != counter_raw)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter, "raw_counter::raw_counter",
                 "unexpected counter type specified for raw_counter");
         }
     }
 
-    hpx::performance_counters::counter_value
-        raw_counter::get_counter_value(bool reset)
+    hpx::performance_counters::counter_value raw_counter::get_counter_value(
+        bool reset)
     {
         hpx::performance_counters::counter_value value;
-        value.value_ = f_(reset);               // gather the current value
+        value.value_ = f_(reset);    // gather the current value
         reset_ = false;
         value.scaling_ = 1;
         value.scale_inverse_ = false;
@@ -59,5 +58,4 @@ namespace hpx { namespace performance_counters { namespace server
     {
         f_(true);
     }
-}}}
-
+}}}    // namespace hpx::performance_counters::server

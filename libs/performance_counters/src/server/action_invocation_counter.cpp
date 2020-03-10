@@ -5,17 +5,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/counters.hpp>
+#include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 
 #include <cstdint>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters
-{
+namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     // Discoverer function for action invocation counters
     bool action_invocation_counter_discoverer(counter_info const& info,
@@ -27,10 +26,12 @@ namespace hpx { namespace performance_counters
         performance_counters::counter_path_elements p;
         performance_counters::counter_status status =
             get_counter_path_elements(info.fullname_, p, ec);
-        if (!status_is_valid(status)) return false;
+        if (!status_is_valid(status))
+            return false;
 
         bool result = registry.counter_discoverer(info, p, f, mode, ec);
-        if (!result || ec) return false;
+        if (!result || ec)
+            return false;
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -43,8 +44,8 @@ namespace hpx { namespace performance_counters
         error_code& ec)
     {
         using hpx::actions::detail::invocation_count_registry;
-        return action_invocation_counter_discoverer(info, f, mode,
-            invocation_count_registry::local_instance(), ec);
+        return action_invocation_counter_discoverer(
+            info, f, mode, invocation_count_registry::local_instance(), ec);
     }
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -53,8 +54,8 @@ namespace hpx { namespace performance_counters
         error_code& ec)
     {
         using hpx::actions::detail::invocation_count_registry;
-        return action_invocation_counter_discoverer(info, f, mode,
-            invocation_count_registry::remote_instance(), ec);
+        return action_invocation_counter_discoverer(
+            info, f, mode, invocation_count_registry::remote_instance(), ec);
     }
 #endif
 
@@ -64,36 +65,40 @@ namespace hpx { namespace performance_counters
         hpx::actions::detail::invocation_count_registry& registry,
         error_code& ec)
     {
-        switch (info.type_) {
+        switch (info.type_)
+        {
         case counter_raw:
+        {
+            counter_path_elements paths;
+            get_counter_path_elements(info.fullname_, paths, ec);
+            if (ec)
+                return naming::invalid_gid;
+
+            if (paths.parentinstance_is_basename_)
             {
-                counter_path_elements paths;
-                get_counter_path_elements(info.fullname_, paths, ec);
-                if (ec) return naming::invalid_gid;
-
-                if (paths.parentinstance_is_basename_) {
-                    HPX_THROWS_IF(ec, bad_parameter,
-                        "action_invocation_counter_creator",
-                        "invalid action invocation counter name (instance name "
-                        "must not be a valid base counter name)");
-                    return naming::invalid_gid;
-                }
-
-                if (paths.parameters_.empty()) {
-                    HPX_THROWS_IF(ec, bad_parameter,
-                        "action_invocation_counter_creator",
-                        "invalid action invocation counter parameter: must "
-                        "specify an action type");
-                    return naming::invalid_gid;
-                }
-
-                // ask registry
-                hpx::util::function_nonser<std::int64_t(bool)> f =
-                    registry.get_invocation_counter(paths.parameters_);
-
-                return detail::create_raw_counter(info, std::move(f), ec);
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "action_invocation_counter_creator",
+                    "invalid action invocation counter name (instance name "
+                    "must not be a valid base counter name)");
+                return naming::invalid_gid;
             }
-            break;
+
+            if (paths.parameters_.empty())
+            {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "action_invocation_counter_creator",
+                    "invalid action invocation counter parameter: must "
+                    "specify an action type");
+                return naming::invalid_gid;
+            }
+
+            // ask registry
+            hpx::util::function_nonser<std::int64_t(bool)> f =
+                registry.get_invocation_counter(paths.parameters_);
+
+            return detail::create_raw_counter(info, std::move(f), ec);
+        }
+        break;
 
         default:
             HPX_THROWS_IF(ec, bad_parameter,
@@ -107,8 +112,8 @@ namespace hpx { namespace performance_counters
         counter_info const& info, error_code& ec)
     {
         using hpx::actions::detail::invocation_count_registry;
-        return action_invocation_counter_creator(info,
-            invocation_count_registry::local_instance(), ec);
+        return action_invocation_counter_creator(
+            info, invocation_count_registry::local_instance(), ec);
     }
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -116,9 +121,8 @@ namespace hpx { namespace performance_counters
         counter_info const& info, error_code& ec)
     {
         using hpx::actions::detail::invocation_count_registry;
-        return action_invocation_counter_creator(info,
-            invocation_count_registry::remote_instance(), ec);
+        return action_invocation_counter_creator(
+            info, invocation_count_registry::remote_instance(), ec);
     }
 #endif
-}}
-
+}}    // namespace hpx::performance_counters

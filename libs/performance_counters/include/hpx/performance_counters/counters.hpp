@@ -8,12 +8,12 @@
 #define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM
 
 #include <hpx/config.hpp>
-#include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -22,8 +22,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters
-{
+namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     constexpr char const counter_prefix[] = "/counters";
     constexpr std::size_t counter_prefix_len =
@@ -37,7 +36,8 @@ namespace hpx { namespace performance_counters
         return name;
     }
 
-    inline std::string ensure_counter_prefix(std::string const& counter) //-V659
+    inline std::string ensure_counter_prefix(
+        std::string const& counter)    //-V659
     {
         std::string name(counter);
         return ensure_counter_prefix(name);
@@ -50,7 +50,8 @@ namespace hpx { namespace performance_counters
         return name;
     }
 
-    inline std::string remove_counter_prefix(std::string const& counter) //-V659
+    inline std::string remove_counter_prefix(
+        std::string const& counter)    //-V659
     {
         std::string name(counter);
         return remove_counter_prefix(name);
@@ -179,10 +180,10 @@ namespace hpx { namespace performance_counters
         status_valid_data,      ///< No error occurred, data is valid
         status_new_data,        ///< Data is valid and different from last call
         status_invalid_data,    ///< Some error occurred, data is not value
-        status_already_defined, ///< The type or instance already has been defined
-        status_counter_unknown, ///< The counter instance is unknown
-        status_counter_type_unknown,  ///< The counter type is unknown
-        status_generic_error    ///< A unknown error occurred
+        status_already_defined,    ///< The type or instance already has been defined
+        status_counter_unknown,         ///< The counter instance is unknown
+        status_counter_type_unknown,    ///< The counter type is unknown
+        status_generic_error            ///< A unknown error occurred
     };
 #endif
 
@@ -203,20 +204,20 @@ namespace hpx { namespace performance_counters
     ///
     struct counter_type_path_elements
     {
-        counter_type_path_elements()
-        {}
+        counter_type_path_elements() {}
 
         counter_type_path_elements(std::string const& objectname,
-                std::string const& countername, std::string const& parameters)
-          : objectname_(objectname),
-            countername_(countername),
-            parameters_(parameters)
-        {}
+            std::string const& countername, std::string const& parameters)
+          : objectname_(objectname)
+          , countername_(countername)
+          , parameters_(parameters)
+        {
+        }
 
-        std::string objectname_;          ///< the name of the performance object
-        std::string countername_;         ///< contains the counter name
-        std::string parameters_;          ///< optional parameters for the
-                                          ///< counter instance
+        std::string objectname_;     ///< the name of the performance object
+        std::string countername_;    ///< contains the counter name
+        std::string parameters_;     ///< optional parameters for the
+                                     ///< counter instance
 
     protected:
         // serialization support
@@ -248,44 +249,51 @@ namespace hpx { namespace performance_counters
           , instanceindex_(-1)
           , subinstanceindex_(-1)
           , parentinstance_is_basename_(false)
-        {}
+        {
+        }
 
         counter_path_elements(std::string const& objectname,
-                std::string const& countername, std::string const& parameters,
-                std::string const& parentname, std::string const& instancename,
-                std::int64_t parentindex = -1, std::int64_t instanceindex = -1,
-                bool parentinstance_is_basename = false)
-          : counter_type_path_elements(objectname, countername, parameters),
-            parentinstancename_(parentname), instancename_(instancename),
-            subinstancename_(),
-            parentinstanceindex_(parentindex), instanceindex_(instanceindex),
-            subinstanceindex_(-1),
-            parentinstance_is_basename_(parentinstance_is_basename)
-        {}
+            std::string const& countername, std::string const& parameters,
+            std::string const& parentname, std::string const& instancename,
+            std::int64_t parentindex = -1, std::int64_t instanceindex = -1,
+            bool parentinstance_is_basename = false)
+          : counter_type_path_elements(objectname, countername, parameters)
+          , parentinstancename_(parentname)
+          , instancename_(instancename)
+          , subinstancename_()
+          , parentinstanceindex_(parentindex)
+          , instanceindex_(instanceindex)
+          , subinstanceindex_(-1)
+          , parentinstance_is_basename_(parentinstance_is_basename)
+        {
+        }
 
         counter_path_elements(std::string const& objectname,
-                std::string const& countername, std::string const& parameters,
-                std::string const& parentname, std::string const& instancename,
-                std::string const& subinstancename,
-                std::int64_t parentindex = -1, std::int64_t instanceindex = -1,
-                std::int64_t subinstanceindex = -1,
-                bool parentinstance_is_basename = false)
-          : counter_type_path_elements(objectname, countername, parameters),
-            parentinstancename_(parentname), instancename_(instancename),
-            subinstancename_(subinstancename),
-            parentinstanceindex_(parentindex), instanceindex_(instanceindex),
-            subinstanceindex_(subinstanceindex),
-            parentinstance_is_basename_(parentinstance_is_basename)
-        {}
+            std::string const& countername, std::string const& parameters,
+            std::string const& parentname, std::string const& instancename,
+            std::string const& subinstancename, std::int64_t parentindex = -1,
+            std::int64_t instanceindex = -1, std::int64_t subinstanceindex = -1,
+            bool parentinstance_is_basename = false)
+          : counter_type_path_elements(objectname, countername, parameters)
+          , parentinstancename_(parentname)
+          , instancename_(instancename)
+          , subinstancename_(subinstancename)
+          , parentinstanceindex_(parentindex)
+          , instanceindex_(instanceindex)
+          , subinstanceindex_(subinstanceindex)
+          , parentinstance_is_basename_(parentinstance_is_basename)
+        {
+        }
 
-        std::string parentinstancename_;  ///< the name of the parent instance
-        std::string instancename_;        ///< the name of the object instance
-        std::string subinstancename_;     ///< the name of the object sub-instance
+        std::string parentinstancename_;    ///< the name of the parent instance
+        std::string instancename_;          ///< the name of the object instance
+        std::string
+            subinstancename_;    ///< the name of the object sub-instance
         std::int64_t parentinstanceindex_;    ///< the parent instance index
-        std::int64_t instanceindex_;    ///< the instance index
-        std::int64_t subinstanceindex_;    ///< the sub-instance index
-        bool parentinstance_is_basename_; ///< the parentinstancename_
-                                          ///member holds a base counter name
+        std::int64_t instanceindex_;          ///< the instance index
+        std::int64_t subinstanceindex_;       ///< the sub-instance index
+        bool parentinstance_is_basename_;     ///< the parentinstancename_
+            ///member holds a base counter name
 
     private:
         // serialization support
@@ -301,30 +309,42 @@ namespace hpx { namespace performance_counters
     struct counter_info
     {
         counter_info(counter_type type = counter_raw)
-          : type_(type), version_(HPX_PERFORMANCE_COUNTER_V1),
-            status_(status_invalid_data)
-        {}
+          : type_(type)
+          , version_(HPX_PERFORMANCE_COUNTER_V1)
+          , status_(status_invalid_data)
+        {
+        }
 
         counter_info(std::string const& name)
-          : type_(counter_raw), version_(HPX_PERFORMANCE_COUNTER_V1),
-            status_(status_invalid_data), fullname_(name)
-        {}
+          : type_(counter_raw)
+          , version_(HPX_PERFORMANCE_COUNTER_V1)
+          , status_(status_invalid_data)
+          , fullname_(name)
+        {
+        }
 
         counter_info(counter_type type, std::string const& name,
-                std::string const& helptext = "",
-                std::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
-                std::string const& uom = "")
-          : type_(type), version_(version), status_(status_invalid_data),
-            fullname_(name), helptext_(helptext), unit_of_measure_(uom)
-        {}
+            std::string const& helptext = "",
+            std::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
+            std::string const& uom = "")
+          : type_(type)
+          , version_(version)
+          , status_(status_invalid_data)
+          , fullname_(name)
+          , helptext_(helptext)
+          , unit_of_measure_(uom)
+        {
+        }
 
-        counter_type type_;         ///< The type of the described counter
-        std::uint32_t version_;     ///< The version of the described counter
-                                    ///< using the 0xMMmmSSSS scheme
-        counter_status status_;     ///< The status of the counter object
-        std::string fullname_;      ///< The full name of this counter
-        std::string helptext_;      ///< The full descriptive text for this counter
-        std::string unit_of_measure_; ///< The unit of measure for this counter
+        counter_type type_;        ///< The type of the described counter
+        std::uint32_t version_;    ///< The version of the described counter
+                                   ///< using the 0xMMmmSSSS scheme
+        counter_status status_;    ///< The status of the counter object
+        std::string fullname_;     ///< The full name of this counter
+        std::string
+            helptext_;    ///< The full descriptive text for this counter
+        std::string
+            unit_of_measure_;    ///< The unit of measure for this counter
 
     private:
         // serialization support
@@ -340,52 +360,49 @@ namespace hpx { namespace performance_counters
     /// \brief This declares the type of a function, which will be
     ///        called by HPX whenever a new performance counter instance of a
     ///        particular type needs to be created.
-    typedef hpx::util::function_nonser<
-        naming::gid_type(counter_info const&, error_code&)>
+    typedef hpx::util::function_nonser<naming::gid_type(
+        counter_info const&, error_code&)>
         create_counter_func;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief This declares a type of a function, which will be passed to
     ///        a \a discover_counters_func in order to be called for each
     ///        discovered performance counter instance.
-    typedef hpx::util::function_nonser<
-        bool(counter_info const&, error_code&)>
+    typedef hpx::util::function_nonser<bool(counter_info const&, error_code&)>
         discover_counter_func;
 
     /// \brief This declares the type of a function, which will be called by
     ///        HPX whenever it needs to discover all performance counter
     ///        instances of a particular type.
-    typedef hpx::util::function_nonser<
-        bool(counter_info const&, discover_counter_func const&,
-            discover_counters_mode, error_code&)>
+    typedef hpx::util::function_nonser<bool(counter_info const&,
+        discover_counter_func const&, discover_counters_mode, error_code&)>
         discover_counters_func;
 
     ///////////////////////////////////////////////////////////////////////
-    inline counter_status add_counter_type(counter_info const& info,
-        error_code& ec)
+    inline counter_status add_counter_type(
+        counter_info const& info, error_code& ec)
     {
-        return add_counter_type(info, create_counter_func(),
-            discover_counters_func(), ec);
+        return add_counter_type(
+            info, create_counter_func(), discover_counters_func(), ec);
     }
 
-    inline naming::id_type get_counter(std::string const& name,
-        error_code& ec)
+    inline naming::id_type get_counter(std::string const& name, error_code& ec)
     {
         lcos::future<naming::id_type> f = get_counter_async(name, ec);
-        if (ec) return naming::invalid_id;
+        if (ec)
+            return naming::invalid_id;
 
         return f.get(ec);
     }
 
-    inline naming::id_type get_counter(counter_info const& info,
-        error_code& ec)
+    inline naming::id_type get_counter(counter_info const& info, error_code& ec)
     {
         lcos::future<naming::id_type> f = get_counter_async(info, ec);
-        if (ec) return naming::invalid_id;
+        if (ec)
+            return naming::invalid_id;
 
         return f.get(ec);
     }
-}}
+}}    // namespace hpx::performance_counters
 
 #endif
-

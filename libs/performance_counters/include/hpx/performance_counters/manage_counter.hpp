@@ -15,13 +15,11 @@
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
-namespace hpx { namespace performance_counters
-{
+namespace hpx { namespace performance_counters {
     /// Install a new performance counter in a way, which will uninstall it
     /// automatically during shutdown.
     HPX_EXPORT void install_counter(naming::id_type const& id,
         counter_info const& info, error_code& ec = throws);
-}}
+}}    // namespace hpx::performance_counters
 
-#endif // HPX_8B1A4443_7D95_4C0D_9970_7CEA4D049608
-
+#endif    // HPX_8B1A4443_7D95_4C0D_9970_7CEA4D049608

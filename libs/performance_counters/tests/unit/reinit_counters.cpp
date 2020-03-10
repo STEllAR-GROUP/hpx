@@ -76,11 +76,12 @@ hpx::naming::gid_type test_counter_creator(
 {
     hpx::performance_counters::counter_path_elements paths;
     get_counter_path_elements(info.fullname_, paths, ec);
-    if (ec) return hpx::naming::invalid_gid;
+    if (ec)
+        return hpx::naming::invalid_gid;
 
-    if (paths.parentinstance_is_basename_) {
-        HPX_THROWS_IF(ec, hpx::bad_parameter,
-            "test_counter_creator",
+    if (paths.parentinstance_is_basename_)
+    {
+        HPX_THROWS_IF(ec, hpx::bad_parameter, "test_counter_creator",
             "invalid counter instance parent name: " +
                 paths.parentinstancename_);
         return hpx::naming::invalid_gid;
@@ -92,15 +93,18 @@ hpx::naming::gid_type test_counter_creator(
         // make sure parent instance name is set properly
         hpx::performance_counters::counter_info complemented_info = info;
         complement_counter_info(complemented_info, info, ec);
-        if (ec) return hpx::naming::invalid_gid;
+        if (ec)
+            return hpx::naming::invalid_gid;
 
         // create the counter as requested
         hpx::naming::gid_type id;
-        try {
+        try
+        {
             id = hpx::components::server::construct<test_counter_type>(
                 complemented_info);
         }
-        catch (hpx::exception const& e) {
+        catch (hpx::exception const& e)
+        {
             if (&ec == &hpx::throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
@@ -112,8 +116,7 @@ hpx::naming::gid_type test_counter_creator(
         return id;
     }
 
-    HPX_THROWS_IF(ec, hpx::bad_parameter,
-        "test_counter_creator",
+    HPX_THROWS_IF(ec, hpx::bad_parameter, "test_counter_creator",
         "invalid counter instance name: " + paths.instancename_);
     return hpx::naming::invalid_gid;
 }
@@ -125,7 +128,7 @@ void register_counter_type()
     hpx::performance_counters::install_counter_type("/test/reinit-values",
         hpx::performance_counters::counter_raw_values,
         "returns an array of linearly increasing counter values, supports "
-            "reinit",
+        "reinit",
         &test_counter_creator,
         &hpx::performance_counters::locality_counter_discoverer,
         HPX_PERFORMANCE_COUNTER_V1);
@@ -134,7 +137,7 @@ void register_counter_type()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::time(nullptr);
+    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -169,17 +172,13 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     hpx::register_startup_function(&register_counter_type);
 
     // Initialize and run HPX.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=1"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=1"};
     HPX_TEST_EQ(hpx::init(desc_commandline, argc, argv, cfg), 0);
 
     return hpx::util::report_errors();

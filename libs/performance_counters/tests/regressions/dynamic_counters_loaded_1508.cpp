@@ -11,14 +11,15 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/testing.hpp>
 
-int hpx_main(int argc, char ** argv)
+int hpx_main(int argc, char** argv)
 {
     using hpx::performance_counters::performance_counter;
 
     bool counter_created = false;
     bool value_retrieved = false;
 
-    try {
+    try
+    {
         performance_counter memory("/runtime/memory/resident");
         counter_created = true;
 
@@ -33,7 +34,8 @@ int hpx_main(int argc, char ** argv)
 
         value_retrieved = true;
     }
-    catch (hpx::exception const&) {
+    catch (hpx::exception const&)
+    {
         HPX_TEST(false);
     }
 
@@ -43,7 +45,7 @@ int hpx_main(int argc, char ** argv)
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
     return hpx::util::report_errors();

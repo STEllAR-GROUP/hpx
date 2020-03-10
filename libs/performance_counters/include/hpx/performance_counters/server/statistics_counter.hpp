@@ -4,14 +4,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_SERVER_AVERAGE_COUNT_COUNTER_SEP_30_2011_1045AM)
+#if !defined(                                                                  \
+    HPX_PERFORMANCE_COUNTERS_SERVER_AVERAGE_COUNT_COUNTER_SEP_30_2011_1045AM)
 #define HPX_PERFORMANCE_COUNTERS_SERVER_AVERAGE_COUNT_COUNTER_SEP_30_2011_1045AM
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/util/interval_timer.hpp>
 
 #include <cstddef>
@@ -20,10 +21,8 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server
-{
-    namespace detail
-    {
+namespace hpx { namespace performance_counters { namespace server {
+    namespace detail {
         struct counter_type_from_statistic_base
         {
             virtual ~counter_type_from_statistic_base() {}
@@ -32,7 +31,7 @@ namespace hpx { namespace performance_counters { namespace server
             virtual double get_value() = 0;
             virtual void add_value(double value) = 0;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // This counter exposes the average count of items processed during the
@@ -40,14 +39,17 @@ namespace hpx { namespace performance_counters { namespace server
     // growing counter value.
     template <typename Statistic>
     class statistics_counter
-      : public base_performance_counter,
-        public components::component_base<statistics_counter<Statistic> >
+      : public base_performance_counter
+      , public components::component_base<statistics_counter<Statistic>>
     {
-        typedef components::component_base<
-            statistics_counter<Statistic> > base_type;
+        typedef components::component_base<statistics_counter<Statistic>>
+            base_type;
 
         // avoid warnings about using this in member initializer list
-        statistics_counter* this_() { return this; }
+        statistics_counter* this_()
+        {
+            return this;
+        }
 
     public:
         typedef statistics_counter type_holder;
@@ -58,16 +60,16 @@ namespace hpx { namespace performance_counters { namespace server
           , parameter1_(0)
           , parameter2_(0)
           , reset_base_counter_(false)
-        {}
+        {
+        }
 
         statistics_counter(counter_info const& info,
-            std::string const& base_counter_name,
-            std::size_t parameter1, std::size_t parameter2,
-            bool reset_base_counter);
+            std::string const& base_counter_name, std::size_t parameter1,
+            std::size_t parameter2, bool reset_base_counter);
 
         /// Overloads from the base_counter base class.
-        hpx::performance_counters::counter_value
-            get_counter_value(bool reset = false) override;
+        hpx::performance_counters::counter_value get_counter_value(
+            bool reset = false) override;
 
         bool start() override;
 
@@ -94,8 +96,10 @@ namespace hpx { namespace performance_counters { namespace server
         typedef lcos::local::spinlock mutex_type;
         mutable mutex_type mtx_;
 
-        hpx::util::interval_timer timer_; ///< base time interval in milliseconds
-        std::string base_counter_name_;   ///< name of base counter to be queried
+        hpx::util::interval_timer
+            timer_;    ///< base time interval in milliseconds
+        std::string
+            base_counter_name_;    ///< name of base counter to be queried
         naming::id_type base_counter_id_;
 
         std::unique_ptr<detail::counter_type_from_statistic_base> value_;
@@ -105,6 +109,6 @@ namespace hpx { namespace performance_counters { namespace server
         std::size_t parameter1_, parameter2_;
         bool reset_base_counter_;
     };
-}}}
+}}}    // namespace hpx::performance_counters::server
 
 #endif

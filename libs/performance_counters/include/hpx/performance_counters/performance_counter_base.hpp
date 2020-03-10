@@ -4,15 +4,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_BASE_SEP_18_2014_0732PM)
+#if !defined(                                                                  \
+    HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_BASE_SEP_18_2014_0732PM)
 #define HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_BASE_SEP_18_2014_0732PM
 
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters
-{
+namespace hpx { namespace performance_counters {
     //[performance_counter_interface
     // Abstract base interface for all Performance Counters.
     struct performance_counter_base
@@ -48,6 +48,6 @@ namespace hpx { namespace performance_counters
         virtual void reinit(bool reset) = 0;
     };
     //]
-}}
+}}    // namespace hpx::performance_counters
 
 #endif
