@@ -56,10 +56,11 @@
 #include <vector>
 
 #if defined(HPX_MSVC)
+#include <windows.h>
+
 #include <dbghelp.h>
 #include <stdlib.h>
 #include <winbase.h>
-#include <windows.h>
 #endif
 
 namespace hpx { namespace util { namespace stack_trace {
