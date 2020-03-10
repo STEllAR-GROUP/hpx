@@ -14,7 +14,6 @@
 #include <hpx/execution/executors/thread_pool_executor.hpp>
 
 namespace hpx { namespace threads { namespace executors {
-    //  TODO: Keep get_state?
     using current_executor = parallel::execution::thread_pool_executor;
 }}}    // namespace hpx::threads::executors
 
