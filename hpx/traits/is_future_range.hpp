@@ -5,16 +5,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/ref.hpp
-// hpxinspect:nodeprecatedname:boost::reference_wrapper
-
 #ifndef HPX_TRAITS_IS_FUTURE_RANGE_HPP
 #define HPX_TRAITS_IS_FUTURE_RANGE_HPP
 
 #include <hpx/traits/is_future.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-
-#include <boost/ref.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -37,11 +32,6 @@ namespace hpx { namespace traits
     template <typename R, typename Enable = void>
     struct is_ref_wrapped_future_range
       : std::false_type
-    {};
-
-    template <typename R>
-    struct is_ref_wrapped_future_range< ::boost::reference_wrapper<R> >
-      : is_future_range<R>
     {};
 
     template <typename R>

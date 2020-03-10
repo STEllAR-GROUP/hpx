@@ -4,17 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/ref.hpp
-// hpxinspect:nodeprecatedname:boost::reference_wrapper
-
 #ifndef HPX_UTIL_INVOKE_HPP
 #define HPX_UTIL_INVOKE_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/type_support/void_guard.hpp>
-
-#include <boost/ref.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -102,13 +97,6 @@ namespace hpx { namespace util {
         // flatten std::[c]ref
         template <typename F, typename X>
         struct dispatch_invoke<F, ::std::reference_wrapper<X>>
-        {
-            using type = X&;
-        };
-
-        // support boost::[c]ref, which is not callable as std::[c]ref
-        template <typename F, typename X>
-        struct dispatch_invoke<F, ::boost::reference_wrapper<X>>
         {
             using type = X&;
         };

@@ -5,9 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/ref.hpp
-// hpxinspect:nodeprecatedname:boost::reference_wrapper
-
 /// \file lcos/wait_all.hpp
 
 #if !defined(HPX_LCOS_WAIT_ALL_APR_19_2012_1140AM)
@@ -119,8 +116,6 @@ namespace hpx
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
 
-#include <boost/ref.hpp>
-
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -149,11 +144,6 @@ namespace hpx { namespace lcos
 
         template <typename R>
         struct is_future_or_shared_state<std::reference_wrapper<R> >
-          : is_future_or_shared_state<R>
-        {};
-
-        template <typename R>
-        struct is_future_or_shared_state<boost::reference_wrapper<R> >
           : is_future_or_shared_state<R>
         {};
 

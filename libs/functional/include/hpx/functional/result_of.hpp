@@ -4,15 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/ref.hpp
-// hpxinspect:nodeprecatedname:boost::reference_wrapper
-
 #ifndef HPX_UTIL_RESULT_OF_HPP
 #define HPX_UTIL_RESULT_OF_HPP
 
 #include <hpx/config.hpp>
-
-#include <boost/ref.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -127,13 +122,6 @@ namespace hpx { namespace util {
             typename... Ts>
         struct result_of_impl<R (C::*)(Ps...) const, F(Ts...)>
           : result_of_member_pointer<C, R (C::*(Ts...))(Ps...) const>
-        {
-        };
-
-        // support boost::[c]ref, which is not callable as std::[c]ref
-        template <typename X, typename F, typename... Ts>
-        struct result_of_impl<::boost::reference_wrapper<X>, F(Ts...)>
-          : result_of_impl<X, X&(Ts...)>
         {
         };
     }    // namespace detail
