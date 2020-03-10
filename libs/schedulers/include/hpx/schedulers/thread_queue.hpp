@@ -16,9 +16,9 @@
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
-#include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
+#include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/maintain_queue_wait_times.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_data.hpp>

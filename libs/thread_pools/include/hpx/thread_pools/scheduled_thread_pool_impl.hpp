@@ -27,6 +27,7 @@
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <boost/system/system_error.hpp>

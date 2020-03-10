@@ -13,7 +13,7 @@
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
 #include <hpx/assertion.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
+#include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>

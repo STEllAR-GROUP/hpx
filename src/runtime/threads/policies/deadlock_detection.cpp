@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/policies/deadlock_detection.hpp>
+#include <hpx/schedulers/deadlock_detection.hpp>
 
 namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
