@@ -15,8 +15,6 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
-#include <boost/array.hpp>
-
 #include <algorithm>
 #include <array>
 #include <cstddef>    // for size_t
@@ -458,12 +456,6 @@ namespace hpx { namespace util {
     };
 
     template <typename Type, std::size_t Size>
-    struct tuple_size<boost::array<Type, Size>>
-      : std::integral_constant<std::size_t, Size>
-    {
-    };
-
-    template <typename Type, std::size_t Size>
     struct tuple_size<std::array<Type, Size>>
       : std::integral_constant<std::size_t, Size>
     {
@@ -552,24 +544,6 @@ namespace hpx { namespace util {
             std::pair<T0, T1> const& tuple) noexcept
         {
             return tuple.second;
-        }
-    };
-
-    template <std::size_t I, typename Type, std::size_t Size>
-    struct tuple_element<I, boost::array<Type, Size>>
-    {
-        using type = Type;
-
-        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
-            boost::array<Type, Size>& tuple) noexcept
-        {
-            return tuple[I];
-        }
-
-        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
-            boost::array<Type, Size> const& tuple) noexcept
-        {
-            return tuple[I];
         }
     };
 
