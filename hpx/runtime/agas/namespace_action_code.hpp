@@ -13,8 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 
-#include <boost/utility/binary.hpp>
-
 #include <cstddef>
 #include <string>
 
@@ -29,48 +27,48 @@ enum namespace_action_code
 {
     invalid_request                         = 0,
 
-    locality_ns_service                     = BOOST_BINARY_U(1100000),
-    locality_ns_bulk_service                = BOOST_BINARY_U(1100001),
-    locality_ns_allocate                    = BOOST_BINARY_U(1100010),
-    locality_ns_free                        = BOOST_BINARY_U(1100011),
-    locality_ns_localities                  = BOOST_BINARY_U(1100100),
-    locality_ns_num_localities              = BOOST_BINARY_U(1100101),
-    locality_ns_num_threads                 = BOOST_BINARY_U(1100110),
-    locality_ns_statistics_counter          = BOOST_BINARY_U(1100111),
-    locality_ns_resolve_locality            = BOOST_BINARY_U(1101000),
+    locality_ns_service                     = 0b1100000,
+    locality_ns_bulk_service                = 0b1100001,
+    locality_ns_allocate                    = 0b1100010,
+    locality_ns_free                        = 0b1100011,
+    locality_ns_localities                  = 0b1100100,
+    locality_ns_num_localities              = 0b1100101,
+    locality_ns_num_threads                 = 0b1100110,
+    locality_ns_statistics_counter          = 0b1100111,
+    locality_ns_resolve_locality            = 0b1101000,
 
-    primary_ns_service                      = BOOST_BINARY_U(1000000),
-    primary_ns_bulk_service                 = BOOST_BINARY_U(1000001),
-    primary_ns_route                        = BOOST_BINARY_U(1000010),
-    primary_ns_bind_gid                     = BOOST_BINARY_U(1000011),
-    primary_ns_resolve_gid                  = BOOST_BINARY_U(1000100),
-    primary_ns_unbind_gid                   = BOOST_BINARY_U(1000101),
-    primary_ns_increment_credit             = BOOST_BINARY_U(1000110),
-    primary_ns_decrement_credit             = BOOST_BINARY_U(1000111),
-    primary_ns_allocate                     = BOOST_BINARY_U(1001000),
-    primary_ns_begin_migration              = BOOST_BINARY_U(1001001),
-    primary_ns_end_migration                = BOOST_BINARY_U(1001010),
-    primary_ns_statistics_counter           = BOOST_BINARY_U(1001011),
+    primary_ns_service                      = 0b1000000,
+    primary_ns_bulk_service                 = 0b1000001,
+    primary_ns_route                        = 0b1000010,
+    primary_ns_bind_gid                     = 0b1000011,
+    primary_ns_resolve_gid                  = 0b1000100,
+    primary_ns_unbind_gid                   = 0b1000101,
+    primary_ns_increment_credit             = 0b1000110,
+    primary_ns_decrement_credit             = 0b1000111,
+    primary_ns_allocate                     = 0b1001000,
+    primary_ns_begin_migration              = 0b1001001,
+    primary_ns_end_migration                = 0b1001010,
+    primary_ns_statistics_counter           = 0b1001011,
 
-    component_ns_service                    = BOOST_BINARY_U(0100000),
-    component_ns_bulk_service               = BOOST_BINARY_U(0100001),
-    component_ns_bind_prefix                = BOOST_BINARY_U(0100010),
-    component_ns_bind_name                  = BOOST_BINARY_U(0100011),
-    component_ns_resolve_id                 = BOOST_BINARY_U(0100100),
-    component_ns_unbind_name                = BOOST_BINARY_U(0100101),
-    component_ns_iterate_types              = BOOST_BINARY_U(0100110),
-    component_ns_get_component_type_name    = BOOST_BINARY_U(0100111),
-    component_ns_num_localities             = BOOST_BINARY_U(0101000),
-    component_ns_statistics_counter         = BOOST_BINARY_U(0101001),
+    component_ns_service                    = 0b0100000,
+    component_ns_bulk_service               = 0b0100001,
+    component_ns_bind_prefix                = 0b0100010,
+    component_ns_bind_name                  = 0b0100011,
+    component_ns_resolve_id                 = 0b0100100,
+    component_ns_unbind_name                = 0b0100101,
+    component_ns_iterate_types              = 0b0100110,
+    component_ns_get_component_type_name    = 0b0100111,
+    component_ns_num_localities             = 0b0101000,
+    component_ns_statistics_counter         = 0b0101001,
 
-    symbol_ns_service                       = BOOST_BINARY_U(0010000),
-    symbol_ns_bulk_service                  = BOOST_BINARY_U(0010001),
-    symbol_ns_bind                          = BOOST_BINARY_U(0010010),
-    symbol_ns_resolve                       = BOOST_BINARY_U(0010011),
-    symbol_ns_unbind                        = BOOST_BINARY_U(0010100),
-    symbol_ns_iterate_names                 = BOOST_BINARY_U(0010101),
-    symbol_ns_on_event                      = BOOST_BINARY_U(0010110),
-    symbol_ns_statistics_counter            = BOOST_BINARY_U(0010111)
+    symbol_ns_service                       = 0b0010000,
+    symbol_ns_bulk_service                  = 0b0010001,
+    symbol_ns_bind                          = 0b0010010,
+    symbol_ns_resolve                       = 0b0010011,
+    symbol_ns_unbind                        = 0b0010100,
+    symbol_ns_iterate_names                 = 0b0010101,
+    symbol_ns_on_event                      = 0b0010110,
+    symbol_ns_statistics_counter            = 0b0010111
 };
 
 namespace detail
