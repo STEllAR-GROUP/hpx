@@ -11,8 +11,6 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/serialization/serialize_buffer.hpp>
 
-#include <boost/assert.hpp>
-
 #include <cstddef>
 #include <memory>
 #include <utility>
