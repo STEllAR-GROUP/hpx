@@ -325,7 +325,7 @@ namespace hpx { namespace parallel { namespace execution {
             // the real task will be spawned on a new task with hints - as intended
             return dataflow(
                 launch::sync,
-                [HPX_CAPTURE_FORWARD(f), this](
+                [f = std::forward<F>(f), this](
                     Future&& predecessor, Ts&&... ts) {
                     detail::pre_execution_then_domain_schedule<decltype(*this),
                         pool_numa_hint<Tag>>
@@ -387,7 +387,7 @@ namespace hpx { namespace parallel { namespace execution {
             // Please see notes for previous then_execute function above
             return dataflow(
                 launch::sync,
-                [HPX_CAPTURE_FORWARD(f), this](
+                [f = std::forward<F>(f), this](
                     OuterFuture<hpx::util::tuple<InnerFutures...>>&&
                         predecessor,
                     Ts&&... ts) {

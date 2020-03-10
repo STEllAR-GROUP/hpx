@@ -145,7 +145,7 @@ namespace hpx { namespace parallel { namespace execution {
                 shared_state_type p =
                     lcos::detail::make_continuation_exec<vector_result_type>(
                         std::forward<Future>(predecessor), exec_current,
-                        [HPX_CAPTURE_MOVE(func)](
+                        [func = std::move(func)](
                             future_type&& predecessor) mutable
                         -> vector_result_type {
                             return hpx::util::unwrap(

@@ -9,13 +9,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/util/yield_while.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -93,8 +93,8 @@ namespace hpx { namespace parallel { namespace execution {
             count_up();
             auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             parallel::execution::post(executor_,
-                [this, HPX_CAPTURE_FORWARD(f),
-                    HPX_CAPTURE_FORWARD(args)]() mutable {
+                [this, f = std::forward<F>(f),
+                    args = std::forward<decltype(args)>(args)]() mutable {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();
                 });
@@ -114,8 +114,8 @@ namespace hpx { namespace parallel { namespace execution {
             count_up();
             auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             lcos::local::futures_factory<result_type()> p(executor_,
-                [this, HPX_CAPTURE_FORWARD(f),
-                    HPX_CAPTURE_FORWARD(args)]() mutable {
+                [this, f = std::forward<F>(f),
+                    args = std::forward<decltype(args)>(args)]() mutable {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();
                 });
@@ -144,8 +144,8 @@ namespace hpx { namespace parallel { namespace execution {
 
             auto&& args = hpx::util::make_tuple(std::forward<Ts>(ts)...);
             lcos::local::futures_factory<result_type()> p(executor_,
-                [this, HPX_CAPTURE_FORWARD(f),
-                    HPX_CAPTURE_FORWARD(args)]() mutable {
+                [this, f = std::forward<F>(f),
+                    args = std::forward<decltype(args)>(args)]() mutable {
                     hpx::util::invoke_fused(std::move(f), std::move(args));
                     count_down();
                 });
