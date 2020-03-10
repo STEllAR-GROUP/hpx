@@ -45,10 +45,10 @@
 #include <hpx/logging.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/string_util.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/predef/other/endian.h>

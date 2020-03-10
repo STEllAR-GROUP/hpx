@@ -53,6 +53,7 @@ add_hpx_module(runtime_configuration
     hpx_plugin
     hpx_prefix
     hpx_serialization
+    hpx_string_util
     hpx_thread_support
     hpx_version
   CMAKE_SUBDIRS examples tests

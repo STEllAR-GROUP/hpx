@@ -16,6 +16,7 @@
 #include <hpx/util/from_string.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
+#include <hpx/string_util/case_conv.hpp>
 
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -54,7 +55,6 @@
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #endif
 
-#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -1567,7 +1567,7 @@ namespace hpx { namespace components { namespace server
             bool isenabled = true;
             if (sect.has_entry("enabled")) {
                 std::string tmp = sect.get_entry("enabled");
-                boost::algorithm::to_lower (tmp);
+                hpx::string_util::to_lower (tmp);
                 if (tmp == "no" || tmp == "false" || tmp == "0") {
                     LRT_(info) << "component factory disabled: " << instance;
                     isenabled = false;     // this component has been disabled
@@ -1578,7 +1578,7 @@ namespace hpx { namespace components { namespace server
             bool isdefault = false;
             if (sect.has_entry("isdefault")) {
                 std::string tmp = sect.get_entry("isdefault");
-                boost::algorithm::to_lower (tmp);
+                hpx::string_util::to_lower (tmp);
                 if (tmp == "true")
                     isdefault = true;
             }
@@ -2010,7 +2010,7 @@ namespace hpx { namespace components { namespace server
             bool isenabled = true;
             if (sect.has_entry("enabled")) {
                 std::string tmp = sect.get_entry("enabled");
-                boost::algorithm::to_lower (tmp);
+                hpx::string_util::to_lower (tmp);
                 if (tmp == "no" || tmp == "false" || tmp == "0") {
                     LRT_(info) << "plugin factory disabled: " << instance;
                     isenabled = false;     // this component has been disabled

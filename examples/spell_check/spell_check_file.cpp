@@ -6,19 +6,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/string_util.hpp>
 
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include <boost/algorithm/string.hpp>
 
 std::vector<std::string> words;
 
@@ -146,7 +143,7 @@ int hpx_main()
         vector<string> strs;
         {
             vector<string> temp;
-            boost::split(temp, word, boost::is_any_of("\n\t -"));
+            hpx::string_util::split(temp, word, hpx::string_util::is_any_of("\n\t -"));
             for (string::size_type i = 0; i < temp.size(); i++)
             {
                 bool isContraction = false;
