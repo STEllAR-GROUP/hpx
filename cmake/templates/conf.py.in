@@ -76,8 +76,8 @@ for subdir_full, dirs, files in os.walk(hpx_libs_dir):
         # We only scan the include subdir...
         if not '/include' in subdir:
             continue
-        # ... but omit anything in detail directories
-        if '/detail' in subdir:
+        # ... but omit anything in detail and include_compatibility directories
+        if '/detail' in subdir or '/include_compatibility' in subdir:
             continue
 
         # strip the name of the library... the base path is already
