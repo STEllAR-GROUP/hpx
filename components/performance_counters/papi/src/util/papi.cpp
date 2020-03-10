@@ -12,7 +12,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/format.hpp>
-#include <hpx/util/parse_command_line.hpp>
+#include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
 

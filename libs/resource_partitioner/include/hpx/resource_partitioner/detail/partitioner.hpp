@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/command_line_handling.hpp>
 
 #include <atomic>
 #include <cstddef>

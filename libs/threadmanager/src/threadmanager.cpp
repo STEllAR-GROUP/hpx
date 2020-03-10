@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/hardware/timestamp.hpp>
@@ -33,7 +34,6 @@
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>

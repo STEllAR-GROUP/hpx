@@ -33,8 +33,9 @@
 #include <hpx/state.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/util/backtrace.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
+#include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/version.hpp>
@@ -1009,6 +1010,47 @@ namespace hpx
             return;
         }
     }
+
+    namespace util {
+        ///////////////////////////////////////////////////////////////////////////
+        // retrieve the command line arguments for the current locality
+        bool retrieve_commandline_arguments(
+            hpx::program_options::options_description const& app_options,
+            hpx::program_options::variables_map& vm)
+        {
+            // The command line for this application instance is available from
+            // this configuration section:
+            //
+            //     [hpx]
+            //     cmd_line=....
+            //
+            std::string cmdline;
+            std::size_t node = std::size_t(-1);
+
+            hpx::util::section& cfg = hpx::get_runtime().get_config();
+            if (cfg.has_entry("hpx.cmd_line"))
+                cmdline = cfg.get_entry("hpx.cmd_line");
+            if (cfg.has_entry("hpx.locality"))
+                node = hpx::util::from_string<std::size_t>(
+                    cfg.get_entry("hpx.locality"));
+
+            return parse_commandline(
+                cfg, app_options, cmdline, vm, node, allow_unregistered);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // retrieve the command line arguments for the current locality
+        bool retrieve_commandline_arguments(
+            std::string const& appname, hpx::program_options::variables_map& vm)
+        {
+            using hpx::program_options::options_description;
+
+            options_description desc_commandline(
+                "Usage: " + appname + " [options]");
+
+            return retrieve_commandline_arguments(desc_commandline, vm);
+        }
+    }    // namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers

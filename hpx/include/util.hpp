@@ -32,7 +32,7 @@
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/util/parse_command_line.hpp>
+#include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
 #include <hpx/util/unwrap.hpp>

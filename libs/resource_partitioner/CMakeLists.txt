@@ -41,6 +41,7 @@ add_hpx_module(resource_partitioner
     hpx_allocator_support
     hpx_assertion
     hpx_cache
+    hpx_command_line_handling
     hpx_concurrency
     hpx_coroutines
     hpx_errors

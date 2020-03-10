@@ -23,7 +23,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/state.hpp>
 #include <hpx/util/backtrace.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/version.hpp>
 

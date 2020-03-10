@@ -12,7 +12,7 @@
 
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 

@@ -10,7 +10,7 @@
 // config
 #include <hpx/config.hpp>
 // util
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/format.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>

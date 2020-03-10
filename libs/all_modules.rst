@@ -17,12 +17,14 @@ All modules
    /libs/affinity/docs/index.rst
    /libs/algorithms/docs/index.rst
    /libs/allocator_support/docs/index.rst
+   /libs/asio/docs/index.rst
    /libs/assertion/docs/index.rst
    /libs/basic_execution/docs/index.rst
    /libs/batch_environments/docs/index.rst
    /libs/cache/docs/index.rst
    /libs/checkpoint/docs/index.rst
    /libs/collectives/docs/index.rst
+   /libs/command_line_handling/docs/index.rst
    /libs/compute/docs/index.rst
    /libs/compute_cuda/docs/index.rst
    /libs/concepts/docs/index.rst
@@ -44,6 +46,7 @@ All modules
    /libs/memory/docs/index.rst
    /libs/naming_base/docs/index.rst
    /libs/plugin/docs/index.rst
+   /libs/prefix/docs/index.rst
    /libs/preprocessor/docs/index.rst
    /libs/program_options/docs/index.rst
    /libs/resiliency/docs/index.rst
@@ -62,3 +65,4 @@ All modules
    /libs/topology/docs/index.rst
    /libs/type_support/docs/index.rst
    /libs/util/docs/index.rst
+   /libs/version/docs/index.rst

@@ -11,7 +11,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(runtime_configuration_headers
   hpx/runtime_configuration/agas_service_mode.hpp
   hpx/runtime_configuration/component_registry_base.hpp
-  hpx/runtime_configuration/find_prefix.hpp
   hpx/runtime_configuration/ini.hpp
   hpx/runtime_configuration/plugin_registry_base.hpp
   hpx/runtime_configuration/runtime_configuration.hpp
@@ -20,7 +19,6 @@ set(runtime_configuration_headers
 )
 
 set(runtime_configuration_compat_headers
-  hpx/util/find_prefix.hpp
   hpx/util/ini.hpp
   hpx/util/runtime_configuration.hpp
   hpx/plugins/plugin_registry_base.hpp
@@ -30,7 +28,6 @@ set(runtime_configuration_compat_headers
 )
 
 set(runtime_configuration_sources
-  find_prefix.cpp
   ini.cpp
   init_ini_data.cpp
   runtime_configuration.cpp
@@ -54,7 +51,9 @@ add_hpx_module(runtime_configuration
     hpx_errors
     hpx_functional
     hpx_plugin
+    hpx_prefix
     hpx_serialization
     hpx_thread_support
+    hpx_version
   CMAKE_SUBDIRS examples tests
 )

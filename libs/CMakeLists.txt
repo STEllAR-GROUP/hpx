@@ -14,12 +14,14 @@ set(HPX_LIBS
   affinity
   algorithms
   allocator_support
+  asio
   assertion
   basic_execution
   batch_environments
   cache
   checkpoint
   collectives
+  command_line_handling
   compute
   compute_cuda
   concepts
@@ -41,6 +43,7 @@ set(HPX_LIBS
   memory
   naming_base
   plugin
+  prefix
   preprocessor
   program_options
   resiliency
@@ -59,6 +62,7 @@ set(HPX_LIBS
   topology
   type_support
   util
+  version
   CACHE INTERNAL "list of HPX modules" FORCE
 )
 

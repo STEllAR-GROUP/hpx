@@ -17,7 +17,7 @@
 #include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime_configuration/find_prefix.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <boost/algorithm/string/classification.hpp>

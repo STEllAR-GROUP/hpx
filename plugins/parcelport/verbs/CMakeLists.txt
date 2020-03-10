@@ -21,8 +21,9 @@ if (HPX_WITH_PARCELPORT_VERBS)
         "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/locality.hpp"
         "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/pinned_memory_vector.hpp"
     DEPENDENCIES
-      hpx_config
+      hpx_asio
       hpx_assertion
+      hpx_config
       hpx_format
       hpx_preprocessor
       hpx_plugin

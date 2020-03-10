@@ -69,11 +69,12 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
     # FIXME : Could this be private
     DEPENDENCIES
       ${_libfabric_libraries}
-      hpx_config
       hpx_allocator_support
+      hpx_asio
       hpx_assertion
       hpx_cache
       hpx_concurrency
+      hpx_config
       hpx_coroutines
       hpx_errors
       hpx_execution

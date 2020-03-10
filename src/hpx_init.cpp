@@ -39,9 +39,10 @@
 #include <hpx/timing.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/command_line_handling.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/from_string.hpp>
+#include <hpx/util/init_logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 
@@ -335,7 +336,8 @@ namespace hpx
         };
 
         ///////////////////////////////////////////////////////////////////////
-        void activate_global_options(util::command_line_handling& cms)
+        void activate_global_options(util::command_line_handling& cms,
+            int argc, char** argv)
         {
 #if defined(__linux) || defined(linux) || defined(__linux__) ||                \
     defined(__FreeBSD__)
@@ -371,6 +373,28 @@ namespace hpx
                 cms.rtcfg_.enable_spinlock_deadlock_detection();
             util::detail::spinlock_deadlock_detection_limit =
                 cms.rtcfg_.get_spinlock_deadlock_detection_limit();
+#endif
+
+            // initialize logging
+            util::detail::init_logging(
+                cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
+
+#if defined(HPX_HAVE_NETWORKING)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            // getting localities from MPI environment (support mpirun)
+            if (detail::check_mpi_environment(cms.rtcfg_))
+            {
+                mpi_environment::init(&argc, &argv, *this);
+                num_localities_ =
+                    static_cast<std::size_t>(mpi_environment::size());
+            }
+#endif
+
+            if (cms.num_localities_ != 1 || cms.node_ != 0 ||
+                cms.rtcfg_.enable_networking())
+            {
+                parcelset::parcelhandler::init(&argc, &argv, cms);
+            }
 #endif
         }
 
@@ -721,7 +745,8 @@ namespace hpx
                         desc_cmdline, argc, argv, std::move(ini_config),
                         resource::mode_default, mode, false, &result);
 
-                    activate_global_options(rp.get_command_line_switches());
+                    activate_global_options(rp.get_command_line_switches(),
+                        argc, argv);
 
                     // check whether HPX should be exited at this point
                     // (parse_result is returning a result > 0, if the program options
