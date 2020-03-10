@@ -1,4 +1,4 @@
-// error.hpp
+// manipulator.cpp
 
 // Boost Logging library
 //
@@ -14,13 +14,20 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef JT28092007_error_HPP_DEFINED
-#define JT28092007_error_HPP_DEFINED
-
-#include <hpx/logging/detail/fwd.hpp>
+#include <hpx/logging/manipulator.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
-}}}    // namespace hpx::util::logging
+    namespace formatter {
 
-#endif
+        manipulator::~manipulator() = default;
+
+    }    // namespace formatter
+
+    namespace destination {
+
+        manipulator::~manipulator() = default;
+
+    }    // namespace destination
+
+}}}    // namespace hpx::util::logging

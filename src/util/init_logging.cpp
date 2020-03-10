@@ -10,11 +10,13 @@
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/logging.hpp>
 #include <hpx/logging/format/named_write.hpp>
-#include <hpx/logging/format/destination/defaults.hpp>
+#include <hpx/logging/manipulator.hpp>
 #include <hpx/naming_base.hpp>
+#include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/components/console_logging.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
@@ -22,14 +24,13 @@
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/init_logging.hpp>
 
-#include <boost/version.hpp>
 #include <boost/config.hpp>
+#include <boost/version.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <iomanip>
-#include <sstream>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -43,216 +44,198 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     typedef logging::writer::named_write logger_writer_type;
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: shepherd
-    struct shepherd_thread_id
-      : hpx::util::logging::formatter::class_<shepherd_thread_id>
+    struct shepherd_thread_id : logging::formatter::manipulator
     {
-        shepherd_thread_id()
-        {}
+        shepherd_thread_id() {}
 
-        void operator()(param str) const
+        void operator()(std::ostream& to) const override
         {
             error_code ec(lightweight);
             std::size_t thread_num = hpx::get_worker_thread_num(ec);
 
             if (std::size_t(-1) != thread_num)
             {
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::size_t)*2)
-                    << std::setfill('0')
-                    << thread_num;
-                str.prepend_string(out.str());
+                util::format_to(to, "{:016x}", thread_num);
             }
             else
             {
-                str.prepend_string(std::string(sizeof(std::size_t)*2, '-'));
+                to << std::string(16, '-');
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix
-    struct locality_prefix
-      : hpx::util::logging::formatter::class_<locality_prefix>
+    struct locality_prefix : logging::formatter::manipulator
     {
-        locality_prefix()
-        {}
+        locality_prefix() {}
 
-        void operator()(param str) const
+        void operator()(std::ostream& to) const override
         {
             std::uint32_t locality_id = hpx::get_locality_id();
 
-            if (naming::invalid_locality_id != locality_id) {
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::uint32_t)*2)
-                    << std::setfill('0') << locality_id;
-                str.prepend_string(out.str());
+            if (naming::invalid_locality_id != locality_id)
+            {
+                util::format_to(to, "{:08x}", locality_id);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(std::uint32_t)*2, '-'));
+                to << std::string(8, '-');
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread id
-    struct thread_id
-      : hpx::util::logging::formatter::class_<thread_id>
+    struct thread_id : logging::formatter::manipulator
     {
-        void operator()(param str) const
+        void operator()(std::ostream& to) const override
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (nullptr != self) {
+            if (nullptr != self)
+            {
                 // called from inside a HPX thread
                 threads::thread_id_type id = threads::get_self_id();
-                if (id != threads::invalid_thread_id) {
-                    std::stringstream out;
-                    out << std::hex << std::setw(sizeof(void*)*2)
-                        << std::setfill('0')
-                        << reinterpret_cast<std::ptrdiff_t>(id.get());
-                    str.prepend_string(out.str());
+                if (id != threads::invalid_thread_id)
+                {
+                    std::ptrdiff_t value =
+                        reinterpret_cast<std::ptrdiff_t>(id.get());
+                    util::format_to(to, "{:016x}", value);
                     return;
                 }
             }
 
             // called from outside a HPX thread or invalid thread id
-            str.prepend_string(std::string(sizeof(void*)*2, '-'));
+            to << std::string(16, '-');
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread phase
-    struct thread_phase
-      : hpx::util::logging::formatter::class_<thread_phase>
+    struct thread_phase : logging::formatter::manipulator
     {
-        void operator()(param str) const
+        void operator()(std::ostream& to) const override
         {
             threads::thread_self* self = threads::get_self_ptr();
-            if (nullptr != self) {
+            if (nullptr != self)
+            {
                 // called from inside a HPX thread
                 std::size_t phase = self->get_thread_phase();
-                if (0 != phase) {
-                    std::stringstream out;
-                    out << std::hex << std::setw(sizeof(std::uint32_t))
-                        << std::setfill('0') << self->get_thread_phase();
-                    str.prepend_string(out.str());
+                if (0 != phase)
+                {
+                    util::format_to(to, "{:04x}", self->get_thread_phase());
                     return;
                 }
             }
 
             // called from outside a HPX thread or no phase given
-            str.prepend_string(std::string(sizeof(std::uint32_t), '-'));
+            to << std::string(4, '-');
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix of parent thread
-    struct parent_thread_locality
-      : hpx::util::logging::formatter::class_<parent_thread_locality>
+    struct parent_thread_locality : logging::formatter::manipulator
     {
-        void operator()(param str) const
+        void operator()(std::ostream& to) const override
         {
-            std::uint32_t parent_locality_id = threads::get_parent_locality_id();
-            if (naming::invalid_locality_id != parent_locality_id) {
+            std::uint32_t parent_locality_id =
+                threads::get_parent_locality_id();
+            if (naming::invalid_locality_id != parent_locality_id)
+            {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::uint32_t)*2)
-                    << std::setfill('0') << parent_locality_id;
-                str.prepend_string(out.str());
+                util::format_to(to, "{:08x}", parent_locality_id);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(std::uint32_t)*2, '-'));
+                to << std::string(8, '-');
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread id
-    struct parent_thread_id
-      : hpx::util::logging::formatter::class_<parent_thread_id>
+    struct parent_thread_id : logging::formatter::manipulator
     {
-        void operator()(param str) const
+        void operator()(std::ostream& to) const override
         {
             threads::thread_id_type parent_id = threads::get_parent_id();
-            if (nullptr != parent_id && threads::invalid_thread_id != parent_id) {
+            if (nullptr != parent_id && threads::invalid_thread_id != parent_id)
+            {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(void*)*2)
-                    << std::setfill('0')
-                    << reinterpret_cast<std::ptrdiff_t>(parent_id.get());
-                str.prepend_string(out.str());
+                std::ptrdiff_t value =
+                    reinterpret_cast<std::ptrdiff_t>(parent_id.get());
+                util::format_to(to, "{:016x}", value);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(void*)*2, '-'));
+                to << std::string(16, '-');
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread phase
-    struct parent_thread_phase
-      : hpx::util::logging::formatter::class_<parent_thread_phase>
+    struct parent_thread_phase : logging::formatter::manipulator
     {
-        void operator()(param str) const
+        void operator()(std::ostream& to) const override
         {
             std::size_t parent_phase = threads::get_parent_phase();
-            if (0 != parent_phase) {
+            if (0 != parent_phase)
+            {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::uint32_t))
-                    << std::setfill('0') << parent_phase;
-                str.prepend_string(out.str());
+                util::format_to(to, "{:04x}", parent_phase);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(std::uint32_t), '-'));
+                to << std::string(4, '-');
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX component id of current thread
-    struct thread_component_id
-      : hpx::util::logging::formatter::class_<thread_component_id>
+    struct thread_component_id : logging::formatter::manipulator
     {
-        void operator()(param str) const
+        void operator()(std::ostream& to) const override
         {
             std::uint64_t component_id = threads::get_self_component_id();
-            if (0 != component_id) {
+            if (0 != component_id)
+            {
                 // called from inside a HPX thread
-                std::stringstream out;
-                out << std::hex << std::setw(sizeof(std::uint64_t)*2)
-                    << std::setfill('0')
-                    << component_id;
-                str.prepend_string(out.str());
+                util::format_to(to, "{:016x}", component_id);
             }
-            else {
+            else
+            {
                 // called from outside a HPX thread
-                str.prepend_string(std::string(sizeof(std::uint64_t)*2, '-'));
+                to << std::string(16, '-');
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // custom log destination: send generated strings to console
-    struct console : hpx::util::logging::destination::is_generic
+    struct console : logging::destination::manipulator
     {
-        console(std::size_t level, logging_destination dest)
-          : level_(level), dest_(dest)
-        {}
-
-        template<typename MsgType>
-        void operator()(MsgType const& msg) const
+        console(logging::level level, logging_destination dest)
+          : level_(level)
+          , dest_(dest)
         {
-            components::console_logging(dest_, level_, msg);
+        }
+
+        void operator()(logging::message const& msg) override
+        {
+            components::console_logging(
+                dest_, static_cast<std::size_t>(level_), msg.full_string());
         }
 
         bool operator==(console const& rhs) const
@@ -260,22 +243,23 @@ namespace hpx { namespace util
             return dest_ == rhs.dest_;
         }
 
-        std::size_t level_;
+        logging::level level_;
         logging_destination dest_;
     };
 
 #if defined(ANDROID) || defined(__ANDROID__)
     // default log destination for Android
-    struct android_log : hpx::util::logging::destination::is_generic
+    struct android_log : logging::destination::manipulator
     {
         android_log(char const* tag_)
           : tag(tag_)
-        {}
-
-        template<typename MsgType>
-        void operator()(MsgType const& msg) const
         {
-            __android_log_write(ANDROID_LOG_DEBUG, tag.c_str(), msg.c_str());
+        }
+
+        void operator()(logging::message const& msg) override
+        {
+            __android_log_write(
+                ANDROID_LOG_DEBUG, tag.c_str(), msg.full_string().c_str());
         }
 
         bool operator==(android_log const& rhs) const
@@ -287,88 +271,93 @@ namespace hpx { namespace util
     };
 #endif
 
-    namespace detail
-    {
+    namespace detail {
         // unescape config entry
-        std::string unescape(std::string const &value)
+        static std::string unescape(std::string const& value)
         {
             std::string result;
             std::string::size_type pos = 0;
-            std::string::size_type pos1 = value.find_first_of ('\\', 0);
-            if (std::string::npos != pos1) {
-                do {
-                    switch (value[pos1+1]) {
+            std::string::size_type pos1 = value.find_first_of('\\', 0);
+            if (std::string::npos != pos1)
+            {
+                do
+                {
+                    switch (value[pos1 + 1])
+                    {
                     case '\\':
                     case '\"':
                     case '?':
-                        result = result + value.substr(pos, pos1-pos);
-                        pos1 = value.find_first_of ('\\', (pos = pos1+1)+1);
+                        result = result + value.substr(pos, pos1 - pos);
+                        pos1 = value.find_first_of('\\', (pos = pos1 + 1) + 1);
                         break;
 
                     case 'n':
-                        result = result + value.substr(pos, pos1-pos) + "\n";
-                        pos1 = value.find_first_of ('\\', pos = pos1+1);
+                        result = result + value.substr(pos, pos1 - pos) + "\n";
+                        pos1 = value.find_first_of('\\', pos = pos1 + 1);
                         ++pos;
                         break;
 
                     default:
-                        result = result + value.substr(pos, pos1-pos+1);
-                        pos1 = value.find_first_of ('\\', pos = pos1+1);
+                        result = result + value.substr(pos, pos1 - pos + 1);
+                        pos1 = value.find_first_of('\\', pos = pos1 + 1);
                     }
 
                 } while (pos1 != std::string::npos);
                 result = result + value.substr(pos);
             }
-            else {
-            // the string doesn't contain any escaped character sequences
+            else
+            {
+                // the string doesn't contain any escaped character sequences
                 result = value;
             }
             return result;
         }
 
-        template <typename Writer>
-        void define_formatters(Writer& writer)
+        static void define_formatters(logger_writer_type& writer)
         {
-            writer.replace_formatter("osthread", shepherd_thread_id());
-            writer.replace_formatter("locality", locality_prefix());
-            writer.replace_formatter("hpxthread", thread_id());
-            writer.replace_formatter("hpxphase", thread_phase());
-            writer.replace_formatter("hpxparent", parent_thread_id());
-            writer.replace_formatter("hpxparentphase", parent_thread_phase());
-            writer.replace_formatter("parentloc", parent_thread_locality());
-            writer.replace_formatter("hpxcomponent", thread_component_id());
+            writer.set_formatter("osthread", shepherd_thread_id());
+            writer.set_formatter("locality", locality_prefix());
+            writer.set_formatter("hpxthread", thread_id());
+            writer.set_formatter("hpxphase", thread_phase());
+            writer.set_formatter("hpxparent", parent_thread_id());
+            writer.set_formatter("hpxparentphase", parent_thread_phase());
+            writer.set_formatter("parentloc", parent_thread_locality());
+            writer.set_formatter("hpxcomponent", thread_component_id());
         }
-    }
+    }    // namespace detail
 
     // initialize logging for AGAS
     void init_agas_log(util::section const& ini, bool isconsole)
     {
         std::string loglevel, logdest, logformat;
 
-        if (ini.has_section("hpx.logging.agas")) {
+        if (ini.has_section("hpx.logging.agas"))
+        {
             util::section const* logini = ini.get_section("hpx.logging.agas");
             HPX_ASSERT(nullptr != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            if (!loglevel.empty()) {
+            if (!loglevel.empty())
+            {
                 logdest = logini->get_entry("destination", empty);
-                logformat = detail::unescape(logini->get_entry("format", empty));
+                logformat =
+                    detail::unescape(logini->get_entry("format", empty));
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
-           logger_writer_type& writer = agas_logger()->writer();
+            logger_writer_type& writer = agas_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            agas_logger()->writer().add_destination("android_log",
+            agas_logger()->writer().set_destination("android_log",
                 android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
@@ -377,7 +366,7 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.add_destination("console", console(lvl, destination_agas)); //-V106
+            writer.set_destination("console", console(lvl, destination_agas)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -403,18 +392,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
            logger_writer_type& writer = parcel_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            parcel_logger()->writer().add_destination("android_log",
+            parcel_logger()->writer().set_destination("android_log",
                 android_log("hpx.parcel"));
 #else
             if (logdest.empty())      // ensure minimal defaults
@@ -423,7 +412,7 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.add_destination("console",
+            writer.set_destination("console",
                 console(lvl, destination_parcel)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
@@ -450,11 +439,11 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
            logger_writer_type& writer = timing_logger()->writer();
 
@@ -462,7 +451,7 @@ namespace hpx { namespace util
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
 
-            writer.add_destination("android_log",
+            writer.set_destination("android_log",
                 android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
@@ -471,7 +460,7 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.add_destination("console", console(lvl, destination_timing)); //-V106
+            writer.set_destination("console", console(lvl, destination_timing)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -496,7 +485,7 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
@@ -507,8 +496,8 @@ namespace hpx { namespace util
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "android_log" : "console";
 
-        writer.add_destination("android_log", android_log("hpx"));
-        error_writer.add_destination("android_log", android_log("hpx"));
+        writer.set_destination("android_log", android_log("hpx"));
+        error_writer.set_destination("android_log", android_log("hpx"));
 #else
         if (logdest.empty())      // ensure minimal defaults
             logdest = isconsole ? "cerr" : "console";
@@ -516,9 +505,9 @@ namespace hpx { namespace util
         if (logformat.empty())
             logformat = "|\\n";
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
-            writer.add_destination("console", console(lvl, destination_hpx)); //-V106
+            writer.set_destination("console", console(lvl, destination_hpx)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -526,7 +515,7 @@ namespace hpx { namespace util
             hpx_logger()->set_enabled(lvl);
 
             // errors are logged to the given destination and to cerr
-            error_writer.add_destination("console",
+            error_writer.set_destination("console",
                 console(lvl, destination_hpx)); //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
             if (logdest != "cerr")
@@ -540,7 +529,7 @@ namespace hpx { namespace util
         else {
             // errors are always logged to cerr
             if (!isconsole) {
-                error_writer.add_destination("console",
+                error_writer.set_destination("console",
                     console(lvl, destination_hpx)); //-V106
                 error_writer.write(logformat, "console");
             }
@@ -575,18 +564,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = app_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            writer.add_destination("android_log", android_log("hpx.application"));
+            writer.set_destination("android_log", android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -594,7 +583,7 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.add_destination("console", console(lvl, destination_app)); //-V106
+            writer.set_destination("console", console(lvl, destination_app)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
 
@@ -620,18 +609,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = debuglog_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            writer.add_destination("android_log", android_log("hpx.debuglog"));
+            writer.set_destination("android_log", android_log("hpx.debuglog"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -639,7 +628,7 @@ namespace hpx { namespace util
             if (logformat.empty())
                 logformat = "|\\n";
 
-            writer.add_destination("console",
+            writer.set_destination("console",
                 console(lvl, destination_debuglog)); //-V106
             writer.write(logformat, logdest);
             detail::define_formatters(writer);
@@ -666,18 +655,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = agas_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.agas"));
+            writer.set_destination("android_log", android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -710,18 +699,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = parcel_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.parcel"));
+            writer.set_destination("android_log", android_log("hpx.parcel"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -753,18 +742,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = timing_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.timing"));
+            writer.set_destination("android_log", android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -796,18 +785,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = hpx_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx"));
+            writer.set_destination("android_log", android_log("hpx"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -840,18 +829,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = app_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.application"));
+            writer.set_destination("android_log", android_log("hpx.application"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -884,18 +873,18 @@ namespace hpx { namespace util
             }
         }
 
-        unsigned lvl = hpx::util::logging::level::disable_all;
+        auto lvl = hpx::util::logging::level::disable_all;
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (unsigned(hpx::util::logging::level::disable_all) != lvl)
+        if (hpx::util::logging::level::disable_all != lvl)
         {
             logger_writer_type& writer = debuglog_console_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "android_log";
-            writer.add_destination("android_log", android_log("hpx.debuglog"));
+            writer.set_destination("android_log", android_log("hpx.debuglog"));
 #else
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";

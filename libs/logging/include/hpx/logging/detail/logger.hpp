@@ -14,19 +14,16 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-// IMPORTANT : the JT28092007_logger_HPP_DEFINED needs to remain constant
-// - don't change the macro name!
-#ifndef JT28092007_logger_HPP_DEFINED
-#define JT28092007_logger_HPP_DEFINED
+#ifndef HPX_LOGGING_DETAIL_LOGGER_HPP
+#define HPX_LOGGING_DETAIL_LOGGER_HPP
 
-#include <hpx/logging/detail/cache_before_init.hpp>
-#include <hpx/logging/detail/fwd.hpp>
-#include <hpx/logging/detail/level.hpp>
+#include <hpx/config.hpp>
+#include <hpx/format.hpp>
 #include <hpx/logging/format/named_write.hpp>
+#include <hpx/logging/level.hpp>
 
-#include <sstream>
-#include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -81,35 +78,35 @@ namespace hpx { namespace util { namespace logging {
     - check out the writer namespace
 
     */
-    struct logger
+    class logger
     {
-        typedef writer::named_write write_type;
+        HPX_NON_COPYABLE(logger);
 
-        struct gather_holder
+        struct gather_holder : message
         {    //-V690
             HPX_NON_COPYABLE(gather_holder);
 
-            gather_holder(logger const& p_this)
+            gather_holder(logger& p_this)
               : m_this(p_this)
             {
             }
 
             ~gather_holder()
             {
-                m_this.do_write(m_out.str());
-            }
-
-            std::ostringstream& out()
-            {
-                return m_out;
+                if (!empty())
+                    m_this.write(std::move(*this));
             }
 
         private:
-            logger const& m_this;
-            std::ostringstream m_out;
+            logger& m_this;
         };
 
-        logger(level::type default_level = level::enable_all)
+    public:
+        logger() noexcept
+          : m_level(level::enable_all)
+        {
+        }
+        explicit logger(level default_level) noexcept
           : m_level(default_level)
         {
         }
@@ -124,26 +121,26 @@ namespace hpx { namespace util { namespace logging {
         /**
             reads all data about a log message (gathers all the data about it)
         */
-        gather_holder gather() const
+        gather_holder gather()
         {
             return {*this};
         }
 
-        write_type& writer()
+        writer::named_write& writer() noexcept
         {
             return m_writer;
         }
-        const write_type& writer() const
+        writer::named_write const& writer() const noexcept
         {
             return m_writer;
         }
 
-        bool is_enabled(level::type level) const
+        bool is_enabled(level level) const noexcept
         {
             return level >= m_level;
         }
 
-        void set_enabled(level::type level)
+        void set_enabled(level level) noexcept
         {
             m_level = level;
         }
@@ -170,25 +167,23 @@ namespace hpx { namespace util { namespace logging {
         }
 
     public:
-        void turn_cache_off()
-        {
-            m_cache.turn_cache_off(m_writer);
-        }
+        HPX_EXPORT void turn_cache_off();
 
         // called after all data has been gathered
-        void do_write(msg_type msg) const
+        void write(message msg)
         {
-            if (m_cache.is_cache_turned_off())
+            if (m_is_caching_off)
                 m_writer(msg);
             else
-                m_cache.add_msg(std::move(msg));
+                m_cache.push_back(std::move(msg));
         }
 
     private:
-        mutable detail::cache_before_init m_cache;
-        write_type m_writer;
-        level::type m_level;
+        mutable std::vector<message> m_cache;
+        mutable bool m_is_caching_off;
+        writer::named_write m_writer;
+        level m_level;
     };
 }}}    // namespace hpx::util::logging
 
-#endif
+#endif /*HPX_LOGGING_DETAIL_LOGGER_HPP*/

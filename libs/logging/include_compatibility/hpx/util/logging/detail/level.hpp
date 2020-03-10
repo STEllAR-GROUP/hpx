@@ -6,14 +6,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging/config/defines.hpp>
-#include <hpx/logging/detail/level.hpp>
+#include <hpx/logging/level.hpp>
 
 #if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/logging/detail/level.hpp is deprecated, \
-    please include hpx/logging/detail/level.hpp instead")
+    please include hpx/logging/level.hpp instead")
 #else
 #warning "The header hpx/util/logging/detail/level.hpp is deprecated, \
-    please include hpx/logging/detail/level.hpp instead"
+    please include hpx/logging/level.hpp instead"
 #endif
 #endif
