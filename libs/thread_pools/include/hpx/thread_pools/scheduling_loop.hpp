@@ -14,7 +14,6 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>

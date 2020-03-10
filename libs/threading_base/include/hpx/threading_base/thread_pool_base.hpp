@@ -12,6 +12,7 @@
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/functional.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>

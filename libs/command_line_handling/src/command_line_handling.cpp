@@ -15,7 +15,6 @@
 #include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
-#include <hpx/thread.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/asio_util.hpp>
