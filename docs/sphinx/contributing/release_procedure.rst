@@ -100,6 +100,9 @@ are completed to avoid confusion.
    The main CMakeLists.txt contains a comment indicating for which version
    the breaking change was introduced first.
 
+#. Update the minimum required versions if necessary (compilers, dependencies,
+   etc.).
+
 #. Switch Buildbot over to test the release branch.
 
    * ``https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg``

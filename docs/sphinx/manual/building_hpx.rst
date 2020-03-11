@@ -153,14 +153,14 @@ work, but we do not test |hpx| with other platforms, so please be warned.
 
 .. table:: Supported Platforms for |hpx|
 
-   ========= =================== ================== ====================
-   Name      Recommended Version Minimum Version    Architectures
-   ========= =================== ================== ====================
-   Linux     3.2                 2.6                x86-32, x86-64, k1om
-   BlueGeneQ V1R2M0              V1R2M0             PowerPC A2
-   Windows   7, Server 2008 R2   Any Windows system x86-32, x86-64
-   Mac OSX                       Any OSX system     x86-64
-   ========= =================== ================== ====================
+   ========= ================== ====================
+   Name      Minimum Version    Architectures
+   ========= ================== ====================
+   Linux     2.6                x86-32, x86-64, k1om
+   BlueGeneQ V1R2M0             PowerPC A2
+   Windows   Any Windows system x86-32, x86-64
+   Mac OSX   Any OSX system     x86-64
+   ========= ================== ====================
 
 Software and libraries
 ----------------------
@@ -196,7 +196,6 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
 .. list-table:: Software prerequisites for |hpx| on Linux systems.
 
    * * Name
-     * Recommended version
      * Minimum version
      * Notes
    * * **Compilers**
@@ -204,23 +203,19 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |gcc|_
-     * 4.9 or newer
-     * 4.9
+     * 7.0
      *
    * * |icpc|_
-     * 2014 or newer
      * 2014
      *
    * * |clang|_
-     * 3.8 or newer
-     * 3.8
+     * 4.0
      *
    * * **Build System**
      *
      *
      *
    * * |cmake|_
-     * 3.9.0
      * 3.3.2
      * Cuda support 3.9
    * * **Required Libraries**
@@ -228,48 +223,32 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost_libraries|_
-     * 1.67.0 or newer
      * 1.61.0
      *
    * * |hwloc|_
-     * 1.11
      * 1.2 (Xeon Phi: 1.6)
      *
 
 .. note::
 
-   When compiling with the Intel Compiler on Linux systems, we only support C++
-   Standard Libraries provided by gcc 4.8 and upwards. If the ``g++`` in your
-   path is older than 4.8, please specify the path of a newer ``g++`` by setting
-   ``CMAKE_CXX_FLAGS='-gxx-name=/path/to/g++'`` via |cmake|_.
-
-.. note::
-
-   When building Boost using gcc, please note that it is always a good idea to
-   specify a ``cxxflags=-std=c++11`` command line argument to ``b2`` (``bjam``).
-   Note, however, that this is absolutely necessary when using gcc V5.2 and
-   above.
+   When building Boost using gcc, please note that it is required to specify a
+   ``cxxflags=-std=c++14`` command line argument to ``b2`` (``bjam``).
 
 .. list-table:: Software prerequisites for |hpx| on Windows systems
 
    * * Name
-     * Recommended version
      * Minimum version
      * Notes
    * * **Compilers**
      *
      *
-     *
    * * |visual_cxx|_ (x64)
-     * 2015
      * 2015
      *
    * * **Build System**
      *
      *
-     *
    * * |cmake|_
-     * 3.9.0
      * 3.3.2
      *
    * * **Required Libraries**
@@ -277,21 +256,19 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      *
      *
    * * |boost|_
-     * 1.67.0 or newer
      * 1.61.0
      *
    * * |hwloc|_
-     * 1.11
      * 1.5
      *
 
 .. note::
 
    You need to build the following Boost libraries for |hpx|:
-   Boost.Filesystem, Boost.ProgramOptions, Boost.Regex, and Boost.System. The
+   Boost.Filesystem, Boost.ProgramOptions, and Boost.System. The
    following are not needed by default, but are required in certain
-   configurations: Boost.Chrono, Boost.DateTime, Boost.Log, Boost.LogSetup, and
-   Boost.Thread.
+   configurations: Boost.Chrono, Boost.DateTime, Boost.Log, Boost.LogSetup,
+   Boost.Regex, and Boost.Thread.
 
 Depending on the options you chose while building and installing |hpx|,
 you will find that |hpx| may depend on several other libraries such as those
@@ -308,20 +285,16 @@ listed below.
    Linux systems
 
    * * Name
-     * Recommended version
      * Minimum version
      * Notes
    * * |google_perftools|_
      * 1.7.1
-     * 1.7.1
      * Used as a replacement for the system allocator, and for allocation
        diagnostics.
    * * |libunwind|_
-     * 0.99
      * 0.97
      * Dependency of google-perftools on x86-64, used for stack unwinding.
    * * |openmpi|_
-     * 1.10.1
      * 1.8.0
      * Can be used as a highspeed communication library backend for the
        parcelport.
@@ -335,34 +308,27 @@ listed below.
 .. list-table:: Optional software prerequisites for |hpx| on Linux systems
 
    * * Name
-     * Recommended version
      * Minimum version
      * Notes
    * * |papi|
      *
-     *
      * Used for accessing hardware performance data.
    * * |jemalloc|_
-     * 2.1.2
      * 2.1.0
      * Used as a replacement for the system allocator.
    * * |mimalloc|_
-     * latest
      * 1.0.0
      * Used as a replacement for the system allocator.
    * * |hdf5|_
-     * 1.8.7
      * 1.6.7
      * Used for data I/O in some example applications. See important note below.
 
 .. list-table:: Optional software prerequisites for |hpx| on Windows systems
 
    * * Name
-     * Recommended version
      * Minimum version
      * Notes
    * * |hdf5|_
-     * 1.8.7
      * 1.6.7
      * Used for data I/O in some example applications. See important note below.
 
@@ -422,9 +388,8 @@ Installing Boost
 
 .. important::
 
-   When building Boost using gcc, please note that it is always a good idea to
-   specify a ``cxxflags=-std=c++11`` command line argument to ``b2`` (``bjam``).
-   Doint so is absolutely necessary when using gcc V5.2 and above.
+   When building Boost using gcc, please note that it is required to specify a
+   ``cxxflags=-std=c++14`` command line argument to ``b2`` (``bjam``).
 
 .. important::
 
