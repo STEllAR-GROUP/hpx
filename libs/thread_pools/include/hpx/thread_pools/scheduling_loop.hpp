@@ -1082,3 +1082,5 @@ namespace hpx { namespace threads { namespace detail {
 }}}    // namespace hpx::threads::detail
 
 #endif
+// NOTE: This line only exists to please doxygen. Without the line doxygen
+// generates incomplete xml output.
