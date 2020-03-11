@@ -37,7 +37,7 @@ namespace hpx { namespace threads {
     namespace policies {
         struct scheduler_base;
     }
-    class thread_pool_base;
+    class HPX_EXPORT thread_pool_base;
 
     /// \cond NOINTERNAL
     using thread_id_type = thread_id;

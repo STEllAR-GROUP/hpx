@@ -64,7 +64,7 @@ namespace hpx { namespace threads {
         ///////////////////////////////////////////////////////////////////////
         // The interface below is used by the resource manager to
         // interact with the executor.
-        struct manage_executor
+        struct HPX_EXPORT manage_executor
         {
             virtual ~manage_executor() {}
 
@@ -159,7 +159,7 @@ namespace hpx { namespace threads {
     // note: this data structure has to be protected from races from the outside
 
     /// \brief The base class used to manage a pool of OS threads.
-    class thread_pool_base
+    class HPX_EXPORT thread_pool_base
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
       : public detail::manage_executor
 #endif
