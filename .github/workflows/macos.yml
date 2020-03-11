@@ -39,4 +39,19 @@ jobs:
       shell: bash
       run: |
           cd build
-          ctest --output-on-failure
+          ctest --output-on-failure \
+            --exclude-regex \
+          "tests.regressions.modules.collectives.distributed.tcp.broadcast_apply|\
+          tests.regressions.modules.collectives.distributed.tcp.broadcast_unwrap_future_2885|\
+          tests.unit.modules.algorithms.destroy|\
+          tests.unit.modules.algorithms.default_construct|\
+          tests.unit.modules.execution.standalone_thread_pool_executor|\
+          tests.unit.modules.resource_partitioner.used_pus|\
+          tests.unit.modules.segmented_algorithms.distributed.tcp.partitioned_vector|\
+          tests.performance.local.wait_all_timings|\
+          tests.regressions.lcos.wait_all_hang_1946|\
+          tests.regressions.dynamic_counters_loaded_1508|\
+          tests.unit.threads.distributed.tcp.thread_stacksize|\
+          tests.unit.topology.numa_allocator|\
+          tests.examples.quickstart.1d_wave_equation|\
+          tests.examples.transpose.transpose_block_numa"

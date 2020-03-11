@@ -35,5 +35,37 @@ jobs:
           cd build
           ctest \
           --output-on-failure \
-          --build-config Debug \
-          -R tests.examples
+            --build-config Debug \
+            --exclude-regex \
+          "tests.examples.modules.checkpoint.1d_stencil_4_checkpoint|\
+          tests.examples.modules.program_options.config_file_types|\
+          tests.examples.modules.program_options.custom_syntax|\
+          tests.examples.modules.program_options.env_options|\
+          tests.examples.modules.program_options.first|\
+          tests.examples.modules.program_options.multiple_sources|\
+          tests.examples.modules.program_options.option_groups|\
+          tests.examples.modules.program_options.options_description|\
+          tests.examples.modules.program_options.options_hierarchy|\
+          tests.examples.modules.program_options.real|\
+          tests.examples.modules.program_options.regex|\
+          tests.examples.modules.program_options.response_file|\
+          tests.examples.modules.resiliency.1d_stencil_replay_exception|\
+          tests.examples.modules.resiliency.1d_stencil_replay_validate|\
+          tests.examples.modules.resiliency.async_replay|\
+          tests.examples.modules.resiliency.async_replicate|\
+          tests.examples.modules.resiliency.async_replicate_vote|\
+          tests.examples.modules.resiliency.dataflow_replicate|\
+          tests.examples.modules.resiliency.version|\
+          tests.examples.modules.resource_partitioner.simplest_resource_partitioner_1|\
+          tests.examples.modules.resource_partitioner.simplest_resource_partitioner_2|\
+          tests.examples.modules.resource_partitioner.async_customization|\
+          tests.examples.modules.resource_partitioner.oversubscribing_resource_partitioner|\
+          tests.examples.modules.resource_partitioner.simple_resource_partitioner|\
+          tests.examples.modules.resource_partitioner.guided_pool_test|\
+          tests.examples.1d_stencil.1d_stencil_6|\
+          tests.examples.1d_stencil.1d_stencil_7|\
+          tests.examples.quickstart.1d_wave_equation|\
+          tests.examples.quickstart.partitioned_vector_spmd_foreach|\
+          tests.examples.thread_aware_timer.thread_aware_timer|\
+          tests.examples.transpose.transpose_block_numa" \
+            -R tests.examples
