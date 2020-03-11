@@ -22,6 +22,7 @@ add_hpx_module(version
   DEPENDENCIES
     hpx_config
     hpx_prefix
+    hpx::hwloc
   CMAKE_SUBDIRS
 )
 
