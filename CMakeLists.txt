@@ -1395,7 +1395,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-sign-promo LANGUAGES CXX)
     hpx_add_compile_flag_if_available(-Wno-attributes LANGUAGES CXX)
     hpx_add_compile_flag_if_available(-Wno-cast-align LANGUAGES CXX)
-    
+
     # We do not in general guarantee ABI compatibility between C++ standards, so
     # we ignore this warning
     hpx_add_compile_flag_if_available(-Wno-noexcept-type LANGUAGES CXX)
