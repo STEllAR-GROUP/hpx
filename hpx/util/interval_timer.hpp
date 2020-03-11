@@ -56,7 +56,7 @@ namespace hpx { namespace util { namespace detail
         ~interval_timer();
 
         bool start(bool evaluate);
-        bool stop();
+        bool stop(bool terminate = false);
 
         bool restart(bool evaluate);
 
@@ -83,6 +83,8 @@ namespace hpx { namespace util { namespace detail
         util::function_nonser<void()> on_term_; ///< function to call on termination
         std::int64_t microsecs_;    ///< time interval
         threads::thread_id_type id_;  ///< id of currently scheduled thread
+        threads::thread_id_type timerid_;  ///< id of the timer thread for the
+                                           ///< currently scheduled thread
         std::string description_;     ///< description of this interval timer
 
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
@@ -125,9 +127,9 @@ namespace hpx { namespace util
         {
             return timer_->start(evaluate);
         }
-        bool stop()
+        bool stop(bool terminate = false)
         {
-            return timer_->stop();
+            return timer_->stop(terminate);
         }
 
         bool restart(bool evaluate = true)

@@ -289,7 +289,7 @@ namespace hpx
             char const* description = nullptr, error_code& ec = throws);
 
         // stop periodic evaluation of counters during shutdown
-        void stop_evaluating_counters();
+        void stop_evaluating_counters(bool terminate = false);
 
 #if defined(HPX_HAVE_NETWORKING)
         void register_message_handler(char const* message_handler_type,

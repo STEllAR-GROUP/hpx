@@ -27,7 +27,8 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     interval_timer::interval_timer()
       : microsecs_(0)
-      , id_(nullptr)
+      , id_()
+      , timerid_()
       , pre_shutdown_(false)
       , is_started_(false)
       , first_start_(true)
@@ -36,22 +37,35 @@ namespace hpx { namespace util { namespace detail
     {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            std::int64_t microsecs, std::string const& description,
-            bool pre_shutdown)
-      : f_(f), on_term_(),
-        microsecs_(microsecs), id_(nullptr), description_(description),
-        pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
-        is_terminated_(false), is_stopped_(false)
+        std::int64_t microsecs, std::string const& description,
+        bool pre_shutdown)
+      : f_(f)
+      , on_term_()
+      , microsecs_(microsecs)
+      , id_()
+      , timerid_()
+      , description_(description)
+      , pre_shutdown_(pre_shutdown)
+      , is_started_(false)
+      , first_start_(true)
+      , is_terminated_(false)
+      , is_stopped_(false)
     {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            std::int64_t microsecs, std::string const& description,
-            bool pre_shutdown)
-      : f_(f), on_term_(on_term),
-        microsecs_(microsecs), id_(nullptr), description_(description),
-        pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
-        is_terminated_(false), is_stopped_(false)
+        util::function_nonser<void()> const& on_term, std::int64_t microsecs,
+        std::string const& description, bool pre_shutdown)
+      : f_(f)
+      , on_term_(on_term)
+      , microsecs_(microsecs)
+      , id_()
+      , timerid_()
+      , description_(description)
+      , pre_shutdown_(pre_shutdown)
+      , is_started_(false)
+      , first_start_(true)
+      , is_terminated_(false)
+      , is_stopped_(false)
     {}
 
     bool interval_timer::start(bool evaluate_)
@@ -118,8 +132,14 @@ namespace hpx { namespace util { namespace detail
         return true;
     }
 
-    bool interval_timer::stop()
+    bool interval_timer::stop(bool terminate_timer)
     {
+        if (terminate_timer)
+        {
+            terminate();
+            return true;
+        }
+
         std::lock_guard<mutex_type> l(mtx_);
         is_stopped_ = true;
         return stop_locked();
@@ -127,10 +147,20 @@ namespace hpx { namespace util { namespace detail
 
     bool interval_timer::stop_locked()
     {
-        if (is_started_) {
+        if (is_started_)
+        {
             is_started_ = false;
 
-            if (id_) {
+            if (timerid_)
+            {
+                error_code ec(lightweight);    // avoid throwing on error
+                threads::set_thread_state(timerid_, threads::pending,
+                    threads::wait_abort, threads::thread_priority_boost, true,
+                    ec);
+                timerid_.reset();
+            }
+            if (id_)
+            {
                 error_code ec(lightweight);    // avoid throwing on error
                 threads::set_thread_state(id_, threads::pending,
                     threads::wait_abort, threads::thread_priority_boost, true,
@@ -141,13 +171,15 @@ namespace hpx { namespace util { namespace detail
         }
 
         HPX_ASSERT(id_ == nullptr);
+        HPX_ASSERT(timerid_ == nullptr);
         return false;
     }
 
     void interval_timer::terminate()
     {
         std::unique_lock<mutex_type> l(mtx_);
-        if (!is_terminated_) {
+        if (!is_terminated_)
+        {
             is_terminated_ = true;
             stop_locked();
 
@@ -204,6 +236,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             id_.reset();
+            timerid_.reset();
             is_started_ = false;
 
             bool result = false;
@@ -214,7 +247,8 @@ namespace hpx { namespace util { namespace detail
             }
 
             // some other thread might already have started the timer
-            if (nullptr == id_ && result) {
+            if (nullptr == id_ && result)
+            {
                 HPX_ASSERT(!is_started_);
                 schedule_thread(l);        // wait and repeat
             }
@@ -266,9 +300,9 @@ namespace hpx { namespace util { namespace detail
         }
 
         // schedule this thread to be run after the given amount of seconds
-        threads::set_thread_state(id, std::chrono::microseconds(microsecs_),
-            threads::pending, threads::wait_signaled,
-            threads::thread_priority_boost, true, ec);
+        threads::thread_id_type timerid = threads::set_thread_state(id,
+            std::chrono::microseconds(microsecs_), threads::pending,
+            threads::wait_signaled, threads::thread_priority_boost, true, ec);
 
         if (ec) {
             is_terminated_ = true;
@@ -282,6 +316,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         id_ = id;
+        timerid_ = timerid;
         is_started_ = true;
     }
 }}}
