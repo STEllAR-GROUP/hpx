@@ -98,6 +98,25 @@ int main()
 
     HPX_TEST_EQ(sivar.which(), sovar.which());
     HPX_TEST_EQ(sivar, sovar);
+
+    bool caught_exception = false;
+    try
+    {
+        std::variant<std::string, int> sovar = 42;
+        std::variant<std::string> sivar;
+        oar << sovar;
+        iar >> sivar;
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception const& e)
+    {
+        if (e.get_error() == hpx::serialization_error)
+        {
+            caught_exception = true;
+        }
+    }
+    HPX_TEST(caught_exception);
 #endif
 
     return hpx::util::report_errors();

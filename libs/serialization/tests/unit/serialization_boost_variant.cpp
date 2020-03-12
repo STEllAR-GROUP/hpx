@@ -102,7 +102,9 @@ int main()
 
     HPX_TEST_EQ(sivar.which(), sovar.which());
     HPX_TEST_EQ(sivar, sovar);
-#endif
 
     return hpx::util::report_errors();
+#else
+    return 0;
+#endif
 }

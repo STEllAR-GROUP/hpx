@@ -12,7 +12,7 @@
 #define HPX_SERIALIZATION_VARIANT_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/boost_variant.hpp>  // for backwards compatibility
+#include <hpx/serialization/boost_variant.hpp>    // for backwards compatibility
 
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
 

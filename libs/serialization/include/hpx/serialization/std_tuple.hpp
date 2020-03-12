@@ -15,8 +15,8 @@
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
-#include <type_traits>
 #include <tuple>
+#include <type_traits>
 
 namespace hpx { namespace serialization {
 
