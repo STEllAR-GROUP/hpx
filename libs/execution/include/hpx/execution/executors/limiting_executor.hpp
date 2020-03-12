@@ -131,7 +131,7 @@ namespace hpx { namespace parallel { namespace execution {
         // note that future<> and shared_future<> are both supported
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename = enable_if_t<traits::is_future<
+            typename = enable_if_t<hpx::traits::is_future<
                 typename std::remove_reference<Future>::type>::value>>
         auto then_execute(F&& f, Ts&&... ts)
             -> future<typename hpx::util::detail::invoke_deferred_result<F,

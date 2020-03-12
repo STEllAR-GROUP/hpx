@@ -50,9 +50,9 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Future>
         struct is_future_of_tuple_of_futures
           : std::integral_constant<bool,
-                traits::is_future<Future>::value &&
-                    traits::is_future_tuple<typename traits::future_traits<
-                        Future>::result_type>::value>
+                hpx::traits::is_future<Future>::value &&
+                    hpx::traits::is_future_tuple<typename hpx::traits::
+                            future_traits<Future>::result_type>::value>
         {
         };
 
@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename T, template <typename> class Future>
             const T& operator()(const Future<T>& el) const
             {
-                const auto& state = traits::detail::get_shared_state(el);
+                const auto& state = hpx::traits::detail::get_shared_state(el);
                 return *state->get_result();
             }
         };
@@ -292,7 +292,8 @@ namespace hpx { namespace parallel { namespace execution {
         // note that future<> and shared_future<> are both supported
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename = detail::enable_if_t<traits::is_future<Future>::value>>
+            typename =
+                detail::enable_if_t<hpx::traits::is_future<Future>::value>>
         auto then_execute(F&& f, Future&& predecessor, Ts&&... ts)
             -> future<typename hpx::util::detail::invoke_deferred_result<F,
                 Future, Ts...>::type>
@@ -305,7 +306,7 @@ namespace hpx { namespace parallel { namespace execution {
                 "Predecessor  : ", hpx::util::debug::print_type<Future>(),
                 "\n\t", "Future       : ",
                 hpx::util::debug::print_type<
-                    typename traits::future_traits<Future>::result_type>(),
+                    typename hpx::traits::future_traits<Future>::result_type>(),
                 "\n\t",
                 "Arguments   : ", hpx::util::debug::print_type<Ts...>(" | "),
                 "\n\t",
@@ -346,7 +347,7 @@ namespace hpx { namespace parallel { namespace execution {
             typename =
                 detail::enable_if_t<detail::is_future_of_tuple_of_futures<
                     OuterFuture<hpx::util::tuple<InnerFutures...>>>::value>,
-            typename = detail::enable_if_t<traits::is_future_tuple<
+            typename = detail::enable_if_t<hpx::traits::is_future_tuple<
                 hpx::util::tuple<InnerFutures...>>::value>>
         auto then_execute(F&& f,
             OuterFuture<hpx::util::tuple<InnerFutures...>>&& predecessor,
@@ -411,7 +412,7 @@ namespace hpx { namespace parallel { namespace execution {
         // function type, result type and tuple of futures as arguments
         // --------------------------------------------------------------------
         template <typename F, typename... InnerFutures,
-            typename = detail::enable_if_t<traits::is_future_tuple<
+            typename = detail::enable_if_t<hpx::traits::is_future_tuple<
                 hpx::util::tuple<InnerFutures...>>::value>>
         auto async_execute(
             F&& f, hpx::util::tuple<InnerFutures...>&& predecessor)
@@ -543,7 +544,8 @@ namespace hpx { namespace parallel { namespace execution {
         // Continuation
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename = detail::enable_if_t<traits::is_future<Future>::value>>
+            typename =
+                detail::enable_if_t<hpx::traits::is_future<Future>::value>>
         auto then_execute(F&& f, Future&& predecessor, Ts&&... ts)
             -> future<typename hpx::util::detail::invoke_deferred_result<F,
                 Future, Ts...>::type>
