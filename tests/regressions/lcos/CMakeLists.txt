@@ -16,6 +16,7 @@ set(tests
     channel_not_empty_2890
     channel_register_as_2722
     dataflow_791
+    dataflow_4436
     dataflow_action_2008
     dataflow_const_functor_773
     dataflow_future_swap2
