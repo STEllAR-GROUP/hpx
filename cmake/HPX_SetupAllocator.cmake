@@ -57,7 +57,8 @@ if (NOT TARGET hpx::allocator)
       if(NOT JEMALLOC_LIBRARIES)
         hpx_error(${allocator_error})
       endif()
-      target_include_directories(hpx::allocator INTERFACE ${JEMALLOC_INCLUDE_DIR})
+      target_include_directories(hpx::allocator INTERFACE
+          ${JEMALLOC_INCLUDE_DIR} ${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
       target_link_libraries(hpx::allocator INTERFACE ${JEMALLOC_LIBRARIES})
     endif()
 
