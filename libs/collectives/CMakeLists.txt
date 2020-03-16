@@ -71,6 +71,7 @@ add_hpx_module(collectives
       hpx_local_lcos
       hpx_logging
       hpx_memory
+      hpx_performance_counters
       hpx_preprocessor
       hpx_program_options
       hpx_runtime_configuration

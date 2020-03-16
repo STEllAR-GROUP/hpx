@@ -42,6 +42,7 @@ set(HPX_LIBS
   logging
   memory
   naming_base
+  performance_counters
   plugin
   prefix
   preprocessor

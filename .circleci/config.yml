@@ -552,32 +552,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.parcelset
 
-  tests.unit.performance_counter:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.performance_counter
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.performance_counter
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.performance_counter
-      - store_artifacts:
-          path: tests.unit.performance_counter
-
   tests.unit.resource:
     <<: *defaults
     steps:
@@ -738,6 +712,7 @@ jobs:
               ninja -j2 -k 0 tests.unit.modules.hashing
               ninja -j2 -k 0 tests.unit.modules.iterator_support
               ninja -j2 -k 0 tests.unit.modules.logging
+              ninja -j2 -k 0 tests.unit.modules.performance_counters
               ninja -j2 -k 0 tests.unit.modules.preprocessor
               ninja -j2 -k 0 tests.unit.modules.program_options
               ninja -j2 -k 0 tests.unit.modules.resiliency
@@ -777,6 +752,7 @@ jobs:
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.performance_counters
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.program_options
               ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resiliency
@@ -1101,8 +1077,6 @@ workflows:
           <<: *core_dependency
       - tests.unit.parcelset:
           <<: *core_dependency
-      - tests.unit.performance_counter:
-          <<: *core_dependency
       - tests.unit.resource:
           <<: *core_dependency
       - tests.unit.threads:
@@ -1146,7 +1120,6 @@ workflows:
             - tests.unit.lcos
             - tests.unit.parallel_block
             - tests.unit.parcelset
-            - tests.unit.performance_counter
             - tests.unit.resource
             - tests.unit.threads
             - tests.unit.topology

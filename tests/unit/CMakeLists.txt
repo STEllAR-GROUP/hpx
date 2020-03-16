@@ -13,7 +13,6 @@ set(subdirs
     diagnostics
     lcos
     parallel_block
-    performance_counter
     resource
     threads
     topology

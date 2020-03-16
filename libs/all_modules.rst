@@ -45,6 +45,7 @@ All modules
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
    /libs/naming_base/docs/index.rst
+   /libs/performance_counters/docs/index.rst
    /libs/plugin/docs/index.rst
    /libs/prefix/docs/index.rst
    /libs/preprocessor/docs/index.rst
@@ -58,8 +59,8 @@ All modules
    /libs/statistics/docs/index.rst
    /libs/synchronization/docs/index.rst
    /libs/testing/docs/index.rst
-   /libs/thread_data/docs/index.rst
    /libs/thread_support/docs/index.rst
+   /libs/threading_base/docs/index.rst
    /libs/threadmanager/docs/index.rst
    /libs/timing/docs/index.rst
    /libs/topology/docs/index.rst

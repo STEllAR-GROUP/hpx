@@ -25,6 +25,7 @@ if (HPX_WITH_PARCELPORT_VERBS)
       hpx_assertion
       hpx_config
       hpx_format
+      hpx_performance_counters
       hpx_preprocessor
       hpx_plugin
       hpx_timing

@@ -13,7 +13,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_suspend.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/task_block.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration_fwd.hpp"
@@ -57,8 +56,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/util/debugging.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal_async.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/unwrap.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp")
+    "${PROJECT_SOURCE_DIR}/hpx/util/unwrap.hpp")
 
 foreach(doxygen_input ${doxygen_dependencies})
   set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")

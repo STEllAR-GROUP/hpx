@@ -9,7 +9,6 @@
 #include <hpx/compute/host/numa_domains.hpp>
 #include <hpx/compute/host/target.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
@@ -20,7 +19,7 @@
 namespace hpx { namespace compute { namespace host {
     std::vector<target> numa_domains()
     {
-        auto const& topo = hpx::threads::get_topology();
+        auto const& topo = hpx::threads::create_topology();
 
         std::size_t numa_nodes = topo.get_number_of_numa_nodes();
         if (numa_nodes == 0)
