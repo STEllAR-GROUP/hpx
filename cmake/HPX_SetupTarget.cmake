@@ -134,7 +134,7 @@ function(hpx_setup_target target)
 
   if("${_type}" STREQUAL "LIBRARY" AND target_PLUGIN)
     set(plugin_name "HPX_PLUGIN_NAME=hpx_${name}")
-    target_link_libraries(${target} ${__tll_public}
+    target_link_libraries(${target} ${__tll_private}
       $<TARGET_NAME_IF_EXISTS:plugin>
       $<TARGET_NAME_IF_EXISTS:HPX::plugin>)
   endif()
@@ -144,7 +144,7 @@ function(hpx_setup_target target)
       PRIVATE
       "HPX_COMPONENT_NAME=hpx_${name}"
       "HPX_COMPONENT_STRING=\"hpx_${name}\"")
-    target_link_libraries(${target} ${__tll_public}
+    target_link_libraries(${target} ${__tll_private}
       $<TARGET_NAME_IF_EXISTS:component>
       $<TARGET_NAME_IF_EXISTS:HPX::component>)
   endif()
