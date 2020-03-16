@@ -166,7 +166,7 @@ namespace hpx
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/threading.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/datastructures/tuple.hpp>
 

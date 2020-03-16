@@ -23,7 +23,7 @@
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/threading.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/from_string.hpp>

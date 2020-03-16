@@ -42,7 +42,7 @@ if(HPX_WITH_PARCELPORT_MPI)
       hpx_plugin
       hpx_program_options
       hpx_serialization
-      hpx_thread
+      hpx_threading
       hpx_threadmanager
       hpx_timing
       hpx_topology

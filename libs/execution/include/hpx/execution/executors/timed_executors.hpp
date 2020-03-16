@@ -13,7 +13,7 @@
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/threading.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>

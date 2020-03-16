@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/executors.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/threading.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_specific_ptr.hpp>
 #include <hpx/topology/topology.hpp>

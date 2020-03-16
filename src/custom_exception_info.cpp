@@ -21,7 +21,7 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/threading.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>

@@ -71,6 +71,7 @@ add_hpx_module(performance_counters
     hpx_synchronization
     hpx_static_reinit
     hpx_statistics
+    hpx_threading
     hpx_threading_base
     hpx_thread_support
     hpx_timing

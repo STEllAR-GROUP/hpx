@@ -13,7 +13,7 @@
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/threading.hpp>
 
 #include <chrono>
 #include <mutex>

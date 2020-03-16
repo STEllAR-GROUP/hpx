@@ -13,7 +13,7 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/threading.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/io_service/io_service_pool.hpp>

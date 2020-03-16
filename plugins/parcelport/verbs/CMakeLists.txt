@@ -29,7 +29,7 @@ if (HPX_WITH_PARCELPORT_VERBS)
       hpx_timing
       hpx_plugin
       hpx_preprocessor
-      hpx_thread
+      hpx_threading
       hpx::verbs
       hpx::boost
     INCLUDE_DIRS
