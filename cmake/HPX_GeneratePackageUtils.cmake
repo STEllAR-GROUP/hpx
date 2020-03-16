@@ -18,6 +18,11 @@ endmacro(get_target_property)
 function(hpx_collect_usage_requirements target compile_definitions compile_options
     pic_option include_directories system_include_directories link_libraries
     link_options already_processed_targets is_component)
+  cmake_parse_arguments(collect "" "" "EXCLUDE" ${ARGN})
+
+  if(${target} IN_LIST collect_EXCLUDE)
+    return()
+  endif()
 
   # Check if the target has already been processed
   list(FIND ${already_processed_targets} ${target} _found)
@@ -77,7 +82,8 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
           # This is not put inside a function in order not to hide the recursivity
           hpx_collect_usage_requirements(${dep} dep_compile_definitions dep_compile_options
              dep_pic_option dep_include_directories dep_system_include_directories
-             dep_link_libraries dep_link_options _already_processed_targets ${is_component})
+             dep_link_libraries dep_link_options _already_processed_targets ${is_component}
+             EXCLUDE ${collect_EXCLUDE})
           list(APPEND _target_compile_definitions "${dep_compile_definitions}")
           list(APPEND _target_compile_options "${dep_compile_options}")
           list(APPEND _target_include_directories "${dep_include_directories}")
@@ -179,8 +185,10 @@ function(hpx_construct_library_list link_libraries link_options library_list)
 endfunction(hpx_construct_library_list)
 
 
-# Configure the corresponding package config template for the specified ${template}
+# Configure the corresponding package config template for the specified
+# ${template}
 function(hpx_generate_pkgconfig_from_target target template is_build)
+  cmake_parse_arguments(pkgconfig "" "" "EXCLUDE" ${ARGN})
 
   if(${is_build})
     set(OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/)
@@ -200,7 +208,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     hpx_link_libraries
     hpx_link_options
     processed_targets
-    ${is_component})
+    ${is_component}
+    EXCLUDE ${pkgconfig_EXCLUDE})
 
   # Add all the components which aren't linked to hpx
   set(_component_list ${HPX_COMPONENTS})

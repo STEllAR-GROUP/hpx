@@ -28,10 +28,8 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
     set(_libfabric_libraries hpx::libfabric hpx::pmi)
   else()
     add_library(hpx::gni INTERFACE IMPORTED)
-    set_property(TARGET hpx::gni PROPERTY
-      INTERFACE_INCLUDE_DIRECTORIES ${LIBFABRIC_INCLUDE_DIR})
-    set_property(TARGET hpx::gni PROPERTY
-      INTERFACE_LINK_LIBRARIES ${GNI_LIB})
+    target_include_directories(hpx::gni INTERFACE ${LIBFABRIC_INCLUDE_DIR})
+    target_link_libraries(hpx::gni INTERFACE ${GNI_LIB})
     set(_deps hpx::gni hpx::pmi)
 
     set(_libfabric_C_srcs

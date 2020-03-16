@@ -14,12 +14,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V3.6.3
-cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
-
-if (HPX_WITH_CUDA AND CMAKE_VERSION VERSION_LESS 3.9)
-  message(FATAL_ERROR "CUDA support requires at least CMake 3.9.")
-endif()
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 # Overrides must go before the project() statement, otherwise they are ignored.
 
@@ -82,28 +77,14 @@ set(HPX_BINARY_DIR "${PROJECT_BINARY_DIR}")
 ################################################################################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
-# To fix the windows link bug (need to be included only once!)
-include(HPX_FilterLibrariesMSVC)
-
 include(GNUInstallDirs)
 include(HPX_Utils)
 
 # explicitly set certain policies
-cmake_policy(VERSION 3.6.3)
+cmake_policy(VERSION 3.13)
 hpx_set_cmake_policy(CMP0042 NEW)
-if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-  # the old behavior not supported for newer cmake versions anymore
-  hpx_set_cmake_policy(CMP0054 OLD)
-endif()
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
-
-# If we have a cmake version older than 3.12, we can't rely on CONFIGURE_DEPENDS
-if(${CMAKE_VERSION} VERSION_LESS "3.12")
-  set(DO_CONFIGURE_DEPENDS)
-else()
-  set(DO_CONFIGURE_DEPENDS CONFIGURE_DEPENDS)
-endif()
 
 # We save the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols
@@ -541,6 +522,10 @@ hpx_option(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION BOOL
 # We create a target to contain libraries like rt, dl etc. in order to remove
 # global variables
 add_library(hpx_base_libraries INTERFACE)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  target_link_libraries(hpx_base_libraries INTERFACE imf svml irng intlc)
+endif()
 
 if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
   hpx_info("Stack traces are enabled.")

@@ -49,12 +49,9 @@ if(HPX_WITH_APEX AND NOT TARGET hpx::apex)
   endif()
 
   add_library(hpx::apex INTERFACE IMPORTED)
-  # System has been removed when passing at set_property for cmake < 3.11
-  get_target_property(_apex_include_directories apex INTERFACE_INCLUDE_DIRECTORIES)
-  set_property(TARGET hpx::apex PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${_apex_include_directories})
-  set_property(TARGET hpx::apex PROPERTY INTERFACE_LINK_LIBRARIES apex)
+  target_link_libraries(hpx::apex INTERFACE apex)
   if(UNIX AND NOT APPLE)
-    set_property(TARGET hpx::apex PROPERTY INTERFACE_LINK_OPTIONS "-Wl,-no-as-needed")
+    target_link_options(hpx::apex INTERFACE "-Wl,-no-as-needed")
   endif()
 
   # handle optional ITTNotify library (private dependency, skip when called in find_package(HPX))
@@ -65,9 +62,8 @@ if(HPX_WITH_APEX AND NOT TARGET hpx::apex)
     endif()
 
     add_library(hpx::ittnotify INTERFACE IMPORTED)
-    # System has been removed when passing at set_property for cmake < 3.11
-    set_property(TARGET hpx::ittnotify PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${ITTNOTIFY_SOURCE_DIR})
-    set_property(TARGET hpx::apex APPEND PROPERTY INTERFACE_LINK_LIBRARIES hpx::ittnotify)
+    target_include_directories(hpx::ittnotify INTERFACE ${ITTNOTIFY_SOURCE_DIR})
+    target_link_libraries(hpx::apex INTERFACE hpx::ittnotify)
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
   endif()
 endif()

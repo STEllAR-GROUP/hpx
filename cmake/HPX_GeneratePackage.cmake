@@ -19,33 +19,37 @@ write_basic_package_version_file(
 
 # Export HPXModulesTargets in the build directory
 export(TARGETS ${HPX_EXPORT_MODULES_TARGETS}
+  NAMESPACE HPX::
   FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXModulesTargets.cmake"
 )
 
-# Export HPXTargets in the install directory
+# Export HPXModulesTargets in the install directory
 install(EXPORT HPXModulesTargets
+  NAMESPACE HPX::
   FILE HPXModulesTargets.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
 )
 
 # Export HPXTargets in the build directory
 export(TARGETS ${HPX_EXPORT_TARGETS}
+  NAMESPACE HPX::
   FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXTargets.cmake"
 )
 
 # Export HPXTargets in the install directory
 install(EXPORT HPXTargets
+  NAMESPACE HPX::
   FILE HPXTargets.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
 )
 
 if (NOT MSVC)
   # Generate the pkconfig files for HPX_APPLICATION (both for build and install)
-  hpx_generate_pkgconfig_from_target(hpx::application hpx_application TRUE)
-  hpx_generate_pkgconfig_from_target(hpx::application hpx_application FALSE)
+  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_application hpx_application TRUE EXCLUDE hpx_interface)
+  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_application hpx_application FALSE EXCLUDE hpx_interface)
   # Generate the pkconfig files for HPX_COMPONENT (both for build and install)
-  hpx_generate_pkgconfig_from_target(hpx::component hpx_component TRUE)
-  hpx_generate_pkgconfig_from_target(hpx::component hpx_component FALSE)
+  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_component hpx_component TRUE EXCLUDE hpx_interface)
+  hpx_generate_pkgconfig_from_target(hpx_pkgconfig_component hpx_component FALSE EXCLUDE hpx_interface)
 endif()
 
 # Install dir

@@ -42,12 +42,7 @@ if (NOT TARGET hpx::allocator)
         hpx_error(${allocator_error})
       endif()
 
-      if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-        set_property(TARGET hpx::allocator PROPERTY
-          INTERFACE_LINK_LIBRARIES ${TCMALLOC_LIBRARIES})
-      else()
-          target_link_libraries(hpx::allocator INTERFACE ${TCMALLOC_LIBRARIES})
-      endif()
+      target_link_libraries(hpx::allocator INTERFACE ${TCMALLOC_LIBRARIES})
 
       if(MSVC)
         hpx_add_link_flag_if_available(/INCLUDE:__tcmalloc)
@@ -62,15 +57,8 @@ if (NOT TARGET hpx::allocator)
       if(NOT JEMALLOC_LIBRARIES)
         hpx_error(${allocator_error})
       endif()
-      set_property(TARGET hpx::allocator PROPERTY
-        INTERFACE_INCLUDE_DIRECTORIES ${JEMALLOC_INCLUDE_DIR}
-        ${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
-      if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-        set_property(TARGET hpx::allocator PROPERTY
-          INTERFACE_LINK_LIBRARIES ${JEMALLOC_LIBRARIES})
-      else()
-        target_link_libraries(hpx::allocator INTERFACE ${JEMALLOC_LIBRARIES})
-      endif()
+      target_include_directories(hpx::allocator INTERFACE ${JEMALLOC_INCLUDE_DIR})
+      target_link_libraries(hpx::allocator INTERFACE ${JEMALLOC_LIBRARIES})
     endif()
 
     ##################################################
@@ -80,12 +68,7 @@ if (NOT TARGET hpx::allocator)
       if(NOT mimalloc_FOUND)
         hpx_error(${allocator_error})
       endif()
-      if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-        set_property(TARGET hpx::allocator PROPERTY
-          INTERFACE_LINK_LIBRARIES mimalloc)
-      else()
-        target_link_libraries(hpx::allocator INTERFACE mimalloc)
-      endif()
+      target_link_libraries(hpx::allocator INTERFACE mimalloc)
       set(hpx_MALLOC_LIBRARY mimalloc)
       if(MSVC)
         hpx_add_link_flag_if_available(/INCLUDE:mi_version)
@@ -103,13 +86,8 @@ if (NOT TARGET hpx::allocator)
       if(MSVC)
         hpx_add_link_flag_if_available(/INCLUDE:__TBB_malloc_proxy)
       endif()
-      if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-        set_property(TARGET hpx::allocator PROPERTY
-          INTERFACE_LINK_LIBRARIES ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
-      else()
-        target_link_libraries(hpx::allocator INTERFACE
-          ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
-      endif()
+      target_link_libraries(hpx::allocator INTERFACE
+        ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
     endif()
 
     if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "CUSTOM")
@@ -140,14 +118,8 @@ if (NOT TARGET hpx::allocator)
     endif()
 
     add_library(hpx::amplifier INTERFACE IMPORTED)
-    set_property(TARGET hpx::amplifier PROPERTY
-      INTERFACE_INCLUDE_DIRECTORIES ${AMPLIFIER_INCLUDE_DIR})
-    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-      set_property(TARGET hpx::amplifier PROPERTY
-        INTERFACE_LINK_LIBRARIES ${AMPLIFIER_LIBRARIES})
-    else()
-      target_link_libraries(hpx::allocator INTERFACE ${AMPLIFIER_LIBRARIES})
-    endif()
+    target_include_directories(hpx::amplifier INTERFACE ${AMPLIFIER_INCLUDE_DIR})
+    target_link_libraries(hpx::amplifier INTERFACE ${AMPLIFIER_LIBRARIES})
 
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)

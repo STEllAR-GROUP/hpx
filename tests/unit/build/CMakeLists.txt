@@ -11,12 +11,13 @@ if(NOT HPX_WITH_TESTS_EXTERNAL_BUILD)
 endif()
 
 # Try building an external cmake based project ...
-function(create_cmake_test name hpx_dir)
+function(create_cmake_test name hpx_dir setup_type)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
   add_custom_target(${name}.make_build_dir
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}" VERBATIM
   )
   set(ADDITIONAL_CMAKE_OPTIONS)
+  set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS} -DSETUP_TYPE=${setup_type})
   if(CMAKE_TOOLCHAIN_FILE)
     set(ADDITIONAL_CMAKE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
   endif()
@@ -100,12 +101,25 @@ function(create_pkgconfig_test name hpx_dir)
 endfunction()
 
 create_cmake_test(
-  cmake_build_dir_test
-  "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}")
+  cmake_build_dir_targets_test
+  "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}"
+  TARGETS)
 
 create_cmake_test(
-  cmake_install_dir_test
+  cmake_build_dir_macros_test
+  "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}"
+  MACROS)
+
+create_cmake_test(
+  cmake_install_dir_targets_test
   "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}"
+  TARGETS
+)
+
+create_cmake_test(
+  cmake_install_dir_macros_test
+  "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}"
+  MACROS
 )
 
 if(NOT MSVC)
@@ -121,21 +135,25 @@ if(NOT MSVC)
   endif()
 endif()
 
-set(tests
-  build_dir_
-  install_dir_)
-
 set(build_systems cmake)
+set(cmake_tests
+  build_dir_targets
+  build_dir_macros
+  install_dir_targets
+  install_dir_macros)
 if(NOT CMAKE_TOOLCHAIN_FILE AND PKGCONFIG_FOUND AND NOT MSVC)
   set(build_systems ${build_systems} pkgconfig)
+  set(pkgconfig_tests
+    build_dir
+    install_dir)
 endif()
 
 foreach(system ${build_systems})
   add_hpx_pseudo_target(tests.unit.build.${system})
-  foreach(test ${tests})
+  foreach(test ${${system}_tests})
     add_hpx_pseudo_target(tests.unit.build.${system}.${test})
     add_hpx_pseudo_dependencies(tests.unit.build.${system}.${test}
-      ${system}_${test}test)
+      ${system}_${test}_test)
     add_hpx_pseudo_dependencies(tests.unit.build.${system}
       tests.unit.build.${system}.${test})
   endforeach()

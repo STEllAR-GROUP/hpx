@@ -88,7 +88,6 @@ function(add_hpx_library name)
   hpx_print_list("DEBUG" "add_library.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
   set(exclude_from_all)
-  set(install_options)
 
   if(${name}_EXCLUDE_FROM_ALL)
     set(exclude_from_all EXCLUDE_FROM_ALL)
@@ -217,7 +216,6 @@ function(add_hpx_library name)
     DEPENDENCIES ${${name}_DEPENDENCIES}
     COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
     ${_target_flags}
-    ${install_optional}
   )
 
 endfunction()

@@ -18,16 +18,7 @@ if(NOT TARGET hpx::boost::iostreams)
 
   add_library(hpx::boost::iostreams INTERFACE IMPORTED)
 
-  # Can't directly link to "iostreams" target in set_property, can change is when using target_link_libraries
-
-  set_property(TARGET hpx::boost::iostreams APPEND PROPERTY
-    INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    set_property(TARGET hpx::boost::iostreams APPEND PROPERTY
-      INTERFACE_LINK_LIBRARIES ${Boost_IOSTREAMS_LIBRARIES})
-  else()
-    target_link_libraries(hpx::boost::iostreams INTERFACE
-      ${Boost_IOSTREAMS_LIBRARIES})
-  endif()
+  target_include_directories(hpx::boost::iostreams INTERFACE ${Boost_INCLUDE_DIRS})
+  target_link_libraries(hpx::boost::iostreams INTERFACE ${Boost_IOSTREAMS_LIBRARIES})
 
 endif()

@@ -56,16 +56,11 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
   endif()
 
   add_library(hpx::vc INTERFACE IMPORTED)
-  set_property(TARGET hpx::vc PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Vc_INCLUDE_DIR})
+  target_include_directories(hpx::vc INTERFACE ${Vc_INCLUDE_DIR})
 
   if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
-    if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
-      set_property(TARGET hpx::vc PROPERTY INTERFACE_LINK_LIBRARIES ${Vc_LIBRARIES})
-      set_property(TARGET hpx::vc PROPERTY INTERFACE_LINK_DIRECTORIES ${Vc_LIB_DIR})
-    else()
-      target_link_libraries(hpx::vc INTERFACE ${Vc_LIBRARIES})
-      target_link_directories(hpx::vc INTERFACE ${Vc_LIB_DIR})
-    endif()
+    target_link_libraries(hpx::vc INTERFACE ${Vc_LIBRARIES})
+    target_link_directories(hpx::vc INTERFACE ${Vc_LIB_DIR})
   endif()
 
   foreach(_flag ${Vc_DEFINITIONS})
@@ -76,7 +71,7 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
       string(SUBSTRING ${_flag} 2 -1 _flag)
     endif()
 
-    set_property(TARGET hpx::vc APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS ${_flag})
+    target_compile_definitions(hpx::vc INTERFACE ${_flag})
   endforeach()
 
   include(HPX_AddDefinitions)
@@ -84,7 +79,7 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
   # do not include Vc build flags for MSVC builds as this breaks building the
   # core HPX libraries itself
   if(NOT MSVC)
-    set_property(TARGET hpx::vc PROPERTY INTERFACE_COMPILE_OPTIONS ${Vc_COMPILE_FLAGS} ${Vc_ARCHITECTURE_FLAGS})
+    target_compile_options(hpx::vc INTERFACE ${Vc_COMPILE_FLAGS} ${Vc_ARCHITECTURE_FLAGS})
   else()
     hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
   endif()

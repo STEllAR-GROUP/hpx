@@ -23,15 +23,8 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET hpx::libfabric)
   endif()
   # Setup Libfabric imported target
   add_library(hpx::libfabric INTERFACE IMPORTED)
-  set_property(TARGET hpx::libfabric PROPERTY
-    INTERFACE_INCLUDE_DIRECTORIES ${LIBFABRIC_INCLUDE_DIR})
-
-  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    set_property(TARGET hpx::libfabric PROPERTY INTERFACE_LINK_LIBRARIES ${LIBFABRIC_LIBRARY})
-  else()
-    target_link_libraries(hpx::libfabric INTERFACE ${LIBFABRIC_LIBRARY})
-  endif()
-
+  target_include_directories(hpx::libfabric INTERFACE ${LIBFABRIC_INCLUDE_DIR})
+  target_link_libraries(hpx::libfabric INTERFACE ${LIBFABRIC_LIBRARY})
 
   # Setup PMI imported target
   find_package(PMI)
@@ -42,10 +35,8 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET hpx::libfabric)
   endif()
 
   add_library(hpx::pmi INTERFACE IMPORTED)
-  set_property(TARGET hpx::pmi PROPERTY
-    INTERFACE_INCLUDE_DIRECTORIES ${PMI_INCLUDE_DIR})
-  set_property(TARGET hpx::pmi PROPERTY
-    INTERFACE_LINK_LIBRARIES ${PMI_LIBRARY})
+  target_include_directories(hpx::pmi INTERFACE ${PMI_INCLUDE_DIR})
+  target_link_libraries(hpx::pmi INTERFACE ${PMI_LIBRARY})
 
   #------------------------------------------------------------------------------
   # Logging

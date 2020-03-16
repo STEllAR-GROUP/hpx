@@ -58,10 +58,6 @@ if (NOT TARGET hpx::boost)
   endif()
 
   if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
-    if(CMAKE_VERSION VERSION_LESS 3.12)
-      hpx_error("The Boost.context component needs at least CMake 3.12.3 to be \
-      found.")
-    endif()
     # if context is needed, we should still link with boost thread and chrono
     set(__boost_libraries ${__boost_libraries} context thread chrono)
   endif()
@@ -89,21 +85,11 @@ if (NOT TARGET hpx::boost)
   # Boost headers
   # FIXME: push changes upstream
   if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-    # Before flag remove when passing at set_property for cmake < 3.11 instead of target_include_directories
-    # so should be added first
-    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-      set_property(TARGET hpx::boost PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/external/asio)
-    else()
-      target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
-    endif()
+    target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
   endif()
 
-  set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${Boost_LIBRARIES})
-  else()
-    target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
-  endif()
+  target_include_directories(hpx::boost INTERFACE ${Boost_INCLUDE_DIRS})
+  target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
 
   include(HPX_AddDefinitions)
 
@@ -111,11 +97,7 @@ if (NOT TARGET hpx::boost)
   hpx_add_config_cond_define(BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION 0)
 
   find_package(Threads QUIET REQUIRED)
-  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads)
-  else()
-    target_link_libraries(hpx::boost INTERFACE Threads::Threads)
-  endif()
+  target_link_libraries(hpx::boost INTERFACE Threads::Threads)
 
   # Boost preprocessor definitions
   if(NOT Boost_USE_STATIC_LIBS)
@@ -125,6 +107,6 @@ if (NOT TARGET hpx::boost)
     hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
   endif()
   hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
-  set_property(TARGET hpx::boost APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS BOOST_ALL_NO_LIB) # disable auto-linking
+  target_link_libraries(hpx::boost INTERFACE Boost::disable_autolinking)
 
 endif()
