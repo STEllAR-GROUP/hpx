@@ -34,7 +34,7 @@ function(add_parcelport name)
 
   target_link_libraries(${parcelport_name} PUBLIC ${${name}_DEPENDENCIES})
   target_include_directories(${parcelport_name} PUBLIC ${${name}_INCLUDE_DIRS})
-  target_link_libraries(${parcelport_name} PRIVATE hpx_internal_flags)
+  target_link_libraries(${parcelport_name} PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
   target_compile_options(${parcelport_name} PUBLIC ${${name}_COMPILE_FLAGS})
   set_target_properties(${parcelport_name} PROPERTIES
     FOLDER "${${name}_FOLDER}"

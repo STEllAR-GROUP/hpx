@@ -225,24 +225,7 @@ else()
   endif()
 endif()
 
-# Default unnamed config (not Debug/Release/etc) are in this var
-get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_)
-target_compile_options(hpx PRIVATE ${_temp_flags})
-target_compile_definitions(hpx PUBLIC $<$<CONFIG:Debug>:HPX_DEBUG>)
-
-# message("Adding ${_temp_flags}")
-
-# Could potentially use CMAKE_CONFIGURATION_TYPES in case a user defined config exists
-foreach(_config "DEBUG" "RELEASE" "RELWITHDEBINFO" "MINSIZEREL")
-  get_property(_temp_flags GLOBAL PROPERTY HPX_CMAKE_FLAGS_CXX_${_config})
-  target_compile_options(hpx PRIVATE $<$<CONFIG:${_config}>:${_temp_flags}>)
-#  message("Adding $<$<CONFIG:${_config}>:${_temp_flags}>")
-endforeach()
-
-#if(HPX_WITH_STATIC_LINKING)
-#  add_dependencies(hpx static_component_data_hpp)
-#endif()
-
+target_link_libraries(hpx PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
 target_link_libraries(hpx PUBLIC hpx::boost)
 
 # Set the basic search paths for the HPX headers
@@ -350,8 +333,7 @@ if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") 
   set_target_properties(hpx PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
-target_compile_definitions(hpx PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
-  HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
+target_compile_definitions(hpx PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
 ################################################################################
 # Emulation of SwapContext on Windows
@@ -399,10 +381,10 @@ if(NOT HPX_WITH_STATIC_LINKING)
       $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
       $<INSTALL_INTERFACE:include>)
+  target_link_libraries(hpx_init PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
   target_link_libraries(hpx_init PRIVATE hpx::boost)
 
-  target_compile_definitions(hpx_init PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
-    HPX_APPLICATION_EXPORTS)
+  target_compile_definitions(hpx_init PRIVATE HPX_APPLICATION_EXPORTS)
 
   set_property(TARGET hpx_init PROPERTY FOLDER "Core")
   set(hpx_targets ${hpx_targets} hpx_init)
@@ -443,8 +425,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
 
     set_target_properties(hpx_wrap PROPERTIES CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-    target_compile_definitions(hpx_wrap PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
-      HPX_APPLICATION_EXPORTS)
+    target_compile_definitions(hpx_wrap PRIVATE HPX_APPLICATION_EXPORTS)
 
     # Set the basic search paths for the generated HPX headers
     target_include_directories(hpx_wrap
@@ -452,6 +433,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:include>)
+    target_link_libraries(hpx_wrap PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
     target_link_libraries(hpx_wrap PUBLIC hpx)
     if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
       target_link_libraries(hpx_wrap INTERFACE "-Wl,-wrap=main")
@@ -473,39 +455,6 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
   endif()
 
 endif()
-
-foreach(_keyword PUBLIC;PRIVATE)
-  get_property(HPX_TARGET_COMPILE_DEFINITIONS_VAR
-    GLOBAL PROPERTY HPX_TARGET_COMPILE_DEFINITIONS_${_keyword})
-  foreach(_flag ${HPX_TARGET_COMPILE_DEFINITIONS_VAR})
-    target_compile_definitions(hpx ${_keyword} ${_flag})
-    if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
-      target_compile_definitions(hpx_wrap ${_keyword} ${_flag})
-    endif()
-    if(NOT HPX_WITH_STATIC_LINKING)
-      target_compile_definitions(hpx_init ${_keyword} ${_flag})
-    endif()
-    foreach(_module ${HPX_LIBS})
-      target_compile_definitions(hpx_${_module} ${_keyword} ${_flag})
-    endforeach()
-  endforeach()
-
-  get_property(HPX_TARGET_COMPILE_OPTIONS_VAR
-    GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS_${_keyword})
-  foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_VAR})
-    target_compile_options(hpx ${_keyword} ${_flag})
-    target_compile_options(hpx_internal_flags INTERFACE ${_flag})
-    if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
-      target_compile_options(hpx_wrap ${_keyword} ${_flag})
-    endif()
-    if(NOT HPX_WITH_STATIC_LINKING)
-      target_compile_options(hpx_init ${_keyword} ${_flag})
-    endif()
-    foreach(_module ${HPX_LIBS})
-      target_compile_options(hpx_${_module} ${_keyword} ${_flag})
-    endforeach()
-  endforeach()
-endforeach()
 
 set(_optional)
 if(HPX_WITH_DEFAULT_TARGETS)

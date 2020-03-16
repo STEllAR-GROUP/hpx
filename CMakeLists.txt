@@ -90,6 +90,7 @@ hpx_set_cmake_policy(CMP0074 NEW)
 # build system unit tests. Some flags might influence the created symbols
 # (_GLIBCXX_DEBUG i look at you)
 set(CMAKE_CXX_FLAGS_SAFE ${CMAKE_CXX_FLAGS})
+include(HPX_CheckCXXStandard)
 
 include(CheckCXXCompilerFlag)
 include(CMakeDependentOption)
@@ -116,6 +117,11 @@ unset(HPX_EXPORT_TARGETS CACHE)
 unset(HPX_EXPORT_MODULES_TARGETS CACHE)
 unset(HPX_LIBS CACHE)
 unset(HPX_STATIC_PARCELPORT_PLUGINS CACHE)
+
+################################################################################
+# Set up dummy compiler flags targets
+################################################################################
+include(HPX_CompilerFlagsTargets)
 
 ################################################################################
 # Fortran compiler detection
@@ -1146,10 +1152,6 @@ hpx_add_target_compile_definition(HPX_DISABLE_ASSERTS PUBLIC
 hpx_add_target_compile_definition(BOOST_DISABLE_ASSERTS PUBLIC
   CONFIGURATIONS Release RelWithDebInfo MinSizeRelease)
 
-# Make sure we compile in proper C++xx mode (MSVC uses it automatically)
-include(HPX_DetectCppDialect)
-hpx_detect_cpp_dialect()
-
 ################################################################################
 # C++ feature tests
 ################################################################################
@@ -1713,11 +1715,6 @@ endif()
 ################################################################################
 set(CMAKE_DEBUG_POSTFIX "d")
 set(HPX_DEBUG_POSTFIX "d")
-
-################################################################################
-# Set up dummy compiler flags target
-################################################################################
-include(HPX_CompilerFlagsTarget)
 
 if(HPX_WITH_COMPRESSION_BZIP2)
   hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
