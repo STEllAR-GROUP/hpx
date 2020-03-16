@@ -357,7 +357,7 @@ target_compile_definitions(hpx PUBLIC HPX_ENABLE_ASSERT_HANDLER PRIVATE
 # Emulation of SwapContext on Windows
 ################################################################################
 if(MSVC AND HPX_WITH_SWAP_CONTEXT_EMULATION)
-  target_link_options(hpx "/EXPORT:switch_to_fiber")
+  target_link_options(hpx PRIVATE "/EXPORT:switch_to_fiber")
 endif()
 
 set(hpx_targets ${hpx_targets} hpx)
