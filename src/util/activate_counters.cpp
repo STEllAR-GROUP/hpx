@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2013      Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,7 +11,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -93,7 +93,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     void activate_counters::start_counters(error_code& ec)
     {
-        using performance_counters::stubs::performance_counter;
+        using performance_counters::performance_counter;
 
         // add counter prefix, if necessary
         for (std::string& name : names_)
@@ -106,7 +106,10 @@ namespace hpx { namespace util
 
         started.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            started.push_back(performance_counter::start(launch::async, ids_[i]));
+        {
+            performance_counter c(ids_[i]);
+            started.push_back(c.start());
+        }
 
         // wait for all counters to be started
         wait_all(started);
@@ -140,12 +143,15 @@ namespace hpx { namespace util
         }
 
         // Query the performance counters.
-        using performance_counters::stubs::performance_counter;
+        using performance_counters::performance_counter;
         std::vector<future<bool> > stopped;
 
         stopped.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            stopped.push_back(performance_counter::stop(launch::async, ids_[i]));
+        {
+            performance_counter c(ids_[i]);
+            stopped.push_back(c.stop());
+        }
 
         // wait for all counters to be started
         wait_all(stopped);
@@ -180,12 +186,15 @@ namespace hpx { namespace util
         }
 
         // Query the performance counters.
-        using performance_counters::stubs::performance_counter;
+        using performance_counters::performance_counter;
         std::vector<future<void> > reset;
 
         reset.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
-            reset.push_back(performance_counter::reset(launch::async, ids_[i]));
+        {
+            performance_counter c(ids_[i]);
+            reset.push_back(c.reset());
+        }
 
         // wait for all counters to be started
         wait_all(reset);
@@ -223,11 +232,11 @@ namespace hpx { namespace util
         }
 
         values.reserve(ids_.size());
-        using hpx::performance_counters::stubs::performance_counter;
+        using hpx::performance_counters::performance_counter;
         for (std::size_t i = 0; i != ids_.size(); ++i)
         {
-            values.push_back(performance_counter::get_value(
-                launch::async, ids_[i], reset));
+            performance_counter c(ids_[i]);
+            values.push_back(c.get_counter_value(reset));
         }
         return values;
     }

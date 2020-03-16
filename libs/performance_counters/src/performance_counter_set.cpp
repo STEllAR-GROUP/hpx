@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2018 Hartmut Kaiser
+//  Copyright (c) 2016-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
-#include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -170,8 +170,8 @@ namespace hpx { namespace performance_counters {
         // start all performance counters
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
-            using performance_counters::stubs::performance_counter;
-            v.push_back(performance_counter::start(launch::async, ids[i]));
+            performance_counters::performance_counter c(ids[i]);
+            v.push_back(c.start());
         }
 
         return v;
@@ -207,8 +207,8 @@ namespace hpx { namespace performance_counters {
         // stop all performance counters
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
-            using performance_counters::stubs::performance_counter;
-            v.push_back(performance_counter::stop(launch::async, ids[i]));
+            performance_counters::performance_counter c(ids[i]);
+            v.push_back(c.stop());
         }
 
         return v;
@@ -244,8 +244,8 @@ namespace hpx { namespace performance_counters {
         // reset all performance counters
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
-            using performance_counters::stubs::performance_counter;
-            v.push_back(performance_counter::reset(launch::async, ids[i]));
+            performance_counters::performance_counter c(ids[i]);
+            v.push_back(c.reset());
         }
 
         return v;
@@ -278,9 +278,8 @@ namespace hpx { namespace performance_counters {
         // re-initialize all performance counters
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
-            using performance_counters::stubs::performance_counter;
-            v.push_back(
-                performance_counter::reinit(launch::async, ids[i], reset));
+            performance_counters::performance_counter c(ids[i]);
+            v.push_back(c.reinit(reset));
         }
 
         return v;
@@ -323,9 +322,8 @@ namespace hpx { namespace performance_counters {
                 continue;
             }
 
-            using performance_counters::stubs::performance_counter;
-            v.push_back(performance_counter::get_value(
-                launch::async, ids[i], reset || reset_[i]));
+            performance_counters::performance_counter c(ids[i]);
+            v.push_back(c.get_counter_value(reset || reset_[i]));
         }
 
         return v;
@@ -370,9 +368,8 @@ namespace hpx { namespace performance_counters {
                 continue;
             }
 
-            using performance_counters::stubs::performance_counter;
-            v.push_back(performance_counter::get_values_array(
-                launch::async, ids[i], reset || reset_[i]));
+            performance_counters::performance_counter c(ids[i]);
+            v.push_back(c.get_counter_values_array(reset || reset_[i]));
         }
 
         return v;

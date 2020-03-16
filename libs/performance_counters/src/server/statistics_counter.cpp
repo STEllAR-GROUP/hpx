@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/statistics_counter.hpp>
-#include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
@@ -519,8 +519,8 @@ namespace hpx { namespace performance_counters { namespace server {
         if (!base_counter_id_ && !ensure_base_counter())
             return false;
 
-        value = stubs::performance_counter::get_value(
-            launch::sync, base_counter_id_, reset_base_counter_);
+        performance_counters::performance_counter c(base_counter_id_);
+        value = c.get_counter_value(launch::sync, reset_base_counter_);
 
         if (!has_prev_value_)
         {
@@ -543,8 +543,8 @@ namespace hpx { namespace performance_counters { namespace server {
             if (!base_counter_id_ && !ensure_base_counter())
                 return false;
 
-            bool result = stubs::performance_counter::start(
-                launch::sync, base_counter_id_);
+            performance_counters::performance_counter c(base_counter_id_);
+            bool result = c.start(launch::sync);
             if (result)
             {
                 // acquire the current value of the base counter
@@ -579,8 +579,9 @@ namespace hpx { namespace performance_counters { namespace server {
 
             if (!base_counter_id_ && !ensure_base_counter())
                 return false;
-            return stubs::performance_counter::stop(
-                launch::sync, base_counter_id_);
+
+            performance_counters::performance_counter c(base_counter_id_);
+            return c.stop(launch::sync);
         }
         return false;
     }

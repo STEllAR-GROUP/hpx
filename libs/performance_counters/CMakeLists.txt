@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,7 +29,6 @@ set(performance_counters_headers
   hpx/performance_counters/server/raw_counter.hpp
   hpx/performance_counters/server/raw_values_counter.hpp
   hpx/performance_counters/server/statistics_counter.hpp
-  hpx/performance_counters/stubs/performance_counter.hpp
 )
 
 set(performance_counters_sources
@@ -50,7 +49,6 @@ set(performance_counters_sources
   server/action_invocation_counter.cpp
   server/arithmetics_counter.cpp
   server/statistics_counter.cpp
-  stubs/performance_counter_stub.cpp
 )
 
 include(HPX_AddModule)

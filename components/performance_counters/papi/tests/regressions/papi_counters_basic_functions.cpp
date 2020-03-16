@@ -28,13 +28,13 @@ int hpx_main(hpx::program_options::variables_map&)
     // use floating point instructions here to avoid measuring runtime side effects
     using hpx::naming::id_type;
     using hpx::performance_counters::get_counter;
-    using hpx::performance_counters::stubs::performance_counter;
+    using hpx::performance_counters::performance_counter;
     using hpx::performance_counters::counter_value;
 
-    id_type id = get_counter(hpx::util::format(
+    performance_counter counter(hpx::util::format(
         "/papi{{locality#{}/worker-thread#0}}/PAPI_FP_INS", prefix));
 
-    performance_counter::start(hpx::launch::sync, id);
+    counter.start(hpx::launch::sync);
 
     // perform n ops, active counter
     volatile size_t i;
@@ -42,24 +42,26 @@ int hpx_main(hpx::program_options::variables_map&)
     for (i = 0; i < n; i++) a=b+c;
 
     counter_value value1 = performance_counter::get_value(hpx::launch::sync, id);
+
     // stop the counter w/o resetting
-    performance_counter::stop(hpx::launch::sync,id);
+    counter.stop(hpx::launch::sync);
 
     // perform n ops (should be uncounted)
     for (i = 0; i < n; i++) a=b+c;
     // get value and reset, and start again
-    counter_value value2 = performance_counter::get_value(hpx::launch::sync, id, true);
+    counter_value value2 = counter.get_counter_value(hpx::launch::sync, true);
     performance_counter::start(hpx::launch::sync, id);
 
     // perform 2*n ops, counted from 0 (or close to it)
     for (i = 0; i < 2*n; i++) a=b+c;
-    counter_value value3 = performance_counter::get_value(hpx::launch::sync, id);
+    counter_value value3 = counter.get_counter_value(hpx::launch::sync);
+
     // reset counter using reset-only interface
     performance_counter::reset(hpx::launch::sync, id);
 
     // perform n ops, counted from 0 (or close to it)
     for (i = 0; i < n; i++) a=b+c;
-    counter_value value4 = performance_counter::get_value(hpx::launch::sync, id);
+    counter_value value4 = counter.get_counter_value(hpx::launch::sync);
 
     bool pass = status_is_valid(value1.status_) &&
                 status_is_valid(value2.status_) &&

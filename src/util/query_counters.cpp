@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/config_entry.hpp>

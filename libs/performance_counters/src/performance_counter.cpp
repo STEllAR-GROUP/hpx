@@ -1,11 +1,13 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 
@@ -18,6 +20,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
+
     ///////////////////////////////////////////////////////////////////////////
     performance_counter::performance_counter(std::string const& name)
       : base_type(performance_counters::get_counter_async(name))
@@ -43,102 +46,107 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     future<counter_info> performance_counter::get_info() const
     {
-        return stubs::performance_counter::get_info(launch::async, get_id());
+        using action_type =
+            server::base_performance_counter::get_counter_info_action;
+        return hpx::async<action_type>(get_id());
     }
     counter_info performance_counter::get_info(
         launch::sync_policy, error_code& ec) const
     {
-        return stubs::performance_counter::get_info(launch::sync, get_id(), ec);
+        return get_info().get(ec);
     }
 
     future<counter_value> performance_counter::get_counter_value(bool reset)
     {
-        return stubs::performance_counter::get_value(
-            launch::async, get_id(), reset);
+        using action_type =
+            server::base_performance_counter::get_counter_value_action;
+        return hpx::async<action_type>(get_id(), reset);
     }
     counter_value performance_counter::get_counter_value(
         launch::sync_policy, bool reset, error_code& ec)
     {
-        return stubs::performance_counter::get_value(
-            launch::sync, get_id(), reset, ec);
+        return get_counter_value(reset).get(ec);
     }
 
     future<counter_value> performance_counter::get_counter_value() const
     {
-        return stubs::performance_counter::get_value(
-            launch::async, get_id(), false);
+        using action_type =
+            server::base_performance_counter::get_counter_value_action;
+        return hpx::async<action_type>(get_id(), false);
     }
     counter_value performance_counter::get_counter_value(
         launch::sync_policy, error_code& ec) const
     {
-        return stubs::performance_counter::get_value(
-            launch::sync, get_id(), false, ec);
+        return get_counter_value().get(ec);
     }
 
     future<counter_values_array> performance_counter::get_counter_values_array(
         bool reset)
     {
-        return stubs::performance_counter::get_values_array(
-            launch::async, get_id(), reset);
+        using action_type =
+            server::base_performance_counter::get_counter_values_array_action;
+        return hpx::async<action_type>(get_id(), reset);
     }
     counter_values_array performance_counter::get_counter_values_array(
         launch::sync_policy, bool reset, error_code& ec)
     {
-        return stubs::performance_counter::get_values_array(
-            launch::sync, get_id(), reset, ec);
+        return get_counter_values_array(reset).get(ec);
     }
 
     future<counter_values_array> performance_counter::get_counter_values_array()
         const
     {
-        return stubs::performance_counter::get_values_array(
-            launch::async, get_id(), false);
+        using action_type =
+            server::base_performance_counter::get_counter_values_array_action;
+        return hpx::async<action_type>(get_id(), false);
     }
     counter_values_array performance_counter::get_counter_values_array(
         launch::sync_policy, error_code& ec) const
     {
-        return stubs::performance_counter::get_values_array(
-            launch::sync, get_id(), false, ec);
+        return get_counter_values_array().get(ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     future<bool> performance_counter::start()
     {
-        auto res = stubs::performance_counter::start(launch::async, get_id());
-        return res;
+        using action_type = server::base_performance_counter::start_action;
+        return hpx::async<action_type>(get_id());
     }
     bool performance_counter::start(launch::sync_policy, error_code& ec)
     {
-        return stubs::performance_counter::start(launch::sync, get_id(), ec);
+        return start().get(ec);
     }
 
     future<bool> performance_counter::stop()
     {
-        return stubs::performance_counter::stop(launch::async, get_id());
+        using action_type = server::base_performance_counter::stop_action;
+        return hpx::async<action_type>(get_id());
     }
     bool performance_counter::stop(launch::sync_policy, error_code& ec)
     {
-        return stubs::performance_counter::stop(launch::sync, get_id(), ec);
+        return stop().get(ec);
     }
 
     future<void> performance_counter::reset()
     {
-        return stubs::performance_counter::reset(launch::async, get_id());
+        using action_type =
+            server::base_performance_counter::reset_counter_value_action;
+        return hpx::async<action_type>(get_id());
     }
     void performance_counter::reset(launch::sync_policy, error_code& ec)
     {
-        stubs::performance_counter::reset(launch::sync, get_id(), ec);
+        reset().get(ec);
     }
 
     future<void> performance_counter::reinit(bool reset)
     {
-        return stubs::performance_counter::reinit(
-            launch::async, get_id(), reset);
+        using action_type = server::base_performance_counter::reinit_action;
+        return hpx::async<action_type>(get_id(), reset);
     }
     void performance_counter::reinit(
         launch::sync_policy, bool reset, error_code& ec)
     {
-        stubs::performance_counter::reinit(launch::sync, get_id(), reset, ec);
+        reinit(reset).get(ec);
     }
 
     ///
