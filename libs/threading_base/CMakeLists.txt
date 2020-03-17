@@ -94,7 +94,3 @@ add_hpx_module(threading_base
     hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )
-
-include(HPX_PrintSummary)
-create_configuration_summary(
-  "  Module configuration summary (threading_base):" "threading_base")

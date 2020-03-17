@@ -37,7 +37,3 @@ add_hpx_module(threading
     hpx_timing
   CMAKE_SUBDIRS examples tests
 )
-
-include(HPX_PrintSummary)
-create_configuration_summary(
-  "  Module configuration summary (threading):" "threading")

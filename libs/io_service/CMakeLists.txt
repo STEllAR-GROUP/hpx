@@ -39,7 +39,3 @@ add_hpx_module(io_service
     hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )
-
-include(HPX_PrintSummary)
-create_configuration_summary(
-  "  Module configuration summary (io_service):" "io_service")
