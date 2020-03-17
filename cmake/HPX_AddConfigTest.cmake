@@ -19,7 +19,7 @@ function(add_hpx_config_test variable)
   cmake_parse_arguments(${variable} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   set(_run_msg)
-  # Check CMake feature tests iff the user didn't override the value
+  # Check CMake feature tests if the user didn't override the value
   # of this variable:
   if(NOT DEFINED ${variable})
     if(${variable}_CMAKECXXFEATURE)
