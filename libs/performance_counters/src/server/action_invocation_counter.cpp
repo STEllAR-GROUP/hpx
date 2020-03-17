@@ -67,7 +67,7 @@ namespace hpx { namespace performance_counters {
     {
         switch (info.type_)
         {
-        case counter_raw:
+        case counter_monotonically_increasing:
         {
             counter_path_elements paths;
             get_counter_path_elements(info.fullname_, paths, ec);

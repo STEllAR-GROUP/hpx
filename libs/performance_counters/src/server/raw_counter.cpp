@@ -27,13 +27,18 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::performance_counters::server::raw_counter)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
+
     raw_counter::raw_counter(counter_info const& info,
         hpx::util::function_nonser<std::int64_t(bool)> f)
       : base_type_holder(info)
       , f_(std::move(f))
       , reset_(false)
     {
-        if (info.type_ != counter_raw)
+        if (info.type_ != counter_raw && info.type_ != counter_elapsed_time &&
+            info.type_ != counter_aggregating &&
+            info.type_ != counter_monotonically_increasing &&
+            info.type_ != counter_average_count &&
+            info.type_ != counter_average_timer)
         {
             HPX_THROW_EXCEPTION(bad_parameter, "raw_counter::raw_counter",
                 "unexpected counter type specified for raw_counter");

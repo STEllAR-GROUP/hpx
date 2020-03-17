@@ -135,11 +135,12 @@ namespace hpx { namespace performance_counters {
     // shutdown.
     counter_status install_counter_type(std::string const& name,
         hpx::util::function_nonser<std::int64_t(bool)> const& counter_value,
-        std::string const& helptext, std::string const& uom, error_code& ec)
+        std::string const& helptext, std::string const& uom,
+        counter_type type, error_code& ec)
     {
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
-        return install_counter_type(name, counter_raw, helptext,
+        return install_counter_type(name, type, helptext,
             util::bind(&hpx::performance_counters::locality_raw_counter_creator,
                 _1, counter_value, _2),
             &hpx::performance_counters::locality_counter_discoverer,

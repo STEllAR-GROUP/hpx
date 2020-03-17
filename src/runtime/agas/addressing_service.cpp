@@ -2366,7 +2366,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache/hits", performance_counters::counter_raw,
+        { "/agas/count/cache/hits",
+          performance_counters::counter_monotonically_increasing,
           "returns the number of cache hits while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           util::bind(&performance_counters::locality_raw_counter_creator,
@@ -2374,7 +2375,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache/misses", performance_counters::counter_raw,
+        { "/agas/count/cache/misses",
+          performance_counters::counter_monotonically_increasing,
           "returns the number of cache misses while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           util::bind(&performance_counters::locality_raw_counter_creator,
@@ -2382,7 +2384,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache/evictions", performance_counters::counter_raw,
+        { "/agas/count/cache/evictions",
+            performance_counters::counter_monotonically_increasing,
           "returns the number of cache evictions from the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           util::bind(&performance_counters::locality_raw_counter_creator,
@@ -2390,7 +2393,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache/insertions", performance_counters::counter_raw,
+        { "/agas/count/cache/insertions",
+            performance_counters::counter_monotonically_increasing,
           "returns the number of cache insertions into the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           util::bind(&performance_counters::locality_raw_counter_creator,
@@ -2398,7 +2402,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache/get_entry", performance_counters::counter_raw,
+        { "/agas/count/cache/get_entry",
+            performance_counters::counter_monotonically_increasing,
           "returns the number of invocations of get_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2407,7 +2412,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache/insert_entry", performance_counters::counter_raw,
+        { "/agas/count/cache/insert_entry",
+            performance_counters::counter_monotonically_increasing,
           "returns the number of invocations of insert function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2416,7 +2422,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache/update_entry", performance_counters::counter_raw,
+        { "/agas/count/cache/update_entry",
+            performance_counters::counter_monotonically_increasing,
           "returns the number of invocations of update_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2425,7 +2432,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/count/cache/erase_entry", performance_counters::counter_raw,
+        { "/agas/count/cache/erase_entry",
+            performance_counters::counter_monotonically_increasing,
           "returns the number of invocations of erase_entry function of the "
                 "AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2434,7 +2442,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/time/cache/get_entry", performance_counters::counter_raw,
+        { "/agas/time/cache/get_entry",
+            performance_counters::counter_monotonically_increasing,
           "returns the overall time spent executing of the get_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2443,7 +2452,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
-        { "/agas/time/cache/insert_entry", performance_counters::counter_raw,
+        { "/agas/time/cache/insert_entry",
+            performance_counters::counter_monotonically_increasing,
           "returns the overall time spent executing of the insert_entry API "
               "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2452,7 +2462,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           ""
         },
-        { "/agas/time/cache/update_entry", performance_counters::counter_raw,
+        { "/agas/time/cache/update_entry",
+            performance_counters::counter_monotonically_increasing,
           "returns the overall time spent executing of the update_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
@@ -2461,7 +2472,8 @@ void addressing_service::register_counter_types()
           &performance_counters::locality_counter_discoverer,
           "ns"
         },
-        { "/agas/time/cache/erase_entry", performance_counters::counter_raw,
+        { "/agas/time/cache/erase_entry",
+            performance_counters::counter_monotonically_increasing,
           "returns the overall time spent executing of the erase_entry API "
                 "function of the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,

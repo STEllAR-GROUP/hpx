@@ -257,8 +257,16 @@ namespace hpx { namespace util
                 bool first = true;
                 for (std::size_t i = 0; i != infos.size(); ++i)
                 {
-                    if (infos[i].type_ != performance_counters::counter_raw)
+                    using namespace performance_counters;
+                    if (infos[i].type_ != counter_raw &&
+                        infos[i].type_ != counter_monotonically_increasing &&
+                        infos[i].type_ != counter_aggregating &&
+                        infos[i].type_ != counter_elapsed_time &&
+                        infos[i].type_ != counter_average_count &&
+                        infos[i].type_ != counter_average_timer)
+                    {
                         continue;
+                    }
                     if (!first)
                         output << ",";
                     first = false;
@@ -288,8 +296,16 @@ namespace hpx { namespace util
                 bool first = true;
                 for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
                 {
-                    if (infos[i].type_ != performance_counters::counter_raw)
+                    using namespace performance_counters;
+                    if (infos[i].type_ != counter_raw &&
+                        infos[i].type_ != counter_monotonically_increasing &&
+                        infos[i].type_ != counter_aggregating &&
+                        infos[i].type_ != counter_elapsed_time &&
+                        infos[i].type_ != counter_average_count &&
+                        infos[i].type_ != counter_average_timer)
+                    {
                         continue;
+                    }
                     if (!first)
                         output << ",";
                     first = false;

@@ -28,19 +28,22 @@ namespace hpx { namespace performance_counters { namespace memory
         pc::install_counter_type(
             "/runtime/memory/virtual", &read_psm_virtual,
             "returns the amount of virtual memory currently allocated by the "
-            "referenced locality", "bytes"
+            "referenced locality",
+            "bytes", pc::counter_raw
         );
         pc::install_counter_type(
             "/runtime/memory/resident", &read_psm_resident,
             "returns the amount of resident memory currently allocated by the "
-            "referenced locality", "bytes"
+            "referenced locality",
+            "bytes", pc::counter_raw
         );
 #if defined(__linux) || defined(linux) || defined(linux__) || defined(__linux__) \
  || defined(HPX_WINDOWS)
         // this counter is currently supported on Linux only
         pc::install_counter_type(
             "/runtime/memory/total", &read_total_mem_avail,
-            "returns the total available memory on the node", "kB"
+            "returns the total available memory on the node", "kB",
+            pc::counter_raw
         );
 #endif
     }

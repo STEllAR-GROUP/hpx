@@ -19,6 +19,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
+
     ///////////////////////////////////////////////////////////////////////////
     // Discoverer function for per-action parcel data counters
     bool per_action_data_counter_discoverer(counter_info const& info,
@@ -62,7 +63,8 @@ namespace hpx { namespace performance_counters {
     {
         switch (info.type_)
         {
-        case counter_raw:
+        case counter_elapsed_time: HPX_FALLTHROUGH;
+        case counter_monotonically_increasing:
         {
             counter_path_elements paths;
             get_counter_path_elements(info.fullname_, paths, ec);

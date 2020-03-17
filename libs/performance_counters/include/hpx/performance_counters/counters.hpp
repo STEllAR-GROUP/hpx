@@ -77,6 +77,14 @@ namespace hpx { namespace performance_counters {
         /// Type:     Instantaneous
         counter_raw,
 
+        // \a counter_raw shows the cumulatively accumulated observed value.
+        // It does not deliver an average.
+        //
+        // Formula:  None. Shows cumulatively accumulated data as collected.
+        // Average:  None
+        // Type:     Instantaneous
+        counter_monotonically_increasing,
+
         /// \a counter_average_base is used as the base data (denominator) in the
         /// computation of time or count averages for the \a counter_average_count
         /// and \a counter_average_timer counter types. This counter type

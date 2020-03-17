@@ -456,7 +456,10 @@ namespace hpx { namespace performance_counters {
             counter_raw != info.type_)
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
-                "invalid counter type requested (only counter_raw is "
+                "invalid counter type requested (only counter_raw, "
+                "counter_monotonically_increasing, "
+                "counter_aggregating, counter_elapsed_time, "
+                "counter_average_count, or counter_average_timer are "
                 "supported)");
             return status_counter_type_unknown;
         }
@@ -530,7 +533,7 @@ namespace hpx { namespace performance_counters {
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
                 "invalid counter type requested (only counter_histogram "
-                "or counter_raw_values is supported)");
+                "or counter_raw_values are supported)");
             return status_counter_type_unknown;
         }
 
@@ -605,7 +608,12 @@ namespace hpx { namespace performance_counters {
             }
             break;
 
-            case counter_raw:
+            // NOLINTNEXTLINE(bugprone-branch-clone)
+            case counter_raw: HPX_FALLTHROUGH;
+            case counter_monotonically_increasing: HPX_FALLTHROUGH;
+            case counter_aggregating: HPX_FALLTHROUGH;
+            case counter_average_count: HPX_FALLTHROUGH;
+            case counter_average_timer:
                 HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter",
                     "need function parameter for raw_counter");
                 return status_counter_type_unknown;
@@ -1173,24 +1181,6 @@ namespace hpx { namespace performance_counters {
             return status_invalid_data;
         }
 
-        //         // delete the counter
-        //         switch (info.type_) {
-        //         case counter_elapsed_time:
-        //         case counter_raw:
-        // //             {
-        // //                 typedef
-        // //                     components::component<server::raw_counter>
-        // //                 counter_type;
-        // //                 components::server::destroy<counter_type>(id.get_gid(), ec);
-        // //                 if (ec) return status_invalid_data;
-        // //             }
-        //             break;
-        //
-        //         default:
-        //             HPX_THROWS_IF(ec, bad_parameter, "registry::remove_counter",
-        //                 "invalid counter type requested");
-        //             return status_counter_type_unknown;
-        //         }
         return status_valid_data;
     }
 

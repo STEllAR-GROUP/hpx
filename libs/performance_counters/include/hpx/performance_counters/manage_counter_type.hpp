@@ -23,6 +23,7 @@
 #include <vector>
 
 namespace hpx { namespace performance_counters {
+
     /// \brief Install a new generic performance counter type in a way, which
     ///        will uninstall it automatically during shutdown.
     ///
@@ -48,6 +49,7 @@ namespace hpx { namespace performance_counters {
     ///               this type.
     /// \param uom    [in] The unit of measure for the new performance counter
     ///               type.
+    /// \param type   [in] Type for the new performance counter type.
     /// \param ec     [in,out] this represents the error status on exit,
     ///               if this is pre-initialized to \a hpx#throws
     ///               the function will throw on error instead.
@@ -67,7 +69,7 @@ namespace hpx { namespace performance_counters {
     HPX_EXPORT counter_status install_counter_type(std::string const& name,
         hpx::util::function_nonser<std::int64_t(bool)> const& counter_value,
         std::string const& helptext = "", std::string const& uom = "",
-        error_code& ec = throws);
+        counter_type type = counter_raw, error_code& ec = throws);
 
     /// Install a new generic performance counter type returning an
     /// array of values in a way, that will uninstall it automatically during
