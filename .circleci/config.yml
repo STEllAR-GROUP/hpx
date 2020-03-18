@@ -692,81 +692,67 @@ jobs:
       - run:
           name: Building Module Unit Tests
           command: |
-              ninja -j2 -k 0 tests.unit.modules.allocator_support
-              ninja -j2 -k 0 tests.unit.modules.assertion
-              ninja -j2 -k 0 tests.unit.modules.basic_execution
-              ninja -j2 -k 0 tests.unit.modules.cache
-              ninja -j2 -k 0 tests.unit.modules.collectives
-              ninja -j2 -k 0 tests.unit.modules.compute
-              # ninja -j2 -k 0 tests.unit.modules.compute_cuda # CUDA not enabled on CircleCI
-              ninja -j2 -k 0 tests.unit.modules.concepts
-              ninja -j2 -k 0 tests.unit.modules.config
-              ninja -j2 -k 0 tests.unit.modules.concurrency
-              ninja -j2 -k 0 tests.unit.modules.datastructures
-              ninja -j2 -k 0 tests.unit.modules.debugging
-              ninja -j2 -k 0 tests.unit.modules.errors
-              ninja -j2 -k 0 tests.unit.modules.filesystem
-              ninja -j2 -k 0 tests.unit.modules.format
-              ninja -j2 -k 0 tests.unit.modules.functional
-              ninja -j2 -k 0 tests.unit.modules.hardware
-              ninja -j2 -k 0 tests.unit.modules.hashing
-              ninja -j2 -k 0 tests.unit.modules.iterator_support
-              ninja -j2 -k 0 tests.unit.modules.logging
-              ninja -j2 -k 0 tests.unit.modules.performance_counters
-              ninja -j2 -k 0 tests.unit.modules.preprocessor
-              ninja -j2 -k 0 tests.unit.modules.program_options
-              ninja -j2 -k 0 tests.unit.modules.resiliency
-              ninja -j2 -k 0 tests.unit.modules.resource_partitioner
-              ninja -j2 -k 0 tests.unit.modules.serialization
-              ninja -j2 -k 0 tests.unit.modules.statistics
-              ninja -j2 -k 0 tests.unit.modules.testing
-              ninja -j2 -k 0 tests.unit.modules.thread_support
-              ninja -j2 -k 0 tests.unit.modules.threading_base
-              ninja -j2 -k 0 tests.unit.modules.threadmanager
-              ninja -j2 -k 0 tests.unit.modules.timing
-              ninja -j2 -k 0 tests.unit.modules.topology
-              ninja -j2 -k 0 tests.unit.modules.type_support
-              ninja -j2 -k 0 tests.unit.modules.util
+              ninja -j2 -k 0 tests.unit.modules.affinity \
+                  tests.unit.modules.allocator_support \
+                  tests.unit.modules.asio \
+                  tests.unit.modules.assertion \
+                  tests.unit.modules.basic_execution \
+                  tests.unit.modules.batch_environments \
+                  tests.unit.modules.cache \
+                  tests.unit.modules.checkpoint \
+                  tests.unit.modules.collectives \
+                  tests.unit.modules.compute \
+                  tests.unit.modules.concepts \
+                  tests.unit.modules.concurrency \
+                  tests.unit.modules.config \
+                  tests.unit.modules.coroutines \
+                  tests.unit.modules.datastructures \
+                  tests.unit.modules.debugging \
+                  tests.unit.modules.errors \
+                  tests.unit.modules.filesystem \
+                  tests.unit.modules.format \
+                  tests.unit.modules.functional \
+                  tests.unit.modules.hardware \
+                  tests.unit.modules.hashing \
+                  tests.unit.modules.iterator_support \
+                  tests.unit.modules.local_lcos \
+                  tests.unit.modules.logging \
+                  tests.unit.modules.memory \
+                  tests.unit.modules.naming_base \
+                  tests.unit.modules.performance_counters \
+                  tests.unit.modules.preprocessor \
+                  tests.unit.modules.program_options \
+                  tests.unit.modules.resiliency \
+                  tests.unit.modules.resource_partitioner \
+                  tests.unit.modules.runtime_configuration \
+                  tests.unit.modules.serialization \
+                  tests.unit.modules.static_reinit \
+                  tests.unit.modules.statistics \
+                  tests.unit.modules.string_util \
+                  tests.unit.modules.synchronization \
+                  tests.unit.modules.testing \
+                  tests.unit.modules.thread_support \
+                  tests.unit.modules.threading_base \
+                  tests.unit.modules.threadmanager \
+                  tests.unit.modules.timing \
+                  tests.unit.modules.topology \
+                  tests.unit.modules.type_support \
+                  tests.unit.modules.util
       - run:
           name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.allocator_support
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.assertion
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.basic_execution
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.cache
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.collectives
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute
-              # ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.compute_cuda
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concepts
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.config
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.concurrency
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.datastructures
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.debugging
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.errors
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.filesystem
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.format
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.functional
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hardware
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.hashing
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.iterator_support
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.logging
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.performance_counters
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.preprocessor
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.program_options
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resiliency
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.resource_partitioner
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.serialization
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.statistics
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.testing
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.thread_support
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.threading_base
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.threadmanager
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.timing
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.topology
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.type_support
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.util
+              ctest --timeout 60 \
+                  -T test \
+                  --no-compress-output \
+                  --output-on-failure \
+                  -R tests.unit.modules \
+                  -E \
+              "tests.unit.modules.algorithms|\
+              tests.unit.modules.compute_cuda|\
+              tests.unit.modules.execution|\
+              tests.unit.modules.segmented_algorithms"
 
       - run:
           <<: *convert_xml
