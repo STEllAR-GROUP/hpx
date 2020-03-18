@@ -6,6 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/string_util/trim.hpp>
 
 #include <iostream>
 #include <iterator>
@@ -13,8 +14,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <boost/algorithm/string/trim.hpp>
 
 struct pipeline
 {
@@ -28,7 +27,7 @@ struct pipeline
             {
                 auto trim = [](std::string const& s)
                 {
-                    return boost::algorithm::trim_copy(s);
+                    return hpx::string_util::trim_copy(s);
                 };
 
                 hpx::async(trim, std::move(item))

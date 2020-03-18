@@ -16,9 +16,9 @@
 #include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/string_util/classification.hpp>
+#include <hpx/string_util/split.hpp>
 
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/integer/common_factor.hpp>
 
 #include <chrono>
@@ -414,9 +414,9 @@ int hpx_main(variables_map& vm)
             for (auto& raw_counter : raw_counters)
             {
                 std::vector<std::string> entry;
-                boost::algorithm::split(entry, raw_counter,
-                    boost::algorithm::is_any_of(","),
-                    boost::algorithm::token_compress_on);
+                hpx::string_util::split(entry, raw_counter,
+                    hpx::string_util::is_any_of(","),
+                    hpx::string_util::token_compress_mode::on);
 
                 HPX_TEST_EQ(entry.size(), 2);
 

@@ -6,8 +6,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
-
 #include <hpx/config.hpp>
 
 // System Header Files
@@ -30,11 +28,9 @@
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/string_util/classification.hpp>
+#include <hpx/string_util/split.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/split.hpp>
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -667,7 +663,8 @@ namespace hpx { namespace util {
         typedef std::vector<std::string> string_vector;
 
         string_vector split_key;
-        boost::split(split_key, key, boost::is_any_of("."));
+        hpx::string_util::split(
+            split_key, key, hpx::string_util::is_any_of("."));
 
         std::string sk = split_key.back();
         split_key.pop_back();

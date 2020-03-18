@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
-
 #if !defined(HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM)
 #define HPX_PLUGIN_REGISTRY_MAR_24_2013_0235PM
 
@@ -20,9 +18,8 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
-
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <hpx/string_util/classification.hpp>
+#include <hpx/string_util/split.hpp>
 
 #include <string>
 #include <vector>
@@ -64,7 +61,7 @@ namespace hpx { namespace plugins
             if (more != nullptr)    // -V547
             {
                 std::vector<std::string> data;
-                boost::split(data, more, boost::is_any_of("\n"));
+                hpx::string_util::split(data, more, hpx::string_util::is_any_of("\n"));
                 std::copy(data.begin(), data.end(), std::back_inserter(fillini));
             }
             return true;

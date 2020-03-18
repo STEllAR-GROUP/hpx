@@ -5,17 +5,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// make inspect happy: hpxinspect:nodeprecatedname:boost::is_any_of
-
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
+#include <hpx/string_util/classification.hpp>
+#include <hpx/string_util/split.hpp>
 #include <hpx/util/from_string.hpp>
 
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/fusion/include/pair.hpp>
 #include <boost/phoenix/bind.hpp>
 #include <boost/phoenix/core.hpp>
@@ -86,8 +84,8 @@ namespace hpx { namespace util { namespace batch_environments {
         if (slurm_step_tasks_per_node)
         {
             std::vector<std::string> tokens;
-            boost::split(
-                tokens, slurm_step_tasks_per_node, boost::is_any_of(","));
+            hpx::string_util::split(tokens, slurm_step_tasks_per_node,
+                hpx::string_util::is_any_of(","));
 
             char* slurm_node_id = std::getenv("SLURM_NODEID");
             HPX_ASSERT(slurm_node_id != nullptr);
@@ -317,8 +315,8 @@ namespace hpx { namespace util { namespace batch_environments {
             if (slurm_job_cpus_on_node)
             {
                 std::vector<std::string> tokens;
-                boost::split(
-                    tokens, slurm_job_cpus_on_node, boost::is_any_of(","));
+                hpx::string_util::split(tokens, slurm_job_cpus_on_node,
+                    hpx::string_util::is_any_of(","));
 
                 char* slurm_node_id = std::getenv("SLURM_NODEID");
                 HPX_ASSERT(slurm_node_id != nullptr);

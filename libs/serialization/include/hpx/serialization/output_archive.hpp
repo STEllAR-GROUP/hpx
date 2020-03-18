@@ -5,8 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/cstdint.hpp
-
 #ifndef HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_OUTPUT_ARCHIVE_HPP
 
@@ -18,9 +16,6 @@
 #include <hpx/serialization/output_container.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
-#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
-#include <boost/cstdint.hpp>
-#endif
 #include <boost/predef/other/endian.h>
 
 #include <cstddef>
@@ -270,41 +265,6 @@ namespace hpx { namespace serialization {
         {
             save_integral_impl(static_cast<std::uint64_t>(val));
         }
-
-#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
-        void save_integral(boost::int128_type t, std::false_type)
-        {
-            save_integral_impl(t);
-        }
-
-        void save_integral(boost::uint128_type t, std::true_type)
-        {
-            save_integral_impl(t);
-        }
-
-        // On some platforms (gcc) std::is_integral<int128>::value
-        // evaluates to false. Thus these functions re-route the
-        // serialization for those types to the proper implementation
-        void save_bitwise(boost::int128_type t, std::false_type)
-        {
-            save_integral_impl(t);
-        }
-
-        void save_bitwise(boost::int128_type t, std::true_type)
-        {
-            save_integral_impl(t);
-        }
-
-        void save_bitwise(boost::uint128_type t, std::false_type)
-        {
-            save_integral_impl(t);
-        }
-
-        void save_bitwise(boost::uint128_type t, std::true_type)
-        {
-            save_integral_impl(t);
-        }
-#endif
 
         template <class Promoted>
         void save_integral_impl(Promoted l)

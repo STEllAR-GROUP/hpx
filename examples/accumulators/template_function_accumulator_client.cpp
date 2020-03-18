@@ -7,13 +7,12 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/string_util/split.hpp>
+#include <hpx/string_util/trim.hpp>
+#include <hpx/string_util/classification.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include "template_function_accumulator.hpp"
-
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/algorithm/string/classification.hpp>
 
 #include <iostream>
 #include <string>
@@ -49,11 +48,11 @@ int hpx_main()
         {
             std::vector<std::string> cmd;
 
-            boost::algorithm::trim(line);
+            hpx::string_util::trim(line);
 
-            boost::algorithm::split(cmd, line,
-                boost::algorithm::is_any_of(" \t\n"),
-                boost::algorithm::token_compress_on);
+            hpx::string_util::split(cmd, line,
+                hpx::string_util::is_any_of(" \t\n"),
+                hpx::string_util::token_compress_mode::on);
 
             if (!cmd.empty() && !cmd[0].empty())
             {

@@ -35,6 +35,8 @@
 #include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime_handlers.hpp>
 #include <hpx/runtime_impl.hpp>
+#include <hpx/string_util/split.hpp>
+#include <hpx/string_util/classification.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -49,9 +51,6 @@
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #endif
-
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -472,9 +471,9 @@ namespace hpx
                     if (counter_format == "csv-short"){
                         for (std::size_t i = 0; i != counters.size() ; ++i) {
                             std::vector<std::string> entry;
-                            boost::algorithm::split(entry, counters[i],
-                                boost::algorithm::is_any_of(","),
-                                boost::algorithm::token_compress_on);
+                            hpx::string_util::split(entry, counters[i],
+                                hpx::string_util::is_any_of(","),
+                                hpx::string_util::token_compress_mode::on);
 
                             if (entry.size() != 2)
                             {

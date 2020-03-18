@@ -17,8 +17,8 @@
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
 #include <hpx/serialization/string.hpp>
+#include <hpx/string_util/predicate.hpp>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>

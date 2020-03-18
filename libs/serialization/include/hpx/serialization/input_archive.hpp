@@ -5,8 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/cstdint.hpp
-
 #ifndef HPX_SERIALIZATION_BASIC_INPUT_ARCHIVE_HPP
 #define HPX_SERIALIZATION_BASIC_INPUT_ARCHIVE_HPP
 
@@ -18,7 +16,6 @@
 #include <hpx/serialization/input_container.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
-#include <boost/cstdint.hpp>
 #include <boost/predef/other/endian.h>
 
 #include <cstddef>
@@ -180,41 +177,6 @@ namespace hpx { namespace serialization {
             load_integral_impl(ul);
             val = static_cast<T>(ul);
         }
-
-#if defined(BOOST_HAS_INT128) && !defined(__NVCC__) && !defined(__CUDACC__)
-        void load_integral(boost::int128_type& t, std::false_type)
-        {
-            load_integral_impl(t);
-        }
-
-        void load_integral(boost::uint128_type& t, std::true_type)
-        {
-            load_integral_impl(t);
-        }
-
-        // On some platforms (gcc) std::is_integral<int128>::value
-        // evaluates to false. Thus, these functions re-route the
-        // serialization for those types to the proper implementation
-        void load_bitwise(boost::int128_type& t, std::false_type)
-        {
-            load_integral_impl(t);
-        }
-
-        void load_bitwise(boost::int128_type& t, std::true_type)
-        {
-            load_integral_impl(t);
-        }
-
-        void load_bitwise(boost::uint128_type& t, std::false_type)
-        {
-            load_integral_impl(t);
-        }
-
-        void load_bitwise(boost::uint128_type& t, std::true_type)
-        {
-            load_integral_impl(t);
-        }
-#endif
         template <class Promoted>
         void load_integral_impl(Promoted& l)
         {

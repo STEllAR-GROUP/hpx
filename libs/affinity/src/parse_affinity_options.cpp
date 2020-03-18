@@ -13,8 +13,6 @@
 
 #include <hwloc.h>
 
-#include <boost/variant.hpp>
-
 // #define BOOST_SPIRIT_DEBUG
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/fusion/include/adapt_struct.hpp>

@@ -5,9 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedinclude:boost/ref.hpp
-// hpxinspect:nodeprecatedname:boost::reference_wrapper
-
 #if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETERS_AUG_21_2017_0750PM)
 #define HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETERS_AUG_21_2017_0750PM
 
@@ -26,8 +23,6 @@
 
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
-
-#include <boost/ref.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -620,26 +615,6 @@ namespace hpx { namespace parallel { namespace execution {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        struct unwrapper<::boost::reference_wrapper<T>>
-          : base_member_helper<boost::reference_wrapper<T>>
-          , maximal_number_of_chunks_call_helper<T, boost::reference_wrapper<T>>
-          , get_chunk_size_call_helper<T, boost::reference_wrapper<T>>
-          , mark_begin_execution_call_helper<T, boost::reference_wrapper<T>>
-          , mark_end_of_scheduling_call_helper<T, boost::reference_wrapper<T>>
-          , mark_end_execution_call_helper<T, boost::reference_wrapper<T>>
-          , processing_units_count_call_helper<T, boost::reference_wrapper<T>>
-          , reset_thread_distribution_call_helper<T,
-                boost::reference_wrapper<T>>
-        {
-            using wrapper_type = boost::reference_wrapper<T>;
-
-            unwrapper(wrapper_type wrapped_param)
-              : base_member_helper<wrapper_type>(wrapped_param)
-            {
-            }
-        };
-
         template <typename T>
         struct unwrapper<::std::reference_wrapper<T>>
           : base_member_helper<std::reference_wrapper<T>>

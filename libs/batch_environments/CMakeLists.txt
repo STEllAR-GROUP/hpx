@@ -44,6 +44,7 @@ add_hpx_module(batch_environments
     hpx_config
     hpx_errors
     hpx_format
+    hpx_string_util
     hpx_util
   CMAKE_SUBDIRS examples tests
 )

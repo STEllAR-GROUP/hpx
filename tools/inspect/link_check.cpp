@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/string_util.hpp>
 
 #include "link_check.hpp"
 #include "function_hyper.hpp"
 #include "boost/regex.hpp"
-#include <boost/algorithm/string/case_conv.hpp>
 #include <cstdlib>
 #include <set>
 
@@ -165,9 +165,9 @@ namespace boost
           if (a_what[4].matched)
           {
             string tag( a_what[1].first, a_what[1].second );
-            boost::algorithm::to_lower(tag);
+            hpx::string_util::to_lower(tag);
             string attribute( a_what[2].first, a_what[2].second );
-            boost::algorithm::to_lower(attribute);
+            hpx::string_util::to_lower(attribute);
             string bookmark( a_what[4].first, a_what[4].second );
 
             bool name_following_id = ( attribute == "name" && previous_id == bookmark );
@@ -182,7 +182,7 @@ namespace boost
               // w3.org recommends case-insensitive checking for duplicate bookmarks
               // since some browsers do a case-insensitive match.
               string bookmark_lowercase( bookmark );
-              boost::algorithm::to_lower(bookmark_lowercase);
+              hpx::string_util::to_lower(bookmark_lowercase);
 
               std::pair<bookmark_set::iterator, bool> result
                 = bookmarks_lowercase.insert( bookmark_lowercase );
@@ -220,7 +220,7 @@ namespace boost
           if(what[3].matched)
           {
             string type( what[1].first, what[1].second );
-            boost::algorithm::to_lower(type);
+            hpx::string_util::to_lower(type);
 
             // TODO: Complain if 'link' tags use external stylesheets.
             do_url( string( what[3].first, what[3].second ),

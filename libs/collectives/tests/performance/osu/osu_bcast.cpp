@@ -14,8 +14,6 @@
 #include <hpx/local_lcos/and_gate.hpp>
 #include <hpx/util/serializable_any.hpp>
 
-#include <boost/assert.hpp>
-
 #include <cstddef>
 #include <memory>
 #include <numeric>
