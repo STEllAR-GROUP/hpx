@@ -11,6 +11,7 @@
 #include <hpx/format.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
@@ -21,6 +22,7 @@
 #endif
 
 #include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -142,6 +144,9 @@ namespace hpx { namespace threads {
         thread_data* thrd_data = get_thread_id_data(id);
         HPX_ASSERT(thrd_data);
         thrd_data->interruption_point();
+
+        thrd_data->set_last_worker_thread_num(
+            hpx::get_local_worker_thread_num());
 
         threads::thread_state_ex_enum statex = threads::wait_unknown;
 
@@ -274,7 +279,8 @@ namespace hpx { namespace threads {
         {
             auto* data = get_thread_id_data(id);
             auto scheduler = data->get_scheduler_base();
-            auto hint = thread_schedule_hint();
+            auto hint = thread_schedule_hint(
+                static_cast<std::int16_t>(data->get_last_worker_thread_num()));
             scheduler->schedule_thread(data, hint, true, data->get_priority());
             // Wake up scheduler
             scheduler->do_some_work(hint.hint);
