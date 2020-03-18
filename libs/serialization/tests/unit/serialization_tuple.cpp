@@ -14,6 +14,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 template <typename T>
 struct A
