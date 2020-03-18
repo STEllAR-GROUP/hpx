@@ -284,6 +284,10 @@ The following table summarizes the available command line options:
    * * ``--hpx:reset-counters``
      * reset all performance counter(s) specified with ``--hpx:print-counter``
        after they have been evaluated)
+   * * ``--hpx:print-counter-types``
+     * each locality prints only its own local counters
+   * * ``--hpx:print-counters-locally``
+     * append counter type description to generated output
 
 While the options ``--hpx:list-counters`` and ``--hpx:list-counter-infos`` give
 a short listing of all available counters, the full documentation for those can
@@ -364,6 +368,12 @@ counter data as gathered at application shutdown. These lines have 6 fields, the
 counter name, the sequence number of the counter invocation, the time stamp at
 which this information has been sampled, the unit of measure for the time stamp,
 the actual counter value, and an optional unit of measure for the counter value.
+
+.. note::
+
+   The command line option ``--hpx:print-counter-types` will append a seventh
+   field to the generated output. This field will hold an abbreviated counter
+   type.
 
 The actual counter value can be represented by a single number (for counters
 returning singular values) or a list of numbers separated by ``':'`` (for

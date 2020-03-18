@@ -35,14 +35,15 @@ namespace hpx { namespace util
 
     public:
         query_counters(std::vector<std::string> const& names,
-            std::vector<std::string> const& reset_names,
-            std::int64_t interval, std::string const& dest,
-            std::string const& form, std::vector<std::string> const& shortnames,
-            bool csv_header, bool print_counters_locally);
+            std::vector<std::string> const& reset_names, std::int64_t interval,
+            std::string const& dest, std::string const& form,
+            std::vector<std::string> const& shortnames, bool csv_header,
+            bool print_counters_locally, bool counter_types);
+        ~query_counters();
 
         void start();
         void stop_evaluating_counters(bool terminate = false);
-        bool evaluate();
+        bool evaluate(bool force = false);
         void terminate();
 
         void start_counters(error_code& ec = throws);
@@ -50,7 +51,8 @@ namespace hpx { namespace util
         void reset_counters(error_code& ec = throws);
         void reinit_counters(bool reset = true, error_code& ec = throws);
         bool evaluate_counters(bool reset = false,
-            char const* description = nullptr, error_code& ec = throws);
+            char const* description = nullptr, bool force = false,
+            error_code& ec = throws);
 
     protected:
         void find_counters();
@@ -74,23 +76,25 @@ namespace hpx { namespace util
             std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream>
-        void print_value(Stream* out, std::string const& name,
-            performance_counters::counter_value const& value,
-            std::string const& uom);
+        void print_value(Stream* out,
+            performance_counters::counter_info const& infos,
+            performance_counters::counter_value const& value);
         template <typename Stream>
-        void print_value(Stream* out, std::string const& name,
-            performance_counters::counter_values_array const& value,
-            std::string const& uom);
+        void print_value(Stream* out,
+            performance_counters::counter_info const& infos,
+            performance_counters::counter_values_array const& value);
 
         template <typename Stream>
         void print_name_csv(Stream& out,
             std::string const& name);
 
         template <typename Stream>
-        void print_value_csv(Stream* out, std::string const& name,
+        void print_value_csv(Stream* out,
+            performance_counters::counter_info const& infos,
             performance_counters::counter_value const& value);
         template <typename Stream>
-        void print_value_csv(Stream* out, std::string const& name,
+        void print_value_csv(Stream* out,
+            performance_counters::counter_info const& infos,
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
@@ -110,6 +114,7 @@ namespace hpx { namespace util
         std::vector<std::string> counter_shortnames_;
         bool csv_header_;
         bool print_counters_locally_;
+        bool counter_types_;
 
         interval_timer timer_;
 

@@ -452,8 +452,18 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the counter type requested is supported
-        if (counter_raw != (*it).second.info_.type_ ||
-            counter_raw != info.type_)
+        if ((counter_raw != (*it).second.info_.type_ ||
+                counter_raw != info.type_) &&
+            (counter_monotonically_increasing != (*it).second.info_.type_ ||
+                counter_monotonically_increasing != info.type_) &&
+            (counter_aggregating != (*it).second.info_.type_ ||
+                counter_aggregating != info.type_) &&
+            (counter_elapsed_time != (*it).second.info_.type_ ||
+                counter_elapsed_time != info.type_) &&
+            (counter_average_count != (*it).second.info_.type_ ||
+                counter_average_count != info.type_) &&
+            (counter_average_timer != (*it).second.info_.type_ ||
+                counter_average_timer != info.type_))
         {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
                 "invalid counter type requested (only counter_raw, "

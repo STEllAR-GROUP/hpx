@@ -368,7 +368,7 @@ namespace hpx
         char const* description, error_code& ec)
     {
         if (active_counters_.get())
-            active_counters_->evaluate_counters(reset, description, ec);
+            active_counters_->evaluate_counters(reset, description, true, ec);
     }
 
     void runtime::stop_evaluating_counters(bool terminate)

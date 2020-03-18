@@ -636,6 +636,8 @@ namespace hpx { namespace util {
                   "after they have been evaluated")
                 ("hpx:print-counters-locally",
                   "each locality prints only its own local counters")
+                ("hpx:print-counter-types",
+                  "append counter type description to generated output")
             ;
 
             hidden_options.add_options()

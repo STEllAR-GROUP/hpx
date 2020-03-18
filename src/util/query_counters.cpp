@@ -43,13 +43,14 @@ namespace hpx { namespace util
             std::vector<std::string> const& reset_names,
             std::int64_t interval, std::string const& dest, std::string const& form,
             std::vector<std::string> const& shortnames, bool csv_header,
-            bool print_counters_locally)
+            bool print_counters_locally, bool counter_types)
       : names_(names), reset_names_(reset_names),
         counters_(print_counters_locally),
         destination_(dest), format_(form),
         counter_shortnames_(shortnames), csv_header_(csv_header),
         print_counters_locally_(print_counters_locally),
-        timer_(util::bind_front(&query_counters::evaluate, this_()),
+        counter_types_(counter_types),
+        timer_(util::bind_front(&query_counters::evaluate, this_(), false),
             util::bind_front(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
     {
@@ -62,6 +63,11 @@ namespace hpx { namespace util
         {
             performance_counters::ensure_counter_prefix(name);
         }
+    }
+
+    query_counters::~query_counters()
+    {
+        counters_.release();
     }
 
     void query_counters::find_counters()
@@ -112,6 +118,33 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace strings {
+
+        char const* const counter_type_short_names[] = {
+            "text",
+            "instant",
+            "monoinc",
+            "avgbase",
+            "avgcount",
+            "aggregated",
+            "avgtime",
+            "elapsed",
+            "histogram",
+            "values",
+        };
+    }
+
+    char const* get_counter_short_type_name(
+        performance_counters::counter_type type)
+    {
+        if (type < performance_counters::counter_text ||
+            type > performance_counters::counter_raw_values)
+        {
+            return "unknown";
+        }
+        return strings::counter_type_short_names[type];
+    }
+
     template <typename Stream>
     void query_counters::print_name_csv(Stream& out, std::string const& name)
     {
@@ -123,9 +156,13 @@ namespace hpx { namespace util
     }
 
     template <typename Stream>
-    void query_counters::print_value(Stream* out, std::string const& name,
-        performance_counters::counter_value const& value, std::string const& uom)
+    void query_counters::print_value(Stream* out,
+        performance_counters::counter_info const& info,
+        performance_counters::counter_value const& value)
     {
+        std::string const& name = info.fullname_;
+        std::string const& uom = info.unit_of_measure_;
+
         error_code ec(lightweight);        // do not throw
         double val = value.get_value<double>(ec);
 
@@ -154,6 +191,13 @@ namespace hpx { namespace util
                 << ",[s]," << val;
             if (!uom.empty())
                 *out << ",[" << uom << "]";
+
+            if (counter_types_)
+            {
+                if (uom.empty())
+                    *out << ",[]";
+                *out << "," << get_counter_short_type_name(info.type_);
+            }
             *out << "\n";
         }
         else {
@@ -163,12 +207,15 @@ namespace hpx { namespace util
     }
 
     template <typename Stream>
-    void query_counters::print_value(Stream* out, std::string const& name,
-        performance_counters::counter_values_array const& value,
-        std::string const& uom)
+    void query_counters::print_value(Stream* out,
+        performance_counters::counter_info const& info,
+        performance_counters::counter_values_array const& value)
     {
         if (out == nullptr)
             return;
+
+        std::string const& name = info.fullname_;
+        std::string const& uom = info.unit_of_measure_;
 
         error_code ec(lightweight);        // do not throw
 
@@ -189,13 +236,22 @@ namespace hpx { namespace util
 
         if (!uom.empty())
             *out << ",[" << uom << "]";
+
+        if (counter_types_)
+        {
+            if (uom.empty())
+                *out << ",[]";
+            *out << "," << get_counter_short_type_name(info.type_);
+        }
         *out << "\n";
     }
 
     template <typename Stream>
-    void query_counters::print_value_csv(Stream* out, std::string const& name,
+    void query_counters::print_value_csv(Stream* out,
+        performance_counters::counter_info const& info,
         performance_counters::counter_value const& value)
     {
+        std::string const &name = info.fullname_;
         error_code ec(lightweight);
         double val = value.get_value<double>(ec);
 
@@ -224,7 +280,8 @@ namespace hpx { namespace util
     }
 
     template <typename Stream>
-    void query_counters::print_value_csv(Stream* out, std::string const&,
+    void query_counters::print_value_csv(Stream* out,
+        performance_counters::counter_info const& info,
         performance_counters::counter_values_array const& value)
     {
         if (out == nullptr)
@@ -346,7 +403,7 @@ namespace hpx { namespace util
                 if (!first && output != nullptr)
                     *output << ",";
                 first = false;
-                print_value_csv(output, infos[i].fullname_, values[i]);
+                print_value_csv(output, infos[i], values[i]);
             }
             if (output != nullptr)
                 *output << "\n";
@@ -356,26 +413,24 @@ namespace hpx { namespace util
             std::size_t idx = 0;
             for (std::size_t i : indices)
             {
-                print_value(output, infos[i].fullname_, values[idx],
-                    infos[i].unit_of_measure_);
+                print_value(output, infos[i], values[idx]);
                 ++idx;
             }
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool query_counters::evaluate()
+    bool query_counters::evaluate(bool force)
     {
         bool reset = false;
         if (get_config_entry("hpx.print_counter.reset", "0") == "1")
             reset = true;
 
-        return evaluate_counters(reset);
+        return evaluate_counters(reset, nullptr, force);
     }
 
     void query_counters::terminate()
     {
-        counters_.release();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -548,12 +603,11 @@ namespace hpx { namespace util
     }
 
     bool query_counters::evaluate_counters(bool reset,
-        char const* description, error_code& ec)
+        char const* description, bool force, error_code& ec)
     {
-        if (timer_.is_terminated())
+        if (!force && timer_.is_terminated())
         {
             // just do nothing as we're about to terminate the application
-            counters_.release();       // free all held performance counters
             return false;
         }
 
