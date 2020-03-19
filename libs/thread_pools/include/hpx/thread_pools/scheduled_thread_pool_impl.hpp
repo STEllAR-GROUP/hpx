@@ -153,14 +153,16 @@ namespace hpx { namespace threads { namespace detail {
     template <typename Scheduler>
     hpx::state scheduled_thread_pool<Scheduler>::get_state() const
     {
-        // get_thread_num_tss returns the global thread number which
-        // might be too large. This function might get called from within
-        // background_work inside the os executors
+        // This function might get called from within background_work inside the
+        // os executors
         if (thread_count_ != 0)
         {
-            std::size_t num_thread =
-                detail::get_thread_num_tss() % thread_count_;
-            if (num_thread != std::size_t(-1))
+            std::size_t num_thread = detail::get_local_thread_num_tss();
+
+            // Local thread number may be valid, but the thread may not yet be
+            // up.
+            if (num_thread != std::size_t(-1) &&
+                num_thread < static_cast<std::size_t>(thread_count_))
                 return get_state(num_thread);
         }
         return sched_->Scheduler::get_minmax_state().second;
@@ -620,7 +622,7 @@ namespace hpx { namespace threads { namespace detail {
         return detail::set_thread_state(id, new_state,    //-V107
             new_state_ex, priority,
             thread_schedule_hint(
-                static_cast<std::int16_t>(detail::get_thread_num_tss())),
+                static_cast<std::int16_t>(detail::get_local_thread_num_tss())),
             true, ec);
     }
 
@@ -633,7 +635,7 @@ namespace hpx { namespace threads { namespace detail {
         return detail::set_thread_state_timed(*sched_, abs_time, id, newstate,
             newstate_ex, priority,
             thread_schedule_hint(
-                static_cast<std::int16_t>(detail::get_thread_num_tss())),
+                static_cast<std::int16_t>(detail::get_local_thread_num_tss())),
             nullptr, true, ec);
     }
 
