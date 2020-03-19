@@ -149,12 +149,12 @@ namespace hpx { namespace util {
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.
-        constexpr HPX_HOST_DEVICE tuple(tuple const& /*other*/) = default;
+        constexpr tuple(tuple const& /*other*/) = default;
 
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
-        constexpr HPX_HOST_DEVICE tuple(tuple&& /*other*/) = default;
+        constexpr tuple(tuple&& /*other*/) = default;
 
         // 20.4.2.2, tuple assignment
 
