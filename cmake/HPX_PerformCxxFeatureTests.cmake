@@ -48,6 +48,9 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx17_std_in_place_type_t(
     DEFINITIONS HPX_HAVE_CXX17_STD_IN_PLACE_TYPE_T)
 
+  hpx_check_for_cxx17_std_variant(
+    DEFINITIONS HPX_HAVE_CXX17_STD_VARIANT)
+
   # we deliberately check for this functionality even for non-C++17
   # configurations as some compilers (notable gcc V7.x) require for noexcept
   # function specializations for actions even in C++11/14 mode

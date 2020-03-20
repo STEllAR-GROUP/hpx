@@ -42,6 +42,7 @@ set(serialization_headers
   hpx/serialization/set.hpp
   hpx/serialization/serialize_buffer.hpp
   hpx/serialization/string.hpp
+  hpx/serialization/std_tuple.hpp
   hpx/serialization/tuple.hpp
   hpx/serialization/unordered_map.hpp
   hpx/serialization/vector.hpp
@@ -70,6 +71,12 @@ set(serialization_headers
   hpx/serialization/traits/polymorphic_traits.hpp
   hpx/serialization/traits/serialization_access_data.hpp
 )
+
+if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
+  set(serialization_headers ${serialization_headers}
+    hpx/serialization/boost_variant.hpp
+  )
+endif()
 
 # Default location is $HPX_ROOT/libs/serialization/include_compatibility
 set(serialization_compat_headers

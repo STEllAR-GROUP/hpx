@@ -17,16 +17,27 @@ set(tests
     serialization_set
     serialization_simple
     serialization_smart_ptr
+    serialization_std_tuple
+    serialization_tuple
     serialization_unordered_map
     serialization_vector
-    serialization_variant
     serialize_with_incompatible_signature
 )
 
 if(HPX_WITH_CXX17_STRUCTURED_BINDINGS)
     set(tests ${tests}
         serialization_brace_initializable
-)
+    )
+endif()
+if(HPX_CXX17_WITH_STD_VARIANT)
+    set(tests ${tests}
+        serialization_std_variant
+    )
+endif()
+if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
+    set(tests ${tests}
+        serialization_boost_variant
+    )
 endif()
 
 set(full_tests

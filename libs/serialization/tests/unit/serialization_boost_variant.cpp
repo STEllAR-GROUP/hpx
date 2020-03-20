@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
+
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -14,6 +18,8 @@
 
 #include <string>
 #include <vector>
+
+#include <boost/variant.hpp>
 
 template <typename T>
 struct A
@@ -50,8 +56,11 @@ struct A
     }
 };
 
+#endif
+
 int main()
 {
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
     std::vector<char> buf;
     hpx::serialization::output_archive oar(buf);
     hpx::serialization::input_archive iar(buf);
@@ -95,4 +104,7 @@ int main()
     HPX_TEST_EQ(sivar, sovar);
 
     return hpx::util::report_errors();
+#else
+    return 0;
+#endif
 }
