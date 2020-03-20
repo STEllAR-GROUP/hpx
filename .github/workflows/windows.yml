@@ -67,5 +67,6 @@ jobs:
           tests.examples.quickstart.1d_wave_equation|\
           tests.examples.quickstart.partitioned_vector_spmd_foreach|\
           tests.examples.thread_aware_timer.thread_aware_timer|\
-          tests.examples.transpose.transpose_block_numa" \
+          tests.examples.transpose.transpose_block_numa|
+          tests.examples.async_io.async_io_simple" \
             -R tests.examples
