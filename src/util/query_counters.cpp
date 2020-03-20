@@ -9,6 +9,7 @@
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#include <hpx/performance_counters/apex_set_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -168,7 +169,7 @@ namespace hpx { namespace util
 
         if(!ec) {
 #ifdef HPX_HAVE_APEX
-            external_timer::sample_value(name.c_str(), val);
+            external_timer::sample_value(info, val);
 #elif HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {
@@ -251,17 +252,16 @@ namespace hpx { namespace util
         performance_counters::counter_info const& info,
         performance_counters::counter_value const& value)
     {
-        std::string const &name = info.fullname_;
         error_code ec(lightweight);
         double val = value.get_value<double>(ec);
 
         if(!ec) {
 #ifdef HPX_HAVE_APEX
-            external_timer::sample_value(name.c_str(), val);
+            external_timer::sample_value(info, val);
 #elif HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {
-                auto it = itt_counters_.find(name);
+                auto it = itt_counters_.find(info.fullname_);
                 if (it != itt_counters_.end())
                 {
                     (*it).second.set_value(val);

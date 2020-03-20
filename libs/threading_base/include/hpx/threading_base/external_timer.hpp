@@ -121,21 +121,21 @@ namespace hpx { namespace util {
             return (init_function == nullptr) ?
                 0ULL :
                 init_function(thread_name, comm_rank, comm_size);
-        };
+        }
         static inline void finalize(void)
         {
             if (finalize_function != nullptr)
             {
                 finalize_function();
             }
-        };
+        }
         static inline void register_thread(const std::string& name)
         {
             if (register_thread_function != nullptr)
             {
                 register_thread_function(name);
             }
-        };
+        }
         static inline std::shared_ptr<task_wrapper> new_task(
             const std::string& name, const uint64_t task_id,
             const std::shared_ptr<task_wrapper> parent_task)
@@ -143,7 +143,7 @@ namespace hpx { namespace util {
             return (new_task_string_function == nullptr) ?
                 0ULL :
                 new_task_string_function(name, task_id, parent_task);
-        };
+        }
         static inline std::shared_ptr<task_wrapper> new_task(uintptr_t address,
             const uint64_t task_id,
             const std::shared_ptr<task_wrapper> parent_task)
@@ -151,21 +151,14 @@ namespace hpx { namespace util {
             return (new_task_address_function == nullptr) ?
                 0ULL :
                 new_task_address_function(address, task_id, parent_task);
-        };
-        static inline void sample_value(const std::string& name, double value)
-        {
-            if (sample_value_function != nullptr)
-            {
-                sample_value_function(name, value);
-            }
-        };
+        }
         static inline void send(uint64_t tag, uint64_t size, uint64_t target)
         {
             if (send_function != nullptr)
             {
                 send_function(tag, size, target);
             }
-        };
+        }
         static inline void recv(uint64_t tag, uint64_t size,
             uint64_t source_rank, uint64_t source_thread)
         {
@@ -173,42 +166,42 @@ namespace hpx { namespace util {
             {
                 recv_function(tag, size, source_rank, source_thread);
             }
-        };
+        }
         static inline std::shared_ptr<task_wrapper> update_task(
             std::shared_ptr<task_wrapper> wrapper, const std::string& name)
         {
             return (update_task_string_function == nullptr) ?
                 0ULL :
                 update_task_string_function(wrapper, name);
-        };
+        }
         static inline std::shared_ptr<task_wrapper> update_task(
             std::shared_ptr<task_wrapper> wrapper, uintptr_t address)
         {
             return (update_task_address_function == nullptr) ?
                 0ULL :
                 update_task_address_function(wrapper, address);
-        };
+        }
         static inline void start(std::shared_ptr<task_wrapper> task_wrapper_ptr)
         {
             if (start_function != nullptr)
             {
                 start_function(task_wrapper_ptr);
             }
-        };
+        }
         static inline void stop(std::shared_ptr<task_wrapper> task_wrapper_ptr)
         {
             if (stop_function != nullptr)
             {
                 stop_function(task_wrapper_ptr);
             }
-        };
+        }
         static inline void yield(std::shared_ptr<task_wrapper> task_wrapper_ptr)
         {
             if (yield_function != nullptr)
             {
                 yield_function(task_wrapper_ptr);
             }
-        };
+        }
 
         HPX_EXPORT std::shared_ptr<task_wrapper> new_task(
             thread_description const& description,
