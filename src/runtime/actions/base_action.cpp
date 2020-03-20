@@ -7,8 +7,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
-
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/serialization/serialize.hpp>

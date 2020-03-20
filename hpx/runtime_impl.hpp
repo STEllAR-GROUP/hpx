@@ -20,7 +20,7 @@
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/util/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <condition_variable>

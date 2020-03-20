@@ -8,8 +8,8 @@
 #define HPX_UTIL_DEBUG_THREAD_STACKS_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/threading_base.hpp>
 
 #include <vector>
 #include <string>

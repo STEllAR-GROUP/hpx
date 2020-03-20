@@ -16,7 +16,6 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>

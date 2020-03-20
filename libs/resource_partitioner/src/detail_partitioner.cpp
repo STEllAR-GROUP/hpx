@@ -13,7 +13,7 @@
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/config_entry.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/topology/topology.hpp>

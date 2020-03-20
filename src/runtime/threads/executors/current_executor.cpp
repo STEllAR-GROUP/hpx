@@ -16,7 +16,6 @@
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
@@ -133,7 +132,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         case threads::detail::min_concurrency:
         case threads::detail::max_concurrency:
         case threads::detail::current_concurrency:
-            return hpx::get_os_thread_count();
+            return scheduler_base_->get_parent_pool()->get_os_thread_count();
 
         default:
             break;

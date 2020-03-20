@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
+#include <hpx/schedulers/maintain_queue_wait_times.hpp>
 
 namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME

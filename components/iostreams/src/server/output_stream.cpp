@@ -18,7 +18,7 @@
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 
-#include <hpx/util/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 
 #include <cstdint>
 #include <functional>

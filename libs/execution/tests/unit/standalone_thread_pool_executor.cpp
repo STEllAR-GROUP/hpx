@@ -16,7 +16,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
+#include <hpx/schedulers.hpp>
 #include <hpx/testing.hpp>
 
 #include <algorithm>

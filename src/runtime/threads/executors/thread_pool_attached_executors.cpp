@@ -8,22 +8,23 @@
 
 #include <hpx/errors.hpp>
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
-#  include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#  include <hpx/schedulers/local_queue_scheduler.hpp>
 #endif
-#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-#  include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
+#  include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #endif
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
-#  include <hpx/runtime/threads/policies/static_queue_scheduler.hpp>
+#  include <hpx/schedulers/static_queue_scheduler.hpp>
 #endif
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -74,7 +75,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         schedulehint.mode = threads::thread_schedule_hint_mode_thread;
         schedulehint.hint =
-            static_cast<std::int16_t>(get_worker_thread_num());
+            static_cast<std::int16_t>(threads::detail::get_thread_num_tss());
         register_thread_nullary(std::move(f), desc, initial_state, run_now,
             priority_, schedulehint, stacksize, ec);
     }
@@ -126,7 +127,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (&ec != &throws)
             ec = make_success_code();
 
-        return get_thread_count() - get_thread_count(terminated);
+        threads::thread_pool_base* pool = threads::detail::get_self_or_default_pool();
+        HPX_ASSERT(pool);
+        threads::policies::scheduler_base* scheduler = pool->get_scheduler();
+        HPX_ASSERT(scheduler);
+        return scheduler->get_thread_count() - scheduler->get_thread_count(terminated);
     }
 
     // Reset internal (round robin) thread distribution scheme
@@ -141,11 +146,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     std::size_t thread_pool_attached_executor<Scheduler>::get_policy_element(
         threads::detail::executor_parameter p, error_code& ec) const
     {
+        thread_pool_base* pool = threads::detail::get_self_or_default_pool();
+        HPX_ASSERT(pool);
+
         switch(p) {
         case threads::detail::min_concurrency:
         case threads::detail::max_concurrency:
         case threads::detail::current_concurrency:
-            return hpx::get_os_thread_count();
+            return pool->get_os_thread_count();
 
         default:
             break;

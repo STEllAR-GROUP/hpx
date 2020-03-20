@@ -12,6 +12,7 @@
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/steady_clock.hpp>

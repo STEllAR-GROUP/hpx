@@ -11,6 +11,7 @@
 #include <hpx/threadmanager.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -60,4 +61,23 @@ namespace hpx { namespace resource
     {
         return get_thread_pool(get_pool_name(pool_index));
     }
-}}    // namespace hpx
+}}    // namespace hpx::resource
+
+namespace hpx { namespace threads {
+    std::int64_t get_thread_count(thread_state_enum state)
+    {
+        return get_thread_manager().get_thread_count(state);
+    }
+
+    std::int64_t get_thread_count(
+        thread_priority priority, thread_state_enum state)
+    {
+        return get_thread_manager().get_thread_count(state, priority);
+    }
+
+    bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
+        thread_state_enum state)
+    {
+        return get_thread_manager().enumerate_threads(f, state);
+    }
+}}    // namespace hpx::threads

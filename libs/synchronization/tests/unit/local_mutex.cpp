@@ -9,11 +9,11 @@
 
 #include <hpx/functional/bind.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/threading.hpp>
 
 #include <chrono>
 #include <mutex>

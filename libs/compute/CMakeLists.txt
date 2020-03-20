@@ -55,6 +55,7 @@ add_hpx_module(compute
     hpx_runtime_configuration
     hpx_serialization
     hpx_synchronization
+    hpx_threading
     hpx_threading_base
     hpx_threadmanager
     hpx_type_support

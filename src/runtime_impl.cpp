@@ -26,7 +26,7 @@
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
-#include <hpx/runtime/threads/scoped_background_timer.hpp>
+#include <hpx/thread_pools/detail/scoped_background_timer.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime_impl.hpp>
 #include <hpx/state.hpp>

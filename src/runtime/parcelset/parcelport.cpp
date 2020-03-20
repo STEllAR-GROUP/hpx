@@ -13,10 +13,10 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/threading.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/errors.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>

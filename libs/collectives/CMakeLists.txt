@@ -78,8 +78,9 @@ add_hpx_module(collectives
       hpx_serialization
       hpx_synchronization
       hpx_timing
-      hpx_threading_base
+      hpx_threading
       hpx_thread_support
+      hpx_threading_base
       hpx_threadmanager
       hpx_topology
       hpx_type_support

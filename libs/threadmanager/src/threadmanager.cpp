@@ -20,13 +20,12 @@
 #include <hpx/logging.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool.hpp>
 #include <hpx/runtime/threads/executors/current_executor.hpp>
-#include <hpx/runtime/threads/policies/maintain_queue_wait_times.hpp>
-#include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/schedulers.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
@@ -184,6 +183,7 @@ namespace hpx { namespace threads {
         if (size == thread_stacksize_unknown)
             return "unknown";
 
+        // TODO: Hold on to reference of runtime_configuration.
         util::runtime_configuration const& rtcfg = hpx::get_config();
         if (rtcfg.get_stack_size(thread_stacksize_small) == size)
             size = thread_stacksize_small;
@@ -1233,24 +1233,5 @@ namespace hpx { namespace threads {
                 pool_iter->resume_direct();
             }
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    std::int64_t get_thread_count(thread_state_enum state)
-    {
-        return get_thread_manager().get_thread_count(state);
-    }
-
-    std::int64_t get_thread_count(
-        thread_priority priority, thread_state_enum state)
-    {
-        return get_thread_manager().get_thread_count(state, priority);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
-        thread_state_enum state)
-    {
-        return get_thread_manager().enumerate_threads(f, state);
     }
 }}    // namespace hpx::threads

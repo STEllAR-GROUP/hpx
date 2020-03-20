@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/util/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 
 #include <cstdint>

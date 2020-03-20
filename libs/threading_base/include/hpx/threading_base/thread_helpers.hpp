@@ -31,10 +31,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {
-    /// \cond NOINTERNAL
-    class thread_init_data;
-    /// \endcond
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
     ///         thread_id \a id.

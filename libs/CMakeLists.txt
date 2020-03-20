@@ -37,6 +37,7 @@ set(HPX_LIBS
   functional
   hardware
   hashing
+  io_service
   iterator_support
   local_lcos
   logging
@@ -50,6 +51,7 @@ set(HPX_LIBS
   resiliency
   resource_partitioner
   runtime_configuration
+  schedulers
   segmented_algorithms
   serialization
   static_reinit
@@ -57,6 +59,8 @@ set(HPX_LIBS
   string_util
   synchronization
   testing
+  threading
+  thread_pools
   thread_support
   threading_base
   threadmanager

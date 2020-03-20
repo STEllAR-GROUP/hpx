@@ -16,7 +16,7 @@
 #include <hpx/async.hpp>
 
 // we should not need these
-#include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
