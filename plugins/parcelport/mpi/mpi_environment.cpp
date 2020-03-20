@@ -45,11 +45,11 @@ namespace hpx { namespace util
         enabled_ = detail::check_mpi_environment(cfg.rtcfg_);
         if (!enabled_)
         {
-            cfg.ini_config_.emplace_back("hpx.parcel.mpi.enable = 0");
+            cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
             return;
         }
 
-        cfg.ini_config_.emplace_back("hpx.parcel.bootstrap!=mpi");
+        cfg.rtcfg_.add_entry("hpx.parcel.bootstrap", "mpi");
 
         // Check if MPI_Init has been called previously
         MPI_Initialized(&is_initialized_);
@@ -77,7 +77,7 @@ namespace hpx { namespace util
                 if (MPI_ERR_OTHER != retval)
                 {
                     // explicitly disable mpi if not run by mpirun
-                    cfg.ini_config_.emplace_back("hpx.parcel.mpi.enable = 0");
+                    cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
 
                     enabled_ = false;
 
@@ -109,7 +109,7 @@ namespace hpx { namespace util
         if (provided_threading_flag_ < MPI_THREAD_SERIALIZED)
         {
             // explicitly disable mpi if not run by mpirun
-            cfg.ini_config_.emplace_back("hpx.parcel.mpi.multithreaded = 0");
+            cfg.rtcfg_.add_entry("hpx.parcel.mpi.multithreaded", "0");
         }
 
         if (provided_threading_flag_ == MPI_THREAD_FUNNELED)
@@ -120,7 +120,7 @@ namespace hpx { namespace util
                 "The underlying MPI implementation only supports "
                 "MPI_THREAD_FUNNELED. This mode is not supported by HPX. Please "
                 "pass -Ihpx.parcel.mpi.multithreaded=0 to explicitly disable MPI"
-                " multithreading.");
+                " multi-threading.");
         }
 
         this_rank = rank();
@@ -135,10 +135,9 @@ namespace hpx { namespace util
             cfg.rtcfg_.mode_ = hpx::runtime_mode_worker;
         }
 
-        cfg.ini_config_.emplace_back("hpx.parcel.mpi.rank!=" +
-            std::to_string(this_rank));
-        cfg.ini_config_.emplace_back("hpx.parcel.mpi.processorname!=" +
-            get_processor_name());
+        cfg.rtcfg_.add_entry("hpx.parcel.mpi.rank", std::to_string(this_rank));
+        cfg.rtcfg_.add_entry(
+            "hpx.parcel.mpi.processorname", get_processor_name());
 
         cfg.node_ = std::size_t(this_rank);
     }
