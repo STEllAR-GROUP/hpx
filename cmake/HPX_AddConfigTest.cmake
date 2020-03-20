@@ -332,7 +332,7 @@ endfunction()
 
 ###############################################################################
 function(hpx_check_for_cxx17_std_variant)
-  add_hpx_config_test(HPX_WITH_CXX17_VARIANT
+  add_hpx_config_test(HPX_WITH_CXX17_STD_VARIANT
     SOURCE cmake/tests/cxx17_std_variant.cpp
     FILE ${ARGN})
 endfunction()

@@ -25,4 +25,42 @@ foreach(test ${tests})
     FOLDER ${folder_name})
 
   add_hpx_regression_test("modules.serialization" ${test} ${${test}_PARAMETERS})
+
 endforeach()
+
+if(HPX_WITH_COMPILE_ONLY_TESTS)
+
+  # add compile time tests
+  set(compile_tests)
+
+  if(HPX_WITH_CXX17_STD_VARIANT)
+    set(compile_tests ${compile_tests}
+        std_variant_4448
+    )
+  endif()
+
+  if(HPX_WITH_FAIL_COMPILE_TESTS)
+    set(fail_compile_tests)
+    foreach(fail_compile_test ${fail_compile_tests})
+      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
+    endforeach()
+
+    set(compile_tests ${compile_tests} ${fail_compile_tests})
+  endif()
+
+  foreach(compile_test ${compile_tests})
+    set(sources
+        ${compile_test}.cpp)
+
+    source_group("Source Files" FILES ${sources})
+
+    add_hpx_regression_compile_test(
+      "modules.serialization"
+      ${compile_test}
+      SOURCES ${sources}
+      ${${compile_test}_FLAGS}
+      FOLDER "Tests/Regressions/Modules/Serialization/CompileOnly")
+
+  endforeach()
+
+endif()

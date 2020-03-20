@@ -29,7 +29,7 @@ if(HPX_WITH_CXX17_STRUCTURED_BINDINGS)
         serialization_brace_initializable
     )
 endif()
-if(HPX_CXX17_WITH_STD_VARIANT)
+if(HPX_WITH_CXX17_STD_VARIANT)
     set(tests ${tests}
         serialization_std_variant
     )

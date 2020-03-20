@@ -1288,7 +1288,10 @@ if(WIN32)
       hpx_add_config_cond_define(_ENABLE_EXTENDED_ALIGNED_STORAGE)
 
       # Make sure that __cplusplus is properly defined
-      hpx_add_target_compile_option(-Zc:__cplusplus)
+      hpx_add_target_compile_option(-Zc:__cplusplus PUBLIC)
+
+      # Silence C++17 deprecation warnings
+      hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
     endif()
 
     # Runtime type information
