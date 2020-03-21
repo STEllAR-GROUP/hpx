@@ -21,6 +21,9 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#if defined(HPX_HAVE_CXX17_STD_VARIANT)
+#include <variant>
+#endif
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
@@ -468,6 +471,14 @@ namespace hpx { namespace util {
     };
 #endif
 
+#if defined(HPX_HAVE_CXX17_STD_VARIANT)
+    template <typename... Ts>
+    struct tuple_size<std::variant<Ts...>>
+      : std::integral_constant<std::size_t, sizeof...(Ts)>
+    {
+    };
+#endif
+
     // template <size_t I, class Tuple>
     // class tuple_element
     template <std::size_t I, typename T>
@@ -593,6 +604,38 @@ namespace hpx { namespace util {
             std::tuple<Ts...> const&& tuple) noexcept
         {
             return std::get<I>(std::move(tuple));
+        }
+    };
+#endif
+
+#if defined(HPX_HAVE_CXX17_STD_VARIANT)
+    template <std::size_t I, typename... Ts>
+    struct tuple_element<I, std::variant<Ts...>>
+    {
+        using type = typename util::at_index<I, Ts...>::type;
+
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type& get(
+            std::variant<Ts...>& var) noexcept
+        {
+            return std::get<I>(var);
+        }
+
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const& get(
+            std::variant<Ts...> const& var) noexcept
+        {
+            return std::get<I>(var);
+        }
+
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type&& get(
+            std::variant<Ts...>&& var) noexcept
+        {
+            return std::get<I>(std::move(var));
+        }
+
+        static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE type const&& get(
+            std::variant<Ts...> const&& var) noexcept
+        {
+            return std::get<I>(std::move(var));
         }
     };
 #endif
