@@ -61,6 +61,16 @@ What's so special about HPX?
 * HPX is published under a liberal open-source license and has an open, active,
   and thriving developer community.
 
+Governance
+==========
+
+The HPX project is a meritocratic, consensus-based community project. Anyone
+with an interest in the project can join the community, contribute to the
+project design and participate in the decision making process.
+`This document <http://hpx.stellar-group.org/documents/governance/>`_ describes
+how that participation takes place and how to set about earning merit within
+the project community.
+
 Documentation
 =============
 
