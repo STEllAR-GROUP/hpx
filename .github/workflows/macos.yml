@@ -54,4 +54,6 @@ jobs:
           tests.unit.threads.distributed.tcp.thread_stacksize|\
           tests.unit.topology.numa_allocator|\
           tests.examples.quickstart.1d_wave_equation|\
-          tests.examples.transpose.transpose_block_numa"
+          tests.examples.transpose.transpose_block_numa|\
+          tests.regressions.modules.performance_counters.dynamic_counters_loaded_1508|\
+          tests.regressions.util.distributed.tcp.zero_copy_parcels_1001_no_zero_copy_optimization"
