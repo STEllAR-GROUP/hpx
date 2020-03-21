@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(performance_counters_headers
-  hpx/performance_counters/apex_set_value.hpp
+  hpx/performance_counters/apex_sample_value.hpp
   hpx/performance_counters/base_performance_counter.hpp
   hpx/performance_counters/counter_creators.hpp
   hpx/performance_counters/counter_parser.hpp

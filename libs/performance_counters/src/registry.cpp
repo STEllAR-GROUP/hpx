@@ -619,10 +619,14 @@ namespace hpx { namespace performance_counters {
             break;
 
             // NOLINTNEXTLINE(bugprone-branch-clone)
-            case counter_raw: HPX_FALLTHROUGH;
-            case counter_monotonically_increasing: HPX_FALLTHROUGH;
-            case counter_aggregating: HPX_FALLTHROUGH;
-            case counter_average_count: HPX_FALLTHROUGH;
+            case counter_raw:
+                HPX_FALLTHROUGH;
+            case counter_monotonically_increasing:
+                HPX_FALLTHROUGH;
+            case counter_aggregating:
+                HPX_FALLTHROUGH;
+            case counter_average_count:
+                HPX_FALLTHROUGH;
             case counter_average_timer:
                 HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter",
                     "need function parameter for raw_counter");

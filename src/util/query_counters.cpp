@@ -9,7 +9,7 @@
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#include <hpx/performance_counters/apex_set_value.hpp>
+#include <hpx/performance_counters/apex_sample_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
