@@ -21,6 +21,7 @@
 
 #if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
 #include <filesystem>
+#include <string>
 #include <system_error>
 
 namespace hpx { namespace filesystem {
@@ -34,9 +35,9 @@ namespace hpx { namespace filesystem {
         return ip;
     }
 
-    inline path basename(path const& p)
+    inline std::string basename(path const& p)
     {
-        return p.stem();
+        return p.stem().string();
     }
 
     inline path canonical(path const& p, path const& base)
