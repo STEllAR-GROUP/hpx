@@ -19,11 +19,11 @@
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>

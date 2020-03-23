@@ -103,14 +103,16 @@ namespace hpx { namespace threads { namespace detail {
         std::size_t virt_core, error_code& ec)
     {
         HPX_ASSERT_MSG(false,
-            "Suspending threads on io_service_thread_pool is not supported");
+            "Suspending threads on io_service_thread_pool is not "
+            "supported");
     }
 
     void io_service_thread_pool::resume_processing_unit_direct(
         std::size_t virt_core, error_code& ec)
     {
         HPX_ASSERT_MSG(false,
-            "Suspending threads on io_service_thread_pool is not supported");
+            "Suspending threads on io_service_thread_pool is not "
+            "supported");
     }
 
     std::thread& io_service_thread_pool::get_os_thread_handle(
@@ -148,4 +150,5 @@ namespace hpx { namespace threads { namespace detail {
         std::size_t thread_num, error_code& ec)
     {
     }
+#endif
 }}}    // namespace hpx::threads::detail
