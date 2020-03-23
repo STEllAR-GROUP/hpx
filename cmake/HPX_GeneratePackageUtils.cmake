@@ -167,8 +167,9 @@ function(hpx_construct_cflag_list compile_definitions compile_options pic_option
     "${_cflag_list} $<JOIN:${${compile_options}}, >")
   set(_cflag_list
     "${_cflag_list} $<$<BOOL:${${include_directories}}>:-I$<JOIN:${${include_directories}}, -I>>")
+  # NOTE: This uses -I and not -isystem in lack of a good way to filter out compiler search paths.
   set(_cflag_list
-    "${_cflag_list} $<$<BOOL:${${sys_include_dirs}}>:-isystem$<JOIN:${${sys_include_dirs}}, -isystem>>")
+    "${_cflag_list} $<$<BOOL:${${sys_include_dirs}}>:-I$<JOIN:${${sys_include_dirs}}, -isystem>>")
   set(${cflag_list} ${_cflag_list} PARENT_SCOPE)
 
 endfunction(hpx_construct_cflag_list)

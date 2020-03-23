@@ -119,7 +119,7 @@ if (NOT TARGET hpx::allocator)
     endif()
 
     add_library(hpx::amplifier INTERFACE IMPORTED)
-    target_include_directories(hpx::amplifier INTERFACE ${AMPLIFIER_INCLUDE_DIR})
+    target_include_directories(hpx::amplifier SYSTEM INTERFACE ${AMPLIFIER_INCLUDE_DIR})
     target_link_libraries(hpx::amplifier INTERFACE ${AMPLIFIER_LIBRARIES})
 
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)

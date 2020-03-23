@@ -22,7 +22,7 @@ if(HPX_WITH_VALGRIND AND NOT TARGET hpx::valgrind)
   endif()
 
   add_library(hpx::valgrind INTERFACE IMPORTED)
-  target_include_directories(hpx::valgrind INTERFACE ${VALGRIND_INCLUDE_DIR})
+  target_include_directories(hpx::valgrind SYSTEM INTERFACE ${VALGRIND_INCLUDE_DIR})
 
   hpx_add_config_define(HPX_HAVE_VALGRIND)
 endif()

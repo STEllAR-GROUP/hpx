@@ -23,7 +23,7 @@ if(HPX_WITH_GOOGLE_PERFTOOLS AND NOT TARGET hpx::gperftools)
   endif()
 
   add_library(hpx::gperftools INTERFACE IMPORTED)
-  target_include_directories(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+  target_include_directories(hpx::gperftools SYSTEM INTERFACE ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
   target_link_libraries(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_LIBRARIES})
 
 endif()

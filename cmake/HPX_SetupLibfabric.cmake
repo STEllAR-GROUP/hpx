@@ -23,7 +23,7 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET hpx::libfabric)
   endif()
   # Setup Libfabric imported target
   add_library(hpx::libfabric INTERFACE IMPORTED)
-  target_include_directories(hpx::libfabric INTERFACE ${LIBFABRIC_INCLUDE_DIR})
+  target_include_directories(hpx::libfabric SYSTEM INTERFACE ${LIBFABRIC_INCLUDE_DIR})
   target_link_libraries(hpx::libfabric INTERFACE ${LIBFABRIC_LIBRARY})
 
   # Setup PMI imported target
@@ -35,7 +35,7 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET hpx::libfabric)
   endif()
 
   add_library(hpx::pmi INTERFACE IMPORTED)
-  target_include_directories(hpx::pmi INTERFACE ${PMI_INCLUDE_DIR})
+  target_include_directories(hpx::pmi SYSTEM INTERFACE ${PMI_INCLUDE_DIR})
   target_link_libraries(hpx::pmi INTERFACE ${PMI_LIBRARY})
 
   #------------------------------------------------------------------------------

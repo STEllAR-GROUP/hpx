@@ -21,7 +21,7 @@ if (NOT TARGET hpx::hwloc)
   endif()
 
   add_library(hpx::hwloc INTERFACE IMPORTED)
-  target_include_directories(hpx::hwloc INTERFACE ${HWLOC_INCLUDE_DIR})
+  target_include_directories(hpx::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
   target_link_libraries(hpx::hwloc INTERFACE ${HWLOC_LIBRARIES})
 
 endif()

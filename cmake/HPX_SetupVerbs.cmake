@@ -215,7 +215,7 @@ if (HPX_WITH_PARCELPORT_VERBS AND NOT TARGET hpx::verbs)
   include(HPX_AddLibrary)
 
   add_library(hpx::verbs INTERFACE IMPORTED)
-  target_include_directories(hpx::verbs INTERFACE ${IB_VERBS_INCLUDE_DIRS} ${RDMA_CM_INCLUDE_DIRS})
+  target_include_directories(hpx::verbs SYSTEM INTERFACE ${IB_VERBS_INCLUDE_DIRS} ${RDMA_CM_INCLUDE_DIRS})
   target_link_libraries(hpx::verbs INTERFACE ${IB_VERBS_LIBRARIES} ${RDMA_CM_LIBRARIES})
 
 endif()

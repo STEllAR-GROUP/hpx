@@ -19,7 +19,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI AND NOT TARGET hpx::mpi)
     MPI_ROOT to point to the root of your MPI installation")
   endif()
   add_library(hpx::mpi INTERFACE IMPORTED)
-  target_include_directories(hpx::mpi INTERFACE ${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
+  target_include_directories(hpx::mpi SYSTEM INTERFACE ${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
   # MPI_LIBRARY and EXTRA is deprecated but still linked for older MPI versions
   if (MPI_CXX_LIBRARIES)
     target_link_libraries(hpx::mpi INTERFACE ${MPI_CXX_LIBRARIES})

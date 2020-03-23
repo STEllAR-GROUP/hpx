@@ -25,7 +25,7 @@ if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY AND NOT TARGET
   endif()
 
   add_library(hpx::boost::program_options INTERFACE IMPORTED)
-  target_include_directories(hpx::boost::program_options INTERFACE ${Boost_INCLUDE_DIRS})
+  target_include_directories(hpx::boost::program_options SYSTEM INTERFACE ${Boost_INCLUDE_DIRS})
   target_link_libraries(hpx::boost::program_options INTERFACE
     ${Boost_PROGRAM_OPTIONS_LIBRARIES})
 
