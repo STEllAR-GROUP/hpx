@@ -878,13 +878,29 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest --timeout 60 -j2 -T test --no-compress-output --output-on-failure -R tests.headers
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure -R tests.headers -E tests.headers.modules
       - run:
           <<: *convert_xml
       - store_test_results:
           path: tests.headers
       - store_artifacts:
           path: tests.headers
+
+  tests.headers.modules:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests
+          command: |
+              ctest --timeout 60 -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers.modules
+      - store_artifacts:
+          path: tests.headers.modules
 
   tests.performance:
     <<: *defaults
@@ -1087,6 +1103,8 @@ workflows:
           <<: *core_dependency
       - tests.headers:
           <<: *core_dependency
+      - tests.headers.modules:
+          <<: *core_dependency
       - examples:
           <<: *core_dependency
       - tests.unit.build:
@@ -1116,6 +1134,7 @@ workflows:
             - tests.unit.modules.execution
             - tests.unit.modules.segmented_algorithms
             - tests.headers
+            - tests.headers.modules
             - tests.performance
             - tests.regressions
             - examples
