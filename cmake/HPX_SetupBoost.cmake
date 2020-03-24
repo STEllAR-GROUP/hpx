@@ -85,10 +85,10 @@ if (NOT TARGET hpx::boost)
   # Boost headers
   # FIXME: push changes upstream
   if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-    target_include_directories(hpx::boost BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
+    target_include_directories(hpx::boost SYSTEM BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
   endif()
 
-  target_include_directories(hpx::boost INTERFACE ${Boost_INCLUDE_DIRS})
+  target_include_directories(hpx::boost SYSTEM INTERFACE ${Boost_INCLUDE_DIRS})
   target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
 
   include(HPX_AddDefinitions)

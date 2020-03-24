@@ -56,7 +56,7 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
   endif()
 
   add_library(hpx::vc INTERFACE IMPORTED)
-  target_include_directories(hpx::vc INTERFACE ${Vc_INCLUDE_DIR})
+  target_include_directories(hpx::vc SYSTEM INTERFACE ${Vc_INCLUDE_DIR})
 
   if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
     target_link_libraries(hpx::vc INTERFACE ${Vc_LIBRARIES})

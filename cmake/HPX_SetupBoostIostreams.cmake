@@ -18,7 +18,7 @@ if(NOT TARGET hpx::boost::iostreams)
 
   add_library(hpx::boost::iostreams INTERFACE IMPORTED)
 
-  target_include_directories(hpx::boost::iostreams INTERFACE ${Boost_INCLUDE_DIRS})
+  target_include_directories(hpx::boost::iostreams SYSTEM INTERFACE ${Boost_INCLUDE_DIRS})
   target_link_libraries(hpx::boost::iostreams INTERFACE ${Boost_IOSTREAMS_LIBRARIES})
 
 endif()

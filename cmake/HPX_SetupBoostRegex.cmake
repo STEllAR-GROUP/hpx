@@ -18,6 +18,6 @@ if(NOT TARGET hpx::boost::regex)
   endif()
 
   add_library(hpx::boost::regex INTERFACE IMPORTED)
-  target_include_directories(hpx::boost::regex INTERFACE ${Boost_INCLUDE_DIRS})
+  target_include_directories(hpx::boost::regex SYSTEM INTERFACE ${Boost_INCLUDE_DIRS})
   target_link_libraries(hpx::boost::regex INTERFACE ${Boost_REGEX_LIBRARIES})
 endif()

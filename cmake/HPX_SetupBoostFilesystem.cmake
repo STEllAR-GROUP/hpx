@@ -19,7 +19,7 @@ if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
       COMPONENTS filesystem)
 
     add_library(hpx::boost::filesystem INTERFACE IMPORTED)
-    target_include_directories(hpx::boost::filesystem INTERFACE ${Boost_INCLUDE_DIRS})
+    target_include_directories(hpx::boost::filesystem SYSTEM INTERFACE ${Boost_INCLUDE_DIRS})
     target_link_libraries(hpx::boost::filesystem INTERFACE ${Boost_FILESYSTEM_LIBRARIES})
 
   endif()

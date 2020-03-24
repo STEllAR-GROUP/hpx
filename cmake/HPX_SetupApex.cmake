@@ -66,7 +66,7 @@ if(HPX_WITH_APEX AND NOT TARGET hpx::apex)
     endif()
 
     add_library(hpx::ittnotify INTERFACE IMPORTED)
-    target_include_directories(hpx::ittnotify INTERFACE ${ITTNOTIFY_SOURCE_DIR})
+    target_include_directories(hpx::ittnotify SYSTEM INTERFACE ${ITTNOTIFY_SOURCE_DIR})
     target_link_libraries(hpx::apex INTERFACE hpx::ittnotify)
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
   endif()
