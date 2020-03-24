@@ -412,8 +412,7 @@ namespace hpx { namespace lcos { namespace detail
     {
 
         template <typename F>
-        HPX_FORCEINLINE static
-        typename hpx::traits::future_then_result<Future, F>::type
+        HPX_FORCEINLINE static decltype(auto)
         call(Future&& fut, F&& f)
         {
             // dummy impl to fail compilation if this function is called
