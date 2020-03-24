@@ -36,6 +36,10 @@ set(schedulers_compat_headers
   hpx/runtime/threads/policies/thread_queue_mc.hpp
   hpx/runtime/threads/policies/schedulers.hpp)
 
+set(schedulers_sources
+  deadlock_detection.cpp
+  maintain_queue_wait_times.cpp)
+
 include(HPX_AddModule)
 add_hpx_module(schedulers
   COMPATIBILITY_HEADERS ON
@@ -44,6 +48,7 @@ add_hpx_module(schedulers
   GLOBAL_HEADER_GEN OFF
   HEADERS ${schedulers_headers}
   COMPAT_HEADERS ${schedulers_compat_headers}
+  SOURCES ${schedulers_sources}
   DEPENDENCIES hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )
