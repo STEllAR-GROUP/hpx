@@ -85,7 +85,7 @@ code:
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_component.cpp
    :language: c++
-   :lines: 7-29
+   :lines: 7-30
 
 **hello_world_component.hpp**
 
