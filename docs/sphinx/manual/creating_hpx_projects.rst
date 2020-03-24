@@ -425,8 +425,8 @@ run it on.
 
 .. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
-   :start-after://[hello_world_1_getting_started
-   :end-before://]
+   :start-after: //[hello_world_1_getting_started
+   :end-before: //]
  
 Copy the content of this program into a file called hello_world.cpp.
 
@@ -486,22 +486,22 @@ code:
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_component.cpp
    :language: c++
-   :start-after://[hello_world_cpp_getting_started
-   :end-before://]
+   :start-after: //[hello_world_cpp_getting_started
+   :end-before: //]
 
 **hello_world_component.hpp**
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_component.hpp
    :language: c++
-   :start-after://[hello_world_hpp_getting_started
-   :end-before://]
+   :start-after: //[hello_world_hpp_getting_started
+   :end-before: //]
 
 **hello_world_client.cpp**
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_client.cpp
    :language: c++
-   :start-after://[hello_world_client_getting_started
-   :end-before://]
+   :start-after: //[hello_world_client_getting_started
+   :end-before: //]
 
 Now, in the directory, create a Makefile. Add the following code:
 
