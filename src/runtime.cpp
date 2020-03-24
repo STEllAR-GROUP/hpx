@@ -32,7 +32,7 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/state.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/util/backtrace.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #include <hpx/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/from_string.hpp>

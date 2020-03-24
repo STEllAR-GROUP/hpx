@@ -7,17 +7,22 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(debugging_headers
+  hpx/debugging/attach_debugger.hpp
+  hpx/debugging/backtrace.hpp
+  hpx/debugging/backtrace/backtrace.hpp
   hpx/debugging/demangle_helper.hpp
   hpx/debugging/print.hpp
-  hpx/debugging/attach_debugger.hpp
   )
 
 set(debugging_compat_headers
+  hpx/util/backtrace.hpp
+  hpx/util/backtrace/backtrace.hpp
   hpx/util/debug/demangle_helper.hpp
   )
 
 set(debugging_sources
   attach_debugger.cpp
+  backtrace.cpp
   )
 
 include(HPX_AddModule)

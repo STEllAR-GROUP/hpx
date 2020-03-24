@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STACKTRACES)
-#include <hpx/util/backtrace/backtrace.hpp>
+#include <hpx/debugging/backtrace/backtrace.hpp>
 #else
 
 #include <cstddef>
