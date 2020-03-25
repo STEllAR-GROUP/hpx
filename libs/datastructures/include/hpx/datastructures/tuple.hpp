@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
 #include <hpx/datastructures/member_pack.hpp>
+#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -37,7 +38,7 @@ namespace hpx { namespace util {
     template <typename... Ts>
     class tuple;
 
-    template <class T>
+    template <typename T>
     struct tuple_size;    // undefined
 
     template <std::size_t I, typename T>
@@ -48,28 +49,63 @@ namespace hpx { namespace util {
     // hpx::util.
     namespace adl_barrier {
 
-        template <std::size_t I, typename Tuple>
+        template <std::size_t I, typename Tuple,
+            typename Enable = typename util::always_void<
+                typename util::tuple_element<I, Tuple>::type>::type>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename tuple_element<I, Tuple>::type&
+            typename util::tuple_element<I, Tuple>::type&
             get(Tuple& t) noexcept;
 
-        template <std::size_t I, typename Tuple>
+        template <std::size_t I, typename Tuple,
+            typename Enable = typename util::always_void<
+                typename util::tuple_element<I, Tuple>::type>::type>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename tuple_element<I, Tuple>::type const&
+            typename util::tuple_element<I, Tuple>::type const&
             get(Tuple const& t) noexcept;
 
-        template <std::size_t I, typename Tuple>
+        template <std::size_t I, typename Tuple,
+            typename Enable =
+                typename util::always_void<typename util::tuple_element<I,
+                    typename std::decay<Tuple>::type>::type>::type>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename tuple_element<I, Tuple>::type&&
+            typename util::tuple_element<I, Tuple>::type&&
             get(Tuple&& t) noexcept;
 
-        template <std::size_t I, typename Tuple>
+        template <std::size_t I, typename Tuple,
+            typename Enable = typename util::always_void<
+                typename util::tuple_element<I, Tuple>::type>::type>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename tuple_element<I, Tuple>::type const&&
+            typename util::tuple_element<I, Tuple>::type const&&
             get(Tuple const&& t) noexcept;
     }    // namespace adl_barrier
 
+    // we separate the implementation of util::get for our tuple type so that
+    // it can be injected into the std:: namespace
+    namespace std_adl_barrier {
+
+        template <std::size_t I, typename... Ts>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::tuple_element<I, util::tuple<Ts...>>::type&
+            get(util::tuple<Ts...>& t) noexcept;
+
+        template <std::size_t I, typename... Ts>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::tuple_element<I, util::tuple<Ts...>>::type const&
+            get(util::tuple<Ts...> const& t) noexcept;
+
+        template <std::size_t I, typename... Ts>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::tuple_element<I, util::tuple<Ts...>>::type&&
+            get(util::tuple<Ts...>&& t) noexcept;
+
+        template <std::size_t I, typename... Ts>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::tuple_element<I, util::tuple<Ts...>>::type const&&
+            get(util::tuple<Ts...> const&& t) noexcept;
+    }    // namespace std_adl_barrier
+
     using hpx::util::adl_barrier::get;
+    using hpx::util::std_adl_barrier::get;
 }}    // namespace hpx::util
 
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
@@ -88,7 +124,7 @@ namespace std {
     {
     };
 
-    using hpx::util::adl_barrier::get;
+    using hpx::util::std_adl_barrier::get;
 }    // namespace std
 #endif
 
@@ -603,49 +639,88 @@ namespace hpx { namespace util {
         // template <size_t I, class... Types>
         // constexpr typename tuple_element<I, tuple<Types...> >::type&
         // get(tuple<Types...>& t) noexcept;
-        template <std::size_t I, typename Tuple>
+        template <std::size_t I, typename Tuple, typename Enable>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename tuple_element<I, Tuple>::type&
+            typename util::tuple_element<I, Tuple>::type&
             get(Tuple& t) noexcept
         {
-            return tuple_element<I, Tuple>::get(t);
+            return util::tuple_element<I, Tuple>::get(t);
         }
 
         // template <size_t I, class... Types>
         // constexpr typename tuple_element<I, tuple<Types...> >::type const&
         // get(const tuple<Types...>& t) noexcept;
-        template <std::size_t I, typename Tuple>
+        template <std::size_t I, typename Tuple, typename Enable>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename tuple_element<I, Tuple>::type const&
+            typename util::tuple_element<I, Tuple>::type const&
             get(Tuple const& t) noexcept
         {
-            return tuple_element<I, Tuple>::get(t);
+            return util::tuple_element<I, Tuple>::get(t);
         }
 
         // template <size_t I, class... Types>
         // constexpr typename tuple_element<I, tuple<Types...> >::type&&
         // get(tuple<Types...>&& t) noexcept;
-        template <std::size_t I, typename Tuple>
+        template <std::size_t I, typename Tuple, typename Enable>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename tuple_element<I, Tuple>::type&&
+            typename util::tuple_element<I, Tuple>::type&&
             get(Tuple&& t) noexcept
         {
-            return std::forward<typename tuple_element<I, Tuple>::type>(
+            return std::forward<typename util::tuple_element<I, Tuple>::type>(
                 util::get<I>(t));
         }
 
         // template <size_t I, class... Types>
         // constexpr typename tuple_element<I, tuple<Types...> >::type const&&
         // get(const tuple<Types...>&& t) noexcept;
-        template <std::size_t I, typename Tuple>
+        template <std::size_t I, typename Tuple, typename Enable>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-            typename tuple_element<I, Tuple>::type const&&
+            typename util::tuple_element<I, Tuple>::type const&&
             get(Tuple const&& t) noexcept
         {
-            return std::forward<typename tuple_element<I, Tuple>::type const>(
+            return std::forward<
+                typename util::tuple_element<I, Tuple>::type const>(
                 util::get<I>(t));
         }
     }    // namespace adl_barrier
+
+    namespace std_adl_barrier {
+
+        template <std::size_t I, typename... Ts>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::tuple_element<I, util::tuple<Ts...>>::type&
+            get(util::tuple<Ts...>& t) noexcept
+        {
+            return util::tuple_element<I, util::tuple<Ts...>>::get(t);
+        }
+
+        template <std::size_t I, typename... Ts>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::tuple_element<I, util::tuple<Ts...>>::type const&
+            get(util::tuple<Ts...> const& t) noexcept
+        {
+            return util::tuple_element<I, util::tuple<Ts...>>::get(t);
+        }
+
+        template <std::size_t I, typename... Ts>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::tuple_element<I, util::tuple<Ts...>>::type&&
+            get(util::tuple<Ts...>&& t) noexcept
+        {
+            return std::forward<
+                typename util::tuple_element<I, util::tuple<Ts...>>::type>(
+                util::get<I>(t));
+        }
+
+        template <std::size_t I, typename... Ts>
+        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+            typename util::tuple_element<I, util::tuple<Ts...>>::type const&&
+            get(util::tuple<Ts...> const&& t) noexcept
+        {
+            return std::forward<typename util::tuple_element<I,
+                util::tuple<Ts...>>::type const>(util::get<I>(t));
+        }
+    }    // namespace std_adl_barrier
 
     // 20.4.2.4, tuple creation functions
     detail::ignore_type const ignore = {};
