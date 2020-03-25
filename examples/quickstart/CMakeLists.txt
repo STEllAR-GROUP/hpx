@@ -20,6 +20,7 @@ set(example_programs
     enumerate_threads
     error_handling
     event_synchronization
+    executor_with_thread_hooks
     factorial
     fibonacci
     fibonacci_await
