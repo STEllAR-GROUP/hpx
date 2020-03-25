@@ -43,10 +43,8 @@ function(create_cmake_test name hpx_dir setup_type)
       ${ADDITIONAL_CMAKE_OPTIONS}
       -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION> VERBATIM)
-  add_dependencies(${name}.make_configure ${name}.make_build_dir hpx iostreams_component)
-  if(NOT HPX_WITH_STATIC_LINKING)
-    add_dependencies(${name}.make_configure hpx_init)
-  endif()
+  add_dependencies(${name}.make_configure ${name}.make_build_dir
+    hpx iostreams_component)
   add_custom_target(${name}.make_compile
     COMMAND
       "${CMAKE_COMMAND}"
@@ -86,11 +84,8 @@ function(create_pkgconfig_test name hpx_dir)
       CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       PKG_CONFIG=${PKG_CONFIG_EXECUTABLE}
       BUILD_TYPE=$<CONFIGURATION> VERBATIM)
-  add_dependencies(${name}.make_compile ${name}.make_build_dir hpx_wrap
-    iostreams_component)
-  if(NOT HPX_WITH_STATIC_LINKING)
-    add_dependencies(${name}.make_compile hpx_init)
-  endif()
+  add_dependencies(${name}.make_compile ${name}.make_build_dir
+    hpx iostreams_component)
   add_hpx_pseudo_target(${name})
   add_hpx_pseudo_dependencies(${name} ${name}.make_compile)
 
