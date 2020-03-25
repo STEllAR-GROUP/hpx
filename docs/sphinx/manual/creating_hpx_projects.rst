@@ -28,6 +28,8 @@ program. It prints ``Hello World!`` on the :term:`locality` you run it on.
 
 .. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
+   :start-after: //[hello_world_1_getting_started
+   :end-before: //]
 
 Copy the text of this program into a file called hello_world.cpp.
 
@@ -85,18 +87,22 @@ code:
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_component.cpp
    :language: c++
-   :lines: 7-29
+   :start-after: //[hello_world_cpp_getting_started
+   :end-before: //]
 
 **hello_world_component.hpp**
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_component.hpp
    :language: c++
-   :lines: 7-54
+   :start-after: //[hello_world_hpp_getting_started
+   :end-before: //]
 
 **hello_world_client.cpp**
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_client.cpp
    :language: c++
+   :start-after: //[hello_world_client_getting_started
+   :end-before: //]
 
 Copy the three source files above into three files (called
 ``hello_world_component.cpp``, ``hello_world_component.hpp`` and
@@ -419,7 +425,9 @@ run it on.
 
 .. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
-
+   :start-after: //[hello_world_1_getting_started
+   :end-before: //]
+ 
 Copy the content of this program into a file called hello_world.cpp.
 
 Now, in the directory where you put hello_world.cpp, create a Makefile.
@@ -478,18 +486,22 @@ code:
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_component.cpp
    :language: c++
-   :lines: 7-29
+   :start-after: //[hello_world_cpp_getting_started
+   :end-before: //]
 
 **hello_world_component.hpp**
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_component.hpp
    :language: c++
-   :lines: 7-54
+   :start-after: //[hello_world_hpp_getting_started
+   :end-before: //]
 
 **hello_world_client.cpp**
 
 .. literalinclude:: ../../examples/hello_world_component/hello_world_client.cpp
    :language: c++
+   :start-after: //[hello_world_client_getting_started
+   :end-before: //]
 
 Now, in the directory, create a Makefile. Add the following code:
 
