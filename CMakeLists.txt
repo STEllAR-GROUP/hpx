@@ -667,7 +667,7 @@ if(HPX_WITH_APEX)
   hpx_option(HPX_WITH_APEX_NO_UPDATE BOOL
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling")
   hpx_option(HPX_WITH_APEX_TAG STRING
-    "APEX repository tag or branch" "v2.1.7" CATEGORY "Profiling")
+    "APEX repository tag or branch" "v2.1.8" CATEGORY "Profiling")
 endif()
 hpx_option(HPX_WITH_PAPI BOOL
   "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
