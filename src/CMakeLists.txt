@@ -542,6 +542,7 @@ add_library(hpx_pkgconfig_application INTERFACE)
 if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
   target_link_libraries(hpx_pkgconfig_application INTERFACE hpx_wrap)
 endif()
+target_link_libraries(hpx_pkgconfig_application INTERFACE hpx_init)
 target_compile_definitions(hpx_pkgconfig_application INTERFACE HPX_APPLICATION_EXPORTS)
 
 add_library(hpx_pkgconfig_component INTERFACE)
