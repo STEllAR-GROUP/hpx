@@ -13,7 +13,7 @@
 
 #if defined(HPX_HAVE_STACKTRACES)
 
-#include <hpx/util/backtrace/backtrace.hpp>
+#include <hpx/debugging/backtrace/backtrace.hpp>
 
 #include <boost/config.hpp>
 

@@ -16,6 +16,7 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/logging.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/util/backtrace.hpp>    // TODO: Move to a separate module.
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif

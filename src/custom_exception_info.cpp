@@ -22,7 +22,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/threading.hpp>
-#include <hpx/util/backtrace.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/version.hpp>

@@ -19,7 +19,7 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/runtime_handlers.hpp>
 #include <hpx/threadmanager.hpp>
-#include <hpx/util/backtrace.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #include <hpx/util/debugging.hpp>
 
 #include <cstddef>

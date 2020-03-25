@@ -17,7 +17,7 @@
 #include <hpx/threading_base/thread_description.hpp>
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-#include <hpx/util/backtrace.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #endif
 
 #include <cstddef>
