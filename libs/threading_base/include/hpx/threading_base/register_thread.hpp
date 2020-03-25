@@ -56,6 +56,11 @@ namespace hpx { namespace threads {
                 // held.
                 util::force_error_on_lock();
 
+                // run and free all registered exit functions for this thread
+                auto* p = get_self_id_data();
+                p->run_thread_exit_callbacks();
+                p->free_thread_exit_callbacks();
+
                 return threads::thread_result_type(
                     threads::terminated, threads::invalid_thread_id);
             }
@@ -76,6 +81,11 @@ namespace hpx { namespace threads {
                 // OS-thread. This will throw if there are still any locks
                 // held.
                 util::force_error_on_lock();
+
+                // run and free all registered exit functions for this thread
+                auto* p = get_self_id_data();
+                p->run_thread_exit_callbacks();
+                p->free_thread_exit_callbacks();
 
                 return threads::thread_result_type(
                     threads::terminated, threads::invalid_thread_id);

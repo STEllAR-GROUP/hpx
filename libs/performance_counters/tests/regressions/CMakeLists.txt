@@ -25,7 +25,7 @@ foreach(test ${tests})
     ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modues/PerformanceCounters")
+    FOLDER "Tests/Regressions/Modules/PerformanceCounters")
 
   add_hpx_regression_test("modules.performance_counters" ${test} ${${test}_PARAMETERS})
 
