@@ -54,7 +54,7 @@ readme_template = f'''
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx/docs/sphinx/latest/html/libs/{lib_name}/docs/index.html>`__.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/{lib_name}/docs/index.html>`__.
 '''
 
 index_rst = f'''..
