@@ -1,7 +1,7 @@
 # Copyright (c) 2007-2017 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
-# SPDX-License-Identifier: BSL-1.0
+# SPDX-License-Identifier:it_all BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -45,11 +45,8 @@ set(tests
     shared_stated_leaked_1211
     shared_future_then_with_executor_3634
     sliding_semaphore_2338
-    split_future_2246
-    wait_all_hang_1946
     wait_for_1751
     wait_for_action_2796
-    when_all_vectors_1623
    )
 
 set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
@@ -73,8 +70,6 @@ set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(sliding_semaphore_2338_PARAMETERS THREADS_PER_LOCALITY 2)
 set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
-set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)
-set(wait_all_hang_1946_FLAGS DEPENDENCIES iostreams_component)
 
 # Create test cases
 foreach(test ${tests})
@@ -109,7 +104,6 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests
       dataflow_future_ref_3639
       future_range_ambiguity_2032
-      wait_all_std_array_2035
      )
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)

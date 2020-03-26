@@ -40,18 +40,8 @@ set(tests
     promise_emplace
     remote_dataflow
     shared_future
-    split_shared_future
     sync_remote
     use_allocator
-    wait_all_std_array
-    wait_any_std_array
-    when_all
-    when_all_std_array
-    when_any
-    when_any_std_array
-    when_each
-    when_some
-    when_some_std_array
    )
 
 if(HPX_WITH_AWAIT)

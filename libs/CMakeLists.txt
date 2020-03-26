@@ -16,6 +16,7 @@ set(HPX_CANDIDATE_LIBS
   allocator_support
   asio
   assertion
+  async_combinators
   basic_execution
   batch_environments
   cache
