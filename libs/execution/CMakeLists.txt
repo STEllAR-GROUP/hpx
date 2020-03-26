@@ -127,6 +127,7 @@ add_hpx_module(execution
   COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES
     hpx_assertion
+    hpx_async_combinators
     hpx_allocator_support
     hpx_concepts
     hpx_config

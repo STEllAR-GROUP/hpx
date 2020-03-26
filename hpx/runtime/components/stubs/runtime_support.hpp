@@ -9,7 +9,6 @@
 #define HPX_COMPONENTS_STUBS_RUNTIME_SUPPORT_JUN_09_2008_0503PM
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/future.hpp>

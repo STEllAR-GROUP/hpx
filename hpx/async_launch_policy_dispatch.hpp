@@ -8,7 +8,6 @@
 #define HPX_ASYNC_LAUNCH_POLICY_DISPATCH_NOV_26_2017_1243PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/async_fwd.hpp>    // declare async_launch_policy_dispatch
 #include <hpx/lcos_fwd.hpp>          // declare futures_factory
 
 #include <hpx/assertion.hpp>
@@ -28,6 +27,10 @@
 
 namespace hpx { namespace detail
 {
+    // dispatch point used for launch_policy implementations
+    template <typename Action, typename Enable = void>
+    struct async_launch_policy_dispatch;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
     HPX_FORCEINLINE lcos::future<

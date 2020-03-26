@@ -39,5 +39,15 @@ add_hpx_module(async_combinators
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}
   DEPENDENCIES
+    hpx_allocator_support
+    hpx_basic_execution
+    hpx_config
+    hpx_datastructures
+    hpx_functional
+    hpx_iterator_support
+    hpx_memory
+    hpx_preprocessor
+    hpx_type_support
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )

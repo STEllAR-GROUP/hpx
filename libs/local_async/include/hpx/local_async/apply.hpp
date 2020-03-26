@@ -4,22 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_APPLY_APR_16_20012_0943AM)
-#define HPX_APPLY_APR_16_20012_0943AM
+#if !defined(HPX_LOCAL_ASYNC_APPLY_APR_16_20012_0943AM)
+#define HPX_LOCAL_ASYNC_APPLY_APR_16_20012_0943AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/applier/apply_continue.hpp>
-#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/util/bind_action.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/parallel_executor.hpp>
 
@@ -29,6 +21,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
+    // dispatch point used for apply implementations
+    template <typename Func, typename Enable = void>
+    struct apply_dispatch;
+
     ///////////////////////////////////////////////////////////////////////////
     // Define apply() overloads for plain local functions and function objects.
     // dispatching trait for hpx::apply
@@ -76,22 +72,6 @@ namespace hpx { namespace detail
             parallel::execution::post(std::forward<Executor_>(exec),
                 std::forward<F>(f), std::forward<Ts>(ts)...);
             return false;
-        }
-    };
-
-    // bound action
-    template <typename Bound>
-    struct apply_dispatch<Bound,
-        typename std::enable_if<
-            traits::is_bound_action<Bound>::value
-        >::type>
-    {
-        template <typename Action, typename Is, typename... Ts, typename ...Us>
-        HPX_FORCEINLINE static bool
-        call(hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
-            Us&&... vs)
-        {
-            return bound.apply(std::forward<Us>(vs)...);
         }
     };
 }}

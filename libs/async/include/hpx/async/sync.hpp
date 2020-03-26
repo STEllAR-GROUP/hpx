@@ -4,9 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_SYNC_JUL_21_2018_0933PM)
-#define HPX_LCOS_SYNC_JUL_21_2018_0933PM
+#if !defined(HPX_SYNC_JUL_21_2018_0937PM)
+#define HPX_SYNC_JUL_21_2018_0937PM
 
+#include <hpx/config.hpp>
+#include <hpx/lcos/sync.hpp>
+#include <hpx/local_async/sync.hpp>
+#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/util/bind_action.hpp>
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/lcos/detail/sync_implementations.hpp>
@@ -293,5 +298,26 @@ namespace hpx { namespace detail
     };
 }}
 
-#endif
+namespace hpx { namespace detail
+{
+    // bound action
+    template <typename Bound>
+    struct sync_dispatch<Bound,
+        typename std::enable_if<
+            traits::is_bound_action<Bound>::value
+        >::type>
+    {
+        template <typename Action, typename Is, typename... Ts, typename ...Us>
+        HPX_FORCEINLINE
+        static typename hpx::util::detail::bound_action<
+            Action, Is, Ts...
+        >::result_type
+        call(hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
+            Us&&... vs)
+        {
+            return bound(std::forward<Us>(vs)...);
+        }
+    };
+}}
 
+#endif

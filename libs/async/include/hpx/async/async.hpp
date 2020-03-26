@@ -4,9 +4,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_ASYNC_SEP_28_2011_0840AM)
-#define HPX_LCOS_ASYNC_SEP_28_2011_0840AM
+#if !defined(HPX_ASYNC_APR_16_20012_0225PM)
+#define HPX_ASYNC_APR_16_20012_0225PM
 
+#include <hpx/config.hpp>
+#include <hpx/lcos/async.hpp>
+#include <hpx/lcos/async_continue.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/local_async/async.hpp>
+#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/util/bind_action.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/parallel_executor.hpp>
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -363,5 +373,26 @@ namespace hpx { namespace detail
 
 #include <hpx/lcos/sync.hpp>
 
-#endif
+namespace hpx { namespace detail
+{
+    // bound action
+    template <typename Bound>
+    struct async_dispatch<Bound,
+        typename std::enable_if<
+            traits::is_bound_action<Bound>::value
+        >::type>
+    {
+        template <typename Action, typename Is, typename... Ts, typename ...Us>
+        HPX_FORCEINLINE
+        static hpx::future<typename hpx::util::detail::bound_action<
+            Action, Is, Ts...
+        >::result_type>
+        call(hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
+            Us&&... vs)
+        {
+            return bound.async(std::forward<Us>(vs)...);
+        }
+    };
+}}
 
+#endif

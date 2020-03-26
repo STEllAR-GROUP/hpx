@@ -16,6 +16,7 @@ set(HPX_CANDIDATE_LIBS
   allocator_support
   asio
   assertion
+  async
   async_combinators
   basic_execution
   batch_environments
@@ -41,6 +42,7 @@ set(HPX_CANDIDATE_LIBS
   include
   io_service
   iterator_support
+  local_async
   local_lcos
   logging
   memory

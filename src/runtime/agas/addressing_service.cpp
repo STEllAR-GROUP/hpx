@@ -40,6 +40,7 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/serialization/serialize.hpp>

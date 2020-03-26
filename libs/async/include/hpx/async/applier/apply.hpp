@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/local_async/apply.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
@@ -269,10 +270,6 @@ namespace hpx
 
     namespace detail
     {
-        // dispatch point used for apply implementations
-        template <typename Func, typename Enable = void>
-        struct apply_dispatch;
-
         template <typename Action>
         struct apply_dispatch<Action,
             typename std::enable_if<

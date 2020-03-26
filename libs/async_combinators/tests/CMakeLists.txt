@@ -36,7 +36,6 @@ if (HPX_ASYNC_COMBINATORS_WITH_TESTS)
         modules.async_combinators
         HEADERS ${async_combinators_headers}
         HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-        NOLIBS
         DEPENDENCIES hpx_async_combinators)
     endif()
 endif()
