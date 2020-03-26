@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_CXX17_HAVE_STD_VARIANT)
+#if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -57,7 +57,7 @@ struct A
 
 int main()
 {
-#if defined(HPX_CXX17_HAVE_STD_VARIANT)
+#if defined(HPX_HAVE_CXX17_STD_VARIANT)
     std::vector<char> buf;
     hpx::serialization::output_archive oar(buf);
     hpx::serialization::input_archive iar(buf);
@@ -67,37 +67,37 @@ int main()
     oar << ovar;
     iar >> ivar;
 
-    HPX_TEST_EQ(ivar.which(), ovar.which());
-    HPX_TEST_EQ(ivar, ovar);
+    HPX_TEST_EQ(ivar.index(), ovar.index());
+    HPX_TEST(ivar == ovar);
 
     ovar = 2.5;
     oar << ovar;
     iar >> ivar;
 
-    HPX_TEST_EQ(ivar.which(), ovar.which());
-    HPX_TEST_EQ(ivar, ovar);
+    HPX_TEST_EQ(ivar.index(), ovar.index());
+    HPX_TEST(ivar == ovar);
 
     ovar = 1;
     oar << ovar;
     iar >> ivar;
 
-    HPX_TEST_EQ(ivar.which(), ovar.which());
-    HPX_TEST_EQ(ivar, ovar);
+    HPX_TEST_EQ(ivar.index(), ovar.index());
+    HPX_TEST(ivar == ovar);
 
     ovar = A<int>(2);
     oar << ovar;
     iar >> ivar;
 
-    HPX_TEST_EQ(ivar.which(), ovar.which());
-    HPX_TEST_EQ(ivar, ovar);
+    HPX_TEST_EQ(ivar.index(), ovar.index());
+    HPX_TEST(ivar == ovar);
 
     const std::variant<std::string> sovar = std::string("string");
     std::variant<std::string> sivar;
     oar << sovar;
     iar >> sivar;
 
-    HPX_TEST_EQ(sivar.which(), sovar.which());
-    HPX_TEST_EQ(sivar, sovar);
+    HPX_TEST_EQ(sivar.index(), sovar.index());
+    HPX_TEST(sivar == sovar);
 
     bool caught_exception = false;
     try

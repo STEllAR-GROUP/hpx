@@ -24,6 +24,7 @@ set(datastructures_headers
   hpx/datastructures/tuple.hpp
   hpx/datastructures/traits/supports_streaming_with_any.hpp
   hpx/datastructures/traits/is_tuple_like.hpp
+  hpx/datastructures/variant_helper.hpp
 )
 
 set(datastructures_compat_headers
@@ -47,6 +48,8 @@ add_hpx_module(datastructures
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER
+    "hpx/datastructures/variant_helper.hpp"
   DEPENDENCIES
     hpx_assertion
     hpx_config
