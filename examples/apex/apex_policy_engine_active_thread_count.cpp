@@ -74,8 +74,8 @@ void setup_counters() {
         // We need to explicitly start all counters before we can use them. For
         // certain counters this could be a no-op, in which case start will
         // return 'false'.
-        counter.start(hpx::launch::sync, id);
-        std::cout << "Counters initialized! " << id << std::endl;
+        counter.start(hpx::launch::sync);
+        std::cout << "Counters initialized! " << counter.get_id() << std::endl;
         counter_value value = counter.get_counter_value(hpx::launch::sync);
         std::cout << "Active threads " << value.get_value<int>() << std::endl;
     }
