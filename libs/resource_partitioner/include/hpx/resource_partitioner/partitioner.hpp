@@ -141,6 +141,18 @@ namespace hpx { namespace resource {
         {
         }
 
+        partitioner(util::function_nonser<int(
+                        hpx::program_options::variables_map& vm)> const& f,
+            hpx::program_options::options_description const& desc_cmdline,
+            int argc, char** argv, std::vector<std::string> ini_config,
+            resource::partitioner_mode rpmode = resource::mode_default,
+            runtime_mode mode = runtime_mode_default, bool check = true,
+            int* result = nullptr)
+          : partitioner_(detail::create_partitioner(f, desc_cmdline, argc, argv,
+                std::move(ini_config), rpmode, mode, check, result))
+        {
+        }
+
 #if !defined(HPX_EXPORTS)
         partitioner(util::function_nonser<int(int, char**)> const& f, int argc,
             char** argv,
@@ -285,6 +297,7 @@ namespace hpx { namespace resource {
     private:
         detail::partitioner& partitioner_;
     };
+
 }}    // namespace hpx::resource
 
 #endif

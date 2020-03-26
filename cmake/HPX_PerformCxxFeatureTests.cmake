@@ -51,6 +51,9 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx17_std_variant(
     DEFINITIONS HPX_HAVE_CXX17_STD_VARIANT)
 
+  hpx_check_for_cxx17_maybe_unused(
+    DEFINITIONS HPX_HAVE_CXX17_MAYBE_UNUSED)
+
   # we deliberately check for this functionality even for non-C++17
   # configurations as some compilers (notable gcc V7.x) require for noexcept
   # function specializations for actions even in C++11/14 mode

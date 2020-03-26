@@ -323,7 +323,7 @@ namespace hpx { namespace threads { namespace policies {
                     {
                         debug::set(msg, "HINT_NONE  ");
                         // Create thread on this worker thread if possible
-                        if (local_num < 0)
+                        if (local_num == std::size_t(-1))
                         {
                             // clang-format off
                             using namespace hpx::threads::detail;
@@ -746,7 +746,7 @@ namespace hpx { namespace threads { namespace policies {
                     {
                         // Create thread on this worker thread if possible
                         debug::set(msg, "HINT_NONE  ");
-                        if (local_num < 0)
+                        if (local_num == std::size_t(-1))
                         {
                             // This is a task being injected from a thread on another
                             // pool - we can schedule on any thread available

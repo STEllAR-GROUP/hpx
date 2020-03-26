@@ -204,10 +204,11 @@ int main(int argc, char* argv[])
          "number of cycles in the benchmark");
     // clang-format on
 
-    // Create the resource partitioner
-    hpx::resource::partitioner rp(cmdline, argc, argv);
+    // Setup the init parameters
+    hpx::init_params init_args;
+    init_args.desc_cmdline = cmdline;
 
-    HPX_TEST_EQ(hpx::init(rp), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 
     return hpx::util::report_errors();
 }

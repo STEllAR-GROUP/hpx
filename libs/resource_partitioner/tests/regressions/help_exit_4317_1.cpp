@@ -22,11 +22,10 @@ int hpx_main()
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> cfg = {"--hpx:help"};
+    hpx::init_params init_args;
+    init_args.cfg = {"--hpx:help"};
 
-    hpx::resource::partitioner rp(argc, argv, cfg);
-
-    HPX_TEST_EQ(hpx::init(rp), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 
     HPX_TEST(!main_executed);
 

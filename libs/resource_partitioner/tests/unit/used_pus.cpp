@@ -38,10 +38,10 @@ int main(int argc, char* argv[])
 {
     std::vector<std::string> cfg = {"hpx.os_threads=4"};
 
-    // set up the resource partitioner
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+    hpx::init_params init_args;
+    init_args.cfg = std::move(cfg);
 
     // now run the test
-    HPX_TEST_EQ(hpx::init(rp), 0);
+    HPX_TEST_EQ(hpx::init(init_args), 0);
     return hpx::util::report_errors();
 }

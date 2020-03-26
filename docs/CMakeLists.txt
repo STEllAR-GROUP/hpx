@@ -9,6 +9,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_to_storage.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_init.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/hpx_init_params.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_suspend.hpp"
@@ -57,6 +58,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal_async.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/unwrap.hpp")
 
+# Definitions for autodoc.doxy.in
 foreach(doxygen_input ${doxygen_dependencies})
   set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
 endforeach()
@@ -75,16 +77,8 @@ set(doxygen_definition_list
     "HPX_FORCEINLINE="
     "HPX_CONCEPT_REQUIRES_(...)=")
 
-# Definitions for autodoc.doxy.in
-set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc")
-set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
-
 foreach(doxygen_predef ${doxygen_definition_list})
   set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
-endforeach()
-
-foreach(doxygen_input ${doxygen_dependencies})
-  set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
 endforeach()
 
 hpx_info("Creating Doxyfile: ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy")

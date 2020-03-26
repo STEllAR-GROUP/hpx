@@ -207,11 +207,8 @@ int hpx_main(int argc, char* /*argv*/[])
     return hpx::finalize();
 }
 
-int main(int argc, char* argv[])
+void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
 {
-    // create the resource partitioner
-    hpx::resource::partitioner rp(argc, argv);
-
     // before adding pools - set the default pool name to "pool-0"
     rp.set_default_pool_name("pool-0");
 
@@ -253,8 +250,15 @@ int main(int argc, char* argv[])
             }
         }
     }
+}
 
+int main(int argc, char* argv[])
+{
+    // Setup the init parameters
+    hpx::init_params init_args;
+    // set the resource partitioner callback
+    init_args.rp_callback = &init_resource_partitioner_handler;
     // now run the test
-    HPX_TEST_EQ(hpx::init(rp), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
     return hpx::util::report_errors();
 }

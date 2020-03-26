@@ -102,15 +102,8 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
-// this test must be run with 4 threads
-int main(int argc, char* argv[])
+void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
 {
-    std::vector<std::string> cfg = {
-        "hpx.os_threads=" + std::to_string(max_threads)};
-
-    // create the resource partitioner
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
-
     // before adding pools - set the default pool name to "pool-0"
     rp.set_default_pool_name("pool-0");
 
@@ -142,8 +135,17 @@ int main(int argc, char* argv[])
             }
         }
     }
+}
+
+// this test must be run with 4 threads
+int main(int argc, char* argv[])
+{
+    hpx::init_params init_args;
+    init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
+    // Set the callback to init the thread_pools
+    init_args.rp_callback = &init_resource_partitioner_handler;
 
     // now run the test
-    HPX_TEST_EQ(hpx::init(rp), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
     return hpx::util::report_errors();
 }

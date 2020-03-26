@@ -1056,7 +1056,7 @@ endif()
 
 # HPX_WITH_ACTION_BASE_COMPATIBILITY: introduced in V1.4.0
 hpx_option(HPX_WITH_ACTION_BASE_COMPATIBILITY BOOL
-    "Enable deprecated action bases (default: ON)"
+  "Enable deprecated action bases (default: ON)"
     ON ADVANCED)
 if(HPX_WITH_ACTION_BASE_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_ACTION_BASE_COMPATIBILITY)
@@ -1064,10 +1064,18 @@ endif()
 
 # HPX_WITH_REGISTER_THREAD_COMPATIBILITY: introduced in V1.4.0
 hpx_option(HPX_WITH_REGISTER_THREAD_COMPATIBILITY BOOL
-    "Enable deprecated register_thread/work functions in the hpx::applier namespace (default: ON)"
+  "Enable deprecated register_thread/work functions in the hpx::applier namespace (default: ON)"
     ON ADVANCED)
 if(HPX_WITH_REGISTER_THREAD_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_REGISTER_THREAD_COMPATIBILITY)
+endif()
+
+# HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY : introduced in V1.5.0?
+hpx_option(HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY BOOL
+  "Enable deprecated init() and start() overloads functions (default: ON)"
+    ON ADVANCED)
+if(HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
 endif()
 
 ################################################################################
