@@ -144,6 +144,7 @@ add_hpx_module(execution
     hpx_local_lcos
     hpx_preprocessor
     hpx_synchronization
+    hpx_thread_executors
     hpx_timing
     hpx_topology
     hpx_type_support

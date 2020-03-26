@@ -36,7 +36,6 @@ if (HPX_THREAD_EXECUTORS_WITH_TESTS)
         modules.thread_executors
         HEADERS ${thread_executors_headers}
         HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-        NOLIBS
         DEPENDENCIES hpx_thread_executors)
     endif()
 endif()
