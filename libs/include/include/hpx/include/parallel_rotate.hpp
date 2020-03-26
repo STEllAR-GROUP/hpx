@@ -11,4 +11,3 @@
 #include <hpx/parallel/container_algorithms/rotate.hpp>
 
 #endif
-

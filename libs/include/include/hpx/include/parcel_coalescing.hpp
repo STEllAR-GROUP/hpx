@@ -11,4 +11,3 @@
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
 #endif
-

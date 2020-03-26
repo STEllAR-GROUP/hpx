@@ -14,4 +14,3 @@
 #include <hpx/lcos/detail/async_colocated_callback.hpp>
 
 #endif
-

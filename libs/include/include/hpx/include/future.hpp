@@ -10,4 +10,3 @@
 #include <hpx/lcos/future.hpp>
 
 #endif
-

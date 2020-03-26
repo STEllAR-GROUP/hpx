@@ -9,8 +9,7 @@
 #define HPX_PARALLEL_COUNT_JUN_28_2014_0827AM
 
 #include <hpx/parallel/algorithms/count.hpp>
-#include <hpx/parallel/segmented_algorithms/count.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
+#include <hpx/parallel/segmented_algorithms/count.hpp>
 
 #endif
-

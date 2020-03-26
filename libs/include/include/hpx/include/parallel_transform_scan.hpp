@@ -9,6 +9,6 @@
 
 #include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
-#include <hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp>
+#include <hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp>
 #endif

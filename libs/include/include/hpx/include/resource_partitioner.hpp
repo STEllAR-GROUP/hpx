@@ -11,4 +11,3 @@
 #include <hpx/resource_partitioner/partitioner.hpp>
 
 #endif
-

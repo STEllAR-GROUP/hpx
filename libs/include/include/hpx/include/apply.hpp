@@ -12,4 +12,3 @@
 #include <hpx/runtime/applier/detail/apply_colocated_callback.hpp>
 
 #endif
-

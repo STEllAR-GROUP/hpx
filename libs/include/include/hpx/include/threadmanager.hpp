@@ -11,12 +11,11 @@
 
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/topology/topology.hpp>
 
 #endif
-

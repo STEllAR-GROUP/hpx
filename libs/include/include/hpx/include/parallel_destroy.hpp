@@ -10,4 +10,3 @@
 #include <hpx/parallel/algorithms/destroy.hpp>
 
 #endif
-

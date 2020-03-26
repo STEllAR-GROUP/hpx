@@ -10,4 +10,3 @@
 #include <hpx/runtime/agas/interface.hpp>
 
 #endif
-

@@ -13,4 +13,3 @@
 #include <hpx/parallel/segmented_algorithms/all_any_none.hpp>
 
 #endif
-

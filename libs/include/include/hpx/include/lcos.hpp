@@ -17,9 +17,9 @@
 #include <hpx/lcos/packaged_action.hpp>
 
 #include <hpx/collectives/barrier.hpp>
+#include <hpx/collectives/gather.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/collectives/reduce.hpp>
-#include <hpx/collectives/gather.hpp>
 #include <hpx/lcos/channel.hpp>
 
 #include <hpx/include/async.hpp>
@@ -36,4 +36,3 @@
 #include <hpx/lcos/when_some.hpp>
 
 #endif
-

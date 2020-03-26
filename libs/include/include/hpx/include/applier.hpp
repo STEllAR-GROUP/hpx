@@ -17,4 +17,3 @@
 #include <hpx/runtime/applier/trigger.hpp>
 
 #endif
-

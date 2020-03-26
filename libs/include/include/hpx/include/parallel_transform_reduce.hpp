@@ -13,4 +13,3 @@
 #include <hpx/parallel/segmented_algorithms/transform_reduce.hpp>
 
 #endif
-

@@ -10,4 +10,3 @@
 #include <hpx/parallel/algorithm.hpp>
 
 #endif
-

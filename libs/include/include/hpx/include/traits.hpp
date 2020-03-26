@@ -12,6 +12,9 @@
 #include <hpx/concepts/has_xxx.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/execution/traits/is_timed_executor.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_action.hpp>
@@ -54,13 +57,10 @@
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/execution/traits/is_executor_parameters.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/execution/traits/is_timed_executor.hpp>
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/traits/pointer_category.hpp>
@@ -70,4 +70,3 @@
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #endif
-

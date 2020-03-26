@@ -11,4 +11,3 @@
 #include <hpx/parallel/container_algorithms/is_heap.hpp>
 
 #endif
-

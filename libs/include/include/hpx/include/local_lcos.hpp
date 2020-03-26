@@ -16,12 +16,11 @@
 #include <hpx/synchronization.hpp>
 
 #include <hpx/lcos/future.hpp>
-#include <hpx/local_lcos/and_gate.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/local_lcos/and_gate.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/local_lcos/receive_buffer.hpp>
 #include <hpx/local_lcos/trigger.hpp>
 
 #endif
-

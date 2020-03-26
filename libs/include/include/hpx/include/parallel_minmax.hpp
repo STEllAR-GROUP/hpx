@@ -13,4 +13,3 @@
 #include <hpx/parallel/segmented_algorithms/minmax.hpp>
 
 #endif
-

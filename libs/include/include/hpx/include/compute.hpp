@@ -7,10 +7,9 @@
 #if !defined(HPX_COMPUTE_MAY_10_2016_1244PM)
 #define HPX_COMPUTE_MAY_10_2016_1244PM
 
-#include <hpx/compute/host.hpp>
 #include <hpx/compute/cuda.hpp>
-#include <hpx/compute/vector.hpp>
+#include <hpx/compute/host.hpp>
 #include <hpx/compute/serialization/vector.hpp>
+#include <hpx/compute/vector.hpp>
 
 #endif
-
