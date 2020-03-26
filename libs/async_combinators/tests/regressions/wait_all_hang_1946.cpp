@@ -9,56 +9,55 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <cstddef>
-#include <list>
 #include <iostream>
-#include <set>
-#include <vector>
+#include <list>
 #include <math.h>
+#include <set>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 
 void out(std::vector<unsigned int> const& vec)
 {
-     hpx::cout << "out called " << hpx::find_here() << std::endl;
+    hpx::cout << "out called " << hpx::find_here() << std::endl;
 }
 HPX_PLAIN_ACTION(out, out_action);
 
 int main(int argc, char* argv[])
 {
-     // Initialize and run HPX.
-     return hpx::init(argc, argv);
+    // Initialize and run HPX.
+    return hpx::init(argc, argv);
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-     // find locality info
-     std::vector<hpx::naming::id_type> locs = hpx::find_all_localities();
+    // find locality info
+    std::vector<hpx::naming::id_type> locs = hpx::find_all_localities();
 
-     // create data
-     std::vector<unsigned int> vec;
-     for (unsigned long j=0; j < 300000; j++)
-     {
-         vec.push_back(1);
-     }
-     // send out data
-     for (unsigned int j = 0; j < 8; j++)
-     {
-         std::vector<hpx::future<void> > fut1;
-         for (std::size_t i = 0; i < locs.size(); i++)
-         {
-             typedef out_action out_act;
-             fut1.push_back(hpx::async<out_act>(locs.at(i), vec));
-             hpx::cout << "Scheduled out to " << i+1 << std::endl;
-         }
-         wait_all(fut1);
-         hpx::cout << j+1 << ". round finished " << std::endl;
-     }
-     hpx::cout << "program finished!!!" << std::endl;
-     return hpx::finalize();
+    // create data
+    std::vector<unsigned int> vec;
+    for (unsigned long j = 0; j < 300000; j++)
+    {
+        vec.push_back(1);
+    }
+    // send out data
+    for (unsigned int j = 0; j < 8; j++)
+    {
+        std::vector<hpx::future<void>> fut1;
+        for (std::size_t i = 0; i < locs.size(); i++)
+        {
+            typedef out_action out_act;
+            fut1.push_back(hpx::async<out_act>(locs.at(i), vec));
+            hpx::cout << "Scheduled out to " << i + 1 << std::endl;
+        }
+        wait_all(fut1);
+        hpx::cout << j + 1 << ". round finished " << std::endl;
+    }
+    hpx::cout << "program finished!!!" << std::endl;
+    return hpx::finalize();
 }

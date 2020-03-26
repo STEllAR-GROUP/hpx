@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 void test_when_all()
 {
-    std::vector<hpx::future<void> > v1, v2;
+    std::vector<hpx::future<void>> v1, v2;
     v1.push_back(hpx::make_ready_future());
     v2.push_back(hpx::make_ready_future());
 
@@ -25,7 +25,7 @@ void test_when_all()
 
 void test_when_any()
 {
-    std::vector<hpx::future<void> > v1, v2;
+    std::vector<hpx::future<void>> v1, v2;
     v1.push_back(hpx::make_ready_future());
     v2.push_back(hpx::make_ready_future());
 
@@ -34,7 +34,7 @@ void test_when_any()
 
 void test_when_some()
 {
-    std::vector<hpx::future<void> > v1, v2;
+    std::vector<hpx::future<void>> v1, v2;
     v1.push_back(hpx::make_ready_future());
     v2.push_back(hpx::make_ready_future());
 
@@ -44,7 +44,7 @@ void test_when_some()
 ///////////////////////////////////////////////////////////////////////////////
 void test_wait_all()
 {
-    std::vector<hpx::future<void> > v1, v2;
+    std::vector<hpx::future<void>> v1, v2;
     v1.push_back(hpx::make_ready_future());
     v2.push_back(hpx::make_ready_future());
 
@@ -53,7 +53,7 @@ void test_wait_all()
 
 void test_wait_any()
 {
-    std::vector<hpx::future<void> > v1, v2;
+    std::vector<hpx::future<void>> v1, v2;
     v1.push_back(hpx::make_ready_future());
     v2.push_back(hpx::make_ready_future());
 
@@ -62,7 +62,7 @@ void test_wait_any()
 
 void test_wait_some()
 {
-    std::vector<hpx::future<void> > v1, v2;
+    std::vector<hpx::future<void>> v1, v2;
     v1.push_back(hpx::make_ready_future());
     v2.push_back(hpx::make_ready_future());
 

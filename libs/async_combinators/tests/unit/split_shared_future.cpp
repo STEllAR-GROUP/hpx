@@ -27,9 +27,8 @@ void test_split_future0()
         make_tuple0_slowly);
     pt.apply();
 
-    hpx::util::tuple<hpx::future<void> > result =
-        hpx::split_future(hpx::shared_future<hpx::util::tuple<> >(
-            pt.get_future()));
+    hpx::util::tuple<hpx::future<void>> result = hpx::split_future(
+        hpx::shared_future<hpx::util::tuple<>>(pt.get_future()));
 
     hpx::util::get<0>(result).get();
 }
@@ -47,9 +46,8 @@ void test_split_future1()
         make_tuple1_slowly);
     pt.apply();
 
-    hpx::util::tuple<hpx::future<int> > result =
-        hpx::split_future(hpx::shared_future<hpx::util::tuple<int> >(
-            pt.get_future()));
+    hpx::util::tuple<hpx::future<int>> result = hpx::split_future(
+        hpx::shared_future<hpx::util::tuple<int>>(pt.get_future()));
 
     HPX_TEST_EQ(hpx::util::get<0>(result).get(), 42);
 }
@@ -67,9 +65,9 @@ void test_split_future2()
         make_tuple2_slowly);
     pt.apply();
 
-    hpx::util::tuple<hpx::future<int>, hpx::future<int> > result =
-        hpx::split_future(hpx::shared_future<hpx::util::tuple<int, int> >(
-            pt.get_future()));
+    hpx::util::tuple<hpx::future<int>, hpx::future<int>> result =
+        hpx::split_future(
+            hpx::shared_future<hpx::util::tuple<int, int>>(pt.get_future()));
 
     HPX_TEST_EQ(hpx::util::get<0>(result).get(), 42);
     HPX_TEST_EQ(hpx::util::get<1>(result).get(), 43);
@@ -88,9 +86,9 @@ void test_split_future3()
         make_tuple3_slowly);
     pt.apply();
 
-    hpx::util::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int> >
+    hpx::util::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>>
         result = hpx::split_future(
-            hpx::shared_future<hpx::util::tuple<int, int, int> >(
+            hpx::shared_future<hpx::util::tuple<int, int, int>>(
                 pt.get_future()));
 
     HPX_TEST_EQ(hpx::util::get<0>(result).get(), 42);
@@ -111,9 +109,8 @@ void test_split_future_pair()
         make_pair_slowly);
     pt.apply();
 
-    std::pair<hpx::future<int>, hpx::future<int> > result =
-        hpx::split_future(hpx::shared_future<std::pair<int, int> >(
-            pt.get_future()));
+    std::pair<hpx::future<int>, hpx::future<int>> result = hpx::split_future(
+        hpx::shared_future<std::pair<int, int>>(pt.get_future()));
 
     HPX_TEST_EQ(result.first.get(), 42);
     HPX_TEST_EQ(result.second.get(), 43);
@@ -151,8 +148,7 @@ void test_split_future_array()
         make_array_slowly);
     pt.apply();
 
-    std::array<hpx::future<int>, 3> result =
-        hpx::split_future(pt.get_future());
+    std::array<hpx::future<int>, 3> result = hpx::split_future(pt.get_future());
 
     HPX_TEST_EQ(result[0].get(), 42);
     HPX_TEST_EQ(result[1].get(), 43);
@@ -179,11 +175,8 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(argc, argv, cfg);
 }
-

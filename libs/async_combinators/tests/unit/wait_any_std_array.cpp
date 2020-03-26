@@ -15,8 +15,7 @@
 int main()
 {
     std::array<hpx::future<int>, 2> future_array{
-        { hpx::make_ready_future(0), hpx::make_ready_future(0) }
-    };
+        {hpx::make_ready_future(0), hpx::make_ready_future(0)}};
 
     hpx::wait_any(future_array);
 

@@ -38,8 +38,7 @@ void test_wait_for_all_from_list()
         task.apply();
     }
 
-    hpx::lcos::future<Container> r =
-        hpx::when_all(futures);
+    hpx::lcos::future<Container> r = hpx::when_all(futures);
 
     Container result = r.get();
 
@@ -64,8 +63,8 @@ void test_wait_for_all_from_list_iterators()
     }
 
     hpx::lcos::future<Container> r =
-        hpx::when_all<typename Container::iterator,
-            Container>(futures.begin(), futures.end());
+        hpx::when_all<typename Container::iterator, Container>(
+            futures.begin(), futures.end());
 
     Container result = r.get();
 
@@ -82,10 +81,8 @@ void test_wait_for_all_one_future()
     hpx::lcos::future<int> f1 = pt1.get_future();
     pt1.apply();
 
-    typedef hpx::util::tuple<
-        hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r =
-        hpx::when_all(f1);
+    typedef hpx::util::tuple<hpx::lcos::future<int>> result_type;
+    hpx::lcos::future<result_type> r = hpx::when_all(f1);
 
     result_type result = r.get();
 
@@ -103,11 +100,9 @@ void test_wait_for_all_two_futures()
     hpx::lcos::future<int> f2 = pt2.get_future();
     pt2.apply();
 
-    typedef hpx::util::tuple<
-        hpx::lcos::future<int>
-      , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r =
-        hpx::when_all(f1, f2);
+    typedef hpx::util::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>>
+        result_type;
+    hpx::lcos::future<result_type> r = hpx::when_all(f1, f2);
 
     result_type result = r.get();
 
@@ -130,12 +125,10 @@ void test_wait_for_all_three_futures()
     hpx::lcos::future<int> f3 = pt3.get_future();
     pt3.apply();
 
-    typedef hpx::util::tuple<
-        hpx::lcos::future<int>
-      , hpx::lcos::future<int>
-      , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r =
-        hpx::when_all(f1, f2, f3);
+    typedef hpx::util::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
+        hpx::lcos::future<int>>
+        result_type;
+    hpx::lcos::future<result_type> r = hpx::when_all(f1, f2, f3);
 
     result_type result = r.get();
 
@@ -163,13 +156,10 @@ void test_wait_for_all_four_futures()
     hpx::lcos::future<int> f4 = pt4.get_future();
     pt4.apply();
 
-    typedef hpx::util::tuple<
-        hpx::lcos::future<int>
-      , hpx::lcos::future<int>
-      , hpx::lcos::future<int>
-      , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r =
-        hpx::when_all(f1, f2, f3, f4);
+    typedef hpx::util::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
+        hpx::lcos::future<int>, hpx::lcos::future<int>>
+        result_type;
+    hpx::lcos::future<result_type> r = hpx::when_all(f1, f2, f3, f4);
 
     result_type result = r.get();
 
@@ -202,14 +192,10 @@ void test_wait_for_all_five_futures()
     hpx::lcos::future<int> f5 = pt5.get_future();
     pt5.apply();
 
-    typedef hpx::util::tuple<
-        hpx::lcos::future<int>
-      , hpx::lcos::future<int>
-      , hpx::lcos::future<int>
-      , hpx::lcos::future<int>
-      , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r =
-        hpx::when_all(f1, f2, f3, f4, f5);
+    typedef hpx::util::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
+        hpx::lcos::future<int>, hpx::lcos::future<int>, hpx::lcos::future<int>>
+        result_type;
+    hpx::lcos::future<result_type> r = hpx::when_all(f1, f2, f3, f4, f5);
 
     result_type result = r.get();
 
@@ -234,11 +220,9 @@ void test_wait_for_all_late_futures()
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2 = pt2.get_future();
 
-    typedef hpx::util::tuple<
-        hpx::lcos::future<int>
-      , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r =
-        hpx::when_all(f1, f2);
+    typedef hpx::util::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>>
+        result_type;
+    hpx::lcos::future<result_type> r = hpx::when_all(f1, f2);
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -253,14 +237,14 @@ void test_wait_for_all_late_futures()
 
 void test_wait_for_all_deferred_futures()
 {
-    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::deferred, &make_int_slowly);
-    hpx::lcos::future<int> f2 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::lcos::future<int> f1 =
+        hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::lcos::future<int> f2 =
+        hpx::async(hpx::launch::deferred, &make_int_slowly);
 
-    typedef hpx::util::tuple<
-        hpx::lcos::future<int>
-      , hpx::lcos::future<int> > result_type;
-    hpx::lcos::future<result_type> r =
-        hpx::when_all(f1, f2);
+    typedef hpx::util::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>>
+        result_type;
+    hpx::lcos::future<result_type> r = hpx::when_all(f1, f2);
 
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
@@ -272,20 +256,20 @@ void test_wait_for_all_deferred_futures()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 using hpx::lcos::future;
 
 int hpx_main(variables_map&)
 {
     {
-        test_wait_for_all_from_list<std::vector<future<int> > >();
-        test_wait_for_all_from_list<std::list<future<int> > >();
-        test_wait_for_all_from_list<std::deque<future<int> > >();
-        test_wait_for_all_from_list_iterators<std::vector<future<int> > >();
-        test_wait_for_all_from_list_iterators<std::list<future<int> > >();
-        test_wait_for_all_from_list_iterators<std::deque<future<int> > >();
+        test_wait_for_all_from_list<std::vector<future<int>>>();
+        test_wait_for_all_from_list<std::list<future<int>>>();
+        test_wait_for_all_from_list<std::deque<future<int>>>();
+        test_wait_for_all_from_list_iterators<std::vector<future<int>>>();
+        test_wait_for_all_from_list_iterators<std::list<future<int>>>();
+        test_wait_for_all_from_list_iterators<std::deque<future<int>>>();
         test_wait_for_all_one_future();
         test_wait_for_all_two_futures();
         test_wait_for_all_three_futures();
@@ -306,11 +290,8 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
 }
-

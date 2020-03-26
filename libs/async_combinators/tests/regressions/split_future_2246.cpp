@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 
 #include <iostream>
@@ -17,15 +17,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(int argc, char* argv[])
 {
-    using pair_type     = std::pair<std::map<int, int>, std::set<int> >;
-    using pair_fut_type = std::pair<hpx::future<std::map<int, int> >,
-                              hpx::future<std::set<int> > >;
+    using pair_type = std::pair<std::map<int, int>, std::set<int>>;
+    using pair_fut_type =
+        std::pair<hpx::future<std::map<int, int>>, hpx::future<std::set<int>>>;
 
     std::map<int, int> mm;
     // fill mm with arbitrary values
     mm[123] = 321;
     mm[999] = 999;
-    mm[6]   = 43556;
+    mm[6] = 43556;
 
     // fill ss with arbitrary values
     std::set<int> ss{0, 1, 10, 100, 101, 2000};
@@ -39,7 +39,7 @@ int hpx_main(int argc, char* argv[])
     // see if the values of mm2 and ss2 are the same
     std::map<int, int> mm2 = pair_f.first.get();
     std::cout << "Printing map: ";
-    for(auto val: mm2)
+    for (auto val : mm2)
         std::cout << "(" << val.first << ", " << val.second << ") ";
     std::cout << std::endl;
 
@@ -54,7 +54,7 @@ int hpx_main(int argc, char* argv[])
 
     std::set<int> ss2 = pair_f.second.get();
     std::cout << "Printing set: ";
-    for(auto val: ss2)
+    for (auto val : ss2)
         std::cout << val << " ";
     std::cout << std::endl;
 

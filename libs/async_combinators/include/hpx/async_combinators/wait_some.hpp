@@ -11,8 +11,7 @@
 #define HPX_LCOS_WAIT_SOME_APR_19_2012_0203PM
 
 #if defined(DOXYGEN)
-namespace hpx
-{
+namespace hpx {
     /// The function \a wait_some is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the same list of futures
@@ -49,7 +48,8 @@ namespace hpx
     ///       but the futures held in the output collection may.
     template <typename InputIter>
     future<vector<future<typename std::iterator_traits<InputIter>::value_type>>>
-    wait_some(std::size_t n, Iterator first, Iterator last, error_code& ec = throws);
+    wait_some(
+        std::size_t n, Iterator first, Iterator last, error_code& ec = throws);
 
     /// The function \a wait_some is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -133,8 +133,8 @@ namespace hpx
     ///       order of the futures in the input collection.
     ///       The future returned by \a wait_some will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename ...T>
-    void wait_some(std::size_t n, T &&... futures, error_code& ec = throws);
+    template <typename... T>
+    void wait_some(std::size_t n, T&&... futures, error_code& ec = throws);
 
     /// The function \a wait_some_n is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -170,24 +170,24 @@ namespace hpx
     ///       The future returned by \a wait_some_n will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename InputIter>
-    InputIter wait_some_n(std::size_t n, Iterator first,
-        std::size_t count, error_code& ec = throws);
-}
+    InputIter wait_some_n(std::size_t n, Iterator first, std::size_t count,
+        error_code& ec = throws);
+}    // namespace hpx
 #else
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/deferred_call.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/threading.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <algorithm>
 #include <array>
@@ -200,10 +200,8 @@ namespace hpx
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
         struct wait_some;
@@ -213,13 +211,14 @@ namespace hpx { namespace lcos
         {
             explicit set_wait_some_callback_impl(wait_some<Sequence>& wait)
               : wait_(wait)
-            {}
+            {
+            }
 
             template <typename SharedState>
             void operator()(SharedState& shared_state,
                 typename std::enable_if<
-                    traits::is_shared_state<SharedState>::value
-                >::type* = nullptr) const
+                    traits::is_shared_state<SharedState>::value>::type* =
+                    nullptr) const
             {
                 std::size_t counter =
                     wait_.count_.load(std::memory_order_seq_cst);
@@ -248,36 +247,32 @@ namespace hpx { namespace lcos
             }
 
             template <typename Sequence_>
-            HPX_FORCEINLINE
-            void operator()(Sequence_& sequence,
+            HPX_FORCEINLINE void operator()(Sequence_& sequence,
                 typename std::enable_if<
-                    !traits::is_shared_state<Sequence_>::value
-                >::type* = nullptr) const
+                    !traits::is_shared_state<Sequence_>::value>::type* =
+                    nullptr) const
             {
                 apply(sequence);
             }
 
-            template <typename Tuple, std::size_t ...Is>
-            HPX_FORCEINLINE
-            void apply(Tuple& tuple, util::index_pack<Is...>) const
+            template <typename Tuple, std::size_t... Is>
+            HPX_FORCEINLINE void apply(
+                Tuple& tuple, util::index_pack<Is...>) const
             {
-                int const _sequencer[]= {
-                    (((*this)(util::get<Is>(tuple))), 0)...
-                };
-                (void)_sequencer;
+                int const _sequencer[] = {
+                    (((*this)(util::get<Is>(tuple))), 0)...};
+                (void) _sequencer;
             }
 
-            template <typename ...Ts>
-            HPX_FORCEINLINE
-            void apply(util::tuple<Ts...>& sequence) const
+            template <typename... Ts>
+            HPX_FORCEINLINE void apply(util::tuple<Ts...>& sequence) const
             {
                 apply(sequence,
                     typename util::make_index_pack<sizeof...(Ts)>::type());
             }
 
             template <typename Sequence_>
-            HPX_FORCEINLINE
-            void apply(Sequence_& sequence) const
+            HPX_FORCEINLINE void apply(Sequence_& sequence) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
@@ -293,7 +288,8 @@ namespace hpx { namespace lcos
         }
 
         template <typename Sequence>
-        struct wait_some : std::enable_shared_from_this<wait_some<Sequence> > //-V690
+        struct wait_some
+          : std::enable_shared_from_this<wait_some<Sequence>>    //-V690
         {
         public:
             void on_future_ready(hpx::basic_execution::agent_ref ctx)
@@ -316,12 +312,13 @@ namespace hpx { namespace lcos
         public:
             typedef Sequence argument_type;
 
-            wait_some(argument_type && lazy_values, std::size_t n)
+            wait_some(argument_type&& lazy_values, std::size_t n)
               : lazy_values_(std::move(lazy_values))
               , count_(0)
               , needed_count_(n)
               , goal_reached_on_calling_thread_(false)
-            {}
+            {
+            }
 
             void operator()()
             {
@@ -339,7 +336,8 @@ namespace hpx { namespace lcos
                 }
 
                 // at least N futures should be ready
-                HPX_ASSERT(count_.load(std::memory_order_seq_cst) >= needed_count_);
+                HPX_ASSERT(
+                    count_.load(std::memory_order_seq_cst) >= needed_count_);
             }
 
             argument_type lazy_values_;
@@ -347,19 +345,17 @@ namespace hpx { namespace lcos
             std::size_t const needed_count_;
             bool goal_reached_on_calling_thread_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    void wait_some(std::size_t n,
-        std::vector<Future> const& lazy_values,
+    void wait_some(std::size_t n, std::vector<Future> const& lazy_values,
         error_code& ec = throws)
     {
         static_assert(
             traits::is_future<Future>::value, "invalid use of wait_some");
 
-        typedef
-            typename traits::detail::shared_state_ptr_for<Future>::type
+        typedef typename traits::detail::shared_state_ptr_for<Future>::type
             shared_state_ptr;
         typedef std::vector<shared_state_ptr> result_type;
 
@@ -370,8 +366,7 @@ namespace hpx { namespace lcos
 
         if (n > lazy_values.size())
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_some",
+            HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
@@ -381,16 +376,15 @@ namespace hpx { namespace lcos
             std::back_inserter(lazy_values_),
             traits::detail::wait_get_shared_state<Future>());
 
-        std::shared_ptr<detail::wait_some<result_type> > f =
-            std::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type>> f =
+            std::make_shared<detail::wait_some<result_type>>(
                 std::move(lazy_values_), n);
 
         return (*f.get())();
     }
 
     template <typename Future>
-    void wait_some(std::size_t n,
-        std::vector<Future>& lazy_values,
+    void wait_some(std::size_t n, std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
         return lcos::wait_some(
@@ -398,8 +392,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    void wait_some(std::size_t n,
-        std::vector<Future> && lazy_values,
+    void wait_some(std::size_t n, std::vector<Future>&& lazy_values,
         error_code& ec = throws)
     {
         return lcos::wait_some(
@@ -408,15 +401,13 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
-    void wait_some(std::size_t n,
-        std::array<Future, N> const& lazy_values,
+    void wait_some(std::size_t n, std::array<Future, N> const& lazy_values,
         error_code& ec = throws)
     {
         static_assert(
             traits::is_future<Future>::value, "invalid use of wait_some");
 
-        typedef
-            typename traits::detail::shared_state_ptr_for<Future>::type
+        typedef typename traits::detail::shared_state_ptr_for<Future>::type
             shared_state_ptr;
         typedef std::array<shared_state_ptr, N> result_type;
 
@@ -427,8 +418,7 @@ namespace hpx { namespace lcos
 
         if (n > lazy_values.size())
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_some",
+            HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
@@ -438,16 +428,15 @@ namespace hpx { namespace lcos
             lazy_values_.begin(),
             traits::detail::wait_get_shared_state<Future>());
 
-        std::shared_ptr<detail::wait_some<result_type> > f =
-            std::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type>> f =
+            std::make_shared<detail::wait_some<result_type>>(
                 std::move(lazy_values_), n);
 
         return (*f.get())();
     }
 
     template <typename Future, std::size_t N>
-    void wait_some(std::size_t n,
-        std::array<Future, N>& lazy_values,
+    void wait_some(std::size_t n, std::array<Future, N>& lazy_values,
         error_code& ec = throws)
     {
         return lcos::wait_some(
@@ -455,8 +444,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future, std::size_t N>
-    void wait_some(std::size_t n,
-        std::array<Future, N> && lazy_values,
+    void wait_some(std::size_t n, std::array<Future, N>&& lazy_values,
         error_code& ec = throws)
     {
         return lcos::wait_some(
@@ -466,16 +454,13 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     typename util::always_void<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    >::type
-    wait_some(std::size_t n, Iterator begin, Iterator end,
-        error_code& ec = throws)
+        typename lcos::detail::future_iterator_traits<Iterator>::type>::type
+    wait_some(
+        std::size_t n, Iterator begin, Iterator end, error_code& ec = throws)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
-        typedef
-            typename traits::detail::shared_state_ptr_for<future_type>::type
+        typedef typename traits::detail::shared_state_ptr_for<future_type>::type
             shared_state_ptr;
         typedef std::vector<shared_state_ptr> result_type;
 
@@ -483,23 +468,20 @@ namespace hpx { namespace lcos
         std::transform(begin, end, std::back_inserter(lazy_values_),
             traits::detail::wait_get_shared_state<future_type>());
 
-        std::shared_ptr<detail::wait_some<result_type> > f =
-            std::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type>> f =
+            std::make_shared<detail::wait_some<result_type>>(
                 std::move(lazy_values_), n);
 
         return (*f.get())();
     }
 
     template <typename Iterator>
-    Iterator
-    wait_some_n(std::size_t n, Iterator begin,
-        std::size_t count, error_code& ec = throws)
+    Iterator wait_some_n(std::size_t n, Iterator begin, std::size_t count,
+        error_code& ec = throws)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
-        typedef
-            typename traits::detail::shared_state_ptr_for<future_type>::type
+        typedef typename traits::detail::shared_state_ptr_for<future_type>::type
             shared_state_ptr;
         typedef std::vector<shared_state_ptr> result_type;
 
@@ -509,8 +491,8 @@ namespace hpx { namespace lcos
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        std::shared_ptr<detail::wait_some<result_type> > f =
-            std::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type>> f =
+            std::make_shared<detail::wait_some<result_type>>(
                 std::move(lazy_values_), n);
 
         (*f.get())();
@@ -525,19 +507,17 @@ namespace hpx { namespace lcos
             return;
         }
 
-        HPX_THROWS_IF(ec, hpx::bad_parameter,
-            "hpx::lcos::wait_some",
+        HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::wait_some",
             "number of results to wait for is out of bounds");
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    void wait_some(std::size_t n, hpx::future<T> && f, error_code& ec = throws)
+    void wait_some(std::size_t n, hpx::future<T>&& f, error_code& ec = throws)
     {
         if (n != 1)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_some",
+            HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
@@ -546,12 +526,12 @@ namespace hpx { namespace lcos
     }
 
     template <typename T>
-    void wait_some(std::size_t n, hpx::shared_future<T> && f, error_code& ec = throws)
+    void wait_some(
+        std::size_t n, hpx::shared_future<T>&& f, error_code& ec = throws)
     {
         if (n != 1)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_some",
+            HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
@@ -561,11 +541,11 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    void wait_some(std::size_t n, error_code& ec, Ts&&...ts)
+    void wait_some(std::size_t n, error_code& ec, Ts&&... ts)
     {
         typedef util::tuple<
-                typename traits::detail::shared_state_ptr_for<Ts>::type...
-            > result_type;
+            typename traits::detail::shared_state_ptr_for<Ts>::type...>
+            result_type;
 
         result_type lazy_values_ =
             result_type(traits::detail::get_shared_state(ts)...);
@@ -577,25 +557,24 @@ namespace hpx { namespace lcos
 
         if (n > sizeof...(Ts))
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::lcos::wait_some",
+            HPX_THROWS_IF(ec, hpx::bad_parameter, "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
 
-        std::shared_ptr<detail::wait_some<result_type> > f =
-            std::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type>> f =
+            std::make_shared<detail::wait_some<result_type>>(
                 std::move(lazy_values_), n);
 
         return (*f.get())();
     }
 
     template <typename... Ts>
-    void wait_some(std::size_t n, Ts&&...ts)
+    void wait_some(std::size_t n, Ts&&... ts)
     {
         typedef util::tuple<
-                typename traits::detail::shared_state_ptr_for<Ts>::type...
-            > result_type;
+            typename traits::detail::shared_state_ptr_for<Ts>::type...>
+            result_type;
 
         result_type lazy_values_ =
             result_type(traits::detail::get_shared_state(ts)...);
@@ -607,25 +586,23 @@ namespace hpx { namespace lcos
 
         if (n > sizeof...(Ts))
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "hpx::lcos::wait_some",
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::lcos::wait_some",
                 "number of results to wait for is out of bounds");
             return;
         }
 
-        std::shared_ptr<detail::wait_some<result_type> > f =
-            std::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type>> f =
+            std::make_shared<detail::wait_some<result_type>>(
                 std::move(lazy_values_), n);
 
         return (*f.get())();
     }
-}}
+}}    // namespace hpx::lcos
 
-namespace hpx
-{
+namespace hpx {
     using lcos::wait_some;
     using lcos::wait_some_n;
-}
+}    // namespace hpx
 
-#endif // DOXYGEN
+#endif    // DOXYGEN
 #endif

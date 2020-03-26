@@ -36,7 +36,7 @@ void test_wait_for_all_from_array()
         task.apply();
     }
 
-    hpx::lcos::future<std::array<hpx::future<int>, 10> > r =
+    hpx::lcos::future<std::array<hpx::future<int>, 10>> r =
         hpx::when_all(futures);
 
     std::array<hpx::future<int>, 10> result = r.get();
@@ -48,8 +48,8 @@ void test_wait_for_all_from_array()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 using hpx::lcos::future;
 
@@ -68,9 +68,7 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

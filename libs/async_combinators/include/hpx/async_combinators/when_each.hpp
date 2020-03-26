@@ -12,8 +12,7 @@
 #define HPX_LCOS_WHEN_EACH_JUN_16_2014_0206PM
 
 #if defined(DOXYGEN)
-namespace hpx
-{
+namespace hpx {
     /// The function \a when_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the event of all those futures
@@ -123,9 +122,9 @@ namespace hpx
     ///
     template <typename F, typename Iterator>
     future<Iterator> when_each_n(F&& f, Iterator begin, std::size_t count);
-}
+}    // namespace hpx
 
-#else // DOXYGEN
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -153,31 +152,28 @@ namespace hpx
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos {
+    namespace detail {
         // call supplied callback with or without index
         struct dispatch
         {
-
-            template<typename F, typename IndexType, typename FutureType>
-            inline static void call(F&& f, IndexType index, FutureType&& future,
-                std::true_type)
+            template <typename F, typename IndexType, typename FutureType>
+            inline static void call(
+                F&& f, IndexType index, FutureType&& future, std::true_type)
             {
                 f(index, std::forward<FutureType>(future));
             }
 
-            template<typename F, typename IndexType, typename FutureType>
-            inline static void call(F&& f, IndexType index, FutureType&& future,
-                std::false_type)
+            template <typename F, typename IndexType, typename FutureType>
+            inline static void call(
+                F&& f, IndexType index, FutureType&& future, std::false_type)
             {
                 f(std::forward<FutureType>(future));
             }
         };
 
         template <typename Tuple, typename F>
-        struct when_each_frame //-V690
+        struct when_each_frame    //-V690
           : lcos::detail::future_data<void>
         {
             typedef lcos::future<void> type;
@@ -189,25 +185,24 @@ namespace hpx { namespace lcos
 
             template <std::size_t I>
             struct is_end
-              : std::integral_constant<
-                    bool,
-                    util::tuple_size<Tuple>::value == I
-                >
-            {};
+              : std::integral_constant<bool,
+                    util::tuple_size<Tuple>::value == I>
+            {
+            };
 
         public:
             template <typename Tuple_, typename F_>
-            when_each_frame(Tuple_&& t, F_ && f, std::size_t needed_count)
+            when_each_frame(Tuple_&& t, F_&& f, std::size_t needed_count)
               : t_(std::forward<Tuple_>(t))
               , f_(std::forward<F_>(f))
               , count_(0)
               , needed_count_(needed_count)
-            {}
+            {
+            }
 
         protected:
             template <std::size_t I>
-            HPX_FORCEINLINE
-            void do_await(std::true_type)
+            HPX_FORCEINLINE void do_await(std::true_type)
             {
                 this->set_value(util::unused);
             }
@@ -216,17 +211,16 @@ namespace hpx { namespace lcos
             template <std::size_t I, typename Iter>
             void await_range(Iter next, Iter end)
             {
-                typedef typename std::iterator_traits<Iter>::value_type
-                    future_type;
+                typedef
+                    typename std::iterator_traits<Iter>::value_type future_type;
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
 
-                for(/**/; next != end; ++next)
+                for (/**/; next != end; ++next)
                 {
                     typename traits::detail::shared_state_ptr<
-                            future_result_type
-                        >::type next_future_data =
-                            traits::detail::get_shared_state(*next);
+                        future_result_type>::type next_future_data =
+                        traits::detail::get_shared_state(*next);
 
                     if (next_future_data.get() != nullptr &&
                         !next_future_data->is_ready())
@@ -242,8 +236,8 @@ namespace hpx { namespace lcos
                             hpx::intrusive_ptr<when_each_frame> this_(this);
                             next_future_data->set_on_completed(
                                 [this_ = std::move(this_),
-                                    next = std::move(next), end = std::move(end)
-                                ]() mutable -> void {
+                                    next = std::move(next),
+                                    end = std::move(end)]() mutable -> void {
                                     return this_->template await_range<I>(
                                         std::move(next), std::move(end));
                                 });
@@ -253,12 +247,10 @@ namespace hpx { namespace lcos
 
                     dispatch::call(std::forward<F>(f_), count_++,
                         std::move(*next),
-                        typename traits::is_invocable<
-                            F, std::size_t, future_type
-                        >::type()
-                    );
+                        typename traits::is_invocable<F, std::size_t,
+                            future_type>::type());
 
-                    if(count_ == needed_count_)
+                    if (count_ == needed_count_)
                     {
                         do_await<I + 1>(std::true_type());
                         return;
@@ -269,22 +261,19 @@ namespace hpx { namespace lcos
             }
 
             template <std::size_t I>
-            HPX_FORCEINLINE
-            void await_next(std::false_type, std::true_type)
+            HPX_FORCEINLINE void await_next(std::false_type, std::true_type)
             {
-                await_range<I>(
-                    util::begin(util::unwrap_ref(util::get<I>(t_))),
+                await_range<I>(util::begin(util::unwrap_ref(util::get<I>(t_))),
                     util::end(util::unwrap_ref(util::get<I>(t_))));
             }
 
             // Current element is a simple future
             template <std::size_t I>
-            HPX_FORCEINLINE
-            void await_next(std::true_type, std::false_type)
+            HPX_FORCEINLINE void await_next(std::true_type, std::false_type)
             {
-                typedef typename util::decay_unwrap<
-                    typename util::tuple_element<I, Tuple>::type
-                >::type future_type;
+                typedef
+                    typename util::decay_unwrap<typename util::tuple_element<I,
+                        Tuple>::type>::type future_type;
 
                 typedef typename traits::future_traits<future_type>::type
                     future_result_type;
@@ -292,14 +281,12 @@ namespace hpx { namespace lcos
                 future_type& fut = util::get<I>(t_);
 
                 typename traits::detail::shared_state_ptr<
-                        future_result_type
-                    >::type next_future_data =
-                        traits::detail::get_shared_state(fut);
+                    future_result_type>::type next_future_data =
+                    traits::detail::get_shared_state(fut);
 
                 if (next_future_data.get() != nullptr &&
                     !next_future_data->is_ready())
                 {
-
                     next_future_data->execute_deferred();
 
                     // execute_deferred might have made the future ready
@@ -319,12 +306,10 @@ namespace hpx { namespace lcos
                 }
 
                 dispatch::call(std::forward<F>(f_), count_++, std::move(fut),
-                    typename traits::is_invocable<
-                        F, std::size_t, future_type
-                    >::type()
-                );
+                    typename traits::is_invocable<F, std::size_t,
+                        future_type>::type());
 
-                if(count_ == needed_count_)
+                if (count_ == needed_count_)
                 {
                     do_await<I + 1>(std::true_type());
                     return;
@@ -334,22 +319,19 @@ namespace hpx { namespace lcos
             }
 
             template <std::size_t I>
-            HPX_FORCEINLINE
-            void do_await(std::false_type)
+            HPX_FORCEINLINE void do_await(std::false_type)
             {
-                typedef typename util::decay_unwrap<
-                    typename util::tuple_element<I, Tuple>::type
-                >::type future_type;
+                typedef
+                    typename util::decay_unwrap<typename util::tuple_element<I,
+                        Tuple>::type>::type future_type;
 
-                typedef util::any_of<
-                        traits::is_future<future_type>,
-                        traits::is_ref_wrapped_future<future_type>
-                    > is_future;
+                typedef util::any_of<traits::is_future<future_type>,
+                    traits::is_ref_wrapped_future<future_type>>
+                    is_future;
 
-                typedef util::any_of<
-                        traits::is_future_range<future_type>,
-                        traits::is_ref_wrapped_future_range<future_type>
-                    > is_range;
+                typedef util::any_of<traits::is_future_range<future_type>,
+                    traits::is_ref_wrapped_future_range<future_type>>
+                    is_range;
 
                 await_next<I>(is_future(), is_range());
             }
@@ -366,17 +348,16 @@ namespace hpx { namespace lcos
             std::size_t count_;
             std::size_t needed_count_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename Future>
-    lcos::future<void>
-    when_each(F&& func, std::vector<Future>& lazy_values)
+    lcos::future<void> when_each(F&& func, std::vector<Future>& lazy_values)
     {
         static_assert(
             traits::is_future<Future>::value, "invalid use of when_each");
 
-        typedef util::tuple<std::vector<Future> > argument_type;
+        typedef util::tuple<std::vector<Future>> argument_type;
         typedef typename std::decay<F>::type func_type;
         typedef detail::when_each_frame<argument_type, func_type> frame_type;
 
@@ -384,13 +365,12 @@ namespace hpx { namespace lcos
         lazy_values_.reserve(lazy_values.size());
 
         std::transform(lazy_values.begin(), lazy_values.end(),
-            std::back_inserter(lazy_values_),
-            traits::acquire_future_disp());
+            std::back_inserter(lazy_values_), traits::acquire_future_disp());
 
         std::size_t lazy_values_size = lazy_values_.size();
-        hpx::intrusive_ptr<frame_type> p(new frame_type(
-            util::forward_as_tuple(std::move(lazy_values_)),
-            std::forward<F>(func), lazy_values_size));
+        hpx::intrusive_ptr<frame_type> p(
+            new frame_type(util::forward_as_tuple(std::move(lazy_values_)),
+                std::forward<F>(func), lazy_values_size));
 
         p->do_await();
 
@@ -399,21 +379,18 @@ namespace hpx { namespace lcos
     }
 
     template <typename F, typename Future>
-    lcos::future<void> //-V659
+    lcos::future<void>    //-V659
     when_each(F&& f, std::vector<Future>&& lazy_values)
     {
         return lcos::when_each(std::forward<F>(f), lazy_values);
     }
 
     template <typename F, typename Iterator>
-    typename std::enable_if<
-        !traits::is_future<Iterator>::value,
-        lcos::future<Iterator>
-    >::type
+    typename std::enable_if<!traits::is_future<Iterator>::value,
+        lcos::future<Iterator>>::type
     when_each(F&& f, Iterator begin, Iterator end)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
 
         std::vector<future_type> lazy_values_;
@@ -421,20 +398,17 @@ namespace hpx { namespace lcos
             traits::acquire_future_disp());
 
         return lcos::when_each(std::forward<F>(f), lazy_values_)
-            .then(hpx::launch::sync, [
-                end = std::move(end)
-            ](lcos::future<void> fut) -> Iterator {
-                fut.get();      // rethrow exceptions, if any
-                return end;
-            });
+            .then(hpx::launch::sync,
+                [end = std::move(end)](lcos::future<void> fut) -> Iterator {
+                    fut.get();    // rethrow exceptions, if any
+                    return end;
+                });
     }
 
     template <typename F, typename Iterator>
-    lcos::future<Iterator>
-    when_each_n(F&& f, Iterator begin, std::size_t count)
+    lcos::future<Iterator> when_each_n(F&& f, Iterator begin, std::size_t count)
     {
-        typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
             future_type;
 
         std::vector<future_type> lazy_values_;
@@ -445,17 +419,15 @@ namespace hpx { namespace lcos
             lazy_values_.push_back(func(*begin++));
 
         return lcos::when_each(std::forward<F>(f), lazy_values_)
-            .then(hpx::launch::sync, [
-                begin = std::move(begin)
-            ](lcos::future<void> fut) -> Iterator {
-                fut.get();      // rethrow exceptions, if any
-                return begin;
-            });
+            .then(hpx::launch::sync,
+                [begin = std::move(begin)](lcos::future<void> fut) -> Iterator {
+                    fut.get();    // rethrow exceptions, if any
+                    return begin;
+                });
     }
 
     template <typename F>
-    inline lcos::future<void>
-    when_each(F&& f)
+    inline lcos::future<void> when_each(F&& f)
     {
         return lcos::make_ready_future();
     }
@@ -464,14 +436,12 @@ namespace hpx { namespace lcos
     template <typename F, typename... Ts>
     typename std::enable_if<
         !traits::is_future<typename std::decay<F>::type>::value &&
-        util::all_of<traits::is_future<Ts>...>::value,
-        lcos::future<void>
-    >::type
+            util::all_of<traits::is_future<Ts>...>::value,
+        lcos::future<void>>::type
     when_each(F&& f, Ts&&... ts)
     {
-        typedef util::tuple<
-                typename traits::acquire_future<Ts>::type...
-            > argument_type;
+        typedef util::tuple<typename traits::acquire_future<Ts>::type...>
+            argument_type;
 
         typedef typename std::decay<F>::type func_type;
         typedef detail::when_each_frame<argument_type, func_type> frame_type;
@@ -487,14 +457,12 @@ namespace hpx { namespace lcos
         using traits::future_access;
         return future_access<typename frame_type::type>::create(std::move(p));
     }
-}}
+}}    // namespace hpx::lcos
 
-namespace hpx
-{
+namespace hpx {
     using lcos::when_each;
     using lcos::when_each_n;
-}
+}    // namespace hpx
 
-#endif // DOXYGEN
+#endif    // DOXYGEN
 #endif
-

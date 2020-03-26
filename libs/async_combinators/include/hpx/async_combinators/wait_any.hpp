@@ -11,8 +11,7 @@
 #define HPX_LCOS_WAIT_ANY_APR_17_2012_1143AM
 
 #if defined(DOXYGEN)
-namespace hpx
-{
+namespace hpx {
     /// The function \a wait_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns after one future of
     /// that list finishes execution.
@@ -85,8 +84,9 @@ namespace hpx
     ///           \a hpx::exception.
     ///
     /// \note     None of the futures in the input sequence are invalidated.
-    template <typename R, std:;size_t N>
-    void wait_any(std::array<future<R>, N>& futures, error_code& ec = throws);
+    template <typename R, std:;
+    size_t N > void wait_any(
+                   std::array<future<R>, N>& futures, error_code& ec = throws);
 
     /// The function \a wait_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns after one future of
@@ -109,7 +109,7 @@ namespace hpx
     ///           \a hpx::exception.
     ///
     /// \note     None of the futures in the input sequence are invalidated.
-    template <typename ...T>
+    template <typename... T>
     void wait_any(error_code& ec, T&&... futures);
 
     /// The function \a wait_any is a non-deterministic choice operator. It
@@ -125,7 +125,7 @@ namespace hpx
     ///       returns.
     ///
     /// \note     None of the futures in the input sequence are invalidated.
-    template <typename ...T>
+    template <typename... T>
     void wait_any(T&&... futures);
 
     /// The function \a wait_any_n is a non-deterministic choice operator. It
@@ -156,19 +156,19 @@ namespace hpx
     ///
     /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
-    InputIter wait_any_n(InputIter first, std::size_t count,
-        error_code& ec = throws);
-}
+    InputIter wait_any_n(
+        InputIter first, std::size_t count, error_code& ec = throws);
+}    // namespace hpx
 
-#else // DOXYGEN
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <array>
 #include <cstddef>
@@ -176,8 +176,7 @@ namespace hpx
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
-{
+namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     void wait_any(std::vector<Future> const& futures, error_code& ec = throws)
@@ -193,7 +192,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    void wait_any(std::vector<Future> && lazy_values, error_code& ec = throws)
+    void wait_any(std::vector<Future>&& lazy_values, error_code& ec = throws)
     {
         return lcos::wait_any(
             const_cast<std::vector<Future> const&>(lazy_values), ec);
@@ -214,7 +213,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future, std::size_t N>
-    void wait_any(std::array<Future, N> && lazy_values, error_code& ec = throws)
+    void wait_any(std::array<Future, N>&& lazy_values, error_code& ec = throws)
     {
         return lcos::wait_any(
             const_cast<std::array<Future, N> const&>(lazy_values), ec);
@@ -223,8 +222,7 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
     typename util::always_void<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
-    >::type
+        typename lcos::detail::future_iterator_traits<Iterator>::type>::type
     wait_any(Iterator begin, Iterator end, error_code& ec = throws)
     {
         return lcos::wait_some(1, begin, end, ec);
@@ -237,9 +235,8 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
-    Iterator
-    wait_any_n(Iterator begin, std::size_t count,
-        error_code& ec = throws)
+    Iterator wait_any_n(
+        Iterator begin, std::size_t count, error_code& ec = throws)
     {
         return wait_some_n(1, begin, count, ec);
     }
@@ -256,13 +253,12 @@ namespace hpx { namespace lcos
     {
         return lcos::wait_some(1, std::forward<Ts>(ts)...);
     }
-}}
+}}    // namespace hpx::lcos
 
-namespace hpx
-{
+namespace hpx {
     using lcos::wait_any;
     using lcos::wait_any_n;
-}
+}    // namespace hpx
 
-#endif // DOXYGEN
+#endif    // DOXYGEN
 #endif

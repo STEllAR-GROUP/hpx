@@ -12,8 +12,7 @@
 #define HPX_LCOS_WAIT_EACH_JUN_16_2014_0428PM
 
 #if defined(DOXYGEN)
-namespace hpx
-{
+namespace hpx {
     /// The function \a wait_each is an operator allowing to join on the results
     /// of all given futures. It AND-composes all future objects given and
     /// returns after they finished executing.
@@ -86,7 +85,7 @@ namespace hpx
     ///       parameter. The first parameter will correspond to the
     ///       index of the current \a future in the collection.
     ///
-    template <typename F, typename ...T>
+    template <typename F, typename... T>
     void wait_each(F&& f, T&&... futures);
 
     /// The function \a wait_each is an operator allowing to join on the result
@@ -113,9 +112,9 @@ namespace hpx
     ///
     template <typename F, typename Iterator>
     void wait_each_n(F&& f, Iterator begin, std::size_t count);
-}
+}    // namespace hpx
 
-#else // DOXYGEN
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/when_each.hpp>
@@ -128,8 +127,7 @@ namespace hpx
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
-{
+namespace hpx { namespace lcos {
     template <typename F, typename Future>
     void wait_each(F&& f, std::vector<Future>& lazy_values)
     {
@@ -137,21 +135,19 @@ namespace hpx { namespace lcos
     }
 
     template <typename F, typename Future>
-    void wait_each(F&& f, std::vector<Future> && lazy_values)
+    void wait_each(F&& f, std::vector<Future>&& lazy_values)
     {
         lcos::when_each(std::forward<F>(f), lazy_values).wait();
     }
 
     template <typename F, typename Iterator>
-    void
-    wait_each(F&& f, Iterator begin, Iterator end)
+    void wait_each(F&& f, Iterator begin, Iterator end)
     {
         lcos::when_each(std::forward<F>(f), begin, end).wait();
     }
 
     template <typename F, typename Iterator>
-    void
-    wait_each_n(F&& f, Iterator begin, std::size_t count)
+    void wait_each_n(F&& f, Iterator begin, std::size_t count)
     {
         when_each_n(std::forward<F>(f), begin, count).wait();
     }
@@ -166,20 +162,17 @@ namespace hpx { namespace lcos
     template <typename F, typename... Ts>
     typename std::enable_if<
         !traits::is_future<typename std::decay<F>::type>::value &&
-        util::all_of<traits::is_future<Ts>...>::value
-    >::type
+        util::all_of<traits::is_future<Ts>...>::value>::type
     wait_each(F&& f, Ts&&... ts)
     {
         lcos::when_each(std::forward<F>(f), std::forward<Ts>(ts)...).wait();
     }
-}}
+}}    // namespace hpx::lcos
 
-namespace hpx
-{
+namespace hpx {
     using lcos::wait_each;
     using lcos::wait_each_n;
-}
+}    // namespace hpx
 
-#endif // DOXYGEN
+#endif    // DOXYGEN
 #endif
-

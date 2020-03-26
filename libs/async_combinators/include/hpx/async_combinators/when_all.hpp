@@ -12,8 +12,7 @@
 #define HPX_LCOS_WHEN_ALL_APR_19_2012_1140AM
 
 #if defined(DOXYGEN)
-namespace hpx
-{
+namespace hpx {
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
     /// returns a new future object representing the same list of futures
@@ -40,10 +39,10 @@ namespace hpx
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename InputIter, typename Container =
-        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
-    future<Container>
-    when_all(InputIter first, InputIter last);
+    template <typename InputIter,
+        typename Container = vector<
+            future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<Container> when_all(InputIter first, InputIter last);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -69,8 +68,7 @@ namespace hpx
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename Range>
-    future<Range>
-    when_all(Range&& values);
+    future<Range> when_all(Range&& values);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -94,9 +92,8 @@ namespace hpx
     ///       order of the futures in the input collection.
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
-    template <typename ...T>
-    future<tuple<future<T>...>>
-    when_all(T &&... futures);
+    template <typename... T>
+    future<tuple<future<T>...>> when_all(T&&... futures);
 
     /// The function \a when_all_n is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -128,15 +125,17 @@ namespace hpx
     ///           hpx::exception.
     ///
     /// \note     None of the futures in the input sequence are invalidated.
-    template <typename InputIter, typename Container =
-        vector<future<typename std::iterator_traits<InputIter>::value_type>>>
-    future<Container>
-    when_all_n(InputIter begin, std::size_t count);
-}
+    template <typename InputIter,
+        typename Container = vector<
+            future<typename std::iterator_traits<InputIter>::value_type>>>
+    future<Container> when_all_n(InputIter begin, std::size_t count);
+}    // namespace hpx
 
-#else // DOXYGEN
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos/detail/future_transforms.hpp>
@@ -145,9 +144,6 @@ namespace hpx
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/datastructures/tuple.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -156,10 +152,8 @@ namespace hpx
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
-{
-    namespace detail
-    {
+namespace hpx { namespace lcos {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct when_all_result
@@ -174,9 +168,7 @@ namespace hpx { namespace lcos
 
         template <typename T>
         struct when_all_result<util::tuple<T>,
-            typename std::enable_if<
-                traits::is_future_range<T>::value
-            >::type>
+            typename std::enable_if<traits::is_future_range<T>::value>::type>
         {
             typedef T type;
 
@@ -228,10 +220,7 @@ namespace hpx { namespace lcos
 
         template <typename... T>
         typename detail::async_when_all_frame<
-            util::tuple<
-                typename traits::acquire_future<T>::type...
-            >
-        >::type
+            util::tuple<typename traits::acquire_future<T>::type...>>::type
         when_all_impl(T&&... args)
         {
             typedef util::tuple<typename traits::acquire_future<T>::type...>
@@ -251,7 +240,7 @@ namespace hpx { namespace lcos
             return future_access<typename frame_type::type>::create(
                 std::move(frame));
         }
-    }
+    }    // namespace detail
 
     template <typename First, typename Second>
     auto when_all(First&& first, Second&& second)
@@ -270,7 +259,7 @@ namespace hpx { namespace lcos
             detail::acquire_future_iterators<Iterator, Container>(begin, end));
     }
 
-    inline lcos::future<util::tuple<> > //-V524
+    inline lcos::future<util::tuple<>>    //-V524
     when_all()
     {
         typedef util::tuple<> result_type;
@@ -296,13 +285,12 @@ namespace hpx { namespace lcos
     {
         return detail::when_all_impl(std::forward<Args>(args)...);
     }
-}}
+}}    // namespace hpx::lcos
 
-namespace hpx
-{
+namespace hpx {
     using lcos::when_all;
     using lcos::when_all_n;
-}
+}    // namespace hpx
 
-#endif // DOXYGEN
+#endif    // DOXYGEN
 #endif

@@ -37,10 +37,9 @@ void test_wait_for_either_of_two_futures_list()
 
     pt1();
 
-    hpx::lcos::future<hpx::when_some_result<
-            std::array<hpx::future<int>, 2>
-        > > r = hpx::when_some(1u, futures);
-    hpx::when_some_result<std::array<hpx::future<int>, 2> > raw = r.get();
+    hpx::lcos::future<hpx::when_some_result<std::array<hpx::future<int>, 2>>>
+        r = hpx::when_some(1u, futures);
+    hpx::when_some_result<std::array<hpx::future<int>, 2>> raw = r.get();
 
     HPX_TEST_EQ(raw.indices.size(), 1u);
     HPX_TEST_EQ(raw.indices[0], 0u);
@@ -55,8 +54,8 @@ void test_wait_for_either_of_two_futures_list()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 using hpx::lcos::future;
 
@@ -75,9 +74,7 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
