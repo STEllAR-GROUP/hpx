@@ -487,6 +487,7 @@ namespace hpx { namespace performance_counters {
         char const* const counter_type_names[] = {
             "counter_text",
             "counter_raw",
+            "counter_monotonically_increasing",
             "counter_average_base",
             "counter_average_count",
             "counter_aggregating",

@@ -445,23 +445,28 @@ namespace hpx
                 rt.add_startup_function(&list_component_types);
             }
 
-            if (vm.count("hpx:print-counter") || vm.count("hpx:print-counter-reset"))
+            if (vm.count("hpx:print-counter") ||
+                vm.count("hpx:print-counter-reset"))
             {
                 std::size_t interval = 0;
                 if (vm.count("hpx:print-counter-interval"))
-                    interval = vm["hpx:print-counter-interval"].as<std::size_t>();
+                {
+                    interval =
+                        vm["hpx:print-counter-interval"].as<std::size_t>();
+                }
 
                 std::vector<std::string> counters;
                 if (vm.count("hpx:print-counter"))
                 {
-                    counters = vm["hpx:print-counter"]
-                        .as<std::vector<std::string> >();
+                    counters =
+                        vm["hpx:print-counter"].as<std::vector<std::string>>();
                 }
+
                 std::vector<std::string> reset_counters;
                 if (vm.count("hpx:print-counter-reset"))
                 {
                     reset_counters = vm["hpx:print-counter-reset"]
-                        .as<std::vector<std::string> >();
+                                         .as<std::vector<std::string>>();
                 }
 
                 std::vector<std::string> counter_shortnames;
@@ -489,27 +494,31 @@ namespace hpx
                 }
 
                 bool csv_header = true;
-                if(vm.count("hpx:no-csv-header"))
+                if (vm.count("hpx:no-csv-header"))
                     csv_header = false;
 
                 std::string destination("cout");
                 if (vm.count("hpx:print-counter-destination"))
                     destination = vm["hpx:print-counter-destination"].as<std::string>();
 
+                bool counter_types = false;
+                if (vm.count("hpx:print-counter-types"))
+                    counter_types = true;
+
                 // schedule the query function at startup, which will schedule
                 // itself to run after the given interval
                 std::shared_ptr<util::query_counters> qc =
-                    std::make_shared<util::query_counters>(
-                        std::ref(counters), std::ref(reset_counters), interval,
-                        destination, counter_format, counter_shortnames, csv_header,
-                        print_counters_locally);
+                    std::make_shared<util::query_counters>(std::ref(counters),
+                        std::ref(reset_counters), interval, destination,
+                        counter_format, counter_shortnames, csv_header,
+                        print_counters_locally, counter_types);
 
                 // schedule to print counters at shutdown, if requested
                 if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")
                 {
                     // schedule to run at shutdown
-                    rt.add_pre_shutdown_function(
-                        util::bind_front(&util::query_counters::evaluate, qc));
+                    rt.add_pre_shutdown_function(util::bind_front(
+                        &util::query_counters::evaluate, qc, true));
                 }
 
                 // schedule to start all counters

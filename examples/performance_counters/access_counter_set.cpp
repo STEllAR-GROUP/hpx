@@ -44,8 +44,15 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // print the values for all 'raw' (non-histogram) counters
     for (std::size_t i = 0, j = 0; i != infos.size(); ++i)
     {
-        if (infos[i].type_ != counter_raw)
+        if (infos[i].type_ != counter_raw &&
+            infos[i].type_ != counter_monotonically_increasing &&
+            infos[i].type_ != counter_aggregating &&
+            infos[i].type_ != counter_elapsed_time &&
+            infos[i].type_ != counter_average_count &&
+            infos[i].type_ != counter_average_timer)
+        {
             continue;
+        }
 
         if (infos[i].unit_of_measure_.empty())
         {

@@ -72,27 +72,35 @@ void symbol_namespace::register_counter_types(
           ++i)
     {
         // global counters are handled elsewhere
-        if (detail::symbol_namespace_services[i].code_ == symbol_ns_statistics_counter)
+        if (detail::symbol_namespace_services[i].code_ ==
+            symbol_ns_statistics_counter)
             continue;
 
         std::string name(detail::symbol_namespace_services[i].name_);
         std::string help;
+        performance_counters::counter_type type;
         std::string::size_type p = name.find_last_of('/');
         HPX_ASSERT(p != std::string::npos);
 
-        if (detail::symbol_namespace_services[i].target_
-            == detail::counter_target_count)
+        if (detail::symbol_namespace_services[i].target_ ==
+            detail::counter_target_count)
+        {
             help = hpx::util::format(
                 "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
+            type = performance_counters::counter_monotonically_increasing;
+        }
         else
+        {
             help = hpx::util::format(
                 "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
+            type = performance_counters::counter_elapsed_time;
+        }
 
         performance_counters::install_counter_type(
             agas::performance_counter_basename + name
-          , performance_counters::counter_raw
+          , type
           , help
           , creator
           , &performance_counters::locality_counter_discoverer
@@ -117,20 +125,30 @@ void symbol_namespace::register_global_counter_types(
           ++i)
     {
         // local counters are handled elsewhere
-        if (detail::symbol_namespace_services[i].code_ != symbol_ns_statistics_counter)
+        if (detail::symbol_namespace_services[i].code_ !=
+            symbol_ns_statistics_counter)
             continue;
 
         std::string help;
-        if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
-            help = "returns the overall number of invocations \
-                    of all symbol AGAS services";
+        performance_counters::counter_type type;
+        if (detail::symbol_namespace_services[i].target_ ==
+            detail::counter_target_count)
+        {
+            help = "returns the overall number of invocations of all symbol "
+                   "AGAS services";
+            type = performance_counters::counter_monotonically_increasing;
+        }
         else
-            help = "returns the overall execution time of all symbol AGAS services";
+        {
+            help = "returns the overall execution time of all symbol AGAS "
+                   "services";
+            type = performance_counters::counter_elapsed_time;
+        }
 
         performance_counters::install_counter_type(
             std::string(agas::performance_counter_basename) +
                 detail::symbol_namespace_services[i].name_
-          , performance_counters::counter_raw
+          , type
           , help
           , creator
           , &performance_counters::locality_counter_discoverer

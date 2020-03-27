@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2015 Oregon University
 //
@@ -42,7 +42,7 @@
 
 using hpx::naming::id_type;
 using hpx::performance_counters::get_counter;
-using hpx::performance_counters::stubs::performance_counter;
+using hpx::performance_counters::performance_counter;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_is_valid;
 
@@ -53,15 +53,16 @@ static hpx::naming::id_type counter_id;
 
 void setup_counters() {
     try {
-        id_type id = get_counter(counter_name);
+        performance_counter counter(counter_name);
         // We need to explicitly start all counters before we can use them. For
         // certain counters this could be a no-op, in which case start will return
         // 'false'.
-        performance_counter::start(hpx::launch::sync, id);
-        std::cout << "Counter " << counter_name << " initialized " << id << std::endl;
-        counter_value value = performance_counter::get_value(hpx::launch::sync, id);
+        counter.start(hpx::launch::sync);
+        counter_id = counter.get_id();
+        std::cout << "Counter " << counter_name << " initialized " << counter_id
+                  << std::endl;
+        counter_value value = counter.get_counter_value(hpx::launch::sync);
         std::cout << "Counter value " << value.get_value<std::int64_t>() << std::endl;
-        counter_id = id;
         end_iteration_event = apex::register_custom_event("Repartition");
         counters_initialized = true;
     }
@@ -80,8 +81,9 @@ double get_counter_value() {
         return false;
     }
     try {
+        performance_counter counter(counter_id);
         counter_value value1 =
-            performance_counter::get_value(hpx::launch::sync, counter_id, true);
+            counter.get_counter_value(hpx::launch::sync, true);
         std::int64_t counter_value = value1.get_value<std::int64_t>();
         std::cerr << "counter_value " << counter_value << std::endl;
         return (double)(counter_value);

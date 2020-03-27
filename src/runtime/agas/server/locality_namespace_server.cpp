@@ -60,22 +60,29 @@ void locality_namespace::register_counter_types(
 
         std::string name(detail::locality_namespace_services[i].name_);
         std::string help;
+        performance_counters::counter_type type;
         std::string::size_type p = name.find_last_of('/');
         HPX_ASSERT(p != std::string::npos);
 
         if (detail::locality_namespace_services[i].target_ ==
             detail::counter_target_count)
+        {
             help = hpx::util::format(
                 "returns the number of invocations of the AGAS service '{}'",
                 name.substr(p+1));
+            type = performance_counters::counter_monotonically_increasing;
+        }
         else
+        {
             help = hpx::util::format(
                 "returns the overall execution time of the AGAS service '{}'",
                 name.substr(p+1));
+            type = performance_counters::counter_elapsed_time;
+        }
 
         performance_counters::install_counter_type(
             agas::performance_counter_basename + name
-          , performance_counters::counter_raw
+          , type
           , help
           , creator
           , &performance_counters::locality0_counter_discoverer
@@ -105,17 +112,25 @@ void locality_namespace::register_global_counter_types(
             continue;
 
         std::string help;
+        performance_counters::counter_type type;
         if (detail::locality_namespace_services[i].target_ ==
             detail::counter_target_count)
-            help = "returns the overall number of invocations \
-                    of all locality AGAS services";
+        {
+            help = "returns the overall number of invocations of all locality "
+                   "AGAS services";
+            type = performance_counters::counter_monotonically_increasing;
+        }
         else
-            help = "returns the overall execution time of all locality AGAS services";
+        {
+            help = "returns the overall execution time of all locality AGAS "
+                   "services";
+            type = performance_counters::counter_elapsed_time;
+        }
 
         performance_counters::install_counter_type(
             std::string(agas::performance_counter_basename) +
                 detail::locality_namespace_services[i].name_
-          , performance_counters::counter_raw
+          , type
           , help
           , creator
           , &performance_counters::locality0_counter_discoverer

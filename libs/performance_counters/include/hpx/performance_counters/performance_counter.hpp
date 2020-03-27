@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/performance_counters/stubs/performance_counter.hpp>
+#include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 #include <string>
 #include <utility>
@@ -22,20 +22,26 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
+
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT performance_counter
-      : components::client_base<performance_counter, stubs::performance_counter>
+      : components::client_base<performance_counter,
+            server::base_performance_counter>
     {
-        typedef components::client_base<performance_counter,
-            stubs::performance_counter>
-            base_type;
+        using base_type = components::client_base<performance_counter,
+            server::base_performance_counter>;
 
-        performance_counter() {}
+        performance_counter() = default;
 
         performance_counter(std::string const& name);
 
         performance_counter(
             std::string const& name, hpx::id_type const& locality);
+
+        performance_counter(id_type const& id)
+          : base_type(id)
+        {
+        }
 
         performance_counter(future<id_type>&& id)
           : base_type(std::move(id))
@@ -122,7 +128,7 @@ namespace hpx { namespace performance_counters {
         }
     };
 
-    /// Return all counters matching the given name (with optional wildcards).
+    // Return all counters matching the given name (with optional wild cards).
     HPX_API_EXPORT std::vector<performance_counter> discover_counters(
         std::string const& name, error_code& ec = throws);
 }}    // namespace hpx::performance_counters

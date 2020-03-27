@@ -368,7 +368,7 @@ namespace hpx
         char const* description, error_code& ec)
     {
         if (active_counters_.get())
-            active_counters_->evaluate_counters(reset, description, ec);
+            active_counters_->evaluate_counters(reset, description, true, ec);
     }
 
     void runtime::stop_evaluating_counters(bool terminate)
@@ -530,7 +530,8 @@ namespace hpx
             },
 
             // action invocation counters
-            { "/runtime/count/action-invocation", performance_counters::counter_raw,
+            { "/runtime/count/action-invocation",
+              performance_counters::counter_monotonically_increasing,
               "returns the number of (local) invocations of a specific action "
               "on this locality (the action type has to be specified as the "
               "counter parameter)",
@@ -541,7 +542,7 @@ namespace hpx
             },
 #if defined(HPX_HAVE_NETWORKING)
             { "/runtime/count/remote-action-invocation",
-              performance_counters::counter_raw,
+              performance_counters::counter_monotonically_increasing,
               "returns the number of (remote) invocations of a specific action "
               "on this locality (the action type has to be specified as the "
               "counter parameter)",

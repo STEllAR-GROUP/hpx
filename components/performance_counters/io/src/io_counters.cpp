@@ -156,39 +156,39 @@ namespace hpx { namespace performance_counters { namespace io
             &get_pio_riss,
             "number of bytes read by process (aggregate of count "
             "arguments passed to read() call or its analogues)",
-            "bytes");
+            "bytes", pc::counter_monotonically_increasing);
         pc::install_counter_type(
             "/runtime/io/write_bytes_issued",
             &get_pio_wiss,
             "number of bytes the process has caused or shall cause to be "
             "written (aggregate of count arguments passed to write() call or "
             "its analogues)",
-            "bytes");
+            "bytes", pc::counter_monotonically_increasing);
         pc::install_counter_type(
             "/runtime/io/read_syscalls",
             &get_pio_rsysc,
-            "number of system calls that perform I/O reads",
-            "");
+            "number of system calls that perform I/O reads", "",
+            pc::counter_monotonically_increasing);
         pc::install_counter_type(
             "/runtime/io/write_syscalls",
             &get_pio_wsysc,
-            "number of system calls that perform I/O writes",
-            "");
+            "number of system calls that perform I/O writes", "",
+            pc::counter_monotonically_increasing);
         pc::install_counter_type(
             "/runtime/io/read_bytes_transferred",
             &get_pio_rstor,
-            "number of bytes retrieved from storage by I/O operations",
-            "bytes");
+            "number of bytes retrieved from storage by I/O operations", "bytes",
+            pc::counter_monotonically_increasing);
         pc::install_counter_type(
             "/runtime/io/write_bytes_transferred",
             &get_pio_wstor,
-            "number of bytes transferred to storage by I/O operations",
-            "bytes");
+            "number of bytes transferred to storage by I/O operations", "bytes",
+            pc::counter_monotonically_increasing);
         pc::install_counter_type(
             "/runtime/io/write_bytes_cancelled", &get_pio_wcanc,
             "number of bytes accounted by write_bytes_transferred that has not "
             "been ultimately stored due to truncation or deletion",
-            "bytes");
+            "bytes", pc::counter_monotonically_increasing);
     }
 
     bool get_startup(hpx::startup_function_type& startup_func,

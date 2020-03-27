@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(performance_counters_headers
+  hpx/performance_counters/apex_sample_value.hpp
   hpx/performance_counters/base_performance_counter.hpp
   hpx/performance_counters/counter_creators.hpp
   hpx/performance_counters/counter_parser.hpp
@@ -29,7 +30,6 @@ set(performance_counters_headers
   hpx/performance_counters/server/raw_counter.hpp
   hpx/performance_counters/server/raw_values_counter.hpp
   hpx/performance_counters/server/statistics_counter.hpp
-  hpx/performance_counters/stubs/performance_counter.hpp
 )
 
 set(performance_counters_sources
@@ -50,7 +50,6 @@ set(performance_counters_sources
   server/action_invocation_counter.cpp
   server/arithmetics_counter.cpp
   server/statistics_counter.cpp
-  stubs/performance_counter_stub.cpp
 )
 
 include(HPX_AddModule)
@@ -72,8 +71,8 @@ add_hpx_module(performance_counters
     hpx_static_reinit
     hpx_statistics
     hpx_threading
-    hpx_threading_base
     hpx_thread_support
+    hpx_threading_base
     hpx_timing
   CMAKE_SUBDIRS examples tests
 )

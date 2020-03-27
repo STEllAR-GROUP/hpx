@@ -43,8 +43,8 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
 #endif
 
     // Resolve the GID of the performance counter using it's symbolic name.
-    hpx::naming::id_type id = hpx::performance_counters::get_counter(name);
-    if (!id)
+    hpx::performance_counters::performance_counter c(name);
+    if (!c.get_id())
     {
         hpx::util::format_to(std::cout,
             "error: performance counter not found ({})",
@@ -53,7 +53,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
     }
 
     std::uint32_t const locality_id = hpx::get_locality_id();
-    if (locality_id == hpx::naming::get_locality_id_from_gid(id.get_gid()))
+    if (locality_id == hpx::naming::get_locality_id_from_id(c.get_id()))
     {
         hpx::util::format_to(std::cout,
             "error: cannot query performance counters on its own locality ({})",
@@ -79,8 +79,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
 
         // Query the performance counter.
         using namespace hpx::performance_counters;
-        counter_value value =
-            stubs::performance_counter::get_value(hpx::launch::sync, id);
+        counter_value value = c.get_counter_value(hpx::launch::sync);
 
         if (status_is_valid(value.status_))
         {
