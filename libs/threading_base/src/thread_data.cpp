@@ -67,6 +67,7 @@ namespace hpx { namespace threads {
         , enabled_interrupt_(true)
         , ran_exit_funcs_(false)
         , scheduler_base_(init_data.scheduler_base)
+        , last_worker_thread_num_(std::size_t(-1))
         , stacksize_(init_data.stacksize)
         , queue_(queue)
         , is_stackless_(is_stackless)
@@ -195,6 +196,7 @@ namespace hpx { namespace threads {
             ran_exit_funcs_ = false;
             exit_funcs_.clear();
             scheduler_base_ = init_data.scheduler_base;
+            last_worker_thread_num_ = std::size_t(-1);
 
             HPX_ASSERT(init_data.stacksize == get_stack_size());
 

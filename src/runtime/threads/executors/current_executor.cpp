@@ -146,8 +146,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     hpx::state current_executor::get_state() const
     {
-        return scheduler_base_->get_state(
-            threads::detail::get_thread_num_tss());
+        return scheduler_base_->get_state(get_local_worker_thread_num());
     }
 
     void current_executor::set_scheduler_mode(

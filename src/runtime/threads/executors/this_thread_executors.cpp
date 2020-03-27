@@ -349,7 +349,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             HPX_ASSERT(orig_thread_num_ != std::size_t(-1));
 
             threads::detail::reset_tss_helper reset_on_exit(orig_thread_num_);
-            parent_thread_num_ = reset_on_exit.previous_thread_num();
+            parent_thread_num_ = reset_on_exit.previous_global_thread_num();
 
             // FIXME: turn these values into performance counters
             std::int64_t executed_threads = 0, executed_thread_phases = 0;
@@ -441,7 +441,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_ASSERT(std::size_t(-1) == orig_thread_num_);
 
         thread_num_ = thread_num;
-        orig_thread_num_ = threads::detail::get_thread_num_tss();
+        orig_thread_num_ = get_worker_thread_num();
 
         std::atomic<hpx::state>& state = scheduler_.get_state(0);
         hpx::state expected = state_initialized;

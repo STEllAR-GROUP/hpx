@@ -500,6 +500,17 @@ namespace hpx { namespace threads {
             return scheduler_base_;
         }
 
+        std::size_t get_last_worker_thread_num() const noexcept
+        {
+            return last_worker_thread_num_;
+        }
+
+        void set_last_worker_thread_num(
+            std::size_t last_worker_thread_num) noexcept
+        {
+            last_worker_thread_num_ = last_worker_thread_num;
+        }
+
         std::ptrdiff_t get_stack_size() const noexcept
         {
             return stacksize_;
@@ -603,6 +614,7 @@ namespace hpx { namespace threads {
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
+        std::size_t last_worker_thread_num_;
 
         std::ptrdiff_t stacksize_;
 

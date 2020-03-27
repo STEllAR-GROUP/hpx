@@ -15,45 +15,55 @@
 
 namespace hpx { namespace threads { namespace detail {
     namespace {
-        std::size_t& thread_num_tss()
+        thread_nums& thread_nums_tss()
         {
-            static thread_local std::size_t thread_num_tss_ = std::size_t(-1);
-            return thread_num_tss_;
-        }
-
-        thread_pool& thread_pool_tss()
-        {
-            static thread_local thread_pool thread_pool_tss_ = {
-                std::uint16_t(-1), std::uint16_t(-1)};
-            return thread_pool_tss_;
+            static thread_local thread_nums thread_nums_tss_ = {
+                std::size_t(-1), std::size_t(-1), std::size_t(-1)};
+            return thread_nums_tss_;
         }
     }    // namespace
 
-    // use this to store the global thread number/id in thread local storage
-    std::size_t set_thread_num_tss(std::size_t num)
+    std::size_t set_global_thread_num_tss(std::size_t num)
     {
-        std::swap(thread_num_tss(), num);
+        std::swap(thread_nums_tss().global_thread_num, num);
         return num;
     }
 
-    // this returns the globl thread number from thread local storage
-    std::size_t get_thread_num_tss()
+    std::size_t get_global_thread_num_tss()
     {
-        return thread_num_tss();
+        return thread_nums_tss().global_thread_num;
     }
 
-    // set the local thread number and pool index associated with this
-    // system thread into thread local storage
-    void set_thread_pool_tss(const thread_pool& tup)
+    std::size_t set_local_thread_num_tss(std::size_t num)
     {
-        thread_pool_tss() = tup;
+        std::swap(thread_nums_tss().local_thread_num, num);
+        return num;
     }
 
-    // this returns a struct of the local thread number and the pool
-    // Id or index that this thread is assigned to
-    thread_pool get_thread_pool_tss()
+    std::size_t get_local_thread_num_tss()
     {
-        return thread_pool_tss();
+        return thread_nums_tss().local_thread_num;
+    }
+
+    std::size_t set_thread_pool_num_tss(std::size_t num)
+    {
+        std::swap(thread_nums_tss().thread_pool_num, num);
+        return num;
+    }
+
+    std::size_t get_thread_pool_num_tss()
+    {
+        return thread_nums_tss().thread_pool_num;
+    }
+
+    void set_thread_nums_tss(const thread_nums& t)
+    {
+        thread_nums_tss() = t;
+    }
+
+    thread_nums get_thread_nums_tss()
+    {
+        return thread_nums_tss();
     }
 
 }}}    // namespace hpx::threads::detail
@@ -61,11 +71,31 @@ namespace hpx { namespace threads { namespace detail {
 namespace hpx {
     std::size_t get_worker_thread_num(error_code& ec)
     {
-        return threads::detail::get_thread_num_tss();
+        return threads::detail::thread_nums_tss().global_thread_num;
     }
 
     std::size_t get_worker_thread_num()
     {
         return get_worker_thread_num(throws);
+    }
+
+    std::size_t get_local_worker_thread_num(error_code& ec)
+    {
+        return threads::detail::thread_nums_tss().local_thread_num;
+    }
+
+    std::size_t get_local_worker_thread_num()
+    {
+        return get_local_worker_thread_num(throws);
+    }
+
+    std::size_t get_thread_pool_num(error_code& ec)
+    {
+        return threads::detail::thread_nums_tss().thread_pool_num;
+    }
+
+    std::size_t get_thread_pool_num()
+    {
+        return get_thread_pool_num(throws);
     }
 }    // namespace hpx

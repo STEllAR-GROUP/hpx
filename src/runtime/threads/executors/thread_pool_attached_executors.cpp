@@ -75,7 +75,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         schedulehint.mode = threads::thread_schedule_hint_mode_thread;
         schedulehint.hint =
-            static_cast<std::int16_t>(threads::detail::get_thread_num_tss());
+            static_cast<std::int16_t>(threads::detail::get_global_thread_num_tss());
         register_thread_nullary(std::move(f), desc, initial_state, run_now,
             priority_, schedulehint, stacksize, ec);
     }
