@@ -11,14 +11,10 @@
 
 
 namespace hpx { namespace detail {
-
-    const hpx::program_options::options_description default_desc(
-                "Usage: " HPX_APPLICATION_STRING " [options]");
     startup_function_type default_startup = startup_function_type();
     shutdown_function_type default_shutdown = shutdown_function_type();
     HPX_MAYBE_UNUSED int dummy_argc = 1;
     // TODO: make it only one parameter, probably add a cast
-    char app_name[] = HPX_APPLICATION_STRING;
     char *default_argv[2] = { app_name, nullptr };
     HPX_MAYBE_UNUSED char **dummy_argv = default_argv;
 }}  // namespace hpx::detail

@@ -59,13 +59,16 @@ namespace hpx
         HPX_EXPORT void on_exit() noexcept;
         HPX_EXPORT void on_abort(int signal) noexcept;
         // Default params to initialize the init_params struct
-        extern HPX_EXPORT const hpx::program_options::options_description
-            default_desc;
         extern HPX_EXPORT startup_function_type default_startup;
         extern HPX_EXPORT shutdown_function_type default_shutdown;
         HPX_MAYBE_UNUSED extern HPX_EXPORT int dummy_argc;
-        // TODO: make it only one parameter, probably add a cast
         HPX_MAYBE_UNUSED extern HPX_EXPORT char **dummy_argv;
+        // HPX_APPLICATION_STRING is specific to an application and therefore
+        // cannot be in the source file
+        static char app_name[] = HPX_APPLICATION_STRING;
+        static const hpx::program_options::options_description default_desc =
+            hpx::program_options::options_description(
+                    "Usage: " HPX_APPLICATION_STRING " [options]");
     }
 
 #ifndef DOXYGEN
