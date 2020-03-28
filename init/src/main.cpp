@@ -5,10 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/init/config/defines.hpp>
 
 // We support different implementation depending upon the Operating
 // System in use.
-#if !((HPX_HAVE_DYNAMIC_HPX_MAIN != 0) &&                                      \
+#if !(defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                    \
     (defined(__linux) || defined(__linux__) || defined(linux) ||               \
         defined(__APPLE__)))
 

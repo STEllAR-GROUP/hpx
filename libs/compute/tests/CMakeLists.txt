@@ -36,6 +36,6 @@ if (HPX_COMPUTE_WITH_TESTS)
       modules.compute
       HEADERS ${compute_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-      DEPENDENCIES hpx_compute hpx_includes)
+      DEPENDENCIES hpx_compute)
   endif()
 endif()

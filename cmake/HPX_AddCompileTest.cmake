@@ -18,14 +18,13 @@ function(add_hpx_compile_test category name)
 
   string(REGEX REPLACE "\\." "_" test_name "${category}.${name}")
 
-  add_hpx_library(
+  add_hpx_executable(
     ${test_name}
     SOURCE_ROOT ${${name}_SOURCE_ROOT}
     SOURCES ${${name}_SOURCES}
     EXCLUDE_FROM_ALL
     EXCLUDE_FROM_DEFAULT_BUILD
     FOLDER ${${name}_FOLDER}
-    STATIC
     COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
     DEPENDENCIES ${${name}_DEPENDENCIES}
     ${_additional_flags})

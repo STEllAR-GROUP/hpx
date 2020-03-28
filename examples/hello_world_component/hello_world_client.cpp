@@ -6,9 +6,9 @@
 
 //[hello_world_client_getting_started
 #include "hello_world_component.hpp"
-#include <hpx/hpx_init.hpp>
+#include <hpx/hpx_main.hpp>
 
-int hpx_main(hpx::program_options::variables_map&)
+int main(int argc, char* argv[])
 {
     {
         // Create a single instance of the component on this locality.
@@ -19,12 +19,7 @@ int hpx_main(hpx::program_options::variables_map&)
         client.invoke();
     }
 
-    return hpx::finalize(); // Initiate shutdown of the runtime system.
-}
-
-int main(int argc, char* argv[])
-{
-    return hpx::init(argc, argv); // Initialize and run HPX.
+    return 0;
 }
 //]
 

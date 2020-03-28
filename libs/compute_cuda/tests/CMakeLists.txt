@@ -36,14 +36,10 @@ if (HPX_COMPUTE_CUDA_WITH_TESTS)
   endif()
 
   if (HPX_WITH_TESTS_HEADERS)
-    # TODO: Why is this needed?
-    add_library(hpx_includes INTERFACE)
-    target_include_directories(hpx_includes INTERFACE ${PROJECT_SOURCE_DIR})
     add_hpx_header_tests(
       modules.compute_cuda
       HEADERS ${compute_cuda_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-      NOLIBS
-      DEPENDENCIES hpx_compute_cuda hpx_includes)
+      DEPENDENCIES hpx_compute_cuda)
   endif()
 endif()
