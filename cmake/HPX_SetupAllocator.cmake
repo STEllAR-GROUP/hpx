@@ -65,7 +65,7 @@ if (NOT TARGET hpx::allocator)
     ##################################################
     # MIMALLOC
     if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "MIMALLOC")
-      find_package(mimalloc 1.0)
+      find_package(mimalloc 1.0 CONFIG HINTS ${MIMALLOC_ROOT} $ENV{MIMALLOC_ROOT})
       if(NOT mimalloc_FOUND)
         hpx_error(${allocator_error})
       endif()
