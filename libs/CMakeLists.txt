@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,6 +37,7 @@ set(HPX_LIBS
   functional
   hardware
   hashing
+  include
   io_service
   iterator_support
   local_lcos
@@ -59,9 +60,9 @@ set(HPX_LIBS
   string_util
   synchronization
   testing
-  threading
   thread_pools
   thread_support
+  threading
   threading_base
   threadmanager
   timing

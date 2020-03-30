@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 '''
-Copyright (c) 2018 Thomas Heller
+Copyright (c) 2019-2020 ETH Zurich
+Copyright (c) 2018      Thomas Heller
 
 SPDX-License-Identifier: BSL-1.0
 Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +25,7 @@ header_str = '=' * len(lib_name)
 # CMake minimum version
 cmake_version = '3.13'
 
-cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
+cmake_header = f'''# Copyright (c) 2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +34,7 @@ cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
 
 readme_template = f'''
 ..
-    Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2020 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -50,7 +51,7 @@ Documentation can be found `here
 '''
 
 index_rst = f'''..
-    Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2020 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -317,7 +318,7 @@ f.write(libs_cmakelists)
 
 # Adapting all_modules.rst
 all_modules_rst = f'''..
-    Copyright (c) 2018-2019 The STE||AR-Group
+    Copyright (c) 2018-2020 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying

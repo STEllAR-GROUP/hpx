@@ -1,5 +1,5 @@
 ..
-    Copyright (c) 2018-2019 The STE||AR-Group
+    Copyright (c) 2018-2020 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,6 +40,7 @@ All modules
    /libs/functional/docs/index.rst
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
+   /libs/include/docs/index.rst
    /libs/io_service/docs/index.rst
    /libs/iterator_support/docs/index.rst
    /libs/local_lcos/docs/index.rst
@@ -62,9 +63,9 @@ All modules
    /libs/string_util/docs/index.rst
    /libs/synchronization/docs/index.rst
    /libs/testing/docs/index.rst
-   /libs/threading/docs/index.rst
    /libs/thread_pools/docs/index.rst
    /libs/thread_support/docs/index.rst
+   /libs/threading/docs/index.rst
    /libs/threading_base/docs/index.rst
    /libs/threadmanager/docs/index.rst
    /libs/timing/docs/index.rst
