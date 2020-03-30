@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_901997BE_9730_41F7_9DBC_AD1DC70D7819)
-#define HPX_901997BE_9730_41F7_9DBC_AD1DC70D7819
+#pragma once
 
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/promise.hpp>
@@ -147,5 +146,4 @@ struct managed_object
 
 }}
 
-#endif // HPX_901997BE_9730_41F7_9DBC_AD1DC70D7819
 

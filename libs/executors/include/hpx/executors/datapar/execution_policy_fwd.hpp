@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_DATAPAR_EXECUTION_POLICY_FWD_SEP_07_2016_0528AM)
-#define HPX_PARALLEL_DATAPAR_EXECUTION_POLICY_FWD_SEP_07_2016_0528AM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -34,5 +33,4 @@ namespace hpx { namespace parallel { namespace execution { inline namespace v1 {
     struct datapar_task_policy_shim;
 }}}}    // namespace hpx::parallel::execution::v1
 
-#endif
 #endif

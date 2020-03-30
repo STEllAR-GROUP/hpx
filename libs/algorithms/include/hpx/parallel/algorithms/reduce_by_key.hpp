@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/reduce_by_key.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015)
-#define HPX_PARALLEL_ALGORITHM_REDUCE_BY_KEY_DEC_2015
+#pragma once
 //
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -606,5 +605,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Compare>(comp), std::forward<Func>(func));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http:// ww.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARTITIONED_VECTOR_SEGMENTED_ITERATOR_HPP
-#define HPX_PARTITIONED_VECTOR_SEGMENTED_ITERATOR_HPP
+#pragma once
 
 /// \file hpx/components/partitioned_vector/partitioned_vector_segmented_iterator.hpp
 /// \brief This file contains the implementation of iterators for hpx::partitioned_vector.
@@ -1095,4 +1094,3 @@ namespace hpx { namespace traits
     {};
 }}
 
-#endif //  SEGMENTED_ITERATOR_HPP

@@ -6,8 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM)
-#define HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -712,4 +711,3 @@ namespace hpx { namespace traits
     {};
 }}
 
-#endif  // HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM

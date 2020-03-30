@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_703646B3_0567_484E_AD34_A752B8163B30)
-#define HPX_703646B3_0567_484E_AD34_A752B8163B30
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
@@ -28,5 +27,4 @@ namespace hpx
     }
 }
 
-#endif // HPX_703646B3_0567_484E_AD34_A752B8163B30
 

@@ -4,9 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_AUG_28_2015_0511PM)
-#define HPX_PARALLEL_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_AUG_28_2015_0511PM
+#pragma once
 
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
 
@@ -29,5 +27,3 @@ namespace hpx { namespace parallel { namespace execution {
 #endif
 #endif
 }}}    // namespace hpx::parallel::execution
-
-#endif

@@ -6,9 +6,7 @@
 
 /// \file parallel/executors/distribution_policy_executor.hpp
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_DISTRIBUTION_POLICY_EXECUTOR_JUL_21_2015_0404PM)
-#define HPX_PARALLEL_EXECUTORS_DISTRIBUTION_POLICY_EXECUTOR_JUL_21_2015_0404PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -201,5 +199,4 @@ namespace hpx { namespace parallel { namespace execution {
     /// \endcond
 }}}    // namespace hpx::parallel::execution
 
-#endif
 #endif

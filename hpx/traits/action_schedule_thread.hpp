@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM)
-#define HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM
+#pragma once
 
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -74,5 +73,4 @@ namespace hpx { namespace traits
     };
 }}
 
-#endif
 

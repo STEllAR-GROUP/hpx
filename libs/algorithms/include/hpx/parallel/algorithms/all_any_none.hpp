@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/all_any_none.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM)
-#define HPX_PARALLEL_DETAIL_ALL_ANY_NONE_JUL_05_2014_0940PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -526,5 +525,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

@@ -6,8 +6,7 @@
 
 /// \file host/target_distribution_policy.hpp
 
-#if !defined(HPX_COMPUTE_HOST_TARGET_DISTRIBUTION_POLICY)
-#define HPX_COMPUTE_HOST_TARGET_DISTRIBUTION_POLICY
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -248,5 +247,4 @@ namespace hpx { namespace traits {
 }}    // namespace hpx::traits
 /// \endcond
 
-#endif
 #endif

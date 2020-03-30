@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/for_loop_induction.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM)
-#define HPX_PARALLEL_ALGORITHM_FOR_LOOP_INDUCTION_MAR_05_2016_0305PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/decay.hpp>
@@ -231,5 +230,3 @@ namespace hpx { namespace parallel { inline namespace v2 {
     }
     /// \endcond
 }}}    // namespace hpx::parallel::v2
-
-#endif

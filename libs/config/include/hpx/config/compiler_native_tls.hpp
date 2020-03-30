@@ -6,8 +6,7 @@
 
 // hpxinspect:nodeprecated_macros
 
-#if !defined(HPX_COMPILER_NATIVE_TLS)
-#define HPX_COMPILER_NATIVE_TLS
+#pragma once
 
 #include <hpx/config/defines.hpp>
 
@@ -18,5 +17,3 @@
 /// This macro is deprecated. It is always replaced with the ``thread_local``
 /// keyword. Prefer using ``thread_local`` directly instead.
 #define HPX_NATIVE_TLS thread_local
-
-#endif

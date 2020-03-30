@@ -7,8 +7,7 @@
 
 /// \file parallel/execution_policy.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM)
-#define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -1498,5 +1497,3 @@ namespace hpx { namespace parallel { namespace execution {
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::execution
-
-#endif

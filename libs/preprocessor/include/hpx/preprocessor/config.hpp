@@ -18,8 +18,7 @@
 
 /* See http://www.boost.org for most recent version. */
 
-#ifndef HPX_PREPROCESSOR_CONFIG_HPP
-#define HPX_PREPROCESSOR_CONFIG_HPP
+#pragma once
 #
 #/* HPX_PP_CONFIG_FLAGS */
 #
@@ -32,7 +31,7 @@
 #define HPX_PP_CONFIG_EDG() 0x0020
 #define HPX_PP_CONFIG_DMC() 0x0040
 #
-#ifndef HPX_PP_CONFIG_FLAGS
+#if !defined(HPX_PP_CONFIG_FLAGS)
 #if defined(_GCCXML_)
 #define HPX_PP_CONFIG_FLAGS() (HPX_PP_CONFIG_STRICT())
 #elif defined(_WAVE_)
@@ -64,13 +63,13 @@
 #
 #/* HPX_PP_CONFIG_EXTENDED_LINE_INFO */
 #
-#ifndef HPX_PP_CONFIG_EXTENDED_LINE_INFO
+#if !defined(HPX_PP_CONFIG_EXTENDED_LINE_INFO)
 #define HPX_PP_CONFIG_EXTENDED_LINE_INFO 0
 #endif
 #
 #/* HPX_PP_CONFIG_ERRORS */
 #
-#ifndef HPX_PP_CONFIG_ERRORS
+#if !defined(HPX_PP_CONFIG_ERRORS)
 #ifdef NDEBUG
 #define HPX_PP_CONFIG_ERRORS 0
 #else
@@ -126,4 +125,3 @@
 #define HPX_UTIL_VARIADICS 0
 #endif
 #
-#endif

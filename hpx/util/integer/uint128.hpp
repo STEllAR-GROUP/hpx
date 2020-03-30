@@ -7,8 +7,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_INTEGER_UINT128_HPP
-#define HPX_UTIL_INTEGER_UINT128_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -175,4 +174,3 @@ namespace hpx { namespace util { namespace integer
 
 // typedef hpx::util::integer::uint128 __uint128_t;
 
-#endif

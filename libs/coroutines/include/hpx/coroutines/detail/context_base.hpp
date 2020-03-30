@@ -28,8 +28,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP
+#pragma once
 
 /*
  * Currently asio can, in some cases. call copy constructors and
@@ -355,5 +354,3 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         std::size_t continuation_recursion_count_;
     };
 }}}}    // namespace hpx::threads::coroutines::detail
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_BASE_HPP*/

@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/rotate.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_ROTATE_AUG_05_2014_0138PM)
-#define HPX_PARALLEL_DETAIL_ROTATE_AUG_05_2014_0138PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -337,5 +336,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 last, dest_first));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

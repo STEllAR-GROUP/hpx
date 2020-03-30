@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENT_FACTORY_BASE_SEP_26_2008_0446PM)
-#define HPX_COMPONENT_FACTORY_BASE_SEP_26_2008_0446PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
@@ -44,5 +43,4 @@
 #define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
 #endif
 
-#endif
 

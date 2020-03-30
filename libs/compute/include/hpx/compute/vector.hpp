@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_VECTOR_HPP
-#define HPX_COMPUTE_VECTOR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -384,5 +383,3 @@ namespace hpx { namespace compute {
         x.swap(y);
     }
 }}    // namespace hpx::compute
-
-#endif

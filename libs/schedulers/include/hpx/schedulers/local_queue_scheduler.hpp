@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_QUEUE_MAR_15_2011_0926AM)
-#define HPX_THREADMANAGER_SCHEDULING_LOCAL_QUEUE_MAR_15_2011_0926AM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -103,7 +102,8 @@ namespace hpx { namespace threads { namespace policies {
           , curr_queue_(0)
           , affinity_data_(init.affinity_data_)
           ,
-#ifndef HPX_NATIVE_MIC    // we know that the MIC has one NUMA domain only
+#if !defined(                                                                  \
+    HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only)
           steals_in_numa_domain_()
           , steals_outside_numa_domain_()
 #endif
@@ -387,7 +387,8 @@ namespace hpx { namespace threads { namespace policies {
                     }
                 }
 
-#ifndef HPX_NATIVE_MIC    // we know that the MIC has one NUMA domain only
+#if !defined(                                                                  \
+    HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only)
                 // if nothing found, ask everybody else
                 if (test(steals_outside_numa_domain_,
                         pu_number))    //-V600 //-V111
@@ -740,7 +741,8 @@ namespace hpx { namespace threads { namespace policies {
                     }
                 }
 
-#ifndef HPX_NATIVE_MIC    // we know that the MIC has one NUMA domain only
+#if !defined(                                                                  \
+    HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only)
                 // if nothing found, ask everybody else
                 if (test(steals_outside_numa_domain_,
                         pu_number))    //-V600 //-V111
@@ -914,5 +916,4 @@ namespace hpx { namespace threads { namespace policies {
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

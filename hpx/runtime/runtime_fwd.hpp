@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime/runtime_fwd.hpp
 
-#ifndef HPX_RUNTIME_RUNTIME_FWD_HPP
-#define HPX_RUNTIME_RUNTIME_FWD_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -36,4 +35,3 @@ namespace hpx
     HPX_API_EXPORT bool is_networking_enabled();
 }
 
-#endif

@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/for_each.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_FOR_EACH_JUL_18_2015_0959AM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_FOR_EACH_JUL_18_2015_0959AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -106,5 +105,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

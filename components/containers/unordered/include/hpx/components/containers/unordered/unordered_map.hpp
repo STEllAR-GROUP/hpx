@@ -6,8 +6,7 @@
 
 /// \file hpx/components/unordered/unordered_map.hpp
 
-#if !defined(HPX_UNORDERED_MAP_NOV_11_2014_0852PM)
-#define HPX_UNORDERED_MAP_NOV_11_2014_0852PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -877,4 +876,3 @@ namespace hpx
     };
 }
 
-#endif

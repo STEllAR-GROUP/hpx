@@ -6,8 +6,7 @@
 
 //  See www.boost.org/libs/program_options for documentation.
 
-#ifndef PROGRAM_OPTIONS_VP_2003_05_19
-#define PROGRAM_OPTIONS_VP_2003_05_19
+#pragma once
 
 #if defined(_MSC_VER)
 #pragma once
@@ -25,5 +24,3 @@
 #include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/program_options/version.hpp>
-
-#endif

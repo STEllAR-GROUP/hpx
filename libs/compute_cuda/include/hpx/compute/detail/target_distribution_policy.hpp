@@ -6,8 +6,7 @@
 
 /// \file target_distribution_policy.hpp
 
-#if !defined(HPX_COMPUTE_TARGET_DISTRIBUTION_POLICY)
-#define HPX_COMPUTE_TARGET_DISTRIBUTION_POLICY
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -172,5 +171,3 @@ namespace hpx { namespace compute { namespace detail {
         /// \endcond
     };
 }}}    // namespace hpx::compute::detail
-
-#endif

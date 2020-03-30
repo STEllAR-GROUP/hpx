@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_DATAPAR_EXECUTION_POLICY_SEP_07_2016_0601AM)
-#define HPX_PARALLEL_DATAPAR_EXECUTION_POLICY_SEP_07_2016_0601AM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -1368,5 +1367,4 @@ namespace hpx { namespace parallel { namespace execution {
     }    // namespace detail
 }}}      // namespace hpx::parallel::execution
 
-#endif
 #endif

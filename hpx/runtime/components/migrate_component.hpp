@@ -6,8 +6,7 @@
 
 /// \file migrate_component.hpp
 
-#if !defined(HPX_RUNTIME_COMPONENTS_COPY_MIGRATE_COMPONENT_JAN_31_2014_1009AM)
-#define HPX_RUNTIME_COMPONENTS_COPY_MIGRATE_COMPONENT_JAN_31_2014_1009AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/async.hpp>
@@ -190,4 +189,3 @@ namespace hpx { namespace components
     /// \endcond
 }}
 
-#endif

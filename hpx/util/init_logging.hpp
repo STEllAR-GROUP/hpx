@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_AGAS_INIT_LOGGING_SEP_07_2013_0754PM)
-#define HPX_UTIL_AGAS_INIT_LOGGING_SEP_07_2013_0754PM
+#pragma once
 
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
@@ -22,4 +21,3 @@ namespace hpx { namespace util { namespace detail
     HPX_API_EXPORT void init_logging(runtime_configuration& ini, bool isconsole);
 }}}
 
-#endif

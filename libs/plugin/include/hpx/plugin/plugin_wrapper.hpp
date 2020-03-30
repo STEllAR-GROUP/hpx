@@ -4,8 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PLUGIN_WRAPPER_VP_2004_08_25
-#define HPX_PLUGIN_WRAPPER_VP_2004_08_25
+#pragma once
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/plugin/virtual_constructor.hpp>
@@ -42,5 +41,3 @@ namespace hpx { namespace util { namespace plugin {
         }
     };
 }}}    // namespace hpx::util::plugin
-
-#endif

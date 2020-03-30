@@ -8,8 +8,7 @@
 // hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
 // hpxinspect:nodeprecatedname:boost::shared_ptr
 
-#ifndef HPX_SERIALIZATION_SHARED_PTR_HPP
-#define HPX_SERIALIZATION_SHARED_PTR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/detail/pointer.hpp>
@@ -56,5 +55,3 @@ namespace hpx { namespace serialization {
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
         (template <typename T>), (std::shared_ptr<T>) )
 }}    // namespace hpx::serialization
-
-#endif

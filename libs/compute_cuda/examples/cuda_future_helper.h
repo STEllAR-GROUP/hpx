@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef CUDA_HELPER_H
-#define CUDA_HELPER_H
+#pragma once
 
 #define BOOST_NO_CXX11_ALLOCATOR
 #define CUDA_API_PER_THREAD_DEFAULT_STREAM
@@ -318,5 +317,3 @@ namespace hpx { namespace compute { namespace util
 }}} // namespace
 
 //#endif
-
-#endif

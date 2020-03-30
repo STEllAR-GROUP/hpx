@@ -5,8 +5,7 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_SERIALIZATION_NON_DEFAULT_CONSTRUCTIBLE_HPP
-#define HPX_SERIALIZATION_NON_DEFAULT_CONSTRUCTIBLE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -27,5 +26,3 @@ namespace hpx { namespace serialization { namespace detail {
         ::new (t) T;
     }
 }}}    // namespace hpx::serialization::detail
-
-#endif

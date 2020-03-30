@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_BASIC_EXECUTION_AGENT_BASE_HPP
-#define HPX_BASIC_EXECUTION_AGENT_BASE_HPP
+#pragma once
 
 #include <hpx/basic_execution/context_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -34,5 +33,3 @@ namespace hpx { namespace basic_execution {
             char const* desc) = 0;
     };
 }}    // namespace hpx::basic_execution
-
-#endif

@@ -4,8 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef PROGRAM_OPTIONS_CMDLINE_HPP_VP_2004_03_13
-#define PROGRAM_OPTIONS_CMDLINE_HPP_VP_2004_03_13
+#pragma once
 
 #include <hpx/program_options/config.hpp>
 
@@ -106,5 +105,4 @@ namespace hpx { namespace program_options { namespace command_line_style {
 
 #include <hpx/program_options/detail/cmdline.hpp>
 
-#endif
 #endif

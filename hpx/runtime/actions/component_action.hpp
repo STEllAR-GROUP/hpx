@@ -6,8 +6,7 @@
 
 /// \file component_action.hpp
 
-#if !defined(HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM)
-#define HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -371,4 +370,3 @@ namespace hpx { namespace actions
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif

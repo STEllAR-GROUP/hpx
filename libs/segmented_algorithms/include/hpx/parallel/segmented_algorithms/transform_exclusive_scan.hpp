@@ -6,8 +6,7 @@
 
 /// \file parallel/segmented_algorithms/transform_exclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFORM_EXCLUSIVE_SCAN)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFORM_EXCLUSIVE_SCAN
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -57,4 +56,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
-#endif

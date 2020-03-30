@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_SCHEDULING_QUEUE_HELPER)
-#define HPX_THREADMANAGER_SCHEDULING_QUEUE_HELPER
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
@@ -36,7 +35,7 @@
 #include <utility>
 
 #if !defined(QUEUE_HOLDER_NUMA_DEBUG)
-#ifndef NDEBUG
+#if !defined(NDEBUG)
 #define QUEUE_HOLDER_NUMA_DEBUG false
 #else
 #if !defined(QUEUE_HOLDER_NUMA_DEBUG)
@@ -303,5 +302,3 @@ namespace hpx { namespace threads { namespace policies {
         void on_error(std::size_t num_thread, std::exception_ptr const& e) {}
     };
 }}}    // namespace hpx::threads::policies
-
-#endif    // HPX_F0153C92_99B1_4F31_8FA9_4208DB2F26CE

@@ -7,8 +7,7 @@
 //
 // This was modeled after the code available in the Range v3 library
 
-#if !defined(HPX_DATASTRUCTURES_TAGGED_PAIR_DEC_23_2015_1014AM)
-#define HPX_DATASTRUCTURES_TAGGED_PAIR_DEC_23_2015_1014AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -127,5 +126,3 @@ namespace hpx { namespace util {
     {
     };
 }}    // namespace hpx::util
-
-#endif

@@ -6,8 +6,7 @@
 
 // make inspect happy: hpxinspect:nodeprecatedname:boost::is_placeholder
 
-#ifndef HPX_TRAITS_IS_PLACEHOLDER_HPP
-#define HPX_TRAITS_IS_PLACEHOLDER_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -31,5 +30,3 @@ namespace hpx { namespace traits {
     {
     };
 }}    // namespace hpx::traits
-
-#endif /*HPX_TRAITS_IS_PLACEHOLDER_HPP*/

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_OCT_15_2014_0839PM)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHM_OCT_15_2014_0839PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/algorithm.hpp>
@@ -26,5 +25,3 @@
 #include <hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/transform_reduce.hpp>
-
-#endif

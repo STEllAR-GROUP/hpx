@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_HOST_TARGET_TRAITS_HPP
-#define HPX_COMPUTE_HOST_TARGET_TRAITS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -53,5 +52,3 @@ namespace hpx { namespace compute { namespace traits {
         }
     };
 }}}    // namespace hpx::compute::traits
-
-#endif

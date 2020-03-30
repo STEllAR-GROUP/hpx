@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/generate.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_GENERATE_JULY_15_2014_0224PM)
-#define HPX_PARALLEL_DETAIL_GENERATE_JULY_15_2014_0224PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -264,5 +263,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<F>(f));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

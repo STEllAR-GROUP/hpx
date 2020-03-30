@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/fill.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM)
-#define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
@@ -262,5 +261,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             is_seq(), first, std::size_t(count), value);
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

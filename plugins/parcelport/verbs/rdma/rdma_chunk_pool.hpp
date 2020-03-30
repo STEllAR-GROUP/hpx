@@ -11,8 +11,7 @@
 // which will then be stored in a threadsafe lockfree::stack so that they can be
 // quickly popped and pushed when needed or freed.
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_PINNED_MEMORY_POOL
-#define HPX_PARCELSET_POLICIES_VERBS_PINNED_MEMORY_POOL
+#pragma once
 
 #undef BOOST_POOL_INSTRUMENT
 
@@ -501,7 +500,7 @@ namespace details
         }
     };
 
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+#if !defined(BOOST_NO_INCLASS_MEMBER_INITIALIZATION)
     template <typename UserAllocator>
     typename rdma_chunk_pool<UserAllocator>::size_type const
         rdma_chunk_pool<UserAllocator>::min_alloc_size;
@@ -747,4 +746,3 @@ namespace details
 #pragma warning(pop)
 #endif
 
-#endif

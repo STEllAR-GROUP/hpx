@@ -13,8 +13,7 @@
 
 // hpxinspect:noinclude:HPX_PP_CAT
 
-#ifndef HPX_PREPROCESSOR_CAT_HPP
-#define HPX_PREPROCESSOR_CAT_HPP
+#pragma once
 
 #if defined(DOXYGEN)
 /// Concatenates the tokens \c A and \c B into a single token. Evaluates to \c AB
@@ -40,5 +39,4 @@
 #define HPX_PP_CAT_II(p, res) res
 #endif
 
-#endif
 #endif

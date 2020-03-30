@@ -14,8 +14,7 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef JT28092007_logging_HPP_DEFINED
-#define JT28092007_logging_HPP_DEFINED
+#pragma once
 
 #include <hpx/logging/detail/logger.hpp>
 #include <hpx/logging/detail/macros.hpp>
@@ -38,5 +37,3 @@ then you can include this one instead:
 */
 
 }}}    // namespace hpx::util::logging
-
-#endif

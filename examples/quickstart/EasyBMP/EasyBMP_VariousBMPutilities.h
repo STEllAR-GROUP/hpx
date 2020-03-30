@@ -18,8 +18,7 @@
 *                                                *
 *************************************************/
 
-#ifndef _EasyBMP_VariousBMPutilities_h_
-#define _EasyBMP_VariousBMPutilities_h_
+#pragma once
 
 BMFH GetBMFH( const char* szFileNameIn );
 BMIH GetBMIH( const char* szFileNameIn );
@@ -39,5 +38,3 @@ void RangedPixelToPixelCopyTransparent(
 bool CreateGrayscaleColorTable( BMP& InputImage );
 
 bool Rescale( BMP& InputImage , char mode, int NewDimension );
-
-#endif

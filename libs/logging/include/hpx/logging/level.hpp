@@ -14,8 +14,7 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef HPX_LOGGING_LEVEL_HPP
-#define HPX_LOGGING_LEVEL_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -61,5 +60,3 @@ namespace hpx { namespace util { namespace logging {
         std::ostream& os, boost::string_ref spec, level value);
 
 }}}    // namespace hpx::util::logging
-
-#endif /*HPX_LOGGING_LEVEL_HPP*/

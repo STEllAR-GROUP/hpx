@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime/trigger_lco.hpp
 
-#if !defined(HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM)
-#define HPX_RUNTIME_TRIGGER_LCO_JUN_22_2015_0618PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -536,4 +535,3 @@ namespace hpx
     /// \endcond
 }
 
-#endif

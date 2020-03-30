@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_RUNTIME_AGAS_HOSTED_COMPONENT_NAMESPACE_HPP)
-#define HPX_RUNTIME_AGAS_HOSTED_COMPONENT_NAMESPACE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -69,5 +68,4 @@ namespace hpx { namespace agas { namespace detail
 
 }}}
 
-#endif
 #endif

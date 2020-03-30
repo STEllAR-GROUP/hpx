@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_FB3518C8_4493_450E_A823_A9F8A3185B2D)
-#define HPX_FB3518C8_4493_450E_A823_A9F8A3185B2D
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -297,5 +296,3 @@ namespace hpx { namespace threads { namespace policies {
 #endif    // HPX_HAVE_CXX11_STD_ATOMIC_128BIT
 
 }}}    // namespace hpx::threads::policies
-
-#endif    // HPX_FB3518C8_4493_450E_A823_A9F8A3185B2D

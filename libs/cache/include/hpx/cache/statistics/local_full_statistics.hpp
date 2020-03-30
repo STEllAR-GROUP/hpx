@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_CACHE_LOCAL_FULL_STATISTICS_AUG_11_2014_1029AM)
-#define HPX_UTIL_CACHE_LOCAL_FULL_STATISTICS_AUG_11_2014_1029AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/cache/statistics/local_statistics.hpp>
@@ -163,5 +162,3 @@ namespace hpx { namespace util { namespace cache { namespace statistics {
         api_counter_data erase_entry_;
     };
 }}}}    // namespace hpx::util::cache::statistics
-
-#endif

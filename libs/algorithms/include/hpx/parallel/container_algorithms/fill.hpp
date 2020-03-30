@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/fill.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_FILL_FEB_23_2018_0057AM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_FILL_FEB_23_2018_0057AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
@@ -120,5 +119,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }
 
 }}}    // namespace hpx::parallel::v1
-
-#endif

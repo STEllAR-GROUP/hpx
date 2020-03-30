@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_BABB0428_2085_4DCF_851A_8819D186835E)
-#define HPX_BABB0428_2085_4DCF_851A_8819D186835E
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -177,5 +176,3 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 #endif
-
-#endif    // HPX_BABB0428_2085_4DCF_851A_8819D186835E

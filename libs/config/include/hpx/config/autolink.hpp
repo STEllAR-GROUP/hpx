@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once
+
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/debug.hpp>
 
@@ -12,7 +14,7 @@
     (defined(__MWERKS__) && defined(_WIN32) && (__MWERKS__ >= 0x3000)) ||      \
     (defined(__ICL) && defined(_MSC_EXTENSIONS) && (HPX_MSVC >= 1200))
 
-#ifndef HPX_AUTOLINK_LIB_NAME
+#if !defined(HPX_AUTOLINK_LIB_NAME)
 #error "Macro HPX_AUTOLINK_LIB_NAME not set (internal error)"
 #endif
 

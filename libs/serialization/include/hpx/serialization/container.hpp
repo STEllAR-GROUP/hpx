@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_SERIALIZATION_CONTAINER_HPP
-#define HPX_SERIALIZATION_CONTAINER_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/basic_archive.hpp>
@@ -46,5 +45,3 @@ namespace hpx { namespace serialization {
         virtual void load_binary_chunk(void* address, std::size_t count) = 0;
     };
 }}    // namespace hpx::serialization
-
-#endif

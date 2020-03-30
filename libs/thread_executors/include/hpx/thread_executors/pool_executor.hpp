@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
-#define HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -18,4 +17,3 @@ namespace hpx { namespace threads { namespace executors {
 }}}    // namespace hpx::threads::executors
 
 #endif
-#endif /*HPX_RUNTIME_THREADS_CUSTOMIZED_POOL_EXECUTOR*/

@@ -6,8 +6,7 @@
 
 // hpxinspect:nounnamed
 
-#if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETER_FWD_MAY_19_2017_0120PM)
-#define HPX_PARALLEL_EXECUTORS_EXECUTION_PARAMETER_FWD_MAY_19_2017_0120PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
@@ -437,5 +436,3 @@ namespace hpx { namespace parallel { namespace execution {
                 detail::mark_end_execution_tag>>::value;
     }    // namespace
 }}}      // namespace hpx::parallel::execution
-
-#endif

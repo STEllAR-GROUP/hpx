@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_CUDA_GET_TARGETS_HPP
-#define HPX_COMPUTE_CUDA_GET_TARGETS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -25,5 +24,4 @@ namespace hpx { namespace compute { namespace cuda {
         hpx::id_type const& locality);
 }}}    // namespace hpx::compute::cuda
 
-#endif
 #endif

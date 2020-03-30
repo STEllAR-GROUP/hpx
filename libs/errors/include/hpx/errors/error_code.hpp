@@ -7,8 +7,7 @@
 
 /// \file error_code.hpp
 
-#if !defined(HPX_ERROR_CODE_MAR_24_2008_0929AM)
-#define HPX_ERROR_CODE_MAR_24_2008_0929AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors/error.hpp>
@@ -293,5 +292,3 @@ namespace hpx {
 }    // namespace hpx
 
 #include <hpx/errors/throw_exception.hpp>
-
-#endif

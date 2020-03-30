@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(PERFORMANCE_COUNTERS_IO_COUNTERS_IO_COUNTERS_201508111554)
-#define PERFORMANCE_COUNTERS_IO_COUNTERS_IO_COUNTERS_201508111554
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -30,4 +29,3 @@ namespace hpx { namespace performance_counters { namespace io
     std::uint64_t get_pio_wcanc(bool);
 }}}
 
-#endif // !defined(PERFORMANCE_COUNTERS_IO_COUNTERS_IO_COUNTERS_201508111554)

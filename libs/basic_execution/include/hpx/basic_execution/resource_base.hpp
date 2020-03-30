@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_EXECUTION_RESOURCE_BASE_HPP
-#define HPX_EXECUTION_RESOURCE_BASE_HPP
+#pragma once
 
 namespace hpx { namespace basic_execution {
 
@@ -17,5 +16,3 @@ namespace hpx { namespace basic_execution {
         virtual ~resource_base() = default;
     };
 }}    // namespace hpx::basic_execution
-
-#endif

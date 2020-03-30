@@ -9,8 +9,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PROCESS_POSIX_INITIALIZERS_HPP
-#define HPX_PROCESS_POSIX_INITIALIZERS_HPP
+#pragma once
 
 // #include <hpx/components/process/util/posix/initializers/bind_fd.hpp>
 // #include <hpx/components/process/util/posix/initializers/bind_stderr.hpp>
@@ -38,4 +37,3 @@
 #include <hpx/components/process/util/posix/initializers/throw_on_error.hpp>
 #include <hpx/components/process/util/posix/initializers/wait_on_latch.hpp>
 
-#endif

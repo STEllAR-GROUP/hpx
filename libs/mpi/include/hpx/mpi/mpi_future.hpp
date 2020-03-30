@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_MPI_FUTURE_HPP
-#define HPX_MPI_FUTURE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution.hpp>
@@ -229,5 +228,3 @@ namespace hpx { namespace mpi { namespace experimental {
         mpi_debug.debug(detail::get_mpi_info(), std::forward<Args>(args)...);
     }
 }}}    // namespace hpx::mpi::experimental
-
-#endif

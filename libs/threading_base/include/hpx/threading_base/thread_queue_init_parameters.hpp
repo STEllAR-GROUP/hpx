@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_POLICIES_THREAD_QUEUE_INIT_PARAMETER_HPP)
-#define HPX_RUNTIME_THREADS_POLICIES_THREAD_QUEUE_INIT_PARAMETER_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -72,5 +71,3 @@ namespace hpx { namespace threads { namespace policies {
         std::ptrdiff_t const nostack_stacksize_;
     };
 }}}    // namespace hpx::threads::policies
-
-#endif

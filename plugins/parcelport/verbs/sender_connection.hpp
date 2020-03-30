@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_SENDER_CONNECTION_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_SENDER_CONNECTION_HPP
+#pragma once
 
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
@@ -89,5 +88,4 @@ namespace verbs
     };
 }}}}
 
-#endif
 

@@ -27,8 +27,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_WINDOWS_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_WINDOWS_HPP
+#pragma once
 
 #include <windows.h>
 #include <winnt.h>
@@ -286,5 +285,3 @@ namespace hpx { namespace threads { namespace coroutines {
         };
     }}    // namespace detail::windows
 }}}       // namespace hpx::threads::coroutines
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_WINDOWS_HPP*/

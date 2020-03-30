@@ -5,9 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_TRAITS_VECTOR_PACK_ALIGNMENT_SIZE_VC_SEP_29_2016_0905PM)
-#define HPX_PARALLEL_TRAITS_VECTOR_PACK_ALIGNMENT_SIZE_VC_SEP_29_2016_0905PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -188,5 +186,4 @@ namespace hpx { namespace parallel { namespace traits {
 
 #endif    // Vc_IS_VERSION_1
 
-#endif
 #endif

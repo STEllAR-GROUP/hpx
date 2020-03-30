@@ -9,8 +9,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
-#define BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
+#pragma once
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
@@ -209,4 +208,3 @@ private:
 
 #include <boost/asio/detail/pop_options.hpp>
 
-#endif // BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP

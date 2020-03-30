@@ -10,8 +10,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_INCLUDE_CHECK_HPP
-#define HPX_INCLUDE_CHECK_HPP
+#pragma once
 
 #include "inspector.hpp"
 
@@ -68,4 +67,3 @@ namespace boost
   }
 }
 
-#endif // HPX_INCLUDE_CHECK_HPP

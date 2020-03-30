@@ -9,8 +9,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_FILE_NAME_CHECK_HPP
-#define BOOST_FILE_NAME_CHECK_HPP
+#pragma once
 
 #include "inspector.hpp"
 
@@ -47,4 +46,3 @@ namespace boost
   }
 }
 
-#endif // BOOST_FILE_NAME_CHECK_HPP

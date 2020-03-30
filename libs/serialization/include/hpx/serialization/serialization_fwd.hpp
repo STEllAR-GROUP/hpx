@@ -5,8 +5,7 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_SERIALIZATION_FWD_HPP
-#define HPX_SERIALIZATION_FWD_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
@@ -78,5 +77,3 @@ namespace hpx { namespace serialization {
             0);                                                                \
     }                                                                          \
     /**/
-
-#endif    // HPX_SERIALIZATION_FWD_HPP

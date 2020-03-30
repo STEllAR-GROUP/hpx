@@ -6,8 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
-#define HPX_UTIL_DETAIL_EMPTY_FUNCTION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
@@ -54,5 +53,3 @@ namespace hpx { namespace util { namespace detail {
             }
 #endif
 }}}    // namespace hpx::util::detail
-
-#endif

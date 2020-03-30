@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM)
-#define HPX_COMPONENTS_SERVER_RANDOM_JUN_06_2011_1154AM
+#pragma once
 
 #include <hpx/hpx.hpp>
 
@@ -120,5 +119,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::random_mem_access::print_action,
     random_mem_access_print_action);
 
-#endif
 

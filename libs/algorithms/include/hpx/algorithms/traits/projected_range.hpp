@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TRAITS_PROJECTED_RANGE_JUL_18_2015_1001PM)
-#define HPX_PARALLEL_TRAITS_PROJECTED_RANGE_JUL_18_2015_1001PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/result_of.hpp>
@@ -60,5 +59,3 @@ namespace hpx { namespace parallel { namespace traits {
         typedef typename hpx::traits::range_iterator<Rng>::type iterator_type;
     };
 }}}    // namespace hpx::parallel::traits
-
-#endif

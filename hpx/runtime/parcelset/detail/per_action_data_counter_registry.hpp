@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_ACTION_DATA_COUNTER_REGISTRY_AUG_04_2016_0729PM)
-#define HPX_PARCELSET_ACTION_DATA_COUNTER_REGISTRY_AUG_04_2016_0729PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -111,4 +110,3 @@ namespace hpx { namespace parcelset { namespace detail
 
 #endif
 
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPRESSION_ZLIB_FEB_26_2013_0415AM)
-#define HPX_COMPRESSION_ZLIB_FEB_26_2013_0415AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/plugins/binary_filter/zlib_serialization_filter.hpp>
@@ -22,5 +21,4 @@
   #endif
 #endif
 
-#endif
 

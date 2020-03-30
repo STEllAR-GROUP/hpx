@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/adjacent_find.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM)
-#define HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -196,5 +195,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             last, std::forward<Pred>(op), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

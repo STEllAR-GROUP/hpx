@@ -17,8 +17,7 @@
 //  partial specialization to correctly extend the sign when cover integer size
 //  differs from endian representation size.
 
-#ifndef HPX_UTIL_INTEGER_ENDIAN_HPP
-#define HPX_UTIL_INTEGER_ENDIAN_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/util/integer/cover_operators.hpp>
@@ -327,4 +326,3 @@ namespace hpx { namespace util
   } // namespace integer
 }} // namespace hpx::util
 
-#endif // HPX_UTIL_INTEGER_ENDIAN_HPP

@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_EC1602ED_CCC2_471C_BC28_1DBB98902F40)
-#define HPX_EC1602ED_CCC2_471C_BC28_1DBB98902F40
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -70,5 +69,3 @@ namespace hpx { namespace util {
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
-
-#endif    // HPX_EC1602ED_CCC2_471C_BC28_1DBB98902F40

@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_A16135FC_AA32_444F_BB46_549AD456A661)
-#define HPX_A16135FC_AA32_444F_BB46_549AD456A661
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
@@ -257,5 +256,4 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif // HPX_A16135FC_AA32_444F_BB46_549AD456A661
 

@@ -6,8 +6,7 @@
 
 /// \file gather.hpp
 
-#if !defined(HPX_LCOS_GATHER_MAY_05_2014_0418PM)
-#define HPX_LCOS_GATHER_MAY_05_2014_0418PM
+#pragma once
 
 #if defined(DOXYGEN)
 namespace hpx { namespace lcos {
@@ -599,4 +598,3 @@ namespace hpx { namespace lcos {
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN
-#endif

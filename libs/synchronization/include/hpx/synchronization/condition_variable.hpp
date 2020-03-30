@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LCOS_LOCAL_CONDITION_VARIABLE_HPP
-#define HPX_LCOS_LOCAL_CONDITION_VARIABLE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
@@ -411,5 +410,3 @@ namespace hpx { namespace lcos { namespace local {
         hpx::util::cache_aligned_data_derived<data_type> data_;
     };
 }}}    // namespace hpx::lcos::local
-
-#endif /*HPX_LCOS_LOCAL_CONDITION_VARIABLE_HPP*/

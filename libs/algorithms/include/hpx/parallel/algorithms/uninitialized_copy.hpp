@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/uninitialized_copy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_UNINITIALIZED_COPY_OCT_02_2014_1145AM)
-#define HPX_PARALLEL_DETAIL_UNINITIALIZED_COPY_OCT_02_2014_1145AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -333,5 +332,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             dest);
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

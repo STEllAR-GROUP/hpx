@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9)
-#define HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -152,5 +151,4 @@ HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-#endif // HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
 

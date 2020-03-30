@@ -14,8 +14,7 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef HPX_LOGGING_FORMAT_FORMATTERS_HPP
-#define HPX_LOGGING_FORMAT_FORMATTERS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/logging/manipulator.hpp>
@@ -115,5 +114,3 @@ std::(w)string and the string that holds your logged message. See convert_format
     };
 
 }}}}    // namespace hpx::util::logging::formatter
-
-#endif /*HPX_LOGGING_FORMAT_FORMATTERS_HPP*/

@@ -8,8 +8,7 @@
 // hpxinspect:nodeprecatedinclude:boost/chrono/chrono.hpp
 // hpxinspect:nodeprecatedname:boost::chrono
 
-#ifndef HPX_UTIL_STEADY_CLOCK_HPP
-#define HPX_UTIL_STEADY_CLOCK_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -77,5 +76,3 @@ namespace hpx { namespace util {
         value_type _rel_time;
     };
 }}    // namespace hpx::util
-
-#endif /*HPX_UTIL_STEADY_CLOCK_HPP*/

@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_CUDA_TARGET_PTR_HPP
-#define HPX_COMPUTE_CUDA_TARGET_PTR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -144,5 +143,4 @@ namespace hpx { namespace compute { namespace cuda {
     };
 }}}    // namespace hpx::compute::cuda
 
-#endif
 #endif

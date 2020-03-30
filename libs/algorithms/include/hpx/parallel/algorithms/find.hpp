@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/find.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM)
-#define HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -927,5 +926,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj2>(proj2));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

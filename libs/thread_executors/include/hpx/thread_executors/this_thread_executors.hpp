@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_HPP
-#define HPX_RUNTIME_THREADS_EXECUTORS_THIS_THREAD_EXECUTOR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -160,7 +159,5 @@ namespace hpx { namespace threads { namespace executors {
 }}}    // namespace hpx::threads::executors
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif
 
 #endif

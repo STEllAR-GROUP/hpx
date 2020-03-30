@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_CACHE_LRU_CACHE_HPP
-#define HPX_UTIL_CACHE_LRU_CACHE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/cache/statistics/no_statistics.hpp>
@@ -435,5 +434,3 @@ namespace hpx { namespace util { namespace cache {
         statistics_type statistics_;
     };
 }}}    // namespace hpx::util::cache
-
-#endif

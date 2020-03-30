@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_MERGE_AUG_11_2017_0540PM)
-#define HPX_PARALLEL_TEST_MERGE_AUG_11_2017_0540PM
+#pragma once
 
 #include <hpx/include/parallel_merge.hpp>
 #include <hpx/testing.hpp>
@@ -616,5 +615,3 @@ void test_merge_bad_alloc()
     test_merge_bad_alloc_async(execution::seq(execution::task), IteratorTag());
     test_merge_bad_alloc_async(execution::par(execution::task), IteratorTag());
 }
-
-#endif

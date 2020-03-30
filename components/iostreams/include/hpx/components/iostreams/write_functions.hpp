@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_B72D9BF0_B236_46F6_83AA_E45A70BD1FAA)
-#define HPX_B72D9BF0_B236_46F6_83AA_E45A70BD1FAA
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -57,5 +56,4 @@ inline write_function_type make_std_ostream_write_function(std::ostream& os)
 
 }}
 
-#endif // HPX_B72D9BF0_B236_46F6_83AA_E45A70BD1FAA
 

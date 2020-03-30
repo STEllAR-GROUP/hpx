@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_COUNTING_SEMAPHORE_OCT_16_2008_1007AM)
-#define HPX_LCOS_COUNTING_SEMAPHORE_OCT_16_2008_1007AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/detail/counting_semaphore.hpp>
@@ -111,6 +110,4 @@ namespace hpx { namespace lcos { namespace local {
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
-#endif
-
 #endif

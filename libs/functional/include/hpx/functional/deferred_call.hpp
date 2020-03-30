@@ -7,8 +7,7 @@
 // hpxinspect:nodeprecatedname:is_callable
 // hpxinspect:nodeprecatedname:util::result_of
 
-#ifndef HPX_UTIL_DEFERRED_CALL_HPP
-#define HPX_UTIL_DEFERRED_CALL_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/member_pack.hpp>
@@ -223,5 +222,3 @@ namespace hpx { namespace serialization {
         d.serialize(ar, version);
     }
 }}    // namespace hpx::serialization
-
-#endif

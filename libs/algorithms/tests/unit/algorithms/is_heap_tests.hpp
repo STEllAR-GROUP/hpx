@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_test_is_heap_JUN_28_2017_1745PM)
-#define HPX_PARALLEL_test_is_heap_JUN_28_2017_1745PM
+#pragma once
 
 #include <hpx/include/parallel_is_heap.hpp>
 #include <hpx/testing.hpp>
@@ -435,5 +434,3 @@ void test_is_heap_bad_alloc(bool test_for_is_heap = true)
     test_is_heap_bad_alloc_async(
         execution::par(execution::task), IteratorTag(), test_for_is_heap);
 }
-
-#endif

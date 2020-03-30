@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/is_partitioned.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHMS_IS_PARTITIONED_FEB_11_2015_0331PM)
-#define HPX_PARALLEL_ALGORITHMS_IS_PARTITIONED_FEB_11_2015_0331PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -192,5 +191,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Pred>(pred));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

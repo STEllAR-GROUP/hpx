@@ -8,8 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_RUNTIME_THREADS_CPU_MASK_HPP
-#define HPX_RUNTIME_THREADS_CPU_MASK_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -241,5 +240,3 @@ namespace hpx { namespace threads {
         HPX_API_EXPORT std::string to_string(mask_cref_type);
         /// \endcond
 }}    // namespace hpx::threads
-
-#endif /*HPX_RUNTIME_THREADS_CPU_MASK_HPP*/

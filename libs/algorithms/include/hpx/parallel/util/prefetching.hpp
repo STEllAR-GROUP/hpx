@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PREFETCHING_LOOP)
-#define HPX_PREFETCHING_LOOP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
@@ -411,5 +410,3 @@ namespace hpx { namespace parallel { namespace util {
             base_begin, base_end, std::move(ranges), p_factor);
     }
 }}}    // namespace hpx::parallel::util
-
-#endif

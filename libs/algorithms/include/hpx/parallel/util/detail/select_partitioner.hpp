@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_UTIL_DETAIL_SELECT_PARTITIONER)
-#define HPX_PARALLEL_UTIL_DETAIL_SELECT_PARTITIONER
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
@@ -56,5 +55,3 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     };
 #endif
 }}}}    // namespace hpx::parallel::util::detail
-
-#endif

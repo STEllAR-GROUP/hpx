@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_CDD12289_0A65_47A4_BC53_A4670CDAF5A7)
-#define HPX_CDD12289_0A65_47A4_BC53_A4670CDAF5A7
+#pragma once
 
 #include <vector>
 
@@ -56,5 +55,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::simple_refcnt_checker::take_reference_action,
     simple_refcnt_checker_take_reference_action);
 
-#endif // HPX_CDD12289_0A65_47A4_BC53_A4670CDAF5A7
 

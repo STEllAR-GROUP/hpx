@@ -13,8 +13,7 @@
 /// codebase. It also provides some functions only available in Boost.Filesystem
 /// when using C++17 filesystem.
 
-#if !defined(HPX_FILESYSTEM_HPP)
-#define HPX_FILESYSTEM_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem/config/defines.hpp>
@@ -76,6 +75,4 @@ namespace hpx { namespace filesystem {
     using namespace boost::filesystem;
     using boost::system::error_code;
 }}    // namespace hpx::filesystem
-#endif
-
 #endif

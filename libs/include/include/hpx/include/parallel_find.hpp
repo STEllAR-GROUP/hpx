@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_FIND_JUL_21_2014_0248PM)
-#define HPX_PARALLEL_FIND_JUL_21_2014_0248PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
@@ -14,6 +13,4 @@
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/find.hpp>
-#endif
-
 #endif

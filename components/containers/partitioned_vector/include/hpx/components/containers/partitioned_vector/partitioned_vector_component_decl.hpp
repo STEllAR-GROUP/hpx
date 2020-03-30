@@ -7,8 +7,7 @@
 
 /// \file hpx/components/partitioned_vector/partitioned_vector_component_decl.hpp
 
-#ifndef HPX_PARTITIONED_VECTOR_COMPONENT_DECL_HPP
-#define HPX_PARTITIONED_VECTOR_COMPONENT_DECL_HPP
+#pragma once
 
 /// \brief The partitioned_vector_partition as the hpx component is defined here.
 ///
@@ -579,4 +578,3 @@ namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif

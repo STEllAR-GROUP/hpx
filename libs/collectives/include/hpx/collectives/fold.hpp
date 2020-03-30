@@ -7,6 +7,8 @@
 
 /// \file fold.hpp
 
+#pragma once
+
 #if defined(DOXYGEN)
 namespace hpx { namespace lcos {
 
@@ -154,9 +156,6 @@ namespace hpx { namespace lcos {
         FoldOp&& fold_op, Init&& init, ArgN argN, ...);
 }}    // namespace hpx::lcos
 #else
-
-#if !defined(HPX_LCOS_FOLD_SEP_29_2013_1442AM)
-#define HPX_LCOS_FOLD_SEP_29_2013_1442AM
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -561,7 +560,5 @@ namespace hpx { namespace lcos {
                 fold_with_index<Action>>::fold_invoker<FoldOp>::type,          \
         HPX_PP_CAT(fold_, Name))                                               \
     /**/
-
-#endif
 
 #endif    // DOXYGEN

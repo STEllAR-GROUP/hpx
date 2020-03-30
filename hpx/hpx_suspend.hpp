@@ -6,8 +6,7 @@
 
 /// \file hpx_finalize.hpp
 
-#ifndef HPX_HPX_SUSPEND_HPP
-#define HPX_HPX_SUSPEND_HPP
+#pragma once
 
 #include <hpx/errors.hpp>
 
@@ -55,4 +54,3 @@ namespace hpx
     HPX_EXPORT int resume(error_code& ec = throws);
 }
 
-#endif /*HPX_HPX_SUSPEND_HPP*/

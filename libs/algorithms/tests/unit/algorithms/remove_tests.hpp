@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_REMOVE_DEC_24_2017_0820PM)
-#define HPX_PARALLEL_TEST_REMOVE_DEC_24_2017_0820PM
+#pragma once
 
 #include <hpx/include/parallel_remove.hpp>
 #include <hpx/testing.hpp>
@@ -623,5 +622,3 @@ void test_remove_bad_alloc(bool test_for_remove_if = false)
     test_remove_bad_alloc_async(
         execution::par(execution::task), IteratorTag(), test_for_remove_if);
 }
-
-#endif

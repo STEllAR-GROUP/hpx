@@ -28,8 +28,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_POSIX_UTILITY_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_POSIX_UTILITY_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -268,5 +267,3 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
 #error This header can only be included when compiling for posix systems.
 #endif
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_POSIX_UTILITY_HPP*/

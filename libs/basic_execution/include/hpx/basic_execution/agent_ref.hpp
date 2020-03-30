@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_BASIC_EXECUTION_AGENT_REF_HPP
-#define HPX_BASIC_EXECUTION_AGENT_REF_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -103,5 +102,3 @@ namespace hpx { namespace basic_execution {
         friend std::ostream& operator<<(std::ostream&, agent_ref const&);
     };
 }}    // namespace hpx::basic_execution
-
-#endif

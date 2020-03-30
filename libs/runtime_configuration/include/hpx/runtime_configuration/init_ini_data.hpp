@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_INIT_INI_DATA_SEP_26_2008_0344PM)
-#define HPX_INIT_INI_DATA_SEP_26_2008_0344PM
+#pragma once
 
 #include <hpx/filesystem.hpp>
 #include <hpx/plugin.hpp>
@@ -53,5 +52,3 @@ namespace hpx { namespace util {
         std::map<std::string, hpx::util::plugin::dll>& modules);
 
 }}    // namespace hpx::util
-
-#endif

@@ -7,8 +7,7 @@
 
 /// \file hpx/components/partitioned_vector/partitioned_vector.hpp
 
-#ifndef HPX_PARTITIONED_VECTOR_DECL_HPP
-#define HPX_PARTITIONED_VECTOR_DECL_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -1295,4 +1294,3 @@ namespace hpx
     };
 }
 
-#endif // VECTOR_HPP

@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/move.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM)
-#define HPX_PARALLEL_DETAIL_MOVE_JUNE_16_2014_1106AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -165,5 +164,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<ExPolicy>(policy), first, last, dest);
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

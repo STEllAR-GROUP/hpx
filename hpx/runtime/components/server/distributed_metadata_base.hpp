@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_DISTRIBUTED_METADATA_BASE_NOV_12_2014_0958AM)
-#define HPX_COMPONENTS_DISTRIBUTED_METADATA_BASE_NOV_12_2014_0958AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -104,5 +103,4 @@ namespace hpx { namespace components { namespace server
         HPX_PP_CAT(__distributed_metadata_, name))                            \
     /**/
 
-#endif
 

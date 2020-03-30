@@ -6,8 +6,7 @@
 
 /// \file hpx/coroutines/thread_enums.hpp
 
-#if !defined(HPX_THREAD_ENUMS_JUL_23_2015_0852PM)
-#define HPX_THREAD_ENUMS_JUL_23_2015_0852PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
@@ -226,5 +225,3 @@ namespace hpx { namespace threads {
         std::int16_t hint;
     };
 }}    // namespace hpx::threads
-
-#endif

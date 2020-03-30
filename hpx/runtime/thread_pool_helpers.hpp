@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime/thread_pool_helpers.hpp
 
-#ifndef HPX_RUNTIME_THREAD_POOL_HELPERS_HPP
-#define HPX_RUNTIME_THREAD_POOL_HELPERS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -98,4 +97,3 @@ namespace hpx { namespace threads {
         thread_state_enum state = unknown);
 }}
 
-#endif

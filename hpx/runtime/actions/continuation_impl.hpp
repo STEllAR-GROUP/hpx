@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_ACTIONS_CONTINUATION_IMPL_HPP
-#define HPX_ACTIONS_CONTINUATION_IMPL_HPP
+#pragma once
 
 #include <hpx/functional/result_of.hpp>
 #include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
@@ -63,4 +62,3 @@ namespace hpx { namespace actions {
     };
 }}
 
-#endif

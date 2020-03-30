@@ -9,9 +9,7 @@
 // (C) Copyright 2008 Anthony Williams
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
-#if !defined(                                                                  \
-    HPX_UTIL_RUNTIME_THREADS_THREAD_SPECIFIC_PTR_MAR_20_2014_0941A320PM)
-#define HPX_UTIL_RUNTIME_THREADS_THREAD_SPECIFIC_PTR_MAR_20_2014_0941A320PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/detail/tss.hpp>
@@ -110,5 +108,3 @@ namespace hpx { namespace threads {
         }
     };
 }}    // namespace hpx::threads
-
-#endif

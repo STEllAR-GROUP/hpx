@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_HOST_HPP
-#define HPX_COMPUTE_HOST_HPP
+#pragma once
 
 #include <hpx/compute/host/block_allocator.hpp>
 #include <hpx/compute/host/block_executor.hpp>
@@ -16,5 +15,3 @@
 #include <hpx/compute/host/target.hpp>
 #include <hpx/compute/host/target_distribution_policy.hpp>
 #include <hpx/compute/host/traits/access_target.hpp>
-
-#endif

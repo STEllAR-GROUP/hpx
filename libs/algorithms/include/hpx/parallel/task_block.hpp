@@ -6,8 +6,7 @@
 
 /// \file task_block.hpp
 
-#if !defined(HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM)
-#define HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/when_all.hpp>
@@ -533,5 +532,3 @@ namespace std {
         hpx::parallel::v2::task_block<ExPolicy>&) = delete;
 }
 /// \endcond
-
-#endif

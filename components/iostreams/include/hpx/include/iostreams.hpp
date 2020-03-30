@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_28391A68_5D15_4616_9453_963891EE34D1)
-#define HPX_28391A68_5D15_4616_9453_963891EE34D1
+#pragma once
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -15,5 +14,4 @@
 #include <hpx/include/components.hpp>
 #endif
 
-#endif // HPX_28391A68_5D15_4616_9453_963891EE34D1
 

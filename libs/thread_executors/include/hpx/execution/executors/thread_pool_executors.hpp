@@ -6,8 +6,7 @@
 
 /// \file parallel/executors/thread_pool_executors.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_THREAD_POOL_EXECUTORS_MAY_15_2015_0548PM)
-#define HPX_PARALLEL_EXECUTORS_THREAD_POOL_EXECUTORS_MAY_15_2015_0548PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -65,6 +64,4 @@ namespace hpx { namespace parallel { namespace execution {
         threads::executors::static_priority_queue_executor;
 #endif
 }}}    // namespace hpx::parallel::execution
-#endif
-
 #endif

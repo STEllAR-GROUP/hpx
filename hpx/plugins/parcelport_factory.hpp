@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PLUGINS_PARCELPORT_FACTORY_HPP)
-#define HPX_PLUGINS_PARCELPORT_FACTORY_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
@@ -166,5 +165,4 @@ namespace hpx { namespace plugins
     HPX_REGISTER_PARCELPORT_(                                                  \
         Parcelport, HPX_PP_CAT(parcelport_, pluginname), pluginname)
 
-#endif
 

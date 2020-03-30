@@ -7,8 +7,7 @@
 
 /// \file parallel/executors/parallel_executor.hpp
 
-#if !defined(HPX_THREAD_POOL_EXECUTOR_HPP)
-#define HPX_THREAD_POOL_EXECUTOR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
@@ -382,5 +381,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_ASYNC_UNWRAP_IMPLEMENTATIONS_FWD_JUL_22_2018_0145PM)
-#define HPX_LCOS_ASYNC_UNWRAP_IMPLEMENTATIONS_FWD_JUL_22_2018_0145PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/async_fwd.hpp>
@@ -20,5 +19,3 @@ namespace hpx { namespace detail {
     async_unwrap_result_impl(
         Launch&& policy, hpx::id_type const& id, Ts&&... vs);
 }}    // namespace hpx::detail
-
-#endif

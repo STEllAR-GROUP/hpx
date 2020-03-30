@@ -7,8 +7,7 @@
 
 /// \file util_fwd.hpp
 
-#ifndef HPX_UTIL_FWD_HPP
-#define HPX_UTIL_FWD_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -26,4 +25,3 @@ namespace hpx { namespace util
     /// \endcond
 }}
 
-#endif /*HPX_UTIL_FWD_HPP*/

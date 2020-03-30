@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/find.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHMS_FIND)
-#define HPX_PARALLEL_CONTAINER_ALGORITHMS_FIND
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -228,5 +227,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }
 
 }}}    // namespace hpx::parallel::v1
-
-#endif

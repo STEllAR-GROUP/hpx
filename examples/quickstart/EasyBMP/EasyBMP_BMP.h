@@ -18,8 +18,7 @@
 *                                                *
 *************************************************/
 
-#ifndef _EasyBMP_BMP_h_
-#define _EasyBMP_BMP_h_
+#pragma once
 
 bool SafeFread( char* buffer, int size, int number, FILE* fp );
 bool EasyBMPcheckDataSize( void );
@@ -82,5 +81,3 @@ class BMP
  RGBApixel GetColor( int ColorNumber );
  bool SetColor( int ColorNumber, RGBApixel NewColor ); 
 };
-
-#endif

@@ -7,8 +7,7 @@
 
 /// \file get_colocation_id.hpp
 
-#if !defined(HPX_RUNTIME_GET_COLOCATION_ID_HPP)
-#define HPX_RUNTIME_GET_COLOCATION_ID_HPP
+#pragma once
 
 #include <hpx/errors.hpp>
 #include <hpx/lcos_fwd.hpp>
@@ -48,4 +47,3 @@ namespace hpx
         naming::id_type const& id);
 }
 
-#endif

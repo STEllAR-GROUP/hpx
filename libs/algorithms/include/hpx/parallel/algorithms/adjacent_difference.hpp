@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/adjacent_difference.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15)
-#define HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -272,5 +271,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             first, last, dest, std::forward<Op>(op), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

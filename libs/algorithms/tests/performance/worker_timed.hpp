@@ -7,8 +7,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_TESTS_PERFORMANCE_WORKER_HPP
-#define HPX_TESTS_PERFORMANCE_WORKER_HPP
+#pragma once
 
 #include <hpx/timing.hpp>
 
@@ -28,5 +27,3 @@ inline void worker_timed(std::uint64_t delay_ns)
             break;
     }
 }
-
-#endif

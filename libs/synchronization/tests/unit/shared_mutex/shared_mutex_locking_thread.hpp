@@ -6,8 +6,7 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TEST_SHARED_MUTEX_LOCKING_THREAD_AUG_03_2015_0927PM)
-#define HPX_TEST_SHARED_MUTEX_LOCKING_THREAD_AUG_03_2015_0927PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
@@ -175,5 +174,3 @@ namespace test {
         }
     };
 }    // namespace test
-
-#endif

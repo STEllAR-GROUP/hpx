@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/includes.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM)
-#define HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -295,5 +294,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             first1, last1, first2, last2, std::forward<Pred>(op));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

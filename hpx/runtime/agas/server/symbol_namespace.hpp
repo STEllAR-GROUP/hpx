@@ -8,8 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB)
-#define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -218,5 +217,4 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif // HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 

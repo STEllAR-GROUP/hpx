@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADS_SCOPED_BACKGROUND_TIMER_JUN_10_2019_0301PM)
-#define HPX_THREADS_SCOPED_BACKGROUND_TIMER_JUN_10_2019_0301PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/hardware/timestamp.hpp>
@@ -57,5 +56,3 @@ namespace hpx { namespace threads {
     };
 #endif
 }}    // namespace hpx::threads
-
-#endif

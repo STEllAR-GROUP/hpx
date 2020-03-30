@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COMPUTE_HOST_GET_TARGETS_HPP
-#define HPX_COMPUTE_HOST_GET_TARGETS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -21,5 +20,3 @@ namespace hpx { namespace compute { namespace host {
     HPX_EXPORT hpx::future<std::vector<target>> get_targets(
         hpx::id_type const& locality);
 }}}    // namespace hpx::compute::host
-
-#endif

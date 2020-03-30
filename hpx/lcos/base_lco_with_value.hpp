@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
-#define HPX_LCOS_BASE_LCO_WITH_VALUE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -456,5 +455,3 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<std::uint32_t>, vector_std_uint32_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, hpx_section)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::string, std_string)
-
-#endif /*HPX_LCOS_BASE_LCO_WITH_VALUE_HPP*/

@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_EXAMPLES_SERVER_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM)
-#define HPX_EXAMPLES_SERVER_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM
+#pragma once
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
@@ -105,4 +104,3 @@ HPX_REGISTER_ACTION_DECLARATION(
     examples::server::template_function_accumulator::query_action,
     managed_accumulator_query_action);
 
-#endif

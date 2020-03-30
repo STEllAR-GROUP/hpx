@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5)
-#define HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -323,5 +322,4 @@ HPX_API_EXPORT std::map<std::string, hpx::id_type> find_symbols(
     hpx::launch::sync_policy, std::string const& pattern = "*");
 }}
 
-#endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5
 

@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_9CF0FD9D_039C_4046_B244_C7FCC97D9945)
-#define HPX_9CF0FD9D_039C_4046_B244_C7FCC97D9945
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/components/iostreams/export_definitions.hpp>
@@ -54,5 +53,4 @@ namespace hpx
     using iostreams::async_endl;
 }
 
-#endif // HPX_9CF0FD9D_039C_4046_B244_C7FCC97D9945
 

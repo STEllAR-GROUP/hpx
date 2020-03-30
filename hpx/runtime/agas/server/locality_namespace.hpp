@@ -8,8 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_AGAS_LOCALITY_NAMESPACE_APR_04_2013_1107AM)
-#define HPX_AGAS_LOCALITY_NAMESPACE_APR_04_2013_1107AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -253,5 +252,4 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 

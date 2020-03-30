@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_SLIDING_SEMAPHORE_AUG_25_2016_1028AM)
-#define HPX_LCOS_SLIDING_SEMAPHORE_AUG_25_2016_1028AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/detail/sliding_semaphore.hpp>
@@ -134,6 +133,4 @@ namespace hpx { namespace lcos { namespace local {
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
-#endif
-
 #endif

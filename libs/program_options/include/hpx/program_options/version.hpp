@@ -4,8 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef PROGRAM_OPTIONS_VERSION_HPP_VP_2004_04_05
-#define PROGRAM_OPTIONS_VERSION_HPP_VP_2004_04_05
+#pragma once
 
 #include <hpx/program_options/config.hpp>
 
@@ -27,5 +26,4 @@
 // token, if available.
 #define HPX_PROGRAM_OPTIONS_IMPLICIT_VALUE_NEXT_TOKEN 1
 
-#endif
 #endif

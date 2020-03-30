@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/search.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM)
-#define HPX_PARALLEL_ALGORITHMS_SEARCH_NOV_9_2014_0317PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -471,5 +470,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

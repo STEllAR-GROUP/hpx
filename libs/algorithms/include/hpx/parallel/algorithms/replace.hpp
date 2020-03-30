@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/replace.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REPLACE_AUG_18_2014_0136PM)
-#define HPX_PARALLEL_DETAIL_REPLACE_AUG_18_2014_0136PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -661,5 +660,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<F>(f), new_value, std::forward<Proj>(proj)));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

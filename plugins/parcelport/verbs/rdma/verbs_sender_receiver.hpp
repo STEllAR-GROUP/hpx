@@ -4,8 +4,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_SENDER_RECEIVER_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_SENDER_RECEIVER_HPP
+#pragma once
 
 // Includes
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
@@ -485,4 +484,3 @@ namespace verbs
 
 }}}}
 
-#endif

@@ -6,8 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_SCHEDULING_STATIC_PRIOTITY_QUEUE_HPP)
-#define HPX_THREADMANAGER_SCHEDULING_STATIC_PRIOTITY_QUEUE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -84,5 +83,4 @@ namespace hpx { namespace threads { namespace policies {
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

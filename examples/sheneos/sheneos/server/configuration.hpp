@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SHENEOS_CONFIGURATION_AUG_08_2011_1220PM)
-#define HPX_SHENEOS_CONFIGURATION_AUG_08_2011_1220PM
+#pragma once
 
 #include <hpx/hpx.hpp>
 
@@ -48,5 +47,4 @@ namespace hpx { namespace serialization
     serialize(output_archive& ar, sheneos::config_data& cfg, unsigned int const);
 }}
 
-#endif
 

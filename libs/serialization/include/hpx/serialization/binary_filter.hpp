@@ -6,8 +6,7 @@
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM)
-#define HPX_SERIALIZATION_BINARY_FILTER_MAR_09_2015_0414PM
+#pragma once
 
 #include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -39,5 +38,3 @@ namespace hpx { namespace serialization {
         virtual ~binary_filter() {}
     };
 }}    // namespace hpx::serialization
-
-#endif

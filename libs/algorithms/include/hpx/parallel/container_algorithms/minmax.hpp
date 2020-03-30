@@ -8,8 +8,7 @@
 
 /// \file parallel/container_algorithms/minmax.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHMS_MINMAX_JAN_25_2016_1218PM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHMS_MINMAX_JAN_25_2016_1218PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -286,5 +285,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma pop_macro("max")
 #endif
 }}}    // namespace hpx::parallel::v1
-
-#endif

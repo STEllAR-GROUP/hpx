@@ -5,8 +5,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
-#define HPX_VIRTUAL_CONSTRUCTORS_VP_2004_08_05
+#pragma once
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
@@ -33,5 +32,3 @@ namespace hpx { namespace util { namespace plugin {
     };
 
 }}}    // namespace hpx::util::plugin
-
-#endif

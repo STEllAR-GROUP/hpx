@@ -4,8 +4,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_DEVICE_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_DEVICE_HPP
+#pragma once
 
 #include <memory>
 #include <string>
@@ -273,4 +272,3 @@ namespace verbs
 
 }}}}
 
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_SERVER_CHANNEL_JUL_23_731PM)
-#define HPX_LCOS_SERVER_CHANNEL_JUL_23_731PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
@@ -172,5 +171,3 @@ namespace hpx { namespace lcos { namespace server {
         HPX_PP_CAT(__channel_close_action, HPX_PP_CAT(type, name)))            \
     HPX_REGISTER_BASE_LCO_WITH_VALUE(type, type, name, component_tag)          \
     /**/
-
-#endif

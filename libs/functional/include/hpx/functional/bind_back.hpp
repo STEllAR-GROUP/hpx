@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_BIND_BACK_HPP
-#define HPX_UTIL_BIND_BACK_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/member_pack.hpp>
@@ -220,5 +219,3 @@ namespace hpx { namespace serialization {
         bound.serialize(ar, version);
     }
 }}    // namespace hpx::serialization
-
-#endif

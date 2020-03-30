@@ -7,10 +7,8 @@
 
 /// \file hpx/components/partitioned_vector/partitioned_vector_component.hpp
 
-#ifndef HPX_PARTITIONED_VECTOR_COMPONENT_HPP
-#define HPX_PARTITIONED_VECTOR_COMPONENT_HPP
+#pragma once
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_impl.hpp>
 
-#endif

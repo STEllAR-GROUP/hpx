@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/is_heap.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_IS_HEAP_JUL_30_2017_0501PM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_IS_HEAP_JUL_30_2017_0501PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -170,5 +169,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

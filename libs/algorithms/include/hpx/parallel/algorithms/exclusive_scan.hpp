@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/exclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_EXCLUSIVE_SCAN_DEC_30_2014_1236PM)
-#define HPX_PARALLEL_ALGORITHM_EXCLUSIVE_SCAN_DEC_30_2014_1236PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -373,5 +372,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             last, dest, init, std::plus<T>(), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

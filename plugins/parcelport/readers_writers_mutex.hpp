@@ -8,8 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_READERS_WRITERS_MUTEX_HPP
-#define HPX_READERS_WRITERS_MUTEX_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
@@ -308,4 +307,3 @@ namespace local {
 
 #pragma GCC pop_options
 
-#endif

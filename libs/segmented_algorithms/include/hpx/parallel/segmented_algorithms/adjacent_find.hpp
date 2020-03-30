@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_ADJACENT_FIND_AUG_22_2017_1157AM)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHM_ADJACENT_FIND_AUG_22_2017_1157AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -299,5 +298,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
-
-#endif

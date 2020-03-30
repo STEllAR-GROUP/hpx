@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_05A1C29B_DB73_463A_8C9D_B8EDC3B69F5E)
-#define HPX_05A1C29B_DB73_463A_8C9D_B8EDC3B69F5E
+#pragma once
 
 #include <hpx/assertion.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
@@ -133,5 +132,3 @@ namespace hpx { namespace performance_counters { namespace parcels {
     using gatherer = detail::gatherer<lcos::local::spinlock>;
     using gatherer_nolock = detail::gatherer<lcos::local::no_mutex>;
 }}}    // namespace hpx::performance_counters::parcels
-
-#endif    // HPX_05A1C29B_DB73_463A_8C9D_B8EDC3B69F5E

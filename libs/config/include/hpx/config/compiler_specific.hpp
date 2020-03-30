@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPILER_SPECIFIC_201204261048)
-#define HPX_COMPILER_SPECIFIC_201204261048
+#pragma once
 
 #if defined(DOXYGEN)
 /// Returns the GCC version HPX is compiled with. Only set if compiled with GCC.
@@ -140,6 +139,4 @@
 #  endif
 #endif
 // clang-format on
-#endif
-
 #endif

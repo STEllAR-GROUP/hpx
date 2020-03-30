@@ -7,8 +7,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -340,5 +339,3 @@ namespace hpx { namespace threads { namespace coroutines {
         };
     }}    // namespace detail::generic_context
 }}}       // namespace hpx::threads::coroutines
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_GENERIC_HPP*/

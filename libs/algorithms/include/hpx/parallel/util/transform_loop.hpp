@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_UTIL_TRANSFORM_LOOP_SEP_08_2016_0611PM)
-#define HPX_PARALLEL_UTIL_TRANSFORM_LOOP_SEP_08_2016_0611PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -174,6 +173,4 @@ namespace hpx { namespace parallel { namespace util {
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/parallel/datapar/transform_loop.hpp>
-#endif
-
 #endif

@@ -8,8 +8,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PROCESS_POSIX_INITIALIZERS_CLOSE_FDS_IF_HPP
-#define HPX_PROCESS_POSIX_INITIALIZERS_CLOSE_FDS_IF_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -24,7 +23,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#ifndef HPX_PROCESS_POSIX_MAX_FD
+#if !defined(HPX_PROCESS_POSIX_MAX_FD)
 #   define HPX_PROCESS_POSIX_MAX_FD 32
 #endif
 
@@ -86,5 +85,4 @@ close_fds_if_<Predicate> close_fds_if(const Predicate &pred)
 
 }}}}
 
-#endif
 #endif

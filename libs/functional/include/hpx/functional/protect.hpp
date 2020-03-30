@@ -8,8 +8,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_PROTECT_HPP
-#define HPX_UTIL_PROTECT_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
@@ -73,5 +72,3 @@ namespace hpx { namespace util {
         return std::forward<T>(v);
     }
 }}    // namespace hpx::util
-
-#endif /*HPX_UTIL_PROTECT_HPP*/

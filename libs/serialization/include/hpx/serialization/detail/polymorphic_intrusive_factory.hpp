@@ -6,8 +6,7 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
-#define HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/debugging.hpp>
@@ -166,5 +165,3 @@ namespace hpx { namespace serialization { namespace detail {
     HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                          \
         Class, hpx::util::debug::type_id<T>::typeid_.type_id();)               \
     /**/
-
-#endif

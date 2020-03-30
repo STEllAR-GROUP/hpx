@@ -18,6 +18,8 @@
 *                                                *
 *************************************************/
 
+#pragma once
+
 #if defined(HPX_MSVC) && !defined(_CRT_SECURE_NO_DEPRECATE)
 // MS Visual Studio gives warnings when using 
 // fopen. But fopen_s is not going to work well 
@@ -31,9 +33,6 @@
 #include <cmath>
 #include <cctype>
 #include <cstring>
-
-#ifndef EasyBMP
-#define EasyBMP
 
 #ifdef __BCPLUSPLUS__ 
 // The Borland compiler must use this because something
@@ -82,5 +81,3 @@
 void SetEasyBMPwarningsOff( void );
 void SetEasyBMPwarningsOn( void );
 bool GetEasyBMPwarningState( void );
-
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_COMPLETION_QUEUE_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_COMPLETION_QUEUE_HPP
+#pragma once
 
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
@@ -209,4 +208,3 @@ namespace verbs
 
 }}}}
 
-#endif

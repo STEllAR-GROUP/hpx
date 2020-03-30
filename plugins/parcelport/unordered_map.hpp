@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_CONCURRENT_UNORDERED_MAP)
-#define HPX_CONCURRENT_UNORDERED_MAP
+#pragma once
 
 #include <hpx/synchronization/mutex.hpp>
 #include <plugins/parcelport/readers_writers_mutex.hpp>
@@ -355,4 +354,3 @@ namespace concurrent {
     };
 
 }}
-#endif

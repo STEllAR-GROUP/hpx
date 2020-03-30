@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP
-#define HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
@@ -44,4 +43,3 @@ namespace hpx { namespace plugins
     };
 }}
 
-#endif /*HPX_PLUGINS_PARCELPORT_FACTORY_BASE_HPP*/

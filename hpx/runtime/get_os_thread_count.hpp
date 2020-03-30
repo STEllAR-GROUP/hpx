@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime/get_os_thread_count.hpp
 
-#ifndef HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP
-#define HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -37,4 +36,3 @@ namespace hpx
     HPX_API_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
 }
 
-#endif /*HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP*/

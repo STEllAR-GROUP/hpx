@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_DETAIL_CONTAINER_CATEGORY_HPP
-#define HPX_UTIL_DETAIL_CONTAINER_CATEGORY_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
@@ -25,5 +24,3 @@ namespace hpx { namespace util { namespace detail {
         container_category_tag<traits::is_range<T>::value,
             traits::is_tuple_like<T>::value>;
 }}}    // namespace hpx::util::detail
-
-#endif    // HPX_UTIL_DETAIL_CONTAINER_CATEGORY_HPP

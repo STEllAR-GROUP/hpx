@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/merge.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_MERGE_AUG_15_2017_1045AM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_MERGE_AUG_15_2017_1045AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -230,5 +229,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

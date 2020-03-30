@@ -131,7 +131,7 @@ namespace moodycamel { namespace details {
 
     template<> struct thread_id_converter<thread_id_t> {
         typedef thread_id_size<sizeof(thread_id_t)>::numeric_t thread_id_numeric_size_t;
-#ifndef __APPLE__
+#if !defined(__APPLE__)
         typedef std::size_t thread_id_hash_t;
 #else
         typedef thread_id_numeric_size_t thread_id_hash_t;
@@ -139,7 +139,7 @@ namespace moodycamel { namespace details {
 
         static thread_id_hash_t prehash(thread_id_t const& x)
         {
-#ifndef __APPLE__
+#if !defined(__APPLE__)
             return std::hash<std::thread::id>()(x);
 #else
             return *reinterpret_cast<thread_id_hash_t const*>(&x);
@@ -168,7 +168,7 @@ namespace moodycamel { namespace details {
 #endif
 
 // Exceptions
-#ifndef MOODYCAMEL_EXCEPTIONS_ENABLED
+#if !defined(MOODYCAMEL_EXCEPTIONS_ENABLED)
 #if (defined(_MSC_VER) && defined(_CPPUNWIND)) || (defined(__GNUC__) && defined(__EXCEPTIONS)) || (!defined(_MSC_VER) && !defined(__GNUC__))
 #define MOODYCAMEL_EXCEPTIONS_ENABLED
 #endif
@@ -185,7 +185,7 @@ namespace moodycamel { namespace details {
 #define MOODYCAMEL_THROW(expr)
 #endif
 
-#ifndef MOODYCAMEL_NOEXCEPT
+#if !defined(MOODYCAMEL_NOEXCEPT)
 #if !defined(MOODYCAMEL_EXCEPTIONS_ENABLED)
 #define MOODYCAMEL_NOEXCEPT
 #define MOODYCAMEL_NOEXCEPT_CTOR(type, valueType, expr) true
@@ -207,7 +207,7 @@ namespace moodycamel { namespace details {
 #endif
 #endif
 
-#ifndef MOODYCAMEL_CPP11_THREAD_LOCAL_SUPPORTED
+#if !defined(MOODYCAMEL_CPP11_THREAD_LOCAL_SUPPORTED)
 #ifdef MCDBGQ_USE_RELACY
 #define MOODYCAMEL_CPP11_THREAD_LOCAL_SUPPORTED
 #else
@@ -223,7 +223,7 @@ namespace moodycamel { namespace details {
 
 // VS2012 doesn't support deleted functions.
 // In this case, we declare the function normally but don't define it. A link error will be generated if the function is called.
-#ifndef MOODYCAMEL_DELETE_FUNCTION
+#if !defined(MOODYCAMEL_DELETE_FUNCTION)
 #if defined(_MSC_VER) && _MSC_VER < 1800
 #define MOODYCAMEL_DELETE_FUNCTION
 #else
@@ -334,7 +334,7 @@ struct ConcurrentQueueDefaultTraits
     static const size_t MAX_SUBQUEUE_SIZE = details::const_numeric_max<size_t>::value;
 
 
-#ifndef MCDBGQ_USE_RELACY
+#if !defined(MCDBGQ_USE_RELACY)
     // Memory allocation can be customized if needed.
     // malloc should return nullptr on failure, and handle alignment like std::malloc.
 #if defined(malloc) || defined(free)

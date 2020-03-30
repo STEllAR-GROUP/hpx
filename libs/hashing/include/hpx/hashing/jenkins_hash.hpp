@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(JENKINS_HASH_HPP_SEP_08_2007_0102PM)
-#define JENKINS_HASH_HPP_SEP_08_2007_0102PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -254,5 +253,3 @@ namespace hpx { namespace util {
 #endif
     };
 }}    // namespace hpx::util
-
-#endif

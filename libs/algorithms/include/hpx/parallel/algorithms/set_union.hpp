@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/set_union.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM)
-#define HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -218,5 +217,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             last2, dest, std::forward<Pred>(op));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

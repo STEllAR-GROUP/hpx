@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM)
-#define HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
@@ -92,6 +91,4 @@ namespace hpx { namespace util {
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
-#endif
-
 #endif

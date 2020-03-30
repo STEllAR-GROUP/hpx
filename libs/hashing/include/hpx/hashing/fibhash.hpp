@@ -7,8 +7,7 @@
 // This code is based on the article found here:
 // https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/
 
-#ifndef HPX_UTIL_FIBHASH_HPP
-#define HPX_UTIL_FIBHASH_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -53,5 +52,3 @@ namespace hpx { namespace util {
             helper::shift_amount;
     }
 }}    // namespace hpx::util
-
-#endif

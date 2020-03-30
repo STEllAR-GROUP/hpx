@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_MEMORY_POOL
-#define HPX_PARCELSET_POLICIES_VERBS_MEMORY_POOL
+#pragma once
 
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -107,7 +106,7 @@ namespace verbs
     template <typename pool_chunk_allocator, typename PoolType>
     struct pool_container
     {
-#ifndef RDMA_POOL_USE_LOCKFREE_STACK
+#if !defined(RDMA_POOL_USE_LOCKFREE_STACK)
         typedef hpx::lcos::local::spinlock                               mutex_type;
         typedef hpx::parcelset::policies::verbs::scoped_lock<mutex_type> scoped_lock;
 #endif
@@ -167,7 +166,7 @@ namespace verbs
         // ------------------------------------------------------------------------
         inline void push(verbs_memory_region *region)
         {
-#ifndef RDMA_POOL_USE_LOCKFREE_STACK
+#if !defined(RDMA_POOL_USE_LOCKFREE_STACK)
             scoped_lock lock(memBuffer_mutex_);
 #endif
             LOG_TRACE_MSG(PoolType::desc() << "Push block "
@@ -202,7 +201,7 @@ namespace verbs
         // ------------------------------------------------------------------------
         inline verbs_memory_region *pop()
         {
-#ifndef RDMA_POOL_USE_LOCKFREE_STACK
+#if !defined(RDMA_POOL_USE_LOCKFREE_STACK)
             scoped_lock lock(memBuffer_mutex_);
 #endif
             // if we have not exceeded our max size, allocate a new block
@@ -479,4 +478,3 @@ namespace verbs
     typedef std::shared_ptr<rdma_memory_pool> rdma_memory_pool_ptr;
 }}}}
 
-#endif

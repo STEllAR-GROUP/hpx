@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP
-#define HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -34,4 +33,3 @@ namespace hpx { namespace threads { namespace executors {
 }}}    // namespace hpx::threads::executors
 
 #endif
-#endif /*HPX_RUNTIME_THREADS_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_HPP*/

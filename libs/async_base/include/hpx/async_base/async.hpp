@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_ASYNC_BASE_ASYNC_APR_16_20012_0225PM)
-#define HPX_ASYNC_BASE_ASYNC_APR_16_20012_0225PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/decay.hpp>
@@ -26,5 +25,3 @@ namespace hpx {
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }    // namespace hpx
-
-#endif

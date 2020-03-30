@@ -9,8 +9,7 @@
 
 //  Contributed by Joerg Walter
 
-#ifndef BOOST_CRLF_CHECK_HPP
-#define BOOST_CRLF_CHECK_HPP
+#pragma once
 
 #include "inspector.hpp"
 
@@ -40,4 +39,3 @@ namespace boost
   }
 }
 
-#endif // BOOST_CRLF_CHECK_HPP

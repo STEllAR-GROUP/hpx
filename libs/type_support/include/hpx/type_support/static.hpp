@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_STATIC_JUN_12_2008_0934AM)
-#define HPX_UTIL_STATIC_JUN_12_2008_0934AM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -169,5 +168,3 @@ namespace hpx { namespace util {
     std::once_flag static_<T, Tag>::constructed_;
 #endif
 }}    // namespace hpx::util
-
-#endif    // include guard

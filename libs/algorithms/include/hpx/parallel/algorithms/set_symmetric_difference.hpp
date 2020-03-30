@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/set_symmetric_difference.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_SET_SYMMETRIC_DIFFERENCE_MAR_10_2015_0204PM)
-#define HPX_PARALLEL_ALGORITHM_SET_SYMMETRIC_DIFFERENCE_MAR_10_2015_0204PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -220,5 +219,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             last2, dest, std::forward<Pred>(op));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

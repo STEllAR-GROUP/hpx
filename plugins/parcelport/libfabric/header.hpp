@@ -6,8 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_LIBFABRIC_HEADER_HPP
-#define HPX_PARCELSET_POLICIES_LIBFABRIC_HEADER_HPP
+#pragma once
 
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
@@ -401,4 +400,3 @@ namespace libfabric
 
 }}}}
 
-#endif

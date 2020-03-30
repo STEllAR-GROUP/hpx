@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(SERVER_STARTUP_SHUTDOWN_NOV_23_2011_0706PM)
-#define SERVER_STARTUP_SHUTDOWN_NOV_23_2011_0706PM
+#pragma once
 
 #include <string>
 
@@ -42,4 +41,3 @@ HPX_REGISTER_ACTION_DECLARATION(
     startup_shutdown::server::startup_shutdown_component::init_action,
     startup_shutdown_component_init_action);
 
-#endif

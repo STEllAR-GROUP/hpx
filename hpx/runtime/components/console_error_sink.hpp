@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0621PM)
-#define HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0621PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -25,5 +24,4 @@ namespace hpx { namespace components
     HPX_EXPORT void console_error_sink(std::exception_ptr const& e);
 }}
 
-#endif
 

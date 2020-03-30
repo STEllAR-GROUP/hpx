@@ -10,8 +10,7 @@
 // dataflow from this executor, or introduce a higher-level executors module for
 // executors that need to use things like dataflow.
 
-#ifndef HPX_PARALLEL_EXECUTORS_GUIDED_POOL_EXECUTOR
-#define HPX_PARALLEL_EXECUTORS_GUIDED_POOL_EXECUTOR
+#pragma once
 
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/debugging/print.hpp>
@@ -615,5 +614,3 @@ namespace hpx { namespace parallel { namespace execution {
 }}}    // namespace hpx::parallel::execution
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif /*HPX_PARALLEL_EXECUTORS_GUIDED_POOL_EXECUTOR*/

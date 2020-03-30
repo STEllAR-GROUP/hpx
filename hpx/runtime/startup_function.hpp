@@ -7,8 +7,7 @@
 
 /// \file startup_function.hpp
 
-#ifndef HPX_RUNTIME_STARTUP_FUNCTION_HPP
-#define HPX_RUNTIME_STARTUP_FUNCTION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/unique_function.hpp>
@@ -70,4 +69,3 @@ namespace hpx
     HPX_API_EXPORT void register_startup_function(startup_function_type f);
 }
 
-#endif

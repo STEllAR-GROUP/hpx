@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_SERVER_BASE_MAR_03_2009_0741M)
-#define HPX_PERFORMANCE_COUNTERS_SERVER_BASE_MAR_03_2009_0741M
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -240,5 +239,3 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::performance_counters::counter_value, hpx_counter_value)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::performance_counters::counter_values_array, hpx_counter_values_array)
-
-#endif

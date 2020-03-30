@@ -6,8 +6,7 @@
 
 /// \file all_reduce.hpp
 
-#if !defined(HPX_COLLECTIVES_ALL_REDUCE_JUL_01_2019_0313PM)
-#define HPX_COLLECTIVES_ALL_REDUCE_JUL_01_2019_0313PM
+#pragma once
 
 #if defined(DOXYGEN)
 // clang-format off
@@ -477,4 +476,3 @@ namespace hpx {
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN
-#endif

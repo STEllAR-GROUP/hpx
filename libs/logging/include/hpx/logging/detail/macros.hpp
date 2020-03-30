@@ -18,8 +18,7 @@
 
 // IMPORTANT : the JT28092007_macros_HPP_DEFINED needs to remain constant
 // - don't change the macro name!
-#ifndef JT28092007_macros_HPP_DEFINED
-#define JT28092007_macros_HPP_DEFINED
+#pragma once
 
 #include <string>
 
@@ -157,5 +156,3 @@ HPX_DEFINE_LOG(g_l, logger_type)
     HPX_LOG_USE_LOG(NAME, LEVEL).format(FORMAT, __VA_ARGS__)
 
 }}}    // namespace hpx::util::logging
-
-#endif

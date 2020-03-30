@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_ALLOCATOR_TRAITS_HPP
-#define HPX_COMPUTE_ALLOCATOR_TRAITS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/always_void.hpp>
@@ -288,5 +287,3 @@ namespace hpx { namespace compute { namespace traits {
         }
     };
 }}}    // namespace hpx::compute::traits
-
-#endif

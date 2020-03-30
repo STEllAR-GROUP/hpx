@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PREPROCESSOR_NARG_HPP
-#define HPX_PREPROCESSOR_NARG_HPP
+#pragma once
 
 // hpxinspect:noinclude:HPX_PP_NARGS
 
@@ -43,5 +42,3 @@
     _59, _60, _61, _62, _63, N, ...)                                           \
     N /**/
 /// \endcond
-
-#endif

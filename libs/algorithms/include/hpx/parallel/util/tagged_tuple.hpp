@@ -7,8 +7,7 @@
 //
 // This was modeled after the code available in the Range v3 library
 
-#if !defined(HPX_UTIL_TAGGED_TUPLE_DEC_23_2015_0123PM)
-#define HPX_UTIL_TAGGED_TUPLE_DEC_23_2015_0123PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tagged.hpp>
@@ -40,5 +39,3 @@ namespace hpx { namespace util {
             });
     }
 }}    // namespace hpx::util
-
-#endif

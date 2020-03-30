@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef JACOBI_ROW_RANGE_HPP
-#define JACOBI_ROW_RANGE_HPP
+#pragma once
 
 #include <hpx/assertion.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
@@ -165,4 +164,3 @@ namespace boost
     };
 }
 
-#endif

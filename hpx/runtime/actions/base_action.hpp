@@ -8,8 +8,7 @@
 
 /// \file base_action.hpp
 
-#ifndef HPX_ACTIONS_BASE_ACTION_HPP
-#define HPX_ACTIONS_BASE_ACTION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -181,5 +180,4 @@ namespace hpx { namespace actions
 HPX_TRAITS_SERIALIZED_WITH_ID(hpx::actions::base_action)
 HPX_TRAITS_SERIALIZED_WITH_ID(hpx::actions::base_action_data)
 
-#endif
 #endif

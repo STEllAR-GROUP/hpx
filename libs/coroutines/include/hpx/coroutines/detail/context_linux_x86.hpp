@@ -10,8 +10,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_LINUX_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_LINUX_HPP
+#pragma once
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
@@ -37,7 +36,7 @@
 #include <stdlib.h>
 #include <strings.h>
 
-#ifndef SEGV_STACK_SIZE
+#if !defined(SEGV_STACK_SIZE)
 #define SEGV_STACK_SIZE MINSIGSTKSZ + 4096
 #endif
 
@@ -536,7 +535,7 @@ namespace hpx { namespace threads { namespace coroutines {
                     {
                         //        HPX_ASSERT(*(void**)from.m_stack == (void*)~0);
                         to.prefetch();
-#ifndef HPX_COROUTINE_NO_SEPARATE_CALL_SITES
+#if !defined(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
                         swapcontext_stack2(&from.m_sp, to.m_sp);
 #else
             swapcontext_stack(&from.m_sp, to.m_sp);
@@ -558,5 +557,3 @@ namespace hpx { namespace threads { namespace coroutines {
 #error This header can only be included when compiling for linux systems.
 
 #endif
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_LINUX_HPP*/

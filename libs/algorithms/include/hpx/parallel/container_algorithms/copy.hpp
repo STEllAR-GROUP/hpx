@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/copy.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_COPY_DEC_13_2015_0241PM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_COPY_DEC_13_2015_0241PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -174,5 +173,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }
     /// \endcond
 }}}    // namespace hpx::parallel::v1
-
-#endif

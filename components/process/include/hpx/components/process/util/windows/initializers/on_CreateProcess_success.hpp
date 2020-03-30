@@ -9,8 +9,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PROCESS_WINDOWS_INITIALIZERS_ON_CREATEPROCESS_SUCCESS_HPP
-#define HPX_PROCESS_WINDOWS_INITIALIZERS_ON_CREATEPROCESS_SUCCESS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -62,5 +61,4 @@ on_CreateProcess_success_<Handler> on_CreateProcess_success(Handler && handler)
 
 }}}}
 
-#endif
 #endif

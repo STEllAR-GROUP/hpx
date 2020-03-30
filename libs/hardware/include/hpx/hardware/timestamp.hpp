@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093)
-#define HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -44,5 +43,3 @@
     #error Unsupported platform.
 #endif
 // clang-format on
-
-#endif    // HPX_E19D2797_B133_4BDB_8E25_2DD9BDE7E093

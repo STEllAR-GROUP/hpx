@@ -4,8 +4,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_RDMA_ERROR_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_RDMA_ERROR_HPP
+#pragma once
 
 #include <plugins/parcelport/parcelport_logging.hpp>
 //
@@ -55,5 +54,4 @@ public:
 
 }}}}
 
-#endif
 

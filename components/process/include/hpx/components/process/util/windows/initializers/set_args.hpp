@@ -9,8 +9,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PROCESS_WINDOWS_INITIALIZERS_SET_ARGS_HPP
-#define HPX_PROCESS_WINDOWS_INITIALIZERS_SET_ARGS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -105,5 +104,4 @@ set_args_<Range> set_args(Range const& range)
 
 }}}}
 
-#endif
 #endif

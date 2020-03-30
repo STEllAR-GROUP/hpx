@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_DETAIL_PACK_TRAVERSAL_ASYNC_IMPL_HPP
-#define HPX_UTIL_DETAIL_PACK_TRAVERSAL_ASYNC_IMPL_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
@@ -723,5 +722,3 @@ namespace hpx {
         }
     }}    // namespace util::detail
 }    // end namespace hpx
-
-#endif    // HPX_UTIL_DETAIL_PACK_TRAVERSAL_ASYNC_IMPL_HPP

@@ -7,8 +7,7 @@
 //  This code is based on boost::iterators::counting_iterator
 //  Copyright David Abrahams 2003.
 
-#if !defined(HPX_ITERATOR_SUPPORT_COUNTING_ITERATOR_FEB_03_2020_1055AM)
-#define HPX_ITERATOR_SUPPORT_COUNTING_ITERATOR_FEB_03_2020_1055AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
@@ -184,5 +183,3 @@ namespace hpx { namespace util {
         return counting_iterator<Incrementable>(x);
     }
 }}    // namespace hpx::util
-
-#endif

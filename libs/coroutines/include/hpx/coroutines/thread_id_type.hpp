@@ -6,8 +6,7 @@
 
 /// \file hpx/coroutines/thread_id_type.hpp
 
-#ifndef HPX_THREADS_THREAD_ID_TYPE_HPP
-#define HPX_THREADS_THREAD_ID_TYPE_HPP
+#pragma once
 
 #include <hpx/config/constexpr.hpp>
 #include <hpx/config/export_definitions.hpp>
@@ -129,5 +128,3 @@ namespace hpx { namespace threads {
     constexpr thread_id invalid_thread_id;
 
 }}    // namespace hpx::threads
-
-#endif

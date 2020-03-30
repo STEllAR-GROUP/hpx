@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_PBS_ENVIRONMENT_HPP)
-#define HPX_UTIL_PBS_ENVIRONMENT_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -53,5 +52,3 @@ namespace hpx { namespace util { namespace batch_environments {
             std::vector<std::string>& nodelist, bool debug);
     };
 }}}    // namespace hpx::util::batch_environments
-
-#endif

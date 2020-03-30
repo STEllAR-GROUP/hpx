@@ -9,8 +9,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PROCESS_WINDOWS_INITIALIZERS_START_IN_DIR_HPP
-#define HPX_PROCESS_WINDOWS_INITIALIZERS_START_IN_DIR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -87,5 +86,4 @@ inline start_in_dir_<std::string> start_in_dir(const filesystem::path &p)
 
 }}}}
 
-#endif
 #endif

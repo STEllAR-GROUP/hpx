@@ -6,8 +6,7 @@
 
 /// \file all_to_all.hpp
 
-#if !defined(HPX_COLLECTIVES_ALL_TO_ALL_JUN_23_2019_0900AM)
-#define HPX_COLLECTIVES_ALL_TO_ALL_JUN_23_2019_0900AM
+#pragma once
 
 #if defined(DOXYGEN)
 // clang-format off
@@ -480,4 +479,3 @@ namespace hpx {
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN
-#endif

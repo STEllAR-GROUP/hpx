@@ -14,8 +14,7 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef HPX_LOGGING_FORMAT_NAMED_WRITER_HPP
-#define HPX_LOGGING_FORMAT_NAMED_WRITER_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/logging/format/destinations.hpp>
@@ -455,5 +454,3 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
     };
 
 }}}}    // namespace hpx::util::logging::writer
-
-#endif /*HPX_LOGGING_FORMAT_NAMED_WRITER_HPP*/

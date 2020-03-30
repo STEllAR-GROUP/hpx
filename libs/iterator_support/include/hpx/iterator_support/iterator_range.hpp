@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_ITERATOR_RANGE_HPP
-#define HPX_UTIL_ITERATOR_RANGE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -87,5 +86,3 @@ namespace hpx { namespace util {
         return iterator_range<Iterator, Sentinel>(iterator, sentinel);
     }
 }}    // namespace hpx::util
-
-#endif /*HPX_UTIL_ITERATOR_RANGE_HPP*/

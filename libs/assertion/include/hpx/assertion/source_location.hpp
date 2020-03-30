@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_ASSERT_SOURCE_LOCATION_HPP
-#define HPX_ASSERT_SOURCE_LOCATION_HPP
+#pragma once
 
 #include <hpx/config/export_definitions.hpp>
 
@@ -23,5 +22,3 @@ namespace hpx { namespace assertion {
     HPX_EXPORT std::ostream& operator<<(
         std::ostream& os, source_location const& loc);
 }}    // namespace hpx::assertion
-
-#endif

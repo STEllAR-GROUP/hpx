@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_1CA2FF5A_2757_440C_8D2D_240A48191E63)
-#define HPX_1CA2FF5A_2757_440C_8D2D_240A48191E63
+#pragma once
 
 #include <cstdint>
 
@@ -41,5 +40,3 @@ namespace hpx { namespace util { namespace hardware {
     // clang-format on
 
 }}}    // namespace hpx::util::hardware
-
-#endif    // HPX_1CA2FF5A_2757_440C_8D2D_240A48191E63

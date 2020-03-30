@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_DB9FD2D1_DFD8_491C_AB4B_1CDBCC56A7D0)
-#define HPX_DB9FD2D1_DFD8_491C_AB4B_1CDBCC56A7D0
+#pragma once
 
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -44,5 +43,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::simple_mobile_object::get_lva_action,
     simple_mobile_object_get_lva_action);
 
-#endif // HPX_DB9FD2D1_DFD8_491C_AB4B_1CDBCC56A7D0
 

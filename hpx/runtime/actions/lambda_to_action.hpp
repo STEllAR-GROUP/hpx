@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime/actions/make_action.hpp
 
-#ifndef HPX_RUNTIME_ACTIONS_LAMBDA_TO_ACTION_HPP
-#define HPX_RUNTIME_ACTIONS_LAMBDA_TO_ACTION_HPP
+#pragma once
 
 #include <hpx/include/plain_actions.hpp>
 #include <string>
@@ -106,4 +105,3 @@ namespace hpx { namespace actions
     }
 }}
 
-#endif /*HPX_RUNTIME_ACTIONS_LAMBDA_TO_ACTION_HPP*/

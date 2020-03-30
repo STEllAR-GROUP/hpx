@@ -6,8 +6,7 @@
 
 /// \file copy_component.hpp
 
-#if !defined(HPX_RUNTIME_COMPONENTS_COPY_COMPONENT_SEP_20_2013_0828PM)
-#define HPX_RUNTIME_COMPONENTS_COPY_COMPONENT_SEP_20_2013_0828PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/async.hpp>
@@ -125,4 +124,3 @@ namespace hpx { namespace components
     }
 }}
 
-#endif

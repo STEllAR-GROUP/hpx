@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SHENEOS_PARTITION3D_AUG_08_2011_1220PM)
-#define HPX_SHENEOS_PARTITION3D_AUG_08_2011_1220PM
+#pragma once
 
 #include <hpx/hpx.hpp>
 
@@ -235,5 +234,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action,
     set_value_action_vector_double);
 
-#endif
 

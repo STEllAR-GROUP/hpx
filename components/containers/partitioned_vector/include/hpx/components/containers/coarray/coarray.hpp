@@ -7,8 +7,7 @@
 
 /// \file hpx/components/coarray/coarray.hpp
 
-#ifndef HPX_COARRAY_HPP
-#define HPX_COARRAY_HPP
+#pragma once
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
@@ -252,4 +251,3 @@ namespace hpx
     };
 }
 
-#endif    // COARRAY_HPP

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_INTERVAL_TIMER_SEP_27_2011_0434PM)
-#define HPX_UTIL_INTERVAL_TIMER_SEP_27_2011_0434PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -160,4 +159,3 @@ namespace hpx { namespace util
 #pragma warning(pop)
 #endif
 
-#endif

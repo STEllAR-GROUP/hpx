@@ -9,8 +9,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_15D904C7_CD18_46E1_A54A_65059966A34F)
-#define HPX_15D904C7_CD18_46E1_A54A_65059966A34F
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -1422,5 +1421,4 @@ public:
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif // HPX_15D904C7_CD18_46E1_A54A_65059966A34F
 

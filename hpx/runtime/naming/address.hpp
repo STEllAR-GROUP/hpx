@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_NAMING_ADDRESS_HPP
-#define HPX_RUNTIME_NAMING_ADDRESS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -97,4 +96,3 @@ HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::address)
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif /*HPX_RUNTIME_NAMING_ADDRESS_HPP*/

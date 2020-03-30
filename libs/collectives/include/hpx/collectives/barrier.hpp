@@ -6,8 +6,7 @@
 
 /// \file hpx/collectives/barrier.hpp
 
-#ifndef HPX_LCOS_BARRIER_HPP
-#define HPX_LCOS_BARRIER_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
@@ -137,5 +136,3 @@ namespace hpx { namespace lcos {
 }}    // namespace hpx::lcos
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

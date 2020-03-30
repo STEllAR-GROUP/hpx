@@ -28,8 +28,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_FWD_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_FWD_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -43,5 +42,3 @@ namespace hpx { namespace threads { namespace coroutines {
     class coroutine;
     class stackless_coroutine;
 }}}    // namespace hpx::threads::coroutines
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_COROUTINE_FWD_HPP*/

@@ -6,8 +6,7 @@
 
 /// \file parallel/executors/execute_at_executor.hpp
 
-#if !defined(HPX_PARALLEL_TIMED_EXECUTORS_JAN_06_2017_0802AM)
-#define HPX_PARALLEL_TIMED_EXECUTORS_JAN_06_2017_0802AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/bind.hpp>
@@ -453,5 +452,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

@@ -5,8 +5,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_DLL_WINDOWS_HPP_HK_2005_11_06
-#define HPX_DLL_WINDOWS_HPP_HK_2005_11_06
+#pragma once
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/assertion.hpp>
@@ -271,5 +270,3 @@ namespace hpx { namespace util { namespace plugin {
     };
 
 }}}    // namespace hpx::util::plugin
-
-#endif

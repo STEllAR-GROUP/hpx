@@ -6,8 +6,7 @@
 
 /// \file parallel/executors/pool_executor.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_POOL_EXECUTOR_FEB_17_2018_0327PM)
-#define HPX_PARALLEL_EXECUTORS_POOL_EXECUTOR_FEB_17_2018_0327PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/thread_pool_executor.hpp>
@@ -61,5 +60,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

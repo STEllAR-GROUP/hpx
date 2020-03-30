@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_ALGORITHM_IS_HEAP_JUN_22_2017_1705PM)
-#define HPX_PARALLEL_ALGORITHM_IS_HEAP_JUN_22_2017_1705PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -411,5 +410,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Comp>(comp), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

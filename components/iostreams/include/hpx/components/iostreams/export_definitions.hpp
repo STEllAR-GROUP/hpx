@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_IOSTREAMS_EXPORT_DEFINITIONS_DEC_01_2011_0826AM)
-#define HPX_IOSTREAMS_EXPORT_DEFINITIONS_DEC_01_2011_0826AM
+#pragma once
 
 #include <hpx/config/export_definitions.hpp>
 
@@ -15,6 +14,5 @@
 # define HPX_IOSTREAMS_EXPORT HPX_SYMBOL_IMPORT
 #endif
 
-#endif
 
 

@@ -7,8 +7,7 @@
 
 /// \file runtime_fwd.hpp
 
-#ifndef HPX_RUNTIME_FWD_HPP
-#define HPX_RUNTIME_FWD_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -314,4 +313,3 @@ namespace hpx {
     }
 }    // namespace hpx
 
-#endif

@@ -8,8 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_RUNTIME_THREADS_POLICIES_PARSE_AFFINITY_OPTIONS_HPP
-#define HPX_RUNTIME_THREADS_POLICIES_PARSE_AFFINITY_OPTIONS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -124,5 +123,3 @@ namespace hpx { namespace threads {
             spec, affinities, 1, 1, affinities.size(), num_pus, false, ec);
     }
 }}    // namespace hpx::threads
-
-#endif    // HPX_RUNTIME_THREADS_POLICIES_PARSE_AFFINITY_OPTIONS_HPP

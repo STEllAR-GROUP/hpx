@@ -6,8 +6,7 @@
 
 /// \file hpx/execution/traits/is_execution_policy.hpp
 
-#if !defined(HPX_TRAITS_IS_EXECUTION_POLICY_SEP_07_2016_0805AM)
-#define HPX_TRAITS_IS_EXECUTION_POLICY_SEP_07_2016_0805AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/decay.hpp>
@@ -150,5 +149,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

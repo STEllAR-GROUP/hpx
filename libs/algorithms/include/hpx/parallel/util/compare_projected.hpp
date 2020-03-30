@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_UTIL_COMPARE_PROJECTED_JAN_25_2016_1144AM)
-#define HPX_PARALLEL_UTIL_COMPARE_PROJECTED_JAN_25_2016_1144AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -64,5 +63,3 @@ namespace hpx { namespace parallel { namespace util {
         Proj2 proj2_;
     };
 }}}    // namespace hpx::parallel::util
-
-#endif

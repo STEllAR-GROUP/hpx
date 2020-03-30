@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_SERVER_ARITHMETICS_COUNTER_EXTENDED)
-#define HPX_PERFORMANCE_COUNTERS_SERVER_ARITHMETICS_COUNTER_EXTENDED
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
@@ -60,5 +59,3 @@ namespace hpx { namespace performance_counters { namespace server {
         performance_counter_set counters_;
     };
 }}}    // namespace hpx::performance_counters::server
-
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_MAKE_CLIENT_JAN_02_2017_0220PM)
-#define HPX_COMPONENTS_MAKE_CLIENT_JAN_02_2017_0220PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
@@ -167,5 +166,4 @@ namespace hpx { namespace components
     }
 }}
 
-#endif
 

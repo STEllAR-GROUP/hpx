@@ -9,8 +9,7 @@
 // (C) Copyright 2008 Anthony Williams
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -205,5 +204,3 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     HPX_EXPORT std::size_t set_tss_thread_data(
         tss_storage* storage, std::size_t);
 }}}}    // namespace hpx::threads::coroutines::detail
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_TSS_HPP*/

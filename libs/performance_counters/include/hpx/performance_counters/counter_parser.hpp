@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PERFORMANCE_COUNTERS_PARSER_HPP
-#define HPX_PERFORMANCE_COUNTERS_PARSER_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -38,5 +37,3 @@ namespace hpx { namespace performance_counters {
     HPX_API_EXPORT bool parse_counter_name(
         std::string const& name, path_elements& elements);
 }}    // namespace hpx::performance_counters
-
-#endif /*HPX_PERFORMANCE_COUNTERS_PARSER_HPP*/

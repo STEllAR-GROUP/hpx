@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/for_each.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM)
-#define HPX_PARALLEL_DETAIL_FOR_EACH_MAY_29_2014_0932PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -577,6 +576,4 @@ namespace hpx { namespace traits {
     };
 #endif
 }}    // namespace hpx::traits
-#endif
-
 #endif

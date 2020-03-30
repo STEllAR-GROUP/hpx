@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LCOS_BASE_LCO_HPP
-#define HPX_LCOS_BASE_LCO_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
@@ -134,4 +133,3 @@ HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
     hpx::lcos::base_lco::set_exception_action, "lco_set_value_action",
     std::size_t(-1), std::size_t(-1))
 
-#endif

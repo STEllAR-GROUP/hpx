@@ -7,8 +7,7 @@
 
 /// \file parallel/executors/execution.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_DEC_23_0712PM)
-#define HPX_PARALLEL_EXECUTORS_EXECUTION_DEC_23_0712PM
+#pragma once
 
 #include <hpx/config.hpp>
 // Necessary to avoid circular include
@@ -1192,5 +1191,3 @@ namespace hpx { namespace parallel { namespace execution {
     }    // namespace detail
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

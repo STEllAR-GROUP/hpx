@@ -6,8 +6,7 @@
 //
 // This is partially taken from: http://www.garret.ru/threadalloc/readme.html
 
-#if !defined(HPX_UTIL_ALLOCATOR_DELETER_AUG_08_2018_1047AM)
-#define HPX_UTIL_ALLOCATOR_DELETER_AUG_08_2018_1047AM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -28,5 +27,3 @@ namespace hpx { namespace util {
         Allocator alloc_;
     };
 }}    // namespace hpx::util
-
-#endif

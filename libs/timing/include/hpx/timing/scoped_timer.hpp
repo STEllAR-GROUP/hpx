@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_UTIL_SCOPED_TIMER_HPP
-#define HPX_UTIL_SCOPED_TIMER_HPP
+#pragma once
 
 #include <hpx/timing/high_resolution_clock.hpp>
 
@@ -58,5 +57,3 @@ namespace hpx { namespace util {
         T* t_;
     };
 }}    // namespace hpx::util
-
-#endif

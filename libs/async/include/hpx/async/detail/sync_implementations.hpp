@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_SYNC_IMPLEMENTATIONS_JUL_21_2018_0921PM)
-#define HPX_LCOS_SYNC_IMPLEMENTATIONS_JUL_21_2018_0921PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/detail/async_implementations.hpp>
@@ -105,5 +104,3 @@ namespace hpx { namespace detail {
     }
     /// \endcond
 }}    // namespace hpx::detail
-
-#endif

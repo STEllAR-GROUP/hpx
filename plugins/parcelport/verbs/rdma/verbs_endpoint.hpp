@@ -4,8 +4,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_ENDPOINT_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_ENDPOINT_HPP
+#pragma once
 
 #include <hpx/lcos/promise.hpp>
 #include <hpx/lcos/future.hpp>
@@ -893,4 +892,3 @@ namespace verbs
 
 }}}}
 
-#endif

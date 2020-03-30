@@ -6,8 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_CONFIG_THREADS_STACK_HPP
-#define HPX_CONFIG_THREADS_STACK_HPP
+#pragma once
 
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/debug.hpp>
@@ -66,5 +65,3 @@
 #  define HPX_HUGE_STACK_SIZE     0x2000000       // 32MByte
 #endif
 // clang-format on
-
-#endif

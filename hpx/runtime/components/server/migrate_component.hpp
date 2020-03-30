@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_COMPONENTS_SERVER_MIGRATE_COMPONENT_JAN_30_2014_0737AM)
-#define HPX_RUNTIME_COMPONENTS_SERVER_MIGRATE_COMPONENT_JAN_30_2014_0737AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -360,5 +359,4 @@ namespace hpx { namespace components { namespace server
     {};
 }}}
 
-#endif
 

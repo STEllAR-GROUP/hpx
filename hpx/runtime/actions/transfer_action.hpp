@@ -8,8 +8,7 @@
 
 /// \file transfer_action.hpp
 
-#ifndef HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP
-#define HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -244,4 +243,3 @@ namespace hpx { namespace traits
 
 #endif
 
-#endif /*HPX_RUNTIME_ACTIONS_TRANSFER_ACTION_HPP*/

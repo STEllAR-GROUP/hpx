@@ -14,8 +14,7 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#ifndef HPX_LOGGING_FORMAT_DESTINATIONS_HPP
-#define HPX_LOGGING_FORMAT_DESTINATIONS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/logging/manipulator.hpp>
@@ -162,5 +161,3 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     };
 
 }}}}    // namespace hpx::util::logging::destination
-
-#endif /*HPX_LOGGING_FORMAT_DESTINATIONS_HPP*/

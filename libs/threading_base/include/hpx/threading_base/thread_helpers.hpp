@@ -7,8 +7,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP
-#define HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
@@ -614,5 +613,3 @@ namespace hpx { namespace this_thread {
         std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD);
     /// \endcond
 }}    // namespace hpx::this_thread
-
-#endif /*HPX_RUNTIME_THREADS_THREAD_HELPERS_HPP*/
