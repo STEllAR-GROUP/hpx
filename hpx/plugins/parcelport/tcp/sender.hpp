@@ -14,6 +14,7 @@
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 
 #include <hpx/assertion.hpp>
+#include <hpx/asio/asio_util.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
@@ -23,7 +24,6 @@
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/state.hpp>
-#include <hpx/util/asio_util.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>

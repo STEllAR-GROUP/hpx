@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/asio/asio_util.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/plugins/parcelport/tcp/receiver.hpp>
 #include <hpx/plugins/parcelport/tcp/sender.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/util/asio_util.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 

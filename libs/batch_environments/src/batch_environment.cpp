@@ -6,12 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config/asio.hpp>
+#include <hpx/asio/asio_util.hpp>
 #include <hpx/batch_environments/alps_environment.hpp>
 #include <hpx/batch_environments/batch_environment.hpp>
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/util/asio_util.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>
