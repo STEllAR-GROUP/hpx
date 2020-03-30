@@ -13,43 +13,37 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/extract_action.hpp>
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Launch, typename ...Ts>
+    template <typename Action, typename Launch, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_impl(Launch && policy, hpx::id_type const& id, Ts&&... vs);
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
+    async_impl(Launch&& policy, hpx::id_type const& id, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_cb_impl(launch policy, hpx::id_type const& id,
-        Callback&& cb, Ts&&... vs);
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
+    async_cb_impl(
+        launch policy, hpx::id_type const& id, Callback&& cb, Ts&&... vs);
 
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
     async_cb_impl(hpx::detail::sync_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs);
 
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
     async_cb_impl(hpx::detail::async_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs);
 
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
     async_cb_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs);
-}}
+}}    // namespace hpx::detail
 
 #endif

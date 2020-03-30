@@ -8,19 +8,18 @@
 #define HPX_LOCAL_ASYNC_APR_16_20012_0225PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/parallel_executor.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     // dispatch point used for async implementations
     template <typename Func, typename Enable = void>
     struct async_dispatch;
@@ -30,15 +29,12 @@ namespace hpx { namespace detail
     template <typename Func, typename Enable>
     struct async_dispatch
     {
-        template <typename F, typename ...Ts>
-        HPX_FORCEINLINE static
-        typename std::enable_if<
+        template <typename F, typename... Ts>
+        HPX_FORCEINLINE static typename std::enable_if<
             traits::detail::is_deferred_invocable<F, Ts...>::value,
-            hpx::future<
-                typename util::detail::invoke_deferred_result<F, Ts...>::type
-            >
-        >::type
-        call(F && f, Ts &&... ts)
+            hpx::future<typename util::detail::invoke_deferred_result<F,
+                Ts...>::type>>::type
+        call(F&& f, Ts&&... ts)
         {
             parallel::execution::parallel_executor exec;
             return exec.async_execute(
@@ -53,11 +49,9 @@ namespace hpx { namespace detail
     // threads::executor
     template <typename Executor>
     struct async_dispatch<Executor,
-        typename std::enable_if<
-            traits::is_one_way_executor<Executor>::value ||
+        typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
             traits::is_two_way_executor<Executor>::value ||
-            traits::is_threads_executor<Executor>::value
-        >::type>
+            traits::is_threads_executor<Executor>::value>::type>
     {
         template <typename Executor_, typename F, typename ...Ts>
         HPX_FORCEINLINE static
@@ -68,20 +62,17 @@ namespace hpx { namespace detail
                 std::forward<Ts>(ts)...);
         }
     };
-}}
+}}    // namespace hpx::detail
 
-namespace hpx
-{
-    template <typename F, typename ...Ts>
+namespace hpx {
+    template <typename F, typename... Ts>
     HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
-    ->  decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...
-        ))
+        -> decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
+            std::forward<F>(f), std::forward<Ts>(ts)...))
     {
-        return detail::async_dispatch<
-                typename util::decay<F>::type
-            >::call(std::forward<F>(f), std::forward<Ts>(ts)...);
+        return detail::async_dispatch<typename util::decay<F>::type>::call(
+            std::forward<F>(f), std::forward<Ts>(ts)...);
     }
-}
+}    // namespace hpx
 
 #endif

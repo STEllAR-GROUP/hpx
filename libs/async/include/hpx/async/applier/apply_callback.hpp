@@ -24,16 +24,14 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx
-{
+namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
-    namespace applier { namespace detail
-    {
-        template <typename Action, typename Callback, typename ...Ts>
-        inline bool
-        apply_r_p_cb(naming::address&& addr, naming::id_type const& id,
-            threads::thread_priority priority, Callback && cb, Ts&&... vs)
+    namespace applier { namespace detail {
+        template <typename Action, typename Callback, typename... Ts>
+        inline bool apply_r_p_cb(naming::address&& addr,
+            naming::id_type const& id, threads::thread_priority priority,
+            Callback&& cb, Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
@@ -41,79 +39,70 @@ namespace hpx
                 std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename Callback, typename ...Ts>
-        inline bool
-        apply_r_cb(naming::address&& addr, naming::id_type const& gid,
-            Callback && cb, Ts&&... vs)
+        template <typename Action, typename Callback, typename... Ts>
+        inline bool apply_r_cb(naming::address&& addr,
+            naming::id_type const& gid, Callback&& cb, Ts&&... vs)
         {
             return apply_r_p_cb<Action>(std::move(addr), gid,
                 actions::action_priority<Action>(), std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
         }
-    }}
+    }}    // namespace applier::detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Callback, typename ...Ts>
-    inline bool
-    apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
-        Callback && cb, Ts&&... vs)
+    template <typename Action, typename Callback, typename... Ts>
+    inline bool apply_p_cb(naming::id_type const& gid,
+        threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
         return hpx::detail::apply_cb_impl<Action>(
-            gid, priority,
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            gid, priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Callback, typename ...Ts>
-    inline bool
-    apply_cb(naming::id_type const& gid, Callback && cb, Ts&&... vs)
+    template <typename Action, typename Callback, typename... Ts>
+    inline bool apply_cb(naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
-        typename Callback, typename ...Ts>
-    inline bool
-    apply_cb(
+        typename Callback, typename... Ts>
+    inline bool apply_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename DistPolicy, typename Callback,
-        typename ...Ts>
+        typename... Ts>
     inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value, bool
-    >::type
+        traits::is_distribution_policy<DistPolicy>::value, bool>::type
     apply_p_cb(DistPolicy const& policy, threads::thread_priority priority,
-        Callback && cb, Ts&&... vs)
+        Callback&& cb, Ts&&... vs)
     {
         return policy.template apply_cb<Action>(
             priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename DistPolicy, typename Callback,
-        typename ...Ts>
+        typename... Ts>
     inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value, bool
-    >::type
-    apply_cb(DistPolicy const& policy, Callback && cb, Ts&&... vs)
+        traits::is_distribution_policy<DistPolicy>::value, bool>::type
+    apply_cb(DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
         return apply_p_cb<Action>(policy, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
-        typename DistPolicy, typename Callback, typename ...Ts>
+        typename DistPolicy, typename Callback, typename... Ts>
     inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value, bool
-    >::type
-    apply_cb(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        DistPolicy const& policy, Callback && cb, Ts&&... vs)
+        traits::is_distribution_policy<DistPolicy>::value, bool>::type
+    apply_cb(hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
+        DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
         return apply_p_cb<Derived>(policy, actions::action_priority<Derived>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
@@ -121,57 +110,56 @@ namespace hpx
 
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
-    namespace applier { namespace detail
-    {
+    namespace applier { namespace detail {
         template <typename Action, typename Continuation, typename Callback,
-            typename ...Ts>
-        inline bool
-        apply_r_p_cb(naming::address&& addr,
-            Continuation && c, naming::id_type const& id,
-            threads::thread_priority priority, Callback && cb, Ts&&... vs)
+            typename... Ts>
+        inline bool apply_r_p_cb(naming::address&& addr, Continuation&& c,
+            naming::id_type const& id, threads::thread_priority priority,
+            Callback&& cb, Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             return detail::put_parcel_cont_cb<Action>(id, std::move(addr),
-                priority, std::forward<Continuation>(c), std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+                priority, std::forward<Continuation>(c),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
 
         template <typename Action, typename Continuation, typename Callback,
-            typename ...Ts>
-        inline bool
-        apply_r_cb(naming::address&& addr, Continuation && c,
-            naming::id_type const& gid, Callback && cb, Ts&&... vs)
+            typename... Ts>
+        inline bool apply_r_cb(naming::address&& addr, Continuation&& c,
+            naming::id_type const& gid, Callback&& cb, Ts&&... vs)
         {
-            return apply_r_p_cb<Action>(std::move(addr), std::forward<Continuation>(c),
-                gid,
+            return apply_r_p_cb<Action>(std::move(addr),
+                std::forward<Continuation>(c), gid,
                 actions::action_priority<Action>(), std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
         }
-    }}
+    }}    // namespace applier::detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Continuation, typename Callback, typename ...Ts>
-    inline bool
-    apply_p_cb(Continuation && c, naming::address&& addr,
+    template <typename Action, typename Continuation, typename Callback,
+        typename... Ts>
+    inline bool apply_p_cb(Continuation&& c, naming::address&& addr,
         naming::id_type const& gid, threads::thread_priority priority,
-        Callback && cb, Ts&&... vs)
+        Callback&& cb, Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid))
+        {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb",
-                hpx::util::format(
-                    "the target (destination) does not match the action type ({})",
+                hpx::util::format("the target (destination) does not match the "
+                                  "action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
 
         // Determine whether the gid is local or remote
-        if (addr.locality_ == hpx::get_locality()) {
+        if (addr.locality_ == hpx::get_locality())
+        {
             // apply locally
-            bool result =
-                applier::detail::apply_l_p<Action>(std::forward<Continuation>(c), gid,
-                std::move(addr), priority, std::forward<Ts>(vs)...);
+            bool result = applier::detail::apply_l_p<Action>(
+                std::forward<Continuation>(c), gid, std::move(addr), priority,
+                std::forward<Ts>(vs)...);
 
             // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -185,239 +173,226 @@ namespace hpx
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
         return applier::detail::apply_r_p_cb<Action>(std::move(addr),
-            std::forward<Continuation>(c), gid,
-            priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            std::forward<Continuation>(c), gid, priority,
+            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status,
-            "hpx::apply_cb",
+        HPX_THROW_EXCEPTION(invalid_status, "hpx::apply_cb",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
 
-    template <typename Action, typename Continuation, typename Callback, typename ...Ts>
-    inline bool
-    apply_p_cb(Continuation && c, naming::id_type const& gid,
-        threads::thread_priority priority, Callback && cb, Ts&&... vs)
+    template <typename Action, typename Continuation, typename Callback,
+        typename... Ts>
+    inline bool apply_p_cb(Continuation&& c, naming::id_type const& gid,
+        threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
         return hpx::detail::apply_cb_impl<Action>(std::forward<Continuation>(c),
-            gid, priority,
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            gid, priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Continuation, typename Callback, typename ...Ts>
-    inline bool
-    apply_cb(Continuation && c, naming::id_type const& gid,
-        Callback && cb, Ts&&... vs)
+    template <typename Action, typename Continuation, typename Callback,
+        typename... Ts>
+    inline bool apply_cb(
+        Continuation&& c, naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_p_cb<Action>(std::forward<Continuation>(c), gid,
-            actions::action_priority<Action>(),
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            actions::action_priority<Action>(), std::forward<Callback>(cb),
+            std::forward<Ts>(vs)...);
     }
 
     template <typename Component, typename Continuation, typename Signature,
-        typename Derived,
-        typename Callback, typename ...Ts>
-    inline bool
-    apply_cb(Continuation && c,
+        typename Derived, typename Callback, typename... Ts>
+    inline bool apply_cb(Continuation&& c,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_p<Derived>(std::forward<Continuation>(c), gid,
-            actions::action_priority<Derived>(),
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            actions::action_priority<Derived>(), std::forward<Callback>(cb),
+            std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename Continuation, typename DistPolicy,
-        typename Callback,
-        typename ...Ts>
-    inline typename std::enable_if<
-        traits::is_continuation<Continuation>::value &&
-        traits::is_distribution_policy<DistPolicy>::value, bool
-    >::type
-    apply_p_cb(Continuation && c, DistPolicy const& policy,
-        threads::thread_priority priority, Callback && cb, Ts&&... vs)
+        typename Callback, typename... Ts>
+    inline
+        typename std::enable_if<traits::is_continuation<Continuation>::value &&
+                traits::is_distribution_policy<DistPolicy>::value,
+            bool>::type
+        apply_p_cb(Continuation&& c, DistPolicy const& policy,
+            threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
         return policy.template apply_cb<Action>(std::forward<Continuation>(c),
             priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Action, typename Continuation, typename DistPolicy,
-        typename Callback,
-        typename ...Ts>
-    inline typename std::enable_if<
-        traits::is_continuation<Continuation>::value &&
-        traits::is_distribution_policy<DistPolicy>::value, bool
-    >::type
-    apply_cb(Continuation && c, DistPolicy const& policy,
-        Callback && cb, Ts&&... vs)
+        typename Callback, typename... Ts>
+    inline
+        typename std::enable_if<traits::is_continuation<Continuation>::value &&
+                traits::is_distribution_policy<DistPolicy>::value,
+            bool>::type
+        apply_cb(Continuation&& c, DistPolicy const& policy, Callback&& cb,
+            Ts&&... vs)
     {
         return apply_p_cb<Action>(std::forward<Continuation>(c), policy,
-            actions::action_priority<Action>(),
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            actions::action_priority<Action>(), std::forward<Callback>(cb),
+            std::forward<Ts>(vs)...);
     }
 
     template <typename Component, typename Continuation, typename Signature,
-        typename Derived,
-        typename DistPolicy, typename Callback, typename ...Ts>
+        typename Derived, typename DistPolicy, typename Callback,
+        typename... Ts>
     inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value, bool
-    >::type
-    apply_cb(Continuation && c,
+        traits::is_distribution_policy<DistPolicy>::value, bool>::type
+    apply_cb(Continuation&& c,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        DistPolicy const& policy, Callback && cb, Ts&&... vs)
+        DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
         return apply_p<Derived>(std::forward<Continuation>(c), policy,
-            actions::action_priority<Derived>(),
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            actions::action_priority<Derived>(), std::forward<Callback>(cb),
+            std::forward<Ts>(vs)...);
     }
 
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
-    namespace applier { namespace detail
-    {
-        template <typename Action, typename Callback, typename ...Ts>
-        inline bool
-        apply_c_p_cb(naming::address&& addr, naming::id_type const& contgid,
-            naming::id_type const& gid, threads::thread_priority priority,
-            Callback && cb, Ts&&... vs)
+    namespace applier { namespace detail {
+        template <typename Action, typename Callback, typename... Ts>
+        inline bool apply_c_p_cb(naming::address&& addr,
+            naming::id_type const& contgid, naming::id_type const& gid,
+            threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::remote_result_type
-                remote_result_type;
+                    remote_result_type;
             typedef
                 typename hpx::traits::extract_action<Action>::local_result_type
-                local_result_type;
+                    local_result_type;
 
             return apply_r_p_cb<Action>(std::move(addr),
-                actions::typed_continuation<
-                    local_result_type, remote_result_type>(contgid),
+                actions::typed_continuation<local_result_type,
+                    remote_result_type>(contgid),
                 gid, priority, std::forward<Callback>(cb),
                 std::forward<Ts>(vs)...);
         }
 
-        template <typename Action, typename Callback, typename ...Ts>
-        inline bool
-        apply_c_cb(naming::address&& addr, naming::id_type const& contgid,
-            naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        template <typename Action, typename Callback, typename... Ts>
+        inline bool apply_c_cb(naming::address&& addr,
+            naming::id_type const& contgid, naming::id_type const& gid,
+            Callback&& cb, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::remote_result_type
-                remote_result_type;
+                    remote_result_type;
             typedef
                 typename hpx::traits::extract_action<Action>::local_result_type
-                local_result_type;
+                    local_result_type;
 
             return apply_r_p_cb<Action>(std::move(addr),
-                actions::typed_continuation<
-                    local_result_type, remote_result_type>(contgid),
+                actions::typed_continuation<local_result_type,
+                    remote_result_type>(contgid),
                 gid, actions::action_priority<Action>(),
-                std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
-    }}
+    }}    // namespace applier::detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Callback, typename ...Ts>
-    inline bool
-    apply_c_p_cb(naming::id_type const& contgid, naming::id_type const& gid,
-        threads::thread_priority priority, Callback && cb, Ts&&... vs)
+    template <typename Action, typename Callback, typename... Ts>
+    inline bool apply_c_p_cb(naming::id_type const& contgid,
+        naming::id_type const& gid, threads::thread_priority priority,
+        Callback&& cb, Ts&&... vs)
     {
-        typedef
-            typename hpx::traits::extract_action<Action>::remote_result_type
+        typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
-        typedef
-            typename hpx::traits::extract_action<Action>::local_result_type
+        typedef typename hpx::traits::extract_action<Action>::local_result_type
             local_result_type;
 
         return apply_p_cb<Action>(
-            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
-            gid, priority, std::forward<Callback>(cb),
+            actions::typed_continuation<local_result_type, remote_result_type>(
+                contgid),
+            gid, priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+    }
+
+    template <typename Action, typename Callback, typename... Ts>
+    inline bool apply_c_cb(naming::id_type const& contgid,
+        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
+    {
+        typedef typename hpx::traits::extract_action<Action>::remote_result_type
+            remote_result_type;
+        typedef typename hpx::traits::extract_action<Action>::local_result_type
+            local_result_type;
+
+        return apply_p_cb<Action>(
+            actions::typed_continuation<local_result_type, remote_result_type>(
+                contgid),
+            gid, actions::action_priority<Action>(), std::forward<Callback>(cb),
             std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Callback, typename ...Ts>
-    inline bool
-    apply_c_cb(naming::id_type const& contgid, naming::id_type const& gid,
-        Callback && cb, Ts&&... vs)
+    template <typename Action, typename Callback, typename... Ts>
+    inline bool apply_c_p_cb(naming::id_type const& contgid,
+        naming::address&& addr, naming::id_type const& gid,
+        threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
-        typedef
-            typename hpx::traits::extract_action<Action>::remote_result_type
+        typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
-        typedef
-            typename hpx::traits::extract_action<Action>::local_result_type
+        typedef typename hpx::traits::extract_action<Action>::local_result_type
             local_result_type;
 
         return apply_p_cb<Action>(
-            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
-            gid, actions::action_priority<Action>(),
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
-    }
-
-    template <typename Action, typename Callback, typename ...Ts>
-    inline bool
-    apply_c_p_cb(naming::id_type const& contgid, naming::address&& addr,
-        naming::id_type const& gid, threads::thread_priority priority,
-        Callback && cb, Ts&&... vs)
-    {
-        typedef
-            typename hpx::traits::extract_action<Action>::remote_result_type
-            remote_result_type;
-        typedef
-            typename hpx::traits::extract_action<Action>::local_result_type
-            local_result_type;
-
-        return apply_p_cb<Action>(
-            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(
+                contgid),
             std::move(addr), gid, priority, std::forward<Callback>(cb),
             std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Callback, typename ...Ts>
-    inline bool
-    apply_c_cb(naming::id_type const& contgid, naming::address&& addr,
-        naming::id_type const& gid, Callback && cb, Ts&&... vs)
+    template <typename Action, typename Callback, typename... Ts>
+    inline bool apply_c_cb(naming::id_type const& contgid,
+        naming::address&& addr, naming::id_type const& gid, Callback&& cb,
+        Ts&&... vs)
     {
-        typedef
-            typename hpx::traits::extract_action<Action>::remote_result_type
+        typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
-        typedef
-            typename hpx::traits::extract_action<Action>::local_result_type
+        typedef typename hpx::traits::extract_action<Action>::local_result_type
             local_result_type;
 
         return apply_p_cb<Action>(
-            actions::typed_continuation<local_result_type, remote_result_type>(contgid),
+            actions::typed_continuation<local_result_type, remote_result_type>(
+                contgid),
             std::move(addr), gid, actions::action_priority<Action>(),
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
-    namespace functional
-    {
-        template <typename Action, typename Callback, typename ...Ts>
+    namespace functional {
+        template <typename Action, typename Callback, typename... Ts>
         struct apply_c_p_cb_impl
         {
         public:
             typedef util::tuple<Ts...> tuple_type;
 
-            template <typename ...Ts_>
+            template <typename... Ts_>
             apply_c_p_cb_impl(naming::id_type const& contid,
-                    naming::address && addr, naming::id_type const& id,
-                    threads::thread_priority p, Callback && cb, Ts_ &&... vs)
-              : contid_(contid), addr_(std::move(addr)), id_(id), p_(p),
-                cb_(std::move(cb)),
-                args_(std::forward<Ts_>(vs)...)
-            {}
+                naming::address&& addr, naming::id_type const& id,
+                threads::thread_priority p, Callback&& cb, Ts_&&... vs)
+              : contid_(contid)
+              , addr_(std::move(addr))
+              , id_(id)
+              , p_(p)
+              , cb_(std::move(cb))
+              , args_(std::forward<Ts_>(vs)...)
+            {
+            }
 
-            apply_c_p_cb_impl(apply_c_p_cb_impl && rhs)
-              : contid_(std::move(rhs.contid_)),
-                addr_(std::move(rhs.addr_)),
-                id_(std::move(rhs.id_)),
-                p_(std::move(rhs.p_)),
-                cb_(std::move(rhs.cb_)),
-                args_(std::move(rhs.args_))
-            {}
+            apply_c_p_cb_impl(apply_c_p_cb_impl&& rhs)
+              : contid_(std::move(rhs.contid_))
+              , addr_(std::move(rhs.addr_))
+              , id_(std::move(rhs.id_))
+              , p_(std::move(rhs.p_))
+              , cb_(std::move(rhs.cb_))
+              , args_(std::move(rhs.args_))
+            {
+            }
 
-            apply_c_p_cb_impl& operator=(apply_c_p_cb_impl && rhs)
+            apply_c_p_cb_impl& operator=(apply_c_p_cb_impl&& rhs)
             {
                 contid_ = std::move(rhs.contid_);
                 addr_ = std::move(rhs.addr_);
@@ -435,19 +410,18 @@ namespace hpx
             }
 
         protected:
-            template <std::size_t ...Is>
+            template <std::size_t... Is>
             void apply_action(util::index_pack<Is...>)
             {
                 if (addr_)
                 {
-                    hpx::apply_c_p_cb<Action>(
-                        contid_, std::move(addr_), id_, p_, std::move(cb_),
+                    hpx::apply_c_p_cb<Action>(contid_, std::move(addr_), id_,
+                        p_, std::move(cb_),
                         util::get<Is>(std::forward<tuple_type>(args_))...);
                 }
                 else
                 {
-                    hpx::apply_c_p_cb<Action>(
-                        contid_, id_, p_, std::move(cb_),
+                    hpx::apply_c_p_cb<Action>(contid_, id_, p_, std::move(cb_),
                         util::get<Is>(std::forward<tuple_type>(args_))...);
                 }
             }
@@ -461,25 +435,22 @@ namespace hpx
             tuple_type args_;
         };
 
-        template <typename Action, typename Callback, typename ...Ts>
-        apply_c_p_cb_impl<
-            Action, typename util::decay<Callback>::type,
-            typename util::decay<Ts>::type...
-        >
-        apply_c_p_cb(naming::id_type const& contid, naming::address && addr,
+        template <typename Action, typename Callback, typename... Ts>
+        apply_c_p_cb_impl<Action, typename util::decay<Callback>::type,
+            typename util::decay<Ts>::type...>
+        apply_c_p_cb(naming::id_type const& contid, naming::address&& addr,
             naming::id_type const& id, threads::thread_priority p,
-            Callback && cb, Ts &&... vs)
+            Callback&& cb, Ts&&... vs)
         {
-            typedef apply_c_p_cb_impl<
-                    Action, typename util::decay<Callback>::type,
-                    typename util::decay<Ts>::type...
-                > result_type;
+            typedef apply_c_p_cb_impl<Action,
+                typename util::decay<Callback>::type,
+                typename util::decay<Ts>::type...>
+                result_type;
 
-            return result_type(
-                contid, std::move(addr), id, p, std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+            return result_type(contid, std::move(addr), id, p,
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
         }
-    }
-}
+    }    // namespace functional
+}    // namespace hpx
 
 #endif

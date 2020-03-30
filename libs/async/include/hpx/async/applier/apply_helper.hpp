@@ -9,13 +9,13 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/action_continuation.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_priority.hpp>
@@ -24,23 +24,21 @@
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <thread>
 #include <chrono>
 #include <exception>
 #include <memory>
+#include <thread>
 #include <utility>
 
-namespace hpx
-{
+namespace hpx {
     bool HPX_EXPORT is_pre_startup();
 }
 
-namespace hpx { namespace applier { namespace detail
-{
+namespace hpx { namespace applier { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     template <typename Action>
-    inline threads::thread_priority
-        fix_priority(threads::thread_priority priority)
+    inline threads::thread_priority fix_priority(
+        threads::thread_priority priority)
     {
         return hpx::actions::detail::thread_priority<
             static_cast<threads::thread_priority>(
@@ -58,29 +56,29 @@ namespace hpx { namespace applier { namespace detail
             continuation_type;
 
         continuation_type cont;
-        if (traits::action_decorate_continuation<Action>::call(cont)) //-V614
+        if (traits::action_decorate_continuation<Action>::call(cont))    //-V614
         {
             data.func = Action::construct_thread_function(target,
                 std::move(cont), lva, comptype, std::forward<Ts>(vs)...);
         }
         else
         {
-            data.func = Action::construct_thread_function(target, lva,
-                comptype, std::forward<Ts>(vs)...);
+            data.func = Action::construct_thread_function(
+                target, lva, comptype, std::forward<Ts>(vs)...);
         }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        data.description = util::thread_description(
-            actions::detail::get_action_name<Action>(),
-            actions::detail::get_action_name_itt<Action>());
+        data.description =
+            util::thread_description(actions::detail::get_action_name<Action>(),
+                actions::detail::get_action_name_itt<Action>());
 #else
         data.description = actions::detail::get_action_name<Action>();
 #endif
 #endif
         data.priority = fix_priority<Action>(priority);
-        data.stacksize = threads::get_stack_size(
-            static_cast<threads::thread_stacksize>(
+        data.stacksize =
+            threads::get_stack_size(static_cast<threads::thread_stacksize>(
                 traits::action_stacksize<Action>::value));
 
         while (!threads::threadmanager_is_at_least(state_running))
@@ -94,9 +92,8 @@ namespace hpx { namespace applier { namespace detail
     }
 
     template <typename Action, typename Continuation, typename... Ts>
-    void call_async(threads::thread_init_data&& data,
-        Continuation&& cont, naming::id_type const& target,
-        naming::address::address_type lva,
+    void call_async(threads::thread_init_data&& data, Continuation&& cont,
+        naming::id_type const& target, naming::address::address_type lva,
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs)
     {
@@ -110,16 +107,16 @@ namespace hpx { namespace applier { namespace detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        data.description = util::thread_description(
-            actions::detail::get_action_name<Action>(),
-            actions::detail::get_action_name_itt<Action>());
+        data.description =
+            util::thread_description(actions::detail::get_action_name<Action>(),
+                actions::detail::get_action_name_itt<Action>());
 #else
         data.description = actions::detail::get_action_name<Action>();
 #endif
 #endif
         data.priority = fix_priority<Action>(priority);
-        data.stacksize = threads::get_stack_size(
-            static_cast<threads::thread_stacksize>(
+        data.stacksize =
+            threads::get_stack_size(static_cast<threads::thread_stacksize>(
                 traits::action_stacksize<Action>::value));
 
         while (!threads::threadmanager_is_at_least(state_running))
@@ -144,11 +141,13 @@ namespace hpx { namespace applier { namespace detail
         naming::address::address_type lva,
         naming::address::component_type comptype, Ts&&... vs)
     {
-        try {
-            cont.trigger_value(Action::execute_function(lva, comptype,
-                std::forward<Ts>(vs)...));
+        try
+        {
+            cont.trigger_value(Action::execute_function(
+                lva, comptype, std::forward<Ts>(vs)...));
         }
-        catch (...) {
+        catch (...)
+        {
             // make sure hpx::exceptions are propagated back to the
             // client
             cont.trigger_error(std::current_exception());
@@ -185,9 +184,8 @@ namespace hpx { namespace applier { namespace detail
             }
         }
 
-        template <typename Continuation, typename ...Ts>
-        static void
-        call (threads::thread_init_data&& data, Continuation && cont,
+        template <typename Continuation, typename... Ts>
+        static void call(threads::thread_init_data&& data, Continuation&& cont,
             naming::id_type const& target, naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)
@@ -259,6 +257,6 @@ namespace hpx { namespace applier { namespace detail
             }
         }
     };
-}}}
+}}}    // namespace hpx::applier::detail
 
 #endif

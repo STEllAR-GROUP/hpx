@@ -15,74 +15,54 @@
 #include <type_traits>
 #endif
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <
-            typename Action, typename RemoteResult, typename Cont,
-            typename Target, typename Callback, typename ...Ts>
-        lcos::future<
-            typename traits::promise_local_result<
-                typename result_of_async_continue<Action, Cont>::type
-            >::type
-        >
-        async_continue_r_cb(Cont&& cont, Target const& target,
-            Callback&& cb, Ts&&... vs);
+    namespace detail {
+        template <typename Action, typename RemoteResult, typename Cont,
+            typename Target, typename Callback, typename... Ts>
+        lcos::future<typename traits::promise_local_result<
+            typename result_of_async_continue<Action, Cont>::type>::type>
+        async_continue_r_cb(
+            Cont&& cont, Target const& target, Callback&& cb, Ts&&... vs);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Cont, typename Callback, typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename detail::result_of_async_continue<Action, Cont>::type
-        >::type
-    >
-    async_continue_cb(Cont&& cont, naming::id_type const& gid, Callback&& cb,
-        Ts&&... vs);
+    template <typename Action, typename Cont, typename Callback, typename... Ts>
+    lcos::future<typename traits::promise_local_result<
+        typename detail::result_of_async_continue<Action, Cont>::type>::type>
+    async_continue_cb(
+        Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 
-    template <
-        typename Component, typename Signature, typename Derived,
-        typename Cont, typename Callback, typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename detail::result_of_async_continue<Derived, Cont>::type
-        >::type
-    >
+    template <typename Component, typename Signature, typename Derived,
+        typename Cont, typename Callback, typename... Ts>
+    lcos::future<typename traits::promise_local_result<
+        typename detail::result_of_async_continue<Derived, Cont>::type>::type>
     async_continue_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-      , Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs);
+        ,
+        Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration
 #ifndef HPX_MSVC
     template <typename Action, typename Cont, typename DistPolicy,
-        typename Callback, typename ...Ts>
-    typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value,
-        lcos::future<
-            typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Action, Cont>::type
-            >::type>
-    >::type
-    async_continue_cb(Cont&& cont, DistPolicy const& policy, Callback&& cb,
-        Ts&&... vs);
+        typename Callback, typename... Ts>
+    typename std::enable_if<traits::is_distribution_policy<DistPolicy>::value,
+        lcos::future<typename traits::promise_local_result<typename detail::
+                result_of_async_continue<Action, Cont>::type>::type>>::type
+    async_continue_cb(
+        Cont&& cont, DistPolicy const& policy, Callback&& cb, Ts&&... vs);
 
-    template <
-        typename Component, typename Signature, typename Derived,
-        typename Cont, typename DistPolicy, typename Callback, typename ...Ts>
-    typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value,
-        lcos::future<
-            typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Derived, Cont>::type
-            >::type>
-    >::type
+    template <typename Component, typename Signature, typename Derived,
+        typename Cont, typename DistPolicy, typename Callback, typename... Ts>
+    typename std::enable_if<traits::is_distribution_policy<DistPolicy>::value,
+        lcos::future<typename traits::promise_local_result<typename detail::
+                result_of_async_continue<Derived, Cont>::type>::type>>::type
     async_continue_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-      , Cont&& cont, DistPolicy const& policy, Callback&& cb, Ts&&... vs);
+        ,
+        Cont&& cont, DistPolicy const& policy, Callback&& cb, Ts&&... vs);
 #endif
-}
+}    // namespace hpx
 
 #endif

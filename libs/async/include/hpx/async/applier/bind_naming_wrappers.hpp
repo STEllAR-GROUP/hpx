@@ -14,19 +14,18 @@
 
 #include <cstddef>
 
-namespace hpx { namespace applier
-{
+namespace hpx { namespace applier {
     // helper functions allowing to bind and unbind a GID to a given address
     // without having to directly refer to the resolver_client
-    HPX_EXPORT bool bind_gid_local(naming::gid_type const&, naming::address const&,
-        error_code& ec = throws);
-    HPX_EXPORT void unbind_gid_local(naming::gid_type const&,
-        error_code& ec = throws);
+    HPX_EXPORT bool bind_gid_local(naming::gid_type const&,
+        naming::address const&, error_code& ec = throws);
+    HPX_EXPORT void unbind_gid_local(
+        naming::gid_type const&, error_code& ec = throws);
 
     HPX_EXPORT bool bind_range_local(naming::gid_type const&, std::size_t,
         naming::address const&, std::size_t, error_code& ec = throws);
-    HPX_EXPORT void unbind_range_local(naming::gid_type const&, std::size_t,
-        error_code& ec = throws);
-}}
+    HPX_EXPORT void unbind_range_local(
+        naming::gid_type const&, std::size_t, error_code& ec = throws);
+}}    // namespace hpx::applier
 
 #endif

@@ -10,13 +10,10 @@
 
 #if defined(HPX_ASYNC_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/sync.hpp is deprecated, \
+#pragma message("The header hpx/sync.hpp is deprecated, \
     please include hpx/async/sync.hpp instead")
 #else
-#warning \
-    "The header hpx/async.hpp is deprecated, \
+#warning "The header hpx/async.hpp is deprecated, \
     please include hpx/async/sync.hpp instead"
 #endif
 #endif
-

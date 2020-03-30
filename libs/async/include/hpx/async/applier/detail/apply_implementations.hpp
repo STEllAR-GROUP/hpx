@@ -8,36 +8,34 @@
 #define HPX_APPLY_IMPLEMENTATIONS_APR_13_2015_0945AM
 
 #include <hpx/config.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/format.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/format.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail
-{
-    template <typename Action, typename Continuation, typename ...Ts>
-    typename std::enable_if<
-        traits::is_continuation<Continuation>::value, bool
-    >::type
-    apply_impl(Continuation && c, hpx::id_type const& id,
+namespace hpx { namespace detail {
+    template <typename Action, typename Continuation, typename... Ts>
+    typename std::enable_if<traits::is_continuation<Continuation>::value,
+        bool>::type
+    apply_impl(Continuation&& c, hpx::id_type const& id,
         threads::thread_priority priority, Ts&&... vs)
     {
         if (!traits::action_is_target_valid<Action>::call(id))
         {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                hpx::util::format(
-                    "the target (destination) does not match the action type ({})",
+                hpx::util::format("the target (destination) does not match the "
+                                  "action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
@@ -52,7 +50,7 @@ namespace hpx { namespace detail
             if (traits::component_supports_migration<component_type>::call())
             {
                 r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
+                    id, addr.address_);
                 if (!r.first)
                 {
                     return applier::detail::apply_l_p<Action>(
@@ -71,38 +69,38 @@ namespace hpx { namespace detail
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
         return applier::detail::apply_r_p<Action>(std::move(addr),
-            std::forward<Continuation>(c), id, priority, std::forward<Ts>(vs)...);
+            std::forward<Continuation>(c), id, priority,
+            std::forward<Ts>(vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status,
-            "hpx::apply_impl",
+        HPX_THROW_EXCEPTION(invalid_status, "hpx::apply_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
 
-    template <typename Action, typename Continuation, typename ...Ts>
-    typename std::enable_if<
-        traits::is_continuation<Continuation>::value, bool
-    >::type
-    apply_impl(Continuation && c, hpx::id_type const& id, naming::address&& addr,
+    template <typename Action, typename Continuation, typename... Ts>
+    typename std::enable_if<traits::is_continuation<Continuation>::value,
+        bool>::type
+    apply_impl(Continuation&& c, hpx::id_type const& id, naming::address&& addr,
         threads::thread_priority priority, Ts&&... vs)
     {
         // Determine whether the id is local or remote
-        if(addr)
+        if (addr)
         {
             if (!traits::action_is_target_valid<Action>::call(id))
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                    hpx::util::format(
-                        "the target (destination) does not match the action type ({})",
+                    hpx::util::format("the target (destination) does not match "
+                                      "the action type ({})",
                         hpx::actions::detail::get_action_name<Action>()));
                 return false;
             }
 
             std::pair<bool, components::pinned_ptr> r;
-            if(addr.locality_ == hpx::get_locality())
+            if (addr.locality_ == hpx::get_locality())
             {
                 using component_type = typename Action::component_type;
-                if (traits::component_supports_migration<component_type>::call())
+                if (traits::component_supports_migration<
+                        component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
@@ -129,9 +127,9 @@ namespace hpx { namespace detail
                     std::forward<Continuation>(c), id, priority,
                     std::forward<Ts>(vs)...);
 #else
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "hpx::detail::apply_impl",
-                    "unexpected attempt to send a parcel with networking disabled");
+                HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::apply_impl",
+                    "unexpected attempt to send a parcel with networking "
+                    "disabled");
 #endif
             }
         }
@@ -140,15 +138,15 @@ namespace hpx { namespace detail
             std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename ...Ts>
-    bool apply_impl(hpx::id_type const& id, threads::thread_priority priority,
-        Ts &&... vs)
+    template <typename Action, typename... Ts>
+    bool apply_impl(
+        hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs)
     {
         if (!traits::action_is_target_valid<Action>::call(id))
         {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                hpx::util::format(
-                    "the target (destination) does not match the action type ({})",
+                hpx::util::format("the target (destination) does not match the "
+                                  "action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
@@ -163,7 +161,7 @@ namespace hpx { namespace detail
             if (traits::component_supports_migration<component_type>::call())
             {
                 r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
+                    id, addr.address_);
                 if (!r.first)
                 {
                     return applier::detail::apply_l_p<Action>(
@@ -179,43 +177,43 @@ namespace hpx { namespace detail
 
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
-        return applier::detail::apply_r_p<Action>(std::move(addr),
-            id, priority, std::forward<Ts>(vs)...);
+        return applier::detail::apply_r_p<Action>(
+            std::move(addr), id, priority, std::forward<Ts>(vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status,
-            "hpx::apply_impl",
+        HPX_THROW_EXCEPTION(invalid_status, "hpx::apply_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
 
-    template <typename Action, typename ...Ts>
+    template <typename Action, typename... Ts>
     bool apply_impl(hpx::id_type const& id, naming::address&& addr,
-        threads::thread_priority priority, Ts &&... vs)
+        threads::thread_priority priority, Ts&&... vs)
     {
         // Determine whether the id is local or remote
-        if(addr)
+        if (addr)
         {
             if (!traits::action_is_target_valid<Action>::call(id))
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_impl",
-                    hpx::util::format(
-                        "the target (destination) does not match the action type ({})",
+                    hpx::util::format("the target (destination) does not match "
+                                      "the action type ({})",
                         hpx::actions::detail::get_action_name<Action>()));
                 return false;
             }
 
             std::pair<bool, components::pinned_ptr> r;
-            if(addr.locality_ == hpx::get_locality())
+            if (addr.locality_ == hpx::get_locality())
             {
                 using component_type = typename Action::component_type;
-                if (traits::component_supports_migration<component_type>::call())
+                if (traits::component_supports_migration<
+                        component_type>::call())
                 {
                     r = traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
                     if (!r.first)
                     {
-                        return applier::detail::apply_l_p<Action>(
-                            id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                        return applier::detail::apply_l_p<Action>(id,
+                            std::move(addr), priority, std::forward<Ts>(vs)...);
                     }
                 }
                 else
@@ -229,30 +227,30 @@ namespace hpx { namespace detail
             {
                 // apply remotely
 #if defined(HPX_HAVE_NETWORKING)
-                return applier::detail::apply_r_p<Action>(std::move(addr),
-                    id, priority, std::forward<Ts>(vs)...);
+                return applier::detail::apply_r_p<Action>(
+                    std::move(addr), id, priority, std::forward<Ts>(vs)...);
 #else
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "hpx::detail::apply_impl",
-                    "unexpected attempt to send a parcel with networking disabled");
+                HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::apply_impl",
+                    "unexpected attempt to send a parcel with networking "
+                    "disabled");
 #endif
             }
         }
         return apply_impl<Action>(id, priority, std::forward<Ts>(vs)...);
     }
 
-    template <typename Action, typename Continuation, typename Callback, typename ...Ts>
-    typename std::enable_if<
-        traits::is_continuation<Continuation>::value, bool
-    >::type
-    apply_cb_impl(Continuation && c, hpx::id_type const& id,
+    template <typename Action, typename Continuation, typename Callback,
+        typename... Ts>
+    typename std::enable_if<traits::is_continuation<Continuation>::value,
+        bool>::type
+    apply_cb_impl(Continuation&& c, hpx::id_type const& id,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
         if (!traits::action_is_target_valid<Action>::call(id))
         {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_cb_impl",
-                hpx::util::format(
-                    "the target (destination) does not match the action type ({})",
+                hpx::util::format("the target (destination) does not match the "
+                                  "action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
@@ -267,7 +265,7 @@ namespace hpx { namespace detail
             if (traits::component_supports_migration<component_type>::call())
             {
                 r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
+                    id, addr.address_);
                 if (!r.first)
                 {
                     bool result = applier::detail::apply_l_p<Action>(
@@ -302,23 +300,23 @@ namespace hpx { namespace detail
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
         return applier::detail::apply_r_p_cb<Action>(std::move(addr),
-            std::forward<Continuation>(c), id,
-            priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            std::forward<Continuation>(c), id, priority,
+            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status,
-            "hpx::detail::apply_cb_impl",
+        HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::apply_cb_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
 
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     bool apply_cb_impl(hpx::id_type const& id,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(id)) {
+        if (!traits::action_is_target_valid<Action>::call(id))
+        {
             HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::apply_cb_impl",
-                hpx::util::format(
-                    "the target (destination) does not match the action type ({})",
+                hpx::util::format("the target (destination) does not match the "
+                                  "action type ({})",
                     hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
@@ -337,7 +335,7 @@ namespace hpx { namespace detail
                 if (!r.first)
                 {
                     bool result = applier::detail::apply_l_p<Action>(
-                        id, std::move(addr),  priority, std::forward<Ts>(vs)...);
+                        id, std::move(addr), priority, std::forward<Ts>(vs)...);
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -351,7 +349,7 @@ namespace hpx { namespace detail
             else
             {
                 bool result = applier::detail::apply_l_p<Action>(
-                    id, std::move(addr),  priority, std::forward<Ts>(vs)...);
+                    id, std::move(addr), priority, std::forward<Ts>(vs)...);
 
                 // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -368,11 +366,10 @@ namespace hpx { namespace detail
         return applier::detail::apply_r_p_cb<Action>(std::move(addr), id,
             priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status,
-            "hpx::detail::apply_cb_impl",
+        HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::apply_cb_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
-}}
+}}    // namespace hpx::detail
 
 #endif

@@ -16,24 +16,20 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         // dispatch point used for async<Action> implementations
         template <typename Action, typename Func, typename Enable = void>
         struct async_action_dispatch;
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename F, typename ...Ts>
-    HPX_FORCEINLINE
-    auto async(F && f, Ts &&... ts)
-    ->  decltype(detail::async_action_dispatch<
-                Action, typename util::decay<F>::type
-            >::call(std::forward<F>(f), std::forward<Ts>(ts)...)
-        );
-}
+    template <typename Action, typename F, typename... Ts>
+    HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
+        -> decltype(detail::async_action_dispatch<Action,
+            typename util::decay<F>::type>::call(std::forward<F>(f),
+            std::forward<Ts>(ts)...));
+}    // namespace hpx
 
 #endif

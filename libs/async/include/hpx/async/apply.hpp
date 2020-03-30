@@ -16,23 +16,20 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     // bound action
     template <typename Bound>
     struct apply_dispatch<Bound,
-        typename std::enable_if<
-            traits::is_bound_action<Bound>::value
-        >::type>
+        typename std::enable_if<traits::is_bound_action<Bound>::value>::type>
     {
-        template <typename Action, typename Is, typename... Ts, typename ...Us>
-        HPX_FORCEINLINE static bool
-        call(hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
+        template <typename Action, typename Is, typename... Ts, typename... Us>
+        HPX_FORCEINLINE static bool call(
+            hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
             Us&&... vs)
         {
             return bound.apply(std::forward<Us>(vs)...);
         }
     };
-}}
+}}    // namespace hpx::detail
 
 #endif

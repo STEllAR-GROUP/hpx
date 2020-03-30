@@ -17,59 +17,57 @@
 
 #include <utility>
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Cont, typename Callback,
-        typename ...Ts>
-    bool apply_continue_cb(Cont&& cont, naming::id_type const& gid,
-        Callback && cb, Ts&&... vs)
+    template <typename Action, typename Cont, typename Callback, typename... Ts>
+    bool apply_continue_cb(
+        Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type local_result_type;
         typedef typename action_type::remote_result_type result_type;
 
         return apply_cb<Action>(
-            hpx::actions::typed_continuation<
-                local_result_type, result_type>(std::forward<Cont>(cont)),
+            hpx::actions::typed_continuation<local_result_type, result_type>(
+                std::forward<Cont>(cont)),
             gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
-        typename Cont, typename Callback, typename ...Ts>
+        typename Cont, typename Callback, typename... Ts>
     bool apply_continue_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        Cont&& cont, naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        Cont&& cont, naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         return apply_continue_cb<Derived>(std::forward<Cont>(cont), gid,
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     bool apply_continue_cb(naming::id_type const& cont,
-        naming::id_type const& gid, Callback && cb, Ts&&... vs)
+        naming::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type local_result_type;
         typedef typename action_type::remote_result_type result_type;
 
         return apply_cb<Action>(
-            hpx::actions::typed_continuation<
-                local_result_type, result_type>(cont, make_continuation()),
+            hpx::actions::typed_continuation<local_result_type, result_type>(
+                cont, make_continuation()),
             gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
-        typename Callback, typename ...Ts>
+        typename Callback, typename... Ts>
     bool apply_continue_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& cont, naming::id_type const& gid,
-        Callback && cb, Ts&&... vs)
+        naming::id_type const& cont, naming::id_type const& gid, Callback&& cb,
+        Ts&&... vs)
     {
-        return apply_continue_cb<Derived>(cont, gid,
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        return apply_continue_cb<Derived>(
+            cont, gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
-}
+}    // namespace hpx
 
 #endif

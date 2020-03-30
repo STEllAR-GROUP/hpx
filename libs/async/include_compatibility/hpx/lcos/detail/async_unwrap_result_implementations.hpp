@@ -10,11 +10,11 @@
 
 #if defined(HPX_ASYNC_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/lcos/detail/async_unwrap_result_implementations.hpp is deprecated, \
     please include hpx/async/detail/async_unwrap_result_implementations.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/lcos/detail/async_unwrap_result_implementations.hpp is deprecated, \
     please include hpx/async/detail/async_unwrap_result_implementations.hpp instead"
 #endif

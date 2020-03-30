@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_select_direct_execution.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
@@ -29,15 +29,15 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     /// \cond NOINTERNAL
     ///////////////////////////////////////////////////////////////////////////
     struct keep_id_alive
     {
         explicit keep_id_alive(naming::id_type const& id)
           : id_(id)
-        {}
+        {
+        }
 
         void operator()() const {}
 
@@ -45,7 +45,7 @@ namespace hpx { namespace detail
     };
 
     template <typename T>
-    future<T> keep_alive(future<T> && f, id_type const& id)
+    future<T> keep_alive(future<T>&& f, id_type const& id)
     {
         if (id.get_management_type() == naming::id_type::managed)
         {
@@ -58,9 +58,11 @@ namespace hpx { namespace detail
     struct keep_id_and_ptr_alive
     {
         explicit keep_id_and_ptr_alive(
-                naming::id_type const& id, components::pinned_ptr&& p)
-          : id_(id), p_(std::move(p))
-        {}
+            naming::id_type const& id, components::pinned_ptr&& p)
+          : id_(id)
+          , p_(std::move(p))
+        {
+        }
 
         void operator()() const {}
 
@@ -88,12 +90,14 @@ namespace hpx { namespace detail
 
     public:
         handle_managed_target(hpx::id_type const& id, future<Result>& f)
-          : target_is_managed_(false), id_(id), f_(f)
+          : target_is_managed_(false)
+          , id_(id)
+          , f_(f)
         {
             if (id.get_management_type() == naming::id_type::managed)
             {
-                unmanaged_id_ = naming::id_type(
-                    id.get_gid(), naming::id_type::unmanaged);
+                unmanaged_id_ =
+                    naming::id_type(id.get_gid(), naming::id_type::unmanaged);
                 target_is_managed_ = true;
             }
         }
@@ -105,8 +109,7 @@ namespace hpx { namespace detail
             if (target_is_managed_)
             {
                 typedef typename traits::detail::shared_state_ptr_for<
-                    future<Result>
-                >::type shared_state_ptr;
+                    future<Result>>::type shared_state_ptr;
 
                 shared_state_ptr const& state =
                     traits::detail::get_shared_state(f_);
@@ -114,8 +117,7 @@ namespace hpx { namespace detail
                 {
                     HPX_ASSERT(id_);
                     HPX_ASSERT(unmanaged_id_);
-                    state->set_on_completed(
-                        hpx::detail::keep_id_alive(id_));
+                    state->set_on_completed(hpx::detail::keep_id_alive(id_));
                 }
             }
         }
@@ -135,9 +137,9 @@ namespace hpx { namespace detail
     template <typename Action, typename Result>
     struct sync_local_invoke
     {
-        template <typename ...Ts>
-        static lcos::future<Result>
-        call(naming::id_type const& /*id*/, naming::address && addr, Ts &&... vs)
+        template <typename... Ts>
+        static lcos::future<Result> call(
+            naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             try
             {
@@ -147,13 +149,13 @@ namespace hpx { namespace detail
                     get_remote_result_type;
 
                 return make_ready_future(
-                    get_remote_result_type::call(
-                        Action::execute_function(
-                            addr.address_, addr.type_, std::forward<Ts>(vs)...)));
+                    get_remote_result_type::call(Action::execute_function(
+                        addr.address_, addr.type_, std::forward<Ts>(vs)...)));
             }
             catch (...)
             {
-                return make_exceptional_future<Result>(std::current_exception());
+                return make_exceptional_future<Result>(
+                    std::current_exception());
             }
         }
     };
@@ -162,9 +164,8 @@ namespace hpx { namespace detail
     bool can_invoke_locally()
     {
         std::ptrdiff_t requested_stack_size =
-            threads::get_stack_size(
-                static_cast<threads::thread_stacksize>(
-                    traits::action_stacksize<Action>::value));
+            threads::get_stack_size(static_cast<threads::thread_stacksize>(
+                traits::action_stacksize<Action>::value));
         return !traits::action_decorate_function<Action>::value &&
             this_thread::get_stack_size() >= requested_stack_size &&
             this_thread::has_sufficient_stack_space(requested_stack_size);
@@ -173,9 +174,9 @@ namespace hpx { namespace detail
     template <typename Action>
     struct sync_local_invoke<Action, void>
     {
-        template <typename ...Ts>
-        static lcos::future<void>
-        call(naming::id_type const& /*id*/, naming::address && addr, Ts &&... vs)
+        template <typename... Ts>
+        static lcos::future<void> call(
+            naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             try
             {
@@ -195,10 +196,9 @@ namespace hpx { namespace detail
     template <typename Action, typename Result>
     struct sync_local_invoke_cb
     {
-        template <typename Callback, typename ...Ts>
-        static lcos::future<Result>
-        call(naming::id_type const& id, naming::address && addr, Callback && cb,
-            Ts &&... vs)
+        template <typename Callback, typename... Ts>
+        static lcos::future<Result> call(naming::id_type const& id,
+            naming::address&& addr, Callback&& cb, Ts&&... vs)
         {
             future<Result> f;
             {
@@ -268,8 +268,8 @@ namespace hpx { namespace detail
             handle_managed_target<result_type> hmt(id, f);
             lcos::packaged_action<action_type, result_type> p;
             f = p.get_future();
-            p.apply_deferred(std::move(addr), hmt.get_id(),
-                std::forward<Ts>(vs)...);
+            p.apply_deferred(
+                std::move(addr), hmt.get_id(), std::forward<Ts>(vs)...);
         }
         return f;
     }
@@ -279,22 +279,22 @@ namespace hpx { namespace detail
     hpx::future<
         typename hpx::traits::extract_action<Action>::type::local_result_type>
     async_remote_impl(launch policy, hpx::id_type const& id,
-            naming::address&& addr, Ts&&... vs)
+        naming::address&& addr, Ts&&... vs)
     {
         if (policy == launch::sync)
         {
-            return async_remote_impl<Action>(launch::sync, id,
-                std::move(addr), std::forward<Ts>(vs)...);
+            return async_remote_impl<Action>(
+                launch::sync, id, std::move(addr), std::forward<Ts>(vs)...);
         }
         else if (hpx::detail::has_async_policy(policy))
         {
-            return async_remote_impl<Action>(launch::async, id,
-                std::move(addr), std::forward<Ts>(vs)...);
+            return async_remote_impl<Action>(
+                launch::async, id, std::move(addr), std::forward<Ts>(vs)...);
         }
         else if (policy == launch::deferred)
         {
-            return async_remote_impl<Action>(launch::deferred, id,
-                std::move(addr), std::forward<Ts>(vs)...);
+            return async_remote_impl<Action>(
+                launch::deferred, id, std::move(addr), std::forward<Ts>(vs)...);
         }
 
         HPX_THROW_EXCEPTION(
@@ -316,8 +316,8 @@ namespace hpx { namespace detail
             naming::address::address_type lva,
             naming::address::component_type comptype, Ts&&... vs) const
         {
-            return get_remote_result_type::call(Action::invoker(
-                lva, comptype, std::forward<Ts>(vs)...));
+            return get_remote_result_type::call(
+                Action::invoker(lva, comptype, std::forward<Ts>(vs)...));
         }
     };
 
@@ -334,9 +334,9 @@ namespace hpx { namespace detail
 
         if (policy == launch::sync || action_type::direct_execution::value)
         {
-            return hpx::detail::sync_local_invoke<
-                        action_type, result_type
-                    >::call(id, std::move(addr), std::forward<Ts>(vs)...);
+            return hpx::detail::sync_local_invoke<action_type,
+                result_type>::call(id, std::move(addr),
+                std::forward<Ts>(vs)...);
         }
         else if (hpx::detail::has_async_policy(policy))
         {
@@ -371,12 +371,12 @@ namespace hpx { namespace detail
         if (traits::component_supports_migration<component_type>::call())
         {
             r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
+                id, addr.address_);
 
             if (!r.first)
             {
-                f = async_local_impl<Action>(policy, id, addr, r,
-                        std::forward<Ts>(vs)...);
+                f = async_local_impl<Action>(
+                    policy, id, addr, r, std::forward<Ts>(vs)...);
                 return true;
             }
 
@@ -385,17 +385,16 @@ namespace hpx { namespace detail
         }
 
         f = async_local_impl<Action>(
-                policy, id, addr, r, std::forward<Ts>(vs)...);
+            policy, id, addr, r, std::forward<Ts>(vs)...);
 
         return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Launch, typename ...Ts>
+    template <typename Action, typename Launch, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_impl(Launch && policy, hpx::id_type const& id, Ts&&... vs)
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
+    async_impl(Launch&& policy, hpx::id_type const& id, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type result_type;
@@ -421,11 +420,11 @@ namespace hpx { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     /// \note This function is part of the invocation policy implemented by
     ///       this class
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_cb_impl(launch policy, hpx::id_type const& id, Callback&& cb, Ts&&... vs)
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
+    async_cb_impl(
+        launch policy, hpx::id_type const& id, Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type result_type;
@@ -444,26 +443,25 @@ namespace hpx { namespace detail
             if (traits::component_supports_migration<component_type>::call())
             {
                 r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
+                    id, addr.address_);
                 if (!r.first)
                 {
                     if (policy == launch::sync ||
                         action_type::direct_execution::value)
                     {
-                        return hpx::detail::sync_local_invoke_cb<
-                                action_type, result_type
-                            >::call(id, std::move(addr), std::forward<Callback>(cb),
-                                std::forward<Ts>(vs)...);
+                        return hpx::detail::sync_local_invoke_cb<action_type,
+                            result_type>::call(id, std::move(addr),
+                            std::forward<Callback>(cb),
+                            std::forward<Ts>(vs)...);
                     }
                 }
             }
             else if (policy == launch::sync ||
                 action_type::direct_execution::value)
             {
-                return hpx::detail::sync_local_invoke_cb<
-                        action_type, result_type
-                    >::call(id, std::move(addr), std::forward<Callback>(cb),
-                        std::forward<Ts>(vs)...);
+                return hpx::detail::sync_local_invoke_cb<action_type,
+                    result_type>::call(id, std::move(addr),
+                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
             }
         }
 
@@ -471,8 +469,7 @@ namespace hpx { namespace detail
         {
             handle_managed_target<result_type> hmt(id, f);
 
-            if (policy == launch::sync ||
-                hpx::detail::has_async_policy(policy))
+            if (policy == launch::sync || hpx::detail::has_async_policy(policy))
             {
                 lcos::packaged_action<action_type, result_type> p;
 
@@ -492,69 +489,18 @@ namespace hpx { namespace detail
             }
             else
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "async_cb_impl", "unknown launch policy");
+                HPX_THROW_EXCEPTION(
+                    bad_parameter, "async_cb_impl", "unknown launch policy");
                 return f;
             }
         }
         return f;
     }
 
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_cb_impl(hpx::detail::sync_policy, hpx::id_type const& id, Callback&& cb,
-        Ts&&... vs)
-    {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
-        typedef typename action_type::component_type component_type;
-
-        std::pair<bool, components::pinned_ptr> r;
-
-        naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
-        {
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
-                if (!r.first)
-                {
-                    return hpx::detail::sync_local_invoke_cb<
-                            action_type, result_type
-                        >::call(id, std::move(addr), std::forward<Callback>(cb),
-                            std::forward<Ts>(vs)...);
-                }
-            }
-            else
-            {
-                return hpx::detail::sync_local_invoke_cb<
-                        action_type, result_type
-                    >::call(id, std::move(addr), std::forward<Callback>(cb),
-                        std::forward<Ts>(vs)...);
-            }
-        }
-
-        future<result_type> f;
-        {
-            handle_managed_target<result_type> hmt(id, f);
-            lcos::packaged_action<action_type, result_type> p;
-
-            f = p.get_future();
-            p.apply_cb(std::move(addr), hmt.get_id(), std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
-            f.wait();
-        }
-        return f;
-    }
-
-    template <typename Action, typename Callback, typename ...Ts>
-    hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
-    async_cb_impl(hpx::detail::async_policy async_policy, hpx::id_type const& id,
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
+    async_cb_impl(hpx::detail::sync_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
@@ -566,33 +512,22 @@ namespace hpx { namespace detail
         naming::address addr;
         if (agas::is_local_address_cached(id, addr))
         {
-            // route launch policy through component
-            launch policy = traits::action_select_direct_execution<Action>::call(
-                async_policy, addr.address_);
-
             if (traits::component_supports_migration<component_type>::call())
             {
                 r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
+                    id, addr.address_);
                 if (!r.first)
                 {
-                    if (policy == launch::sync ||
-                        action_type::direct_execution::value)
-                    {
-                        return hpx::detail::sync_local_invoke_cb<
-                                action_type, result_type
-                            >::call(id, std::move(addr), std::forward<Callback>(cb),
-                                std::forward<Ts>(vs)...);
-                    }
+                    return hpx::detail::sync_local_invoke_cb<action_type,
+                        result_type>::call(id, std::move(addr),
+                        std::forward<Callback>(cb), std::forward<Ts>(vs)...);
                 }
             }
-            else if (policy == launch::sync ||
-                action_type::direct_execution::value)
+            else
             {
-                return hpx::detail::sync_local_invoke_cb<
-                        action_type, result_type
-                    >::call(id, std::move(addr), std::forward<Callback>(cb),
-                        std::forward<Ts>(vs)...);
+                return hpx::detail::sync_local_invoke_cb<action_type,
+                    result_type>::call(id, std::move(addr),
+                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
             }
         }
 
@@ -602,16 +537,73 @@ namespace hpx { namespace detail
             lcos::packaged_action<action_type, result_type> p;
 
             f = p.get_future();
-            p.apply_cb(std::move(addr), hmt.get_id(), std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+            p.apply_cb(std::move(addr), hmt.get_id(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            f.wait();
         }
         return f;
     }
 
-    template <typename Action, typename Callback, typename ...Ts>
+    template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type
-    >
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
+    async_cb_impl(hpx::detail::async_policy async_policy,
+        hpx::id_type const& id, Callback&& cb, Ts&&... vs)
+    {
+        typedef typename hpx::traits::extract_action<Action>::type action_type;
+        typedef typename action_type::local_result_type result_type;
+        typedef typename action_type::component_type component_type;
+
+        std::pair<bool, components::pinned_ptr> r;
+
+        naming::address addr;
+        if (agas::is_local_address_cached(id, addr))
+        {
+            // route launch policy through component
+            launch policy =
+                traits::action_select_direct_execution<Action>::call(
+                    async_policy, addr.address_);
+
+            if (traits::component_supports_migration<component_type>::call())
+            {
+                r = traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+                if (!r.first)
+                {
+                    if (policy == launch::sync ||
+                        action_type::direct_execution::value)
+                    {
+                        return hpx::detail::sync_local_invoke_cb<action_type,
+                            result_type>::call(id, std::move(addr),
+                            std::forward<Callback>(cb),
+                            std::forward<Ts>(vs)...);
+                    }
+                }
+            }
+            else if (policy == launch::sync ||
+                action_type::direct_execution::value)
+            {
+                return hpx::detail::sync_local_invoke_cb<action_type,
+                    result_type>::call(id, std::move(addr),
+                    std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            }
+        }
+
+        future<result_type> f;
+        {
+            handle_managed_target<result_type> hmt(id, f);
+            lcos::packaged_action<action_type, result_type> p;
+
+            f = p.get_future();
+            p.apply_cb(std::move(addr), hmt.get_id(),
+                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        }
+        return f;
+    }
+
+    template <typename Action, typename Callback, typename... Ts>
+    hpx::future<
+        typename hpx::traits::extract_action<Action>::type::local_result_type>
     async_cb_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
@@ -633,6 +625,6 @@ namespace hpx { namespace detail
         return f;
     }
     /// \endcond
-}}
+}}    // namespace hpx::detail
 
 #endif

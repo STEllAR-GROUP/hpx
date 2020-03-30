@@ -23,76 +23,57 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        template <
-            typename Action, typename RemoteResult, typename Cont,
-            typename Target, typename ...Ts>
-        lcos::future<
-            typename traits::promise_local_result<
-                typename result_of_async_continue<Action, Cont>::type
-            >::type
-        >
+    namespace detail {
+        template <typename Action, typename RemoteResult, typename Cont,
+            typename Target, typename... Ts>
+        lcos::future<typename traits::promise_local_result<
+            typename result_of_async_continue<Action, Cont>::type>::type>
         async_continue_r(Cont&& cont, Target const& target, Ts&&... vs)
         {
-            typedef
-                typename traits::promise_local_result<
-                    typename result_of_async_continue<Action, Cont>::type
-                >::type
-            result_type;
+            typedef typename traits::promise_local_result<
+                typename result_of_async_continue<Action, Cont>::type>::type
+                result_type;
 
             typedef
-                typename hpx::traits::extract_action<
-                    Action
-                >::remote_result_type
-            continuation_result_type;
+                typename hpx::traits::extract_action<Action>::remote_result_type
+                    continuation_result_type;
 
             lcos::promise<result_type, RemoteResult> p;
             auto f = p.get_future();
 
-            apply<Action>(
-                hpx::actions::typed_continuation<
-                        result_type, continuation_result_type
-                >(p.get_id(), std::forward<Cont>(cont)),
-                    target, std::forward<Ts>(vs)...);
+            apply<Action>(hpx::actions::typed_continuation<result_type,
+                              continuation_result_type>(
+                              p.get_id(), std::forward<Cont>(cont)),
+                target, std::forward<Ts>(vs)...);
 
             return f;
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Cont, typename ...Ts>
-    lcos::future<
-        typename traits::promise_local_result<
-            typename detail::result_of_async_continue<Action, Cont>::type
-        >::type
-    >
+    template <typename Action, typename Cont, typename... Ts>
+    lcos::future<typename traits::promise_local_result<
+        typename detail::result_of_async_continue<Action, Cont>::type>::type>
     async_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
-        typedef
-            typename traits::promise_remote_result<
-                typename detail::result_of_async_continue<Action, Cont>::type
-            >::type
-        result_type;
+        typedef typename traits::promise_remote_result<
+            typename detail::result_of_async_continue<Action, Cont>::type>::type
+            result_type;
 
         return detail::async_continue_r<Action, result_type>(
             std::forward<Cont>(cont), gid, std::forward<Ts>(vs)...);
     }
 
-    template <
-        typename Component, typename Signature, typename Derived,
-        typename Cont, typename ...Ts>
-    lcos::future<
-         typename traits::promise_local_result<
-            typename detail::result_of_async_continue<Derived, Cont>::type
-        >::type
-    >
+    template <typename Component, typename Signature, typename Derived,
+        typename Cont, typename... Ts>
+    lcos::future<typename traits::promise_local_result<
+        typename detail::result_of_async_continue<Derived, Cont>::type>::type>
     async_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-      , Cont&& cont, naming::id_type const& gid, Ts&&... vs)
+        ,
+        Cont&& cont, naming::id_type const& gid, Ts&&... vs)
     {
         return async_continue<Derived>(
             std::forward<Cont>(cont), gid, std::forward<Ts>(vs)...);
@@ -100,43 +81,33 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Cont, typename DistPolicy,
-        typename ...Ts>
-    typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value,
-        lcos::future<
-            typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Action, Cont>::type
-            >::type>
-    >::type
+        typename... Ts>
+    typename std::enable_if<traits::is_distribution_policy<DistPolicy>::value,
+        lcos::future<typename traits::promise_local_result<typename detail::
+                result_of_async_continue<Action, Cont>::type>::type>>::type
     async_continue(Cont&& cont, DistPolicy const& policy, Ts&&... vs)
     {
-        typedef
-            typename traits::promise_remote_result<
-                typename detail::result_of_async_continue<Action, Cont>::type
-            >::type
-        result_type;
+        typedef typename traits::promise_remote_result<
+            typename detail::result_of_async_continue<Action, Cont>::type>::type
+            result_type;
 
         return detail::async_continue_r<Action, result_type>(
             std::forward<Cont>(cont), policy, std::forward<Ts>(vs)...);
     }
 
-    template <
-        typename Component, typename Signature, typename Derived,
-        typename Cont, typename DistPolicy, typename ...Ts>
-    typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value,
-        lcos::future<
-            typename traits::promise_local_result<
-                typename detail::result_of_async_continue<Derived, Cont>::type
-            >::type>
-    >::type
+    template <typename Component, typename Signature, typename Derived,
+        typename Cont, typename DistPolicy, typename... Ts>
+    typename std::enable_if<traits::is_distribution_policy<DistPolicy>::value,
+        lcos::future<typename traits::promise_local_result<typename detail::
+                result_of_async_continue<Derived, Cont>::type>::type>>::type
     async_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-      , Cont&& cont, DistPolicy const& policy, Ts&&... vs)
+        ,
+        Cont&& cont, DistPolicy const& policy, Ts&&... vs)
     {
         return async_continue<Derived>(
             std::forward<Cont>(cont), policy, std::forward<Ts>(vs)...);
     }
-}
+}    // namespace hpx
 
 #endif

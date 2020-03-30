@@ -10,12 +10,10 @@
 
 #if defined(HPX_ASYNC_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/runtime/applier/applier.hpp is deprecated, \
+#pragma message("The header hpx/runtime/applier/applier.hpp is deprecated, \
     please include hpx/async/applier/applier.hpp instead")
 #else
-#warning \
-    "The header hpx/runtime/applier/applier.hpp is deprecated, \
+#warning "The header hpx/runtime/applier/applier.hpp is deprecated, \
     please include hpx/async/applier/applier.hpp instead"
 #endif
 #endif

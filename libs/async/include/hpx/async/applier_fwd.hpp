@@ -13,15 +13,13 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx
-{
+namespace hpx {
     /// \namespace applier
     ///
     /// The namespace \a applier contains all definitions needed for the
     /// class \a hpx#applier#applier and its related functionality. This
     /// namespace is part of the HPX core module.
-    namespace applier
-    {
+    namespace applier {
         class HPX_API_EXPORT applier;
 
         /// The function \a get_applier returns a reference to the (thread
@@ -33,7 +31,7 @@ namespace hpx
         /// current thread is not known to HPX or if the runtime system is not
         /// active.
         HPX_API_EXPORT applier* get_applier_ptr();
-    }
-}
+    }    // namespace applier
+}    // namespace hpx
 
 #endif

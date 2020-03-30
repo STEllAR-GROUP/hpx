@@ -17,11 +17,9 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         // dispatch point used for async_cb implementations
         template <typename Func, typename Enable = void>
         struct async_cb_dispatch;
@@ -29,17 +27,15 @@ namespace hpx
         // dispatch point used for async_cb<Action> implementations
         template <typename Action, typename Func, typename Enable = void>
         struct async_cb_action_dispatch;
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration
-    template <typename Action, typename F, typename ...Ts>
-    HPX_FORCEINLINE
-    auto async_cb(F && f, Ts &&... ts)
-    ->  decltype(detail::async_cb_action_dispatch<
-                Action, typename util::decay<F>::type
-            >::call(std::forward<F>(f), std::forward<Ts>(ts)...));
-}
+    template <typename Action, typename F, typename... Ts>
+    HPX_FORCEINLINE auto async_cb(F&& f, Ts&&... ts)
+        -> decltype(detail::async_cb_action_dispatch<Action,
+            typename util::decay<F>::type>::call(std::forward<F>(f),
+            std::forward<Ts>(ts)...));
+}    // namespace hpx
 
 #endif
-

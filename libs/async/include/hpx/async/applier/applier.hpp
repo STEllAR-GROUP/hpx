@@ -26,8 +26,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace applier
-{
+namespace hpx { namespace applier {
     /// The \a applier class is used to decide whether a particular action
     /// has to be issued on a local or a remote resource. If the target
     /// component is local a new \a thread will be created, if the target is
@@ -40,7 +39,7 @@ namespace hpx { namespace applier
     public:
         // constructor
 #if defined(HPX_HAVE_NETWORKING)
-        applier(parcelset::parcelhandler &ph,threads::threadmanager& tm);
+        applier(parcelset::parcelhandler& ph, threads::threadmanager& tm);
 #else
         explicit applier(threads::threadmanager& tm);
 #endif
@@ -103,7 +102,8 @@ namespace hpx { namespace applier
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
-        bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
+        bool get_raw_remote_localities(
+            std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid,
             error_code& ec = throws) const;
 
@@ -128,7 +128,8 @@ namespace hpx { namespace applier
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
         bool get_raw_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type =
+                components::component_invalid) const;
 
         bool get_localities(std::vector<naming::id_type>& locality_ids,
             error_code& ec = throws) const;
@@ -175,7 +176,7 @@ namespace hpx { namespace applier
         naming::id_type runtime_support_id_;
         naming::id_type memory_id_;
     };
-}}
+}}    // namespace hpx::applier
 
 #include <hpx/config/warnings_suffix.hpp>
 

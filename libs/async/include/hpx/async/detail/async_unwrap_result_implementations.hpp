@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/detail/async_unwrap_result_implementations_fwd.hpp>
 #include <hpx/lcos/detail/sync_implementations.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_select_direct_execution.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
@@ -31,8 +31,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     /// \cond NOINTERNAL
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
@@ -47,9 +46,9 @@ namespace hpx { namespace detail
         // NOLINTNEXTLINE(bugprone-branch-clone)
         if (policy == launch::sync || action_type::direct_execution::value)
         {
-            return hpx::detail::sync_local_invoke_direct<
-                        action_type, result_type
-                    >::call(id, std::move(addr), std::forward<Ts>(vs)...);
+            return hpx::detail::sync_local_invoke_direct<action_type,
+                result_type>::call(id, std::move(addr),
+                std::forward<Ts>(vs)...);
         }
         else if (hpx::detail::has_async_policy(policy))
         {
@@ -84,7 +83,7 @@ namespace hpx { namespace detail
         if (traits::component_supports_migration<component_type>::call())
         {
             r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
+                id, addr.address_);
 
             if (!r.first)
             {
@@ -105,9 +104,10 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Launch, typename ...Ts>
+    template <typename Action, typename Launch, typename... Ts>
     typename hpx::traits::extract_action<Action>::type::local_result_type
-    async_unwrap_result_impl(Launch && policy, hpx::id_type const& id, Ts&&... vs)
+    async_unwrap_result_impl(
+        Launch&& policy, hpx::id_type const& id, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type result_type;
@@ -132,6 +132,6 @@ namespace hpx { namespace detail
             std::move(addr), std::forward<Ts>(vs)...);
     }
     /// \endcond
-}}
+}}    // namespace hpx::detail
 
 #endif

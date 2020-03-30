@@ -8,31 +8,30 @@
 #define HPX_LCOS_SYNC_IMPLEMENTATIONS_JUL_21_2018_0921PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/detail/sync_implementations_fwd.hpp>
+#include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/action_select_direct_execution.hpp>
+#include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/extract_action.hpp>
 
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     struct sync_local_invoke_direct
     {
-        template <typename ...Ts>
-        HPX_FORCEINLINE static Result
-        call(naming::id_type const& id, naming::address && addr, Ts &&... vs)
+        template <typename... Ts>
+        HPX_FORCEINLINE static Result call(
+            naming::id_type const& id, naming::address&& addr, Ts&&... vs)
         {
             typedef typename Action::remote_result_type remote_result_type;
 
@@ -47,9 +46,9 @@ namespace hpx { namespace detail
     template <typename Action>
     struct sync_local_invoke_direct<Action, void>
     {
-        template <typename ...Ts>
-        HPX_FORCEINLINE static void
-        call(naming::id_type const& id, naming::address && addr, Ts &&... vs)
+        template <typename... Ts>
+        HPX_FORCEINLINE static void call(
+            naming::id_type const& id, naming::address&& addr, Ts&&... vs)
         {
             Action::execute_function(
                 addr.address_, addr.type_, std::forward<Ts>(vs)...);
@@ -57,9 +56,9 @@ namespace hpx { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Launch, typename ...Ts>
+    template <typename Action, typename Launch, typename... Ts>
     typename hpx::traits::extract_action<Action>::type::local_result_type
-    sync_impl(Launch && policy, hpx::id_type const& id, Ts&&... vs)
+    sync_impl(Launch&& policy, hpx::id_type const& id, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type result_type;
@@ -79,31 +78,32 @@ namespace hpx { namespace detail
             if (traits::component_supports_migration<component_type>::call())
             {
                 r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
+                    id, addr.address_);
                 if (!r.first)
                 {
                     if (adapted_policy == launch::sync ||
                         action_type::direct_execution::value)
                     {
                         return hpx::detail::sync_local_invoke_direct<
-                                action_type, result_type
-                            >::call(id, std::move(addr), std::forward<Ts>(vs)...);
+                            action_type, result_type>::call(id, std::move(addr),
+                            std::forward<Ts>(vs)...);
                     }
                 }
             }
             else if (adapted_policy == launch::sync ||
                 action_type::direct_execution::value)
             {
-                return hpx::detail::sync_local_invoke_direct<
-                        action_type, result_type
-                    >::call(id, std::move(addr), std::forward<Ts>(vs)...);
+                return hpx::detail::sync_local_invoke_direct<action_type,
+                    result_type>::call(id, std::move(addr),
+                    std::forward<Ts>(vs)...);
             }
         }
 
         return async_remote_impl<Action>(std::forward<Launch>(policy), id,
-            std::move(addr), std::forward<Ts>(vs)...).get();
+            std::move(addr), std::forward<Ts>(vs)...)
+            .get();
     }
     /// \endcond
-}}
+}}    // namespace hpx::detail
 
 #endif

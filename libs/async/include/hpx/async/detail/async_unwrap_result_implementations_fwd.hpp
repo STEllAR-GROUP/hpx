@@ -13,12 +13,12 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/extract_action.hpp>
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Launch, typename ...Ts>
+    template <typename Action, typename Launch, typename... Ts>
     typename hpx::traits::extract_action<Action>::type::local_result_type
-    async_unwrap_result_impl(Launch && policy, hpx::id_type const& id, Ts&&... vs);
-}}
+    async_unwrap_result_impl(
+        Launch&& policy, hpx::id_type const& id, Ts&&... vs);
+}}    // namespace hpx::detail
 
 #endif
