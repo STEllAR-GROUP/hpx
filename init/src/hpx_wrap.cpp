@@ -12,6 +12,8 @@
     (defined(__linux) || defined(__linux__) || defined(linux) || \
     defined(__APPLE__))
 
+#include <string>
+
 namespace hpx_start
 {
     // include_libhpx_wrap is a weak symbol which helps to determine the course
@@ -23,6 +25,7 @@ namespace hpx_start
     // by this code.
     HPX_SYMBOL_EXPORT extern bool include_libhpx_wrap;
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
+    HPX_SYMBOL_EXPORT extern std::string app_name_libhpx_wrap;
 }
 
 #include <hpx/hpx_finalize.hpp>
@@ -30,7 +33,6 @@ namespace hpx_start
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/functional/function.hpp>
 
-#include <string>
 #include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,13 +97,19 @@ extern "C" int initialize_main(int argc, char** argv)
             "hpx.commandline.allow_unknown!=1",
             "hpx.commandline.aliasing=0",
         };
-
         hpx::util::function_nonser<int(int, char**)> start_function =
             &hpx_start::hpx_entry;
+        using hpx::program_options::options_description;
+        options_description desc = options_description(
+                "Usage: " + ::hpx_start::app_name_libhpx_wrap + " [options]");
+        // Create the init_params struct
+        hpx::init_params iparams;
+        iparams.desc_cmdline = desc;
+        iparams.cfg = cfg;
+        iparams.mode = hpx::runtime_mode_console;
 
         // Initialize the HPX runtime system
-        return hpx::init(start_function, argc, argv,
-            cfg, hpx::runtime_mode_console);
+        return hpx::init(start_function, argc, argv, iparams);
 #if defined(__APPLE__)
     }
     return main(argc, argv);
