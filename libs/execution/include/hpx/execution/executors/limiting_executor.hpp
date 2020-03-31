@@ -12,8 +12,8 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/runtime/threads/executors/default_executor.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/thread_executors/default_executor.hpp>
+#include <hpx/thread_executors/pool_executor.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 

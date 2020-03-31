@@ -5,12 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/runtime/threads/executors/default_executor.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/thread_executors/default_executor.hpp>
+#include <hpx/thread_executors/pool_executor.hpp>
 #define GUIDED_EXECUTOR_DEBUG 1
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
+#include <hpx/thread_executors/guided_pool_executor.hpp>
 //#include <hpx/topology/cpu_mask.hpp>
 //#include <hpx/include/parallel_executors.hpp>
 #include <hpx/async.hpp>

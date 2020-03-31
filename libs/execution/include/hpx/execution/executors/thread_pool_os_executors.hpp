@@ -14,7 +14,7 @@
 #if defined(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
 #include <hpx/execution/executors/thread_execution.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/threads/executors/thread_pool_os_executors.hpp>
+#include <hpx/thread_executors/thread_pool_os_executors.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////

@@ -10,11 +10,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/runtime/threads/executors/current_executor.hpp>
-#include <hpx/runtime/threads/executors/default_executor.hpp>
-#include <hpx/runtime/threads/executors/service_executors.hpp>
-#include <hpx/runtime/threads/executors/this_thread_executors.hpp>
-#include <hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp>
+#include <hpx/thread_executors/current_executor.hpp>
+#include <hpx/thread_executors/default_executor.hpp>
+#include <hpx/thread_executors/service_executors.hpp>
+#include <hpx/thread_executors/this_thread_executors.hpp>
+#include <hpx/thread_executors/embedded_thread_pool_executors.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #endif
 
