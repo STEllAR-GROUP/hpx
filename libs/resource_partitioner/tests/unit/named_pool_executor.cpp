@@ -51,13 +51,11 @@ int hpx_main(int argc, char* argv[])
     // setup executors for different task priorities on the pools
     // segfaults or exceptions in any of the following will cause
     // the test to fail
-    hpx::threads::scheduled_executor exec_0_hp =
-        hpx::threads::executors::pool_executor(
-            "default", hpx::threads::thread_priority_high);
+    hpx::parallel::execution::pool_executor exec_0_hp(
+        "default", hpx::threads::thread_priority_high);
 
-    hpx::threads::scheduled_executor exec_0 =
-        hpx::threads::executors::pool_executor(
-            "default", hpx::threads::thread_priority_default);
+    hpx::parallel::execution::pool_executor exec_0(
+        "default", hpx::threads::thread_priority_default);
 
     std::vector<hpx::future<void>> lotsa_futures;
 
@@ -68,15 +66,15 @@ int hpx_main(int argc, char* argv[])
     lotsa_futures.push_back(
         hpx::async(exec_0, &dummy_task, 3, "Normal default"));
 
-    std::vector<hpx::threads::scheduled_executor> execs;
-    std::vector<hpx::threads::scheduled_executor> execs_hp;
+    std::vector<hpx::parallel::execution::pool_executor> execs;
+    std::vector<hpx::parallel::execution::pool_executor> execs_hp;
     //
     for (int i = 0; i < max_threads; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
-        execs.push_back(hpx::threads::executors::pool_executor(
+        execs.push_back(hpx::parallel::execution::pool_executor(
             pool_name, hpx::threads::thread_priority_default));
-        execs_hp.push_back(hpx::threads::executors::pool_executor(
+        execs_hp.push_back(hpx::parallel::execution::pool_executor(
             pool_name, hpx::threads::thread_priority_high));
     }
 

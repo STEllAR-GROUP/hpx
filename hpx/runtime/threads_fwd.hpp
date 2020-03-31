@@ -15,11 +15,15 @@
 
 namespace hpx
 {
+    namespace parallel { namespace execution {
+        class HPX_EXPORT thread_pool_executor;
+    }}
+
     namespace threads
     {
         namespace executors
         {
-            struct HPX_EXPORT current_executor;
+            using current_executor = parallel::execution::thread_pool_executor;
         }
     }
 }

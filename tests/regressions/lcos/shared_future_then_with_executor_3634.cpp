@@ -12,11 +12,11 @@
 #include <hpx/lcos/future.hpp>
 
 #include <hpx/execution/executors.hpp> // Workaround for a missing header file
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/execution/executors/pool_executor.hpp>
 
 int main()
 {
-    hpx::threads::executors::pool_executor executor("default");
+    hpx::parallel::execution::pool_executor executor("default");
 
     auto future = hpx::make_ready_future().share();
 

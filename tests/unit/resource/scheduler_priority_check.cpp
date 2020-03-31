@@ -17,7 +17,6 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
@@ -80,12 +79,10 @@ int hpx_main(variables_map& vm)
     }
 
     // setup executors for different task priorities on the pools
-    hpx::threads::scheduled_executor HP_executor =
-        hpx::threads::executors::pool_executor(
+    hpx::parallel::execution::pool_executor HP_executor(
             "default", hpx::threads::thread_priority_high);
 
-    hpx::threads::scheduled_executor NP_executor =
-        hpx::threads::executors::pool_executor(
+    hpx::parallel::execution::pool_executor NP_executor(
             "default", hpx::threads::thread_priority_default);
 
     // randomly create normal priority tasks

@@ -10,10 +10,9 @@
 #define HPX_PARALLEL_EXECUTORS_THREAD_POOL_EXECUTORS_MAY_15_2015_0548PM
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
+
+#if defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
 #include <hpx/execution/executors/thread_execution.hpp>
-#include <hpx/execution/executors/thread_execution_information.hpp>
-#include <hpx/execution/executors/thread_timed_execution.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp>
 
@@ -67,5 +66,6 @@ namespace hpx { namespace parallel { namespace execution {
         threads::executors::static_priority_queue_executor;
 #endif
 }}}    // namespace hpx::parallel::execution
+#endif
 
 #endif

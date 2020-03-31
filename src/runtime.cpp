@@ -1251,6 +1251,7 @@ namespace hpx
         return rt->get_config().get_os_thread_count();
     }
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
     std::size_t get_os_thread_count(threads::executor const& exec)
     {
         runtime* rt = get_runtime_ptr();
@@ -1270,6 +1271,7 @@ namespace hpx
         return exec.executor_data_->get_policy_element(
             threads::detail::current_concurrency, ec);
     }
+#endif
 
     std::size_t get_num_worker_threads()
     {

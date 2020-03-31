@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/compute/host/target.hpp>
 #include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/executors/thread_pool_attached_executors.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
@@ -35,9 +36,8 @@ namespace hpx { namespace compute { namespace host {
     /// It will distribute work evenly across the passed targets
     ///
     /// \tparam Executor The underlying executor to use
-    template <
-        typename Executor =
-            hpx::threads::executors::local_priority_queue_attached_executor>
+    template <typename Executor =
+                  hpx::parallel::execution::restricted_thread_pool_executor>
     struct block_executor
     {
     public:

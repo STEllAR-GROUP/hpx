@@ -1573,6 +1573,30 @@ hpx_option(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY
   BOOL "Enable Boost.FileSystem compatibility. (default: ${__filesystem_compatibility_default})"
   ${__filesystem_compatibility_default} ADVANCED CATEGORY "Modules")
 
+# Compatibility for embedded thread pools, introduced in V1.5.0
+hpx_option(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY
+  BOOL "Enable deprecated embedded thread pools (default: ON)"
+  ON ADVANCED)
+if(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
+endif()
+
+# Compatibility for thread pool os executors, introduced in V1.5.0
+hpx_option(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY
+  BOOL "Enable deprecated thread pool executors (default: ON)"
+  ON ADVANCED)
+if(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
+endif()
+
+# Compatibility for thread executors, introduced in V1.5.0
+hpx_option(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY
+  BOOL "Enable deprecated thread executors (default: ON)"
+  ON ADVANCED)
+if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+endif()
+
 ################################################################################
 # Find Our dependencies:
 #   These are all dependencies needed to build the core library. Dependencies

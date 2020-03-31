@@ -8,6 +8,8 @@
 #define HPX_RUNTIME_THREADS_EXECUTORS_MANAGE_THREAD_EXECUTOR_JUL_16_2015_0745PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/errors.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 
@@ -63,4 +65,5 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     };
 }}}}
 
+#endif
 #endif

@@ -9,7 +9,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+    (defined(HPX_HAVE_STATIC_SCHEDULER) || \
+     defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER))
 
 #include <hpx/errors.hpp>
 #include <hpx/affinity/affinity_data.hpp>

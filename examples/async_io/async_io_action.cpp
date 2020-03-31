@@ -13,8 +13,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/include/thread_executors.hpp>
 
 #include <iostream>
 #include <memory>
@@ -41,10 +41,10 @@ namespace detail
             std::make_shared<hpx::lcos::local::promise<int> >();
 
         // Get a reference to one of the IO specific HPX io_service objects ...
-        hpx::threads::executors::io_pool_executor scheduler;
+        hpx::parallel::execution::io_pool_executor executor;
 
         // ... and schedule the handler to run on one of its OS-threads.
-        scheduler.add(hpx::util::bind(&do_async_io, string_to_write, p));
+        hpx::apply(executor, &do_async_io, string_to_write, p);
 
         return p->get_future();
     }

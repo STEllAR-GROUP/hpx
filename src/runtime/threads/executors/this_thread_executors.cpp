@@ -6,7 +6,10 @@
 
 #include <hpx/runtime/threads/executors/this_thread_executors.hpp>
 
-#if defined(HPX_HAVE_STATIC_SCHEDULER) || defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+    defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY) &&                   \
+    (defined(HPX_HAVE_STATIC_SCHEDULER) ||                                     \
+     defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER))
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #  include <hpx/schedulers/static_priority_queue_scheduler.hpp>
@@ -470,8 +473,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 }}}}
 
-#endif
-
 namespace hpx { namespace threads { namespace executors
 {
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
@@ -493,3 +494,5 @@ namespace hpx { namespace threads { namespace executors
     {}
 #endif
 }}}
+
+#endif

@@ -64,7 +64,7 @@ namespace hpx { namespace threads {
         ///////////////////////////////////////////////////////////////////////
         // The interface below is used by the resource manager to
         // interact with the executor.
-        struct manage_executor
+        struct HPX_EXPORT manage_executor
         {
             virtual ~manage_executor() {}
 
@@ -159,7 +159,10 @@ namespace hpx { namespace threads {
     // note: this data structure has to be protected from races from the outside
 
     /// \brief The base class used to manage a pool of OS threads.
-    class HPX_EXPORT thread_pool_base : public detail::manage_executor
+    class HPX_EXPORT thread_pool_base
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+      : public detail::manage_executor
+#endif
     {
     public:
         /// \cond NOINTERNAL
@@ -512,9 +515,9 @@ namespace hpx { namespace threads {
             notifier_.on_error(global_thread_num, e);
         }
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         ///////////////////////////////////////////////////////////////////////
         // detail::manage_executor implementation
-
         /// \brief Return the requested policy element.
         std::size_t get_policy_element(detail::executor_parameter p,
             error_code& ec = throws) const override = 0;
@@ -533,6 +536,7 @@ namespace hpx { namespace threads {
 
         // \brief Return the description string of the underlying scheduler.
         char const* get_description() const override;
+#endif
 
         /// \endcond
 

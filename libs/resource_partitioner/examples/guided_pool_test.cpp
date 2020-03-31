@@ -77,7 +77,7 @@ std::string a_function(hpx::future<double>&& df)
     return "The number 2";
 }
 
-namespace hpx { namespace threads { namespace executors {
+namespace hpx { namespace parallel { namespace execution {
 
     struct guided_test_tag
     {
@@ -124,9 +124,9 @@ namespace hpx { namespace threads { namespace executors {
             return 56;
         }
     };
-}}}    // namespace hpx::threads::executors
+}}}    // namespace hpx::parallel::execution
 
-using namespace hpx::threads::executors;
+using namespace hpx::parallel::execution;
 
 // this is called on an hpx thread after the runtime starts up
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -144,7 +144,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // we must specialize the numa callback hint for the function type we are invoking
     using hint_type1 = pool_numa_hint<guided_test_tag>;
     // create an executor using that hint type
-    hpx::threads::executors::guided_pool_executor<hint_type1> guided_exec(
+    hpx::parallel::execution::guided_pool_executor<hint_type1> guided_exec(
         CUSTOM_POOL_NAME);
     // invoke an async function using our numa hint executor
     hpx::future<void> gf1 = hpx::async(guided_exec, &async_guided,
@@ -162,7 +162,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // the args of the async lambda must match the args of the hint type
     using hint_type2 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
-    hpx::threads::executors::guided_pool_executor<hint_type2>
+    hpx::parallel::execution::guided_pool_executor<hint_type2>
         guided_lambda_exec(CUSTOM_POOL_NAME);
     // invoke a lambda asynchronously and use the numa executor
     hpx::future<double> gf2 = hpx::async(
@@ -179,26 +179,21 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // ------------------------------------------------------------------------
     // static checks for laughs
     // ------------------------------------------------------------------------
-    using namespace hpx::traits;
     static_assert(
-        has_sync_execute_member<
-            hpx::threads::executors::guided_pool_executor<hint_type2>>::value ==
-            std::false_type(),
+        hpx::traits::has_sync_execute_member<hpx::parallel::execution::
+                guided_pool_executor<hint_type2>>::value == std::false_type(),
         "check has_sync_execute_member<Executor>::value");
     static_assert(
-        has_async_execute_member<
-            hpx::threads::executors::guided_pool_executor<hint_type2>>::value ==
-            std::true_type(),
+        hpx::traits::has_async_execute_member<hpx::parallel::execution::
+                guided_pool_executor<hint_type2>>::value == std::true_type(),
         "check has_async_execute_member<Executor>::value");
     static_assert(
-        has_then_execute_member<
-            hpx::threads::executors::guided_pool_executor<hint_type2>>::value ==
-            std::true_type(),
+        hpx::traits::has_then_execute_member<hpx::parallel::execution::
+                guided_pool_executor<hint_type2>>::value == std::true_type(),
         "has_then_execute_member<executor>::value");
     static_assert(
-        has_post_member<
-            hpx::threads::executors::guided_pool_executor<hint_type2>>::value ==
-            std::false_type(),
+        hpx::traits::has_post_member<hpx::parallel::execution::
+                guided_pool_executor<hint_type2>>::value == std::false_type(),
         "has_post_member<executor>::value");
 
     // ------------------------------------------------------------------------
@@ -212,7 +207,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // the args of the async lambda must match the args of the hint type
     using hint_type3 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
-    hpx::threads::executors::guided_pool_executor<hint_type3> guided_cont_exec(
+    hpx::parallel::execution::guided_pool_executor<hint_type3> guided_cont_exec(
         CUSTOM_POOL_NAME);
     // invoke the lambda asynchronously and use the numa executor
     auto new_future = hpx::async([]() -> double {

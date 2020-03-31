@@ -94,9 +94,55 @@ namespace hpx { namespace parallel { namespace execution {
 
         /// Create a new parallel executor
         constexpr explicit parallel_policy_executor(
+            threads::thread_priority priority =
+                threads::thread_priority_default,
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
+            threads::thread_schedule_hint schedulehint = {},
             Policy l = detail::get_default_policy<Policy>::call(),
             std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
-          : policy_(l)
+          : priority_(priority)
+          , stacksize_(stacksize)
+          , schedulehint_(schedulehint)
+          , policy_(l)
+          , num_spread_(spread)
+          , num_tasks_(tasks)
+        {
+        }
+
+        constexpr explicit parallel_policy_executor(
+            threads::thread_stacksize stacksize,
+            threads::thread_schedule_hint schedulehint = {},
+            Policy l = detail::get_default_policy<Policy>::call(),
+            std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
+          : priority_(l.priority())
+          , stacksize_(stacksize)
+          , schedulehint_(schedulehint)
+          , policy_(l)
+          , num_spread_(spread)
+          , num_tasks_(tasks)
+        {
+        }
+
+        constexpr explicit parallel_policy_executor(
+            threads::thread_schedule_hint schedulehint,
+            Policy l = detail::get_default_policy<Policy>::call(),
+            std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
+          : priority_(l.priority())
+          , stacksize_(threads::thread_stacksize_default)
+          , schedulehint_(schedulehint)
+          , policy_(l)
+          , num_spread_(spread)
+          , num_tasks_(tasks)
+        {
+        }
+
+        constexpr explicit parallel_policy_executor(Policy l,
+            std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
+          : priority_(l.priority())
+          , stacksize_(threads::thread_stacksize_default)
+          , schedulehint_()
+          , policy_(l)
           , num_spread_(spread)
           , num_tasks_(tasks)
         {
@@ -129,7 +175,8 @@ namespace hpx { namespace parallel { namespace execution {
         async_execute(F&& f, Ts&&... ts) const
         {
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, priority_, stacksize_, schedulehint_,
+                std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
@@ -162,8 +209,9 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::util::thread_description desc(
                 f, "hpx::parallel::execution::parallel_executor::post");
 
-            detail::post_policy_dispatch<Policy>::call(
-                policy_, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
+            detail::post_policy_dispatch<Policy>::call(policy_, desc, priority_,
+                stacksize_, schedulehint_, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -316,6 +364,9 @@ namespace hpx { namespace parallel { namespace execution {
 
     private:
         /// \cond NOINTERNAL
+        threads::thread_priority priority_;
+        threads::thread_stacksize stacksize_;
+        threads::thread_schedule_hint schedulehint_;
         Policy policy_;
         std::size_t num_spread_;
         std::size_t num_tasks_;

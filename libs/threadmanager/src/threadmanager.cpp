@@ -20,7 +20,6 @@
 #include <hpx/logging.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -1120,20 +1119,32 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     std::size_t threadmanager::shrink_pool(std::string const& pool_name)
     {
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         return resource::get_partitioner().shrink_pool(
             pool_name, [this, &pool_name](std::size_t virt_core) {
                 get_pool(pool_name).remove_processing_unit(virt_core);
             });
+#else
+        HPX_THROW_EXCEPTION(no_success, "threadmanager::shrink_pool",
+            "shrink_pool is not available because "
+            "HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY=OFF");
+#endif
     }
 
     std::size_t threadmanager::expand_pool(std::string const& pool_name)
     {
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         return resource::get_partitioner().expand_pool(
             pool_name, [this, &pool_name](std::size_t virt_core) {
                 thread_pool_base& pool = get_pool(pool_name);
                 pool.add_processing_unit(
                     virt_core, pool.get_thread_offset() + virt_core);
             });
+#else
+        HPX_THROW_EXCEPTION(no_success, "threadmanager::shrink_pool",
+            "shrink_pool is not available because "
+            "HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY=OFF");
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

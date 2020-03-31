@@ -11,8 +11,8 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/execution/execution_policy.hpp>
-#include <hpx/runtime/threads/executors/guided_pool_executor.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/execution/executors/guided_pool_executor.hpp>
+#include <hpx/execution/executors/pool_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -48,7 +48,7 @@ namespace hpx {
         "NUM_B_A");
 }
 
-namespace hpx { namespace threads { namespace executors {
+namespace hpx { namespace parallel { namespace execution {
     struct numa_binding_allocator_tag
     {
     };
@@ -65,7 +65,7 @@ namespace hpx { namespace threads { namespace executors {
             return domain;
         }
     };
-}}}    // namespace hpx::threads::executors
+}}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace compute { namespace host {
     template <typename T>
@@ -433,7 +433,7 @@ namespace hpx { namespace compute { namespace host {
             std::vector<threads::hwloc_bitmap_ptr> nodesets =
                 create_nodesets(bitmap);
             //
-            using namespace threads::executors;
+            using namespace parallel::execution;
             using allocator_hint_type =
                 pool_numa_hint<numa_binding_allocator_tag>;
             //

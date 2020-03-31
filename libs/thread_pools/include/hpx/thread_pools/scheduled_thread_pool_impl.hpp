@@ -1788,6 +1788,7 @@ namespace hpx { namespace threads { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
     template <typename Scheduler>
     std::size_t scheduled_thread_pool<Scheduler>::get_policy_element(
         executor_parameter p, error_code& ec) const
@@ -1826,6 +1827,7 @@ namespace hpx { namespace threads { namespace detail {
         if (&ec != &throws)
             ec = make_success_code();
     }
+#endif
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::add_processing_unit_internal(
@@ -1861,6 +1863,7 @@ namespace hpx { namespace threads { namespace detail {
             ec = make_success_code();
     }
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::add_processing_unit(
         std::size_t virt_core, std::size_t thread_num, error_code& ec)
@@ -1895,6 +1898,7 @@ namespace hpx { namespace threads { namespace detail {
 
         remove_processing_unit_internal(virt_core, ec);
     }
+#endif
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::remove_processing_unit_internal(

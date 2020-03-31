@@ -193,23 +193,33 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     struct thread_schedule_hint
     {
-        thread_schedule_hint() noexcept
+        constexpr thread_schedule_hint() noexcept
           : mode(thread_schedule_hint_mode_none)
           , hint(-1)
         {
         }
 
-        thread_schedule_hint(std::int16_t thread_hint)
+        constexpr thread_schedule_hint(std::int16_t thread_hint)
           : mode(thread_schedule_hint_mode_thread)
           , hint(thread_hint)
         {
         }
 
-        thread_schedule_hint(
+        constexpr thread_schedule_hint(
             thread_schedule_hint_mode mode, std::int16_t hint) noexcept
           : mode(mode)
           , hint(hint)
         {
+        }
+
+        bool operator==(thread_schedule_hint const& rhs) const noexcept
+        {
+            return mode == rhs.mode && hint == rhs.hint;
+        }
+
+        bool operator!=(thread_schedule_hint const& rhs) const noexcept
+        {
+            return !(*this == rhs);
         }
 
         thread_schedule_hint_mode mode;

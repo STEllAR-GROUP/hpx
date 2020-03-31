@@ -9,7 +9,6 @@ set(tests
     bulk_then_execute_3182
     chunk_size_4118
     future_then_async_executor
-    handled_exception_2959
     is_executor_1691
     parallel_executor_1781
    )
@@ -19,6 +18,10 @@ if(HPX_WITH_DATAPAR)
       lambda_arguments_2403
       lambda_return_type_2402
      )
+endif()
+
+if(HPX_WITH_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
+  set(tests ${tests} handled_exception_2959)
 endif()
 
 foreach(test ${tests})

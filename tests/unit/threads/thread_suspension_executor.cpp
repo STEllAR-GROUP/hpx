@@ -42,7 +42,7 @@ void test_executor_association_yield()
 
         hpx::threads::executors::current_executor exec_after
                 = hpx::threads::get_executor(id);
-        HPX_TEST_EQ(exec_before, exec_after);
+        HPX_TEST(exec_before == exec_after);
     }
 }
 
@@ -66,7 +66,7 @@ void test_executor_association_suspend()
 
         hpx::threads::executors::current_executor exec_after
                 = hpx::threads::get_executor(id);
-        HPX_TEST_EQ(exec_before, exec_after);
+        HPX_TEST(exec_before == exec_after);
     }
 }
 

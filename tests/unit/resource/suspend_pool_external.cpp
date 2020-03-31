@@ -8,9 +8,9 @@
 
 #include <hpx/hpx_start.hpp>
 #include <hpx/include/apply.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/schedulers.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>

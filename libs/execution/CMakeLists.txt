@@ -37,6 +37,7 @@ set(execution_headers
   hpx/execution/executors/pool_executor.hpp
   hpx/execution/executors/post_policy_dispatch.hpp
   hpx/execution/executors/rebind_executor.hpp
+  hpx/execution/executors/restricted_thread_pool_executor.hpp
   hpx/execution/executors/sequenced_executor.hpp
   hpx/execution/executors/service_executors.hpp
   hpx/execution/executors/static_chunk_size.hpp
@@ -64,6 +65,8 @@ set(execution_headers
   hpx/execution/traits/is_executor_parameters.hpp
   hpx/execution/traits/is_timed_executor.hpp
 )
+
+set(execution_sources current_executor.cpp)
 
 set(execution_compat_headers
   hpx/parallel/algorithms/detail/is_negative.hpp
@@ -125,6 +128,7 @@ set(execution_compat_headers
 include(HPX_AddModule)
 add_hpx_module(execution
   FORCE_LINKING_GEN
+  SOURCES ${execution_sources}
   HEADERS ${execution_headers}
   COMPATIBILITY_HEADERS ON    # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}

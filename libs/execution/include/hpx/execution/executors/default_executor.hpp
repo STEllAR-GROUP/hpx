@@ -18,8 +18,7 @@
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
-    /// Refers to the currently used base-executor
-    using default_executor = threads::executors::default_executor;
+    using default_executor = parallel_executor;
 }}}    // namespace hpx::parallel::execution
 
 #endif

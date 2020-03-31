@@ -84,15 +84,13 @@ int hpx_main(int argc, char* /*argv*/[])
     }
 
     // setup executors for different task priorities on the pools
-    std::vector<hpx::threads::scheduled_executor> HP_executors;
-    std::vector<hpx::threads::scheduled_executor> NP_executors;
+    std::vector<hpx::parallel::execution::pool_executor> HP_executors;
+    std::vector<hpx::parallel::execution::pool_executor> NP_executors;
     for (std::size_t i = 0; i < num_pools; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
-        HP_executors.push_back(hpx::threads::executors::pool_executor(
-            pool_name, hpx::threads::thread_priority_high));
-        NP_executors.push_back(hpx::threads::executors::pool_executor(
-            pool_name, hpx::threads::thread_priority_default));
+        HP_executors.emplace_back(pool_name, hpx::threads::thread_priority_high);
+        NP_executors.emplace_back(pool_name, hpx::threads::thread_priority_default);
     }
 
     // randomly create tasks that run on a random pool

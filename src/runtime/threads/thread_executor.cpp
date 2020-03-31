@@ -6,8 +6,9 @@
 
 #include <hpx/runtime/threads/thread_executor.hpp>
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
@@ -27,38 +28,5 @@ namespace hpx { namespace threads
             return rp.get_pu_mask(num_thread);
         }
     }
-
-    scheduled_executor& scheduled_executor::default_executor()
-    {
-        typedef util::reinitializable_static<
-            executors::default_executor, tag
-        > static_type;
-
-        static_type instance;
-        return instance.get();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    lcos::local::spinlock default_executor_mutex;
-    scheduled_executor default_executor_instance;
-
-    scheduled_executor default_executor()
-    {
-        std::lock_guard<lcos::local::spinlock> lock(default_executor_mutex);
-
-        if (!default_executor_instance)
-        {
-            scheduled_executor& default_exec =
-                scheduled_executor::default_executor();
-            default_executor_instance = default_exec;
-        }
-        return default_executor_instance;
-    }
-
-    void set_default_executor(scheduled_executor executor)
-    {
-        std::lock_guard<lcos::local::spinlock> lock(default_executor_mutex);
-
-        default_executor_instance = executor;
-    }
 }}
+#endif

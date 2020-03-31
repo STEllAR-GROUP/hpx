@@ -27,10 +27,9 @@ namespace hpx { namespace threads
     {
         HPX_ASSERT(get_self_ptr() != nullptr);
 
-        parallel::execution::io_pool_executor scheduler;
-        auto result = parallel::execution::async_execute(scheduler,
+        parallel::execution::io_pool_executor executor;
+        auto result = parallel::execution::async_execute(executor,
             std::forward<F>(f), std::forward<Ts>(vs)...);
-        scheduler.detach();
         return result;
     }
 }}

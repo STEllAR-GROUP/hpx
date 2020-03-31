@@ -9,9 +9,10 @@
 // and how to synchronize the result of this IO task with a waiting HPX thread.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/runtime.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/thread_executors.hpp>
+#include <hpx/include/parallel_executors.hpp>
+#include <hpx/include/runtime.hpp>
 
 #include <functional>
 #include <iostream>
@@ -23,7 +24,7 @@ void do_async_io(char const* string_to_write, int& result)
     // kernel.
     std::cout << "OS-thread: " << string_to_write << std::endl;
 
-    result = 0;
+    result = 1;
 }
 
 // This function will be executed by an HPX thread
@@ -33,19 +34,16 @@ int async_io(char const* string_to_write)
 
     {
         // Get a reference to one of the IO specific HPX io_service objects ...
-        hpx::threads::executors::io_pool_executor scheduler;
+        hpx::parallel::execution::io_pool_executor executor;
 
         // ... and schedule the handler to run on one of its OS-threads.
-        scheduler.add(hpx::util::bind(&do_async_io,
-            string_to_write, std::ref(result)));
-
-    // Note that the destructor of the scheduler object will wait for
-    // the scheduled task to finish executing. This might be
-    // undesirable, in which case the technique demonstrated in
-    // the example async_io_low_level.cpp is preferable.
+        hpx::async(executor, &do_async_io, string_to_write, std::ref(result))
+            .get();
     }
 
-    return result;   // this will be executed only after result has been set
+    HPX_ASSERT(result == 1);
+
+    return result;    // this will be executed only after result has been set
 }
 
 int hpx_main()
@@ -57,14 +55,14 @@ int hpx_main()
 
         // Print the returned result.
         hpx::cout << "HPX-thread: The asynchronous IO operation returned: "
-                  << result << "\n" << hpx::flush;
+                  << result << "\n"
+                  << hpx::flush;
     }
 
-    return hpx::finalize(); // Initiate shutdown of the runtime system.
+    return hpx::finalize();    // Initiate shutdown of the runtime system.
 }
 
 int main(int argc, char* argv[])
 {
-    return hpx::init(argc, argv); // Initialize and run HPX.
+    return hpx::init(argc, argv);    // Initialize and run HPX.
 }
-

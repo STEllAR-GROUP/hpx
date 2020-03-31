@@ -277,6 +277,7 @@ namespace hpx { namespace threads { namespace detail {
         std::int64_t get_busy_loop_count(std::size_t num, bool reset) override;
         std::int64_t get_scheduler_utilization() const override;
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
         ///////////////////////////////////////////////////////////////////////
         // detail::manage_executor implementation
 
@@ -294,6 +295,7 @@ namespace hpx { namespace threads { namespace detail {
         // Remove the given processing unit from the scheduler.
         void remove_processing_unit(
             std::size_t virt_core, error_code& = hpx::throws) override;
+#endif
 
     protected:
         friend struct init_tss_helper<Scheduler>;

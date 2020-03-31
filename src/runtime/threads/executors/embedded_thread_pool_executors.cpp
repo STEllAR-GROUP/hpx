@@ -6,6 +6,9 @@
 
 #include <hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp>
 
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+    defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
+
 #include <hpx/runtime/threads/resource_manager.hpp>
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/schedulers/local_queue_scheduler.hpp>
@@ -545,3 +548,4 @@ namespace hpx { namespace threads { namespace executors {
 #endif
 
 }}}    // namespace hpx::threads::executors
+#endif
