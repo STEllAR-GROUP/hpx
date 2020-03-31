@@ -14,16 +14,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_GOOGLE_PERFTOOLS AND NOT TARGET hpx::gperftools)
+if(HPX_WITH_GOOGLE_PERFTOOLS)
   find_package(GooglePerftools)
   if(NOT GOOGLE_PERFTOOLS_FOUND)
     hpx_error("Google Perftools could not be found and \
     HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to \
     the root of your Google Perftools installation")
   endif()
-
-  add_library(hpx::gperftools INTERFACE IMPORTED)
-  target_include_directories(hpx::gperftools SYSTEM INTERFACE ${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-  target_link_libraries(hpx::gperftools INTERFACE ${GOOGLE_PERFTOOLS_LIBRARIES})
-
 endif()

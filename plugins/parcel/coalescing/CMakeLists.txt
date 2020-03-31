@@ -23,8 +23,8 @@ if(HPX_WITH_PARCEL_COALESCING)
     FOLDER "Core/Plugins/MessageHandler"
       )
 
-  if (TARGET hpx::apex)
-    target_link_libraries(parcel_coalescing PRIVATE hpx::apex)
+  if (TARGET APEX::apex)
+    target_link_libraries(parcel_coalescing PRIVATE APEX::apex)
   endif()
   target_compile_definitions(parcel_coalescing PRIVATE HPX_PARCEL_COALESCING_MODULE_EXPORTS)
 

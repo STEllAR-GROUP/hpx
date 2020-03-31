@@ -34,7 +34,7 @@
 # Vc_SSE_INTRINSICS_BROKEN
 # Vc_AVX_INTRINSICS_BROKEN
 
-if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
+if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
   find_package(Vc ${Vc_FIND_VERSION} QUIET)
 
   if(NOT Vc_FOUND)
@@ -55,12 +55,12 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
     set(HPX_WITH_DATAPAR_VC_NO_LIBRARY On)
   endif()
 
-  add_library(hpx::vc INTERFACE IMPORTED)
-  target_include_directories(hpx::vc SYSTEM INTERFACE ${Vc_INCLUDE_DIR})
+  add_library(Vc::vc INTERFACE IMPORTED)
+  target_include_directories(Vc::vc SYSTEM INTERFACE ${Vc_INCLUDE_DIR})
 
   if(NOT HPX_WITH_DATAPAR_VC_NO_LIBRARY)
-    target_link_libraries(hpx::vc INTERFACE ${Vc_LIBRARIES})
-    target_link_directories(hpx::vc INTERFACE ${Vc_LIB_DIR})
+    target_link_libraries(Vc::vc INTERFACE ${Vc_LIBRARIES})
+    target_link_directories(Vc::vc INTERFACE ${Vc_LIB_DIR})
   endif()
 
   foreach(_flag ${Vc_DEFINITIONS})
@@ -71,7 +71,7 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
       string(SUBSTRING ${_flag} 2 -1 _flag)
     endif()
 
-    target_compile_definitions(hpx::vc INTERFACE ${_flag})
+    target_compile_definitions(Vc::vc INTERFACE ${_flag})
   endforeach()
 
   include(HPX_AddDefinitions)
@@ -79,7 +79,7 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET hpx::vc)
   # do not include Vc build flags for MSVC builds as this breaks building the
   # core HPX libraries itself
   if(NOT MSVC)
-    target_compile_options(hpx::vc INTERFACE ${Vc_COMPILE_FLAGS} ${Vc_ARCHITECTURE_FLAGS})
+    target_compile_options(Vc::vc INTERFACE ${Vc_COMPILE_FLAGS} ${Vc_ARCHITECTURE_FLAGS})
   else()
     hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
   endif()

@@ -17,7 +17,7 @@ if (HPX_WITH_SHARED_PRIORITY_SCHEDULER)
 endif()
 set(numa_allocator_FLAGS
   COMPONENT_DEPENDENCIES iostreams
-  DEPENDENCIES PRIVATE hpx::hwloc)
+  DEPENDENCIES PRIVATE Hwloc::hwloc)
 
 ###############################################################################
 foreach(test ${tests})

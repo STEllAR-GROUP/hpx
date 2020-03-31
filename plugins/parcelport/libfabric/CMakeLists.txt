@@ -25,12 +25,12 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC)
   set(_libfabric_C_srcs       "" CACHE INTERNAL "" FORCE)
 
   if(NOT HPX_PARCELPORT_LIBFABRIC_WITH_HPXC)
-    set(_libfabric_libraries hpx::libfabric hpx::pmi)
+    set(_libfabric_libraries Libfabric::libfabric Pmi::pmi)
   else()
-    add_library(hpx::gni INTERFACE IMPORTED)
-    target_include_directories(hpx::gni INTERFACE ${LIBFABRIC_INCLUDE_DIR})
-    target_link_libraries(hpx::gni INTERFACE ${GNI_LIB})
-    set(_deps hpx::gni hpx::pmi)
+    add_library(Gni::gni INTERFACE IMPORTED)
+    target_include_directories(Gni::gni INTERFACE ${LIBFABRIC_INCLUDE_DIR})
+    target_link_libraries(Gni::gni INTERFACE ${GNI_LIB})
+    set(_deps Gni::gni Pmi::pmi)
 
     set(_libfabric_C_srcs
       ${libfabric_SRCS}

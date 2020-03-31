@@ -46,6 +46,6 @@ add_hpx_module(config
   SOURCES ${config_sources}
   HEADERS ${config_headers}
   DEPENDENCIES
-  DEPENDENCIES hpx_preprocessor hpx::boost
+  DEPENDENCIES hpx_preprocessor hpx_dependencies_boost
   CMAKE_SUBDIRS examples tests
 )

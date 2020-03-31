@@ -4,9 +4,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT TARGET hpx::boost::regex)
+if(NOT TARGET Boost::regex)
   find_package(Boost ${Boost_MINIMUM_VERSION}
-    QUIET MODULE
+    MODULE
     COMPONENTS regex)
 
   if(Boost_REGEX_FOUND)
@@ -16,8 +16,4 @@ if(NOT TARGET hpx::boost::regex)
     tool requires Boost.Regex). Either set it to off or provide a boost \
     installation including the regex library")
   endif()
-
-  add_library(hpx::boost::regex INTERFACE IMPORTED)
-  target_include_directories(hpx::boost::regex SYSTEM INTERFACE ${Boost_INCLUDE_DIRS})
-  target_link_libraries(hpx::boost::regex INTERFACE ${Boost_REGEX_LIBRARIES})
 endif()

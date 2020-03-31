@@ -12,7 +12,7 @@ set(tests
 set(shared_mutex1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(shared_mutex2_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(shared_mutex1_FLAGS DEPENDENCIES PRIVATE hpx::boost)
+set(shared_mutex1_FLAGS DEPENDENCIES PRIVATE hpx_dependencies_boost)
 
 foreach(test ${tests})
   set(sources

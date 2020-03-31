@@ -44,7 +44,7 @@ add_hpx_module(topology
     hpx_logging
     hpx_type_support
     hpx_util
-    hpx::hwloc
+    Hwloc::hwloc
   CMAKE_SUBDIRS examples tests
 )
 

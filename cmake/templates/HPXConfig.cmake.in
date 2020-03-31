@@ -71,11 +71,8 @@ set(HPX_BOOST_ROOT "@BOOST_ROOT@")
 if (NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
   set(BOOST_ROOT ${HPX_BOOST_ROOT})
 endif()
-# hpx::boost
 include(HPX_SetupBoost)
-# hpx::boost::filesystem
 include(HPX_SetupBoostFilesystem)
-# hpx::boost::program_options
 include(HPX_SetupBoostProgramOptions)
 
 # Hwloc

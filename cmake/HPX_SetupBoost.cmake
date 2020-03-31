@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # In case find_package(HPX) is called multiple times
-if (NOT TARGET hpx::boost)
+if (NOT TARGET hpx_dependencies_boost)
   # We first try to find the required minimum set of Boost libraries. This will
   # also give us the version of the found boost installation
   if(HPX_WITH_STATIC_LINKING)
@@ -79,17 +79,19 @@ if (NOT TARGET hpx::boost)
     string(REPLACE "/include" "" BOOST_ROOT "${Boost_INCLUDE_DIRS}")
   endif()
 
-  add_library(hpx::boost INTERFACE IMPORTED)
+  add_library(hpx_dependencies_boost INTERFACE IMPORTED)
 
   # If we compile natively for the MIC, we need some workarounds for certain
   # Boost headers
   # FIXME: push changes upstream
   if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-    target_include_directories(hpx::boost SYSTEM BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
+    target_include_directories(hpx_dependencies_boost SYSTEM BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
   endif()
 
-  target_include_directories(hpx::boost SYSTEM INTERFACE ${Boost_INCLUDE_DIRS})
-  target_link_libraries(hpx::boost INTERFACE ${Boost_LIBRARIES})
+  target_link_libraries(hpx_dependencies_boost INTERFACE Boost::boost)
+  foreach(__boost_library ${__boost_libraries})
+    target_link_libraries(hpx_dependencies_boost INTERFACE Boost::${__boost_library})
+  endforeach()
 
   include(HPX_AddDefinitions)
 
@@ -97,7 +99,7 @@ if (NOT TARGET hpx::boost)
   hpx_add_config_cond_define(BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION 0)
 
   find_package(Threads QUIET REQUIRED)
-  target_link_libraries(hpx::boost INTERFACE Threads::Threads)
+  target_link_libraries(hpx_dependencies_boost INTERFACE Threads::Threads)
 
   # Boost preprocessor definitions
   if(NOT Boost_USE_STATIC_LIBS)
@@ -107,6 +109,5 @@ if (NOT TARGET hpx::boost)
     hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
   endif()
   hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
-  target_link_libraries(hpx::boost INTERFACE Boost::disable_autolinking)
-
+  target_link_libraries(hpx_dependencies_boost INTERFACE Boost::disable_autolinking)
 endif()

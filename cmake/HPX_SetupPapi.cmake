@@ -13,14 +13,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_PAPI AND NOT TARGET hpx::papi)
-
+if(HPX_WITH_PAPI)
   find_package(PAPI)
   if(NOT PAPI_FOUND)
     hpx_error("PAPI could not be found and HPX_WITH_PAPI=On, please specify \
     PAPI_ROOT to point to the root of your PAPI installation")
   endif()
-  add_library(hpx::papi INTERFACE IMPORTED)
-  target_include_directories(hpx::papi SYSTEM INTERFACE ${PAPI_INCLUDE_DIR})
-  target_link_libraries(hpx::papi INTERFACE ${PAPI_LIBRARY})
 endif()

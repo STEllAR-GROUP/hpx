@@ -13,15 +13,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if (NOT TARGET hpx::hwloc)
-
-  find_package(Hwloc)
-  if(NOT HWLOC_FOUND)
-    hpx_error("Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location")
-  endif()
-
-  add_library(hpx::hwloc INTERFACE IMPORTED)
-  target_include_directories(hpx::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
-  target_link_libraries(hpx::hwloc INTERFACE ${HWLOC_LIBRARIES})
-
+find_package(Hwloc)
+if(NOT HWLOC_FOUND)
+  hpx_error("Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location")
 endif()

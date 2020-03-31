@@ -108,7 +108,7 @@ add_library(hpx ${hpx_library_link_mode_core}
   ${hpx_external_OBJECTS} ${hpx_HEADERS})
 
 target_link_libraries(hpx PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
-target_link_libraries(hpx PUBLIC hpx::boost)
+target_link_libraries(hpx PUBLIC hpx_dependencies_boost)
 
 # Set the basic search paths for the HPX headers
 target_include_directories(hpx PUBLIC
@@ -122,41 +122,41 @@ target_include_directories(hpx PUBLIC
 # should be removed when we make the modules object libraries that we publicly
 # link to hpx
 if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-  target_link_libraries(hpx PUBLIC hpx::boost::program_options)
+  target_link_libraries(hpx PUBLIC Boost::program_options)
 endif()
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
-  target_link_libraries(hpx PUBLIC hpx::boost::filesystem)
+  target_link_libraries(hpx PUBLIC Boost::filesystem)
 endif()
 
-target_link_libraries(hpx PUBLIC hpx::allocator)
+target_link_libraries(hpx PUBLIC hpx_dependencies_allocator)
 
 # Hwloc PUBLIC because used by exported target hpx_topology
-target_link_libraries(hpx PUBLIC hpx::hwloc)
+target_link_libraries(hpx PUBLIC Hwloc::hwloc)
 
 # Enable SIMD via VC if it is available
-if (TARGET hpx::vc)
-  target_link_libraries(hpx PUBLIC hpx::vc)
+if (TARGET Vc::vc)
+  target_link_libraries(hpx PUBLIC Vc::vc)
 endif()
 
-if (TARGET hpx::amplifier)
-  target_link_libraries(hpx PRIVATE hpx::amplifier)
+if (TARGET Amplifier::amplifier)
+  target_link_libraries(hpx PRIVATE Amplifier::amplifier)
 endif()
 
-if (TARGET hpx::apex)
+if (TARGET APEX::apex)
   # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER,
   # we do want to add the APEX link commands to all executables, so
   # we use the "INTERFACE" option for target_link_libraries.
   # Because libhpx_apex is a shared object library, we don't need to specify
   # the whole archive.
-  target_link_libraries(hpx INTERFACE hpx::apex)
+  target_link_libraries(hpx INTERFACE APEX::apex)
 endif()
 
-if (TARGET hpx::gperftools)
-  target_link_libraries(hpx PRIVATE hpx::gperftools)
+if (TARGET Gperftools::gperftools)
+  target_link_libraries(hpx PRIVATE Gperftools::gperftools)
 endif()
 
-if (TARGET hpx::valgrind)
-  target_link_libraries(hpx PRIVATE hpx::valgrind)
+if (TARGET Valgrind::valgrind)
+  target_link_libraries(hpx PRIVATE Valgrind::valgrind)
 endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")

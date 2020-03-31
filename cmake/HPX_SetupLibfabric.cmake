@@ -7,7 +7,7 @@
 # FIXME : in the future put it directly inside the cmake directory of the
 # corresponding plugin
 
-if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET hpx::libfabric)
+if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET Libfabric::libfabric)
   #------------------------------------------------------------------------------
   # Add #define to global defines.hpp
   #------------------------------------------------------------------------------
@@ -22,9 +22,9 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET hpx::libfabric)
     find_package(Libfabric REQUIRED)
   endif()
   # Setup Libfabric imported target
-  add_library(hpx::libfabric INTERFACE IMPORTED)
-  target_include_directories(hpx::libfabric SYSTEM INTERFACE ${LIBFABRIC_INCLUDE_DIR})
-  target_link_libraries(hpx::libfabric INTERFACE ${LIBFABRIC_LIBRARY})
+  add_library(Libfabric::libfabric INTERFACE IMPORTED)
+  target_include_directories(Libfabric::libfabric SYSTEM INTERFACE ${LIBFABRIC_INCLUDE_DIR})
+  target_link_libraries(Libfabric::libfabric INTERFACE ${LIBFABRIC_LIBRARY})
 
   # Setup PMI imported target
   find_package(PMI)
@@ -34,9 +34,9 @@ if (HPX_WITH_PARCELPORT_LIBFABRIC AND NOT TARGET hpx::libfabric)
       NAMESPACE parcelport)
   endif()
 
-  add_library(hpx::pmi INTERFACE IMPORTED)
-  target_include_directories(hpx::pmi SYSTEM INTERFACE ${PMI_INCLUDE_DIR})
-  target_link_libraries(hpx::pmi INTERFACE ${PMI_LIBRARY})
+  add_library(Pmi::pmi INTERFACE IMPORTED)
+  target_include_directories(Pmi::pmi SYSTEM INTERFACE ${PMI_INCLUDE_DIR})
+  target_link_libraries(Pmi::pmi INTERFACE ${PMI_LIBRARY})
 
   #------------------------------------------------------------------------------
   # Logging

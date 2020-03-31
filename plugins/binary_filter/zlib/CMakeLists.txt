@@ -43,7 +43,7 @@ if(HPX_WITH_COMPRESSION_ZLIB)
   target_include_directories(compression_zlib PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>)
 
-  target_link_libraries(compression_zlib PUBLIC hpx::boost::iostreams)
+  target_link_libraries(compression_zlib PUBLIC Boost::iostreams)
 
   add_hpx_pseudo_dependencies(plugins.binary_filter.zlib compression_zlib)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.zlib)

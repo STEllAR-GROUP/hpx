@@ -13,7 +13,7 @@ set(version_headers hpx/version.hpp)
 set(version_sources version.cpp)
 
 if(HPX_WITH_PARCELPORT_MPI)
-  set(mpi_dependencies hpx::mpi)
+  set(mpi_dependencies Mpi::mpi)
 endif()
 
 include(HPX_AddModule)
@@ -26,7 +26,7 @@ add_hpx_module(version
   DEPENDENCIES
     hpx_config
     hpx_prefix
-    hpx::hwloc
+    Hwloc::hwloc
     ${mpi_dependencies}
   CMAKE_SUBDIRS
 )
