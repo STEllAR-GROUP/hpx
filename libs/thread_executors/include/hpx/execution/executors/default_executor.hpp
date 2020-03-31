@@ -13,7 +13,6 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/thread_execution.hpp>
 #include <hpx/execution/executors/thread_execution_information.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/thread_executors/default_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
