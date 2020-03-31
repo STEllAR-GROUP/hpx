@@ -10,7 +10,6 @@ add_subdirectory(components)
 set(tests
     action_invoke_no_more_than
     copy_component
-    distribution_policy_executor
     get_gid
     get_ptr
     inheritance_2_classes_abstract

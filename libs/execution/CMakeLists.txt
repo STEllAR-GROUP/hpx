@@ -20,7 +20,6 @@ set(execution_headers
   hpx/execution/executor_parameters.hpp
   hpx/execution/executors/auto_chunk_size.hpp
   hpx/execution/executors/current_executor.hpp
-  hpx/execution/executors/distribution_policy_executor.hpp
   hpx/execution/executors/dynamic_chunk_size.hpp
   hpx/execution/executors/execution_fwd.hpp
   hpx/execution/executors/execution.hpp
@@ -77,7 +76,6 @@ set(execution_compat_headers
   hpx/parallel/execution_policy.hpp
   hpx/parallel/executor_parameters.hpp
   hpx/parallel/executors/auto_chunk_size.hpp
-  hpx/parallel/executors/distribution_policy_executor.hpp
   hpx/parallel/executors/dynamic_chunk_size.hpp
   hpx/parallel/executors/execution_fwd.hpp
   hpx/parallel/executors/execution.hpp

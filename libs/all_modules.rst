@@ -35,6 +35,7 @@ All modules
    /libs/coroutines/docs/index.rst
    /libs/datastructures/docs/index.rst
    /libs/debugging/docs/index.rst
+   /libs/distributed_executors/docs/index.rst
    /libs/errors/docs/index.rst
    /libs/execution/docs/index.rst
    /libs/filesystem/docs/index.rst

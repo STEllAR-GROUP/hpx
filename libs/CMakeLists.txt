@@ -32,6 +32,7 @@ set(HPX_CANDIDATE_LIBS
   coroutines
   datastructures
   debugging
+  distributed_executors
   errors
   execution
   filesystem
