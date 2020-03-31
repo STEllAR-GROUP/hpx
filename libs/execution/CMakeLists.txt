@@ -20,7 +20,6 @@ set(execution_headers
   hpx/execution/executor_parameters.hpp
   hpx/execution/executors/auto_chunk_size.hpp
   hpx/execution/executors/current_executor.hpp
-  hpx/execution/executors/default_executor.hpp
   hpx/execution/executors/distribution_policy_executor.hpp
   hpx/execution/executors/dynamic_chunk_size.hpp
   hpx/execution/executors/execution_fwd.hpp
@@ -44,12 +43,9 @@ set(execution_headers
   hpx/execution/executors/sequenced_executor.hpp
   hpx/execution/executors/service_executors.hpp
   hpx/execution/executors/static_chunk_size.hpp
-  hpx/execution/executors/this_thread_executors.hpp
   hpx/execution/executors/thread_execution.hpp
   hpx/execution/executors/thread_execution_information.hpp
   hpx/execution/executors/thread_pool_attached_executors.hpp
-  hpx/execution/executors/thread_pool_executors.hpp
-  hpx/execution/executors/thread_pool_os_executors.hpp
   hpx/execution/executors/timed_execution_fwd.hpp
   hpx/execution/executors/timed_execution.hpp
   hpx/execution/executors/timed_executors.hpp
@@ -81,7 +77,6 @@ set(execution_compat_headers
   hpx/parallel/execution_policy.hpp
   hpx/parallel/executor_parameters.hpp
   hpx/parallel/executors/auto_chunk_size.hpp
-  hpx/parallel/executors/default_executor.hpp
   hpx/parallel/executors/distribution_policy_executor.hpp
   hpx/parallel/executors/dynamic_chunk_size.hpp
   hpx/parallel/executors/execution_fwd.hpp
@@ -102,12 +97,9 @@ set(execution_compat_headers
   hpx/parallel/executors/sequenced_executor.hpp
   hpx/parallel/executors/service_executors.hpp
   hpx/parallel/executors/static_chunk_size.hpp
-  hpx/parallel/executors/this_thread_executors.hpp
   hpx/parallel/executors/thread_execution.hpp
   hpx/parallel/executors/thread_execution_information.hpp
   hpx/parallel/executors/thread_pool_attached_executors.hpp
-  hpx/parallel/executors/thread_pool_executors.hpp
-  hpx/parallel/executors/thread_pool_os_executors.hpp
   hpx/parallel/executors/timed_execution_fwd.hpp
   hpx/parallel/executors/timed_execution.hpp
   hpx/parallel/executors/timed_executors.hpp
@@ -144,7 +136,6 @@ add_hpx_module(execution
     hpx_local_lcos
     hpx_preprocessor
     hpx_synchronization
-    hpx_thread_executors
     hpx_timing
     hpx_topology
     hpx_type_support

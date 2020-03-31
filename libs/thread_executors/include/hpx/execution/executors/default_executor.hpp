@@ -14,7 +14,7 @@
 #include <hpx/execution/executors/thread_execution.hpp>
 #include <hpx/execution/executors/thread_execution_information.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/threads/executors/default_executor.hpp>
+#include <hpx/thread_executors/default_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
     using default_executor = parallel_executor;

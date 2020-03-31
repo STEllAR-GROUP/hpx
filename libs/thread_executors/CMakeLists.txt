@@ -10,6 +10,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/thread_executors/include
 set(thread_executors_headers
+  hpx/execution/executors/default_executor.hpp
+  hpx/execution/executors/thread_pool_executors.hpp
+  hpx/execution/executors/this_thread_executors.hpp
+  hpx/execution/executors/thread_pool_os_executors.hpp
   hpx/thread_executors/current_executor.hpp
   hpx/thread_executors/default_executor.hpp
   hpx/thread_executors/embedded_thread_pool_executors.hpp
@@ -25,6 +29,10 @@ set(thread_executors_headers
 
 # Default location is $HPX_ROOT/libs/thread_executors/include_compatibility
 set(thread_executors_compat_headers
+  hpx/parallel/executors/default_executor.hpp
+  hpx/parallel/executors/this_thread_executors.hpp
+  hpx/parallel/executors/thread_pool_executors.hpp
+  hpx/parallel/executors/thread_pool_os_executors.hpp
   hpx/runtime/threads/executors/current_executor.hpp
   hpx/runtime/threads/executors/default_executor.hpp
   hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp

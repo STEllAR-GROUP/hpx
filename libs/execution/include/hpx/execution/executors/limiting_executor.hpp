@@ -14,8 +14,6 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
-#include <hpx/thread_executors/default_executor.hpp>
-#include <hpx/thread_executors/pool_executor.hpp>
 
 #include <atomic>
 #include <cstddef>

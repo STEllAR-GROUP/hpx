@@ -107,6 +107,7 @@ add_hpx_module(include
     hpx_resource_partitioner
     hpx_segmented_algorithms
     hpx_serialization
+    hpx_thread_executors
     hpx_threadmanager
     hpx_threading
     hpx_util
