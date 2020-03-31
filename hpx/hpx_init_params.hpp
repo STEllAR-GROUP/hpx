@@ -118,8 +118,8 @@ namespace hpx
         std::reference_wrapper<hpx::program_options::options_description const>
             desc_cmdline = detail::default_desc;
         std::vector<std::string> cfg;
-        startup_function_type& startup = detail::default_startup;
-        shutdown_function_type& shutdown = detail::default_startup;
+        mutable startup_function_type startup;
+        mutable shutdown_function_type shutdown;
         hpx::runtime_mode mode = ::hpx::runtime_mode_default;
         hpx::resource::partitioner_mode rp_mode = ::hpx::resource::mode_default;
         hpx::resource::rp_callback_type rp_callback;
