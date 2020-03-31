@@ -13,12 +13,10 @@
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/assertion.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/lcos/dataflow.hpp>
-#endif
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/current_executor.hpp>
 #include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -221,7 +219,7 @@ namespace hpx { namespace threads {
                 [func = std::move(func),
                     exec_current = std::move(exec_current)](
                     future_type&& predecessor) mutable -> result_future_type {
-                    return hpx::dataflow(exec_current,
+                    return hpx::parallel::execution::async_execute(exec_current,
                         hpx::util::functional::unwrap{},
                         func(std::move(predecessor)));
                 });
