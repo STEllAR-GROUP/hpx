@@ -9,18 +9,18 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
     defined(HPX_HAVE_THREAD_POOL_OS_EXECUTOR_COMPATIBILITY)
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/datastructures/optional.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <chrono>

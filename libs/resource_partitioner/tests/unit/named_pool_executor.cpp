@@ -14,8 +14,8 @@
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/thread_executors/pool_executor.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/thread_executors/pool_executor.hpp>
 
 #include <cstddef>
 #include <iostream>

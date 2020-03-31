@@ -9,19 +9,19 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
-    (defined(HPX_HAVE_STATIC_SCHEDULER) || \
-     defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER))
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
+    (defined(HPX_HAVE_STATIC_SCHEDULER) ||                                     \
+        defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER))
 
-#include <hpx/errors.hpp>
 #include <hpx/affinity/affinity_data.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/errors.hpp>
+#include <hpx/functional/unique_function.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/timing/steady_clock.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -30,10 +30,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace executors
-{
-    namespace detail
-    {
+namespace hpx { namespace threads { namespace executors {
+    namespace detail {
         //////////////////////////////////////////////////////////////////////
         template <typename ExecutorImpl>
         class manage_thread_executor;
@@ -53,7 +51,7 @@ namespace hpx { namespace threads { namespace executors
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            void add(closure_type && f,
+            void add(closure_type&& f,
                 util::thread_description const& description,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize,
@@ -63,17 +61,15 @@ namespace hpx { namespace threads { namespace executors
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
-            void add_at(
-                util::steady_clock::time_point const& abs_time,
-                closure_type && f, util::thread_description const& description,
+            void add_at(util::steady_clock::time_point const& abs_time,
+                closure_type&& f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
-            void add_after(
-                util::steady_clock::duration const& rel_time,
-                closure_type && f, util::thread_description const& description,
+            void add_after(util::steady_clock::duration const& rel_time,
+                closure_type&& f, util::thread_description const& description,
                 threads::thread_stacksize stacksize, error_code& ec) override;
 
             // Return an estimate of the number of waiting tasks.
@@ -90,18 +86,20 @@ namespace hpx { namespace threads { namespace executors
             friend class manage_thread_executor<this_thread_executor>;
 
             // Return the requested policy element
-            std::size_t get_policy_element(threads::detail::executor_parameter p,
+            std::size_t get_policy_element(
+                threads::detail::executor_parameter p,
                 error_code& ec) const override;
 
             // The function below are used by the resource manager to
             // interact with the scheduler.
 
             // Return statistics collected by this scheduler
-            void get_statistics(executor_statistics& stats, error_code& ec) const;
+            void get_statistics(
+                executor_statistics& stats, error_code& ec) const;
 
             // Provide the given processing unit to the scheduler.
-            void add_processing_unit(std::size_t virt_core,
-                std::size_t thread_num, error_code& ec);
+            void add_processing_unit(
+                std::size_t virt_core, std::size_t thread_num, error_code& ec);
 
             // Remove the given processing unit from the scheduler.
             void remove_processing_unit(std::size_t thread_num, error_code& ec);
@@ -141,7 +139,7 @@ namespace hpx { namespace threads { namespace executors
             typedef lcos::local::spinlock mutex_type;
             mutex_type mtx_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
@@ -159,7 +157,7 @@ namespace hpx { namespace threads { namespace executors
         this_thread_static_priority_queue_executor();
     };
 #endif
-}}}
+}}}    // namespace hpx::threads::executors
 
 #include <hpx/config/warnings_suffix.hpp>
 

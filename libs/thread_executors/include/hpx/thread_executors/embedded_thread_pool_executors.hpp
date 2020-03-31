@@ -9,17 +9,16 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
     defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/timing/steady_clock.hpp>
 #include <hpx/threading_base/thread_description.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <chrono>

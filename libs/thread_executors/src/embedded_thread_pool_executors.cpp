@@ -6,7 +6,7 @@
 
 #include <hpx/thread_executors/embedded_thread_pool_executors.hpp>
 
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
     defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
 
 #include <hpx/runtime/threads/resource_manager.hpp>
@@ -25,14 +25,13 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/threading_base/create_thread.hpp>
-#include <hpx/thread_pools/scheduling_loop.hpp>
-#include <hpx/threading_base/set_thread_state.hpp>
-#include <hpx/thread_executors/manage_thread_executor.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/thread_executors/manage_thread_executor.hpp>
+#include <hpx/thread_pools/scheduling_loop.hpp>
+#include <hpx/threading_base/create_thread.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -68,8 +67,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
       , self_(max_punits)
       , affinity_data_(affinity_data)
     {
-        scheduler_.add_scheduler_mode
-                (policies::scheduler_mode::enable_stealing_numa);
+        scheduler_.add_scheduler_mode(
+            policies::scheduler_mode::enable_stealing_numa);
         if (max_punits < min_punits)
         {
             HPX_THROW_EXCEPTION(bad_parameter,

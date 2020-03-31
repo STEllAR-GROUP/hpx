@@ -21,13 +21,13 @@
 #include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #endif
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/timing/steady_clock.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <chrono>

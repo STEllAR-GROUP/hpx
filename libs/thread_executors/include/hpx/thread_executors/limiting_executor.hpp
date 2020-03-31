@@ -10,7 +10,7 @@
 #include <hpx/execution/executors/limiting_executor.hpp>
 
 namespace hpx { namespace threads { namespace executors {
-            using hpx::parallel::execution::limiting_executor;
+    using hpx::parallel::execution::limiting_executor;
 }}}    // namespace hpx::threads::executors
 
 #endif /*HPX_RUNTIME_THREADS_LIMITING_EXECUTOR_HPP*/

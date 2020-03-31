@@ -10,12 +10,12 @@
 
 #if defined(HPX_THREAD_EXECUTORS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/runtime/threads/executors/this_thread_executors.hpp is \
     deprecated, \
     please include hpx/thread_executors/this_thread_executors.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/runtime/threads/executors/this_thread_executors.hpp is \
     deprecated, \
     please include hpx/thread_executors/this_thread_executors.hpp instead"

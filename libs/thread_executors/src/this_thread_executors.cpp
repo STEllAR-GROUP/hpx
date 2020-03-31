@@ -6,33 +6,32 @@
 
 #include <hpx/thread_executors/this_thread_executors.hpp>
 
-#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) && \
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
     defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY) &&                   \
     (defined(HPX_HAVE_STATIC_SCHEDULER) ||                                     \
-     defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER))
+        defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER))
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-#  include <hpx/schedulers/static_priority_queue_scheduler.hpp>
+#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #endif
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
-#  include <hpx/schedulers/static_queue_scheduler.hpp>
+#include <hpx/schedulers/static_queue_scheduler.hpp>
 #endif
 
-#include <hpx/assertion.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/threading_base/create_thread.hpp>
-#include <hpx/thread_pools/scheduling_loop.hpp>
-#include <hpx/threading_base/set_thread_state.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/thread_executors/manage_thread_executor.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/runtime/threads/resource_manager.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/runtime/threads/resource_manager.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/thread_executors/manage_thread_executor.hpp>
+#include <hpx/thread_pools/scheduling_loop.hpp>
+#include <hpx/threading_base/create_thread.hpp>
+#include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -41,15 +40,13 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace threads { namespace detail
-{
+namespace hpx { namespace threads { namespace detail {
     // The function \a set_self_ptr sets a pointer to the (OS thread
     // specific) self reference to the current HPX thread.
     void set_self_ptr(threads::thread_self*);
-}}}
+}}}    // namespace hpx::threads::detail
 
-namespace hpx { namespace threads { namespace executors { namespace detail
-{
+namespace hpx { namespace threads { namespace executors { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     this_thread_executor<Scheduler>::this_thread_executor(
@@ -103,7 +100,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         shutdown_sem_.wait(1);
 
         // detach this executor from resource manager
-        rm.detach(cookie_);     // this releases proxy (manage_thread_executor)
+        rm.detach(cookie_);    // this releases proxy (manage_thread_executor)
 
 #if defined(HPX_DEBUG)
         // all resources should have been stopped at this point (or have never
@@ -118,8 +115,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     template <typename Scheduler>
     threads::thread_result_type
-    this_thread_executor<Scheduler>::thread_function_nullary(
-        closure_type func)
+    this_thread_executor<Scheduler>::thread_function_nullary(closure_type func)
     {
         // execute the actual thread function
         func();
@@ -132,27 +128,26 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // held.
         util::force_error_on_lock();
 
-        return threads::thread_result_type(threads::terminated,
-            threads::invalid_thread_id);
+        return threads::thread_result_type(
+            threads::terminated, threads::invalid_thread_id);
     }
 
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
     template <typename Scheduler>
-    void this_thread_executor<Scheduler>::add(closure_type && f,
+    void this_thread_executor<Scheduler>::add(closure_type&& f,
         util::thread_description const& desc,
         threads::thread_state_enum initial_state, bool run_now,
         threads::thread_stacksize stacksize,
-        threads::thread_schedule_hint schedulehint,
-        error_code& ec)
+        threads::thread_schedule_hint schedulehint, error_code& ec)
     {
         HPX_ASSERT(std::size_t(-1) != thread_num_);
 
         // if the scheduler was stopped, we need to restart it
         state expected = state_stopped;
-        scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
-
+        scheduler_.get_state(0).compare_exchange_strong(
+            expected, state_starting);
 
         // create a new thread
         thread_init_data data(
@@ -167,9 +162,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         ++tasks_scheduled_;
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        threads::detail::create_thread(&scheduler_, data, id, initial_state, //-V601
+        threads::detail::create_thread(&scheduler_, data, id,
+            initial_state,    //-V601
             run_now, ec);
-        if (ec) {
+        if (ec)
+        {
             --tasks_scheduled_;
             return;
         }
@@ -186,15 +183,16 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_at(
-        util::steady_clock::time_point const& abs_time,
-        closure_type && f, util::thread_description const& desc,
+        util::steady_clock::time_point const& abs_time, closure_type&& f,
+        util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         HPX_ASSERT(std::size_t(-1) != thread_num_);
 
         // if the scheduler was stopped, we need to restart it
         state expected = state_stopped;
-        scheduler_.get_state(0).compare_exchange_strong(expected, state_starting);
+        scheduler_.get_state(0).compare_exchange_strong(
+            expected, state_starting);
 
         // create a new suspended thread
         thread_init_data data(
@@ -206,9 +204,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        threads::detail::create_thread( //-V601
+        threads::detail::create_thread(    //-V601
             &scheduler_, data, id, suspended, true, ec);
-        if (ec) return;
+        if (ec)
+            return;
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
         // update statistics
@@ -235,12 +234,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::add_after(
-        util::steady_clock::duration const& rel_time,
-        closure_type && f, util::thread_description const& desc,
+        util::steady_clock::duration const& rel_time, closure_type&& f,
+        util::thread_description const& desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
-        return add_at(util::steady_clock::now() + rel_time,
-            std::move(f), desc, stacksize, ec);
+        return add_at(util::steady_clock::now() + rel_time, std::move(f), desc,
+            stacksize, ec);
     }
 
     // Return an estimate of the number of waiting tasks.
@@ -313,9 +312,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     struct this_thread_on_run_exit
     {
         this_thread_on_run_exit(lcos::local::counting_semaphore& shutdown_sem,
-                threads::thread_self* self)
-          : shutdown_sem_(shutdown_sem),
-            self_(self)
+            threads::thread_self* self)
+          : shutdown_sem_(shutdown_sem)
+          , self_(self)
         {
             threads::detail::set_self_ptr(nullptr);
         }
@@ -360,36 +359,35 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             std::int64_t idle_loop_count = 0, busy_loop_count = 0;
             bool task_active = false;
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) && defined(HPX_HAVE_THREAD_IDLE_RATES)
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
             std::int64_t bg_work = 0;
             std::int64_t bg_send = 0;
             std::int64_t bg_receive = 0;
-            threads::detail::scheduling_counters counters(
-                executed_threads, executed_thread_phases,
-                overall_times, thread_times, idle_loop_count, busy_loop_count,
-                task_active, bg_work, bg_send, bg_receive);
+            threads::detail::scheduling_counters counters(executed_threads,
+                executed_thread_phases, overall_times, thread_times,
+                idle_loop_count, busy_loop_count, task_active, bg_work, bg_send,
+                bg_receive);
 #else
-            threads::detail::scheduling_counters counters(
-                executed_threads, executed_thread_phases,
-                overall_times, thread_times, idle_loop_count, busy_loop_count,
-                task_active);
-#endif // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+            threads::detail::scheduling_counters counters(executed_threads,
+                executed_thread_phases, overall_times, thread_times,
+                idle_loop_count, busy_loop_count, task_active);
+#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
-            threads::detail::scheduling_callbacks callbacks(
-                nullptr,
-                util::deferred_call( //-V107
+            threads::detail::scheduling_callbacks callbacks(nullptr,
+                util::deferred_call(    //-V107
                     &this_thread_executor::suspend_back_into_calling_context,
                     this));
 
             scheduler_.set_scheduler_mode(policies::fast_idle_mode);
-            threads::detail::scheduling_loop(0, scheduler_, counters, callbacks);
+            threads::detail::scheduling_loop(
+                0, scheduler_, counters, callbacks);
 
             // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
-            HPX_ASSERT(
-                (scheduler_.get_thread_count(
-                    unknown, thread_priority_default, 0) == 0 &&
-                 scheduler_.get_queue_length(0) == 0) ||
+            HPX_ASSERT((scheduler_.get_thread_count(
+                            unknown, thread_priority_default, 0) == 0 &&
+                           scheduler_.get_queue_length(0) == 0) ||
                 state >= state_terminating);
         }
     }
@@ -418,7 +416,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     std::size_t this_thread_executor<Scheduler>::get_policy_element(
         threads::detail::executor_parameter p, error_code& ec) const
     {
-        switch(p) {
+        switch (p)
+        {
         case threads::detail::min_concurrency:
         case threads::detail::max_concurrency:
         case threads::detail::current_concurrency:
@@ -471,28 +470,29 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         parent_thread_num_ = std::size_t(-1);
         orig_thread_num_ = std::size_t(-1);
     }
-}}}}
+}}}}    // namespace hpx::threads::executors::detail
 
-namespace hpx { namespace threads { namespace executors
-{
+namespace hpx { namespace threads { namespace executors {
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     this_thread_static_queue_executor::this_thread_static_queue_executor()
       : scheduled_executor(new detail::this_thread_executor<
-            policies::static_queue_scheduler<> >(
-                "this_thread_static_queue_executor"))
-    {}
+            policies::static_queue_scheduler<>>(
+            "this_thread_static_queue_executor"))
+    {
+    }
 #endif
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     this_thread_static_priority_queue_executor::
-            this_thread_static_priority_queue_executor()
+        this_thread_static_priority_queue_executor()
       : scheduled_executor(new detail::this_thread_executor<
-            policies::static_priority_queue_scheduler<> >(
-                "this_thread_static_priority_queue_executor"))
-    {}
+            policies::static_priority_queue_scheduler<>>(
+            "this_thread_static_priority_queue_executor"))
+    {
+    }
 #endif
-}}}
+}}}    // namespace hpx::threads::executors
 
 #endif
