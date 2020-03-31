@@ -12,7 +12,6 @@
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>

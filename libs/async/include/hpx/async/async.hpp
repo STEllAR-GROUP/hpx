@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/parallel_executor.hpp>
 #include <hpx/functional/bind_back.hpp>

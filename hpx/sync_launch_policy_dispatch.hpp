@@ -8,7 +8,6 @@
 #define HPX_SYNC_LAUNCH_POLICY_DISPATCH_FEB_14_2019_1252PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -21,6 +20,10 @@
 
 namespace hpx { namespace detail
 {
+    // dispatch point used for launch_policy implementations
+    template <typename Action, typename Enable = void>
+    struct sync_launch_policy_dispatch;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct sync_launch_policy_dispatch<Action,

@@ -8,8 +8,6 @@
 #define HPX_ASYNC_LAUNCH_POLICY_DISPATCH_NOV_26_2017_1243PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos_fwd.hpp>          // declare futures_factory
-
 #include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
