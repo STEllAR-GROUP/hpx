@@ -160,10 +160,10 @@ namespace hpx { namespace lcos {
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/detail/async_colocated.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

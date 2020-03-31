@@ -10,10 +10,10 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_SCAN
 
 #include <hpx/config.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>

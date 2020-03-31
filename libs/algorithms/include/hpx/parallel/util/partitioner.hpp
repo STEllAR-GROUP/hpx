@@ -12,10 +12,10 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/dataflow.hpp>
 #endif
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/execution/execution_policy.hpp>

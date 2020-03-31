@@ -9,12 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/async_continue_fwd.hpp>
+#include <hpx/async/async_fwd.hpp>
+#include <hpx/async/detail/async_colocated_fwd.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/lcos/async_continue_fwd.hpp>
-#include <hpx/lcos/async_fwd.hpp>
-#include <hpx/lcos/detail/async_colocated_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>

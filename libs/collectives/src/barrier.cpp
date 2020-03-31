@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/collectives/barrier.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/basename_registration.hpp>

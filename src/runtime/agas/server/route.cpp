@@ -15,7 +15,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 

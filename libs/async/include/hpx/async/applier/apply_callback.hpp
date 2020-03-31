@@ -18,7 +18,7 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/type_support/pack.hpp>
 
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/async/applier/apply.hpp>
 
 #include <cstddef>
 #include <type_traits>

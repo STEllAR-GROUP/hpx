@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
+#include <hpx/async/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
@@ -19,8 +19,8 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/when_all.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

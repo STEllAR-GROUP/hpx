@@ -10,13 +10,13 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/async/applier/apply_continue.hpp>
+#include <hpx/async/applier/detail/apply_colocated_fwd.hpp>
+#include <hpx/async/applier/register_apply_colocated.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/applier/apply_continue.hpp>
-#include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
-#include <hpx/runtime/applier/register_apply_colocated.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>

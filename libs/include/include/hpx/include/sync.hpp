@@ -7,6 +7,6 @@
 #if !defined(HPX_SYNC_JUL_21_2018_0945PM)
 #define HPX_SYNC_JUL_21_2018_0945PM
 
-#include <hpx/sync.hpp>
+#include <hpx/async/sync.hpp>
 
 #endif

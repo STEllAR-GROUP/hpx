@@ -7,6 +7,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/future.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/local_async.hpp>
 #include <hpx/testing.hpp>
 
 #include <type_traits>

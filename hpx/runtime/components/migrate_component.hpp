@@ -10,8 +10,8 @@
 #define HPX_RUNTIME_COMPONENTS_COPY_MIGRATE_COMPONENT_JAN_31_2014_1009AM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
+#include <hpx/async/async.hpp>
+#include <hpx/async/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/client_base.hpp>

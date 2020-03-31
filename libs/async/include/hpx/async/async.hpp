@@ -9,16 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/async.hpp>
+#include <hpx/async/async_continue.hpp>
+#include <hpx/async/async_fwd.hpp>
+#include <hpx/async/detail/async_implementations.hpp>
 #include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/parallel_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async_continue.hpp>
-#include <hpx/lcos/async_fwd.hpp>
-#include <hpx/lcos/detail/async_implementations.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/local_async/async.hpp>
 #include <hpx/runtime/components/client_base.hpp>
@@ -307,7 +307,7 @@ namespace hpx { namespace detail {
     };
 }}    // namespace hpx::detail
 
-#include <hpx/lcos/sync.hpp>
+#include <hpx/async/sync.hpp>
 
 namespace hpx { namespace detail {
     // bound action

@@ -8,9 +8,9 @@
 #define HPX_LCOS_SYNC_IMPLEMENTATIONS_JUL_21_2018_0921PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/detail/async_implementations.hpp>
-#include <hpx/lcos/detail/sync_implementations_fwd.hpp>
-#include <hpx/lcos/sync_fwd.hpp>
+#include <hpx/async/detail/async_implementations.hpp>
+#include <hpx/async/detail/sync_implementations_fwd.hpp>
+#include <hpx/async/sync_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

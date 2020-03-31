@@ -8,12 +8,12 @@
 #define HPX_PARALLEL_EXECUTORS_GUIDED_POOL_EXECUTOR
 
 #include <hpx/async.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/execution/executors/pool_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/lcos/dataflow.hpp>
 #include <hpx/pack_traversal/pack_traversal.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/traits/is_future_tuple.hpp>

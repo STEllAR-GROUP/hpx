@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/detail/async_implementations.hpp>
+#include <hpx/async/detail/async_unwrap_result_implementations_fwd.hpp>
+#include <hpx/async/detail/sync_implementations.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/detail/async_implementations.hpp>
-#include <hpx/lcos/detail/async_unwrap_result_implementations_fwd.hpp>
-#include <hpx/lcos/detail/sync_implementations.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/launch_policy.hpp>

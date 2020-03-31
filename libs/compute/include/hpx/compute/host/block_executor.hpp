@@ -8,6 +8,7 @@
 #define HPX_COMPUTE_HOST_BLOCK_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/compute/host/target.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/restricted_thread_pool_executor.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <algorithm>

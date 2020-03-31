@@ -8,6 +8,6 @@
 #define HPX_DATAFLOW_HPP
 
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 
 #endif /*HPX_DATAFLOW_HPP*/

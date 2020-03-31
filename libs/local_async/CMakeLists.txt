@@ -10,7 +10,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(local_async_headers
   hpx/local_async/apply.hpp
-  hpx/local_async/async.hpp)
+  hpx/local_async/async.hpp
+  hpx/local_async/dataflow.hpp
+  hpx/local_async/sync.hpp)
 
 include(HPX_AddModule)
 add_hpx_module(local_async

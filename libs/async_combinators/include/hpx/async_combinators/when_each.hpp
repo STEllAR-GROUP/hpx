@@ -127,11 +127,11 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/async_combinators/when_some.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/when_some.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>

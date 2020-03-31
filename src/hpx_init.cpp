@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/apply.hpp>
+#include <hpx/async/apply.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
 #include <hpx/basic_execution/register_locks.hpp>

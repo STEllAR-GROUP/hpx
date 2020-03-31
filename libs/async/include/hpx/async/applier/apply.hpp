@@ -10,12 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/applier/apply_helper.hpp>
+#include <hpx/async/applier/detail/apply_implementations.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/local_async/apply.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/applier/apply_helper.hpp>
-#include <hpx/runtime/applier/detail/apply_implementations.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

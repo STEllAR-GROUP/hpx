@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/execution/execution_policy.hpp>

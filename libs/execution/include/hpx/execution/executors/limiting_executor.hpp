@@ -8,7 +8,7 @@
 #define HPX_PARALLEL_EXECUTORS_LIMITING_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
+#include <hpx/async/apply.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/functional/invoke.hpp>

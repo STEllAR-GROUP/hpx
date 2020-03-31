@@ -9,7 +9,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

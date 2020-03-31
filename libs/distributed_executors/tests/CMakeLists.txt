@@ -36,7 +36,6 @@ if (HPX_DISTRIBUTED_EXECUTORS_WITH_TESTS)
         modules.distributed_executors
         HEADERS ${distributed_executors_headers}
         HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-        NOLIBS
         DEPENDENCIES hpx_distributed_executors)
     endif()
 endif()

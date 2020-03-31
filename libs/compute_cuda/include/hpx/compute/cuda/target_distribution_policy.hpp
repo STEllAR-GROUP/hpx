@@ -15,7 +15,7 @@
 
 #include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/lcos/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #endif
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>

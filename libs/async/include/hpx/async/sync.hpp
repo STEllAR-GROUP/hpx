@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/detail/sync_implementations.hpp>
+#include <hpx/async/sync.hpp>
+#include <hpx/async/sync_fwd.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/detail/sync_implementations.hpp>
-#include <hpx/lcos/sync.hpp>
-#include <hpx/lcos/sync_fwd.hpp>
 #include <hpx/local_async/sync.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>

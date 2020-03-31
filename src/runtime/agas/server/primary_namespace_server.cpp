@@ -16,7 +16,7 @@
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -25,7 +25,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>

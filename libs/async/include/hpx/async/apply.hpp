@@ -8,8 +8,8 @@
 #define HPX_APPLY_APR_16_20012_0943AM
 
 #include <hpx/config.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/local_async/apply.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/bind_action.hpp>
 
 #include <type_traits>

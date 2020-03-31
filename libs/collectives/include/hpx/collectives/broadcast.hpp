@@ -128,18 +128,18 @@ namespace hpx { namespace lcos {
 #define HPX_LCOS_BROADCAST_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/applier/detail/apply_colocated.hpp>
+#include <hpx/async/apply.hpp>
+#include <hpx/async/detail/async_colocated.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/extract_action.hpp>

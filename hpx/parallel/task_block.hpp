@@ -13,10 +13,10 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/lcos/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/lcos/when_all.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/decay.hpp>
 

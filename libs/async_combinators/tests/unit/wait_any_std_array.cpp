@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/async_combinators/wait_any.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/future.hpp>
-#include <hpx/lcos/wait_any.hpp>
 
 #include <array>
 

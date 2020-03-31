@@ -9,10 +9,10 @@
 #define HPX_RUNTIME_APPLIER_APPLY_CONTINUE_CALLBACK_MAR_09_2014_1207PM
 
 #include <hpx/config.hpp>
+#include <hpx/async/applier/apply.hpp>
+#include <hpx/async/applier/apply_callback.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/make_continuation.hpp>
-#include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/traits/extract_action.hpp>
 
 #include <utility>

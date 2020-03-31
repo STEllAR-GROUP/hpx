@@ -8,7 +8,7 @@
 #define HPX_LCOS_ASYNC_UNWRAP_IMPLEMENTATIONS_FWD_JUL_22_2018_0145PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/async/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/extract_action.hpp>

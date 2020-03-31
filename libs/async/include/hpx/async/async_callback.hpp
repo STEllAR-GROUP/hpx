@@ -8,9 +8,9 @@
 #define HPX_LCOS_ASYNC_CALLBACK_MAR_30_2015_1119AM
 
 #include <hpx/config.hpp>
+#include <hpx/async/async_callback_fwd.hpp>
+#include <hpx/async/detail/async_implementations_fwd.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/async_callback_fwd.hpp>
-#include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>

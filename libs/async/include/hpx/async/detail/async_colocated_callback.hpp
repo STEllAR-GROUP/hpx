@@ -8,9 +8,9 @@
 #define HPX_LCOS_ASYNC_COLOCATED_CALLBACK_MAR_30_2015_1146AM
 
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/async_continue_callback.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
-#include <hpx/lcos/detail/async_colocated_callback_fwd.hpp>
+#include <hpx/async/async_continue_callback.hpp>
+#include <hpx/async/detail/async_colocated.hpp>
+#include <hpx/async/detail/async_colocated_callback_fwd.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/traits/extract_action.hpp>

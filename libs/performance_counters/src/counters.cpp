@@ -7,6 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>

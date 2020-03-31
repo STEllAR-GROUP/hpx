@@ -11,11 +11,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/launch_policy.hpp>

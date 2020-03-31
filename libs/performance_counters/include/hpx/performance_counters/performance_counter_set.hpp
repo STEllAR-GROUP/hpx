@@ -9,8 +9,8 @@
 #define HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_SET_DEC_19_2016_1055AM
 
 #include <hpx/config.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/performance_counters/counters.hpp>

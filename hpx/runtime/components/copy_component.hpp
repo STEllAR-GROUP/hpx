@@ -10,8 +10,8 @@
 #define HPX_RUNTIME_COMPONENTS_COPY_COMPONENT_SEP_20_2013_0828PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
+#include <hpx/async/async.hpp>
+#include <hpx/async/detail/async_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/server/copy_component.hpp>

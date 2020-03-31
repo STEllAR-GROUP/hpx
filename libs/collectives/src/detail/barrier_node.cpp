@@ -6,9 +6,9 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>

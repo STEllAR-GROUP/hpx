@@ -10,7 +10,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/wait_each.hpp>
+#include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>

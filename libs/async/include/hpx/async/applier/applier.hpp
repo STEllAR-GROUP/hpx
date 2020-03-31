@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async/applier_fwd.hpp>    // this needs to go first
 #include <hpx/runtime/agas_fwd.hpp>
-#include <hpx/runtime/applier_fwd.hpp>    // this needs to go first
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>

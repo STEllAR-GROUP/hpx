@@ -25,7 +25,7 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/async/applier/applier.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

@@ -15,7 +15,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/lcos/sync_fwd.hpp>
+#include <hpx/async/sync_fwd.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>

@@ -8,10 +8,10 @@
 #define HPX_APPLY_IMPLEMENTATIONS_APR_13_2015_0945AM
 
 #include <hpx/config.hpp>
+#include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

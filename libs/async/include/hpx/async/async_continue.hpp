@@ -10,8 +10,8 @@
 #define HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/async_continue_fwd.hpp>
-#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/async/async_continue_fwd.hpp>
+#include <hpx/async/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>

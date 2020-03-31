@@ -12,7 +12,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime/applier_fwd.hpp>
+#include <hpx/async/applier_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>

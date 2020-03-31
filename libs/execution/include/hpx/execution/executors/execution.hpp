@@ -15,6 +15,7 @@
 #include <hpx/execution/executors/execution_fwd.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
@@ -25,7 +26,6 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result_exec.hpp>
