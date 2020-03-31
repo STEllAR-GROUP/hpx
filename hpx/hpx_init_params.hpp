@@ -65,9 +65,9 @@ namespace hpx
         HPX_MAYBE_UNUSED extern HPX_EXPORT char **dummy_argv;
         // HPX_APPLICATION_STRING is specific to an application and therefore
         // cannot be in the source file
-        static char app_name[] = HPX_APPLICATION_STRING;
-        static const hpx::program_options::options_description default_desc =
-            hpx::program_options::options_description(
+        HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;
+        HPX_MAYBE_UNUSED static const hpx::program_options::options_description
+            default_desc = hpx::program_options::options_description(
                     "Usage: " HPX_APPLICATION_STRING " [options]");
     }
 
