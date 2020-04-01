@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
+  hpx/hpx.hpp
   hpx/include/actions.hpp
   hpx/include/agas.hpp
   hpx/include/applier.hpp
