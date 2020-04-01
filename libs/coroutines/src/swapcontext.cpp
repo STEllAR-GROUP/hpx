@@ -18,7 +18,9 @@
     defined(__i686__)
 #include "swapcontext32.ipp"
 #else
-#error Unsupported platform
+#error You are trying to use x86 context switching on a non-x86 platform. Your \
+    platform may be supported with the CMake option \
+    HPX_WITH_GENERIC_CONTEXT_COROUTINES=ON.
 #endif
 
 #endif
