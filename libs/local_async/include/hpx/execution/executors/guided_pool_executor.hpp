@@ -4,17 +4,21 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// TODO: This executor should be in the executors module together with other
+// executors. However, it depends on dataflow (in the async module, which itself
+// depends on the executors module). We need to either find a way to remove
+// dataflow from this executor, or introduce a higher-level executors module for
+// executors that need to use things like dataflow.
+
 #ifndef HPX_PARALLEL_EXECUTORS_GUIDED_POOL_EXECUTOR
 #define HPX_PARALLEL_EXECUTORS_GUIDED_POOL_EXECUTOR
 
-#include <hpx/async.hpp>
-#include <hpx/async/dataflow.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/execution/executors/pool_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/pack_traversal/pack_traversal.hpp>
+#include <hpx/local_async/dataflow.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
 #include <hpx/util/thread_description.hpp>

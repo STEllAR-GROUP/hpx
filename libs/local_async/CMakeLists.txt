@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(local_async_headers
+  hpx/execution/executors/guided_pool_executor.hpp
   hpx/local_async/apply.hpp
   hpx/local_async/async.hpp
   hpx/local_async/dataflow.hpp
