@@ -52,6 +52,7 @@ set(async_headers
 
 set(async_compat_headers
   hpx/apply.hpp
+  hpx/dataflow.hpp
   hpx/lcos/async_callback_fwd.hpp
   hpx/lcos/async_callback.hpp
   hpx/lcos/async_continue_callback_fwd.hpp
