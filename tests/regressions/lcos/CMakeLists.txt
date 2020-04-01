@@ -7,23 +7,10 @@
 
 set(tests
     after_588
-    async_action_1813
-    async_callback_with_bound_callback
-    async_callback_non_deduced_context
-    async_unwrap_1037
     call_promise_get_gid_more_than_once
     channel_2916
     channel_not_empty_2890
     channel_register_as_2722
-    dataflow_791
-    dataflow_4436
-    dataflow_action_2008
-    dataflow_const_functor_773
-    dataflow_future_swap2
-    dataflow_future_swap
-    dataflow_launch_775
-    dataflow_recursion_1613
-    dataflow_using_774
     exception_from_continuation_1613
     future_2667
     future_790
@@ -50,18 +37,10 @@ set(tests
    )
 
 set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
 set(after_588_PARAMETERS LOCALITIES 2)
-set(async_action_1813_PARAMETERS LOCALITIES 2)
-set(async_callback_with_bound_callback_PARAMETERS LOCALITIES 2)
-set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_2916_FLAGS DEPENDENCIES iostreams_component)
 set(channel_2916_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-set(dataflow_future_swap2_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_launch_775_PARAMETERS THREADS_PER_LOCALITY 2)
-set(dataflow_recursion_1613_PARAMETERS THREADS_PER_LOCALITY 2)
 set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
 set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
@@ -102,7 +81,6 @@ add_hpx_regression_test(
 # compile only tests
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests
-      dataflow_future_ref_3639
       future_range_ambiguity_2032
      )
 
