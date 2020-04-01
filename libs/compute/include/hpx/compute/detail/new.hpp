@@ -9,12 +9,11 @@
 
 #include <utility>
 
-namespace hpx { namespace util { namespace functional
-{
+namespace hpx { namespace util { namespace functional {
     template <typename T>
     struct new_
     {
-        template <typename ...Ts>
+        template <typename... Ts>
         T* operator()(Ts&&... vs) const
         {
             return new T(std::forward<Ts>(vs)...);
@@ -24,7 +23,7 @@ namespace hpx { namespace util { namespace functional
     template <typename T>
     struct placement_new
     {
-        template <typename ...Ts>
+        template <typename... Ts>
         T* operator()(void* p, Ts&&... vs) const
         {
             return new (p) T(std::forward<Ts>(vs)...);
@@ -36,9 +35,10 @@ namespace hpx { namespace util { namespace functional
     {
         placement_new_one(void* p)
           : p_(p)
-        {}
+        {
+        }
 
-        template <typename ...Ts>
+        template <typename... Ts>
         T* operator()(Ts&&... vs) const
         {
             return new (p_) T(std::forward<Ts>(vs)...);
@@ -46,6 +46,6 @@ namespace hpx { namespace util { namespace functional
 
         void* p_;
     };
-}}}
+}}}    // namespace hpx::util::functional
 
 #endif

@@ -11,6 +11,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(compute_headers
   hpx/compute/detail/get_proxy_type.hpp
   hpx/compute/detail/iterator.hpp
+  hpx/compute/detail/new.hpp
   hpx/compute/detail/target_distribution_policy.hpp
   hpx/compute/host/block_allocator.hpp
   hpx/compute/host/block_executor.hpp
@@ -27,6 +28,10 @@ set(compute_headers
   hpx/compute/vector.hpp
 )
 
+set(compute_compat_headers
+  hpx/util/functional/new.hpp
+)
+
 set(compute_sources
   get_host_targets.cpp
   host_target.cpp
@@ -35,6 +40,8 @@ set(compute_sources
 
 include(HPX_AddModule)
 add_hpx_module(compute
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${compute_sources}
