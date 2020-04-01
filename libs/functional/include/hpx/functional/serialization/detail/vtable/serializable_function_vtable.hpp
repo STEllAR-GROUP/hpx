@@ -10,17 +10,16 @@
 #define HPX_UTIL_DETAIL_VTABLE_SERIALIZABLE_FUNCTION_VTABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
-#include <hpx/functional/detail/function_registration.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
-#include <hpx/util/detail/vtable/serializable_vtable.hpp>
+#include <hpx/functional/detail/function_registration.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
+#include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/util/detail/vtable/serializable_vtable.hpp>
 
 #include <string>
 #include <type_traits>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     template <typename VTable>
     struct serializable_function_vtable;
 
@@ -31,15 +30,14 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename VTable, typename T>
-    serializable_function_vtable<VTable> const
-    serializable_vtables<VTable, T>::instance = detail::construct_vtable<T>();
+    serializable_function_vtable<VTable> const serializable_vtables<VTable,
+        T>::instance = detail::construct_vtable<T>();
 
     template <typename VTable, typename T>
     serializable_function_vtable<VTable> const*
     get_serializable_vtable() noexcept
     {
-        static_assert(
-            std::is_same<T, typename std::decay<T>::type>::value,
+        static_assert(std::is_same<T, typename std::decay<T>::type>::value,
             "T shall have no cv-ref-qualifiers");
 
         return &serializable_vtables<VTable, T>::instance;
@@ -47,8 +45,7 @@ namespace hpx { namespace util { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTable>
-    struct serializable_function_vtable
-      : serializable_vtable
+    struct serializable_function_vtable : serializable_vtable
     {
         VTable const* vptr;
         char const* name;
@@ -59,15 +56,18 @@ namespace hpx { namespace util { namespace detail
           , vptr(detail::get_vtable<VTable, T>())
           , name(detail::get_function_name<VTable, T>())
         {
-            hpx::serialization::detail::polymorphic_intrusive_factory::instance().
-                register_class(name, &serializable_function_vtable::get<T>);
+            hpx::serialization::detail::polymorphic_intrusive_factory::
+                instance()
+                    .register_class(
+                        name, &serializable_function_vtable::get<T>);
         }
 
         serializable_function_vtable(construct_vtable<empty_function>) noexcept
           : serializable_vtable(construct_vtable<empty_function>())
           , vptr(detail::get_empty_function_vtable<VTable>())
           , name("empty")
-        {}
+        {
+        }
 
         template <typename T>
         static void* get()
@@ -79,14 +79,14 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename VTable>
-    serializable_function_vtable<VTable> const*
-    get_serializable_vtable(std::string const& name)
+    serializable_function_vtable<VTable> const* get_serializable_vtable(
+        std::string const& name)
     {
         using serializable_vtable = serializable_function_vtable<VTable>;
-        return
-            hpx::serialization::detail::polymorphic_intrusive_factory::instance().
-                create<serializable_vtable const>(name);
+        return hpx::serialization::detail::polymorphic_intrusive_factory::
+            instance()
+                .create<serializable_vtable const>(name);
     }
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif
