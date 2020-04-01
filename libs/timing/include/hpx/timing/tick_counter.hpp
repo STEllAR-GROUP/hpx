@@ -12,8 +12,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     //
     //  tick_counter - a timer
@@ -25,7 +24,8 @@ namespace hpx { namespace util
         tick_counter(std::uint64_t& output)
           : start_time_(take_time_stamp())
           , output_(output)
-        {}
+        {
+        }
 
         ~tick_counter()
         {
@@ -42,7 +42,6 @@ namespace hpx { namespace util
         std::uint64_t const start_time_;
         std::uint64_t& output_;
     };
-}} // namespace hpx::util
+}}    // namespace hpx::util
 
 #endif
-
