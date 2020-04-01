@@ -387,8 +387,18 @@ namespace hpx
             // Change our thread description, as we're about to call hpx_main
             threads::set_thread_description(threads::get_self_id(), "hpx_main");
 
-            // Call hpx_main
-            result = func();
+            try
+            {
+                // Call hpx_main
+                result = func();
+            }
+            catch (...)
+            {
+                // make sure exceptions thrown in hpx_main don't escape
+                // unnoticed
+                report_error(std::current_exception());
+                result = -1;
+            }
         }
         return threads::thread_result_type(threads::terminated,
             threads::invalid_thread_id);
