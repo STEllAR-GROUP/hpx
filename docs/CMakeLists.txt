@@ -15,7 +15,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/hpx_suspend.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/parallel/task_block.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/applier_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_localities.hpp"
@@ -43,14 +42,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/components/new.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_all.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/when_all.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_any.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/when_any.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_some.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/util/debugging.hpp")
 
 # Definitions for autodoc.doxy.in
