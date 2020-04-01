@@ -57,11 +57,6 @@ void threadLoop()
         std::size_t thread_actual = hpx::get_worker_thread_num();
         hpx::deb_schbin.debug(hpx::debug::str<>("Running on thread"),
             thread_actual, "Expected", thread_expected);
-        if (thread_actual != thread_expected)
-        {
-            hpx::deb_schbin.error(hpx::debug::str<>("actual!=expected"), "Got",
-                thread_actual, "Expected", thread_expected);
-        }
         HPX_TEST_EQ(thread_actual, thread_expected);
     };
 
