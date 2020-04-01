@@ -70,13 +70,13 @@ static void register_counter_types()
 
 #if defined(HPX_HAVE_NETWORKING)
 ///////////////////////////////////////////////////////////////////////////////
-extern std::vector<util::tuple<char const*, char const*> >
-    message_handler_registrations;
+std::vector<hpx::util::tuple<char const*, char const*>>&
+get_message_handler_registrations();
 
 static void register_message_handlers()
 {
     runtime& rt = get_runtime();
-    for (auto const& t : message_handler_registrations)
+    for (auto const& t : get_message_handler_registrations())
     {
         error_code ec(lightweight);
         rt.register_message_handler(util::get<0>(t), util::get<1>(t), ec);

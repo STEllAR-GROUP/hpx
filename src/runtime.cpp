@@ -150,8 +150,15 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // There is no need to protect these global from thread concurrent access
     // as they are access during early startup only.
-    std::vector<hpx::util::tuple<char const*, char const*> >
-        message_handler_registrations;
+#if defined(HPX_HAVE_NETWORKING)
+    std::vector<hpx::util::tuple<char const*, char const*>>&
+        get_message_handler_registrations()
+    {
+        static std::vector<hpx::util::tuple<char const*, char const*>>
+            message_handler_registrations;
+        return message_handler_registrations;
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void HPX_CDECL new_handler()
@@ -1568,7 +1575,7 @@ namespace hpx
         }
 
         // store the request for later
-        message_handler_registrations.push_back(
+        get_message_handler_registrations().push_back(
             hpx::util::make_tuple(message_handler_type, action));
     }
 
