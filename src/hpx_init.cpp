@@ -372,10 +372,10 @@ namespace hpx
                 cms.rtcfg_.enable_minimal_deadlock_detection());
 #endif
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-            util::detail::spinlock_break_on_deadlock =
-                cms.rtcfg_.enable_spinlock_deadlock_detection();
-            util::detail::spinlock_deadlock_detection_limit =
-                cms.rtcfg_.get_spinlock_deadlock_detection_limit();
+            util::detail::set_spinlock_break_on_deadlock_enabled(
+                cms.rtcfg_.enable_spinlock_deadlock_detection());
+            util::detail::set_spinlock_deadlock_detection_limit(
+                cms.rtcfg_.get_spinlock_deadlock_detection_limit());
 #endif
 
             // initialize logging

@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/agent_base.hpp>
 #include <hpx/basic_execution/agent_ref.hpp>
+#include <hpx/basic_execution/detail/spinlock_deadlock_detection.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
@@ -64,16 +65,11 @@ namespace hpx { namespace basic_execution { namespace this_thread {
 
 namespace hpx { namespace util {
     namespace detail {
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-        HPX_API_EXPORT extern bool spinlock_break_on_deadlock;
-        HPX_API_EXPORT extern std::size_t spinlock_deadlock_detection_limit;
-#endif
-
         inline void yield_k(std::size_t k, const char* thread_name)
         {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-            if (k > 32 && spinlock_break_on_deadlock &&
-                k > spinlock_deadlock_detection_limit)
+            if (k > 32 && get_spinlock_break_on_deadlock_enabled() &&
+                k > get_spinlock_deadlock_detection_limit())
             {
                 HPX_THROW_EXCEPTION(
                     deadlock, thread_name, "possible deadlock detected");
