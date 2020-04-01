@@ -295,6 +295,8 @@ rst_prolog += '''
 .. _tau: https://www.cs.uoregon.edu/research/tau/home.php
 .. |cmake| replace:: CMake
 .. _cmake: https://www.cmake.org
+.. |cppdependencies| replace:: cpp-dependencies
+.. _cppdependencies: https://github.com/tomtom-international/cpp-dependencies
 .. |ctest| replace:: CTest
 .. _ctest: https://gitlab.kitware.com/cmake/community/wikis/doc/ctest/Testing-With-CTest
 .. |ctest_doc| replace:: CTest Documentation
