@@ -396,7 +396,10 @@ namespace hpx { namespace lcos { namespace detail {
 
         template <typename Allocator, typename P, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(Allocator const& alloc, P&& p, F&& f,
-            hpx::naming::id_type const& id, Ts&&... ts)
+            typename std::enable_if<
+                traits::is_action<typename std::decay<F>::type>::value,
+                hpx::naming::id_type>::type const& id,
+            Ts&&... ts)
             -> decltype(dataflow_dispatch_impl<
                 traits::is_action<typename std::decay<F>::type>::value,
                 Policy>::call(alloc, std::forward<P>(p), std::forward<F>(f), id,
