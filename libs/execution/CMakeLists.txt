@@ -25,7 +25,6 @@ set(execution_headers
   hpx/execution/execution_policy.hpp
   hpx/execution/executor_parameters.hpp
   hpx/execution/executors/auto_chunk_size.hpp
-  hpx/execution/executors/current_executor.hpp
   hpx/execution/executors/dynamic_chunk_size.hpp
   hpx/execution/executors/execution_fwd.hpp
   hpx/execution/executors/execution.hpp
@@ -35,22 +34,12 @@ set(execution_headers
   hpx/execution/executors/execution_parameters.hpp
   hpx/execution/executors/fused_bulk_execute.hpp
   hpx/execution/executors/guided_chunk_size.hpp
-  hpx/execution/executors/guided_pool_executor.hpp
-  hpx/execution/executors.hpp
-  hpx/execution/executors/limiting_executor.hpp
-  hpx/execution/executors/parallel_executor_aggregated.hpp
-  hpx/execution/executors/parallel_executor.hpp
   hpx/execution/executors/persistent_auto_chunk_size.hpp
   hpx/execution/executors/polymorphic_executor.hpp
-  hpx/execution/executors/pool_executor.hpp
   hpx/execution/executors/rebind_executor.hpp
-  hpx/execution/executors/restricted_thread_pool_executor.hpp
-  hpx/execution/executors/sequenced_executor.hpp
-  hpx/execution/executors/service_executors.hpp
   hpx/execution/executors/static_chunk_size.hpp
   hpx/execution/executors/thread_execution.hpp
   hpx/execution/executors/thread_execution_information.hpp
-  hpx/execution/executors/thread_pool_attached_executors.hpp
   hpx/execution/executors/thread_pool_executor.hpp
   hpx/execution/executors/timed_execution_fwd.hpp
   hpx/execution/executors/timed_execution.hpp
@@ -73,7 +62,6 @@ set(execution_headers
 )
 
 set(execution_sources
-  current_executor.cpp
   force_linking.cpp
   polymorphic_executor.cpp)
 
@@ -98,23 +86,15 @@ set(execution_compat_headers
   hpx/parallel/executors/execution_parameters.hpp
   hpx/parallel/executors/fused_bulk_execute.hpp
   hpx/parallel/executors/guided_chunk_size.hpp
-  hpx/parallel/executors.hpp
-  hpx/parallel/executors/parallel_executor_aggregated.hpp
-  hpx/parallel/executors/parallel_executor.hpp
   hpx/parallel/executors/persistent_auto_chunk_size.hpp
-  hpx/parallel/executors/pool_executor.hpp
   hpx/parallel/executors/post_policy_dispatch.hpp
   hpx/parallel/executors/rebind_executor.hpp
-  hpx/parallel/executors/sequenced_executor.hpp
-  hpx/parallel/executors/service_executors.hpp
   hpx/parallel/executors/static_chunk_size.hpp
   hpx/parallel/executors/thread_execution.hpp
   hpx/parallel/executors/thread_execution_information.hpp
-  hpx/parallel/executors/thread_pool_attached_executors.hpp
   hpx/parallel/executors/thread_pool_executor.hpp
   hpx/parallel/executors/timed_execution_fwd.hpp
   hpx/parallel/executors/timed_execution.hpp
-  hpx/parallel/executors/timed_executors.hpp
   hpx/parallel/traits/detail/vc/vector_pack_alignment_size.hpp
   hpx/parallel/traits/detail/vc/vector_pack_count_bits.hpp
   hpx/parallel/traits/detail/vc/vector_pack_load_store.hpp

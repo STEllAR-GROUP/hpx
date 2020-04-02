@@ -32,6 +32,7 @@ set(HPX_CANDIDATE_LIBS
   debugging
   errors
   execution
+  executors
   filesystem
   format
   functional
