@@ -21,7 +21,6 @@ set(tests
     promise_allocator
     promise_emplace
     shared_future
-    sync_remote
     use_allocator
    )
 

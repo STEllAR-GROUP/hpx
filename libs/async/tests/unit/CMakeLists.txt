@@ -25,6 +25,7 @@ set(tests
     async_remote_client
     async_unwrap_result
     remote_dataflow
+    sync_remote
    )
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)

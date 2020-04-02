@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/sync.hpp>
 #include <hpx/testing.hpp>
 
@@ -167,23 +167,18 @@ void test_remote_sync(hpx::id_type const& target)
 
     {
         auto policy1 =
-            hpx::launch::select([]()
-            {
-                return hpx::launch::deferred;
-            });
+            hpx::launch::select([]() { return hpx::launch::deferred; });
 
         increment_with_future_action inc;
         hpx::shared_future<std::int32_t> f =
             hpx::async(policy1, hpx::util::bind(&increment, 42));
 
         std::atomic<int> count(0);
-        auto policy2 =
-            hpx::launch::select([&count]() -> hpx::launch
-            {
-                if (count++ == 0)
-                    return hpx::launch::sync;
+        auto policy2 = hpx::launch::select([&count]() -> hpx::launch {
+            if (count++ == 0)
                 return hpx::launch::sync;
-            });
+            return hpx::launch::sync;
+        });
 
         std::int32_t r1 = hpx::sync(policy2, inc, target, f);
         std::int32_t r2 = hpx::sync(policy2, inc, target, f);
@@ -206,9 +201,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-
