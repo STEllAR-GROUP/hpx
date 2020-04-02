@@ -7,9 +7,7 @@
 #if !defined(HPX_MAR_24_2008_1118AM)
 #define HPX_MAR_24_2008_1118AM
 
-#include <hpx/async/apply.hpp>
 #include <hpx/async.hpp>
-#include <hpx/dataflow.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/performance_counters.hpp>

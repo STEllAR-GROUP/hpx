@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/components/component_type.hpp>

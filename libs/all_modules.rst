@@ -20,6 +20,7 @@ All modules
    /libs/asio/docs/index.rst
    /libs/assertion/docs/index.rst
    /libs/async/docs/index.rst
+   /libs/async_base/docs/index.rst
    /libs/async_combinators/docs/index.rst
    /libs/basic_execution/docs/index.rst
    /libs/batch_environments/docs/index.rst
