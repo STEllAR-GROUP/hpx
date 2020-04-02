@@ -6,11 +6,10 @@
 
 name: Windows CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: windows-latest
 
     steps:
