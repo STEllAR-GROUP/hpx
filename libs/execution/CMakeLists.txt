@@ -13,6 +13,9 @@ set(execution_headers
   hpx/execution/algorithms/detail/predicates.hpp
   hpx/execution/datapar/execution_policy_fwd.hpp
   hpx/execution/datapar/execution_policy.hpp
+  hpx/execution/detail/async_launch_policy_dispatch.hpp
+  hpx/execution/detail/post_policy_dispatch.hpp
+  hpx/execution/detail/sync_launch_policy_dispatch.hpp
   hpx/execution/exception_list.hpp
   hpx/execution/execution.hpp
   hpx/execution/execution_policy_fwd.hpp
@@ -36,7 +39,6 @@ set(execution_headers
   hpx/execution/executors/parallel_executor.hpp
   hpx/execution/executors/persistent_auto_chunk_size.hpp
   hpx/execution/executors/pool_executor.hpp
-  hpx/execution/executors/post_policy_dispatch.hpp
   hpx/execution/executors/rebind_executor.hpp
   hpx/execution/executors/restricted_thread_pool_executor.hpp
   hpx/execution/executors/sequenced_executor.hpp
@@ -66,6 +68,7 @@ set(execution_headers
 set(execution_sources current_executor.cpp)
 
 set(execution_compat_headers
+  hpx/async_launch_policy_dispatch.hpp
   hpx/parallel/algorithms/detail/is_negative.hpp
   hpx/parallel/algorithms/detail/predicates.hpp
   hpx/parallel/datapar/execution_policy_fwd.hpp
@@ -109,6 +112,7 @@ set(execution_compat_headers
   hpx/parallel/traits/vector_pack_count_bits.hpp
   hpx/parallel/traits/vector_pack_load_store.hpp
   hpx/parallel/traits/vector_pack_type.hpp
+  hpx/sync_launch_policy_dispatch.hpp
   hpx/traits/executor_traits.hpp
   hpx/traits/is_execution_policy.hpp
   hpx/traits/is_executor.hpp

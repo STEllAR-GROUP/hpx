@@ -23,8 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     // dispatch point used for launch_policy implementations
     template <typename Action, typename Enable = void>
     struct async_launch_policy_dispatch;
