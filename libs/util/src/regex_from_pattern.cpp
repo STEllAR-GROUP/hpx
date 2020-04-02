@@ -10,38 +10,41 @@
 
 #include <string>
 
-namespace hpx { namespace util
-{
-    namespace detail
-    {
+namespace hpx { namespace util {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
-        inline std::string
-        regex_from_character_set(std::string::const_iterator& it,
-            std::string::const_iterator end, error_code& ec)
+        inline std::string regex_from_character_set(
+            std::string::const_iterator& it, std::string::const_iterator end,
+            error_code& ec)
         {
             std::string::const_iterator start = it;
-            std::string result(1, *it);  // copy '['
-            if (*++it == '!') {
-                result.append(1, '^');   // negated character set
+            std::string result(1, *it);    // copy '['
+            if (*++it == '!')
+            {
+                result.append(1, '^');    // negated character set
             }
-            else if (*it == ']') {
+            else if (*it == ']')
+            {
                 HPX_THROWS_IF(ec, bad_parameter, "regex_from_character_set",
                     "Invalid pattern (empty character set) at: " +
                         std::string(start, end));
                 return "";
             }
-            else {
-                result.append(1, *it);   // append this character
+            else
+            {
+                result.append(1, *it);    // append this character
             }
 
             // copy while in character set
-            while (++it != end) {
+            while (++it != end)
+            {
                 result.append(1, *it);
                 if (*it == ']')
                     break;
             }
 
-            if (it == end || *it != ']') {
+            if (it == end || *it != ']')
+            {
                 HPX_THROWS_IF(ec, bad_parameter, "regex_from_character_set",
                     "Invalid pattern (missing closing ']') at: " +
                         std::string(start, end));
@@ -50,7 +53,7 @@ namespace hpx { namespace util
 
             return result;
         }
-    }
+    }    // namespace detail
 
     std::string regex_from_pattern(std::string const& pattern, error_code& ec)
     {
@@ -59,7 +62,8 @@ namespace hpx { namespace util
         for (std::string::const_iterator it = pattern.begin(); it != end; ++it)
         {
             char c = *it;
-            switch (c) {
+            switch (c)
+            {
             case '*':
                 result.append(".*");
                 break;
@@ -69,18 +73,18 @@ namespace hpx { namespace util
                 break;
 
             case '[':
-                {
-                    std::string r =
-                        detail::regex_from_character_set(it, end, ec);
-                    if (ec) return "";
-                    result.append(r);
-                }
-                break;
+            {
+                std::string r = detail::regex_from_character_set(it, end, ec);
+                if (ec)
+                    return "";
+                result.append(r);
+            }
+            break;
 
             case '\\':
-                if (++it == end) {
-                    HPX_THROWS_IF(ec, bad_parameter,
-                        "regex_from_pattern",
+                if (++it == end)
+                {
+                    HPX_THROWS_IF(ec, bad_parameter, "regex_from_pattern",
                         "Invalid escape sequence at: " + pattern);
                     return "";
                 }
@@ -114,4 +118,4 @@ namespace hpx { namespace util
         }
         return result;
     }
-}}
+}}    // namespace hpx::util
