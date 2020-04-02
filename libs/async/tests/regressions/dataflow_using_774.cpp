@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/local_async/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <iostream>
@@ -17,32 +17,33 @@
 // the following line causes compile errors
 using hpx::dataflow;
 
-typedef hpx::lcos::shared_future< double > future_type;
+typedef hpx::lcos::shared_future<double> future_type;
 
-template< typename Value >
+template <typename Value>
 struct mul
 {
     const Value a;
 
-    mul( const Value alpha )
-      : a( alpha )
-    {}
-
-    double operator() ( double x1 , double x2 ) const // this has to be const?!
+    mul(const Value alpha)
+      : a(alpha)
     {
-        return x1*x2*a;
+    }
+
+    double operator()(double x1, double x2) const    // this has to be const?!
+    {
+        return x1 * x2 * a;
     }
 };
 
 int main()
 {
-    auto functor = hpx::util::unwrapping(mul<double>( 0.5 ));
-    future_type f1 = hpx::make_ready_future( 1.0 );
+    auto functor = hpx::util::unwrapping(mul<double>(0.5));
+    future_type f1 = hpx::make_ready_future(1.0);
 
     // compile error even when using full namespace
-    future_type f2 = hpx::dataflow( functor , f1 , f1 );
-    future_type f3 = hpx::dataflow(
-        hpx::util::unwrapping(mul<double>( 2.0 )) , f1 , f1 );
+    future_type f2 = hpx::dataflow(functor, f1, f1);
+    future_type f3 =
+        hpx::dataflow(hpx::util::unwrapping(mul<double>(2.0)), f1, f1);
 
     hpx::wait_all(f1, f2, f3);
 

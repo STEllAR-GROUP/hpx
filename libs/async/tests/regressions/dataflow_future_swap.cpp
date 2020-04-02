@@ -7,12 +7,12 @@
 // This test case demonstrates the issue described in #775: runtime error with
 // local dataflow (copying futures?).
 
+#include <hpx/format.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/dataflow.hpp>
-#include <hpx/format.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/local_async/dataflow.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -20,35 +20,39 @@
 
 using hpx::util::unwrapping;
 
-typedef hpx::lcos::shared_future< double > future_type;
+typedef hpx::lcos::shared_future<double> future_type;
 
 struct mul
 {
-    double operator()( double x1 , double x2 ) const
+    double operator()(double x1, double x2) const
     {
-        hpx::this_thread::sleep_for( std::chrono::milliseconds(10000) );
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(10000));
         hpx::util::format_to(hpx::cout, "func: {}, {}\n", x1, x2) << hpx::flush;
-        return x1*x2;
+        return x1 * x2;
     }
 };
 
-double dummy(double x, double) { std::cout << "dummy: " << x << "\n"; return x; }
+double dummy(double x, double)
+{
+    std::cout << "dummy: " << x << "\n";
+    return x;
+}
 
-void future_swap( future_type &f1 , future_type &f2 )
+void future_swap(future_type& f1, future_type& f2)
 {
     future_type tmp = f1;
-    f1 = hpx::dataflow( unwrapping( &dummy ) , f2 , f1 );
-    f2 = hpx::dataflow( unwrapping( &dummy ) , tmp, f1 );
+    f1 = hpx::dataflow(unwrapping(&dummy), f2, f1);
+    f2 = hpx::dataflow(unwrapping(&dummy), tmp, f1);
 }
 
 int main()
 {
-    future_type f1 = hpx::make_ready_future( 2.0 );
-    future_type f2 = hpx::make_ready_future( 3.0 );
+    future_type f1 = hpx::make_ready_future(2.0);
+    future_type f2 = hpx::make_ready_future(3.0);
 
-    f1 = hpx::dataflow( unwrapping(mul()) , f1 , f2 );
+    f1 = hpx::dataflow(unwrapping(mul()), f1, f2);
 
-    future_swap( f1 , f2 );
+    future_swap(f1, f2);
 
     hpx::util::format_to(hpx::cout, "f1: {}\n", f1.get()) << hpx::flush;
     hpx::util::format_to(hpx::cout, "f2: {}\n", f2.get()) << hpx::flush;

@@ -140,6 +140,7 @@ namespace hpx {
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_future.hpp>

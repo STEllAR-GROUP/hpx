@@ -8,9 +8,9 @@
 // async(launch::..., action(), ...) always invokes locally
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <vector>
@@ -65,8 +65,7 @@ void test_remote_async(hpx::id_type target)
         hpx::future<hpx::id_type> f1 = hpx::async(call, obj);
         HPX_TEST_EQ(f1.get(), target);
 
-        hpx::future<hpx::id_type> f2 =
-            hpx::async(hpx::launch::all, call, obj);
+        hpx::future<hpx::id_type> f2 = hpx::async(hpx::launch::all, call, obj);
         HPX_TEST_EQ(f2.get(), target);
     }
 }
@@ -84,9 +83,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

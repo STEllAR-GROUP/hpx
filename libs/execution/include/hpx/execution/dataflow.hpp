@@ -8,10 +8,12 @@
 #define HPX_EXECUTION_DATAFLOW_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/dataflow.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/async_base/dataflow.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/parallel_executor.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
@@ -19,6 +21,7 @@
 #include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -30,9 +33,6 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/util/pack_traversal_async.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/parallel_executor.hpp>
 
 #include <cstddef>
 #include <exception>

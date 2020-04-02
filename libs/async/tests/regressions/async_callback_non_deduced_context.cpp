@@ -8,8 +8,8 @@
 //  http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52072
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/plain_actions.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/plain_actions.hpp>
 #include <hpx/testing.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,15 +31,15 @@ int future_callback(hpx::lcos::future<int> p)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    using hpx::lcos::future;
     using hpx::async;
+    using hpx::lcos::future;
 
     {
         test_action do_test;
 
         future<int> f = async(do_test, hpx::find_here());
-        future<int> p = f.then(hpx::util::bind(future_callback,
-            hpx::util::placeholders::_1));
+        future<int> p = f.then(
+            hpx::util::bind(future_callback, hpx::util::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);
     }
@@ -58,4 +58,3 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv);
 }
-

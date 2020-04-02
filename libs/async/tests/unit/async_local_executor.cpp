@@ -44,22 +44,16 @@ struct decrement
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void do_nothing(std::int32_t i)
-{
-}
+void do_nothing(std::int32_t i) {}
 
 struct do_nothing_obj
 {
-    void operator()(std::int32_t i) const
-    {
-    }
+    void operator()(std::int32_t i) const {}
 };
 
 struct do_nothing_member
 {
-    void call(std::int32_t i) const
-    {
-    }
+    void call(std::int32_t i) const {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,18 +113,18 @@ void test_async_with_executor(Executor& exec)
         mult2 mult;
 
         hpx::future<std::int32_t> f1 =
-           hpx::async(exec, hpx::util::bind(mult, 42));
+            hpx::async(exec, hpx::util::bind(mult, 42));
         HPX_TEST_EQ(f1.get(), 84);
 
         using hpx::util::placeholders::_1;
 
         hpx::future<std::int32_t> f2 =
-           hpx::async(exec, hpx::util::bind(mult, _1), 42);
+            hpx::async(exec, hpx::util::bind(mult, _1), 42);
         HPX_TEST_EQ(f2.get(), 84);
 
         do_nothing_obj do_nothing_f;
-        hpx::future<void> f3 = hpx::async(exec,
-            hpx::util::bind(do_nothing_f, _1), 42);
+        hpx::future<void> f3 =
+            hpx::async(exec, hpx::util::bind(do_nothing_f, _1), 42);
         f3.get();
     }
 
@@ -142,8 +136,8 @@ void test_async_with_executor(Executor& exec)
         HPX_TEST_EQ(f1.get(), 41);
 
         do_nothing_member dnm;
-        hpx::future<void> f2 = hpx::async(exec,
-            &do_nothing_member::call, dnm, 42);
+        hpx::future<void> f2 =
+            hpx::async(exec, &do_nothing_member::call, dnm, 42);
         f2.get();
     }
 
@@ -161,8 +155,8 @@ void test_async_with_executor(Executor& exec)
         HPX_TEST_EQ(f2.get(), 41);
 
         do_nothing_member dnm;
-        hpx::future<void> f3 = hpx::async(exec,
-            hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
+        hpx::future<void> f3 = hpx::async(
+            exec, hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
         f3.get();
     }
 }
@@ -185,9 +179,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

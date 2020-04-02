@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/traits.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
+#include <hpx/include/traits.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -63,18 +63,19 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 
     test_client(hpx::id_type const& id)
       : base_type(id)
-    {}
-    test_client(hpx::future<hpx::id_type> && id)
+    {
+    }
+    test_client(hpx::future<hpx::id_type>&& id)
       : base_type(std::move(id))
-    {}
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);
 
 #if defined(HPX_HAVE_NETWORKING)
-void cb(boost::system::error_code const& ec,
-    hpx::parcelset::parcel const& p)
+void cb(boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }
@@ -96,8 +97,8 @@ void test_remote_async_cb_colocated(test_client const& target)
             hpx::async_cb(inc, hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::future<std::int32_t> f2 =
-            hpx::async_cb(hpx::launch::all, inc, hpx::colocated(target), &cb, 42);
+        hpx::future<std::int32_t> f2 = hpx::async_cb(
+            hpx::launch::all, inc, hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f2.get(), 43);
 
         // The callback should have been called 2 times. wait for a short period
@@ -115,8 +116,8 @@ void test_remote_async_cb_colocated(test_client const& target)
         callback_called.store(0);
         hpx::future<std::int32_t> f1 =
             hpx::async_cb(inc, hpx::colocated(target), &cb, f);
-        hpx::future<std::int32_t> f2 =
-            hpx::async_cb(hpx::launch::all, inc, hpx::colocated(target), &cb, f);
+        hpx::future<std::int32_t> f2 = hpx::async_cb(
+            hpx::launch::all, inc, hpx::colocated(target), &cb, f);
 
         p.set_value(42);
         HPX_TEST_EQ(f1.get(), 43);
@@ -171,8 +172,7 @@ void test_remote_async_cb_colocated(test_client const& target)
         hpx::id_type dec = dec_f.get();
 
         callback_called.store(0);
-        hpx::future<std::int32_t> f1 =
-            hpx::async_cb<call_action>(dec, &cb, 42);
+        hpx::future<std::int32_t> f1 = hpx::async_cb<call_action>(dec, &cb, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
         hpx::future<std::int32_t> f2 =
@@ -191,8 +191,8 @@ void test_remote_async_cb_colocated(test_client const& target)
             hpx::async(hpx::launch::deferred, hpx::util::bind(&increment, 42));
 
         callback_called.store(0);
-        hpx::future<std::int32_t> f1 = hpx::async_cb(
-            inc, hpx::colocated(target), &cb, f);
+        hpx::future<std::int32_t> f1 =
+            hpx::async_cb(inc, hpx::colocated(target), &cb, f);
         hpx::future<std::int32_t> f2 = hpx::async_cb(
             hpx::launch::all, inc, hpx::colocated(target), &cb, f);
 
@@ -220,9 +220,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

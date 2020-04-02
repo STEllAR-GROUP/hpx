@@ -25,24 +25,18 @@ void force_recursion_test1()
 {
     hpx::lcos::local::promise<void> first_promise;
 
-    std::vector<hpx::shared_future<void> > results;
-    results.reserve(NUM_FUTURES+1);
+    std::vector<hpx::shared_future<void>> results;
+    results.reserve(NUM_FUTURES + 1);
 
     std::atomic<std::size_t> executed_dataflow(0);
 
     results.push_back(first_promise.get_future());
     for (std::size_t i = 0; i != NUM_FUTURES; ++i)
     {
-        results.push_back(
-            hpx::dataflow(
-                hpx::launch::sync,
-                [&](hpx::shared_future<void> &&)
-                {
-                    ++executed_dataflow;
-                },
-                results.back()
-            )
-        );
+        results.push_back(hpx::dataflow(
+            hpx::launch::sync,
+            [&](hpx::shared_future<void>&&) { ++executed_dataflow; },
+            results.back()));
     }
 
     // make futures ready in backwards sequence
@@ -56,11 +50,10 @@ void force_recursion_test1()
 // (continuations will be executed at the point where they are being attached
 // to the future), and attach the next continuation from inside a continuation.
 // This will trigger a chain of continuations as well.
-void make_ready_continue(
-    std::size_t i,
-    std::vector<hpx::lcos::local::promise<void> >& promises,
-    std::vector<hpx::shared_future<void> > & futures,
-    std::atomic<std::size_t> & executed_continuations)
+void make_ready_continue(std::size_t i,
+    std::vector<hpx::lcos::local::promise<void>>& promises,
+    std::vector<hpx::shared_future<void>>& futures,
+    std::atomic<std::size_t>& executed_continuations)
 {
     if (i >= NUM_FUTURES)
         return;
@@ -68,19 +61,16 @@ void make_ready_continue(
     ++executed_continuations;
     promises[i].set_value();
     futures[i].then(
-        hpx::util::bind(
-            &make_ready_continue, i+1, std::ref(promises), std::ref(futures),
-            std::ref(executed_continuations)
-        )
-    );
+        hpx::util::bind(&make_ready_continue, i + 1, std::ref(promises),
+            std::ref(futures), std::ref(executed_continuations)));
 }
 
 void force_recursion_test2()
 {
-    std::vector<hpx::lcos::local::promise<void> > promises;
+    std::vector<hpx::lcos::local::promise<void>> promises;
     promises.reserve(NUM_FUTURES);
 
-    std::vector<hpx::shared_future<void> > futures;
+    std::vector<hpx::shared_future<void>> futures;
     futures.reserve(NUM_FUTURES);
 
     for (std::size_t i = 0; i != NUM_FUTURES; ++i)

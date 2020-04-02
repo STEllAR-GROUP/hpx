@@ -9,31 +9,32 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/local_async/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
-typedef hpx::lcos::shared_future< double > future_type;
+typedef hpx::lcos::shared_future<double> future_type;
 
-template< typename Value >
+template <typename Value>
 struct mul
 {
     const Value a;
 
-    mul( const Value alpha )
-      : a( alpha )
-    {}
-
-    double operator() ( double x1 , double x2 ) //const // this has to be const?!
+    mul(const Value alpha)
+      : a(alpha)
     {
-        return x1*x2*a;
+    }
+
+    double operator()(double x1, double x2)    //const // this has to be const?!
+    {
+        return x1 * x2 * a;
     }
 };
 
 int main()
 {
-    auto functor = hpx::util::unwrapping(mul<double>( 0.5 ));
-    future_type f1 = hpx::make_ready_future( 1.0 );
-    future_type f2 = hpx::dataflow( functor , f1 , f1 );
+    auto functor = hpx::util::unwrapping(mul<double>(0.5));
+    future_type f1 = hpx::make_ready_future(1.0);
+    future_type f2 = hpx::dataflow(functor, f1, f1);
 
     hpx::wait_all(f1, f2);
 

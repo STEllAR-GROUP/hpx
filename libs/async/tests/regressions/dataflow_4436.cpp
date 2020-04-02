@@ -6,8 +6,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/testing.hpp>
 #include <hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <numeric>
@@ -45,10 +45,9 @@ int start(int argc, char** argv)
         values_futures.emplace_back(hpx::make_ready_future(i));
     }
 
-    auto f = hpx::dataflow(hpx::util::unwrapping(
-        [](const auto&& values) {
-            return std::accumulate(values.begin(), values.end(), 0);
-        }),
+    auto f = hpx::dataflow(hpx::util::unwrapping([](const auto&& values) {
+        return std::accumulate(values.begin(), values.end(), 0);
+    }),
         values_futures);
 
     HPX_TEST_EQ(f.get(), 6);

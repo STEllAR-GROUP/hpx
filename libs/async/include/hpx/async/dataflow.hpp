@@ -19,6 +19,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/local_async/dataflow.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -32,7 +33,6 @@
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/util/pack_traversal_async.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/parallel_executor.hpp>

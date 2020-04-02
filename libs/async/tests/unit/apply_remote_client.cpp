@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -67,8 +67,7 @@ int hpx_main()
     typedef hpx::components::client<increment_server> increment_client;
 
     {
-        increment_client inc =
-            hpx::components::new_<increment_client>(there);
+        increment_client inc = hpx::components::new_<increment_client>(there);
 
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
@@ -84,8 +83,7 @@ int hpx_main()
     }
 
     {
-        increment_client inc =
-            hpx::components::new_<increment_client>(there);
+        increment_client inc = hpx::components::new_<increment_client>(there);
 
         hpx::apply<call_action>(inc, here, 1);
     }
@@ -99,14 +97,13 @@ int main(int argc, char* argv[])
     accumulator.store(0);
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     // After hpx::init returns, all actions should have been executed
     // The final result is only accumulated on the root locality
-    if(root_locality)
+    if (root_locality)
         HPX_TEST_EQ(final_result, 7);
 
     return hpx::util::report_errors();
 }
-

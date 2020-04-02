@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/local_async/dataflow.hpp>
 #include <hpx/timing.hpp>
 
 #include <cstddef>

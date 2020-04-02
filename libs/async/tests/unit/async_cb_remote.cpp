@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -51,8 +51,7 @@ HPX_REGISTER_ACTION(call_action);
 std::atomic<int> callback_called(0);
 
 #if defined(HPX_HAVE_NETWORKING)
-void cb(boost::system::error_code const& ec,
-    hpx::parcelset::parcel const& p)
+void cb(boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }
@@ -147,8 +146,7 @@ void test_remote_async_cb(hpx::id_type const& target)
         hpx::id_type dec = dec_f.get();
 
         callback_called.store(0);
-        hpx::future<std::int32_t> f1 =
-            hpx::async_cb<call_action>(dec, &cb, 42);
+        hpx::future<std::int32_t> f1 = hpx::async_cb<call_action>(dec, &cb, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
         hpx::future<std::int32_t> f2 =
@@ -194,9 +192,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

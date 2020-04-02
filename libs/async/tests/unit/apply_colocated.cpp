@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -119,12 +119,11 @@ int main(int argc, char* argv[])
     accumulator.store(0);
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     HPX_TEST_NEQ(std::uint32_t(-1), locality_id);
     HPX_TEST_NEQ(on_shutdown_executed || 0, locality_id);
 
     return hpx::util::report_errors();
 }
-

@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/components.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -22,7 +22,7 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);  // defines increment_action
+HPX_PLAIN_ACTION(increment);    // defines increment_action
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
@@ -35,7 +35,7 @@ std::int32_t mult2(std::int32_t i)
 {
     return i * 2;
 }
-HPX_PLAIN_ACTION(mult2);      // defines mult2_action
+HPX_PLAIN_ACTION(mult2);    // defines mult2_action
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::simple_component_base<test_server>
@@ -51,18 +51,19 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 
     test_client(hpx::id_type const& id)
       : base_type(id)
-    {}
-    test_client(hpx::future<hpx::id_type> && id)
+    {
+    }
+    test_client(hpx::future<hpx::id_type>&& id)
       : base_type(std::move(id))
-    {}
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);
 
 #if defined(HPX_HAVE_NETWORKING)
-void cb(boost::system::error_code const& ec,
-    hpx::parcelset::parcel const& p)
+void cb(boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }
@@ -144,7 +145,8 @@ int test_async_continue_cb_colocated(test_client const& target)
         HPX_TEST_EQ(f.get(), 87);
 
         f = hpx::async_continue_cb(inc,
-            make_continuation(mult, make_continuation(inc, make_continuation())),
+            make_continuation(
+                mult, make_continuation(inc, make_continuation())),
             hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
 
@@ -156,59 +158,59 @@ int test_async_continue_cb_colocated(test_client const& target)
 
     // test chaining
     {
-//         callback_called.store(0);
-//         hpx::future<int> f = hpx::async_continue_cb(inc,
-//             make_continuation(mult, hpx::colocated(target)),
-//             hpx::colocated(target), &cb, 42);
-//         HPX_TEST_EQ(f.get(), 86);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//
-//         callback_called.store(0);
-//         f = hpx::async_continue_cb(inc,
-//             make_continuation(mult, hpx::colocated(target),
-//                 make_continuation()),
-//             hpx::colocated(target), &cb, 42);
-//         HPX_TEST_EQ(f.get(), 86);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//
-//         callback_called.store(0);
-//         f = hpx::async_continue_cb(inc,
-//             make_continuation(mult, hpx::colocated(target),
-//                 make_continuation(inc)), hpx::colocated(target), &cb, 42);
-//         HPX_TEST_EQ(f.get(), 87);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//
-//         callback_called.store(0);
-//         f = hpx::async_continue_cb(inc,
-//             make_continuation(mult, hpx::colocated(target),
-//                 make_continuation(inc, make_continuation())),
-//                 hpx::colocated(target),
-//             &cb, 42);
-//         HPX_TEST_EQ(f.get(), 87);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//
-//         callback_called.store(0);
-//         f = hpx::async_continue_cb(inc,
-//             make_continuation(mult, hpx::colocated(target),
-//                 make_continuation(inc, hpx::colocated(target))),
-//                 hpx::colocated(target), &cb, 42);
-//         HPX_TEST_EQ(f.get(), 87);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//
-//         callback_called.store(0);
-//         f = hpx::async_continue_cb(inc,
-//             make_continuation(mult, hpx::colocated(target),
-//                 make_continuation(inc, hpx::colocated(target),
-//                 make_continuation())),
-//                 hpx::colocated(target), &cb, 42);
-//         HPX_TEST_EQ(f.get(), 87);
-//         HPX_TEST_EQ(callback_called.load(), 1);
-//
-//         callback_called.store(0);
-//         f = hpx::async_continue_cb(inc,
-//             make_continuation(mult), hpx::colocated(target), &cb, 42);
-//         HPX_TEST_EQ(f.get(), 86);
-//         HPX_TEST_EQ(callback_called.load(), 1);
+        //         callback_called.store(0);
+        //         hpx::future<int> f = hpx::async_continue_cb(inc,
+        //             make_continuation(mult, hpx::colocated(target)),
+        //             hpx::colocated(target), &cb, 42);
+        //         HPX_TEST_EQ(f.get(), 86);
+        //         HPX_TEST_EQ(callback_called.load(), 1);
+        //
+        //         callback_called.store(0);
+        //         f = hpx::async_continue_cb(inc,
+        //             make_continuation(mult, hpx::colocated(target),
+        //                 make_continuation()),
+        //             hpx::colocated(target), &cb, 42);
+        //         HPX_TEST_EQ(f.get(), 86);
+        //         HPX_TEST_EQ(callback_called.load(), 1);
+        //
+        //         callback_called.store(0);
+        //         f = hpx::async_continue_cb(inc,
+        //             make_continuation(mult, hpx::colocated(target),
+        //                 make_continuation(inc)), hpx::colocated(target), &cb, 42);
+        //         HPX_TEST_EQ(f.get(), 87);
+        //         HPX_TEST_EQ(callback_called.load(), 1);
+        //
+        //         callback_called.store(0);
+        //         f = hpx::async_continue_cb(inc,
+        //             make_continuation(mult, hpx::colocated(target),
+        //                 make_continuation(inc, make_continuation())),
+        //                 hpx::colocated(target),
+        //             &cb, 42);
+        //         HPX_TEST_EQ(f.get(), 87);
+        //         HPX_TEST_EQ(callback_called.load(), 1);
+        //
+        //         callback_called.store(0);
+        //         f = hpx::async_continue_cb(inc,
+        //             make_continuation(mult, hpx::colocated(target),
+        //                 make_continuation(inc, hpx::colocated(target))),
+        //                 hpx::colocated(target), &cb, 42);
+        //         HPX_TEST_EQ(f.get(), 87);
+        //         HPX_TEST_EQ(callback_called.load(), 1);
+        //
+        //         callback_called.store(0);
+        //         f = hpx::async_continue_cb(inc,
+        //             make_continuation(mult, hpx::colocated(target),
+        //                 make_continuation(inc, hpx::colocated(target),
+        //                 make_continuation())),
+        //                 hpx::colocated(target), &cb, 42);
+        //         HPX_TEST_EQ(f.get(), 87);
+        //         HPX_TEST_EQ(callback_called.load(), 1);
+        //
+        //         callback_called.store(0);
+        //         f = hpx::async_continue_cb(inc,
+        //             make_continuation(mult), hpx::colocated(target), &cb, 42);
+        //         HPX_TEST_EQ(f.get(), 86);
+        //         HPX_TEST_EQ(callback_called.load(), 1);
 
         callback_called.store(0);
         hpx::future<int> f = hpx::async_continue_cb(inc,
@@ -239,9 +241,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -20,7 +20,7 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);  // defines increment_action
+HPX_PLAIN_ACTION(increment);    // defines increment_action
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
@@ -33,14 +33,13 @@ std::int32_t mult2(std::int32_t i)
 {
     return i * 2;
 }
-HPX_PLAIN_ACTION(mult2);      // defines mult2_action
+HPX_PLAIN_ACTION(mult2);    // defines mult2_action
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);
 
 #if defined(HPX_HAVE_NETWORKING)
-void cb(boost::system::error_code const& ec,
-    hpx::parcelset::parcel const& p)
+void cb(boost::system::error_code const& ec, hpx::parcelset::parcel const& p)
 {
     ++callback_called;
 }
@@ -114,8 +113,8 @@ int hpx_main()
         HPX_TEST_EQ(f.get(), 86);
 
         f = hpx::async_continue_cb(inc,
-            make_continuation(mult, make_continuation()), hpx::find_here(),
-            &cb, 42);
+            make_continuation(mult, make_continuation()), hpx::find_here(), &cb,
+            42);
         HPX_TEST_EQ(f.get(), 86);
 
         f = hpx::async_continue_cb(inc,
@@ -124,7 +123,8 @@ int hpx_main()
         HPX_TEST_EQ(f.get(), 87);
 
         f = hpx::async_continue_cb(inc,
-            make_continuation(mult, make_continuation(inc, make_continuation())),
+            make_continuation(
+                mult, make_continuation(inc, make_continuation())),
             hpx::find_here(), &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
 
@@ -148,34 +148,35 @@ int hpx_main()
         HPX_TEST_EQ(f.get(), 86);
 
         f = hpx::async_continue_cb(inc,
-            make_continuation(mult, localities[0],
-                make_continuation(inc)), localities[0], &cb, 42);
+            make_continuation(mult, localities[0], make_continuation(inc)),
+            localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
 
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, localities[0],
-                make_continuation(inc, make_continuation())), localities[0],
-            &cb, 42);
+                make_continuation(inc, make_continuation())),
+            localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
 
         f = hpx::async_continue_cb(inc,
-            make_continuation(mult, localities[0],
-                make_continuation(inc, localities[0])), localities[0], &cb, 42);
+            make_continuation(
+                mult, localities[0], make_continuation(inc, localities[0])),
+            localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
 
         f = hpx::async_continue_cb(inc,
             make_continuation(mult, localities[0],
                 make_continuation(inc, localities[0], make_continuation())),
-                localities[0], &cb, 42);
+            localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 87);
 
-        f = hpx::async_continue_cb(inc,
-            make_continuation(mult), localities[0], &cb, 42);
+        f = hpx::async_continue_cb(
+            inc, make_continuation(mult), localities[0], &cb, 42);
         HPX_TEST_EQ(f.get(), 86);
 
         f = hpx::async_continue_cb(inc,
-            make_continuation(mult, make_continuation()), localities[0],
-            &cb, 42);
+            make_continuation(mult, make_continuation()), localities[0], &cb,
+            42);
         HPX_TEST_EQ(f.get(), 86);
 
         // The callback should have been called 8 times. wait for a short period
@@ -190,9 +191,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

@@ -15,8 +15,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
-#include <hpx/execution/executors/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>

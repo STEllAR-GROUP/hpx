@@ -7,17 +7,17 @@
 // This test case demonstrates the issue described in #1037:
 // implicit unwrapping of futures in async broken
 
+#include <hpx/async.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/async.hpp>
 #include <hpx/testing.hpp>
 
 hpx::future<int> f(int i)
 {
-    if(i == 0)
+    if (i == 0)
     {
-        return hpx::async(f, i+1);
+        return hpx::async(f, i + 1);
     }
 
     return hpx::make_ready_future(i);

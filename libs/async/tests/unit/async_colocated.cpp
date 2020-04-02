@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/traits.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
+#include <hpx/include/traits.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -63,10 +63,12 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 
     test_client(hpx::id_type const& id)
       : base_type(id)
-    {}
-    test_client(hpx::future<hpx::id_type> && id)
+    {
+    }
+    test_client(hpx::future<hpx::id_type>&& id)
       : base_type(std::move(id))
-    {}
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -130,8 +132,7 @@ void test_remote_async_colocated(test_client const& target)
             hpx::components::new_<decrement_server>(hpx::colocated(target));
         hpx::id_type dec = dec_f.get();
 
-        hpx::future<std::int32_t> f1 =
-            hpx::async<call_action>(dec, 42);
+        hpx::future<std::int32_t> f1 = hpx::async<call_action>(dec, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
         hpx::future<std::int32_t> f2 =
@@ -144,10 +145,10 @@ void test_remote_async_colocated(test_client const& target)
         hpx::shared_future<std::int32_t> f =
             hpx::async(hpx::launch::deferred, hpx::util::bind(&increment, 42));
 
-        hpx::future<std::int32_t> f1 = hpx::async(
-            inc, hpx::colocated(target), f);
-        hpx::future<std::int32_t> f2 = hpx::async(
-            hpx::launch::all, inc, hpx::colocated(target), f);
+        hpx::future<std::int32_t> f1 =
+            hpx::async(inc, hpx::colocated(target), f);
+        hpx::future<std::int32_t> f2 =
+            hpx::async(hpx::launch::all, inc, hpx::colocated(target), f);
 
         HPX_TEST_EQ(f1.get(), 44);
         HPX_TEST_EQ(f2.get(), 44);
@@ -168,9 +169,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

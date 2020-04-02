@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -38,8 +38,8 @@ void increment(hpx::id_type const& there, std::int32_t i)
 }
 HPX_PLAIN_ACTION(increment);
 
-void increment_with_future(hpx::id_type const& there,
-    hpx::shared_future<std::int32_t> fi)
+void increment_with_future(
+    hpx::id_type const& there, hpx::shared_future<std::int32_t> fi)
 {
     accumulator += fi.get();
     hpx::apply(receive_result_action(), there, accumulator.load());
@@ -128,7 +128,6 @@ int hpx_main()
         hpx::apply<call_action>(inc, here, 1);
     }
 
-
     // Let finalize wait for every "apply" to be finished
     return hpx::finalize();
 }
@@ -138,14 +137,13 @@ int main(int argc, char* argv[])
     accumulator.store(0);
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     // After hpx::init returns, all actions should have been executed
     // The final result is only accumulated on the root locality
-    if(root_locality)
+    if (root_locality)
         HPX_TEST_EQ(final_result, 13);
 
     return hpx::util::report_errors();
 }
-

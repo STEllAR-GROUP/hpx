@@ -22,7 +22,7 @@
 #include <hpx/threading_base/thread_description.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/post_policy_dispatch.hpp>
+#include <hpx/execution/detail/post_policy_dispatch.hpp>
 
 #include <exception>
 #include <functional>

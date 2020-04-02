@@ -50,7 +50,7 @@ struct increment_type
     }
 };
 
-auto increment_lambda = [](std::int32_t i){ accumulator += i; };
+auto increment_lambda = [](std::int32_t i) { accumulator += i; };
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
@@ -118,7 +118,8 @@ int hpx_main()
     hpx::lcos::local::no_mutex result_mutex;
     std::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
     result_cv.wait_for(l, std::chrono::seconds(1),
-        hpx::util::bind(std::equal_to<std::int32_t>(), std::ref(accumulator), 18));
+        hpx::util::bind(
+            std::equal_to<std::int32_t>(), std::ref(accumulator), 18));
 
     HPX_TEST_EQ(accumulator.load(), 18);
 
@@ -130,9 +131,8 @@ int main(int argc, char* argv[])
     accumulator.store(0);
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

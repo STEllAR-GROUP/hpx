@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -83,8 +83,7 @@ void test_remote_async(hpx::id_type const& target)
     }
 
     {
-        hpx::future<std::int32_t> f1 =
-            hpx::async<increment_action>(target, 42);
+        hpx::future<std::int32_t> f1 = hpx::async<increment_action>(target, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
         hpx::future<std::int32_t> f2 =
@@ -135,8 +134,7 @@ void test_remote_async(hpx::id_type const& target)
             hpx::components::new_<decrement_server>(target);
         hpx::id_type dec = dec_f.get();
 
-        hpx::future<std::int32_t> f1 =
-            hpx::async<call_action>(dec, 42);
+        hpx::future<std::int32_t> f1 = hpx::async<call_action>(dec, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
         hpx::future<std::int32_t> f2 =
@@ -159,23 +157,18 @@ void test_remote_async(hpx::id_type const& target)
 
     {
         auto policy1 =
-            hpx::launch::select([]()
-            {
-                return hpx::launch::deferred;
-            });
+            hpx::launch::select([]() { return hpx::launch::deferred; });
 
         increment_with_future_action inc;
         hpx::shared_future<std::int32_t> f =
             hpx::async(policy1, hpx::util::bind(&increment, 42));
 
         std::atomic<int> count(0);
-        auto policy2 =
-            hpx::launch::select([&count]() -> hpx::launch
-            {
-                if (count++ == 0)
-                    return hpx::launch::async;
-                return hpx::launch::sync;
-            });
+        auto policy2 = hpx::launch::select([&count]() -> hpx::launch {
+            if (count++ == 0)
+                return hpx::launch::async;
+            return hpx::launch::sync;
+        });
 
         hpx::future<std::int32_t> f1 = hpx::async(policy2, inc, target, f);
         hpx::future<std::int32_t> f2 = hpx::async(policy2, inc, target, f);
@@ -198,9 +191,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

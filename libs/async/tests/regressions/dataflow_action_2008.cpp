@@ -7,8 +7,8 @@
 // This demonstrated the compilation error when using an action that returns a
 // future inside dataflow (issue #2008)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 
 hpx::future<double> foo()
