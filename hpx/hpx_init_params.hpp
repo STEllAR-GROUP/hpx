@@ -59,11 +59,12 @@ namespace hpx
         HPX_EXPORT void on_exit() noexcept;
         HPX_EXPORT void on_abort(int signal) noexcept;
         // Default params to initialize the init_params struct
-        HPX_MAYBE_UNUSED extern HPX_EXPORT int dummy_argc;
-        HPX_MAYBE_UNUSED extern HPX_EXPORT char **dummy_argv;
+        HPX_MAYBE_UNUSED static int dummy_argc = 1;
+        HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;
+        static char *default_argv[2] = { app_name, nullptr };
+        HPX_MAYBE_UNUSED static char **dummy_argv = default_argv;
         // HPX_APPLICATION_STRING is specific to an application and therefore
         // cannot be in the source file
-        HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;
         HPX_MAYBE_UNUSED static const hpx::program_options::options_description
             default_desc = hpx::program_options::options_description(
                     "Usage: " HPX_APPLICATION_STRING " [options]");
