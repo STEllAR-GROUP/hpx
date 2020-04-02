@@ -59,8 +59,6 @@ namespace hpx
         HPX_EXPORT void on_exit() noexcept;
         HPX_EXPORT void on_abort(int signal) noexcept;
         // Default params to initialize the init_params struct
-        extern HPX_EXPORT startup_function_type default_startup;
-        extern HPX_EXPORT shutdown_function_type default_shutdown;
         HPX_MAYBE_UNUSED extern HPX_EXPORT int dummy_argc;
         HPX_MAYBE_UNUSED extern HPX_EXPORT char **dummy_argv;
         // HPX_APPLICATION_STRING is specific to an application and therefore

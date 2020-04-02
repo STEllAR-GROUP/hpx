@@ -11,8 +11,6 @@
 
 
 namespace hpx { namespace detail {
-    startup_function_type default_startup = startup_function_type();
-    shutdown_function_type default_shutdown = shutdown_function_type();
     HPX_MAYBE_UNUSED int dummy_argc = 1;
     // TODO: make it only one parameter, probably add a cast
     char *default_argv[2] = { app_name, nullptr };
