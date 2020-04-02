@@ -11,7 +11,7 @@
 #define HPX_UTIL_SERIALIZABLE_UNIQUE_FUNCTION_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/functional/serialization/detail/serializable_basic_function.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/util/detail/serializable_basic_function.hpp>
 
 #endif
