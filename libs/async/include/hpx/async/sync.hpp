@@ -205,23 +205,10 @@ namespace hpx { namespace detail {
     };
 
     // launch with any action
-    template <typename Policy>
-    struct sync_dispatch<Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+    template <typename Func>
+    struct sync_dispatch_launch_policy_helper<Func,
+        typename std::enable_if<traits::is_action<Func>::value>::type>
     {
-        template <typename Policy_, typename F, typename... Ts>
-        HPX_FORCEINLINE static auto call(
-            Policy_&& launch_policy, F&& f, Ts&&... ts)
-            -> decltype(
-                detail::sync_launch_policy_dispatch<typename util::decay<
-                    F>::type>::call(std::forward<Policy_>(launch_policy),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
-        {
-            return detail::sync_launch_policy_dispatch<typename util::decay<
-                F>::type>::call(std::forward<Policy_>(launch_policy),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
-        }
-
         template <typename Policy_, typename Component, typename Signature,
             typename Derived, typename Client, typename Stub, typename... Ts>
         HPX_FORCEINLINE static typename traits::promise_local_result<

@@ -20,7 +20,40 @@
 #include <utility>
 
 namespace hpx { namespace detail {
-    // TODO: Where are the launch policy overloads? In the async module...
+    template <typename Func, typename Enable = void>
+    struct async_dispatch_launch_policy_helper
+    {
+        template <typename Policy_, typename F, typename... Ts>
+        HPX_FORCEINLINE static auto call(
+            Policy_&& launch_policy, F&& f, Ts&&... ts)
+            -> decltype(
+                async_launch_policy_dispatch<typename util::decay<
+                    F>::type>::call(std::forward<Policy_>(launch_policy),
+                    std::forward<F>(f), std::forward<Ts>(ts)...))
+        {
+            return async_launch_policy_dispatch<typename util::decay<
+                F>::type>::call(std::forward<Policy_>(launch_policy),
+                std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+    };
+
+    template <typename Policy>
+    struct async_dispatch<Policy,
+        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+    {
+        template <typename Policy_, typename F, typename... Ts>
+        HPX_FORCEINLINE static auto call(
+            Policy_&& launch_policy, F&& f, Ts&&... ts)
+            -> decltype(
+                async_dispatch_launch_policy_helper<typename util::decay<
+                    F>::type>::call(std::forward<Policy_>(launch_policy),
+                    std::forward<F>(f), std::forward<Ts>(ts)...))
+        {
+            return async_dispatch_launch_policy_helper<typename util::decay<
+                F>::type>::call(std::forward<Policy_>(launch_policy),
+                std::forward<F>(f), std::forward<Ts>(ts)...);
+        }
+    };
 
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.

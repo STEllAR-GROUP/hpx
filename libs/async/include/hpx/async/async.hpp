@@ -255,9 +255,9 @@ namespace hpx { namespace detail {
     };
 
     // launch with any action
-    template <typename Policy>
-    struct async_dispatch<Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+    template <typename Func>
+    struct async_dispatch_launch_policy_helper<Func,
+        typename std::enable_if<traits::is_action<Func>::value>::type>
     {
         template <typename Policy_, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(
