@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #endif
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/errors.hpp>

@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/util/tagged_pair.hpp>
