@@ -9,29 +9,32 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/sync.hpp>
+#include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/parallel_executor.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/sync_launch_policy_dispatch.hpp>
 
 #include <utility>
 
 namespace hpx { namespace detail {
     template <typename Func, typename Enable = void>
-    struct sync_dispatch_launch_policy_helper
+    struct sync_dispatch_launch_policy_helper;
+
+    template <typename Func>
+    struct sync_dispatch_launch_policy_helper<Func,
+        typename std::enable_if<!traits::is_action<Func>::value>::type>
     {
         template <typename Policy_, typename F, typename... Ts>
-        HPX_FORCEINLINE static auto call(
-            Policy_&& launch_policy, F&& f, Ts&&... ts)
-            -> decltype(
-                sync_launch_policy_dispatch<typename util::decay<
-                    F>::type>::call(std::forward<Policy_>(launch_policy),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+        HPX_FORCEINLINE static auto
+        call(Policy_&& launch_policy, F&& f, Ts&&... ts) -> decltype(
+            sync_launch_policy_dispatch<typename util::decay<F>::type>::call(
+                std::forward<Policy_>(launch_policy), std::forward<F>(f),
+                std::forward<Ts>(ts)...))
         {
-            return sync_launch_policy_dispatch<typename util::decay<
-                F>::type>::call(std::forward<Policy_>(launch_policy),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return sync_launch_policy_dispatch<typename util::decay<F>::type>::
+                call(std::forward<Policy_>(launch_policy), std::forward<F>(f),
+                    std::forward<Ts>(ts)...);
         }
     };
 
@@ -42,10 +45,9 @@ namespace hpx { namespace detail {
         template <typename Policy_, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(
             Policy_&& launch_policy, F&& f, Ts&&... ts)
-            -> decltype(
-                sync_dispatch_launch_policy_helper<typename util::decay<
+            -> decltype(sync_dispatch_launch_policy_helper<typename util::decay<
                     F>::type>::call(std::forward<Policy_>(launch_policy),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+                std::forward<F>(f), std::forward<Ts>(ts)...))
         {
             return sync_dispatch_launch_policy_helper<typename util::decay<
                 F>::type>::call(std::forward<Policy_>(launch_policy),
