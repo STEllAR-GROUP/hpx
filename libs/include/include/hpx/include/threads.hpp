@@ -8,10 +8,10 @@
 #define HPX_THREAD_APR_17_2012_1003AM
 
 #include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/executors.hpp>
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>
 #include <hpx/runtime/threads/run_as_os_thread.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
+#include <hpx/thread_executors.hpp>
 #include <hpx/thread_pools.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/threading_base/thread_data.hpp>

@@ -59,7 +59,7 @@ add_hpx_module(thread_executors
   COMPATIBILITY_HEADERS OFF
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
   SOURCES ${thread_executors_sources}
   HEADERS ${thread_executors_headers}
   COMPAT_HEADERS ${thread_executors_compat_headers}
