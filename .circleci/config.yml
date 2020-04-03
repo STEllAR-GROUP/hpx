@@ -719,6 +719,7 @@ jobs:
                   tests.unit.modules.logging \
                   tests.unit.modules.memory \
                   tests.unit.modules.naming_base \
+                  tests.unit.modules.pack_traversal \
                   tests.unit.modules.performance_counters \
                   tests.unit.modules.preprocessor \
                   tests.unit.modules.program_options \

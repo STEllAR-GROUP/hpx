@@ -103,6 +103,7 @@ add_hpx_module(include
     hpx_algorithms
     hpx_local_lcos
     hpx_naming_base
+    hpx_pack_traversal
     hpx_performance_counters
     hpx_resource_partitioner
     hpx_segmented_algorithms

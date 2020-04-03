@@ -8,12 +8,9 @@ set(tests
     any_serialization
     bind_action
     config_entry
-    pack_traversal
-    pack_traversal_async
     serializable_any
     serializable_boost_any
     tagged
-    unwrap
    )
 
 set(subdirs

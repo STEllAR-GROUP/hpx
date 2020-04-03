@@ -50,6 +50,7 @@ add_hpx_module(resource_partitioner
     hpx_functional
     hpx_hardware
     hpx_memory
+    hpx_pack_traversal
     hpx_plugin
     hpx_program_options
     hpx_runtime_configuration

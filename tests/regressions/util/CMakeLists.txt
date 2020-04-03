@@ -11,7 +11,6 @@ set(tests
     protect_with_nullary_pfo
     serialize_buffer_1069
     set_config_entry_deadlock
-    unwrapped_1528
     use_all_cores_2262
    )
 

@@ -138,6 +138,7 @@ add_hpx_module(algorithms
     hpx_execution
     hpx_iterator_support
     hpx_functional
+    hpx_pack_traversal
     hpx_statistics
     hpx_synchronization
     hpx_timing

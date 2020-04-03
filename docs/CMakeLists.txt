@@ -51,10 +51,7 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_some.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/wait_each.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/lcos/when_each.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/debugging.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/pack_traversal_async.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/util/unwrap.hpp")
+    "${PROJECT_SOURCE_DIR}/hpx/util/debugging.hpp")
 
 # Definitions for autodoc.doxy.in
 foreach(doxygen_input ${doxygen_dependencies})

@@ -54,6 +54,7 @@ add_hpx_module(local_lcos
     hpx_functional
     hpx_iterator_support
     hpx_memory
+    hpx_pack_traversal
     hpx_synchronization
     hpx_thread_support
     hpx_type_support

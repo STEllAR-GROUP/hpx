@@ -44,6 +44,7 @@ set(HPX_LIBS
   logging
   memory
   naming_base
+  pack_traversal
   performance_counters
   plugin
   prefix
