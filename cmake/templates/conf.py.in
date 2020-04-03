@@ -480,7 +480,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'HPX'
-copyright = u'2008-2019, The STE||AR Group'
+copyright = u'2008-2020, The STE||AR Group'
 author = u'The STE||AR Group'
 
 # The version info for the project you're documenting, acts as replacement for
