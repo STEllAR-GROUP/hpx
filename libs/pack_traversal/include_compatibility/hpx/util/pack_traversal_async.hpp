@@ -10,12 +10,10 @@
 
 #if defined(HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/pack_traversal_async.hpp is deprecated, \
+#pragma message("The header hpx/util/pack_traversal_async.hpp is deprecated, \
     please include hpx/pack_traversal/pack_traversal_async.hpp instead")
 #else
-#warning \
-    "The header hpx/util/pack_traversal_async.hpp is deprecated, \
+#warning "The header hpx/util/pack_traversal_async.hpp is deprecated, \
     please include hpx/pack_traversal/pack_traversal_async.hpp instead"
 #endif
 #endif

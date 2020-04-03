@@ -11,8 +11,7 @@
 
 #include <utility>
 
-namespace hpx {
-namespace util {
+namespace hpx { namespace util {
     /// A tag which is passed to the `operator()` of the visitor
     /// if an element is visited synchronously.
     using detail::async_traverse_visit_tag;
@@ -153,15 +152,14 @@ namespace util {
     /// traversal behavior and capabilities.
     ///
     template <typename Allocator, typename Visitor, typename... T>
-    auto traverse_pack_async_allocator(Allocator const& alloc,
-            Visitor&& visitor, T&&... pack)
-    -> decltype(detail::apply_pack_transform_async_allocator(
+    auto traverse_pack_async_allocator(
+        Allocator const& alloc, Visitor&& visitor, T&&... pack)
+        -> decltype(detail::apply_pack_transform_async_allocator(
             alloc, std::forward<Visitor>(visitor), std::forward<T>(pack)...))
     {
         return detail::apply_pack_transform_async_allocator(
             alloc, std::forward<Visitor>(visitor), std::forward<T>(pack)...);
     }
-}    // end namespace util
-}    // end namespace hpx
+}}    // namespace hpx::util
 
 #endif    // HPX_UTIL_PACK_TRAVERSAL_ASYNC_HPP

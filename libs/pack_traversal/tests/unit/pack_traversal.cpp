@@ -5,13 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/lcos/future.hpp>
+#include <hpx/pack_traversal/pack_traversal.hpp>
+#include <hpx/testing.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/pack_traversal/pack_traversal.hpp>
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <functional>
 #include <list>
 #include <memory>
@@ -19,16 +19,16 @@
 #include <utility>
 #include <vector>
 
-using hpx::util::tuple;
+using hpx::lcos::future;
+using hpx::lcos::make_ready_future;
+using hpx::traits::future_traits;
+using hpx::traits::is_future;
 using hpx::util::get;
 using hpx::util::make_tuple;
 using hpx::util::map_pack;
 using hpx::util::spread_this;
 using hpx::util::traverse_pack;
-using hpx::traits::future_traits;
-using hpx::traits::is_future;
-using hpx::lcos::future;
-using hpx::lcos::make_ready_future;
+using hpx::util::tuple;
 
 struct all_map_float
 {
@@ -61,21 +61,15 @@ struct all_map
 static void test_mixed_traversal()
 {
     {
-        auto res = map_pack(all_map_float{},
-            0,
-            1.f,
-            hpx::util::make_tuple(1.f, 3),
-            std::vector<std::vector<int>>{{1, 2}, {4, 5}},
-            std::vector<std::vector<float>>{{1.f, 2.f}, {4.f, 5.f}},
-            2);
+        auto res =
+            map_pack(all_map_float{}, 0, 1.f, hpx::util::make_tuple(1.f, 3),
+                std::vector<std::vector<int>>{{1, 2}, {4, 5}},
+                std::vector<std::vector<float>>{{1.f, 2.f}, {4.f, 5.f}}, 2);
 
         auto expected = hpx::util::make_tuple(    // ...
-            1.f,
-            2.f,
-            hpx::util::make_tuple(2.f, 4.f),
+            1.f, 2.f, hpx::util::make_tuple(2.f, 4.f),
             std::vector<std::vector<float>>{{2.f, 3.f}, {5.f, 6.f}},
-            std::vector<std::vector<float>>{{2.f, 3.f}, {5.f, 6.f}},
-            3.f);
+            std::vector<std::vector<float>>{{2.f, 3.f}, {5.f, 6.f}}, 3.f);
 
         static_assert(std::is_same<decltype(res), decltype(expected)>::value,
             "Type mismatch!");
@@ -95,17 +89,14 @@ static void test_mixed_traversal()
     }
 
     {
-        auto res = map_pack(my_mapper{},
-            0,
-            1.f,
+        auto res = map_pack(my_mapper{}, 0, 1.f,
             hpx::util::make_tuple(1.f, 3,
                 std::vector<std::vector<int>>{{1, 2}, {4, 5}},
                 std::vector<std::vector<float>>{{1.f, 2.f}, {4.f, 5.f}}),
             2);
 
         auto expected = hpx::util::make_tuple(    // ...
-            1.f,
-            1.f,
+            1.f, 1.f,
             hpx::util::make_tuple(1.f, 4.f,
                 std::vector<std::vector<float>>{{2.f, 3.f}, {5.f, 6.f}},
                 std::vector<std::vector<float>>{{1.f, 2.f}, {4.f, 5.f}}),
@@ -656,8 +647,8 @@ static void test_strategic_container_traverse()
                 new std::unique_ptr<int>(new int(7))));
 
             std::vector<std::unique_ptr<int>> res = map_pack(
-                [](std::unique_ptr<std::unique_ptr<int>> &
-                    ref) -> std::unique_ptr<int>&& {
+                [](std::unique_ptr<std::unique_ptr<int>>& ref)
+                    -> std::unique_ptr<int>&& {
                     // ...
                     return std::move(*ref);
                 },
@@ -688,8 +679,7 @@ static void test_strategic_tuple_like_traverse()
                 HPX_TEST_EQ(counter, el);
                 ++counter;
             },
-            make_tuple(0, 1),
-            make_tuple(make_tuple(2, 3), make_tuple(4, 5)),
+            make_tuple(0, 1), make_tuple(make_tuple(2, 3), make_tuple(4, 5)),
             make_tuple(make_tuple(make_tuple(6, 7))));
         HPX_TEST_EQ(counter, 8);
     }

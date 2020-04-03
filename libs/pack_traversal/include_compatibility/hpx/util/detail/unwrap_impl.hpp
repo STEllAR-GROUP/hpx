@@ -10,12 +10,10 @@
 
 #if defined(HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/util/detail/unwrap_impl.hpp is deprecated, \
+#pragma message("The header hpx/util/detail/unwrap_impl.hpp is deprecated, \
     please include hpx/pack_traversal/detail/unwrap_impl.hpp instead")
 #else
-#warning \
-    "The header hpx/util/detail/unwrap_impl.hpp is deprecated, \
+#warning "The header hpx/util/detail/unwrap_impl.hpp is deprecated, \
     please include hpx/pack_traversal/detail/unwrap_impl.hpp instead"
 #endif
 #endif

@@ -20,6 +20,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -36,7 +37,6 @@
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/util/zip_iterator.hpp>
 
 #endif

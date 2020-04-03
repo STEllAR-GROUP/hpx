@@ -10,11 +10,11 @@
 
 #if defined(HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/traits/pack_traversal_rebind_container.hpp is deprecated, \
     please include hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/traits/pack_traversal_rebind_container.hpp is deprecated, \
     please include hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp instead"
 #endif

@@ -10,11 +10,11 @@
 
 #if defined(HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/util/detail/pack_traversal_async_impl.hpp is deprecated, \
     please include hpx/pack_traversal/detail/pack_traversal_async_impl.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/util/detail/pack_traversal_async_impl.hpp is deprecated, \
     please include hpx/pack_traversal/detail/pack_traversal_async_impl.hpp instead"
 #endif

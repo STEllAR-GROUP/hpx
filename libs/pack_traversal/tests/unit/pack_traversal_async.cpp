@@ -6,12 +6,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/pack_traversal/pack_traversal_async.hpp>
+#include <hpx/testing.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <list>
@@ -20,7 +21,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <array>
 
 using hpx::util::async_traverse_complete_tag;
 using hpx::util::async_traverse_detach_tag;
@@ -74,7 +74,10 @@ private:
     mutable counter_type ref_counter;
 
 public:
-    intrusive_ref_counter() noexcept : ref_counter(1) {}
+    intrusive_ref_counter() noexcept
+      : ref_counter(1)
+    {
+    }
 
     unsigned int use_count() const noexcept
     {
@@ -85,12 +88,10 @@ protected:
     ~intrusive_ref_counter() = default;
 
     friend void intrusive_ptr_add_ref<Derived, CounterPolicy>(
-        intrusive_ref_counter<Derived, CounterPolicy> const* p)
-        noexcept;
+        intrusive_ref_counter<Derived, CounterPolicy> const* p) noexcept;
 
     friend void intrusive_ptr_release<Derived, CounterPolicy>(
-        intrusive_ref_counter<Derived, CounterPolicy> const* p)
-        noexcept;
+        intrusive_ref_counter<Derived, CounterPolicy> const* p) noexcept;
 };
 
 template <typename Derived, typename CounterPolicy>
@@ -209,10 +210,10 @@ void test_async_traversal_base(Args&&... args)
     // Test that every element is traversed in the correct order
     // when we detach the control flow on every visit.
     {
-        auto result = traverse_pack_async(
-            hpx::util::async_traverse_in_place_tag<
-                async_increasing_int_visitor<ArgCount>>{},
-            42, args...);
+        auto result =
+            traverse_pack_async(hpx::util::async_traverse_in_place_tag<
+                                    async_increasing_int_visitor<ArgCount>>{},
+                42, args...);
         HPX_TEST_EQ(result->counter(), ArgCount + 1U);
     }
 }
@@ -220,13 +221,8 @@ void test_async_traversal_base(Args&&... args)
 static void test_async_traversal()
 {
     // Just test everything using a casual int pack
-    test_async_traversal_base<4U>(not_accepted_tag{},
-        0U,
-        1U,
-        not_accepted_tag{},
-        2U,
-        3U,
-        not_accepted_tag{});
+    test_async_traversal_base<4U>(not_accepted_tag{}, 0U, 1U,
+        not_accepted_tag{}, 2U, 3U, not_accepted_tag{});
 }
 
 template <typename ContainerFactory>
@@ -295,8 +291,7 @@ static void test_async_tuple_like_traversal()
     test_async_traversal_base<4U>(make_tuple(0U, 1U, 2U, 3U));
 }
 
-template <typename T,
-    typename... Args,
+template <typename T, typename... Args,
     typename Vector = std::vector<typename std::decay<T>::type>>
 Vector vector_of(T&& first, Args&&... args)
 {
@@ -334,9 +329,8 @@ struct async_unique_sync_visitor
     }
 
     template <typename N>
-    void operator()(async_traverse_detach_tag,
-        std::unique_ptr<std::size_t>& i,
-        N&& next)
+    void operator()(
+        async_traverse_detach_tag, std::unique_ptr<std::size_t>& i, N&& next)
     {
         HPX_UNUSED(i);
         HPX_UNUSED(next);
@@ -360,17 +354,16 @@ struct async_unique_visitor : async_counter_base<async_unique_visitor<ArgCount>>
 {
     explicit async_unique_visitor(int dummy) {}
 
-    bool operator()(async_traverse_visit_tag,
-        std::unique_ptr<std::size_t>& i) const
+    bool operator()(
+        async_traverse_visit_tag, std::unique_ptr<std::size_t>& i) const
     {
         HPX_TEST_EQ(*i, this->counter());
         return false;
     }
 
     template <typename N>
-    void operator()(async_traverse_detach_tag,
-        std::unique_ptr<std::size_t>& i,
-        N&& next)
+    void operator()(
+        async_traverse_detach_tag, std::unique_ptr<std::size_t>& i, N&& next)
     {
         HPX_UNUSED(i);
 
@@ -395,17 +388,16 @@ static void test_async_move_only_traversal()
     };
 
     {
-        auto result = traverse_pack_async(
-            hpx::util::async_traverse_in_place_tag<
-                async_unique_sync_visitor<4>>{},
-            42, of(0), of(1), of(2), of(3));
+        auto result =
+            traverse_pack_async(hpx::util::async_traverse_in_place_tag<
+                                    async_unique_sync_visitor<4>>{},
+                42, of(0), of(1), of(2), of(3));
         HPX_TEST_EQ(result->counter(), 5U);
     }
 
     {
         auto result = traverse_pack_async(
-            hpx::util::async_traverse_in_place_tag<
-                async_unique_visitor<4>>{},
+            hpx::util::async_traverse_in_place_tag<async_unique_visitor<4>>{},
             42, of(0), of(1), of(2), of(3));
         HPX_TEST_EQ(result->counter(), 5U);
     }
@@ -422,9 +414,8 @@ struct invalidate_visitor : async_counter_base<invalidate_visitor>
     }
 
     template <typename N>
-    void operator()(async_traverse_detach_tag,
-        std::shared_ptr<int>& i,
-        N&& next)
+    void operator()(
+        async_traverse_detach_tag, std::shared_ptr<int>& i, N&& next)
     {
         HPX_UNUSED(i);
 
@@ -432,8 +423,8 @@ struct invalidate_visitor : async_counter_base<invalidate_visitor>
     }
 
     // Test whether the passed pack was passed as r-value reference
-    void operator()(async_traverse_complete_tag,
-        tuple<std::shared_ptr<int>>&& pack) const
+    void operator()(
+        async_traverse_complete_tag, tuple<std::shared_ptr<int>>&& pack) const
     {
         // Invalidate the moved object
         tuple<std::shared_ptr<int>> moved = std::move(pack);
@@ -448,8 +439,8 @@ static void test_async_complete_invalidation()
     auto value = std::make_shared<int>(22);
 
     auto frame = traverse_pack_async(
-        hpx::util::async_traverse_in_place_tag<invalidate_visitor>{},
-        42, value);
+        hpx::util::async_traverse_in_place_tag<invalidate_visitor>{}, 42,
+        value);
 
     HPX_TEST_EQ(value.use_count(), 1U);
 }

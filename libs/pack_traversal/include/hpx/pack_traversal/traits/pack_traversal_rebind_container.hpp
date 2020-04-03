@@ -10,16 +10,14 @@
 
 #include <array>
 #include <cstddef>
-#include <memory>
 #include <list>
+#include <memory>
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ////////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         ////////////////////////////////////////////////////////////////////////
         template <typename NewType, typename OldType, typename Enable = void>
         struct pack_traversal_rebind_container;
@@ -46,8 +44,8 @@ namespace hpx { namespace traits
             typename std::enable_if<std::uses_allocator<
                 Base<OldType, OldAllocator>, OldAllocator>::value>::type>
         {
-            using NewAllocator = typename std::allocator_traits<OldAllocator>::
-                template rebind_alloc<NewType>;
+            using NewAllocator = typename std::allocator_traits<
+                OldAllocator>::template rebind_alloc<NewType>;
 
             static Base<NewType, NewAllocator> call(
                 Base<OldType, OldAllocator> const& container)
@@ -58,7 +56,7 @@ namespace hpx { namespace traits
                     NewAllocator(container.get_allocator()));
             }
         };
-    }
+    }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
     // Implement a two-level specialization to avoid ambiguities between the
@@ -68,17 +66,18 @@ namespace hpx { namespace traits
     template <typename NewType, typename OldType, typename Enable = void>
     struct pack_traversal_rebind_container
       : pack_traversal_rebind_container<NewType, OldType>
-    {};
+    {
+    };
 
     // gcc reports an ambiguity for any standard container that has a defaulted
     // allocator template argument as it believes both specializations above are
     // viable. This works around by explicitly specializing the trait.
     template <typename NewType, typename OldType, typename OldAllocator>
-    struct pack_traversal_rebind_container<
-        NewType, std::vector<OldType, OldAllocator>>
+    struct pack_traversal_rebind_container<NewType,
+        std::vector<OldType, OldAllocator>>
     {
-        using NewAllocator = typename std::allocator_traits<OldAllocator>::
-            template rebind_alloc<NewType>;
+        using NewAllocator = typename std::allocator_traits<
+            OldAllocator>::template rebind_alloc<NewType>;
 
         static std::vector<NewType, NewAllocator> call(
             std::vector<OldType, OldAllocator> const& container)
@@ -91,11 +90,11 @@ namespace hpx { namespace traits
     };
 
     template <typename NewType, typename OldType, typename OldAllocator>
-    struct pack_traversal_rebind_container<
-        NewType, std::list<OldType, OldAllocator>>
+    struct pack_traversal_rebind_container<NewType,
+        std::list<OldType, OldAllocator>>
     {
-        using NewAllocator = typename std::allocator_traits<OldAllocator>::
-            template rebind_alloc<NewType>;
+        using NewAllocator = typename std::allocator_traits<
+            OldAllocator>::template rebind_alloc<NewType>;
 
         static std::list<NewType, NewAllocator> call(
             std::list<OldType, OldAllocator> const& container)
@@ -116,7 +115,6 @@ namespace hpx { namespace traits
             return std::array<NewType, N>();
         }
     };
-}}
+}}    // namespace hpx::traits
 
 #endif
-

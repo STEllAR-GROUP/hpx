@@ -6,13 +6,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/testing.hpp>
 
 #include <array>
 #include <atomic>
@@ -23,15 +23,15 @@
 #include <utility>
 #include <vector>
 
-using hpx::util::tuple;
 using hpx::util::get;
 using hpx::util::make_tuple;
+using hpx::util::tuple;
 using hpx::util::unwrap;
-using hpx::util::unwrap_n;
 using hpx::util::unwrap_all;
+using hpx::util::unwrap_n;
 using hpx::util::unwrapping;
-using hpx::util::unwrapping_n;
 using hpx::util::unwrapping_all;
+using hpx::util::unwrapping_n;
 
 /// Since the mapping functionality is provided by the `map_pack`
 /// API, we only need to test here for the specific behaviour of `unwrap`
@@ -156,9 +156,7 @@ void test_unwrapping(FutureProvider&& futurize)
 /// the immediate unwrap, because we materialize the arguments back.
 struct back_materializer
 {
-    void operator()() const
-    {
-    }
+    void operator()() const {}
 
     template <typename First>
     First operator()(First&& first) const
@@ -167,9 +165,8 @@ struct back_materializer
     }
 
     template <typename First, typename Second, typename... Rest>
-    tuple<First, Second, Rest...> operator()(First&& first,
-        Second&& second,
-        Rest&&... rest) const
+    tuple<First, Second, Rest...> operator()(
+        First&& first, Second&& second, Rest&&... rest) const
     {
         return tuple<First, Second, Rest...>{std::forward<First>(first),
             std::forward<Second>(second), std::forward<Rest>(rest)...};
@@ -336,213 +333,214 @@ void test_development_regressions(FutureProvider&& futurize)
 /// Most of this functionality was taken and adapted from
 /// the file: `tests/unit/util/unwrapped.cpp`.
 namespace legacy_tests {
-std::atomic<std::size_t> void_counter;
+    std::atomic<std::size_t> void_counter;
 
-static void null_thread()
-{
-    ++void_counter;
-}
-
-std::atomic<std::size_t> result_counter;
-
-static bool null_result_thread()
-{
-    ++result_counter;
-    return true;
-}
-
-static int increment(int c)
-{
-    return c + 1;
-}
-
-static int accumulate(std::vector<int> cs)
-{
-    return std::accumulate(cs.begin(), cs.end(), 0);
-}
-
-static int add(tuple<int, int> result)
-{
-    return get<0>(result) + get<1>(result);
-}
-
-template <template <typename> class FutureType, typename FutureProvider>
-void test_legacy_requirements(FutureProvider&& futurize)
-{
-    using hpx::async;
-
+    static void null_thread()
     {
-        // Sync wait, single future, void return.
+        ++void_counter;
+    }
+
+    std::atomic<std::size_t> result_counter;
+
+    static bool null_result_thread()
+    {
+        ++result_counter;
+        return true;
+    }
+
+    static int increment(int c)
+    {
+        return c + 1;
+    }
+
+    static int accumulate(std::vector<int> cs)
+    {
+        return std::accumulate(cs.begin(), cs.end(), 0);
+    }
+
+    static int add(tuple<int, int> result)
+    {
+        return get<0>(result) + get<1>(result);
+    }
+
+    template <template <typename> class FutureType, typename FutureProvider>
+    void test_legacy_requirements(FutureProvider&& futurize)
+    {
+        using hpx::async;
+
         {
-            unwrap(async(null_thread));
+            // Sync wait, single future, void return.
+            {
+                unwrap(async(null_thread));
 
-            HPX_TEST_EQ(1U, void_counter.load());
+                HPX_TEST_EQ(1U, void_counter.load());
 
-            void_counter.store(0);
-        }
+                void_counter.store(0);
+            }
 
-        // Sync wait, single future, non-void return.
-        {
-            HPX_TEST_EQ(true, unwrap(async(null_result_thread)));
-            HPX_TEST_EQ(1U, result_counter.load());
+            // Sync wait, single future, non-void return.
+            {
+                HPX_TEST_EQ(true, unwrap(async(null_result_thread)));
+                HPX_TEST_EQ(1U, result_counter.load());
 
-            result_counter.store(0);
-        }
+                result_counter.store(0);
+            }
 
-        // Sync wait, multiple futures, void return.
-        {
-            unwrap(async(null_thread), async(null_thread), async(null_thread));
+            // Sync wait, multiple futures, void return.
+            {
+                unwrap(
+                    async(null_thread), async(null_thread), async(null_thread));
 
-            HPX_TEST_EQ(3U, void_counter.load());
+                HPX_TEST_EQ(3U, void_counter.load());
 
-            void_counter.store(0);
-        }
+                void_counter.store(0);
+            }
 
-        // Sync wait, multiple futures, non-void return.
-        {
-            tuple<bool, bool, bool> r = unwrap(async(null_result_thread),
-                async(null_result_thread),
-                async(null_result_thread));
+            // Sync wait, multiple futures, non-void return.
+            {
+                tuple<bool, bool, bool> r = unwrap(async(null_result_thread),
+                    async(null_result_thread), async(null_result_thread));
 
-            HPX_TEST_EQ(true, get<0>(r));
-            HPX_TEST_EQ(true, get<1>(r));
-            HPX_TEST_EQ(true, get<2>(r));
-            HPX_TEST_EQ(3U, result_counter.load());
+                HPX_TEST_EQ(true, get<0>(r));
+                HPX_TEST_EQ(true, get<1>(r));
+                HPX_TEST_EQ(true, get<2>(r));
+                HPX_TEST_EQ(3U, result_counter.load());
 
-            result_counter.store(0);
-        }
+                result_counter.store(0);
+            }
 
-        // Sync wait, vector of futures, void return.
-        {
-            std::vector<FutureType<void>> futures;
-            futures.reserve(64);
+            // Sync wait, vector of futures, void return.
+            {
+                std::vector<FutureType<void>> futures;
+                futures.reserve(64);
 
-            for (std::size_t i = 0; i < 64; ++i)
-                futures.push_back(async(null_thread));
+                for (std::size_t i = 0; i < 64; ++i)
+                    futures.push_back(async(null_thread));
 
-            unwrap(futures);
+                unwrap(futures);
 
-            HPX_TEST_EQ(64U, void_counter.load());
+                HPX_TEST_EQ(64U, void_counter.load());
 
-            void_counter.store(0);
-        }
+                void_counter.store(0);
+            }
 
-        // Sync wait, array of futures, void return.
-        {
-            std::array<FutureType<void>, 64> futures;
+            // Sync wait, array of futures, void return.
+            {
+                std::array<FutureType<void>, 64> futures;
 
-            for (std::size_t i = 0; i < 64; ++i)
-                futures[i] = async(null_thread);
+                for (std::size_t i = 0; i < 64; ++i)
+                    futures[i] = async(null_thread);
 
-            unwrap(futures);
+                unwrap(futures);
 
-            HPX_TEST_EQ(64U, void_counter.load());
+                HPX_TEST_EQ(64U, void_counter.load());
 
-            void_counter.store(0);
-        }
+                void_counter.store(0);
+            }
 
-        // Sync wait, vector of futures, non-void return.
-        {
-            std::vector<FutureType<bool>> futures;
-            futures.reserve(64);
+            // Sync wait, vector of futures, non-void return.
+            {
+                std::vector<FutureType<bool>> futures;
+                futures.reserve(64);
 
-            std::vector<bool> values;
-            values.reserve(64);
+                std::vector<bool> values;
+                values.reserve(64);
 
-            for (std::size_t i = 0; i < 64; ++i)
-                futures.push_back(async(null_result_thread));
+                for (std::size_t i = 0; i < 64; ++i)
+                    futures.push_back(async(null_result_thread));
 
-            values = unwrap(futures);
+                values = unwrap(futures);
 
-            HPX_TEST_EQ(64U, result_counter.load());
+                HPX_TEST_EQ(64U, result_counter.load());
 
-            for (std::size_t i = 0; i < 64; ++i)
-                HPX_TEST_EQ(true, values[i]);
+                for (std::size_t i = 0; i < 64; ++i)
+                    HPX_TEST_EQ(true, values[i]);
 
-            result_counter.store(0);
-        }
+                result_counter.store(0);
+            }
 
-        // Sync wait, array of futures, non-void return.
-        {
-            std::array<FutureType<bool>, 64> futures;
+            // Sync wait, array of futures, non-void return.
+            {
+                std::array<FutureType<bool>, 64> futures;
 
-            for (std::size_t i = 0; i < 64; ++i)
-                futures[i] = async(null_result_thread);
+                for (std::size_t i = 0; i < 64; ++i)
+                    futures[i] = async(null_result_thread);
 
-            std::array<bool, 64> values = unwrap(futures);
+                std::array<bool, 64> values = unwrap(futures);
 
-            HPX_TEST_EQ(64U, result_counter.load());
+                HPX_TEST_EQ(64U, result_counter.load());
 
-            for (std::size_t i = 0; i < 64; ++i)
-                HPX_TEST_EQ(true, values[i]);
+                for (std::size_t i = 0; i < 64; ++i)
+                    HPX_TEST_EQ(true, values[i]);
 
-            result_counter.store(0);
-        }
+                result_counter.store(0);
+            }
 
-        // Sync wait, vector of futures, non-void return ignored.
-        {
-            std::vector<FutureType<bool>> futures;
-            futures.reserve(64);
+            // Sync wait, vector of futures, non-void return ignored.
+            {
+                std::vector<FutureType<bool>> futures;
+                futures.reserve(64);
 
-            for (std::size_t i = 0; i < 64; ++i)
-                futures.push_back(async(null_result_thread));
+                for (std::size_t i = 0; i < 64; ++i)
+                    futures.push_back(async(null_result_thread));
 
-            unwrap(futures);
+                unwrap(futures);
 
-            HPX_TEST_EQ(64U, result_counter.load());
+                HPX_TEST_EQ(64U, result_counter.load());
 
-            result_counter.store(0);
-        }
+                result_counter.store(0);
+            }
 
-        // Sync wait, array of futures, non-void return ignored.
-        {
-            std::array<FutureType<bool>, 64> futures;
+            // Sync wait, array of futures, non-void return ignored.
+            {
+                std::array<FutureType<bool>, 64> futures;
 
-            for (std::size_t i = 0; i < 64; ++i)
-                futures[i] = async(null_result_thread);
+                for (std::size_t i = 0; i < 64; ++i)
+                    futures[i] = async(null_result_thread);
 
-            unwrap(futures);
+                unwrap(futures);
 
-            HPX_TEST_EQ(64U, result_counter.load());
+                HPX_TEST_EQ(64U, result_counter.load());
 
-            result_counter.store(0);
-        }
+                result_counter.store(0);
+            }
 
-        // Functional wrapper, single future
-        {
-            FutureType<int> future = futurize(42);
+            // Functional wrapper, single future
+            {
+                FutureType<int> future = futurize(42);
 
-            HPX_TEST_EQ(unwrapping(&increment)(future), 42 + 1);
-        }
+                HPX_TEST_EQ(unwrapping(&increment)(future), 42 + 1);
+            }
 
-        // Functional wrapper, vector of future
-        {
-            std::vector<FutureType<int>> futures;
-            futures.reserve(64);
+            // Functional wrapper, vector of future
+            {
+                std::vector<FutureType<int>> futures;
+                futures.reserve(64);
 
-            for (std::size_t i = 0; i < 64; ++i)
-                futures.push_back(futurize(42));
+                for (std::size_t i = 0; i < 64; ++i)
+                    futures.push_back(futurize(42));
 
-            HPX_TEST_EQ(unwrapping(&accumulate)(futures), 42 * 64);
-        }
+                HPX_TEST_EQ(unwrapping(&accumulate)(futures), 42 * 64);
+            }
 
-        // Functional wrapper, tuple of future
-        {
-            tuple<FutureType<int>, FutureType<int>> tuple =
-                make_tuple(futurize(42), futurize(42));
+            // Functional wrapper, tuple of future
+            {
+                tuple<FutureType<int>, FutureType<int>> tuple =
+                    make_tuple(futurize(42), futurize(42));
 
-            HPX_TEST_EQ(unwrapping(&add)(tuple), 42 + 42);
-        }
+                HPX_TEST_EQ(unwrapping(&add)(tuple), 42 + 42);
+            }
 
-        // Functional wrapper, future of tuple of future
-        {
-            FutureType<tuple<FutureType<int>, FutureType<int>>> tuple_future =
-                futurize(make_tuple(futurize(42), futurize(42)));
+            // Functional wrapper, future of tuple of future
+            {
+                FutureType<tuple<FutureType<int>, FutureType<int>>>
+                    tuple_future =
+                        futurize(make_tuple(futurize(42), futurize(42)));
 
-            HPX_TEST_EQ(unwrapping_n<2>(&add)(tuple_future), 42 + 42);
+                HPX_TEST_EQ(unwrapping_n<2>(&add)(tuple_future), 42 + 42);
+            }
         }
     }
-}
 }    // end namespace legacy_tests
 
 /// A callable object which provides a specific future type

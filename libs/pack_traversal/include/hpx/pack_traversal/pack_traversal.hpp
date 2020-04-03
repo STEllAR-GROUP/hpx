@@ -7,15 +7,14 @@
 #ifndef HPX_UTIL_PACK_TRAVERSAL_HPP
 #define HPX_UTIL_PACK_TRAVERSAL_HPP
 
-#include <hpx/pack_traversal/detail/pack_traversal_impl.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/pack_traversal/detail/pack_traversal_impl.hpp>
 
 #include <type_traits>
 #include <utility>
 
 #if defined(DOXYGEN)
-namespace hpx {
-namespace util {
+namespace hpx { namespace util {
     /// Maps the pack with the given mapper.
     ///
     /// This function tries to visit all plain elements which may be wrapped in:
@@ -49,21 +48,17 @@ namespace util {
     ///
     template <typename Mapper, typename... T>
     <unspecified> map_pack(Mapper&& mapper, T&&... pack);
-}
-}
+}}       // namespace hpx::util
 #else    // DOXYGEN
 
-namespace hpx {
-namespace util {
+namespace hpx { namespace util {
     template <typename Mapper, typename... T>
     auto map_pack(Mapper&& mapper, T&&... pack)
         -> decltype(detail::apply_pack_transform(detail::strategy_remap_tag{},
-            std::forward<Mapper>(mapper),
-            std::forward<T>(pack)...))
+            std::forward<Mapper>(mapper), std::forward<T>(pack)...))
     {
         return detail::apply_pack_transform(detail::strategy_remap_tag{},
-            std::forward<Mapper>(mapper),
-            std::forward<T>(pack)...);
+            std::forward<Mapper>(mapper), std::forward<T>(pack)...);
     }
 
     /// Indicate that the result shall be spread across the parent container
@@ -87,11 +82,9 @@ namespace util {
     void traverse_pack(Mapper&& mapper, T&&... pack)
     {
         detail::apply_pack_transform(detail::strategy_traverse_tag{},
-            std::forward<Mapper>(mapper),
-            std::forward<T>(pack)...);
+            std::forward<Mapper>(mapper), std::forward<T>(pack)...);
     }
-}    // end namespace util
-}    // end namespace hpx
+}}    // namespace hpx::util
 
 #endif    // DOXYGEN
 #endif    // HPX_UTIL_PACK_TRAVERSAL_HPP

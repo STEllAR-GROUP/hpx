@@ -10,10 +10,10 @@
 
 #include <vector>
 
-void noop(){}
+void noop() {}
 
 int main()
 {
     std::vector<hpx::future<void>> fs;
-    hpx::util::unwrapping(&noop)(fs);
+    hpx::util::unwrapping (&noop)(fs);
 }
