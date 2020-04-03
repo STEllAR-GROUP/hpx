@@ -14,7 +14,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <cstddef>
 #include <string>

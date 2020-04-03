@@ -12,7 +12,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <array>
 #include <atomic>

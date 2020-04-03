@@ -8,7 +8,7 @@
 #define HPX_UTIL_UNWRAP_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/unwrap_impl.hpp>
+#include <hpx/pack_traversal/detail/unwrap_impl.hpp>
 
 #include <cstddef>
 #include <utility>

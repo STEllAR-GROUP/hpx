@@ -16,7 +16,7 @@
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/traits/is_future_tuple.hpp>
-#include <hpx/util/pack_traversal.hpp>
+#include <hpx/pack_traversal/pack_traversal.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <cstddef>

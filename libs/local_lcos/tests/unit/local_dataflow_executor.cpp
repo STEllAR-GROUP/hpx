@@ -11,7 +11,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <atomic>
 #include <cstddef>

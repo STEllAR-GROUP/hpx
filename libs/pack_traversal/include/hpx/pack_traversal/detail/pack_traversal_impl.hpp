@@ -13,10 +13,10 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
-#include <hpx/traits/pack_traversal_rebind_container.hpp>
+#include <hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>
-#include <hpx/util/detail/container_category.hpp>
+#include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <cstddef>

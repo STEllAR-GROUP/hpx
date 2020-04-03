@@ -40,7 +40,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/util/pack_traversal_async.hpp>
+#include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
 #include <hpx/execution/executors/execution.hpp>

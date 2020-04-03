@@ -8,7 +8,7 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/pack_traversal.hpp>
+#include <hpx/pack_traversal/pack_traversal.hpp>
 
 #include <array>
 #include <algorithm>

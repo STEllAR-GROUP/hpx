@@ -7,7 +7,7 @@
 #ifndef HPX_UTIL_PACK_TRAVERSAL_ASYNC_HPP
 #define HPX_UTIL_PACK_TRAVERSAL_ASYNC_HPP
 
-#include <hpx/util/detail/pack_traversal_async_impl.hpp>
+#include <hpx/pack_traversal/detail/pack_traversal_async_impl.hpp>
 
 #include <utility>
 

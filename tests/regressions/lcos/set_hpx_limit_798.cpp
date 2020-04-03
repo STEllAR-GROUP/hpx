@@ -12,7 +12,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/dataflow.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 using hpx::lcos::shared_future;
 using hpx::lcos::make_ready_future;

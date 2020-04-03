@@ -27,7 +27,7 @@
 #include <hpx/lcos/dataflow.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/pack_traversal.hpp>
+#include <hpx/pack_traversal/pack_traversal.hpp>
 //
 #include <chrono>
 #include <cstddef>

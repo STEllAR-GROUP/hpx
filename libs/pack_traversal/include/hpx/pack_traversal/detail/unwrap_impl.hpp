@@ -13,7 +13,7 @@
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/util/pack_traversal.hpp>
+#include <hpx/pack_traversal/pack_traversal.hpp>
 #include <hpx/functional/result_of.hpp>
 
 #include <cstddef>

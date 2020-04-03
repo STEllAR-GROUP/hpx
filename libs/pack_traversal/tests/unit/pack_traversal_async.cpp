@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/util/pack_traversal_async.hpp>
+#include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/type_support/unused.hpp>
 

@@ -30,7 +30,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/pack.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <algorithm>
 #include <type_traits>

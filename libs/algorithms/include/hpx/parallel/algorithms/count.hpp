@@ -14,7 +14,7 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/parallel/traits/vector_pack_count_bits.hpp>

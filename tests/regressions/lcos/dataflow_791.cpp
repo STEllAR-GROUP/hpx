@@ -12,7 +12,7 @@
 #include <hpx/include/actions.hpp>
 
 #include <hpx/dataflow.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/timing.hpp>
 
 #include <hpx/testing.hpp>

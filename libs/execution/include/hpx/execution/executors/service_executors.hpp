@@ -24,7 +24,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <algorithm>
 #include <cstddef>

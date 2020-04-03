@@ -16,7 +16,7 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/sync_launch_policy_dispatch.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <hpx/execution/exception_list.hpp>
 

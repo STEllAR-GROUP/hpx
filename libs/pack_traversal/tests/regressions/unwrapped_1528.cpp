@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <vector>
 

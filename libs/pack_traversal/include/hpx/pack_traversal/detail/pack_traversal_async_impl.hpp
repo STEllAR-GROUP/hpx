@@ -17,7 +17,7 @@
 #include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>
-#include <hpx/util/detail/container_category.hpp>
+#include <hpx/pack_traversal/detail/container_category.hpp>
 
 #include <atomic>
 #include <cstddef>
