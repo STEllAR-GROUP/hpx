@@ -59,13 +59,15 @@ namespace hpx
         HPX_EXPORT void on_exit() noexcept;
         HPX_EXPORT void on_abort(int signal) noexcept;
         // Default params to initialize the init_params struct
-        extern HPX_EXPORT const hpx::program_options::options_description
-            default_desc;
-        extern HPX_EXPORT startup_function_type default_startup;
-        extern HPX_EXPORT shutdown_function_type default_shutdown;
-        HPX_MAYBE_UNUSED extern HPX_EXPORT int dummy_argc;
-        // TODO: make it only one parameter, probably add a cast
-        HPX_MAYBE_UNUSED extern HPX_EXPORT char **dummy_argv;
+        HPX_MAYBE_UNUSED static int dummy_argc = 1;
+        HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;
+        static char *default_argv[2] = { app_name, nullptr };
+        HPX_MAYBE_UNUSED static char **dummy_argv = default_argv;
+        // HPX_APPLICATION_STRING is specific to an application and therefore
+        // cannot be in the source file
+        HPX_MAYBE_UNUSED static const hpx::program_options::options_description
+            default_desc = hpx::program_options::options_description(
+                    "Usage: " HPX_APPLICATION_STRING " [options]");
     }
 
 #ifndef DOXYGEN
@@ -115,8 +117,8 @@ namespace hpx
         std::reference_wrapper<hpx::program_options::options_description const>
             desc_cmdline = detail::default_desc;
         std::vector<std::string> cfg;
-        startup_function_type& startup = detail::default_startup;
-        shutdown_function_type& shutdown = detail::default_startup;
+        mutable startup_function_type startup;
+        mutable shutdown_function_type shutdown;
         hpx::runtime_mode mode = ::hpx::runtime_mode_default;
         hpx::resource::partitioner_mode rp_mode = ::hpx::resource::mode_default;
         hpx::resource::rp_callback_type rp_callback;
