@@ -710,6 +710,7 @@ jobs:
                   tests.unit.modules.coroutines \
                   tests.unit.modules.datastructures \
                   tests.unit.modules.debugging \
+                  tests.unit.modules.distributed_executors \
                   tests.unit.modules.errors \
                   tests.unit.modules.filesystem \
                   tests.unit.modules.format \
