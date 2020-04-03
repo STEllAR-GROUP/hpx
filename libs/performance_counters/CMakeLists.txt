@@ -64,6 +64,7 @@ add_hpx_module(performance_counters
     hpx_config
     hpx_errors
     hpx_execution
+    hpx_executors
     hpx_format
     hpx_functional
     hpx_logging
