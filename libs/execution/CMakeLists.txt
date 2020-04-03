@@ -19,6 +19,7 @@ set(execution_headers
   hpx/execution/execution_policy.hpp
   hpx/execution/executor_parameters.hpp
   hpx/execution/executors/auto_chunk_size.hpp
+  hpx/execution/executors/current_executor.hpp
   hpx/execution/executors/default_executor.hpp
   hpx/execution/executors/distribution_policy_executor.hpp
   hpx/execution/executors/dynamic_chunk_size.hpp
@@ -30,7 +31,9 @@ set(execution_headers
   hpx/execution/executors/execution_parameters.hpp
   hpx/execution/executors/fused_bulk_execute.hpp
   hpx/execution/executors/guided_chunk_size.hpp
+  hpx/execution/executors/guided_pool_executor.hpp
   hpx/execution/executors.hpp
+  hpx/execution/executors/limiting_executor.hpp
   hpx/execution/executors/parallel_executor_aggregated.hpp
   hpx/execution/executors/parallel_executor.hpp
   hpx/execution/executors/persistent_auto_chunk_size.hpp
