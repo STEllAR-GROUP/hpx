@@ -327,78 +327,78 @@ namespace hpx
         util::function_nonser<runtime::hpx_main_function_type> const& func,
         int& result)
     {
-        lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
-
-        // Change our thread description, as we're about to call pre_main
-        threads::set_thread_description(threads::get_self_id(), "pre_main");
-
-        // Finish the bootstrap
-        result = hpx::pre_main(mode_);
-        if (result) {
-            lbt_ << "runtime_impl::run_helper: bootstrap "
-                    "aborted, bailing out";
-            return threads::thread_result_type(threads::terminated,
-                threads::invalid_thread_id);
-        }
-
-        lbt_ << "(4th stage) runtime_impl::run_helper: bootstrap complete";
-        set_state(state_running);
-
-#if defined(HPX_HAVE_NETWORKING)
-        parcel_handler_.enable_alternative_parcelports();
-#endif
-
-        // reset all counters right before running main, if requested
-        if (get_config_entry("hpx.print_counter.startup", "0") == "1")
+        try
         {
-            bool reset = false;
-            if (get_config_entry("hpx.print_counter.reset", "0") == "1")
-                reset = true;
+            lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
-            error_code ec(lightweight);     // ignore errors
-            evaluate_active_counters(reset, "startup", ec);
-        }
+            // Change our thread description, as we're about to call pre_main
+            threads::set_thread_description(threads::get_self_id(), "pre_main");
 
-        // Connect back to given latch if specified
-        std::string connect_back_to(
-            get_config_entry("hpx.on_startup.wait_on_latch", ""));
-        if (!connect_back_to.empty())
-        {
-            lbt_ << "(5th stage) runtime_impl::run_helper: about to "
-                    "synchronize with latch: "
-                 << connect_back_to;
+            // Finish the bootstrap
+            result = hpx::pre_main(mode_);
+            if (result) {
+                lbt_ << "runtime_impl::run_helper: bootstrap "
+                        "aborted, bailing out";
+                return threads::thread_result_type(threads::terminated,
+                    threads::invalid_thread_id);
+            }
 
-            // inform launching process that this locality is up and running
-            hpx::lcos::latch l;
-            l.connect_to(connect_back_to);
-            l.count_down_and_wait();
+            lbt_ << "(4th stage) runtime_impl::run_helper: bootstrap complete";
+            set_state(state_running);
 
-            lbt_ << "(5th stage) runtime_impl::run_helper: "
-                    "synchronized with latch: "
-                 << connect_back_to;
-        }
+    #if defined(HPX_HAVE_NETWORKING)
+            parcel_handler_.enable_alternative_parcelports();
+    #endif
 
-        // Now, execute the user supplied thread function (hpx_main)
-        if (!!func)
-        {
-            lbt_ << "(last stage) runtime_impl::run_helper: about to "
-                    "invoke hpx_main";
-
-            // Change our thread description, as we're about to call hpx_main
-            threads::set_thread_description(threads::get_self_id(), "hpx_main");
-
-            try
+            // reset all counters right before running main, if requested
+            if (get_config_entry("hpx.print_counter.startup", "0") == "1")
             {
+                bool reset = false;
+                if (get_config_entry("hpx.print_counter.reset", "0") == "1")
+                    reset = true;
+
+                error_code ec(lightweight);     // ignore errors
+                evaluate_active_counters(reset, "startup", ec);
+            }
+
+            // Connect back to given latch if specified
+            std::string connect_back_to(
+                get_config_entry("hpx.on_startup.wait_on_latch", ""));
+            if (!connect_back_to.empty())
+            {
+                lbt_ << "(5th stage) runtime_impl::run_helper: about to "
+                        "synchronize with latch: "
+                     << connect_back_to;
+
+                // inform launching process that this locality is up and running
+                hpx::lcos::latch l;
+                l.connect_to(connect_back_to);
+                l.count_down_and_wait();
+
+                lbt_ << "(5th stage) runtime_impl::run_helper: "
+                        "synchronized with latch: "
+                     << connect_back_to;
+            }
+
+            // Now, execute the user supplied thread function (hpx_main)
+            if (!!func)
+            {
+                lbt_ << "(last stage) runtime_impl::run_helper: about to "
+                        "invoke hpx_main";
+
+                // Change our thread description, as we're about to call hpx_main
+                threads::set_thread_description(threads::get_self_id(), "hpx_main");
+
                 // Call hpx_main
                 result = func();
             }
-            catch (...)
-            {
-                // make sure exceptions thrown in hpx_main don't escape
-                // unnoticed
-                report_error(std::current_exception());
-                result = -1;
-            }
+        }
+        catch (...)
+        {
+            // make sure exceptions thrown in hpx_main don't escape
+            // unnoticed
+            report_error(std::current_exception());
+            result = -1;
         }
         return threads::thread_result_type(threads::terminated,
             threads::invalid_thread_id);
