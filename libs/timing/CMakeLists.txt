@@ -43,5 +43,6 @@ add_hpx_module(timing
   COMPAT_HEADERS ${timing_compat_headers}
   DEPENDENCIES
     hpx_config
+    hpx_hardware
   CMAKE_SUBDIRS examples tests
 )
