@@ -18,18 +18,9 @@ set(tests
     parallel_policy_executor
     persistent_executor_parameters
     polymorphic_executor
-    sequenced_executor
-    service_executors
     shared_parallel_executor
-    timed_parallel_executor
     standalone_thread_pool_executor
    )
-
-if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
-  set(tests ${tests}
-    thread_pool_attached_executors
-    )
-endif()
 
 foreach(test ${tests})
   set(sources
