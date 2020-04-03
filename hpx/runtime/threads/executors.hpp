@@ -15,7 +15,7 @@
 #include <hpx/thread_executors/service_executors.hpp>
 #include <hpx/thread_executors/this_thread_executors.hpp>
 #include <hpx/thread_executors/embedded_thread_pool_executors.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/thread_executors/thread_executor.hpp>
 #endif
 
 #endif

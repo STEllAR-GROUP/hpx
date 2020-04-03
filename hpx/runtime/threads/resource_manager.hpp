@@ -12,7 +12,7 @@
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <atomic>

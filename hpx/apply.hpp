@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/execution/traits/is_executor.hpp>

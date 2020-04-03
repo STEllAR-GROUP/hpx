@@ -16,7 +16,7 @@
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/thread_description.hpp>
