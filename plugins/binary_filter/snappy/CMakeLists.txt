@@ -37,7 +37,7 @@ if(HPX_WITH_COMPRESSION_SNAPPY)
     target_link_directories(compression_snappy PRIVATE ${SNAPPY_LIBRARY_DIR})
   endif()
 
-  target_link_libraries(compression_snappy PUBLIC hpx::boost::iostreams)
+  target_link_libraries(compression_snappy PUBLIC Boost::iostreams)
 
   add_hpx_pseudo_dependencies(plugins.binary_filter.snappy compression_snappy)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.snappy)

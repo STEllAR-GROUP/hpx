@@ -6,6 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_FIND_PACKAGE ON)
+cmake_policy(VERSION 3.13)
 
 # Forward HPX_* cache variables
 include("${CMAKE_CURRENT_LIST_DIR}/HPXCacheVariables.cmake")
@@ -70,11 +71,8 @@ set(HPX_BOOST_ROOT "@BOOST_ROOT@")
 if (NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
   set(BOOST_ROOT ${HPX_BOOST_ROOT})
 endif()
-# hpx::boost
 include(HPX_SetupBoost)
-# hpx::boost::filesystem
 include(HPX_SetupBoostFilesystem)
-# hpx::boost::program_options
 include(HPX_SetupBoostProgramOptions)
 
 # Hwloc

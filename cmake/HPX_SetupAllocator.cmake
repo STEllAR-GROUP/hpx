@@ -11,7 +11,7 @@
 include(HPX_AddDefinitions)
 
 # In case find_package(HPX) is called multiple times
-if (NOT TARGET hpx::allocator)
+if (NOT TARGET hpx_dependencies_allocator)
 
   if(NOT HPX_WITH_MALLOC)
     set(HPX_WITH_MALLOC CACHE STRING
@@ -30,7 +30,7 @@ if (NOT TARGET hpx::allocator)
 
   string(TOUPPER "${HPX_WITH_MALLOC}" HPX_WITH_MALLOC_UPPER)
 
-  add_library(hpx::allocator INTERFACE IMPORTED)
+  add_library(hpx_dependencies_allocator INTERFACE IMPORTED)
 
   if(NOT HPX_WITH_MALLOC_DEFAULT)
 
@@ -42,7 +42,7 @@ if (NOT TARGET hpx::allocator)
         hpx_error(${allocator_error})
       endif()
 
-      target_link_libraries(hpx::allocator INTERFACE ${TCMALLOC_LIBRARIES})
+      target_link_libraries(hpx_dependencies_allocator INTERFACE ${TCMALLOC_LIBRARIES})
 
       if(MSVC)
         hpx_add_link_flag_if_available(/INCLUDE:__tcmalloc)
@@ -57,9 +57,9 @@ if (NOT TARGET hpx::allocator)
       if(NOT JEMALLOC_LIBRARIES)
         hpx_error(${allocator_error})
       endif()
-      target_include_directories(hpx::allocator INTERFACE
+      target_include_directories(hpx_dependencies_allocator INTERFACE
           ${JEMALLOC_INCLUDE_DIR} ${JEMALLOC_ADDITIONAL_INCLUDE_DIR})
-      target_link_libraries(hpx::allocator INTERFACE ${JEMALLOC_LIBRARIES})
+      target_link_libraries(hpx_dependencies_allocator INTERFACE ${JEMALLOC_LIBRARIES})
     endif()
 
     ##################################################
@@ -69,7 +69,7 @@ if (NOT TARGET hpx::allocator)
       if(NOT mimalloc_FOUND)
         hpx_error(${allocator_error})
       endif()
-      target_link_libraries(hpx::allocator INTERFACE mimalloc)
+      target_link_libraries(hpx_dependencies_allocator INTERFACE mimalloc)
       set(hpx_MALLOC_LIBRARY mimalloc)
       if(MSVC)
         hpx_add_link_flag_if_available(/INCLUDE:mi_version)
@@ -87,7 +87,7 @@ if (NOT TARGET hpx::allocator)
       if(MSVC)
         hpx_add_link_flag_if_available(/INCLUDE:__TBB_malloc_proxy)
       endif()
-      target_link_libraries(hpx::allocator INTERFACE
+      target_link_libraries(hpx_dependencies_allocator INTERFACE
         ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
     endif()
 
@@ -117,10 +117,6 @@ if (NOT TARGET hpx::allocator)
     if(NOT AMPLIFIER_FOUND)
       hpx_error("Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation")
     endif()
-
-    add_library(hpx::amplifier INTERFACE IMPORTED)
-    target_include_directories(hpx::amplifier SYSTEM INTERFACE ${AMPLIFIER_INCLUDE_DIR})
-    target_link_libraries(hpx::amplifier INTERFACE ${AMPLIFIER_LIBRARIES})
 
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)

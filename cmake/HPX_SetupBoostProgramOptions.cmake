@@ -5,28 +5,21 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-  set(__boost_program_options hpx::boost::program_options)
+  set(__boost_program_options Boost::program_options)
 endif()
 
-# Creates imported hpx::boost::program_options target
 if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY AND NOT TARGET
-    hpx::boost::program_options)
+    Boost::program_options)
 
   hpx_add_config_define_namespace(
     DEFINE HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
     NAMESPACE PROGRAM_OPTIONS)
 
   find_package(Boost ${Boost_MINIMUM_VERSION}
-    QUIET MODULE
+    MODULE
     COMPONENTS program_options)
 
   if(NOT Boost_PROGRAM_OPTIONS_FOUND)
     hpx_error("Could not find Boost.ProgramOptions. Provide a boost installation including the program_options library")
   endif()
-
-  add_library(hpx::boost::program_options INTERFACE IMPORTED)
-  target_include_directories(hpx::boost::program_options SYSTEM INTERFACE ${Boost_INCLUDE_DIRS})
-  target_link_libraries(hpx::boost::program_options INTERFACE
-    ${Boost_PROGRAM_OPTIONS_LIBRARIES})
-
 endif()

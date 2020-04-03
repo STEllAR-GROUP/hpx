@@ -7,7 +7,7 @@
 # FIXME : in the future put it directly inside the cmake directory of the
 # corresponding plugin
 
-if (HPX_WITH_PARCELPORT_VERBS AND NOT TARGET hpx::verbs)
+if (HPX_WITH_PARCELPORT_VERBS AND NOT TARGET Verbs::verbs)
   #------------------------------------------------------------------------------
   # OFED verbs stack
   #------------------------------------------------------------------------------
@@ -214,8 +214,8 @@ if (HPX_WITH_PARCELPORT_VERBS AND NOT TARGET hpx::verbs)
   #------------------------------------------------------------------------------
   include(HPX_AddLibrary)
 
-  add_library(hpx::verbs INTERFACE IMPORTED)
-  target_include_directories(hpx::verbs SYSTEM INTERFACE ${IB_VERBS_INCLUDE_DIRS} ${RDMA_CM_INCLUDE_DIRS})
-  target_link_libraries(hpx::verbs INTERFACE ${IB_VERBS_LIBRARIES} ${RDMA_CM_LIBRARIES})
+  add_library(Verbs::verbs INTERFACE IMPORTED)
+  target_include_directories(Verbs::verbs INTERFACE ${IB_VERBS_INCLUDE_DIRS} ${RDMA_CM_INCLUDE_DIRS})
+  target_link_libraries(Verbs::verbs INTERFACE ${IB_VERBS_LIBRARIES} ${RDMA_CM_LIBRARIES})
 
 endif()

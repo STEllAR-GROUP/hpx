@@ -10,7 +10,7 @@ set(tests
   )
 
 set(shared_mutex_1702_PARAMETERS THREADS_PER_LOCALITY 4)
-set(shared_mutex_1702_LIBRARIES hpx::boost)
+set(shared_mutex_1702_LIBRARIES hpx_dependencies_boost)
 set(ignore_while_locked_1485_PARAMETERS THREADS_PER_LOCALITY 2)
 
 # Create test cases

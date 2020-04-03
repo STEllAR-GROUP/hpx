@@ -38,7 +38,7 @@ endif()
 set(lockfree_fifo_FLAGS NOLIBS)
 set(lockfree_fifo_LIBRARIES
   DEPENDENCIES
-    hpx::boost
+    hpx_dependencies_boost
     hpx_assertion
     hpx_config
     hpx_concurrency
@@ -53,7 +53,7 @@ set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
-set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE hpx::hwloc)
+set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE Hwloc::hwloc)
 
 set(thread_PARAMETERS THREADS_PER_LOCALITY 4)
 

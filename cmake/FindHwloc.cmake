@@ -7,48 +7,54 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-find_package(PkgConfig QUIET)
-pkg_check_modules(PC_HWLOC QUIET hwloc)
+if (NOT TARGET Hwloc::hwloc)
+  find_package(PkgConfig QUIET)
+  pkg_check_modules(PC_HWLOC QUIET hwloc)
 
-find_path(HWLOC_INCLUDE_DIR hwloc.h
-  HINTS
-    ${HWLOC_ROOT} ENV HWLOC_ROOT
-    ${HPX_HWLOC_ROOT}
-    ${PC_HWLOC_MINIMAL_INCLUDEDIR}
-    ${PC_HWLOC_MINIMAL_INCLUDE_DIRS}
-    ${PC_HWLOC_INCLUDEDIR}
-    ${PC_HWLOC_INCLUDE_DIRS}
-  PATH_SUFFIXES include)
+  find_path(HWLOC_INCLUDE_DIR hwloc.h
+    HINTS
+      ${HWLOC_ROOT} ENV HWLOC_ROOT
+      ${HPX_HWLOC_ROOT}
+      ${PC_HWLOC_MINIMAL_INCLUDEDIR}
+      ${PC_HWLOC_MINIMAL_INCLUDE_DIRS}
+      ${PC_HWLOC_INCLUDEDIR}
+      ${PC_HWLOC_INCLUDE_DIRS}
+    PATH_SUFFIXES include)
 
-find_library(HWLOC_LIBRARY NAMES hwloc libhwloc
-  HINTS
-    ${HWLOC_ROOT} ENV HWLOC_ROOT
-    ${HPX_HWLOC_ROOT}
-    ${PC_HWLOC_MINIMAL_LIBDIR}
-    ${PC_HWLOC_MINIMAL_LIBRARY_DIRS}
-    ${PC_HWLOC_LIBDIR}
-    ${PC_HWLOC_LIBRARY_DIRS}
-  PATH_SUFFIXES lib lib64)
+  find_library(HWLOC_LIBRARY NAMES hwloc libhwloc
+    HINTS
+      ${HWLOC_ROOT} ENV HWLOC_ROOT
+      ${HPX_HWLOC_ROOT}
+      ${PC_HWLOC_MINIMAL_LIBDIR}
+      ${PC_HWLOC_MINIMAL_LIBRARY_DIRS}
+      ${PC_HWLOC_LIBDIR}
+      ${PC_HWLOC_LIBRARY_DIRS}
+    PATH_SUFFIXES lib lib64)
 
-# Set HWLOC_ROOT in case the other hints are used
-if (NOT HWLOC_ROOT AND "$ENV{HWLOC_ROOT}")
-  set(HWLOC_ROOT $ENV{HWLOC_ROOT})
-elseif(NOT HWLOC_ROOT)
-  string(REPLACE "/include" "" HWLOC_ROOT "${HWLOC_INCLUDE_DIR}")
-endif()
-
-set(HWLOC_LIBRARIES ${HWLOC_LIBRARY})
-set(HWLOC_INCLUDE_DIRS ${HWLOC_INCLUDE_DIR})
-
-find_package_handle_standard_args(Hwloc DEFAULT_MSG
-  HWLOC_LIBRARY HWLOC_INCLUDE_DIR)
-
-get_property(_type CACHE HWLOC_ROOT PROPERTY TYPE)
-if(_type)
-  set_property(CACHE HWLOC_ROOT PROPERTY ADVANCED 1)
-  if("x${_type}" STREQUAL "xUNINITIALIZED")
-    set_property(CACHE HWLOC_ROOT PROPERTY TYPE PATH)
+  # Set HWLOC_ROOT in case the other hints are used
+  if (NOT HWLOC_ROOT AND "$ENV{HWLOC_ROOT}")
+    set(HWLOC_ROOT $ENV{HWLOC_ROOT})
+  elseif(NOT HWLOC_ROOT)
+    string(REPLACE "/include" "" HWLOC_ROOT "${HWLOC_INCLUDE_DIR}")
   endif()
-endif()
 
-mark_as_advanced(HWLOC_ROOT HWLOC_LIBRARY HWLOC_INCLUDE_DIR)
+  set(HWLOC_LIBRARIES ${HWLOC_LIBRARY})
+  set(HWLOC_INCLUDE_DIRS ${HWLOC_INCLUDE_DIR})
+
+  find_package_handle_standard_args(Hwloc DEFAULT_MSG
+    HWLOC_LIBRARY HWLOC_INCLUDE_DIR)
+
+  get_property(_type CACHE HWLOC_ROOT PROPERTY TYPE)
+  if(_type)
+    set_property(CACHE HWLOC_ROOT PROPERTY ADVANCED 1)
+    if("x${_type}" STREQUAL "xUNINITIALIZED")
+      set_property(CACHE HWLOC_ROOT PROPERTY TYPE PATH)
+    endif()
+  endif()
+
+  add_library(Hwloc::hwloc INTERFACE IMPORTED)
+  target_include_directories(Hwloc::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
+  target_link_libraries(Hwloc::hwloc INTERFACE ${HWLOC_LIBRARIES})
+
+  mark_as_advanced(HWLOC_ROOT HWLOC_LIBRARY HWLOC_INCLUDE_DIR)
+endif()

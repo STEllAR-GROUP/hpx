@@ -47,8 +47,8 @@ if(HPX_WITH_PARCELPORT_MPI)
       hpx_timing
       hpx_topology
       hpx_util
-      hpx::boost
-      hpx::mpi
+      hpx_dependencies_boost
+      Mpi::mpi
     INCLUDE_DIRS
       ${PROJECT_SOURCE_DIR}
     FOLDER

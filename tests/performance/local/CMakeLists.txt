@@ -124,7 +124,7 @@ set(benchmarks ${benchmarks}
     native_tls_overhead
    )
 
-set(native_tls_overhead_LIBRARIES hpx::boost)
+set(native_tls_overhead_LIBRARIES hpx_dependencies_boost)
 
 set(benchmarks ${benchmarks}
     coroutines_call_overhead

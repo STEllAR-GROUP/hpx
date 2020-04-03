@@ -17,7 +17,7 @@ set(exclude_from_headers
 )
 
 if(HPX_WITH_PARCELPORT_MPI)
-  set(test_deps hpx::mpi)
+  set(test_deps Mpi::mpi)
 endif()
 
 add_hpx_header_tests(

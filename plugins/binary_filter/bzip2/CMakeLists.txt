@@ -40,7 +40,7 @@ if(HPX_WITH_COMPRESSION_BZIP2)
 
   target_include_directories(compression_bzip2 PUBLIC
     $<BUILD_INTERFACE:${HEADER_ROOT}>)
-  target_link_libraries(compression_bzip2 PUBLIC hpx::boost::iostreams)
+  target_link_libraries(compression_bzip2 PUBLIC Boost::iostreams)
 
   add_hpx_pseudo_dependencies(plugins.binary_filter.bzip2 compression_bzip2)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.bzip2)

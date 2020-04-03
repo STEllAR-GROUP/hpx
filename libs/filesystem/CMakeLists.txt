@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(__boost_filesystem)
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
-  set(__boost_filesystem hpx::boost::filesystem)
+  set(__boost_filesystem Boost::filesystem)
 endif()
 
 set(filesystem_headers "hpx/filesystem.hpp")

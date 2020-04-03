@@ -30,8 +30,8 @@ if (HPX_WITH_PARCELPORT_VERBS)
       hpx_plugin
       hpx_preprocessor
       hpx_threading
-      hpx::verbs
-      hpx::boost
+      Verbs::verbs
+      hpx_dependencies_boost
     INCLUDE_DIRS
       ${PROJECT_BINARY_DIR}
       ${PROJECT_SOURCE_DIR}

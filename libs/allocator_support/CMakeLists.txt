@@ -30,6 +30,6 @@ add_hpx_module(allocator_support
   DEPENDENCIES
     hpx_config
     hpx_preprocessor
-    hpx::allocator
+    hpx_dependencies_allocator
   CMAKE_SUBDIRS examples tests
 )

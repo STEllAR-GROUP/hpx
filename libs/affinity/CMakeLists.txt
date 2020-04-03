@@ -42,6 +42,6 @@ add_hpx_module(affinity
     hpx_format
     hpx_topology
     hpx_util
-    hpx::hwloc
+    Hwloc::hwloc
   CMAKE_SUBDIRS tests
 )

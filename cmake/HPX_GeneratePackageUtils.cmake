@@ -41,6 +41,11 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
   get_target_property(_target_link_options ${target} INTERFACE_LINK_OPTIONS)
   get_target_property(_target_type ${target} TYPE)
 
+  if(NOT "${_target_type}" STREQUAL "INTERFACE_LIBRARY")
+    get_target_property(_target_imported_location ${target} IMPORTED_LOCATION)
+    list(APPEND _target_link_libraries ${_target_imported_location})
+  endif()
+
   # If the target is a library link against it.
   if("${_target_type}" STREQUAL "STATIC_LIBRARY" OR "${_target_type}" STREQUAL "SHARED_LIBRARY")
     # Necessary cause TARGET_FILE doesn't find the target in the install dir
