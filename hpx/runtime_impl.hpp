@@ -149,18 +149,23 @@ namespace hpx
         ///                   the error has been detected in.
         /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
-        bool report_error(std::size_t num_thread,
-            std::exception_ptr const& e) override;
+        /// \param terminate_all [in] Kill all localities attached to the
+        ///                   currently running application (default: true)
+        bool report_error(std::size_t num_thread, std::exception_ptr const& e,
+            bool terminate_all = true) override;
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
         /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
+        /// \param terminate_all [in] Kill all localities attached to the
+        ///                   currently running application (default: true)
         ///
         /// \note This function will retrieve the number of the current
         ///       shepherd thread and forward to the report_error function
         ///       above.
-        bool report_error(std::exception_ptr const& e) override;
+        bool report_error(
+            std::exception_ptr const& e, bool terminate_all = true) override;
 
         /// \brief Run the HPX runtime system, use the given function for the
         ///        main \a thread and block waiting for all threads to

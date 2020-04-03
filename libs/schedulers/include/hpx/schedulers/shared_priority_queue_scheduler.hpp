@@ -342,6 +342,7 @@ namespace hpx { namespace threads { namespace policies {
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
                                     static_cast<std::size_t>(num_workers_));
+                            local_num = thread_num;
                         }
                         else if (!round_robin_) /* thread parent */
                         {
@@ -402,6 +403,7 @@ namespace hpx { namespace threads { namespace policies {
                             fast_mod(data.schedulehint.hint, num_domains_);
                         // if the thread creating the new task is on the domain
                         // assigned to the new task - try to reuse the core as well
+                        HPX_ASSERT(local_num != std::size_t(-1));
                         thread_num = local_num;
                         if (d_lookup_[thread_num] == domain_num)
                         {
@@ -427,7 +429,8 @@ namespace hpx { namespace threads { namespace policies {
                                 std::to_string(data.schedulehint.mode));
                     }
                     // we do not allow threads created on other queues to 'run now'
-                    // as this caues cross-thread allocations and map accesses
+                    // as this causes cross-thread allocations and map accesses
+                    HPX_ASSERT(local_num != std::size_t(-1));
                     if (local_num != thread_num)
                     {
                         run_now = false;

@@ -327,6 +327,7 @@ namespace hpx
         util::function_nonser<runtime::hpx_main_function_type> const& func,
         int& result)
     {
+        bool caught_exception = false;
         try
         {
             lbt_ << "(2nd stage) runtime_impl::run_helper: launching pre_main";
@@ -387,7 +388,8 @@ namespace hpx
                         "invoke hpx_main";
 
                 // Change our thread description, as we're about to call hpx_main
-                threads::set_thread_description(threads::get_self_id(), "hpx_main");
+                threads::set_thread_description(
+                    threads::get_self_id(), "hpx_main");
 
                 // Call hpx_main
                 result = func();
@@ -397,9 +399,21 @@ namespace hpx
         {
             // make sure exceptions thrown in hpx_main don't escape
             // unnoticed
-            report_error(std::current_exception());
+            {
+                std::lock_guard<std::mutex> l(mtx_);
+                exception_ = std::current_exception();
+            }
             result = -1;
+            caught_exception = true;
         }
+
+        if (caught_exception)
+        {
+            HPX_ASSERT(exception_);
+            report_error(exception_, false);
+            hpx::finalize();    // make sure the application exits
+        }
+
         return threads::thread_result_type(threads::terminated,
             threads::invalid_thread_id);
     }
@@ -743,7 +757,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_impl::report_error(
-        std::size_t num_thread, std::exception_ptr const& e)
+        std::size_t num_thread, std::exception_ptr const& e, bool terminate_all)
     {
         // call thread-specific user-supplied on_error handler
         bool report_exception = true;
@@ -793,15 +807,19 @@ namespace hpx
             }
         }
 
-        components::stubs::runtime_support::terminate_all(
-            naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+        if (terminate_all)
+        {
+            components::stubs::runtime_support::terminate_all(
+                naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+        }
 
         return report_exception;
     }
 
-    bool runtime_impl::report_error(std::exception_ptr const& e)
+    bool runtime_impl::report_error(
+        std::exception_ptr const& e, bool terminate_all)
     {
-        return report_error(hpx::get_worker_thread_num(), e);
+        return report_error(hpx::get_worker_thread_num(), e, terminate_all);
     }
 
     void runtime_impl::rethrow_exception()
@@ -870,7 +888,7 @@ namespace hpx
         char const* prefix)
     {
         typedef bool (runtime_impl::*report_error_t)(
-            std::size_t, std::exception_ptr const&);
+            std::size_t, std::exception_ptr const&, bool);
 
         using util::placeholders::_1;
         using util::placeholders::_2;
@@ -885,7 +903,7 @@ namespace hpx
             util::bind(&runtime_impl::deinit_tss, This(), prefix, _1));
         notifier.set_on_error_callback(
             util::bind(static_cast<report_error_t>(&runtime_impl::report_error),
-                This(), _1, _2));
+                This(), _1, _2, true));
 
         return notifier;
     }
