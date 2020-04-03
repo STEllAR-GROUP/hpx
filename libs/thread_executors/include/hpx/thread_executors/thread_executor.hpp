@@ -14,13 +14,13 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/threading_base/thread_description.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -32,11 +32,9 @@
 #include <iosfwd>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         class HPX_EXPORT executor_base;
     }
 
@@ -45,64 +43,75 @@ namespace hpx { namespace threads
     private:
         std::size_t id_;
 
-        friend bool operator== (executor_id const& x, executor_id const& y) noexcept;
-        friend bool operator!= (executor_id const& x, executor_id const& y) noexcept;
-        friend bool operator< (executor_id const& x, executor_id const& y) noexcept;
-        friend bool operator> (executor_id const& x, executor_id const& y) noexcept;
-        friend bool operator<= (executor_id const& x, executor_id const& y) noexcept;
-        friend bool operator>= (executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator==(
+            executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator!=(
+            executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator<(
+            executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator>(
+            executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator<=(
+            executor_id const& x, executor_id const& y) noexcept;
+        friend bool operator>=(
+            executor_id const& x, executor_id const& y) noexcept;
 
         template <typename Char, typename Traits>
-        friend std::basic_ostream<Char, Traits>&
-        operator<< (std::basic_ostream<Char, Traits>&, executor_id const&);
+        friend std::basic_ostream<Char, Traits>& operator<<(
+            std::basic_ostream<Char, Traits>&, executor_id const&);
 
         friend class detail::executor_base;
 
     public:
-        executor_id() noexcept : id_(0) {}
-        explicit executor_id(std::size_t i) noexcept : id_(i) {}
+        executor_id() noexcept
+          : id_(0)
+        {
+        }
+        explicit executor_id(std::size_t i) noexcept
+          : id_(i)
+        {
+        }
     };
 
-    inline bool operator== (executor_id const& x, executor_id const& y) noexcept
+    inline bool operator==(executor_id const& x, executor_id const& y) noexcept
     {
         return x.id_ == y.id_;
     }
 
-    inline bool operator!= (executor_id const& x, executor_id const& y) noexcept
+    inline bool operator!=(executor_id const& x, executor_id const& y) noexcept
     {
         return !(x == y);
     }
 
-    inline bool operator< (executor_id const& x, executor_id const& y) noexcept
+    inline bool operator<(executor_id const& x, executor_id const& y) noexcept
     {
         return x.id_ < y.id_;
     }
 
-    inline bool operator> (executor_id const& x, executor_id const& y) noexcept
+    inline bool operator>(executor_id const& x, executor_id const& y) noexcept
     {
         return x.id_ > y.id_;
     }
 
-    inline bool operator<= (executor_id const& x, executor_id const& y) noexcept
+    inline bool operator<=(executor_id const& x, executor_id const& y) noexcept
     {
         return !(x.id_ > y.id_);
     }
 
-    inline bool operator>= (executor_id const& x, executor_id const& y) noexcept
+    inline bool operator>=(executor_id const& x, executor_id const& y) noexcept
     {
         return !(x.id_ < y.id_);
     }
 
     template <typename Char, typename Traits>
-    std::basic_ostream<Char, Traits>&
-    operator<< (std::basic_ostream<Char, Traits>& out, executor_id const& id)
+    std::basic_ostream<Char, Traits>& operator<<(
+        std::basic_ostream<Char, Traits>& out, executor_id const& id)
     {
-        out << id.id_; //-V128
+        out << id.id_;    //-V128
         return out;
     }
 
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // Main executor interface
         void intrusive_ptr_add_ref(executor_base* p);
@@ -113,7 +122,10 @@ namespace hpx { namespace threads
         public:
             typedef util::unique_function_nonser<void()> closure_type;
 
-            executor_base() : count_(0) {}
+            executor_base()
+              : count_(0)
+            {
+            }
             virtual ~executor_base() {}
 
             // Scheduling methods.
@@ -125,27 +137,30 @@ namespace hpx { namespace threads
                 util::thread_description const& desc,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize,
-                threads::thread_schedule_hint schedulehint,
-                error_code& ec) = 0;
+                threads::thread_schedule_hint schedulehint, error_code& ec) = 0;
 
             // Return an estimate of the number of waiting closures.
-            virtual std::uint64_t num_pending_closures(error_code& ec) const = 0;
+            virtual std::uint64_t num_pending_closures(
+                error_code& ec) const = 0;
 
             // Reset internal (round robin) thread distribution scheme
             virtual void reset_thread_distribution() {}
 
             // Return the requested policy element
             virtual std::size_t get_policy_element(
-                threads::detail::executor_parameter p, error_code& ec) const = 0;
+                threads::detail::executor_parameter p,
+                error_code& ec) const = 0;
 
             // Return the mask for processing units the given thread is allowed
             // to run on.
-            virtual mask_cref_type get_pu_mask(topology const& topology,
-                std::size_t num_thread) const;
+            virtual mask_cref_type get_pu_mask(
+                topology const& topology, std::size_t num_thread) const;
 
             // Set the new scheduler mode
             virtual void set_scheduler_mode(
-                threads::policies::scheduler_mode /*mode*/) {}
+                threads::policies::scheduler_mode /*mode*/)
+            {
+            }
 
             // retrieve executor id
             virtual executor_id get_id() const
@@ -187,25 +202,25 @@ namespace hpx { namespace threads
         class scheduled_executor_base : public executor_base
         {
         public:
-
             scheduled_executor_base()
-              : stacksize_(thread_stacksize_default),
-                priority_(thread_priority_default),
-                schedulehint_(thread_schedule_hint())
-            {}
+              : stacksize_(thread_stacksize_default)
+              , priority_(thread_priority_default)
+              , schedulehint_(thread_schedule_hint())
+            {
+            }
 
             scheduled_executor_base(thread_priority priority,
                 thread_stacksize stacksize, thread_schedule_hint schedulehint)
-              : stacksize_(stacksize),
-                priority_(priority),
-                schedulehint_(schedulehint)
-            {}
+              : stacksize_(stacksize)
+              , priority_(priority)
+              , schedulehint_(schedulehint)
+            {
+            }
 
             // Schedule given function for execution in this executor no sooner
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
-            virtual void add_at(
-                util::steady_clock::time_point const& abs_time,
+            virtual void add_at(util::steady_clock::time_point const& abs_time,
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
@@ -213,15 +228,14 @@ namespace hpx { namespace threads
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
-                return add_at(abs_time.value(), std::move(f), desc,
-                    stacksize, ec);
+                return add_at(
+                    abs_time.value(), std::move(f), desc, stacksize, ec);
             }
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
             // violate bounds on the executor's queue size.
-            virtual void add_after(
-                util::steady_clock::duration const& rel_time,
+            virtual void add_after(util::steady_clock::duration const& rel_time,
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec) = 0;
 
@@ -229,19 +243,25 @@ namespace hpx { namespace threads
                 closure_type&& f, util::thread_description const& desc,
                 threads::thread_stacksize stacksize, error_code& ec)
             {
-                return add_after(rel_time.value(), std::move(f), desc,
-                    stacksize, ec);
+                return add_after(
+                    rel_time.value(), std::move(f), desc, stacksize, ec);
             }
 
-            thread_priority  get_priority() const { return priority_; }
-            thread_stacksize get_stacksize() const { return stacksize_; }
+            thread_priority get_priority() const
+            {
+                return priority_;
+            }
+            thread_stacksize get_stacksize() const
+            {
+                return stacksize_;
+            }
 
         protected:
-            thread_stacksize     stacksize_;
-            thread_priority      priority_;
+            thread_stacksize stacksize_;
+            thread_priority priority_;
             thread_schedule_hint schedulehint_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // This is equivalent to the proposed executor interface (see N3562)
@@ -262,7 +282,8 @@ namespace hpx { namespace threads
         // generic executors can't be created directly
         executor(detail::executor_base* data)
           : executor_data_(data)
-        {}
+        {
+        }
 
     public:
         typedef detail::executor_base::closure_type closure_type;
@@ -302,8 +323,8 @@ namespace hpx { namespace threads
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
-        mask_cref_type get_pu_mask(topology const& topology,
-                std::size_t num_thread) const
+        mask_cref_type get_pu_mask(
+            topology const& topology, std::size_t num_thread) const
         {
             return executor_data_->get_pu_mask(topology, num_thread);
         }
@@ -350,13 +371,16 @@ namespace hpx { namespace threads
     class HPX_EXPORT scheduled_executor : public executor
     {
     private:
-        struct tag {};
+        struct tag
+        {
+        };
 
     protected:
         // generic executors can't be created directly
         scheduled_executor(detail::scheduled_executor_base* data)
           : executor(data)
-        {}
+        {
+        }
 
     public:
         // default constructor creates invalid (non-usable) executor
@@ -370,10 +394,10 @@ namespace hpx { namespace threads
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
-        void add_at(
-            util::steady_clock::time_point const& abs_time,
+        void add_at(util::steady_clock::time_point const& abs_time,
             closure_type f, char const* desc = "",
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
             error_code& ec = throws)
         {
             hpx::static_pointer_cast<detail::scheduled_executor_base>(
@@ -381,13 +405,13 @@ namespace hpx { namespace threads
                 ->add_at(abs_time, std::move(f), desc, stacksize, ec);
         }
 
-        void add_at(util::steady_time_point const& abs_time,
-            closure_type f, char const* desc = "",
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        void add_at(util::steady_time_point const& abs_time, closure_type f,
+            char const* desc = "",
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
             error_code& ec = throws)
         {
-            return add_at(abs_time.value(), std::move(f), desc,
-                stacksize, ec);
+            return add_at(abs_time.value(), std::move(f), desc, stacksize, ec);
         }
 
         /// Effects: The specified function object shall be scheduled for
@@ -398,10 +422,10 @@ namespace hpx { namespace threads
         /// variables.
         /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
-        void add_after(
-            util::steady_clock::duration const& rel_time,
+        void add_after(util::steady_clock::duration const& rel_time,
             closure_type f, char const* desc = "",
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
             error_code& ec = throws)
         {
             hpx::static_pointer_cast<detail::scheduled_executor_base>(
@@ -409,13 +433,14 @@ namespace hpx { namespace threads
                 ->add_after(rel_time, std::move(f), desc, stacksize, ec);
         }
 
-        void add_after(util::steady_duration const& rel_time,
-            closure_type f, char const* desc = "",
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        void add_after(util::steady_duration const& rel_time, closure_type f,
+            char const* desc = "",
+            threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
             error_code& ec = throws)
         {
-            return add_after(rel_time.value(), std::move(f), desc,
-                stacksize, ec);
+            return add_after(
+                rel_time.value(), std::move(f), desc, stacksize, ec);
         }
 
         void detach()
@@ -423,17 +448,21 @@ namespace hpx { namespace threads
             executor_data_->detach();
         }
 
-        thread_priority get_priority() const {
-            return static_cast<detail::scheduled_executor_base*>
-                    (executor_data_.get())->get_priority();
+        thread_priority get_priority() const
+        {
+            return static_cast<detail::scheduled_executor_base*>(
+                executor_data_.get())
+                ->get_priority();
         }
 
-        thread_stacksize get_stacksize() const {
-            return static_cast<detail::scheduled_executor_base*>
-                    (executor_data_.get())->get_stacksize();
+        thread_stacksize get_stacksize() const
+        {
+            return static_cast<detail::scheduled_executor_base*>(
+                executor_data_.get())
+                ->get_stacksize();
         }
     };
-}}
+}}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
 

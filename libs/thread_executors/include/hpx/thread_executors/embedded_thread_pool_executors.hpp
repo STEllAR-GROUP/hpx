@@ -14,9 +14,9 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
