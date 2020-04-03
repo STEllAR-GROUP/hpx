@@ -15,6 +15,7 @@
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace detail {

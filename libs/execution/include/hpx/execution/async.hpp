@@ -18,6 +18,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace detail {
