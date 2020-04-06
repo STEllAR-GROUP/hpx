@@ -27,7 +27,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-#include <hpx/util/tick_counter.hpp>
+#include <hpx/timing/tick_counter.hpp>
 #endif
 
 #include <atomic>

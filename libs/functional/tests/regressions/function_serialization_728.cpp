@@ -7,22 +7,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/util.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/util.hpp>
 #ifdef HPX_HAVE_COMPRESSION_ZLIB
-  #include <hpx/include/compression_zlib.hpp>
+#include <hpx/include/compression_zlib.hpp>
 #endif
-#include <hpx/include/parcel_coalescing.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/parcel_coalescing.hpp>
 #include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 struct functor
 {
@@ -39,10 +39,9 @@ int pass_functor(hpx::util::function<int()> const& f)
     return f();
 }
 
-
 HPX_DECLARE_PLAIN_ACTION(pass_functor, pass_functor_action);
 #ifdef HPX_HAVE_COMPRESSION_ZLIB
-  HPX_ACTION_USES_ZLIB_COMPRESSION(pass_functor_action);
+HPX_ACTION_USES_ZLIB_COMPRESSION(pass_functor_action);
 #endif
 HPX_ACTION_USES_MESSAGE_COALESCING(pass_functor_action);
 HPX_PLAIN_ACTION(pass_functor, pass_functor_action);
@@ -71,7 +70,7 @@ int hpx_main(variables_map& vm)
         functor g;
         hpx::util::function<int()> f(g);
 
-        std::vector<hpx::future<void> > futures;
+        std::vector<hpx::future<void>> futures;
 
         for (std::size_t i = 0; i != 16; ++i)
         {
@@ -97,4 +96,3 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ(hpx::init(cmdline, argc, argv), 0);
     return 0;
 }
-

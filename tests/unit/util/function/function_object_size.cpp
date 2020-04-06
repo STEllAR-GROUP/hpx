@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/serializable_function.hpp>
+#include <hpx/functional/serialization/serializable_function.hpp>
 
 #include <hpx/serialization/access.hpp>
 

@@ -10,14 +10,13 @@
 #define HPX_UTIL_DETAIL_VTABLE_SERIALIZABLE_VTABLE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
 #include <new>
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     struct serializable_vtable
     {
         template <typename T>
@@ -26,8 +25,8 @@ namespace hpx { namespace util { namespace detail
         {
             ar << vtable::get<T>(obj);
         }
-        void (*save_object)(void const*,
-            serialization::output_archive&, unsigned);
+        void (*save_object)(
+            void const*, serialization::output_archive&, unsigned);
 
         template <typename T>
         static void* _load_object(void* storage, std::size_t storage_size,
@@ -38,15 +37,16 @@ namespace hpx { namespace util { namespace detail
             ar >> vtable::get<T>(obj);
             return obj;
         }
-        void* (*load_object)(void*, std::size_t,
-            serialization::input_archive&, unsigned);
+        void* (*load_object)(
+            void*, std::size_t, serialization::input_archive&, unsigned);
 
         template <typename T>
         constexpr serializable_vtable(construct_vtable<T>) noexcept
           : save_object(&serializable_vtable::template _save_object<T>)
           , load_object(&serializable_vtable::template _load_object<T>)
-        {}
+        {
+        }
     };
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif

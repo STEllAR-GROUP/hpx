@@ -10,6 +10,7 @@ set(basic_execution_headers
   hpx/basic_execution/agent_base.hpp
   hpx/basic_execution/agent_ref.hpp
   hpx/basic_execution/context_base.hpp
+  hpx/basic_execution/detail/spinlock_deadlock_detection.hpp
   hpx/basic_execution/register_locks.hpp
   hpx/basic_execution/resource_base.hpp
   hpx/basic_execution/this_thread.hpp
@@ -24,6 +25,7 @@ set(basic_execution_compat_headers
 set(basic_execution_sources
   agent_ref.cpp
   register_locks.cpp
+  spinlock_deadlock_detection.cpp
   this_thread.cpp
 )
 

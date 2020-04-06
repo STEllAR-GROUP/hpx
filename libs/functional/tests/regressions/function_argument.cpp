@@ -14,11 +14,11 @@
 
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
-using hpx::naming::id_type;
 using hpx::async;
+using hpx::naming::id_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 bool invoked_f = false;
@@ -52,11 +52,13 @@ struct g
 
     // dummy serialization functionality
     template <typename Archive>
-    void serialize(Archive &, unsigned) {}
+    void serialize(Archive&, unsigned)
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map &)
+int hpx_main(variables_map&)
 {
     {
         hpx::util::function<bool()> f = g();
@@ -74,10 +76,9 @@ int hpx_main(variables_map &)
     return hpx::util::report_errors();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    options_description
-        cmdline("usage: " HPX_APPLICATION_STRING " [options]");
+    options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     return hpx::init(cmdline, argc, argv);
 }

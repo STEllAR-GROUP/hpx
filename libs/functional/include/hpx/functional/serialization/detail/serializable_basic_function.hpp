@@ -12,22 +12,21 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/functional/detail/basic_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
-#include <hpx/util/detail/vtable/serializable_function_vtable.hpp>
-#include <hpx/util/detail/vtable/serializable_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
+#include <hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp>
+#include <hpx/functional/serialization/detail/vtable/serializable_vtable.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <string>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail
-{
-    template <bool Copyable, typename R, typename ...Ts>
-    class basic_function<R(Ts...), Copyable, /*Serializable*/true>
-      : public basic_function<R(Ts...), Copyable, /*Serializable*/false>
+namespace hpx { namespace util { namespace detail {
+    template <bool Copyable, typename R, typename... Ts>
+    class basic_function<R(Ts...), Copyable, /*Serializable*/ true>
+      : public basic_function<R(Ts...), Copyable, /*Serializable*/ false>
     {
         using vtable = function_vtable<R(Ts...), Copyable>;
         using serializable_vtable = serializable_function_vtable<vtable>;
@@ -37,7 +36,8 @@ namespace hpx { namespace util { namespace detail
         constexpr basic_function() noexcept
           : base_type()
           , serializable_vptr(nullptr)
-        {}
+        {
+        }
 
         template <typename F>
         void assign(F&& f)
@@ -46,9 +46,9 @@ namespace hpx { namespace util { namespace detail
 
             base_type::assign(std::forward<F>(f));
             if (!base_type::empty())
-        {
+            {
                 serializable_vptr = get_serializable_vtable<target_type>();
-        }
+            }
         }
 
         void swap(basic_function& f) noexcept
@@ -60,7 +60,8 @@ namespace hpx { namespace util { namespace detail
     private:
         friend class hpx::serialization::access;
 
-        void save(serialization::output_archive& ar, unsigned const version) const
+        void save(
+            serialization::output_archive& ar, unsigned const version) const
         {
             bool const is_empty = base_type::empty();
             ar << is_empty;
@@ -83,7 +84,8 @@ namespace hpx { namespace util { namespace detail
             {
                 std::string name;
                 ar >> name;
-                serializable_vptr = detail::get_serializable_vtable<vtable>(name);
+                serializable_vptr =
+                    detail::get_serializable_vtable<vtable>(name);
 
                 vptr = serializable_vptr->vptr;
                 object = serializable_vptr->load_object(
@@ -95,16 +97,16 @@ namespace hpx { namespace util { namespace detail
 
         template <typename T>
         static serializable_vtable const* get_serializable_vtable() noexcept
-    {
+        {
             return detail::get_serializable_vtable<vtable, T>();
         }
 
     protected:
-        using base_type::vptr;
         using base_type::object;
         using base_type::storage;
+        using base_type::vptr;
         serializable_vtable const* serializable_vptr;
     };
-}}}
+}}}    // namespace hpx::util::detail
 
 #endif

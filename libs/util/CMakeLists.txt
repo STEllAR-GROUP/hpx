@@ -14,6 +14,7 @@ set(util_headers
   hpx/util/insert_checked.hpp
   hpx/util/ios_flags_saver.hpp
   hpx/util/manage_config.hpp
+  hpx/util/regex_from_pattern.hpp
   hpx/util/sed_transform.hpp
 )
 
@@ -23,6 +24,7 @@ set(util_compat_headers
 
 set(util_sources
   manage_config.cpp
+  regex_from_pattern.cpp
   sed_transform.cpp
 )
 
@@ -40,6 +42,7 @@ add_hpx_module(util
   DEPENDENCIES
     hpx_config
     hpx_concepts
+    hpx_errors
     hpx_format
     hpx_iterator_support
   CMAKE_SUBDIRS examples tests

@@ -31,6 +31,11 @@ set(functional_headers
   hpx/functional/protect.hpp
   hpx/functional/result_of.hpp
   hpx/functional/unique_function.hpp
+  hpx/functional/serialization/detail/serializable_basic_function.hpp
+  hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp
+  hpx/functional/serialization/detail/vtable/serializable_vtable.hpp
+  hpx/functional/serialization/serializable_function.hpp
+  hpx/functional/serialization/serializable_unique_function.hpp
   hpx/functional/traits/get_action_name.hpp
   hpx/functional/traits/get_function_address.hpp
   hpx/functional/traits/get_function_annotation.hpp
@@ -40,13 +45,15 @@ set(functional_headers
   hpx/functional/traits/is_placeholder.hpp
 )
 
-
 # Default location is $HPX_ROOT/libs/functional/include_compatibility
 set(functional_compat_headers
   hpx/util/bind.hpp
   hpx/util/bind_back.hpp
   hpx/util/bind_front.hpp
   hpx/util/deferred_call.hpp
+  hpx/util/detail/serializable_basic_function.hpp
+  hpx/util/detail/vtable/serializable_function_vtable.hpp
+  hpx/util/detail/vtable/serializable_vtable.hpp
   hpx/util/first_argument.hpp
   hpx/util/function.hpp
   hpx/util/function_ref.hpp
@@ -56,6 +63,8 @@ set(functional_compat_headers
   hpx/util/one_shot.hpp
   hpx/util/protect.hpp
   hpx/util/result_of.hpp
+  hpx/util/serializable_function.hpp
+  hpx/util/serializable_unique_function.hpp
   hpx/util/unique_function.hpp
 )
 
@@ -88,6 +97,7 @@ add_hpx_module(functional
     hpx_datastructures
     hpx_debugging
     hpx_errors
+    hpx_serialization
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

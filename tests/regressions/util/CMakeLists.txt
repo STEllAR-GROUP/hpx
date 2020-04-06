@@ -7,8 +7,6 @@
 
 set(tests
     configuration_1572
-    function_argument
-    function_serialization_728
     iarchive_1237
     protect_with_nullary_pfo
     serialize_buffer_1069
@@ -17,22 +15,8 @@ set(tests
     use_all_cores_2262
    )
 
-set(function_argument_FLAGS DEPENDENCIES iostreams_component)
-set(function_serialization_728_dependencies iostreams_component)
 set(iarchive_1237_FLAGS DEPENDENCIES iostreams_component)
 set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
-
-if(HPX_WITH_COMPRESSION_ZLIB)
-  set(function_serialization_728_dependencies
-    ${function_serialization_728_dependencies}
-    compression_zlib)
-endif()
-if(WITH_PARCEL_COALESCING)
-  set(function_serialization_728_dependencies
-    ${function_serialization_728_dependencies}
-    parcel_coalescing)
-endif()
-set(function_serialization_728_FLAGS DEPENDENCIES ${function_serialization_728_dependencies})
 
 if(HPX_WITH_NETWORKING)
     set(tests ${tests}

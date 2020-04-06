@@ -12,10 +12,9 @@
 
 #include <string>
 
-namespace hpx { namespace util
-{
-    HPX_EXPORT std::string regex_from_pattern(std::string const& pattern,
-        error_code& ec = throws);
-}}
+namespace hpx { namespace util {
+    HPX_EXPORT std::string regex_from_pattern(
+        std::string const& pattern, error_code& ec = throws);
+}}    // namespace hpx::util
 
 #endif
