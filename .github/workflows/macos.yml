@@ -6,11 +6,10 @@
 
 name: macOS CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: macos-latest
 
     steps:
@@ -41,19 +40,20 @@ jobs:
           cd build
           ctest --output-on-failure \
             --exclude-regex \
-          "tests.regressions.modules.collectives.distributed.tcp.broadcast_apply|\
+          "tests.examples.quickstart.1d_wave_equation|\
+          tests.examples.transpose.transpose_block_numa|\
+          tests.performance.local.wait_all_timings|\
+          tests.regressions.components.distributed.tcp.bulk_new_3054|\
+          tests.regressions.dynamic_counters_loaded_1508|\
+          tests.regressions.lcos.wait_all_hang_1946|\
+          tests.regressions.modules.collectives.distributed.tcp.broadcast_apply|\
           tests.regressions.modules.collectives.distributed.tcp.broadcast_unwrap_future_2885|\
-          tests.unit.modules.algorithms.destroy|\
+          tests.regressions.modules.compute.parallel_fill_4132|\
+          tests.regressions.util.distributed.tcp.zero_copy_parcels_1001_no_zero_copy_optimization|\
           tests.unit.modules.algorithms.default_construct|\
+          tests.unit.modules.algorithms.destroy|\
           tests.unit.modules.execution.standalone_thread_pool_executor|\
           tests.unit.modules.resource_partitioner.used_pus|\
           tests.unit.modules.segmented_algorithms.distributed.tcp.partitioned_vector|\
-          tests.performance.local.wait_all_timings|\
-          tests.regressions.lcos.wait_all_hang_1946|\
-          tests.regressions.dynamic_counters_loaded_1508|\
           tests.unit.threads.distributed.tcp.thread_stacksize|\
-          tests.unit.topology.numa_allocator|\
-          tests.examples.quickstart.1d_wave_equation|\
-          tests.examples.transpose.transpose_block_numa|\
-          tests.regressions.modules.performance_counters.dynamic_counters_loaded_1508|\
-          tests.regressions.util.distributed.tcp.zero_copy_parcels_1001_no_zero_copy_optimization"
+          tests.unit.topology.numa_allocator"
