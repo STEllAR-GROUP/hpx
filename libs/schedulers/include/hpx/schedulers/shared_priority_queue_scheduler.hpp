@@ -306,7 +306,7 @@ namespace hpx { namespace threads { namespace policies {
                     // safety check that task was created by this thread/scheduler
                     HPX_ASSERT(data.scheduler_base == this);
 
-                    std::size_t local_num = local_thread_number();
+                    std::size_t const local_num = local_thread_number();
 
                     std::size_t thread_num = local_num;
                     std::size_t domain_num;
@@ -342,7 +342,6 @@ namespace hpx { namespace threads { namespace policies {
                             thread_num =
                                 numa_holder_[0].thread_queue(0)->worker_next(
                                     static_cast<std::size_t>(num_workers_));
-                            local_num = thread_num;
                         }
                         else if (!round_robin_) /* thread parent */
                         {
@@ -403,10 +402,9 @@ namespace hpx { namespace threads { namespace policies {
                             fast_mod(data.schedulehint.hint, num_domains_);
                         // if the thread creating the new task is on the domain
                         // assigned to the new task - try to reuse the core as well
-                        HPX_ASSERT(local_num != std::size_t(-1));
-                        thread_num = local_num;
-                        if (d_lookup_[thread_num] == domain_num)
+                        if (local_num != std::size_t(-1) && d_lookup_[local_num] == domain_num)
                         {
+                            thread_num = local_num;
                             q_index = q_lookup_[thread_num];
                         }
                         else
@@ -430,7 +428,6 @@ namespace hpx { namespace threads { namespace policies {
                     }
                     // we do not allow threads created on other queues to 'run now'
                     // as this causes cross-thread allocations and map accesses
-                    HPX_ASSERT(local_num != std::size_t(-1));
                     if (local_num != thread_num)
                     {
                         run_now = false;
