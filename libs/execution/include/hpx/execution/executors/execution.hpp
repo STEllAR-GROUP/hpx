@@ -27,7 +27,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_then_result.hpp>
+#include <hpx/traits/future_then_result_exec.hpp>
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/type_support/pack.hpp>

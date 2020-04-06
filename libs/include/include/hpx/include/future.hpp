@@ -7,6 +7,6 @@
 #if !defined(HPX_FUTURE_APR_17_2012_0840AM)
 #define HPX_FUTURE_APR_17_2012_0840AM
 
-#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/future_exec.hpp>
 
 #endif

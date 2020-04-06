@@ -10,6 +10,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+// Added here to avoid a circular dependency
+#include <hpx/parallel/executors/thread_timed_execution.hpp>
+
 #include <hpx/runtime/threads/executors/current_executor.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
 #include <hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp>
