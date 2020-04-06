@@ -25,8 +25,8 @@ namespace hpx_start
     // by this code.
     HPX_SYMBOL_EXPORT extern bool include_libhpx_wrap;
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
-    HPX_SYMBOL_EXPORT extern std::string app_name_libhpx_wrap
-        __attribute__((weak));
+    HPX_SYMBOL_EXPORT extern std::string app_name_libhpx_wrap;
+    HPX_SYMBOL_EXPORT std::string app_name_libhpx_wrap __attribute__((weak));
 }
 
 #include <hpx/hpx_finalize.hpp>
