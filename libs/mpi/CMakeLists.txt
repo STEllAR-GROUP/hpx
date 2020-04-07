@@ -33,20 +33,27 @@ endif()
 
 # Default location is $HPX_ROOT/libs/mpi/include
 set(mpi_headers
+    hpx/mpi/force_linking.hpp
     hpx/mpi/mpi_executor.hpp
     hpx/mpi/mpi_future.hpp
 )
 
-set(mpi_sources)
+# Default location is $HPX_ROOT/libs/mpi/src
+set(mpi_sources
+    force_linking.cpp
+    mpi_future.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(mpi
-  FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_sources}
   HEADERS ${mpi_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER
+    "hpx/mpi/force_linking.hpp"
   DEPENDENCIES
     hpx_assertion
+    hpx_basic_execution
     hpx_concurrency
     hpx_config
     hpx_errors

@@ -77,8 +77,8 @@ add_hpx_module(threading_base
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
-  "hpx/threading_base/thread_data_stackful.hpp"
-  "hpx/threading_base/thread_data_stackless.hpp"
+    "hpx/threading_base/thread_data_stackful.hpp"
+    "hpx/threading_base/thread_data_stackless.hpp"
   SOURCES ${threading_base_sources}
   HEADERS ${threading_base_headers}
   COMPAT_HEADERS ${threading_base_compat_headers}
@@ -88,6 +88,7 @@ add_hpx_module(threading_base
     hpx_config
     hpx_coroutines
     hpx_errors
+    hpx_functional
     hpx_hardware
     hpx_logging
     hpx_memory

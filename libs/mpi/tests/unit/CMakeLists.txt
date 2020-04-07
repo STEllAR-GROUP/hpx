@@ -27,8 +27,7 @@ foreach(test ${tests})
     SOURCES ${sources}
     ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    HPX_PREFIX ${HPX_BUILD_PREFIX}
-    DEPENDENCIES hpx_mpi hpx_debugging
+    DEPENDENCIES Mpi::mpi
     FOLDER "Tests/Unit/Modules/MPI")
 
   add_hpx_unit_test("modules.mpi" ${test} ${${test}_PARAMETERS})
