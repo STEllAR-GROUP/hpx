@@ -4,47 +4,41 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
 
 # if networking is off, or MPI parcelport is not being used
 # then allow the option of using an MPI
 if ("${HPX_WITH_NETWORKING}" AND "${HPX_WITH_PARCELPORT_MPI}")
-  hpx_option(HPX_WITH_MPI_FUTURES BOOL
+  hpx_option(HPX_MPI_WITH_FUTURES BOOL
     "Enable support for returning futures from MPI asynchronous calls"
     " (default: ON if networking+MPI already enabled)"
     ON CATEGORY "MPI")
 else()
-  hpx_option(HPX_WITH_MPI_FUTURES BOOL
+  hpx_option(HPX_MPI_WITH_FUTURES BOOL
     "Enable support for returning futures from MPI asynchronous calls"
     " (default: ON if networking+MPI already enabled)"
     OFF CATEGORY "MPI")
 endif()
 
 # if the user does not want mpi async futures, quit - the module will not be enabled
-if (NOT ${HPX_WITH_MPI_FUTURES})
+if (NOT ${HPX_MPI_WITH_FUTURES})
   return()
 endif()
 
 #
 # only process further when enabled
 #
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 find_package(MPI REQUIRED)
-
-if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    message(ERROR "cmake 3.12 or newer required")
-endif()
 
 # All cmake version don't have the same found variable set
 if(NOT MPI_FOUND AND NOT MPI_C_FOUND)
-  hpx_error("MPI could not be found and hpx::mpi library was requested\n
-  set MPI_MPI_CXX_COMPILER to point to your MPI installation's mpicxx")
+  hpx_error("MPI could not be found and hpx::mpi library was requested\n"
+    "set MPI_MPI_CXX_COMPILER to point to your MPI installation's mpicxx")
 endif()
 
 # if networking is on, then the mpi target will already be setup
 # so only do it if it doesn't exist
-if (NOT TARGET hpx::mpi )
+if (NOT TARGET hpx::mpi)
   add_library(hpx::mpi INTERFACE IMPORTED)
   set_property(TARGET hpx::mpi PROPERTY
     INTERFACE_INCLUDE_DIRECTORIES ${MPI_INCLUDE_PATH} ${MPI_C_INCLUDE_DIRS})
@@ -85,10 +79,14 @@ add_hpx_module(mpi
   HEADERS ${mpi_headers}
   COMPAT_HEADERS ${mpi_compat_headers}
   DEPENDENCIES
-    hpx_config
     hpx_assertion
+    hpx_concurrency
+    hpx_config
+    hpx_errors
     hpx_execution
     hpx_local_lcos
+    hpx_memory
+    hpx_threading_base
     hpx::mpi
   CMAKE_SUBDIRS examples tests
 )

@@ -73,7 +73,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         hpx::mpi::executor exec(MPI_COMM_WORLD);
 
-        unsigned int const n_loops = 20;
+        constexpr unsigned int n_loops = 20;
         std::atomic<int> counter(n_loops);
         std::array<int, n_loops> tokens;
         for (unsigned int i = 0; i != n_loops; ++i)
@@ -83,8 +83,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             int rank_to = (rank + 1) % size;
 
             // all ranks pre-post a receive
-            hpx::future<int> f_recv =
-                hpx::async(exec, MPI_Irecv, &tokens[i], 1, MPI_INT, rank_from, i);
+            hpx::future<int> f_recv = hpx::async(
+                exec, MPI_Irecv, &tokens[i], 1, MPI_INT, rank_from, i);
 
             // when the recv completes,
             f_recv.then([=, &tokens, &counter](auto&&) {
@@ -98,7 +98,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     // when the send completes
                     f_send.then([=, &tokens, &counter](auto&&) {
                         msg_send(rank, size, rank_to, rank_from, tokens[i], i);
-                        // ranks>0 are done when they have sent their token
+                        // ranks > 0 are done when they have sent their token
                         --counter;
                     });
                 }
@@ -112,8 +112,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             // rank 0 starts the process with a send
             if (rank == 0)
             {
-                auto f_send =
-                    hpx::async(exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
+                auto f_send = hpx::async(
+                    exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
                 f_send.then([=, &tokens, &counter](auto&&) {
                     msg_send(rank, size, rank_to, rank_from, tokens[i], i);
                 });

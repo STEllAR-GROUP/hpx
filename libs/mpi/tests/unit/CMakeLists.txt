@@ -7,13 +7,12 @@
 set(tests
   mpi_ring_async
   mpi_ring_async_executor
-#  mpi_simple_async
   )
 
 set(mpi_ring_async_PARAMETERS THREADS_PER_LOCALITY 4)
+set(mpi_ring_async_PARAMETERS LOCALITIES 2)
 set(mpi_ring_async_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(mpi_ring_async_executor_PARAMETERS LOCALITIES 2)
-#set(mpi_simple_async_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
 
@@ -36,44 +35,3 @@ foreach(test ${tests})
 
 endforeach()
 
-if(HPX_WITH_COMPILE_ONLY_TESTS)
-  # add compile time tests
-  set(compile_tests
-     )
-
-  if(HPX_WITH_FAIL_COMPILE_TESTS)
-    set(fail_compile_tests
-      )
-    foreach(fail_compile_test ${fail_compile_tests})
-      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
-    endforeach()
-
-    set(compile_tests ${compile_tests} ${fail_compile_tests})
-  endif()
-
-  foreach(compile_test ${compile_tests})
-    set(sources
-        ${compile_test}.cpp)
-
-    add_hpx_unit_compile_test(
-      "modules.mpi"
-      ${compile_test}
-      SOURCES ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER "Tests/Unit/Modules/MPI/CompileOnly")
-
-  endforeach()
-
-endif()
-
-################################################################################
-set(subdirs
-   )
-
-# add sub directories
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.modules.mpi.${subdir})
-  add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.modules.mpi
-    tests.unit.modules.mpi.${subdir})
-endforeach()
