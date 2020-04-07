@@ -402,7 +402,8 @@ namespace hpx { namespace threads { namespace policies {
                             fast_mod(data.schedulehint.hint, num_domains_);
                         // if the thread creating the new task is on the domain
                         // assigned to the new task - try to reuse the core as well
-                        if (local_num != std::size_t(-1) && d_lookup_[local_num] == domain_num)
+                        if (local_num != std::size_t(-1) &&
+                            d_lookup_[local_num] == domain_num)
                         {
                             thread_num = local_num;
                             q_index = q_lookup_[thread_num];
