@@ -26,7 +26,6 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
-#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
