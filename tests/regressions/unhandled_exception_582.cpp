@@ -10,22 +10,26 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 
-int hpx_main(int argc, char ** argv)
+int hpx_main(int argc, char** argv)
 {
     HPX_THROW_EXCEPTION(hpx::invalid_status, "hpx_main", "testing");
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     bool caught_exception = false;
-    try {
+    try
+    {
         hpx::init(argc, argv);
     }
-    catch(hpx::exception const&) {
+    catch (hpx::exception const& e)
+    {
+        HPX_TEST(e.get_error() == hpx::invalid_status);
         caught_exception = true;
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
     HPX_TEST(caught_exception);

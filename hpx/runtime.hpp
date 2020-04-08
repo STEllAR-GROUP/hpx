@@ -200,9 +200,10 @@ namespace hpx
         virtual std::uint64_t get_memory_lva() const = 0;
 
         virtual bool report_error(std::size_t num_thread,
-            std::exception_ptr const& e) = 0;
+            std::exception_ptr const& e, bool terminate_all = true) = 0;
 
-        virtual bool report_error(std::exception_ptr const& e) = 0;
+        virtual bool report_error(
+            std::exception_ptr const& e, bool terminate_all = true) = 0;
 
         virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
 
