@@ -278,7 +278,7 @@ namespace hpx { namespace threads { namespace policies {
 
         void user_polling_function()
         {
-            user_polling_function_();
+            if (user_polling_function_) user_polling_function_();
         }
 
     protected:
