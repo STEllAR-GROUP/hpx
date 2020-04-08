@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional.hpp>
@@ -278,7 +279,8 @@ namespace hpx { namespace threads { namespace policies {
 
         void user_polling_function()
         {
-            if (user_polling_function_) user_polling_function_();
+            if (user_polling_function_)
+                user_polling_function_();
         }
 
     protected:
