@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/execution.hpp>
+#include <hpx/execution/executors.hpp>
 #include <hpx/thread_executors/executors.hpp>
 
 #endif

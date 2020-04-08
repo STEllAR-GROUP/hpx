@@ -105,6 +105,7 @@ add_hpx_module(include
     hpx_async_combinators
     hpx_config
     hpx_errors
+    hpx_executors
     hpx_format
     hpx_local_async
     hpx_local_lcos
