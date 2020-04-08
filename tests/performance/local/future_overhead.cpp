@@ -22,8 +22,8 @@
 #include <hpx/basic_execution/this_thread.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/runtime/threads/executors/limiting_executor.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/thread_executors/limiting_executor.hpp>
+#include <hpx/thread_executors/pool_executor.hpp>
 #include <hpx/synchronization.hpp>
 
 #include <array>

@@ -13,13 +13,13 @@
 // Added here to avoid a circular dependency
 #include <hpx/parallel/executors/thread_timed_execution.hpp>
 
-#include <hpx/runtime/threads/executors/current_executor.hpp>
-#include <hpx/runtime/threads/executors/default_executor.hpp>
-#include <hpx/runtime/threads/executors/embedded_thread_pool_executors.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
-#include <hpx/runtime/threads/executors/service_executors.hpp>
-#include <hpx/runtime/threads/executors/thread_pool_os_executors.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/thread_executors/current_executor.hpp>
+#include <hpx/thread_executors/default_executor.hpp>
+#include <hpx/thread_executors/embedded_thread_pool_executors.hpp>
+#include <hpx/thread_executors/pool_executor.hpp>
+#include <hpx/thread_executors/service_executors.hpp>
+#include <hpx/thread_executors/thread_executor.hpp>
+#include <hpx/thread_executors/thread_pool_os_executors.hpp>
 #endif
 
 #endif

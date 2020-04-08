@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/execution/executors/default_executor.hpp>
 #include <hpx/execution/executors/distribution_policy_executor.hpp>
 #include <hpx/execution/executors/parallel_executor.hpp>
 #include <hpx/execution/executors/parallel_executor_aggregated.hpp>
@@ -17,11 +16,8 @@
 #include <hpx/execution/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/execution/executors/sequenced_executor.hpp>
 #include <hpx/execution/executors/service_executors.hpp>
-#include <hpx/execution/executors/this_thread_executors.hpp>
 #include <hpx/execution/executors/thread_pool_attached_executors.hpp>
 #include <hpx/execution/executors/thread_pool_executor.hpp>
-#include <hpx/execution/executors/thread_pool_executors.hpp>
-#include <hpx/execution/executors/thread_pool_os_executors.hpp>
 #include <hpx/execution/executors/timed_executors.hpp>
 
 #endif

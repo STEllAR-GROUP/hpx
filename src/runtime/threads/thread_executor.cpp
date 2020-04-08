@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/thread_executors/thread_executor.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 

@@ -25,6 +25,13 @@ header_str = '=' * len(lib_name)
 # CMake minimum version
 cmake_version = '3.13'
 
+cmake_root_header = f'''# Copyright (c) 2019-2020 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+'''
+
 cmake_header = f'''# Copyright (c) 2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -70,7 +77,7 @@ details.
 
 '''
 
-root_cmakelists_template = cmake_header + f'''
+root_cmakelists_template = cmake_root_header + f'''
 cmake_minimum_required(VERSION {cmake_version} FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${{CMAKE_CURRENT_SOURCE_DIR}}/cmake")

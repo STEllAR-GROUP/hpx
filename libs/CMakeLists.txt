@@ -60,6 +60,7 @@ set(HPX_LIBS
   string_util
   synchronization
   testing
+  thread_executors
   thread_pools
   thread_support
   threading
