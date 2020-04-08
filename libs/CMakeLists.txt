@@ -114,7 +114,7 @@ endif()
 hpx_info("")
 hpx_info("Configuring modules:")
 
-# generate a file thatliosts all enabled modules for checks that might be
+# Generate a file that lists all enabled modules for checks that might be
 # optional based on the presence of a library or not
 set(MODULE_ENABLED_LIB_DEFINES)
 
