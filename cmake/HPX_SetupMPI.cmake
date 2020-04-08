@@ -15,11 +15,12 @@ macro(setup_mpi)
     # cmake version don't have the same found variable set
     if(NOT MPI_FOUND AND NOT MPI_CXX_FOUND)
       hpx_error(
-        "MPI could not be found and HPX_WITH_PARCELPORT_MPI=ON, please specify \n"
-        "MPI_ROOT to point to the root of your MPI installation")
+        "MPI could not be found but was requested by your configuration, \n"
+        "please specify MPI_ROOT to point to the root of your MPI installation")
     endif()
     add_library(Mpi::mpi INTERFACE IMPORTED)
-    target_include_directories(Mpi::mpi SYSTEM INTERFACE ${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
+    target_include_directories(Mpi::mpi SYSTEM INTERFACE
+      ${MPI_INCLUDE_PATH} ${MPI_CXX_INCLUDE_DIRS})
     # MPI_LIBRARY and EXTRA is deprecated but still linked for older MPI versions
     if (MPI_CXX_LIBRARIES)
       target_link_libraries(Mpi::mpi INTERFACE ${MPI_CXX_LIBRARIES})
@@ -33,7 +34,7 @@ macro(setup_mpi)
     endif()
     target_compile_options(Mpi::mpi INTERFACE ${MPI_CXX_COMPILE_FLAGS})
     target_compile_definitions(Mpi::mpi INTERFACE
-      ${MPI_CXX_COMPILE_DEFINITIONS} HPX_HAVE_LIB_MPI)
+      ${MPI_CXX_COMPILE_DEFINITIONS})
 
     if(MPI_CXX_LINK_FLAGS)
       #hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})

@@ -154,7 +154,7 @@ endforeach()
 
 configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/templates/libs_enabled.hpp.in"
-    "${PROJECT_BINARY_DIR}/hpx/config/libs_enabled.hpp"
+    "${PROJECT_BINARY_DIR}/libs/config/include/hpx/config/libs_enabled.hpp"
     @ONLY)
 
 configure_file(
@@ -163,10 +163,10 @@ configure_file(
     @ONLY)
 
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
-  @ONLY)
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
+    "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
+    @ONLY)
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
-  @ONLY)
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
+    @ONLY)
