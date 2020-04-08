@@ -10,14 +10,8 @@ set(benchmarks
   channel_spsc_throughput
 )
 
-set(channel_mpmc_throughput_FLAGS DEPENDENCIES
-    hpx_assertion hpx_concurrency hpx_errors hpx_synchronization hpx_timing hpx_thread_support)
 set(channel_mpmc_throughput_PARAMETERS THREADS_PER_LOCALITY 2)
-set(channel_mpsc_throughput_FLAGS DEPENDENCIES
-    hpx_assertion hpx_concurrency hpx_errors hpx_synchronization hpx_timing hpx_thread_support)
 set(channel_mpsc_throughput_PARAMETERS THREADS_PER_LOCALITY 2)
-set(channel_spsc_throughput_FLAGS DEPENDENCIES
-    hpx_assertion hpx_concurrency hpx_errors hpx_synchronization hpx_timing hpx_thread_support)
 set(channel_spsc_throughputs_PARAMETERS THREADS_PER_LOCALITY 2)
 
 foreach(benchmark ${benchmarks})

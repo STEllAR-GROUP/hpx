@@ -18,10 +18,7 @@ set(tests
 )
 
 # Set the dependencies of each test
-set(is_iterator_FLAGS NOLIBS)
-set(is_iterator_LIBS
-  DEPENDENCIES hpx_config hpx_iterator_support partitioned_vector_component
-    hpx_testing)
+set(is_iterator_LIBS DEPENDENCIES partitioned_vector_component)
 
 set(is_range_FLAGS NOLIBS)
 set(is_range_LIBS DEPENDENCIES hpx_config hpx_iterator_support hpx_testing)
