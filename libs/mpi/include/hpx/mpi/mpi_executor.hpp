@@ -17,7 +17,7 @@
 
 #include <mpi.h>
 
-namespace hpx { namespace mpi {
+namespace hpx { namespace mpi { namespace experimental {
 
     struct executor
     {
@@ -51,20 +51,21 @@ namespace hpx { namespace mpi {
         template <typename F, typename... Ts>
         decltype(auto) async_execute(F&& f, Ts&&... ts) const
         {
-            return hpx::mpi::detail::async(
+            return hpx::mpi::experimental::detail::async(
                 std::forward<F>(f), std::forward<Ts>(ts)..., communicator_);
         }
 
     private:
         MPI_Comm communicator_;
     };
-}}    // namespace hpx::mpi
+}}}    // namespace hpx::mpi::experimental
 
 namespace hpx { namespace parallel { namespace execution {
 
     /// \cond NOINTERNAL
     template <>
-    struct is_two_way_executor<hpx::mpi::executor> : std::true_type
+    struct is_two_way_executor<hpx::mpi::experimental::executor>
+      : std::true_type
     {
     };
     /// \endcond

@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>

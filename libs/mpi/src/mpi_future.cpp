@@ -11,6 +11,7 @@
 #include <hpx/threading_base.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <mutex>
 #include <ostream>
 #include <string>
@@ -19,18 +20,19 @@
 
 #include <mpi.h>
 
-namespace hpx { namespace mpi {
+namespace hpx { namespace mpi { namespace experimental {
     namespace detail {
 
         // extract MPI error message
         std::string error_message(int code)
         {
             int N = 1023;
-            char err_buff[1024] = {'\0'};
+            std::unique_ptr<char[]> err_buff(new char[std::size_t(N) + 1]);
+            err_buff[0] = '\0';
 
-            MPI_Error_string(code, err_buff, &N);
+            MPI_Error_string(code, err_buff.get(), &N);
 
-            return err_buff;
+            return err_buff.get();
         }
 
         // mutex needed to protect mpi request list, note that the
@@ -159,8 +161,8 @@ namespace hpx { namespace mpi {
     }
 
     // Background progress function for MPI async operations
-    // Checks for completed MPI_Requests and sets mpi::future ready
-    // when found
+    // Checks for completed MPI_Requests and sets mpi::experimental::future
+    // ready when found
     void poll()
     {
         std::unique_lock<std::mutex> lk(
@@ -200,7 +202,7 @@ namespace hpx { namespace mpi {
             add_to_request_list(std::move(val));
         }
 
-        bool keep_trying = detail::get_active_requests().size() > 0;
+        bool keep_trying = !detail::get_active_requests().empty();
         while (keep_trying)
         {
             int index = 0;
@@ -235,7 +237,8 @@ namespace hpx { namespace mpi {
                 keep_trying = flag;
                 if (keep_trying)
                 {
-                    auto req = detail::get_active_requests()[unsigned(index)];
+                    auto req =
+                        detail::get_active_requests()[std::size_t(index)];
                     if (mpi_debug.is_enabled())
                     {
                         // clang-format off
@@ -279,8 +282,9 @@ namespace hpx { namespace mpi {
             }
         }
 
-        // if there are more than 25% NULL request handles in our lists, compact them
-        if (detail::get_active_futures().size() > 0)
+        // if there are more than 25% NULL request handles in our lists,
+        // compact them
+        if (!detail::get_active_futures().empty())
         {
             std::size_t nulls =
                 std::count(detail::get_active_requests().begin(),
@@ -304,7 +308,8 @@ namespace hpx { namespace mpi {
                 if (detail::get_active_requests().size() !=
                     detail::get_active_futures().size())
                 {
-                    HPX_THROW_EXCEPTION(invalid_status, "hpx::mpi::poll",
+                    HPX_THROW_EXCEPTION(invalid_status,
+                        "hpx::mpi::experimental::poll",
                         "Fatal Error: Mismatch in vectors");
                 }
 
@@ -325,11 +330,14 @@ namespace hpx { namespace mpi {
         {
             auto* sched = pool.get_scheduler();
 
-            mpi_debug.debug(debug::str<>("Setting mode"),
-                detail::get_mpi_info(), "enable_user_polling");
+            if (mpi_debug.is_enabled())
+            {
+                mpi_debug.debug(debug::str<>("Setting mode"),
+                    detail::get_mpi_info(), "enable_user_polling");
+            }
 
             // always set polling function before enabling polling
-            sched->set_user_polling_function(&hpx::mpi::poll);
+            sched->set_user_polling_function(&hpx::mpi::experimental::poll);
             sched->add_remove_scheduler_mode(
                 threads::policies::enable_user_polling,
                 threads::policies::do_background_work);
@@ -354,11 +362,13 @@ namespace hpx { namespace mpi {
         {
             int provided;
             int required = MPI_THREAD_MULTIPLE;
-            MPI_Init_thread(0, nullptr, required, &provided);
+            MPI_Init_thread(nullptr, nullptr, required, &provided);
             if (provided < MPI_THREAD_FUNNELED)
             {
-                mpi_debug.error(debug::str<>("hpx::mpi::init"), "init failed");
-                HPX_THROW_EXCEPTION(invalid_status, "hpx::mpi::init",
+                mpi_debug.error(debug::str<>("hpx::mpi::experimental::init"),
+                    "init failed");
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "hpx::mpi::experimental::init",
                     "the MPI installation doesn't allow multiple threads");
             }
             MPI_Comm_rank(MPI_COMM_WORLD, &detail::get_mpi_info().rank_);
@@ -368,8 +378,8 @@ namespace hpx { namespace mpi {
 
         if (mpi_debug.is_enabled())
         {
-            mpi_debug.debug(
-                debug::str<>("hpx::mpi::init"), detail::get_mpi_info());
+            mpi_debug.debug(debug::str<>("hpx::mpi::experimental::init"),
+                detail::get_mpi_info());
         }
 
         if (init_errorhandler)
@@ -431,4 +441,4 @@ namespace hpx { namespace mpi {
                 hpx::resource::get_thread_pool(pool_name));
         }
     }
-}}    // namespace hpx::mpi
+}}}    // namespace hpx::mpi::experimental

@@ -24,7 +24,7 @@
 
 #include <mpi.h>
 
-namespace hpx { namespace mpi {
+namespace hpx { namespace mpi { namespace experimental {
 
     using print_on = debug::enable_print<false>;
     static constexpr print_on mpi_debug("MPI_FUT");
@@ -162,7 +162,7 @@ namespace hpx { namespace mpi {
 
     // -----------------------------------------------------------------
     // Background progress function for MPI async operations
-    // Checks for completed MPI_Requests and sets mpi::future ready
+    // Checks for completed MPI_Requests and sets mpi::experimental::future ready
     // when found
     HPX_EXPORT void poll();
 
@@ -172,7 +172,7 @@ namespace hpx { namespace mpi {
     // to be launched in outstanding continuations etc.
     inline void wait()
     {
-        hpx::util::yield_while([&]() {
+        hpx::util::yield_while([]() {
             std::lock_guard<std::mutex> lk(detail::get_list_mtx());
             return (detail::get_active_futures().size() > 0);
         });
@@ -211,18 +211,12 @@ namespace hpx { namespace mpi {
         enable_user_polling(std::string const& pool_name = "")
           : pool_name_(pool_name)
         {
-            mpi::init(false, pool_name);
+            mpi::experimental::init(false, pool_name);
         }
 
         ~enable_user_polling()
         {
-            mpi::finalize(pool_name_);
-        }
-
-        template <typename F>
-        void wait(F&& f)
-        {
-            return mpi::wait(std::forward<F>(f));
+            mpi::experimental::finalize(pool_name_);
         }
 
     private:
@@ -235,6 +229,6 @@ namespace hpx { namespace mpi {
     {
         mpi_debug.debug(detail::get_mpi_info(), std::forward<Args>(args)...);
     }
-}}    // namespace hpx::mpi
+}}}    // namespace hpx::mpi::experimental
 
 #endif
