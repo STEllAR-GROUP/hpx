@@ -434,37 +434,8 @@ namespace hpx
 
         // initialize instrumentation system
 #ifdef HPX_HAVE_APEX
-#if !defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_LIB_MPI)
-        int rank_ = 0, size_ = 1, is_initialized_ = 0;
-
-        // Check if MPI_Init has been called previously
-        MPI_Initialized(&is_initialized_);
-        if (is_initialized_)
-        {
-            MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-            MPI_Comm_size(MPI_COMM_WORLD, &size_);
-        }
-        else
-        {
-            int required;
-            int required = MPI_THREAD_MULTIPLE;
-            MPI_Init_thread(0, nullptr, required, &provided);
-            if (provided < MPI_THREAD_FUNNELED)
-            {
-                std::cerr << "Your MPI installation doesn't allow multiple "
-                             "threads. Exiting.\n";
-                std::terminate();
-            }
-            MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-            MPI_Comm_size(MPI_COMM_WORLD, &size_);
-            std::cerr << "Initializing mpi on rank " << rank_ << " of " << size_
-                      << std::endl;
-        }
-        util::external_timer::init(nullptr, rank_, size_);
-#else
         util::external_timer::init(
             nullptr, hpx::get_locality_id(), hpx::get_initial_num_localities());
-#endif
 #endif
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
