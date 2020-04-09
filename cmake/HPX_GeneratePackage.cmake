@@ -44,6 +44,16 @@ install(EXPORT HPXTargets
 )
 
 if (NOT MSVC)
+  add_library(hpx_pkgconfig_application INTERFACE)
+  target_link_libraries(hpx_pkgconfig_application INTERFACE hpx_init)
+  target_compile_definitions(hpx_pkgconfig_application INTERFACE HPX_APPLICATION_EXPORTS)
+  target_compile_options(hpx_pkgconfig_application INTERFACE "-std=c++${HPX_CXX_STANDARD}")
+
+  add_library(hpx_pkgconfig_component INTERFACE)
+  target_compile_definitions(hpx_pkgconfig_component INTERFACE HPX_COMPONENT_EXPORTS)
+  target_link_libraries(hpx_pkgconfig_component INTERFACE hpx)
+  target_compile_options(hpx_pkgconfig_component INTERFACE "-std=c++${HPX_CXX_STANDARD}")
+
   # Generate the pkconfig files for HPX_APPLICATION (both for build and install)
   hpx_generate_pkgconfig_from_target(hpx_pkgconfig_application hpx_application TRUE EXCLUDE hpx_interface)
   hpx_generate_pkgconfig_from_target(hpx_pkgconfig_application hpx_application FALSE EXCLUDE hpx_interface)
