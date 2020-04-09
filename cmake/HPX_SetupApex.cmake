@@ -50,7 +50,7 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
 
   add_library(APEX::apex INTERFACE IMPORTED)
   if(HPX_FIND_PACKAGE)
-    target_link_libraries(APEX::apex INTERFACE APEX::apex)
+    target_link_libraries(APEX::apex INTERFACE HPX::apex)
   else()
     target_link_libraries(APEX::apex INTERFACE apex)
   endif()
