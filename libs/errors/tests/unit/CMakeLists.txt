@@ -9,7 +9,7 @@ set(tests
   exception
 )
 
-set(exception_LIBS DEPENDENCIES hpx_errors hpx_testing)
+set(exception_LIBS NOLIBS DEPENDENCIES hpx_errors hpx_testing)
 
 foreach(test ${tests})
   set(sources

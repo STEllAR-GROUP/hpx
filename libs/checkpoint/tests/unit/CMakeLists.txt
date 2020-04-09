@@ -18,7 +18,6 @@ foreach(test ${tests})
     INTERNAL_FLAGS
     SOURCES ${sources}
     ${${test}_FLAGS}
-    DEPENDENCIES hpx_checkpoint hpx_testing
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Checkpoint/")
 
