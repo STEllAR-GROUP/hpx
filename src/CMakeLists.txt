@@ -278,12 +278,3 @@ hpx_export_targets(${hpx_targets})
 foreach(target ${hpx_targets})
   add_hpx_pseudo_dependencies(core ${target})
 endforeach()
-
-# Add particular targets for the pkgconfig setup
-add_library(hpx_pkgconfig_application INTERFACE)
-target_link_libraries(hpx_pkgconfig_application INTERFACE hpx_init)
-target_compile_definitions(hpx_pkgconfig_application INTERFACE HPX_APPLICATION_EXPORTS)
-
-add_library(hpx_pkgconfig_component INTERFACE)
-target_compile_definitions(hpx_pkgconfig_component INTERFACE HPX_COMPONENT_EXPORTS)
-target_link_libraries(hpx_pkgconfig_component INTERFACE hpx)
