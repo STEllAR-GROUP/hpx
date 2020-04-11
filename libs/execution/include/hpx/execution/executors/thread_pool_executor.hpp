@@ -26,6 +26,7 @@
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/synchronization/latch.hpp>
@@ -34,7 +35,6 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -14,10 +14,10 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>
-#include <hpx/util/detail/container_category.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -29,8 +29,7 @@
 #include <utility>
 
 namespace hpx {
-namespace util {
-    namespace detail {
+    namespace util { namespace detail {
         /// A tag which is passed to the `operator()` of the visitor
         /// if an element is visited synchronously.
         struct async_traverse_visit_tag
@@ -150,9 +149,9 @@ namespace util {
 
             /// Calls the visitor with the given element
             template <typename T>
-            auto traverse(T&& value) -> decltype(util::invoke(
-                std::declval<Visitor&>(), async_traverse_visit_tag{},
-                std::forward<T>(value)))
+            auto traverse(T&& value)
+                -> decltype(util::invoke(std::declval<Visitor&>(),
+                    async_traverse_visit_tag{}, std::forward<T>(value)))
             {
                 return util::invoke(visitor(), async_traverse_visit_tag{},
                     std::forward<T>(value));
@@ -197,27 +196,28 @@ namespace util {
           : public async_traversal_frame<Visitor, Args...>
         {
             typedef async_traversal_frame<Visitor, Args...> base_type;
-            typedef typename
-                    std::allocator_traits<Allocator>::template
-                        rebind_alloc<async_traversal_frame_allocator>
-                other_allocator;
+            typedef typename std::allocator_traits<Allocator>::
+                template rebind_alloc<async_traversal_frame_allocator>
+                    other_allocator;
 
         public:
             explicit async_traversal_frame_allocator(
-                    other_allocator const& alloc, Visitor visitor, Args... args)
+                other_allocator const& alloc, Visitor visitor, Args... args)
               : base_type(std::move(visitor), std::move(args)...)
               , alloc_(alloc)
-            {}
+            {
+            }
 
             template <typename MapperArg>
             explicit async_traversal_frame_allocator(
-                    other_allocator const& alloc,
-                    async_traverse_in_place_tag<Visitor> tag,
-                    MapperArg&& mapper_arg, Args... args)
+                other_allocator const& alloc,
+                async_traverse_in_place_tag<Visitor> tag,
+                MapperArg&& mapper_arg, Args... args)
               : base_type(tag, std::forward<MapperArg>(mapper_arg),
-                  std::move(args)...)
+                    std::move(args)...)
               , alloc_(alloc)
-            {}
+            {
+            }
 
         private:
             void destroy() override
@@ -231,30 +231,32 @@ namespace util {
 
             other_allocator alloc_;
         };
-    }}
+    }}    // namespace util::detail
 
-    namespace traits { namespace detail
-    {
+    namespace traits { namespace detail {
         template <typename Visitor, typename... Args, typename Allocator>
         struct shared_state_allocator<
             util::detail::async_traversal_frame<Visitor, Args...>, Allocator>
         {
-            typedef util::detail::async_traversal_frame_allocator<
-                Allocator, Visitor, Args...> type;
+            typedef util::detail::async_traversal_frame_allocator<Allocator,
+                Visitor, Args...>
+                type;
         };
-    }}
+    }}    // namespace traits::detail
 
-    namespace util { namespace detail
-    {
+    namespace util { namespace detail {
         template <typename Target, std::size_t Begin, std::size_t End>
         struct static_async_range
         {
             Target* target_;
 
-            explicit static_async_range(Target* target) : target_(target) {}
+            explicit static_async_range(Target* target)
+              : target_(target)
+            {
+            }
 
             static_async_range(static_async_range const& rhs) = default;
-            static_async_range(static_async_range && rhs)
+            static_async_range(static_async_range&& rhs)
               : target_(rhs.target_)
             {
                 rhs.target_ = nullptr;
@@ -262,7 +264,7 @@ namespace util {
 
             static_async_range& operator=(
                 static_async_range const& rhs) = default;
-            static_async_range& operator=(static_async_range && rhs)
+            static_async_range& operator=(static_async_range&& rhs)
             {
                 if (&rhs != this)
                 {
@@ -279,14 +281,14 @@ namespace util {
             }
 
             template <std::size_t Position>
-            constexpr static_async_range<Target, Position, End> relocate()
-                const noexcept
+            constexpr static_async_range<Target, Position, End> relocate() const
+                noexcept
             {
                 return static_async_range<Target, Position, End>{target_};
             }
 
-            constexpr static_async_range<Target, Begin + 1, End> next()
-                const noexcept
+            constexpr static_async_range<Target, Begin + 1, End> next() const
+                noexcept
             {
                 return static_async_range<Target, Begin + 1, End>{target_};
             }
@@ -366,7 +368,8 @@ namespace util {
         template <typename T, typename Range = dynamic_async_range_of_t<T>>
         Range make_dynamic_async_range(std::reference_wrapper<T> ref_element)
         {
-            return Range{std::begin(ref_element.get()), std::end(ref_element.get())};
+            return Range{
+                std::begin(ref_element.get()), std::end(ref_element.get())};
         }
 
         /// Represents a particular point in a asynchronous traversal hierarchy
@@ -379,7 +382,7 @@ namespace util {
 
         public:
             explicit async_traversal_point(
-                    Frame frame, tuple<Hierarchy...> hierarchy, bool& detached)
+                Frame frame, tuple<Hierarchy...> hierarchy, bool& detached)
               : frame_(std::move(frame))
               , hierarchy_(std::move(hierarchy))
               , detached_(detached)
@@ -401,19 +404,17 @@ namespace util {
 
             /// Creates a new traversal point which
             template <typename Parent>
-            auto push(Parent&& parent)
-            ->  async_traversal_point<
-                    Frame, typename std::decay<Parent>::type, Hierarchy...
-                >
+            auto push(Parent&& parent) -> async_traversal_point<Frame,
+                typename std::decay<Parent>::type, Hierarchy...>
             {
                 // Create a new hierarchy which contains the
                 // the parent (the last traversed element).
                 auto hierarchy = util::tuple_cat(
                     util::make_tuple(std::forward<Parent>(parent)), hierarchy_);
 
-                return async_traversal_point<
-                        Frame, typename std::decay<Parent>::type, Hierarchy...
-                    >(frame_, std::move(hierarchy), detached_);
+                return async_traversal_point<Frame,
+                    typename std::decay<Parent>::type, Hierarchy...>(
+                    frame_, std::move(hierarchy), detached_);
             }
 
             /// Forks the current traversal point and continues the child
@@ -439,12 +440,14 @@ namespace util {
             /// Async traverse a single element which isn't a container or
             /// tuple like type. This function is SFINAEd out if the element
             /// isn't accepted by the visitor.
-            template <typename Current, typename = typename always_void<decltype(
-                std::declval<Frame>()->traverse(*std::declval<Current>()))>::type>
-            void async_traverse_one_impl(container_category_tag<false, false>,
-                Current&& current)
-                /// SFINAE this out if the visitor doesn't accept
-                /// the given element
+            template <typename Current,
+                typename = typename always_void<decltype(
+                    std::declval<Frame>()->traverse(
+                        *std::declval<Current>()))>::type>
+            void async_traverse_one_impl(
+                container_category_tag<false, false>, Current&& current)
+            /// SFINAE this out if the visitor doesn't accept
+            /// the given element
             {
                 if (!frame_->traverse(*current))
                 {
@@ -468,8 +471,7 @@ namespace util {
             /// tuple like type.
             template <bool IsTupleLike, typename Current>
             void async_traverse_one_impl(
-                container_category_tag<true, IsTupleLike>,
-                Current&& current)
+                container_category_tag<true, IsTupleLike>, Current&& current)
             {
                 auto range = make_dynamic_async_range(*current);
                 fork(std::move(range), std::forward<Current>(current));
@@ -477,8 +479,8 @@ namespace util {
 
             /// Async traverse a single element which is a tuple like type only.
             template <typename Current>
-            void async_traverse_one_impl(container_category_tag<false, true>,
-                Current&& current)
+            void async_traverse_one_impl(
+                container_category_tag<false, true>, Current&& current)
             {
                 auto range = make_static_range(*current);
                 fork(std::move(range), std::forward<Current>(current));
@@ -508,8 +510,7 @@ namespace util {
 
             template <std::size_t... Sequence, typename Current>
             void async_traverse_static_async_range(
-                index_pack<Sequence...>,
-                Current&& current)
+                index_pack<Sequence...>, Current&& current)
             {
                 int dummy[] = {((void) async_traverse_one_checked(
                                     current.template relocate<Sequence>()),
@@ -535,7 +536,7 @@ namespace util {
                     for (/**/; !range.is_finished(); ++range)
                     {
                         async_traverse_one(range);
-                        if (is_detached())          // test before increment
+                        if (is_detached())    // test before increment
                             break;
                     }
                 }
@@ -566,8 +567,7 @@ namespace util {
             }
 
             template <typename Frame, typename Current>
-            void next(bool& detached, Frame&& frame,
-                Current&& current) const
+            void next(bool& detached, Frame&& frame, Current&& current) const
             {
                 // Only process the next element if the current iterator
                 // hasn't reached its end.
@@ -592,9 +592,8 @@ namespace util {
             /// its traversal.
             template <typename Frame, typename Current, typename Parent,
                 typename... Hierarchy>
-            void next(bool& detached, Frame&& frame,
-                Current&& current, Parent&& parent,
-                Hierarchy&&... hierarchy) const
+            void next(bool& detached, Frame&& frame, Current&& current,
+                Parent&& parent, Hierarchy&&... hierarchy) const
             {
                 // Only process the element if the current iterator
                 // hasn't reached its end.
@@ -664,9 +663,8 @@ namespace util {
             //
             // Create an intrusive_ptr without increasing its reference count
             // (it's already 'one').
-            auto frame = typename types::frame_pointer_type(
-                new typename types::frame_type(
-                    std::forward<Visitor>(visitor),
+            auto frame = typename types::frame_pointer_type(new
+                typename types::frame_type(std::forward<Visitor>(visitor),
                     std::forward<Args>(args)...),
                 false);
 
@@ -686,20 +684,20 @@ namespace util {
         template <typename Allocator, typename Visitor, typename... Args,
             typename types = async_traversal_types<Visitor, Args...>>
         auto apply_pack_transform_async_allocator(
-                Allocator const& a, Visitor&& visitor, Args&&... args)
-        -> typename types::visitor_pointer_type
+            Allocator const& a, Visitor&& visitor, Args&&... args) ->
+            typename types::visitor_pointer_type
         {
             // Create the frame on the heap which stores the arguments
             // to traverse asynchronously.
             //
             // Create an intrusive_ptr without increasing its reference count
             // (it's already 'one').
-            using shared_state = typename traits::detail::shared_state_allocator<
-                    typename types::frame_type, Allocator
-                >::type;
+            using shared_state =
+                typename traits::detail::shared_state_allocator<
+                    typename types::frame_type, Allocator>::type;
 
-            using other_allocator = typename std::allocator_traits<Allocator>::
-                template rebind_alloc<shared_state>;
+            using other_allocator = typename std::allocator_traits<
+                Allocator>::template rebind_alloc<shared_state>;
             using traits = std::allocator_traits<other_allocator>;
 
             using unique_ptr = std::unique_ptr<shared_state,
@@ -708,8 +706,7 @@ namespace util {
             other_allocator frame_alloc(a);
             unique_ptr p(traits::allocate(frame_alloc, 1),
                 util::allocator_deleter<other_allocator>{frame_alloc});
-            traits::construct(
-                frame_alloc, p.get(), frame_alloc,
+            traits::construct(frame_alloc, p.get(), frame_alloc,
                 std::forward<Visitor>(visitor), std::forward<Args>(args)...);
 
             auto frame = typename types::frame_pointer_type(p.release(), false);
@@ -724,8 +721,7 @@ namespace util {
             resumer();
             return frame;
         }
-    }    // end namespace detail
-}    // end namespace util
+    }}    // namespace util::detail
 }    // end namespace hpx
 
 #endif    // HPX_UTIL_DETAIL_PACK_TRAVERSAL_ASYNC_IMPL_HPP

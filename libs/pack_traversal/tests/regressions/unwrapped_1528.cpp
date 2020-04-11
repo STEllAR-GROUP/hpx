@@ -6,14 +6,14 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <vector>
 
-void noop(){}
+void noop() {}
 
 int main()
 {
     std::vector<hpx::future<void>> fs;
-    hpx::util::unwrapping(&noop)(fs);
+    hpx::util::unwrapping (&noop)(fs);
 }

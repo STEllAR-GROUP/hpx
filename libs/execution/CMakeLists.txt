@@ -139,5 +139,6 @@ add_hpx_module(execution
     hpx_timing
     hpx_topology
     hpx_type_support
+    hpx_pack_traversal
   CMAKE_SUBDIRS examples tests
 )

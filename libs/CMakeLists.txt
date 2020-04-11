@@ -45,6 +45,7 @@ set(HPX_CANDIDATE_LIBS
   memory
   mpi
   naming_base
+  pack_traversal
   performance_counters
   plugin
   prefix

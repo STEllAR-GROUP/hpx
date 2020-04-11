@@ -55,6 +55,7 @@ add_hpx_module(compute
     hpx_execution
     hpx_hardware
     hpx_memory
+    hpx_pack_traversal
     hpx_performance_counters
     hpx_plugin
     hpx_program_options

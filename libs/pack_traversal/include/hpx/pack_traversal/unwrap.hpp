@@ -8,13 +8,12 @@
 #define HPX_UTIL_UNWRAP_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/unwrap_impl.hpp>
+#include <hpx/pack_traversal/detail/unwrap_impl.hpp>
 
 #include <cstddef>
 #include <utility>
 
-namespace hpx {
-namespace util {
+namespace hpx { namespace util {
     /// A helper function for retrieving the actual result of
     /// any hpx::lcos::future like type which is wrapped in an arbitrary way.
     ///
@@ -69,8 +68,7 @@ namespace util {
         return detail::unwrap_depth_impl<1U>(std::forward<Args>(args)...);
     }
 
-    namespace functional
-    {
+    namespace functional {
         /// A helper function object for functionally invoking
         /// `hpx::util::unwrap`. For more information please refer to its
         /// documentation.
@@ -85,7 +83,7 @@ namespace util {
             }
             /// \endcond
         };
-    }
+    }    // namespace functional
 
     /// An alterntive version of hpx::util::unwrap(), which unwraps the given
     /// arguments to a certain depth of hpx::lcos::future like objects.
@@ -103,8 +101,7 @@ namespace util {
         return detail::unwrap_depth_impl<Depth>(std::forward<Args>(args)...);
     }
 
-    namespace functional
-    {
+    namespace functional {
         /// A helper function object for functionally invoking
         /// `hpx::util::unwrap_n`. For more information please refer to its
         /// documentation.
@@ -120,7 +117,7 @@ namespace util {
             }
             /// \endcond
         };
-    }
+    }    // namespace functional
 
     /// An alterntive version of hpx::util::unwrap(), which unwraps the given
     /// arguments recursively so that all contained hpx::lcos::future like
@@ -135,8 +132,7 @@ namespace util {
         return detail::unwrap_depth_impl<0U>(std::forward<Args>(args)...);
     }
 
-    namespace functional
-    {
+    namespace functional {
         /// A helper function object for functionally invoking
         /// `hpx::util::unwrap_all`. For more information please refer to its
         /// documentation.
@@ -151,7 +147,7 @@ namespace util {
             }
             /// \endcond
         };
-    }
+    }    // namespace functional
 
     /// Returns a callable object which unwraps its arguments upon
     /// invocation using the hpx::util::unwrap() function and then passes
@@ -207,7 +203,6 @@ namespace util {
         return detail::functional_unwrap_depth_impl<0U>(
             std::forward<T>(callable));
     }
-}    // end namespace util
-}    // end namespace hpx
+}}    // namespace hpx::util
 
 #endif    // HPX_UTIL_UNWRAP_HPP

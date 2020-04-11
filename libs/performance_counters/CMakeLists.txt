@@ -66,6 +66,7 @@ add_hpx_module(performance_counters
     hpx_format
     hpx_functional
     hpx_logging
+    hpx_pack_traversal
     hpx_serialization
     hpx_synchronization
     hpx_static_reinit
