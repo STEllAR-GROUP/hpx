@@ -10,7 +10,7 @@ include(HPX_Message)
 include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
-set(HPX_LIBS
+set(HPX_CANDIDATE_LIBS
   affinity
   algorithms
   allocator_support
@@ -43,6 +43,7 @@ set(HPX_LIBS
   local_lcos
   logging
   memory
+  mpi
   naming_base
   performance_counters
   plugin
@@ -113,6 +114,10 @@ endif()
 hpx_info("")
 hpx_info("Configuring modules:")
 
+# Generate a file that lists all enabled modules for checks that might be
+# optional based on the presence of a library or not
+set(MODULE_ENABLED_LIB_DEFINES)
+
 # variables needed for modules.cpp
 set(MODULE_FORCE_LINKING_INCLUDES)
 set(MODULE_FORCE_LINKING_CALLS)
@@ -121,20 +126,36 @@ set(MODULE_FORCE_LINKING_CALLS)
 set(CONFIG_STRINGS_MODULES_INCLUDES)
 set(CONFIG_STRINGS_MODULES_ENTRIES)
 
-foreach(lib ${HPX_LIBS})
+foreach(lib ${HPX_CANDIDATE_LIBS})
+  # if the module is successfully added, xxx_LIBRARY_ENABLED will be ON
   add_subdirectory(${lib})
 
-  set(MODULE_FORCE_LINKING_INCLUDES
-    "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n")
+  get_property(HPX_${lib}_LIBRARY_ENABLED GLOBAL PROPERTY HPX_${lib}_LIBRARY_ENABLED)
+  if (HPX_${lib}_LIBRARY_ENABLED)
+    set(HPX_LIBS ${HPX_LIBS} ${lib} CACHE INTERNAL "list of Enabled HPX modules" FORCE)
 
-  set(MODULE_FORCE_LINKING_CALLS
-    "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")
+    string(TOUPPER ${lib} uppercase_lib)
 
-  set(CONFIG_STRINGS_MODULES_INCLUDES
-    "${CONFIG_STRINGS_MODULES_INCLUDES}#include <hpx/${lib}/config/config_strings.hpp>\n")
-  set(CONFIG_STRINGS_MODULES_ENTRIES
-    "${CONFIG_STRINGS_MODULES_ENTRIES}\n        { \"${lib}\", ${lib}::config_strings },")
+    set(MODULE_ENABLED_LIB_DEFINES
+      "${MODULE_ENABLED_LIB_DEFINES}#define HPX_HAVE_LIB_${uppercase_lib}\n")
+
+    set(MODULE_FORCE_LINKING_INCLUDES
+      "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n")
+
+    set(MODULE_FORCE_LINKING_CALLS
+      "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();")
+
+    set(CONFIG_STRINGS_MODULES_INCLUDES
+      "${CONFIG_STRINGS_MODULES_INCLUDES}#include <hpx/${lib}/config/config_strings.hpp>\n")
+    set(CONFIG_STRINGS_MODULES_ENTRIES
+      "${CONFIG_STRINGS_MODULES_ENTRIES}\n        { \"${lib}\", ${lib}::config_strings },")
+  endif()
 endforeach()
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/libs_enabled.hpp.in"
+    "${PROJECT_BINARY_DIR}/libs/config/include/hpx/config/libs_enabled.hpp"
+    @ONLY)
 
 configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
@@ -142,10 +163,10 @@ configure_file(
     @ONLY)
 
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
-  @ONLY)
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
+    "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
+    @ONLY)
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
-  @ONLY)
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
+    @ONLY)

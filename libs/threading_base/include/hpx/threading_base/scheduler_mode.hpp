@@ -58,7 +58,10 @@ namespace hpx { namespace threads { namespace policies {
         steal_after_local = 0x400,
         /// This option allows for certain schedulers to explicitly disable
         /// exponential idle-back off
-        enable_idle_backoff = 0x800,
+        enable_idle_backoff = 0x0800,
+        /// this option tells the scheduler to call a user supplied function
+        /// on each iteration (after execution of each task on each worker thread)
+        enable_user_polling = 0x1000,
 
         // clang-format off
         /// This option represents the default mode.

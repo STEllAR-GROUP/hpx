@@ -26,6 +26,9 @@ function(add_hpx_module name)
 
   string(TOUPPER ${name} name_upper)
 
+  # enable the module (see hpx/libs/CMakeLists.txt)
+  set_property(GLOBAL PROPERTY HPX_${name}_LIBRARY_ENABLED ON)
+
   # HPX options
   hpx_option(HPX_${name_upper}_WITH_TESTS
     BOOL

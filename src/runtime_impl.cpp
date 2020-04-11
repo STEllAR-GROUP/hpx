@@ -36,6 +36,10 @@
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 
+#if defined(HPX_HAVE_LIB_MPI)
+#include <mpi.h>
+#endif
+
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
@@ -430,10 +434,9 @@ namespace hpx
 
         // initialize instrumentation system
 #ifdef HPX_HAVE_APEX
-        util::external_timer::init(nullptr, hpx::get_locality_id(),
-                hpx::get_initial_num_localities());
+        util::external_timer::init(
+            nullptr, hpx::get_locality_id(), hpx::get_initial_num_localities());
 #endif
-
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 

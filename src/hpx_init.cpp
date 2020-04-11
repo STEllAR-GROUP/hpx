@@ -47,7 +47,8 @@
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
+    defined(HPX_HAVE_LIB_MPI)
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #endif
 
@@ -382,8 +383,8 @@ namespace hpx
             util::detail::init_logging(
                 cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
 
-#if defined(HPX_HAVE_NETWORKING)
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
+    defined(HPX_HAVE_LIB_MPI)
             // getting localities from MPI environment (support mpirun)
             if (util::detail::check_mpi_environment(cms.rtcfg_))
             {
@@ -393,6 +394,7 @@ namespace hpx
             }
 #endif
 
+#if defined(HPX_HAVE_NETWORKING)
             if (cms.num_localities_ != 1 || cms.node_ != 0 ||
                 cms.rtcfg_.enable_networking())
             {

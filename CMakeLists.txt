@@ -1616,6 +1616,11 @@ include(HPX_SetupHwloc)
 add_hpx_library_sources_noglob(hpx_external)
 add_hpx_library_headers_noglob(hpx_external)
 
+# Setup plugins
+# (set here cause if we include it inside plugins, it will not be defined in
+# src/CMakeLists.txt where we call add_static_parcelports)
+include(HPX_SetupMPI)  # must come before APEX
+
 # Setup packages and subprojects
 include(HPX_SetupCUDA) # CUDA needs to come before Apex, to have cuda_add_library available
 include(HPX_SetupApex)
@@ -1623,10 +1628,6 @@ include(HPX_SetupPapi)
 include(HPX_SetupHpxmp)
 include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
-# Setup plugins
-# (set here cause if we include it inside plugins, it will not be defined in
-# src/CMakeLists.txt where we call add_static_parcelports)
-include(HPX_SetupMPI)
 
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)
