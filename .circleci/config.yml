@@ -118,7 +118,8 @@ jobs:
           destination: /hpx/artifacts/circular_deps.svg
 
   # Check if the files of the module are listed in the CMakeLists.txt
-  check_cmakelists_files:
+  # Check if all the module dependencies are listed
+  check_module_cmakelists:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -126,26 +127,16 @@ jobs:
       - run:
           name: Check if the headers of the modules are listed in their CMakeLists.txt
           command: |
-              /hpx/source/tools/check_cmakelists_files.sh > /tmp/missing_files.txt
-              if [[ $(wc -l /tmp/missing_files.txt | awk '{print $1}') -gt 0 ]]; then exit 1; fi
+              /hpx/source/tools/check_module_cmakelists.sh
+              if [[ $(wc -l /tmp/missing_files.txt | awk '{print $1}') -gt 1 ]] \
+                  || [[ $(wc -l /tmp/missing_deps.txt | awk '{print $1}') -gt 1 ]]; \
+                  then exit 1; fi
       - store_artifacts:
           path: /tmp/missing_files.txt
           destination: /hpx/artifacts/missing_files.txt
-
-  # Check if the files of the module are listed in the CMakeLists.txt
-  check_modules_dependencies:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Check if the headers of the modules are listed in their CMakeLists.txt
-          command: |
-              /hpx/source/tools/check_modules_dependencies.sh > /tmp/missing_dependencies.txt
-              if [[ $(wc -l /tmp/missing_dependencies.txt | awk '{print $1}') -gt 0 ]]; then exit 1; fi
       - store_artifacts:
-          path: /tmp/missing_dependencies.txt
-          destination: /hpx/artifacts/missing_dependencies.txt
+          path: /tmp/missing_deps.txt
+          destination: /hpx/artifacts/missing_deps.txt
 
   # Ensure that the modules stay clang-formatted
   clang_format:
@@ -1065,11 +1056,7 @@ workflows:
           requires:
             - checkout_code
           <<: *gh_pages_filter
-      - check_cmakelists_files:
-          requires:
-            - checkout_code
-          <<: *gh_pages_filter
-      - check_modules_dependencies:
+      - check_module_cmakelists:
           requires:
             - checkout_code
           <<: *gh_pages_filter
