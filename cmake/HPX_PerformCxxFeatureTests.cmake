@@ -54,6 +54,12 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx17_maybe_unused(
     DEFINITIONS HPX_HAVE_CXX17_MAYBE_UNUSED)
 
+  hpx_check_for_cxx17_inline_variable(
+    DEFINITIONS HPX_HAVE_CXX17_INLINE_VARIABLE)
+
+  hpx_check_for_cxx17_deduction_guides(
+    DEFINITIONS HPX_HAVE_CXX17_DEDUCTION_GUIDES)
+
   # we deliberately check for this functionality even for non-C++17
   # configurations as some compilers (notable gcc V7.x) require for noexcept
   # function specializations for actions even in C++11/14 mode

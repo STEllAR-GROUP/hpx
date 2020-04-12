@@ -317,8 +317,22 @@ endfunction()
 
 ###############################################################################
 function(hpx_check_for_cxx17_maybe_unused)
-  add_hpx_config_test(HPX_HAVE_CXX17_MAYBE_UNUSED
+  add_hpx_config_test(HPX_WITH_CXX17_MAYBE_UNUSED
     SOURCE cmake/tests/cxx17_maybe_unused.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx17_inline_variable)
+  add_hpx_config_test(HPX_WITH_CXX17_INLINE_VARIABLE
+    SOURCE cmake/tests/cxx17_inline_variable.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx17_deduction_guides)
+  add_hpx_config_test(HPX_WITH_CXX17_DEDUCTION_GUIDES
+    SOURCE cmake/tests/cxx17_deduction_guides.cpp
     FILE ${ARGN})
 endfunction()
 

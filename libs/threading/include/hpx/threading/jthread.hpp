@@ -107,10 +107,9 @@ namespace hpx {
           , thread_{
                 // lambda called in the thread
                 [](stop_token st, F&& f, Ts&&... ts) {
-
                     // perform tasks of the thread
-                    using use_stop_token =
-                        typename std::is_invocable<F, stop_token, Ts...>::type;
+                    using use_stop_token = typename traits::is_invocable<F,
+                        stop_token, Ts...>::type;
 
                     jthread::invoke(use_stop_token{}, std::forward<F>(f),
                         std::move(st), std::forward<Ts>(ts)...);
