@@ -155,7 +155,7 @@ void test_exchange_token()
     auto interval = std::chrono::milliseconds(500);
 
     {
-        std::atomic<hpx::stop_token*> pstoken = nullptr;
+        std::atomic<hpx::stop_token*> pstoken(nullptr);
         hpx::jthread t([&pstoken](hpx::stop_token sstoken) {
             auto act_token = sstoken;
             int num_interrupts = 0;
@@ -208,7 +208,7 @@ void test_concurrent_interrupt()
     hpx::stop_source is;
 
     {
-        hpx::jthread t([it = is.get_token()](hpx::stop_token stoken) {
+        hpx::jthread t1([it = is.get_token()](hpx::stop_token stoken) {
             try
             {
                 bool stop_requested = false;
@@ -241,11 +241,12 @@ void test_concurrent_interrupt()
         for (int i = 0; i < num_threads; ++i)
         {
             hpx::this_thread::sleep_for(std::chrono::microseconds(100));
-            hpx::jthread t([&t, &num_requested_stops] {
+            hpx::jthread t([&t1, &num_requested_stops] {
                 for (int i = 0; i < 13; ++i)
                 {
-                    num_requested_stops += (t.request_stop() == true);
-                    HPX_TEST(!t.request_stop());
+                    // only first call to request_stop should return true
+                    num_requested_stops += (t1.request_stop() ? 1 : 0);
+                    HPX_TEST(!t1.request_stop());
                     hpx::this_thread::sleep_for(std::chrono::microseconds(10));
                 }
             });
@@ -258,7 +259,7 @@ void test_concurrent_interrupt()
         }
 
         // only one request to request_stop() should have returned true
-        HPX_TEST(num_requested_stops == 1);
+        HPX_TEST_EQ(num_requested_stops, 1);
         is.request_stop();
     }
 }
@@ -281,6 +282,7 @@ void test_jthread_move()
 
         hpx::jthread t2{std::move(t)};    // should compile
 
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         auto ssource = t.get_stop_source();
         HPX_TEST(!ssource.stop_possible());
         HPX_TEST(!ssource.stop_requested());

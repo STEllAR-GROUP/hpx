@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional.hpp>
-#include <hpx/threading/stop_token.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 #include <hpx/threading/thread.hpp>
 
 #include <type_traits>
@@ -106,7 +106,7 @@ namespace hpx {
           : ssource_{}    // initialize stop_source
           , thread_{
                 // lambda called in the thread
-                [](stop_token st, F&& f, Ts&&... ts) {
+                [](stop_token st, F&& f, Ts&&... ts) -> void {
                     // perform tasks of the thread
                     using use_stop_token = typename traits::is_invocable<F,
                         stop_token, Ts...>::type;

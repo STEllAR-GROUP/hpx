@@ -10,8 +10,8 @@
 //  (http://creativecommons.org/licenses/by/4.0/).
 
 #include <hpx/hpx_main.hpp>
+#include <hpx/synchronization.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/threading.hpp>
 
 #include <chrono>
 #include <utility>
@@ -34,7 +34,7 @@ void test_stop_token_basic_api()
     bool cb1called{false};
     auto cb1 = [&] { cb1called = true; };
     {
-        auto scb1 = hpx::make_stop_callback(stok, cb1);    // copies cb1
+        hpx::stop_callback<decltype(cb1)> scb1(stok, cb1);    // copies cb1
         HPX_TEST(ssrc.stop_possible());
         HPX_TEST(!ssrc.stop_requested());
         HPX_TEST(stok.stop_possible());
@@ -74,7 +74,8 @@ void test_stop_token_basic_api()
     // register another callback
     bool cb3called{false};
 
-    auto scb3 = hpx::make_stop_callback(stok, [&] { cb3called = true; });
+    auto cb3 = [&] { cb3called = true; };
+    hpx::stop_callback<decltype(cb3)> scb3(stok, std::move(cb3));
     HPX_TEST(ssrc.stop_possible());
     HPX_TEST(ssrc.stop_requested());
     HPX_TEST(stok.stop_possible());
@@ -93,6 +94,7 @@ void test_stop_token_api()
         hpx::stop_source is2{is1};
         hpx::stop_source is3 = is1;
         hpx::stop_source is4{std::move(is1)};
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(!is1.stop_possible());
         HPX_TEST(is2.stop_possible());
         HPX_TEST(is3.stop_possible());
@@ -100,6 +102,7 @@ void test_stop_token_api()
         is1 = is2;
         HPX_TEST(is1.stop_possible());
         is1 = std::move(is2);
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(!is2.stop_possible());
         std::swap(is1, is2);
         HPX_TEST(!is1.stop_possible());
@@ -159,6 +162,7 @@ void test_stop_token_api()
         hpx::stop_source is_stopped;
         is_stopped.request_stop();
 
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         hpx::stop_token it_not_valid{is_not_valid.get_token()};
         hpx::stop_token it_not_stopped{is_not_stopped.get_token()};
         hpx::stop_token it_stopped{is_stopped.get_token()};
@@ -195,6 +199,7 @@ void test_stop_token_api()
         hpx::stop_source is_stopped;
         is_stopped.request_stop();
 
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         hpx::stop_token it_not_valid{is_not_valid.get_token()};
         hpx::stop_token it_not_stopped{is_not_stopped.get_token()};
         hpx::stop_token it_stopped{is_stopped.get_token()};
@@ -213,6 +218,7 @@ void test_stop_token_api()
         HPX_TEST(!it_not_valid.stop_possible());
         HPX_TEST(!it_not_valid.stop_requested());
         hpx::stop_token itnew = std::move(it_not_valid);
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(!it_not_valid.stop_possible());
 
         std::swap(is_stopped, is_not_valid);
@@ -220,6 +226,7 @@ void test_stop_token_api()
         HPX_TEST(is_not_valid.stop_possible());
         HPX_TEST(!is_not_valid.stop_requested());
         hpx::stop_source isnew = std::move(is_not_valid);
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(!is_not_valid.stop_possible());
     }
 
@@ -240,12 +247,16 @@ void test_stop_token_api()
         hpx::stop_source is_not_valid1;
         hpx::stop_source is_not_valid2;
         hpx::stop_source is_not_stopped1{std::move(is_not_valid1)};
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         hpx::stop_source is_not_stopped2{is_not_stopped1};
         hpx::stop_source is_stopped1{std::move(is_not_valid2)};
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         hpx::stop_source is_stopped2{is_stopped1};
         is_stopped1.request_stop();
 
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         hpx::stop_token it_not_valid1{is_not_valid1.get_token()};
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         hpx::stop_token it_not_valid2{is_not_valid2.get_token()};
         hpx::stop_token it_not_valid3;
         hpx::stop_token it_not_stopped1{is_not_stopped1.get_token()};

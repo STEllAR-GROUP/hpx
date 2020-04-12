@@ -5,9 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/basic_execution.hpp>
+#include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 #include <hpx/thread_support.hpp>
-#include <hpx/threading/stop_token.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -16,6 +18,7 @@
 
 namespace hpx { namespace detail {
 
+    ///////////////////////////////////////////////////////////////////////////
     void intrusive_ptr_add_ref(stop_state* p)
     {
         p->state_.fetch_add(
@@ -193,7 +196,7 @@ namespace hpx { namespace detail {
 
         // Callback has either already executed or is executing concurrently
         // on another thread.
-        if (signalling_thread_ == hpx::this_thread::get_id())
+        if (signalling_thread_ == hpx::threads::get_self_id())
         {
             // Callback executed on this thread or is still currently executing
             // and is unregistering itself from within the callback.
@@ -249,7 +252,9 @@ namespace hpx { namespace detail {
         if (!l)
             return false;    // stop has already been requested.
 
-        signalling_thread_ = hpx::this_thread::get_id();
+        HPX_ASSERT(stop_requested(state_.load(std::memory_order_acquire)));
+
+        signalling_thread_ = hpx::threads::get_self_id();
 
         // invoke registered callbacks
         while (callbacks_ != nullptr)

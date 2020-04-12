@@ -9,8 +9,9 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/datastructures.hpp>
 #include <hpx/hpx_main.hpp>
+
+#include <hpx/datastructures.hpp>
 #include <hpx/synchronization.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/threading.hpp>
@@ -22,6 +23,7 @@
 #include <functional>
 #include <iostream>
 #include <mutex>
+#include <utility>
 
 //////////////////////////////////////////////////////////////////////////////
 void test_default_token_is_not_stoppable()
@@ -78,8 +80,8 @@ void test_callback_not_executed_immediately_if_stop_not_yet_requested()
 
     bool callback_executed = false;
     {
-        auto cb = hpx::make_stop_callback(
-            s.get_token(), [&] { callback_executed = true; });
+        auto f = [&] { callback_executed = true; };
+        hpx::stop_callback<decltype(f)> cb(s.get_token(), std::move(f));
     }
 
     HPX_TEST(!callback_executed);
@@ -95,8 +97,8 @@ void test_callback_executed_if_stop_requested_before_destruction()
     hpx::stop_source s;
 
     bool callback_executed = false;
-    auto cb = hpx::make_stop_callback(
-        s.get_token(), [&] { callback_executed = true; });
+    auto f = [&] { callback_executed = true; };
+    hpx::stop_callback<decltype(f)> cb(s.get_token(), std::move(f));
 
     HPX_TEST(!callback_executed);
 
@@ -112,7 +114,8 @@ void test_callback_executed_immediately_if_stop_already_requested()
     s.request_stop();
 
     bool executed = false;
-    auto cb = hpx::make_stop_callback(s.get_token(), [&] { executed = true; });
+    auto f = [&] { executed = true; };
+    hpx::stop_callback<decltype(f)> cb(s.get_token(), std::move(f));
     HPX_TEST(executed);
 }
 
@@ -125,16 +128,16 @@ void test_register_multiple_callbacks()
     int callback_execution_count = 0;
     auto callback = [&] { ++callback_execution_count; };
 
-    auto r1 = hpx::make_stop_callback(t, callback);
-    auto r2 = hpx::make_stop_callback(t, callback);
-    auto r3 = hpx::make_stop_callback(t, callback);
-    auto r4 = hpx::make_stop_callback(t, callback);
-    auto r5 = hpx::make_stop_callback(t, callback);
-    auto r6 = hpx::make_stop_callback(t, callback);
-    auto r7 = hpx::make_stop_callback(t, callback);
-    auto r8 = hpx::make_stop_callback(t, callback);
-    auto r9 = hpx::make_stop_callback(t, callback);
-    auto r10 = hpx::make_stop_callback(t, callback);
+    hpx::stop_callback<decltype(callback)> r1(t, callback);
+    hpx::stop_callback<decltype(callback)> r2(t, callback);
+    hpx::stop_callback<decltype(callback)> r3(t, callback);
+    hpx::stop_callback<decltype(callback)> r4(t, callback);
+    hpx::stop_callback<decltype(callback)> r5(t, callback);
+    hpx::stop_callback<decltype(callback)> r6(t, callback);
+    hpx::stop_callback<decltype(callback)> r7(t, callback);
+    hpx::stop_callback<decltype(callback)> r8(t, callback);
+    hpx::stop_callback<decltype(callback)> r9(t, callback);
+    hpx::stop_callback<decltype(callback)> r10(t, callback);
 
     s.request_stop();
 
@@ -144,30 +147,32 @@ void test_register_multiple_callbacks()
 //////////////////////////////////////////////////////////////////////////////
 void test_concurrent_callback_registration()
 {
-    auto thread_loop = [](hpx::stop_token token) {
+    auto f2 = [] {};
+
+    auto thread_loop = [&](hpx::stop_token token) {
         std::atomic<bool> cancelled{false};
+        auto f1 = [&] { cancelled = true; };
         while (!cancelled)
         {
-            auto registration =
-                hpx::make_stop_callback(token, [&] { cancelled = true; });
+            hpx::stop_callback<std::function<void()>> registration(token, f1);
 
-            auto cb0 = hpx::make_stop_callback(token, [] {});
-            auto cb1 = hpx::make_stop_callback(token, [] {});
-            auto cb2 = hpx::make_stop_callback(token, [] {});
-            auto cb3 = hpx::make_stop_callback(token, [] {});
-            auto cb4 = hpx::make_stop_callback(token, [] {});
-            auto cb5 = hpx::make_stop_callback(token, [] {});
-            auto cb6 = hpx::make_stop_callback(token, [] {});
-            auto cb7 = hpx::make_stop_callback(token, [] {});
-            auto cb8 = hpx::make_stop_callback(token, [] {});
-            auto cb9 = hpx::make_stop_callback(token, [] {});
-            auto cb10 = hpx::make_stop_callback(token, [] {});
-            auto cb11 = hpx::make_stop_callback(token, [] {});
-            auto cb12 = hpx::make_stop_callback(token, [] {});
-            auto cb13 = hpx::make_stop_callback(token, [] {});
-            auto cb14 = hpx::make_stop_callback(token, [] {});
-            auto cb15 = hpx::make_stop_callback(token, [] {});
-            auto cb16 = hpx::make_stop_callback(token, [] {});
+            hpx::stop_callback<decltype(f2)> cb0(token, f2);
+            hpx::stop_callback<decltype(f2)> cb1(token, f2);
+            hpx::stop_callback<decltype(f2)> cb2(token, f2);
+            hpx::stop_callback<decltype(f2)> cb3(token, f2);
+            hpx::stop_callback<decltype(f2)> cb4(token, f2);
+            hpx::stop_callback<decltype(f2)> cb5(token, f2);
+            hpx::stop_callback<decltype(f2)> cb6(token, f2);
+            hpx::stop_callback<decltype(f2)> cb7(token, f2);
+            hpx::stop_callback<decltype(f2)> cb8(token, f2);
+            hpx::stop_callback<decltype(f2)> cb9(token, f2);
+            hpx::stop_callback<decltype(f2)> cb10(token, f2);
+            hpx::stop_callback<decltype(f2)> cb11(token, f2);
+            hpx::stop_callback<decltype(f2)> cb12(token, f2);
+            hpx::stop_callback<decltype(f2)> cb13(token, f2);
+            hpx::stop_callback<decltype(f2)> cb14(token, f2);
+            hpx::stop_callback<decltype(f2)> cb15(token, f2);
+            hpx::stop_callback<decltype(f2)> cb16(token, f2);
 
             hpx::this_thread::yield();
         }
@@ -224,12 +229,14 @@ void test_callback_deregistration_doesnt_wait_for_others_to_finish_executing()
 
     // Register a first callback that will signal when it starts executing
     // and then block until it receives a signal.
-    auto blocking_callback = hpx::make_stop_callback(src.get_token(), [&] {
+    auto f = [&] {
         std::unique_lock<hpx::lcos::local::mutex> lock{mut};
         callback_executing = true;
         cv.notify_all();
         cv.wait(lock, [&] { return release_callback; });
-    });
+    };
+    hpx::stop_callback<decltype(f)> blocking_callback(
+        src.get_token(), std::move(f));
 
     hpx::util::optional<hpx::stop_callback<decltype(dummy_callback)&>> cb2{
         hpx::util::in_place, src.get_token(), dummy_callback};
@@ -286,7 +293,7 @@ void test_callback_deregistration_blocks_until_callback_finishes()
                 callback_about_to_return = true;
             };
 
-            auto cb = hpx::make_stop_callback(src.get_token(), f);
+            hpx::stop_callback<std::function<void()>> cb(src.get_token(), f);
 
             {
                 std::unique_lock<hpx::lcos::local::mutex> lock{mut};
@@ -361,7 +368,7 @@ void test_cancellation_single_thread_performance()
 
     for (int i = 0; i < iteration_count; ++i)
     {
-        auto r = hpx::make_stop_callback(s.get_token(), callback);
+        hpx::stop_callback<decltype(callback)> r(s.get_token(), callback);
     }
 
     auto end = hpx::util::high_resolution_clock::now();
@@ -372,7 +379,7 @@ void test_cancellation_single_thread_performance()
 
     for (int i = 0; i < iteration_count; ++i)
     {
-        callback_batch b{s.get_token(), callback};
+        callback_batch<decltype(callback)> b{s.get_token(), callback};
     }
 
     end = hpx::util::high_resolution_clock::now();
@@ -383,11 +390,11 @@ void test_cancellation_single_thread_performance()
 
     for (int i = 0; i < iteration_count; ++i)
     {
-        callback_batch b0{s.get_token(), callback};
-        callback_batch b1{s.get_token(), callback};
-        callback_batch b2{s.get_token(), callback};
-        callback_batch b3{s.get_token(), callback};
-        callback_batch b4{s.get_token(), callback};
+        callback_batch<decltype(callback)> b0{s.get_token(), callback};
+        callback_batch<decltype(callback)> b1{s.get_token(), callback};
+        callback_batch<decltype(callback)> b2{s.get_token(), callback};
+        callback_batch<decltype(callback)> b3{s.get_token(), callback};
+        callback_batch<decltype(callback)> b4{s.get_token(), callback};
     }
 
     end = hpx::util::high_resolution_clock::now();

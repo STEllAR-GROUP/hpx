@@ -42,6 +42,9 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_cxx17_if_constexpr(
     DEFINITIONS HPX_HAVE_CXX17_IF_CONSTEXPR)
 
+  hpx_check_for_cxx17_inline_constexpr_variable(
+    DEFINITIONS HPX_HAVE_CXX17_INLINE_CONSTEXPR_VARIABLE)
+
   hpx_check_for_cxx17_aligned_new(
     DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
 
@@ -53,9 +56,6 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx17_maybe_unused(
     DEFINITIONS HPX_HAVE_CXX17_MAYBE_UNUSED)
-
-  hpx_check_for_cxx17_inline_variable(
-    DEFINITIONS HPX_HAVE_CXX17_INLINE_VARIABLE)
 
   hpx_check_for_cxx17_deduction_guides(
     DEFINITIONS HPX_HAVE_CXX17_DEDUCTION_GUIDES)

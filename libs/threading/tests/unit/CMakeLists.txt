@@ -6,19 +6,21 @@
 
 # Threading tests
 set(threading_tests
+    condition_variable2
+    condition_variable3
+    condition_variable4
     jthread1
     jthread2
-    stop_token
     stop_tokencb1
-    stop_tokencb2
     stop_tokenrace
 )
 
+set(condition_variable2_PARAMETERS THREADS_PER_LOCALITY 4)
+set(condition_variable3_PARAMETERS THREADS_PER_LOCALITY 4)
+set(condition_variable4_PARAMETERS THREADS_PER_LOCALITY 4)
 set(jthread1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(jthread2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(stop_tokencb1_PARAMETERS THREADS_PER_LOCALITY 4)
-set(stop_tokencb2_PARAMETERS THREADS_PER_LOCALITY 4)
-set(stop_token_PARAMETERS THREADS_PER_LOCALITY 4)
 set(stop_tokenrace_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${threading_tests})

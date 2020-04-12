@@ -323,13 +323,6 @@ function(hpx_check_for_cxx17_maybe_unused)
 endfunction()
 
 ###############################################################################
-function(hpx_check_for_cxx17_inline_variable)
-  add_hpx_config_test(HPX_WITH_CXX17_INLINE_VARIABLE
-    SOURCE cmake/tests/cxx17_inline_variable.cpp
-    FILE ${ARGN})
-endfunction()
-
-###############################################################################
 function(hpx_check_for_cxx17_deduction_guides)
   add_hpx_config_test(HPX_WITH_CXX17_DEDUCTION_GUIDES
     SOURCE cmake/tests/cxx17_deduction_guides.cpp
@@ -347,6 +340,13 @@ endfunction()
 function(hpx_check_for_cxx17_if_constexpr)
   add_hpx_config_test(HPX_WITH_CXX17_IF_CONSTEXPR
     SOURCE cmake/tests/cxx17_if_constexpr.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx17_inline_constexpr_variable)
+  add_hpx_config_test(HPX_WITH_CXX17_INLINE_CONSTEXPR_VALUE
+    SOURCE cmake/tests/cxx17_inline_constexpr_variable.cpp
     FILE ${ARGN})
 endfunction()
 

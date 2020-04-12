@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,8 @@ set(tests
   local_event
   local_mutex
   sliding_semaphore
+  stop_token
+  stop_tokencb2
   )
 
 set(channel_mpmc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -37,6 +39,9 @@ set(local_event_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(sliding_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(stop_tokencb2_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stop_token_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
 

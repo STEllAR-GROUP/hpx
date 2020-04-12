@@ -16,6 +16,7 @@
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -53,22 +54,17 @@ namespace hpx { namespace lcos { namespace local {
         void wait(std::unique_lock<mutex>& lock, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
-            util::ignore_while_checking<std::unique_lock<mutex>> il(&lock);
+
+            util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_.data_);
-            util::ignore_while_checking<std::unique_lock<mutex_type>> ill(&l);
             util::unlock_guard<std::unique_lock<mutex>> unlock(lock);
-            //The following ensures that the inner lock will be unlocked
-            //before the outer to avoid deadlock (fixes issue #3608)
+
+            // The following ensures that the inner lock will be unlocked
+            // before the outer to avoid deadlock (fixes issue #3608)
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
             cond_.data_.wait(l, ec);
-
-            // We need to ignore our internal mutex for the user provided lock
-            // being able to be reacquired without a lock held during suspension
-            // error. We can't use RAII here since the guard object would get
-            // destructed before the unlock_guard.
-            hpx::util::ignore_lock(&mtx_.data_);
         }
 
         template <class Predicate>
@@ -88,23 +84,17 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
-            util::ignore_while_checking<std::unique_lock<mutex>> il(&lock);
+            util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_.data_);
-            util::ignore_while_checking<std::unique_lock<mutex_type>> iil(&l);
             util::unlock_guard<std::unique_lock<mutex>> unlock(lock);
-            //The following ensures that the inner lock will be unlocked
-            //before the outer to avoid deadlock (fixes issue #3608)
+
+            // The following ensures that the inner lock will be unlocked
+            // before the outer to avoid deadlock (fixes issue #3608)
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.data_.wait_until(l, abs_time, ec);
-
-            // We need to ignore our internal mutex for the user provided lock
-            // being able to be reacquired without a lock held during suspension
-            // error. We can't use RAII here since the guard object would get
-            // destructed before the unlock_guard.
-            hpx::util::ignore_lock(&mtx_.data_);
 
             if (ec)
                 return cv_status::error;
@@ -175,18 +165,13 @@ namespace hpx { namespace lcos { namespace local {
             util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_.data_);
             util::unlock_guard<Lock> unlock(lock);
-            //The following ensures that the inner lock will be unlocked
-            //before the outer to avoid deadlock (fixes issue #3608)
+
+            // The following ensures that the inner lock will be unlocked
+            // before the outer to avoid deadlock (fixes issue #3608)
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
             cond_.data_.wait(l, ec);
-
-            // We need to ignore our internal mutex for the user provided lock
-            // being able to be reacquired without a lock held during suspension
-            // error. We can't use RAII here since the guard object would get
-            // destructed before the unlock_guard.
-            hpx::util::ignore_lock(&mtx_.data_);
         }
 
         template <class Lock, class Predicate>
@@ -209,19 +194,14 @@ namespace hpx { namespace lcos { namespace local {
             util::ignore_all_while_checking ignore_lock;
             std::unique_lock<mutex_type> l(mtx_.data_);
             util::unlock_guard<Lock> unlock(lock);
-            //The following ensures that the inner lock will be unlocked
-            //before the outer to avoid deadlock (fixes issue #3608)
+
+            // The following ensures that the inner lock will be unlocked
+            // before the outer to avoid deadlock (fixes issue #3608)
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.data_.wait_until(l, abs_time, ec);
-
-            // We need to ignore our internal mutex for the user provided lock
-            // being able to be reacquired without a lock held during suspension
-            // error. We can't use RAII here since the guard object would get
-            // destructed before the unlock_guard.
-            hpx::util::ignore_lock(&mtx_.data_);
 
             if (ec)
                 return cv_status::error;
@@ -258,6 +238,109 @@ namespace hpx { namespace lcos { namespace local {
             Predicate pred, error_code& ec = throws)
         {
             return wait_until(lock, rel_time.from_now(), std::move(pred), ec);
+        }
+
+        // 32.6.4.2, interruptible waits
+        template <typename Lock, typename Predicate>
+        bool wait(Lock& lock, stop_token stoken, Predicate pred,
+            error_code& ec = throws)
+        {
+            if (stoken.stop_requested())
+            {
+                return pred();
+            }
+
+            auto f = [&] {
+                std::unique_lock<mutex_type> l(mtx_.data_);
+                cond_.data_.notify_all(std::move(l), ec);
+            };
+            stop_callback<decltype(f)> cb(stoken, std::move(f));
+
+            while (!pred())
+            {
+                util::ignore_all_while_checking ignore_lock;
+                std::unique_lock<mutex_type> l(mtx_.data_);
+                if (stoken.stop_requested())
+                {
+                    // pred() has already evaluated to false since we last
+                    // a acquired lock
+                    return false;
+                }
+
+                util::unlock_guard<Lock> unlock(lock);
+
+                // The following ensures that the inner lock will be unlocked
+                // before the outer to avoid deadlock (fixes issue #3608)
+                std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
+                    l, std::adopt_lock);
+
+                cond_.data_.wait(l, ec);
+            }
+
+            return true;
+        }
+
+        template <typename Lock, typename Predicate>
+        bool wait_until(Lock& lock, stop_token stoken,
+            util::steady_time_point const& abs_time, Predicate pred,
+            error_code& ec = throws)
+        {
+            if (stoken.stop_requested())
+            {
+                return pred();
+            }
+
+            auto f = [&] {
+                std::unique_lock<mutex_type> l(mtx_.data_);
+                cond_.data_.notify_all(std::move(l), ec);
+            };
+            stop_callback<decltype(f)> cb(stoken, std::move(f));
+
+            while (!pred())
+            {
+                bool should_stop;
+                {
+                    util::ignore_all_while_checking ignore_lock;
+                    std::unique_lock<mutex_type> l(mtx_.data_);
+                    if (stoken.stop_requested())
+                    {
+                        // pred() has already evaluated to false since we last
+                        // acquired lock.
+                        return false;
+                    }
+
+                    util::unlock_guard<Lock> unlock(lock);
+
+                    // The following ensures that the inner lock will be unlocked
+                    // before the outer to avoid deadlock (fixes issue #3608)
+                    std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
+                        l, std::adopt_lock);
+
+                    threads::thread_state_ex_enum const reason =
+                        cond_.data_.wait_until(l, abs_time, ec);
+
+                    if (ec)
+                        return false;
+
+                    should_stop = (reason == threads::wait_timeout) ||
+                        stoken.stop_requested();
+                }
+
+                if (should_stop)
+                {
+                    return pred();
+                }
+            }
+            return true;
+        }
+
+        template <typename Lock, typename Predicate>
+        bool wait_for(Lock& lock, stop_token stoken,
+            util::steady_duration const& rel_time, Predicate pred,
+            error_code& ec = throws)
+        {
+            return wait_until(
+                lock, stoken, rel_time.from_now(), std::move(pred), ec);
         }
 
     private:

@@ -20,6 +20,7 @@
 #include <functional>
 #include <optional>
 #include <thread>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_callback_register()
@@ -43,10 +44,11 @@ void test_callback_register()
     auto cb = [&] {
         cb1_called = true;
         // register another callback while callbacks are being executed
-        auto cb2 = hpx::make_stop_callback(stok, [&] { cb2_called = true; });
+        auto f = [&] { cb2_called = true; };
+        hpx::stop_callback<std::function<void()>> cb2(stok, std::move(f));
     };
 
-    auto cb1 = hpx::make_stop_callback(stok, cb);
+    hpx::stop_callback<decltype(cb)> cb1(stok, cb);
     HPX_TEST(ssrc.stop_possible());
     HPX_TEST(!ssrc.stop_requested());
     HPX_TEST(stok.stop_possible());
@@ -229,7 +231,8 @@ int main()
     test_callback_concurrent_unregister();
     test_callback_concurrent_unregister_other_thread();
 
-    // testCallbackThrow();
+    // this test terminates execution
+    // test_callback_throw();
 
     return hpx::util::report_errors();
 }
