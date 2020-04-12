@@ -10,10 +10,7 @@ namespace hpx { namespace threading {
 
     force_linking_helper& force_linking()
     {
-        static force_linking_helper helper
-        {
-            &hpx::detail::intrusive_ptr_add_ref
-        };
+        static force_linking_helper helper{&hpx::detail::intrusive_ptr_add_ref};
         return helper;
     }
 }}    // namespace hpx::threading

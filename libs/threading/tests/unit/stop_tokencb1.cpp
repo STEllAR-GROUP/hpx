@@ -18,8 +18,9 @@
 
 #include <atomic>
 #include <chrono>
-#include <iostream>
+#include <cstdint>
 #include <functional>
+#include <iostream>
 #include <mutex>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -198,9 +199,7 @@ void test_callback_deregistered_from_within_callback_does_not_deadlock()
     hpx::stop_source src;
     hpx::util::optional<hpx::stop_callback<std::function<void()>>> cb;
 
-    cb.emplace(src.get_token(), [&] {
-        cb.reset();
-    });
+    cb.emplace(src.get_token(), [&] { cb.reset(); });
 
     src.request_stop();
 
@@ -225,13 +224,12 @@ void test_callback_deregistration_doesnt_wait_for_others_to_finish_executing()
 
     // Register a first callback that will signal when it starts executing
     // and then block until it receives a signal.
-    auto blocking_callback = hpx::make_stop_callback(
-        src.get_token(), [&] {
-            std::unique_lock<hpx::lcos::local::mutex> lock{mut};
-            callback_executing = true;
-            cv.notify_all();
-            cv.wait(lock, [&] { return release_callback; });
-        });
+    auto blocking_callback = hpx::make_stop_callback(src.get_token(), [&] {
+        std::unique_lock<hpx::lcos::local::mutex> lock{mut};
+        callback_executing = true;
+        cv.notify_all();
+        cv.wait(lock, [&] { return release_callback; });
+    });
 
     hpx::util::optional<hpx::stop_callback<decltype(dummy_callback)&>> cb2{
         hpx::util::in_place, src.get_token(), dummy_callback};

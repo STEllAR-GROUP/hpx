@@ -16,6 +16,7 @@
 #include <atomic>
 #include <chrono>
 #include <string>
+#include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
 void test_jthread_without_token()

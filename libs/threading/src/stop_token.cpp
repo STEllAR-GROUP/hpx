@@ -11,6 +11,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <mutex>
 
 namespace hpx { namespace detail {
@@ -185,7 +186,7 @@ namespace hpx { namespace detail {
     void stop_state::remove_callback(stop_callback_base* cb) noexcept
     {
         {
-            std::scoped_lock<stop_state> l(*this);
+            std::lock_guard<stop_state> l(*this);
             if (cb->remove_this_callback())
                 return;
         }
@@ -209,7 +210,8 @@ namespace hpx { namespace detail {
             // Callback is currently executing on another thread,
             // block until it finishes executing.
             for (std::size_t k = 0; !cb->callback_finished_executing_.load(
-                std::memory_order_acquire); ++k)
+                     std::memory_order_acquire);
+                 ++k)
             {
                 hpx::basic_execution::this_thread::yield_k(
                     k, "stop_state::remove_callback");

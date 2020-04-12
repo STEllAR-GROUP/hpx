@@ -14,6 +14,7 @@
 #include <hpx/threading.hpp>
 
 #include <chrono>
+#include <utility>
 
 void test_stop_token_basic_api()
 {

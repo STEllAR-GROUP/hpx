@@ -14,6 +14,7 @@
 #include <hpx/testing.hpp>
 #include <hpx/threading.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstdlib>
 #include <functional>
