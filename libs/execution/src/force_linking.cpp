@@ -5,17 +5,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/mpi/force_linking.hpp>
-#include <hpx/mpi/mpi_future.hpp>
+#include <hpx/execution/executors/polymorphic_executor.hpp>
+#include <hpx/execution/force_linking.hpp>
 
-namespace hpx { namespace mpi {
+namespace hpx { namespace execution {
 
     // reference all symbols that have to be explicitly linked with the core
     // library
     force_linking_helper& force_linking()
     {
         static force_linking_helper helper{
-            &experimental::detail::hpx_mpi_errhandler};
+            &parallel::execution::detail::throw_bad_polymorphic_executor};
         return helper;
     }
-}}    // namespace hpx::mpi
+}}    // namespace hpx::execution

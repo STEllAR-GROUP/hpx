@@ -845,8 +845,9 @@ namespace hpx { namespace parallel { namespace execution {
                 Shape const& shape, Ts&&... ts) ->
                 typename bulk_execute_result<F, Shape, Ts...>::type
             {
-                typedef typename hpx::traits::executor_future<Executor,
-                    typename bulk_execute_result<F, Shape, Ts...>::type>::type
+                typedef std::vector<typename hpx::traits::executor_future<
+                    Executor,
+                    typename bulk_function_result<F, Shape, Ts...>::type>::type>
                     result_type;
 
                 try

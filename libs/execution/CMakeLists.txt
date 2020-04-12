@@ -38,6 +38,7 @@ set(execution_headers
   hpx/execution/executors/parallel_executor_aggregated.hpp
   hpx/execution/executors/parallel_executor.hpp
   hpx/execution/executors/persistent_auto_chunk_size.hpp
+  hpx/execution/executors/polymorphic_executor.hpp
   hpx/execution/executors/pool_executor.hpp
   hpx/execution/executors/rebind_executor.hpp
   hpx/execution/executors/restricted_thread_pool_executor.hpp
@@ -50,6 +51,7 @@ set(execution_headers
   hpx/execution/executors/timed_execution_fwd.hpp
   hpx/execution/executors/timed_execution.hpp
   hpx/execution/executors/timed_executors.hpp
+  hpx/execution/force_linking.hpp
   hpx/execution/parallel/traits/detail/vc/vector_pack_alignment_size.hpp
   hpx/execution/parallel/traits/detail/vc/vector_pack_count_bits.hpp
   hpx/execution/parallel/traits/detail/vc/vector_pack_load_store.hpp
@@ -65,7 +67,10 @@ set(execution_headers
   hpx/execution/traits/is_timed_executor.hpp
 )
 
-set(execution_sources current_executor.cpp)
+set(execution_sources
+  current_executor.cpp
+  force_linking.cpp
+  polymorphic_executor.cpp)
 
 set(execution_compat_headers
   hpx/async_launch_policy_dispatch.hpp
@@ -122,12 +127,13 @@ set(execution_compat_headers
 
 include(HPX_AddModule)
 add_hpx_module(execution
-  FORCE_LINKING_GEN
   SOURCES ${execution_sources}
   HEADERS ${execution_headers}
   DEPRECATION_WARNINGS
   COMPATIBILITY_HEADERS ON    # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER
+    "hpx/execution/force_linking.hpp"
   DEPENDENCIES
     hpx_assertion
     hpx_async_base
@@ -136,11 +142,13 @@ add_hpx_module(execution
     hpx_concepts
     hpx_config
     hpx_datastructures
+    hpx_errors
     hpx_functional
     hpx_iterator_support
     hpx_local_lcos
     hpx_preprocessor
     hpx_synchronization
+    hpx_thread_support
     hpx_timing
     hpx_topology
     hpx_type_support

@@ -30,15 +30,16 @@ namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    HPX_FORCEINLINE lcos::future<
-        typename util::detail::invoke_deferred_result<F, Ts...>::type>
-    call_sync(std::false_type, F f, Ts... vs)    // decay-copy
+    HPX_FORCEINLINE lcos::future<typename util::detail::invoke_deferred_result<
+        typename std::decay<F>::type, Ts...>::type>
+    call_sync(std::false_type, F&& f, Ts... vs)
     {
-        using R = typename util::detail::invoke_deferred_result<F, Ts...>::type;
+        using R = typename util::detail::invoke_deferred_result<
+            typename std::decay<F>::type, Ts...>::type;
         try
         {
             return lcos::make_ready_future<R>(
-                util::invoke(std::move(f), std::move(vs)...));
+                util::invoke(std::forward<F>(f), std::move(vs)...));
         }
         catch (...)
         {
@@ -47,13 +48,13 @@ namespace hpx { namespace detail {
     }
 
     template <typename F, typename... Ts>
-    HPX_FORCEINLINE lcos::future<
-        typename util::detail::invoke_deferred_result<F, Ts...>::type>
-    call_sync(std::true_type, F f, Ts... vs)    // decay-copy
+    HPX_FORCEINLINE lcos::future<typename util::detail::invoke_deferred_result<
+        typename std::decay<F>::type, Ts...>::type>
+    call_sync(std::true_type, F&& f, Ts... vs)
     {
         try
         {
-            util::invoke(std::move(f), std::move(vs)...);
+            util::invoke(std::forward<F>(f), std::move(vs)...);
             return lcos::make_ready_future();
         }
         catch (...)

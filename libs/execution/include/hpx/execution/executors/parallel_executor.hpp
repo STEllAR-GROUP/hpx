@@ -183,7 +183,7 @@ namespace hpx { namespace parallel { namespace execution {
         HPX_FORCEINLINE
             hpx::future<typename hpx::util::detail::invoke_deferred_result<F,
                 Future, Ts...>::type>
-            then_execute(F&& f, Future&& predecessor, Ts&&... ts)
+            then_execute(F&& f, Future&& predecessor, Ts&&... ts) const
         {
             using result_type =
                 typename hpx::util::detail::invoke_deferred_result<F, Future,
@@ -305,8 +305,8 @@ namespace hpx { namespace parallel { namespace execution {
         /// \cond NOINTERNAL
         template <typename Result, typename F, typename Iter, typename... Ts>
         void spawn_sequential(std::vector<hpx::future<Result>>& results,
-            lcos::local::latch& l, std::size_t base, std::size_t size,
-            F const& func, Iter it, Ts const&... ts) const
+            lcos::local::latch& l, std::size_t base, std::size_t size, F&& func,
+            Iter it, Ts&&... ts) const
         {
             // spawn tasks sequentially
             HPX_ASSERT(base + size <= results.size());
@@ -322,8 +322,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Result, typename F, typename Iter, typename... Ts>
         void spawn_hierarchical(std::vector<hpx::future<Result>>& results,
             lcos::local::latch& l, std::size_t base, std::size_t size,
-            std::size_t num_tasks, F const& func, Iter it,
-            Ts const&... ts) const
+            std::size_t num_tasks, F&& func, Iter it, Ts&&... ts) const
         {
             if (size > num_tasks)
             {

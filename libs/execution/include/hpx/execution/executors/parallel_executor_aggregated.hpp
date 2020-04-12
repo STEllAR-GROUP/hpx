@@ -63,18 +63,21 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(parallel_policy_executor_aggregated const& rhs) const
-            noexcept
+        // clang-format produces inconsistent results between versions
+        // clang-format off
+        bool operator==(
+            parallel_policy_executor_aggregated const& rhs) const noexcept
         {
             return num_spread_ == rhs.num_spread_ &&
                 num_tasks_ == rhs.num_tasks_;
         }
 
-        bool operator!=(parallel_policy_executor_aggregated const& rhs) const
-            noexcept
+        bool operator!=(
+            parallel_policy_executor_aggregated const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
+        // clang-format on
 
         parallel_policy_executor_aggregated const& context() const noexcept
         {
@@ -125,13 +128,13 @@ namespace hpx { namespace parallel { namespace execution {
                 lcos::local::latch l(size);
                 if (hpx::detail::has_async_policy(Policy{}))
                 {
-                    spawn_hierarchical(l, size, num_tasks, std::forward<F>(f),
+                    spawn_hierarchical(l, size, num_tasks, f,
                         hpx::util::begin(shape), e, mtx_e, ts...);
                 }
                 else
                 {
-                    spawn_sequential(l, size, std::forward<F>(f),
-                        hpx::util::begin(shape), e, mtx_e, ts...);
+                    spawn_sequential(
+                        l, size, f, hpx::util::begin(shape), e, mtx_e, ts...);
                 }
                 l.wait();
 
@@ -148,7 +151,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename F, typename Iter, typename... Ts>
             void spawn_sequential(lcos::local::latch& l, std::size_t size,
                 F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts const&... ts) const
+                lcos::local::spinlock& mtx_e, Ts&&... ts) const
             {
                 // spawn tasks sequentially
                 for (std::size_t i = 0; i != size; ++i, ++it)
@@ -175,7 +178,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename F, typename Iter, typename... Ts>
             void spawn_hierarchical(lcos::local::latch& l, std::size_t size,
                 std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts const&... ts) const
+                lcos::local::spinlock& mtx_e, Ts&&... ts) const
             {
                 if (size > num_tasks)
                 {
@@ -197,8 +200,7 @@ namespace hpx { namespace parallel { namespace execution {
                 }
 
                 // spawn remaining tasks sequentially
-                spawn_sequential(
-                    l, size, std::forward<F>(f), it, e, mtx_e, ts...);
+                spawn_sequential(l, size, f, it, e, mtx_e, ts...);
             }
 
             std::size_t const num_spread_;
@@ -261,18 +263,21 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(parallel_policy_executor_aggregated const& rhs) const
-            noexcept
+        // clang-format produces inconsistent results between versions
+        // clang-format off
+        bool operator==(
+            parallel_policy_executor_aggregated const& rhs) const noexcept
         {
             return policy_ == rhs.policy_ && num_spread_ == rhs.num_spread_ &&
                 num_tasks_ == rhs.num_tasks_;
         }
 
-        bool operator!=(parallel_policy_executor_aggregated const& rhs) const
-            noexcept
+        bool operator!=(
+            parallel_policy_executor_aggregated const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
+        // clang-format on
 
         parallel_policy_executor_aggregated const& context() const noexcept
         {
@@ -323,13 +328,13 @@ namespace hpx { namespace parallel { namespace execution {
                 lcos::local::latch l(size);
                 if (hpx::detail::has_async_policy(policy_))
                 {
-                    spawn_hierarchical(l, size, num_tasks, std::forward<F>(f),
+                    spawn_hierarchical(l, size, num_tasks, f,
                         hpx::util::begin(shape), e, mtx_e, ts...);
                 }
                 else
                 {
-                    spawn_sequential(l, size, std::forward<F>(f),
-                        hpx::util::begin(shape), e, mtx_e, ts...);
+                    spawn_sequential(
+                        l, size, f, hpx::util::begin(shape), e, mtx_e, ts...);
                 }
                 l.wait();
 
@@ -346,7 +351,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename F, typename Iter, typename... Ts>
             void spawn_sequential(lcos::local::latch& l, std::size_t size,
                 F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts const&... ts) const
+                lcos::local::spinlock& mtx_e, Ts&&... ts) const
             {
                 // spawn tasks sequentially
                 hpx::util::thread_description desc(
@@ -377,7 +382,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename F, typename Iter, typename... Ts>
             void spawn_hierarchical(lcos::local::latch& l, std::size_t size,
                 std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts const&... ts) const
+                lcos::local::spinlock& mtx_e, Ts&&... ts) const
             {
                 if (size > num_tasks)
                 {
@@ -403,8 +408,7 @@ namespace hpx { namespace parallel { namespace execution {
                 }
 
                 // spawn remaining tasks sequentially
-                spawn_sequential(
-                    l, size, std::forward<F>(f), it, e, mtx_e, ts...);
+                spawn_sequential(l, size, f, it, e, mtx_e, ts...);
             }
 
             hpx::launch const policy_;
