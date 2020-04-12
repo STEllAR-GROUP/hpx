@@ -181,48 +181,6 @@ void test_callback_concurrent_unregister_other_thread()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// void test_callback_throw()
-// {
-//     // create stop_source
-//     hpx::stop_source ssrc;
-//     HPX_TEST(ssrc.stop_possible());
-//     HPX_TEST(!ssrc.stop_requested());
-//
-//     // create stop_token from stop_source
-//     hpx::stop_token stok{ssrc.get_token()};
-//     HPX_TEST(ssrc.stop_possible());
-//     HPX_TEST(!ssrc.stop_requested());
-//     HPX_TEST(stok.stop_possible());
-//     HPX_TEST(!stok.stop_requested());
-//
-//     // register callback
-//     bool cb1_called{false};
-//     bool cb2_called{false};
-//
-//     auto cb = [&] {
-//         cb1_called = true;
-//         // throw
-//         throw "callback called";
-//     };
-//
-//     auto cb1 = hpx::make_stop_callback(stok, cb);
-//
-//     HPX_TEST(ssrc.stop_possible());
-//     HPX_TEST(!ssrc.stop_requested());
-//     HPX_TEST(stok.stop_possible());
-//     HPX_TEST(!stok.stop_requested());
-//     HPX_TEST(!cb1_called);
-//     HPX_TEST(!cb2_called);
-//
-//     // catch terminate() call:
-//     std::set_terminate([] { std::exit(0); });
-//
-//     // request stop
-//     ssrc.request_stop();
-//     HPX_TEST(false);
-// }
-
-///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     test_callback_register();
@@ -230,9 +188,6 @@ int main()
 
     test_callback_concurrent_unregister();
     test_callback_concurrent_unregister_other_thread();
-
-    // this test terminates execution
-    // test_callback_throw();
 
     return hpx::util::report_errors();
 }

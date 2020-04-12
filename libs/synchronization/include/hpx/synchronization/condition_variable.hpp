@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/memory.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -36,19 +36,45 @@ namespace hpx { namespace lcos { namespace local {
     class condition_variable
     {
     private:
-        typedef lcos::local::spinlock mutex_type;
+        using mutex_type = detail::condition_variable_data::mutex_type;
+        using data_type =
+            hpx::memory::intrusive_ptr<detail::condition_variable_data>;
 
     public:
+        condition_variable()
+          : data_(data_type(new detail::condition_variable_data, false))
+        {
+        }
+
+        // Preconditions: There is no thread blocked on *this. [Note: That is,
+        //      all threads have been notified; they could subsequently block
+        //      on the lock specified in the wait.This relaxes the usual rules,
+        //      which would have required all wait calls to happen before
+        //      destruction.Only the notification to unblock the wait needs to
+        //      happen before destruction.The user should take care to ensure
+        //      that no threads wait on *this once the destructor has been
+        //      started, especially when the waiting threads are calling the
+        //      wait functions in a loop or using the overloads of wait,
+        //      wait_for, or wait_until that take a predicate. end note]
+        //
+        // IOW, ~condition_variable() can execute before a signaled thread
+        // returns from a wait. If this happens with condition_variable, that
+        // waiting thread will attempt to lock the destructed mutex.
+        // To fix this, there must be shared ownership of the data members
+        // between the condition_variable_any object and the member functions
+        // wait (wait_for, etc.).
+        ~condition_variable() = default;
+
         void notify_one(error_code& ec = throws)
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            cond_.data_.notify_one(std::move(l), ec);
+            std::unique_lock<mutex_type> l(data_->mtx_);
+            data_->cond_.notify_one(std::move(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            cond_.data_.notify_all(std::move(l), ec);
+            std::unique_lock<mutex_type> l(data_->mtx_);
+            data_->cond_.notify_all(std::move(l), ec);
         }
 
         void wait(std::unique_lock<mutex>& lock, error_code& ec = throws)
@@ -56,7 +82,7 @@ namespace hpx { namespace lcos { namespace local {
             HPX_ASSERT_OWNS_LOCK(lock);
 
             util::ignore_all_while_checking ignore_lock;
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock<mutex_type> l(data_->mtx_);
             util::unlock_guard<std::unique_lock<mutex>> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
@@ -64,10 +90,11 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
-            cond_.data_.wait(l, ec);
+            auto data = data_;    // keep data alive
+            data_->cond_.wait(l, ec);
         }
 
-        template <class Predicate>
+        template <typename Predicate>
         void wait(std::unique_lock<mutex>& lock, Predicate pred,
             error_code& /*ec*/ = throws)
         {
@@ -85,7 +112,7 @@ namespace hpx { namespace lcos { namespace local {
             HPX_ASSERT_OWNS_LOCK(lock);
 
             util::ignore_all_while_checking ignore_lock;
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock<mutex_type> l(data_->mtx_);
             util::unlock_guard<std::unique_lock<mutex>> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
@@ -93,8 +120,9 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
+            auto data = data_;    // keep data alive
             threads::thread_state_ex_enum const reason =
-                cond_.data_.wait_until(l, abs_time, ec);
+                data_->cond_.wait_until(l, abs_time, ec);
 
             if (ec)
                 return cv_status::error;
@@ -135,35 +163,61 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     private:
-        mutable util::cache_line_data<mutex_type> mtx_;
-        util::cache_line_data<detail::condition_variable> cond_;
+        hpx::util::cache_aligned_data_derived<data_type> data_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     class condition_variable_any
     {
     private:
-        typedef lcos::local::spinlock mutex_type;
+        using mutex_type = detail::condition_variable_data::mutex_type;
+        using data_type =
+            hpx::memory::intrusive_ptr<detail::condition_variable_data>;
 
     public:
+        condition_variable_any()
+          : data_(data_type(new detail::condition_variable_data, false))
+        {
+        }
+
+        // Preconditions: There is no thread blocked on *this. [Note: That is,
+        //      all threads have been notified; they could subsequently block
+        //      on the lock specified in the wait.This relaxes the usual rules,
+        //      which would have required all wait calls to happen before
+        //      destruction.Only the notification to unblock the wait needs to
+        //      happen before destruction.The user should take care to ensure
+        //      that no threads wait on *this once the destructor has been
+        //      started, especially when the waiting threads are calling the
+        //      wait functions in a loop or using the overloads of wait,
+        //      wait_for, or wait_until that take a predicate. end note]
+        //
+        // IOW, ~condition_variable_any() can execute before a signaled thread
+        // returns from a wait. If this happens with condition_variable, that
+        // waiting thread will attempt to lock the destructed mutex.
+        // To fix this, there must be shared ownership of the data members
+        // between the condition_variable_any object and the member functions
+        // wait (wait_for, etc.).
+        ~condition_variable_any() = default;
+
         void notify_one(error_code& ec = throws)
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            cond_.data_.notify_one(std::move(l), ec);
+            std::unique_lock<mutex_type> l(data_->mtx_);
+            data_->cond_.notify_one(std::move(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            cond_.data_.notify_all(std::move(l), ec);
+            std::unique_lock<mutex_type> l(data_->mtx_);
+            data_->cond_.notify_all(std::move(l), ec);
         }
 
-        template <class Lock>
+        template <typename Lock>
         void wait(Lock& lock, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
             util::ignore_all_while_checking ignore_lock;
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock<mutex_type> l(data_->mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
@@ -171,10 +225,11 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
-            cond_.data_.wait(l, ec);
+            auto data = data_;    // keep data alive
+            data_->cond_.wait(l, ec);
         }
 
-        template <class Lock, class Predicate>
+        template <typename Lock, typename Predicate>
         void wait(Lock& lock, Predicate pred, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
@@ -192,7 +247,7 @@ namespace hpx { namespace lcos { namespace local {
             HPX_ASSERT_OWNS_LOCK(lock);
 
             util::ignore_all_while_checking ignore_lock;
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock<mutex_type> l(data_->mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
@@ -200,8 +255,9 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
+            auto data = data_;    // keep data alive
             threads::thread_state_ex_enum const reason =
-                cond_.data_.wait_until(l, abs_time, ec);
+                data_->cond_.wait_until(l, abs_time, ec);
 
             if (ec)
                 return cv_status::error;
@@ -250,16 +306,18 @@ namespace hpx { namespace lcos { namespace local {
                 return pred();
             }
 
-            auto f = [&] {
-                std::unique_lock<mutex_type> l(mtx_.data_);
-                cond_.data_.notify_all(std::move(l), ec);
+            auto data = data_;    // keep data alive
+
+            auto f = [&data, &ec] {
+                std::unique_lock<mutex_type> l(data->mtx_);
+                data->cond_.notify_all(std::move(l), ec);
             };
             stop_callback<decltype(f)> cb(stoken, std::move(f));
 
             while (!pred())
             {
                 util::ignore_all_while_checking ignore_lock;
-                std::unique_lock<mutex_type> l(mtx_.data_);
+                std::unique_lock<mutex_type> l(data_->mtx_);
                 if (stoken.stop_requested())
                 {
                     // pred() has already evaluated to false since we last
@@ -274,7 +332,7 @@ namespace hpx { namespace lcos { namespace local {
                 std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                     l, std::adopt_lock);
 
-                cond_.data_.wait(l, ec);
+                data_->cond_.wait(l, ec);
             }
 
             return true;
@@ -290,9 +348,11 @@ namespace hpx { namespace lcos { namespace local {
                 return pred();
             }
 
-            auto f = [&] {
-                std::unique_lock<mutex_type> l(mtx_.data_);
-                cond_.data_.notify_all(std::move(l), ec);
+            auto data = data_;    // keep data alive
+
+            auto f = [&data, &ec] {
+                std::unique_lock<mutex_type> l(data->mtx_);
+                data->cond_.notify_all(std::move(l), ec);
             };
             stop_callback<decltype(f)> cb(stoken, std::move(f));
 
@@ -301,7 +361,7 @@ namespace hpx { namespace lcos { namespace local {
                 bool should_stop;
                 {
                     util::ignore_all_while_checking ignore_lock;
-                    std::unique_lock<mutex_type> l(mtx_.data_);
+                    std::unique_lock<mutex_type> l(data_->mtx_);
                     if (stoken.stop_requested())
                     {
                         // pred() has already evaluated to false since we last
@@ -317,7 +377,7 @@ namespace hpx { namespace lcos { namespace local {
                         l, std::adopt_lock);
 
                     threads::thread_state_ex_enum const reason =
-                        cond_.data_.wait_until(l, abs_time, ec);
+                        data_->cond_.wait_until(l, abs_time, ec);
 
                     if (ec)
                         return false;
@@ -344,8 +404,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     private:
-        mutable util::cache_line_data<mutex_type> mtx_;
-        util::cache_line_data<detail::condition_variable> cond_;
+        hpx::util::cache_aligned_data_derived<data_type> data_;
     };
 }}}    // namespace hpx::lcos::local
 
