@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
+#include <hpx/parallel/util/tagged_tuple.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/tagged_pair.hpp>
-#include <hpx/util/tagged_tuple.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

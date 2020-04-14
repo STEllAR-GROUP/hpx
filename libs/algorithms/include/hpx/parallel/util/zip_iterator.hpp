@@ -12,7 +12,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/tagged_pair.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <utility>
 

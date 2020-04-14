@@ -11,7 +11,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #endif
-#include <hpx/util/tagged_pair.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/traits/projected.hpp>

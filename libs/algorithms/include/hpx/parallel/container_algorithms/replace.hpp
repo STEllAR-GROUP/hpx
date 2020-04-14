@@ -13,7 +13,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/util/tagged_pair.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/replace.hpp>
 #include <hpx/parallel/tagspec.hpp>

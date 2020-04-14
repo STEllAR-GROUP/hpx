@@ -17,9 +17,9 @@
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/parallel/util/tagged_tuple.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/tagged_tuple.hpp>
 
 #include <hpx/execution/exception_list.hpp>
 #include <hpx/execution/execution_policy.hpp>

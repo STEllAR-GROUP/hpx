@@ -117,6 +117,8 @@ set(algorithms_headers
   hpx/parallel/util/prefetching.hpp
   hpx/parallel/util/projection_identity.hpp
   hpx/parallel/util/scan_partitioner.hpp
+  hpx/parallel/util/tagged_pair.hpp
+  hpx/parallel/util/tagged_tuple.hpp
   hpx/parallel/util/transfer.hpp
   hpx/parallel/util/transform_loop.hpp
   hpx/parallel/util/zip_iterator.hpp
@@ -124,8 +126,14 @@ set(algorithms_headers
   hpx/traits/segmented_iterator_traits.hpp
 )
 
+set(datastructures_compat_headers
+  hpx/util/tagged_pair.hpp
+  hpx/util/tagged_tuple.hpp)
+
 include(HPX_AddModule)
 add_hpx_module(algorithms
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   HEADERS ${algorithms_headers}
   # TODO: Really depends on main HPX library, but cannot add that as a
