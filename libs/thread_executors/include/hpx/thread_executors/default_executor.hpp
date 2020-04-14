@@ -13,6 +13,10 @@
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/execution/executors/default_executor.hpp>
+
+namespace hpx { namespace threads { namespace executors {
+    using default_executor = parallel::execution::default_executor;
+}}}    // namespace hpx::threads::executors
 #endif
 
 #endif /*HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR_HPP*/
