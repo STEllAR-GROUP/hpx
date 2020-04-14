@@ -7,6 +7,9 @@
 #if !defined(HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM)
 #define HPX_UTIL_THREAD_AWARE_TIMER_AUG_17_2012_0745PM
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
 #include <hpx/lcos/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
@@ -82,4 +85,4 @@ namespace hpx { namespace util
 }} // namespace hpx::util
 
 #endif
-
+#endif
