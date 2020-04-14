@@ -9,6 +9,7 @@ set(tests
   boost_any
   is_tuple_like
   unique_any
+  tagged
   tuple
 )
 

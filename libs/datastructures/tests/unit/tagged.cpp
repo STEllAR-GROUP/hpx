@@ -4,35 +4,44 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/datastructures/tagged_pair.hpp>
+#include <hpx/datastructures/tagged_tuple.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/tagged_pair.hpp>
-#include <hpx/util/tagged_tuple.hpp>
 #include <hpx/testing.hpp>
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 struct A
 {
-    A(int val = 0) : value_(val) {}
+    A(int val = 0)
+      : value_(val)
+    {
+    }
     int value_;
 };
 
 struct B
 {
-    B(int val = 0) : value_(val) {}
+    B(int val = 0)
+      : value_(val)
+    {
+    }
     int value_;
 };
 
 struct C
 {
-    C(int val = 0) : value_(val) {}
+    C(int val = 0)
+      : value_(val)
+    {
+    }
     int value_;
 };
 
-HPX_DEFINE_TAG_SPECIFIER(tag1)      // defines tag::tag1
-HPX_DEFINE_TAG_SPECIFIER(tag2)      // defines tag::tag2
-HPX_DEFINE_TAG_SPECIFIER(tag3)      // defines tag::tag3
+HPX_DEFINE_TAG_SPECIFIER(tag1)    // defines tag::tag1
+HPX_DEFINE_TAG_SPECIFIER(tag2)    // defines tag::tag2
+HPX_DEFINE_TAG_SPECIFIER(tag3)    // defines tag::tag3
 
 void tagged_pair_test()
 {
@@ -47,12 +56,14 @@ void tagged_pair_test()
         static_assert(std::is_same<decltype(p.first), A>::value, "");
         static_assert(std::is_same<decltype(p.second), B>::value, "");
 
-        static_assert(std::is_same<
-                typename hpx::util::decay<decltype(p.tag1())>::type, A
-            >::value, "");
-        static_assert(std::is_same<
-                typename hpx::util::decay<decltype(p.tag2())>::type, B
-            >::value, "");
+        static_assert(
+            std::is_same<typename hpx::util::decay<decltype(p.tag1())>::type,
+                A>::value,
+            "");
+        static_assert(
+            std::is_same<typename hpx::util::decay<decltype(p.tag2())>::type,
+                B>::value,
+            "");
     }
 
     {
@@ -93,25 +104,31 @@ void tagged_tuple_test()
     {
         tuple t;
 
-        static_assert(std::is_same<
-                typename hpx::util::tuple_element<0, tuple>::type, A
-            >::value, "");
-        static_assert(std::is_same<
-                typename hpx::util::tuple_element<1, tuple>::type, B
-            >::value, "");
-        static_assert(std::is_same<
-                typename hpx::util::tuple_element<2, tuple>::type, C
-            >::value, "");
+        static_assert(
+            std::is_same<typename hpx::util::tuple_element<0, tuple>::type,
+                A>::value,
+            "");
+        static_assert(
+            std::is_same<typename hpx::util::tuple_element<1, tuple>::type,
+                B>::value,
+            "");
+        static_assert(
+            std::is_same<typename hpx::util::tuple_element<2, tuple>::type,
+                C>::value,
+            "");
 
-        static_assert(std::is_same<
-                typename hpx::util::decay<decltype(t.tag1())>::type, A
-            >::value, "");
-        static_assert(std::is_same<
-                typename hpx::util::decay<decltype(t.tag2())>::type, B
-            >::value, "");
-        static_assert(std::is_same<
-                typename hpx::util::decay<decltype(t.tag3())>::type, C
-            >::value, "");
+        static_assert(
+            std::is_same<typename hpx::util::decay<decltype(t.tag1())>::type,
+                A>::value,
+            "");
+        static_assert(
+            std::is_same<typename hpx::util::decay<decltype(t.tag2())>::type,
+                B>::value,
+            "");
+        static_assert(
+            std::is_same<typename hpx::util::decay<decltype(t.tag3())>::type,
+                C>::value,
+            "");
     }
 
     {
@@ -132,7 +149,8 @@ void tagged_tuple_test()
 
     {
         using hpx::util::make_tagged_tuple;
-        tuple t = make_tagged_tuple<tag::tag1, tag::tag2, tag::tag3>(42, 43, 44);
+        tuple t =
+            make_tagged_tuple<tag::tag1, tag::tag2, tag::tag3>(42, 43, 44);
 
         HPX_TEST_EQ(t.tag1().value_, 42);
         HPX_TEST_EQ(t.tag2().value_, 43);

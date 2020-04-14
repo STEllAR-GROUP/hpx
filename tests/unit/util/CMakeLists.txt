@@ -7,7 +7,6 @@
 set(tests
     bind_action
     config_entry
-    tagged
    )
 
 set(subdirs
