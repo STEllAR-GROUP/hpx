@@ -282,7 +282,9 @@ namespace hpx { namespace parallel { namespace execution {
             // before passing the task onwards to the real executor
             return dataflow(launch::sync,
                 hpx::util::unwrapping(
-                    detail::pre_execution_async_domain_schedule<decltype(*this),
+                    detail::pre_execution_async_domain_schedule<
+                        typename std::decay<typename std::remove_pointer<
+                            decltype(this)>::type>::type,
                         pool_numa_hint<Tag>>{*this, hint_, hp_sync_}),
                 std::forward<F>(f), std::forward<Ts>(ts)...);
         }
@@ -328,7 +330,9 @@ namespace hpx { namespace parallel { namespace execution {
                 launch::sync,
                 [f = std::forward<F>(f), this](
                     Future&& predecessor, Ts&&... ts) {
-                    detail::pre_execution_then_domain_schedule<decltype(*this),
+                    detail::pre_execution_then_domain_schedule<
+                        typename std::decay<typename std::remove_pointer<
+                            decltype(this)>::type>::type,
                         pool_numa_hint<Tag>>
                         pre_exec{*this, hint_, hp_sync_};
 
@@ -392,7 +396,9 @@ namespace hpx { namespace parallel { namespace execution {
                     OuterFuture<hpx::util::tuple<InnerFutures...>>&&
                         predecessor,
                     Ts&&... ts) {
-                    detail::pre_execution_then_domain_schedule<decltype(*this),
+                    detail::pre_execution_then_domain_schedule<
+                        typename std::decay<typename std::remove_pointer<
+                            decltype(this)>::type>::type,
                         pool_numa_hint<Tag>>
                         pre_exec{*this, hint_, hp_sync_};
 
