@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/custom_exception_info.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_task_block.hpp>
 #include <hpx/testing.hpp>
@@ -28,8 +28,7 @@ void define_task_block_test()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    define_task_block([&](task_block<>& trh)
-    {
+    define_task_block([&](task_block<>& trh) {
         parent_flag = true;
 
         trh.run([&]() {
@@ -68,7 +67,8 @@ void define_task_block_test()
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_exceptions_test1()
 {
-    try {
+    try
+    {
         define_task_block([](task_block<>& trh) {
             trh.run([]() {
                 hpx::cout << "task1" << hpx::endl;
@@ -86,26 +86,26 @@ void define_task_block_exceptions_test1()
 
         HPX_TEST(false);
     }
-    catch (hpx::parallel::exception_list const& e) {
+    catch (hpx::parallel::exception_list const& e)
+    {
         HPX_TEST_EQ(e.size(), 3u);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
 
 void define_task_block_exceptions_test2()
 {
-    try {
-        define_task_block([&](task_block<>& trh)
-        {
-            trh.run([&]()
-            {
+    try
+    {
+        define_task_block([&](task_block<>& trh) {
+            trh.run([&]() {
                 HPX_TEST(!hpx::expect_exception());
 
                 // Error: trh is not active
-                trh.run([]()
-                {
+                trh.run([]() {
                     HPX_TEST(false);    // should not be called
                 });
 
@@ -117,10 +117,12 @@ void define_task_block_exceptions_test2()
 
         HPX_TEST(false);
     }
-    catch (hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         HPX_TEST_EQ(int(e.get_error()), int(hpx::task_block_not_active));
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -138,15 +140,11 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv, cfg), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-
-

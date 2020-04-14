@@ -12,7 +12,6 @@ set(subdirs
     component
     diagnostics
     lcos
-    parallel_block
     resource
     threads
     topology

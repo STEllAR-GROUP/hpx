@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/custom_exception_info.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_task_block.hpp>
 #include <hpx/testing.hpp>
@@ -17,8 +17,8 @@
 using hpx::parallel::define_task_block;
 using hpx::parallel::task_block;
 using hpx::parallel::execution::par;
-using hpx::parallel::execution::task;
 using hpx::parallel::execution::parallel_task_policy;
+using hpx::parallel::execution::task;
 
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_test1()
@@ -31,8 +31,7 @@ void define_task_block_test1()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    define_task_block(par, [&](task_block<>& trh)
-    {
+    define_task_block(par, [&](task_block<>& trh) {
         parent_flag = true;
 
         trh.run([&]() {
@@ -79,9 +78,8 @@ void define_task_block_test2()
     bool task21_flag = false;
     bool task3_flag = false;
 
-    hpx::future<void> f = define_task_block(par(task),
-        [&](task_block<parallel_task_policy>& trh)
-        {
+    hpx::future<void> f = define_task_block(
+        par(task), [&](task_block<parallel_task_policy>& trh) {
             parent_flag = true;
 
             trh.run([&]() {
@@ -104,7 +102,8 @@ void define_task_block_test2()
             int i = 0, j = 10, k = 20;
             trh.run([=, &task3_flag]() {
                 task3_flag = true;
-                hpx::cout << "task3: " << i << " " << j << " " << k << hpx::endl;
+                hpx::cout << "task3: " << i << " " << j << " " << k
+                          << hpx::endl;
             });
 
             hpx::cout << "parent" << hpx::endl;
@@ -122,7 +121,8 @@ void define_task_block_test2()
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_exceptions_test1()
 {
-    try {
+    try
+    {
         define_task_block(par, [](task_block<>& trh) {
             trh.run([]() {
                 hpx::cout << "task1" << hpx::endl;
@@ -140,19 +140,20 @@ void define_task_block_exceptions_test1()
 
         HPX_TEST(false);
     }
-    catch (hpx::parallel::exception_list const& e) {
+    catch (hpx::parallel::exception_list const& e)
+    {
         HPX_TEST_EQ(e.size(), 3u);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
 
 void define_task_block_exceptions_test2()
 {
-    hpx::future<void> f = define_task_block(par(task),
-        [](task_block<parallel_task_policy>& trh)
-        {
+    hpx::future<void> f =
+        define_task_block(par(task), [](task_block<parallel_task_policy>& trh) {
             trh.run([]() {
                 hpx::cout << "task1" << hpx::endl;
                 throw 1;
@@ -167,14 +168,17 @@ void define_task_block_exceptions_test2()
             throw 100;
         });
 
-    try {
+    try
+    {
         f.get();
         HPX_TEST(false);
     }
-    catch (hpx::parallel::exception_list const& e) {
+    catch (hpx::parallel::exception_list const& e)
+    {
         HPX_TEST_EQ(e.size(), 3u);
     }
-    catch(...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -182,16 +186,14 @@ void define_task_block_exceptions_test2()
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_exceptions_test3()
 {
-    try {
-        define_task_block(par, [&](task_block<>& trh)
-        {
-            trh.run([&]()
-            {
+    try
+    {
+        define_task_block(par, [&](task_block<>& trh) {
+            trh.run([&]() {
                 HPX_TEST(!hpx::expect_exception());
 
                 // Error: trh is not active
-                trh.run([]()
-                {
+                trh.run([]() {
                     HPX_TEST(false);    // should not be called
                 });
 
@@ -203,24 +205,23 @@ void define_task_block_exceptions_test3()
 
         HPX_TEST(false);
     }
-    catch (hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         HPX_TEST_EQ(int(e.get_error()), int(hpx::task_block_not_active));
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
 
 void define_task_block_exceptions_test4()
 {
-    hpx::future<void> f = define_task_block(par(task),
-        [&](task_block<parallel_task_policy>& trh)
-        {
-            trh.run([&]()
-            {
+    hpx::future<void> f = define_task_block(
+        par(task), [&](task_block<parallel_task_policy>& trh) {
+            trh.run([&]() {
                 // Error: tr is not active
-                trh.run([]()
-                {
+                trh.run([]() {
                     HPX_TEST(false);    // should not be called
                 });
 
@@ -228,14 +229,17 @@ void define_task_block_exceptions_test4()
             });
         });
 
-    try {
+    try
+    {
         f.get();
         HPX_TEST(false);
     }
-    catch (hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         HPX_TEST_EQ(int(e.get_error()), int(hpx::task_block_not_active));
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -258,15 +262,11 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv, cfg), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-
-

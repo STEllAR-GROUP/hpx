@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/custom_exception_info.hpp>
+#include <hpx/execution/execution_policy.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/parallel/spmd_block.hpp>
-#include <hpx/execution/execution_policy.hpp>
 #include <hpx/testing.hpp>
 
 #include <array>
@@ -22,8 +22,8 @@
 std::size_t num_images = 10;
 std::size_t iterations = 20;
 
-void bulk_test_function(hpx::parallel::spmd_block block,
-    std::atomic<std::size_t>* c)
+void bulk_test_function(
+    hpx::parallel::spmd_block block, std::atomic<std::size_t>* c)
 {
     HPX_TEST_EQ(block.get_num_images(), num_images);
     HPX_TEST_EQ(block.this_image() < num_images, true);
@@ -94,17 +94,16 @@ int main()
     using hpx::parallel::execution::par;
     using hpx::parallel::execution::task;
 
-    auto bulk_test =
-        [](hpx::parallel::spmd_block block, std::atomic<std::size_t> * c)
-        {
-            bulk_test_function(std::move(block),c);
-        };
+    auto bulk_test = [](hpx::parallel::spmd_block block,
+                         std::atomic<std::size_t>* c) {
+        bulk_test_function(std::move(block), c);
+    };
 
-    std::array<std::atomic<std::size_t>,4> c1, c2, c3;
+    std::array<std::atomic<std::size_t>, 4> c1, c2, c3;
 
-    for (std::size_t i =0; i<4; i++)
+    for (std::size_t i = 0; i < 4; i++)
     {
-        c1[i] = c2[i] = c3[i] = (std::size_t)0;
+        c1[i] = c2[i] = c3[i] = (std::size_t) 0;
     }
 
     hpx::parallel::define_spmd_block(num_images, bulk_test, c1.data());

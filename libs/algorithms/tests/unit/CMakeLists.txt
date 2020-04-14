@@ -7,6 +7,7 @@
 # add subdirectories
 set(subdirs
     algorithms
+    block
     container_algorithms
    )
 
