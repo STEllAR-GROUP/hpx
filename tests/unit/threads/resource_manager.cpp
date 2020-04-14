@@ -12,8 +12,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/thread_executors/resource_manager.hpp>
 
 #include <atomic>
 #include <cstddef>

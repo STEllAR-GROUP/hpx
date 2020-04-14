@@ -21,12 +21,10 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace  threads
-{
+namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     /// Status of a given processing unit
     enum class punit_status
@@ -41,19 +39,21 @@ namespace hpx { namespace  threads
     struct resource_allocation
     {
         // mapping of physical core to virtual core
-        typedef std::pair<std::size_t, std::size_t>  coreids_type;
+        typedef std::pair<std::size_t, std::size_t> coreids_type;
 
         resource_allocation()
           : description_("")
-        {}
+        {
+        }
 
-        resource_allocation(char const* desc,
-                std::vector<coreids_type> const& core_ids)
-          : description_(desc),
-            core_ids_(core_ids)
-        {}
+        resource_allocation(
+            char const* desc, std::vector<coreids_type> const& core_ids)
+          : description_(desc)
+          , core_ids_(core_ids)
+        {
+        }
 
-        char const*description_;                ///< name of the executor
+        char const* description_;               ///< name of the executor
         std::vector<coreids_type> core_ids_;    ///< mapping of cores
     };
 
@@ -68,7 +68,9 @@ namespace hpx { namespace  threads
     class resource_manager
     {
         typedef lcos::local::spinlock mutex_type;
-        struct tag {};
+        struct tag
+        {
+        };
 
         // mapping of physical core to virtual core
         typedef typename resource_allocation::coreids_type coreids_type;
@@ -77,8 +79,8 @@ namespace hpx { namespace  threads
         resource_manager();
 
         // Request an initial resource allocation
-        std::size_t initial_allocation(detail::manage_executor* proxy,
-                error_code& ec = throws);
+        std::size_t initial_allocation(
+            detail::manage_executor* proxy, error_code& ec = throws);
 
         // Stop the executor identified by the given cookie
         void stop_executor(std::size_t cookie, error_code& ec = throws);
@@ -96,18 +98,16 @@ namespace hpx { namespace  threads
         // allocate virtual cores
         // called by initial_allocation
         std::vector<coreids_type> allocate_virt_cores(
-                detail::manage_executor* proxy, std::size_t min_punits,
-                std::size_t max_punits, error_code& ec);
+            detail::manage_executor* proxy, std::size_t min_punits,
+            std::size_t max_punits, error_code& ec);
 
         // reserve virtual cores for scheduler
-        std::size_t reserve_processing_units(
-                std::size_t use_count, std::size_t desired,
-                std::vector<punit_status>& available_punits);
+        std::size_t reserve_processing_units(std::size_t use_count,
+            std::size_t desired, std::vector<punit_status>& available_punits);
 
         // reserve virtual cores for scheduler at higher use count
         std::size_t reserve_at_higher_use_count(
-                std::size_t desired,
-                std::vector<punit_status>& available_punits);
+            std::size_t desired, std::vector<punit_status>& available_punits);
 
     private:
         mutable mutex_type mtx_;
@@ -118,9 +118,12 @@ namespace hpx { namespace  threads
         // this resource manager.
         struct punit_data
         {
-            punit_data() : use_count_(0) {}
+            punit_data()
+              : use_count_(0)
+            {
+            }
 
-            std::size_t use_count_;   // number of schedulers using this core
+            std::size_t use_count_;    // number of schedulers using this core
         };
 
         typedef std::vector<punit_data> punit_array_type;
@@ -135,32 +138,38 @@ namespace hpx { namespace  threads
         {
         public:
             proxy_data(detail::manage_executor* proxy,
-                    std::vector<coreids_type> && core_ids)
-              : proxy_(proxy), core_ids_(std::move(core_ids))
-            {}
+                std::vector<coreids_type>&& core_ids)
+              : proxy_(proxy)
+              , core_ids_(std::move(core_ids))
+            {
+            }
 
             proxy_data(proxy_data const& rhs)
-              : proxy_(rhs.proxy_),
-                core_ids_(rhs.core_ids_)
-            {}
+              : proxy_(rhs.proxy_)
+              , core_ids_(rhs.core_ids_)
+            {
+            }
 
-            proxy_data(proxy_data && rhs)
-              : proxy_(std::move(rhs.proxy_)),
-                core_ids_(std::move(rhs.core_ids_))
-            {}
+            proxy_data(proxy_data&& rhs)
+              : proxy_(std::move(rhs.proxy_))
+              , core_ids_(std::move(rhs.core_ids_))
+            {
+            }
 
             proxy_data& operator=(proxy_data const& rhs)
             {
-                if (this != &rhs) {
+                if (this != &rhs)
+                {
                     proxy_ = rhs.proxy_;
                     core_ids_ = rhs.core_ids_;
                 }
                 return *this;
             }
 
-            proxy_data& operator=(proxy_data && rhs)
+            proxy_data& operator=(proxy_data&& rhs)
             {
-                if (this != &rhs) {
+                if (this != &rhs)
+                {
                     proxy_ = std::move(rhs.proxy_);
                     core_ids_ = std::move(rhs.core_ids_);
                 }
@@ -182,18 +191,20 @@ namespace hpx { namespace  threads
         struct static_allocation_data
         {
             static_allocation_data()
-              : allocation_(0),
-                scaled_allocation_(0.0),
-                num_borrowed_cores_(0),
-                num_owned_cores_(0),
-                min_proxy_cores_(0),
-                max_proxy_cores_(0),
-                adjusted_desired_(0),
-                num_cores_stolen_(0)
-            {}
+              : allocation_(0)
+              , scaled_allocation_(0.0)
+              , num_borrowed_cores_(0)
+              , num_owned_cores_(0)
+              , min_proxy_cores_(0)
+              , max_proxy_cores_(0)
+              , adjusted_desired_(0)
+              , num_cores_stolen_(0)
+            {
+            }
 
             // The scheduler proxy this allocation data is for.
-            std::shared_ptr<detail::manage_executor> proxy_;  // hold on to proxy
+            std::shared_ptr<detail::manage_executor>
+                proxy_;    // hold on to proxy
 
             // Additional allocation to give to a scheduler after proportional
             // allocation decisions are made.
@@ -202,7 +213,8 @@ namespace hpx { namespace  threads
             // Scaled allocation value during proportional allocation.
             double scaled_allocation_;
 
-            std::size_t num_borrowed_cores_; // borrowed cores held by scheduler
+            std::size_t
+                num_borrowed_cores_;         // borrowed cores held by scheduler
             std::size_t num_owned_cores_;    // owned cores held by scheduler
             std::size_t min_proxy_cores_;    // min cores required by scheduler
             std::size_t max_proxy_cores_;    // max cores required by scheduler
@@ -220,23 +232,22 @@ namespace hpx { namespace  threads
         allocation_data_map_type proxies_static_allocation_data_;
 
         // stores static allocation data for all schedulers
-        std::size_t preprocess_static_allocation(std::size_t min_punits,
-            std::size_t max_punits);
+        std::size_t preprocess_static_allocation(
+            std::size_t min_punits, std::size_t max_punits);
 
         // constants used for parameters to the release_scheduler API
         static std::size_t const release_borrowed_cores = std::size_t(-1);
         static std::size_t const release_cores_to_min = std::size_t(-2);
 
         // release cores from scheduler
-        bool release_scheduler_resources(
-            allocation_data_map_type::iterator it,
+        bool release_scheduler_resources(allocation_data_map_type::iterator it,
             std::size_t number_to_free,
             std::vector<punit_status>& available_punits);
 
         // release cores from all schedulers
         // calls release_scheduler_resources
-        std::size_t release_cores_on_existing_schedulers(
-            std::size_t request, std::size_t number_to_free,
+        std::size_t release_cores_on_existing_schedulers(std::size_t request,
+            std::size_t number_to_free,
             std::vector<punit_status>& available_punits,
             std::size_t new_allocation);
 
@@ -248,13 +259,13 @@ namespace hpx { namespace  threads
             std::size_t new_allocation);
 
         void roundup_scaled_allocations(
-            allocation_data_map_type &scaled_static_allocation_data,
+            allocation_data_map_type& scaled_static_allocation_data,
             std::size_t total_allocated);
     };
 
     // Return the current schedulers and the corresponding allocation data
     HPX_EXPORT std::vector<resource_allocation> get_resource_allocation();
-}}
+}}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
 

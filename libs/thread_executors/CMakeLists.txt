@@ -21,6 +21,7 @@ set(thread_executors_headers
   hpx/thread_executors/limiting_executor.hpp
   hpx/thread_executors/manage_thread_executor.hpp
   hpx/thread_executors/pool_executor.hpp
+  hpx/thread_executors/resource_manager.hpp
   hpx/thread_executors/service_executors.hpp
   hpx/thread_executors/this_thread_executors.hpp
   hpx/thread_executors/thread_executor.hpp
@@ -45,12 +46,15 @@ set(thread_executors_compat_headers
   hpx/runtime/threads/executors/this_thread_executors.hpp
   hpx/runtime/threads/executors/thread_pool_attached_executors.hpp
   hpx/runtime/threads/executors/thread_pool_os_executors.hpp
+  hpx/runtime/threads/resource_manager.hpp
   hpx/runtime/threads/thread_executor.hpp
   )
 
 set(thread_executors_sources
   embedded_thread_pool_executors.cpp
+  resource_manager.cpp
   this_thread_executors.cpp
+  thread_executor.cpp
   thread_pool_os_executors.cpp
   )
 
@@ -74,6 +78,7 @@ add_hpx_module(thread_executors
     hpx_threading_base
     hpx_timing
     hpx_resource_partitioner
+    hpx_static_reinit
     hpx_synchronization
     hpx_thread_pools
     hpx_thread_support

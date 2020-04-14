@@ -8,25 +8,21 @@
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/topology/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <mutex>
 
-namespace hpx { namespace threads
-{
-    namespace detail
+namespace hpx { namespace threads { namespace detail {
+    mask_cref_type executor_base::get_pu_mask(
+        topology const& topology, std::size_t num_thread) const
     {
-        mask_cref_type executor_base::get_pu_mask(topology const& topology,
-                std::size_t num_thread) const
-        {
-            auto &rp = hpx::resource::get_partitioner();
-            return rp.get_pu_mask(num_thread);
-        }
+        auto& rp = hpx::resource::get_partitioner();
+        return rp.get_pu_mask(num_thread);
     }
-}}
+}}}    // namespace hpx::threads::detail
 #endif
