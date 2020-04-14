@@ -26,6 +26,9 @@ if(HPX_WITH_CUDA)
     hpx/compute/cuda/traits/access_target.hpp
     hpx/compute/cuda/transfer.hpp
     hpx/compute/cuda/value_proxy.hpp
+    hpx/compute/detail/get_proxy_type.hpp
+    hpx/compute/detail/iterator.hpp
+    hpx/compute/detail/target_distribution_policy.hpp
   )
 
   set(compute_cuda_compat_headers)

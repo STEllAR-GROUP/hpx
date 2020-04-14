@@ -12,6 +12,7 @@ set(pack_traversal_headers
   hpx/pack_traversal/detail/container_category.hpp
   hpx/pack_traversal/detail/pack_traversal_impl.hpp
   hpx/pack_traversal/detail/pack_traversal_async_impl.hpp
+  hpx/pack_traversal/detail/unwrap_impl.hpp
   hpx/pack_traversal/pack_traversal.hpp
   hpx/pack_traversal/pack_traversal_async.hpp
   hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp
@@ -22,6 +23,7 @@ set(pack_traversal_compat_headers
   hpx/util/detail/container_category.hpp
   hpx/util/detail/pack_traversal_impl.hpp
   hpx/util/detail/pack_traversal_async_impl.hpp
+  hpx/util/detail/unwrap_impl.hpp
   hpx/util/pack_traversal.hpp
   hpx/util/pack_traversal_async.hpp
   hpx/util/unwrap.hpp)

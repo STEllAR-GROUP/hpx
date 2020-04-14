@@ -17,6 +17,7 @@ set(thread_executors_headers
   hpx/thread_executors/current_executor.hpp
   hpx/thread_executors/default_executor.hpp
   hpx/thread_executors/embedded_thread_pool_executors.hpp
+  hpx/thread_executors/executors.hpp
   hpx/thread_executors/guided_pool_executor.hpp
   hpx/thread_executors/limiting_executor.hpp
   hpx/thread_executors/manage_thread_executor.hpp

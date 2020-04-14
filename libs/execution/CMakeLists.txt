@@ -48,6 +48,7 @@ set(execution_headers
   hpx/execution/executors/thread_execution.hpp
   hpx/execution/executors/thread_execution_information.hpp
   hpx/execution/executors/thread_pool_attached_executors.hpp
+  hpx/execution/executors/thread_pool_executor.hpp
   hpx/execution/executors/timed_execution_fwd.hpp
   hpx/execution/executors/timed_execution.hpp
   hpx/execution/executors/timed_executors.hpp
@@ -106,6 +107,7 @@ set(execution_compat_headers
   hpx/parallel/executors/thread_execution.hpp
   hpx/parallel/executors/thread_execution_information.hpp
   hpx/parallel/executors/thread_pool_attached_executors.hpp
+  hpx/parallel/executors/thread_pool_executor.hpp
   hpx/parallel/executors/timed_execution_fwd.hpp
   hpx/parallel/executors/timed_execution.hpp
   hpx/parallel/executors/timed_executors.hpp

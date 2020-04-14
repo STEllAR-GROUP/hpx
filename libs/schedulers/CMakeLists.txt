@@ -15,6 +15,8 @@ set(schedulers_headers
   hpx/schedulers/lockfree_queue_backends.hpp
   hpx/schedulers/maintain_queue_wait_times.hpp
   hpx/schedulers/queue_helpers.hpp
+  hpx/schedulers/queue_holder_numa.hpp
+  hpx/schedulers/queue_holder_thread.hpp
   hpx/schedulers/shared_priority_queue_scheduler.hpp
   hpx/schedulers/static_priority_queue_scheduler.hpp
   hpx/schedulers/static_queue_scheduler.hpp

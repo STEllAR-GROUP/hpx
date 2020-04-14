@@ -12,6 +12,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(errors_headers
   hpx/errors/error.hpp
   hpx/errors/error_code.hpp
+  hpx/errors/exception.hpp
   hpx/errors/exception_fwd.hpp
   hpx/errors/exception_info.hpp
   hpx/errors/exception_list.hpp
@@ -22,6 +23,7 @@ set(errors_headers
 set(errors_compat_headers
   hpx/error.hpp
   hpx/error_code.hpp
+  hpx/exception.hpp
   hpx/exception_fwd.hpp
   hpx/exception_info.hpp
   hpx/exception_list.hpp
