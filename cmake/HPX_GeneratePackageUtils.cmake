@@ -100,9 +100,12 @@ function(hpx_collect_usage_requirements target compile_definitions compile_optio
           endif()
         endif()
 
+      elseif(${dep} MATCHES "\\$<TARGET_NAME_IF_EXISTS:")
+        # Skip conditional targets like $<TARGET_NAME_IF_EXISTS:hpx> as they
+        # are not useful for pkgconfig file generation.
       elseif(${dep} MATCHES "\\$<")
-        # This is a plain generator expression. As we can not determine its type at this point,
-        # just assume that it is an absolute path.
+        # This is a plain generator expression. As we can not determine its
+        # type at this point, just assume that it is an absolute path.
         set(_libraries ${_libraries} ${dep})
 
       elseif(${dep} MATCHES "^-l")
