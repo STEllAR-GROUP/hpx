@@ -5,11 +5,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    any_serialization
     bind_action
     config_entry
-    serializable_any
-    serializable_boost_any
     tagged
    )
 

@@ -41,6 +41,9 @@ if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
 endif()
 
 set(full_tests
+    any_serialization
+    serializable_any
+    serializable_boost_any
     serialize_buffer
 )
 

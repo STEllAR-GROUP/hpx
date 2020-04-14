@@ -14,8 +14,8 @@
 ==============================================================================*/
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/serializable_any.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/util/serializable_any.hpp>
 
 #include <boost/functional/hash.hpp>
 
@@ -50,8 +50,8 @@ namespace hpx { namespace util {
             }
 
             // decompression API
-            std::size_t init_data(char const* buffer, std::size_t size,
-                std::size_t buffer_size)
+            std::size_t init_data(
+                char const* buffer, std::size_t size, std::size_t buffer_size)
             {
                 return 0;
             }
@@ -77,8 +77,7 @@ namespace hpx { namespace util {
 
         {
             std::vector<char> data;
-            serialization::output_archive ar(
-                data, 0U, nullptr, &hasher);
+            serialization::output_archive ar(data, 0U, nullptr, &hasher);
             ar << elem;
         }    // let archive go out of scope
 
@@ -89,9 +88,8 @@ namespace hpx { namespace util {
         const basic_any<serialization::input_archive,
             serialization::output_archive, char, std::true_type>& elem) const;
 
-    template HPX_EXPORT std::size_t hash_any::operator()(
-        const basic_any<serialization::input_archive,
-            serialization::output_archive, wchar_t, std::true_type>& elem) const;
+    template HPX_EXPORT std::size_t
+    hash_any::operator()(const basic_any<serialization::input_archive,
+        serialization::output_archive, wchar_t, std::true_type>& elem) const;
 
 }}    // namespace hpx::util
-

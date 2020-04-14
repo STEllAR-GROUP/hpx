@@ -62,6 +62,7 @@ set(serialization_headers
   hpx/serialization/input_container.hpp
   hpx/serialization/output_archive.hpp
   hpx/serialization/output_container.hpp
+  hpx/serialization/serializable_any.hpp
   hpx/serialization/serialization_chunk.hpp
   hpx/serialization/serialization_fwd.hpp
   hpx/serialization/serialize.hpp
@@ -127,6 +128,7 @@ set(serialization_compat_headers
   hpx/traits/needs_automatic_registration.hpp
   hpx/traits/polymorphic_traits.hpp
   hpx/traits/serialization_access_data.hpp
+  hpx/util/serializable_any.hpp
 )
 
 # Default location is $HPX_ROOT/libs/serialization/src
@@ -135,6 +137,7 @@ set(serialization_sources
   detail/polymorphic_id_factory.cpp
   detail/polymorphic_intrusive_factory.cpp
   detail/polymorphic_nonintrusive_factory.cpp
+  serializable_any.cpp
 )
 
 include(HPX_AddModule)

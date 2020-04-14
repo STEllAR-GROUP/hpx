@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/serializable_any.hpp>
+#include <hpx/serialization/serializable_any.hpp>
 #include <hpx/testing.hpp>
 
 #include <hpx/util/storage/tuple.hpp>
@@ -23,8 +23,8 @@
 using hpx::util::any;
 using hpx::util::any_cast;
 
-using hpx::init;
 using hpx::finalize;
+using hpx::init;
 
 struct compare_any
 {
@@ -54,14 +54,15 @@ int hpx_main()
 
             using field_index_map_type = std::unordered_multimap<elem_type,
                 index_type, hash_elem_functor, compare_any>;
-            using field_index_map_iterator_type = field_index_map_type::iterator;
+            using field_index_map_iterator_type =
+                field_index_map_type::iterator;
 
             field_index_map_type field_index_map_;
             field_index_map_iterator_type it;
             elem_type elem(std::string("first string"));
             index_type id = 1;
 
-            std::pair<elem_type, index_type> pp=std::make_pair(elem,id);
+            std::pair<elem_type, index_type> pp = std::make_pair(elem, id);
             it = field_index_map_.insert(pp);
         }
 
@@ -109,9 +110,9 @@ int hpx_main()
             any any3;
             any3 = any1;
 
-            HPX_TEST_EQ((any_cast<small_object>(any1)) (7), uint64_t(17+7));
-            HPX_TEST_EQ((any_cast<small_object>(any2)) (9), uint64_t(17+9));
-            HPX_TEST_EQ((any_cast<small_object>(any3)) (11), uint64_t(17+11));
+            HPX_TEST_EQ((any_cast<small_object>(any1))(7), uint64_t(17 + 7));
+            HPX_TEST_EQ((any_cast<small_object>(any2))(9), uint64_t(17 + 9));
+            HPX_TEST_EQ((any_cast<small_object>(any3))(11), uint64_t(17 + 11));
         }
 
         {
@@ -126,9 +127,12 @@ int hpx_main()
             any any2(any1);
             any any3 = any1;
 
-            HPX_TEST_EQ((any_cast<big_object>(any1)) (0, 1), uint64_t(5+12+0+1));
-            HPX_TEST_EQ((any_cast<big_object>(any2)) (1, 0), uint64_t(5+12+1+0));
-            HPX_TEST_EQ((any_cast<big_object>(any3)) (1, 1), uint64_t(5+12+1+1));
+            HPX_TEST_EQ(
+                (any_cast<big_object>(any1))(0, 1), uint64_t(5 + 12 + 0 + 1));
+            HPX_TEST_EQ(
+                (any_cast<big_object>(any2))(1, 0), uint64_t(5 + 12 + 1 + 0));
+            HPX_TEST_EQ(
+                (any_cast<big_object>(any3))(1, 1), uint64_t(5 + 12 + 1 + 1));
         }
 
         // move semantics
@@ -137,7 +141,7 @@ int hpx_main()
             HPX_TEST(any1.has_value());
             any any2(std::move(any1));
             HPX_TEST(any2.has_value());
-            HPX_TEST(!any1.has_value()); // NOLINT
+            HPX_TEST(!any1.has_value());    // NOLINT
         }
 
         {
@@ -148,7 +152,7 @@ int hpx_main()
 
             any2 = std::move(any1);
             HPX_TEST(any2.has_value());
-            HPX_TEST(!any1.has_value()); // NOLINT
+            HPX_TEST(!any1.has_value());    // NOLINT
         }
     }
 
@@ -162,4 +166,3 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return init(argc, argv);
 }
-

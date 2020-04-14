@@ -9,33 +9,32 @@
 #include <hpx/config.hpp>
 
 #include <cstddef>
-#include <cstdio> // remove
+#include <cstdio>    // remove
 #include <fstream>
 #include <typeinfo>
 #include <vector>
 
 #include <boost/config.hpp>
 #if defined(BOOST_NO_STDC_NAMESPACE)
-namespace std
-{
+namespace std {
     using ::remove;
 }
 #endif
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/serializable_any.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/serialization/serializable_any.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/testing.hpp>
 
 #include "small_big_object.hpp"
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 using hpx::util::basic_any;
 
-using hpx::init;
 using hpx::finalize;
+using hpx::init;
 
 // note: version can be assigned only to objects whose implementation
 // level is object_class_info.  So, doing the following will result in
@@ -43,14 +42,14 @@ using hpx::finalize;
 // BOOST_CLASS_VERSION(A, 2);
 
 template <typename A>
-void out(std::vector<char> & out_buffer, A & a)
+void out(std::vector<char>& out_buffer, A& a)
 {
     hpx::serialization::output_archive archive(out_buffer);
     archive << a;
 }
 
 template <typename A>
-void in(std::vector<char> & in_buffer, A & a)
+void in(std::vector<char>& in_buffer, A& a)
 {
     hpx::serialization::input_archive archive(in_buffer, in_buffer.size());
     archive >> a;
@@ -58,8 +57,8 @@ void in(std::vector<char> & in_buffer, A & a)
 
 int hpx_main(variables_map& vm)
 {
-    typedef
-        basic_any<hpx::serialization::input_archive, hpx::serialization::output_archive>
+    typedef basic_any<hpx::serialization::input_archive,
+        hpx::serialization::output_archive>
         any_type;
 
     {
@@ -98,9 +97,8 @@ int hpx_main(variables_map& vm)
     return finalize();
 }
 
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
-
     // Configure application-specific options
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 

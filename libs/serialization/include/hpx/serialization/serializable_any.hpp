@@ -97,17 +97,23 @@ namespace hpx { namespace util { namespace detail { namespace any {
 
         void save_object(void* const* object, OArch& ar, unsigned)
         {
+            // clang-format off
             ar & Vtable::get(object);
+            // clang-format on
         }
         void load_object(void** object, IArch& ar, unsigned)
         {
+            // clang-format off
             ar & Vtable::construct(object);
+            // clang-format on
         }
 
         template <typename Arch>
         void serialize(Arch& ar, unsigned)
         {
+            // clang-format off
             ar & hpx::serialization::base_object<base_type>(*this);
+            // clang-format on
         }
         HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(fxn_ptr);
     };
@@ -198,8 +204,8 @@ namespace hpx { namespace util {
         {
             using value_type = typename std::decay<T>::type;
             new_object<T>(object,
-                typename detail::any::get_table<value_type>::is_small(),
-                il, std::forward<Ts>(ts)...);
+                typename detail::any::get_table<value_type>::is_small(), il,
+                std::forward<Ts>(ts)...);
         }
 #endif
 
@@ -337,7 +343,7 @@ namespace hpx { namespace util {
         void load(IArch& ar, const unsigned version)
         {
             bool is_empty;
-            ar & is_empty;
+            ar& is_empty;
 
             if (is_empty)
             {
@@ -348,7 +354,7 @@ namespace hpx { namespace util {
                 typename detail::any::fxn_ptr_table<IArch, OArch, Char,
                     std::true_type>* p = nullptr;
                 ar >> hpx::serialization::detail::raw_ptr(p);
-                table = p->get_ptr();  // -V522
+                table = p->get_ptr();    // -V522
                 delete p;
                 table->load_object(&object, ar, version);
             }
@@ -357,7 +363,7 @@ namespace hpx { namespace util {
         void save(OArch& ar, const unsigned version) const
         {
             bool is_empty = !has_value();
-            ar & is_empty;
+            ar& is_empty;
             if (!is_empty)
             {
                 ar << hpx::serialization::detail::raw_ptr(table);
