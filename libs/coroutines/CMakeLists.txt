@@ -78,6 +78,7 @@ add_hpx_module(coroutines
   DEPENDENCIES
     hpx_assertion
     hpx_config
+    hpx_errors
     hpx_format
     hpx_functional
     hpx_util

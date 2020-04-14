@@ -70,6 +70,7 @@ add_hpx_module(thread_executors
   COMPAT_HEADERS ${thread_executors_compat_headers}
   DEPENDENCIES
     hpx_config
+    hpx_assertion
     hpx_affinity
     hpx_coroutines
     hpx_datastructures

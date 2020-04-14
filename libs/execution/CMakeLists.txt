@@ -143,12 +143,16 @@ add_hpx_module(execution
     hpx_allocator_support
     hpx_concepts
     hpx_config
+    hpx_errors
     hpx_datastructures
     hpx_errors
     hpx_functional
     hpx_iterator_support
     hpx_preprocessor
+    hpx_resource_partitioner
     hpx_synchronization
+    hpx_threading
+    hpx_threadmanager
     hpx_thread_support
     hpx_timing
     hpx_topology

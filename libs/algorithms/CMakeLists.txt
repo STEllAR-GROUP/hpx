@@ -145,10 +145,13 @@ add_hpx_module(algorithms
     hpx_concurrency
     hpx_config
     hpx_datastructures
+    hpx_errors
     hpx_execution
+    hpx_format
     hpx_iterator_support
     hpx_functional
     hpx_pack_traversal
+    hpx_program_options
     hpx_statistics
     hpx_synchronization
     hpx_timing

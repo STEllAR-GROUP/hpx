@@ -57,6 +57,7 @@ add_hpx_module(compute_cuda
     hpx_hardware
     hpx_plugin
     hpx_program_options
+    hpx_timing
     hpx_topology
     hpx_type_support
     hpx_serialization

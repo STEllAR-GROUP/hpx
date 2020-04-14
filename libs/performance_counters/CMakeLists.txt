@@ -72,9 +72,11 @@ add_hpx_module(performance_counters
     hpx_synchronization
     hpx_static_reinit
     hpx_statistics
+    hpx_string_util
     hpx_threading
     hpx_thread_support
     hpx_threading_base
     hpx_timing
+    hpx_version
   CMAKE_SUBDIRS examples tests
 )

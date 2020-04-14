@@ -51,7 +51,9 @@ add_hpx_module(runtime_configuration
     hpx_config
     hpx_coroutines
     hpx_errors
+    hpx_filesystem
     hpx_functional
+    hpx_logging
     hpx_plugin
     hpx_prefix
     hpx_serialization

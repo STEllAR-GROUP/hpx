@@ -85,9 +85,11 @@ add_hpx_module(threading_base
   DEPENDENCIES
     hpx_affinity
     hpx_allocator_support
+    hpx_assertion
     hpx_config
     hpx_coroutines
     hpx_errors
+    hpx_format
     hpx_functional
     hpx_hardware
     hpx_logging

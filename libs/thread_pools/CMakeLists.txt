@@ -36,6 +36,8 @@ add_hpx_module(thread_pools
   DEPENDENCIES
     hpx_assertion
     hpx_config
+    hpx_errors
+    hpx_logging
     hpx_schedulers
   CMAKE_SUBDIRS examples tests
 )

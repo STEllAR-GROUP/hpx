@@ -34,6 +34,7 @@ add_hpx_module(threadmanager
     hpx_assertion
     hpx_command_line_handling
     hpx_concurrency
+    hpx_config
     hpx_coroutines
     hpx_errors
     hpx_execution
@@ -41,6 +42,7 @@ add_hpx_module(threadmanager
     hpx_functional
     hpx_hardware
     hpx_io_service
+    hpx_logging
     hpx_plugin
     hpx_program_options
     hpx_resource_partitioner
