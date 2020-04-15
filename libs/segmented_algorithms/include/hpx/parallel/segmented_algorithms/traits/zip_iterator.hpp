@@ -53,16 +53,15 @@ namespace hpx { namespace traits {
                 }
             };
         };
-    }
+    }    // namespace functional
 
     ///////////////////////////////////////////////////////////////////////////
     // A zip_iterator represents a segmented iterator if all of the zipped
     // iterators are segmented iterators themselves.
     template <typename... Ts>
     struct segmented_iterator_traits<util::zip_iterator<Ts...>,
-        typename std::enable_if<
-            util::all_of<typename segmented_iterator_traits<
-                Ts>::is_segmented_iterator...>::value>::type>
+        typename std::enable_if<util::all_of<typename segmented_iterator_traits<
+            Ts>::is_segmented_iterator...>::value>::type>
     {
         typedef std::true_type is_segmented_iterator;
 
