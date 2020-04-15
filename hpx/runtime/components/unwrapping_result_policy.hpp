@@ -10,10 +10,10 @@
 #define HPX_COMPONENTS_UNWRAPPING_RESULT_POLICY_JUL_22_2018_1240PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/detail/async_implementations.hpp>
-#include <hpx/lcos/detail/async_unwrap_result_implementations.hpp>
-#include <hpx/lcos/detail/sync_implementations.hpp>
-#include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async/detail/async_implementations.hpp>
+#include <hpx/async/detail/async_unwrap_result_implementations.hpp>
+#include <hpx/async/detail/sync_implementations.hpp>
+#include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

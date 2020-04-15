@@ -18,14 +18,14 @@
 // we should not need these
 #include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 
+#include <hpx/async/dataflow.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/lcos/dataflow.hpp>
-#include <hpx/lcos/when_all.hpp>
 #include <hpx/pack_traversal/pack_traversal.hpp>
 #include <hpx/type_support/decay.hpp>
 //

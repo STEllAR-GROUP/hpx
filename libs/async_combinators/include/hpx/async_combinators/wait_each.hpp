@@ -1,0 +1,178 @@
+//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2013 Agustin Berge
+//  Copyright (c) 2016 Lukas Troska
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+/// \file lcos/wait_each.hpp
+
+#if !defined(HPX_LCOS_WAIT_EACH_JUN_16_2014_0428PM)
+#define HPX_LCOS_WAIT_EACH_JUN_16_2014_0428PM
+
+#if defined(DOXYGEN)
+namespace hpx {
+    /// The function \a wait_each is an operator allowing to join on the results
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns after they finished executing.
+    /// Additionally, the supplied function is called for each of the passed
+    /// futures as soon as the future has become ready. \a wait_each returns
+    /// after all futures have been become ready.
+    ///
+    /// \param f        The function which will be called for each of the
+    ///                 input futures once the future has become ready.
+    /// \param futures  A vector holding an arbitrary amount of \a future or
+    ///                 \a shared_future objects for which \a wait_each should
+    ///                 wait.
+    ///
+    /// \note This function consumes the futures as they are passed on to the
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
+    ///
+    template <typename F, typename Future>
+    void wait_each(F&& f, std::vector<Future>&& futures);
+
+    /// The function \a wait_each is an operator allowing to join on the results
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns after they finished executing.
+    /// Additionally, the supplied function is called for each of the passed
+    /// futures as soon as the future has become ready. \a wait_each returns
+    /// after all futures have been become ready.
+    ///
+    /// \param f        The function which will be called for each of the
+    ///                 input futures once the future has become ready.
+    /// \param begin    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_each should wait.
+    /// \param end      The iterator pointing to the last element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_each should wait.
+    ///
+    /// \note This function consumes the futures as they are passed on to the
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
+    ///
+    template <typename F, typename Iterator>
+    void wait_each(F&& f, Iterator begin, Iterator end);
+
+    /// The function \a wait_each is an operator allowing to join on the results
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns after they finished executing.
+    /// Additionally, the supplied function is called for each of the passed
+    /// futures as soon as the future has become ready. \a wait_each returns
+    /// after all futures have been become ready.
+    ///
+    /// \param f        The function which will be called for each of the
+    ///                 input futures once the future has become ready.
+    /// \param futures  An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a wait_each should wait.
+    ///
+    /// \note This function consumes the futures as they are passed on to the
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
+    ///
+    template <typename F, typename... T>
+    void wait_each(F&& f, T&&... futures);
+
+    /// The function \a wait_each is an operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns after they finished executing.
+    /// Additionally, the supplied function is called for each of the passed
+    /// futures as soon as the future has become ready.
+    ///
+    /// \param f        The function which will be called for each of the
+    ///                 input futures once the future has become ready.
+    /// \param begin    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_each_n should wait.
+    /// \param count    The number of elements in the sequence starting at
+    ///                 \a first.
+    ///
+    /// \note This function consumes the futures as they are passed on to the
+    ///       supplied function. The callback should take one or two parameters,
+    ///       namely either a \a future to be processed or a type that
+    ///       \a std::size_t is implicitly convertible to as the
+    ///       first parameter and the \a future as the second
+    ///       parameter. The first parameter will correspond to the
+    ///       index of the current \a future in the collection.
+    ///
+    template <typename F, typename Iterator>
+    void wait_each_n(F&& f, Iterator begin, std::size_t count);
+}    // namespace hpx
+
+#else    // DOXYGEN
+
+#include <hpx/config.hpp>
+#include <hpx/async_combinators/when_each.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/type_support/pack.hpp>
+
+#include <cstddef>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos {
+    template <typename F, typename Future>
+    void wait_each(F&& f, std::vector<Future>& lazy_values)
+    {
+        lcos::when_each(std::forward<F>(f), lazy_values).wait();
+    }
+
+    template <typename F, typename Future>
+    void wait_each(F&& f, std::vector<Future>&& lazy_values)
+    {
+        lcos::when_each(std::forward<F>(f), lazy_values).wait();
+    }
+
+    template <typename F, typename Iterator>
+    void wait_each(F&& f, Iterator begin, Iterator end)
+    {
+        lcos::when_each(std::forward<F>(f), begin, end).wait();
+    }
+
+    template <typename F, typename Iterator>
+    void wait_each_n(F&& f, Iterator begin, std::size_t count)
+    {
+        when_each_n(std::forward<F>(f), begin, count).wait();
+    }
+
+    template <typename F>
+    void wait_each(F&& f)
+    {
+        lcos::when_each(std::forward<F>(f)).wait();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename... Ts>
+    typename std::enable_if<
+        !traits::is_future<typename std::decay<F>::type>::value &&
+        util::all_of<traits::is_future<Ts>...>::value>::type
+    wait_each(F&& f, Ts&&... ts)
+    {
+        lcos::when_each(std::forward<F>(f), std::forward<Ts>(ts)...).wait();
+    }
+}}    // namespace hpx::lcos
+
+namespace hpx {
+    using lcos::wait_each;
+    using lcos::wait_each_n;
+}    // namespace hpx
+
+#endif    // DOXYGEN
+#endif

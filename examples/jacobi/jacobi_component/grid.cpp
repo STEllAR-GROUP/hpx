@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <cstddef>

@@ -139,7 +139,7 @@ namespace hpx { namespace lcos {
 
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/local_lcos/and_gate.hpp>

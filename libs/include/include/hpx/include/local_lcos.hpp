@@ -9,7 +9,7 @@
 #define HPX_6EB418B5_DC41_45A3_ADF4_C45A068F73D4
 
 #include <hpx/config.hpp>
-#include <hpx/dataflow.hpp>
+#include <hpx/local_async/dataflow.hpp>
 
 #include <hpx/local_lcos/channel.hpp>
 

@@ -8,8 +8,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/async/applier/applier.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 
 #include <cstddef>

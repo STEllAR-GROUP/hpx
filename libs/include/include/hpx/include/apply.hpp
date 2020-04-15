@@ -7,8 +7,8 @@
 #if !defined(HPX_APPLY_APR_15_2012_0441PM)
 #define HPX_APPLY_APR_15_2012_0441PM
 
-#include <hpx/apply.hpp>
-#include <hpx/runtime/applier/detail/apply_colocated.hpp>
-#include <hpx/runtime/applier/detail/apply_colocated_callback.hpp>
+#include <hpx/async/applier/detail/apply_colocated.hpp>
+#include <hpx/async/applier/detail/apply_colocated_callback.hpp>
+#include <hpx/async/apply.hpp>
 
 #endif

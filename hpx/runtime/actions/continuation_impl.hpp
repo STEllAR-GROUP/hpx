@@ -8,8 +8,8 @@
 #define HPX_ACTIONS_CONTINUATION_IMPL_HPP
 
 #include <hpx/functional/result_of.hpp>
-#include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/type_support/decay.hpp>

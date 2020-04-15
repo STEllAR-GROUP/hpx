@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/applier/bind_naming_wrappers.hpp>
+#include <hpx/async/applier/applier.hpp>
+#include <hpx/async/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components_fwd.hpp>

@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/util/generate_unique_ids.hpp>
 
 #include <algorithm>
 #include <cstddef>

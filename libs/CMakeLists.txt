@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,9 @@ set(HPX_CANDIDATE_LIBS
   allocator_support
   asio
   assertion
+  async
+  async_base
+  async_combinators
   basic_execution
   batch_environments
   cache
@@ -30,6 +33,7 @@ set(HPX_CANDIDATE_LIBS
   coroutines
   datastructures
   debugging
+  distributed_executors
   errors
   execution
   filesystem
@@ -40,6 +44,7 @@ set(HPX_CANDIDATE_LIBS
   include
   io_service
   iterator_support
+  local_async
   local_lcos
   logging
   memory

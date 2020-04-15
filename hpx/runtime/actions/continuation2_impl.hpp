@@ -9,8 +9,8 @@
 
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/runtime/applier/detail/apply_implementations_fwd.hpp>
-#include <hpx/runtime/applier/apply_continue_fwd.hpp>
+#include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async/applier/apply_continue_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/type_support/decay.hpp>

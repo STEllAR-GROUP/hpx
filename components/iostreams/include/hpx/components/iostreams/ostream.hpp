@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/apply.hpp>
+#include <hpx/async/apply.hpp>
 #include <hpx/async.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>

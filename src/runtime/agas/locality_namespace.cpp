@@ -13,7 +13,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/serialization/vector.hpp>
 

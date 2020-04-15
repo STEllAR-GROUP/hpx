@@ -10,13 +10,13 @@
 #define HPX_COMPONENTS_COLOCATING_DISTRIBUTION_POLICY_APR_10_2015_0227PM
 
 #include <hpx/config.hpp>
-#include <hpx/lcos/detail/async_colocated.hpp>
-#include <hpx/lcos/detail/async_colocated_callback.hpp>
-#include <hpx/lcos/detail/async_implementations.hpp>
+#include <hpx/async/detail/async_colocated.hpp>
+#include <hpx/async/detail/async_colocated_callback.hpp>
+#include <hpx/async/detail/async_implementations.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp>
-#include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>
-#include <hpx/runtime/applier/detail/apply_implementations.hpp>
+#include <hpx/async/applier/detail/apply_colocated_callback_fwd.hpp>
+#include <hpx/async/applier/detail/apply_colocated_fwd.hpp>
+#include <hpx/async/applier/detail/apply_implementations.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>

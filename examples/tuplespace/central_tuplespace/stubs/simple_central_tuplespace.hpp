@@ -8,7 +8,7 @@
 #define HPX_STUBS_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0459PM
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/async/applier/apply.hpp>
 #include <hpx/include/async.hpp>
 
 #include "../server/simple_central_tuplespace.hpp"

@@ -18,7 +18,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/async/applier/applier.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>    // EXPORTS get_next_id

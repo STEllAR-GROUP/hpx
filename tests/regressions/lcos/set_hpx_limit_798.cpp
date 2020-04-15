@@ -11,8 +11,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/local_async/dataflow.hpp>
 
 using hpx::lcos::shared_future;
 using hpx::lcos::make_ready_future;

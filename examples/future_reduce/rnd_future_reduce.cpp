@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/lcos/when_all.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/timing.hpp>
 //

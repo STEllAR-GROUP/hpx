@@ -10,13 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>

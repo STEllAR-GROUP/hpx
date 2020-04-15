@@ -22,17 +22,17 @@
 #include <hpx/collectives/reduce.hpp>
 #include <hpx/lcos/channel.hpp>
 
+#include <hpx/async_combinators/split_future.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/async_combinators/wait_any.hpp>
+#include <hpx/async_combinators/wait_each.hpp>
+#include <hpx/async_combinators/wait_some.hpp>
+#include <hpx/async_combinators/when_all.hpp>
+#include <hpx/async_combinators/when_any.hpp>
+#include <hpx/async_combinators/when_each.hpp>
+#include <hpx/async_combinators/when_some.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/dataflow.hpp>
 #include <hpx/include/local_lcos.hpp>
-#include <hpx/lcos/split_future.hpp>
-#include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/wait_any.hpp>
-#include <hpx/lcos/wait_each.hpp>
-#include <hpx/lcos/wait_some.hpp>
-#include <hpx/lcos/when_all.hpp>
-#include <hpx/lcos/when_any.hpp>
-#include <hpx/lcos/when_each.hpp>
-#include <hpx/lcos/when_some.hpp>
 
 #endif

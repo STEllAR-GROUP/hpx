@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/execution/executors/distribution_policy_executor.hpp>
 #include <hpx/execution/executors/parallel_executor.hpp>
 #include <hpx/execution/executors/parallel_executor_aggregated.hpp>
 #include <hpx/execution/executors/pool_executor.hpp>

@@ -14,7 +14,7 @@
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/async/applier/applier.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

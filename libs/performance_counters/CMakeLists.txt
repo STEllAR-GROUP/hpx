@@ -60,6 +60,7 @@ add_hpx_module(performance_counters
   HEADERS ${performance_counters_headers}
   DEPENDENCIES
     hpx_assertion
+    hpx_async
     hpx_config
     hpx_errors
     hpx_execution

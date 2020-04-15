@@ -10,8 +10,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/applier/bind_naming_wrappers.hpp>
+#include <hpx/async/applier/applier.hpp>
+#include <hpx/async/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>

@@ -15,7 +15,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/async/applier/applier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

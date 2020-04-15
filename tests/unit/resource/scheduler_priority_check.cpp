@@ -15,7 +15,7 @@
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/lcos/when_all.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>

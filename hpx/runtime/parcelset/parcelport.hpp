@@ -19,7 +19,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
-#include <hpx/runtime/applier_fwd.hpp>
+#include <hpx/async/applier_fwd.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

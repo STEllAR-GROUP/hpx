@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/executors/execution_information.hpp>

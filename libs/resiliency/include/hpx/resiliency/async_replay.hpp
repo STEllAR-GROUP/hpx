@@ -14,7 +14,6 @@
 #include <hpx/resiliency/config.hpp>
 
 #include <hpx/async.hpp>
-#include <hpx/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/type_support/pack.hpp>
 

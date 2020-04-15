@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/copy_component.hpp>

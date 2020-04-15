@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #endif
 #include <hpx/assertion.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/wait_all.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>

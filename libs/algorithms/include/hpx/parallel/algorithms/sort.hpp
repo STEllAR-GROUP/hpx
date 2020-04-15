@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/dataflow.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/local_async/dataflow.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>

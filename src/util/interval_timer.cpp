@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/async/applier/applier.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/functional/bind_front.hpp>

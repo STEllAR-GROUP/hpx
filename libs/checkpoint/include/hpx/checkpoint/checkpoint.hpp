@@ -16,7 +16,7 @@
 #if !defined(CHECKPOINT_HPP_07262017)
 #define CHECKPOINT_HPP_07262017
 
-#include <hpx/dataflow.hpp>
+#include <hpx/async/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>

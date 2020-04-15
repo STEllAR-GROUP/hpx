@@ -8,7 +8,7 @@
 #ifndef HPX_ACTIONS_ACTION_PRIORITY_HPP
 #define HPX_ACTIONS_ACTION_PRIORITY_HPP
 
-#include <hpx/lcos/async_fwd.hpp>
+#include <hpx/async/async_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/extract_action.hpp>

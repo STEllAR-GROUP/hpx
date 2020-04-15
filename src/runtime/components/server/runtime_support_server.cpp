@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/apply.hpp>
+#include <hpx/async/apply.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/logging.hpp>
@@ -18,7 +18,7 @@
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/string_util/case_conv.hpp>
 
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
