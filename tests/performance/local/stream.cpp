@@ -273,26 +273,17 @@ struct triad_step
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Allocator, typename Executor, typename Target, typename... Targets>
+template <typename Allocator, typename Policy>
 std::vector<std::vector<double> >
 run_benchmark(
-    std::size_t iterations, std::size_t size, Target target, Targets... targets)
+    std::size_t iterations, std::size_t size, Allocator && alloc, Policy && policy)
 {
-    // Creating our allocator ...
-    Allocator alloc(target);
-
     // Allocate our data
     typedef hpx::compute::vector<STREAM_TYPE, Allocator> vector_type;
 
     vector_type a(size, alloc);
     vector_type b(size, alloc);
     vector_type c(size, alloc);
-
-    // Creating our executor ....
-    Executor exec(target, targets...);
-
-    // Creating the policy used in the parallel algorithms
-    auto policy = hpx::parallel::execution::par.on(exec);
 
     // Initialize arrays
     hpx::parallel::fill(policy, a.begin(), a.end(), 1.0);
@@ -393,6 +384,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::size_t offset = vm["offset"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();
     std::size_t chunk_size = vm["chunk_size"].as<std::size_t>();
+    std::size_t executor = vm["executor"].as<std::size_t>();
 
     HPX_UNUSED(chunk_size);
 
@@ -455,16 +447,57 @@ int hpx_main(hpx::program_options::variables_map& vm)
     else
 #endif
     {
-        typedef hpx::compute::host::block_executor<> executor_type;
-        typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
+        if (executor == 3)
+        {
+            // perform benchmark
+            timing = run_benchmark<>(iterations, vector_size, std::allocator<STREAM_TYPE>{}, hpx::parallel::execution::par);
+        }
+        else if (executor == 0)
+        {
+            typedef hpx::compute::host::block_executor<> executor_type;
+            typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
 
-        // Get the numa targets we want to run on
-        auto numa_nodes = hpx::compute::host::numa_domains();
+            //auto numa_nodes = hpx::compute::host::numa_domains();
+            ////allocator_type alloc(numa_nodes);
+            //std::allocator<STREAM_TYPE> alloc{};
+            //executor_type exec();//numa_nodes);
+            //auto policy = hpx::parallel::execution::par.on(exec);
 
-        // perform benchmark
-        timing =
-            run_benchmark<allocator_type, executor_type>(
-                iterations, vector_size, numa_nodes);
+            //std::allocator<STREAM_TYPE> alloc{};
+            //auto policy = hpx::parallel::execution::par;
+
+            //// perform benchmark
+            //timing = run_benchmark<>(iterations, vector_size, alloc, policy);
+        }
+        else if (executor == 1)
+        {
+            typedef hpx::parallel::execution::parallel_executor executor_type;
+            auto policy = hpx::parallel::execution::par.on(executor_type());
+
+            typedef hpx::compute::host::detail::policy_allocator<STREAM_TYPE, decltype(policy)> allocator_type;
+
+            allocator_type alloc(policy);
+
+            // perform benchmark
+            timing = run_benchmark<>(iterations, vector_size, alloc, policy);
+        }
+        else if (executor == 2)
+        {
+            //typedef hpx::parallel::execution::thread_pool_executor executor_type;
+            //auto policy = hpx::parallel::execution::par.on(executor_type());
+
+            //typedef hpx::compute::host::detail::policy_allocator<STREAM_TYPE, decltype(policy)> allocator_type;
+
+            //allocator_type alloc(policy);
+
+            //// perform benchmark
+            //timing = run_benchmark<>(iterations, vector_size, alloc, policy);
+        }
+        else
+        {
+            // TODO
+            HPX_ASSERT(false);
+        }
     }
     time_total = mysecond() - time_total;
 
@@ -542,6 +575,9 @@ int main(int argc, char* argv[])
         (   "chunk_size",
              hpx::program_options::value<std::size_t>()->default_value(0),
             "size of vector (default: 1024)")
+        (   "executor",
+             hpx::program_options::value<std::size_t>()->default_value(0),
+            "executor to use")
 
 #if defined(HPX_HAVE_COMPUTE)
         (   "use-accelerator",
