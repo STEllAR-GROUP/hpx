@@ -17,7 +17,7 @@ namespace hpx { namespace mpi {
         static force_linking_helper helper
         {
 #if defined(HPX_DEBUG)
-            &experimental::detail::hpx_mpi_errhandler
+            &hpx::experimental::mpi::detail::hpx_mpi_errhandler
 #endif
         };
         return helper;

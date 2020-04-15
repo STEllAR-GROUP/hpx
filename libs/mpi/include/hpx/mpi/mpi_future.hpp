@@ -24,7 +24,7 @@
 
 #include <mpi.h>
 
-namespace hpx { namespace mpi { namespace experimental {
+namespace hpx { namespace experimental { namespace mpi {
 
     using print_on = debug::enable_print<false>;
     static constexpr print_on mpi_debug("MPI_FUT");
@@ -229,6 +229,6 @@ namespace hpx { namespace mpi { namespace experimental {
     {
         mpi_debug.debug(detail::get_mpi_info(), std::forward<Args>(args)...);
     }
-}}}    // namespace hpx::mpi::experimental
+}}}    // namespace hpx::experimental::mpi
 
 #endif

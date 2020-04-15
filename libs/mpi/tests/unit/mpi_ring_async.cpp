@@ -60,10 +60,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         //
         // tell the scheduler that we want to handle mpi in the background
-        // here we use the provided hpx::mpi::experimental::poll function but
+        // here we use the provided hpx::experimental::mpi::poll function but
         // a user provided function or lambda may be supplied
         //
-        hpx::mpi::experimental::enable_user_polling enable_polling;
+        hpx::experimental::mpi::enable_user_polling enable_polling;
 
         if (rank == 0)
         {
@@ -92,7 +92,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             // all ranks pre-post a receive
             hpx::future<int> f_recv =
-                hpx::mpi::experimental::detail::async(MPI_Irecv, &tokens[i], 1,
+                hpx::experimental::mpi::detail::async(MPI_Irecv, &tokens[i], 1,
                     MPI_INT, rank_from, i, MPI_COMM_WORLD);
 
             // when the recv completes,
@@ -103,7 +103,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     // send the incremented token to the next rank
                     ++tokens[i];
                     hpx::future<void> f_send =
-                        hpx::mpi::experimental::detail::async(MPI_Isend,
+                        hpx::experimental::mpi::detail::async(MPI_Isend,
                             &tokens[i], 1, MPI_INT, rank_to, i, MPI_COMM_WORLD);
                     // when the send completes
                     f_send.then([=, &tokens, &counter](auto&&) {
@@ -122,7 +122,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             // rank 0 starts the process with a send
             if (rank == 0)
             {
-                auto f_send = hpx::mpi::experimental::detail::async(MPI_Isend,
+                auto f_send = hpx::experimental::mpi::detail::async(MPI_Isend,
                     &tokens[i], 1, MPI_INT, rank_to, i, MPI_COMM_WORLD);
                 f_send.then([=, &tokens, &counter](auto&&) {
                     msg_send(rank, size, rank_to, rank_from, tokens[i], i);
@@ -131,7 +131,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
 
         // Our simple counter should reach zero when all send/recv pairs are done
-        hpx::mpi::experimental::wait([&]() { return counter != 0; });
+        hpx::experimental::mpi::wait([&]() { return counter != 0; });
 
         // let the user polling go out of scope
     }

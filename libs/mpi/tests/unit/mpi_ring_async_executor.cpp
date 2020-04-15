@@ -64,14 +64,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     {
-        // this needs to scope all uses of hpx::mpi::experimental::executor
-        hpx::mpi::experimental::enable_user_polling enable_polling;
+        // this needs to scope all uses of hpx::experimental::mpi::executor
+        hpx::experimental::mpi::enable_user_polling enable_polling;
 
         // Ring send/recv around N ranks
         // Rank 0      : Send then Recv
         // Rank 1->N-1 : Recv then Send
 
-        hpx::mpi::experimental::executor exec(MPI_COMM_WORLD);
+        hpx::experimental::mpi::executor exec(MPI_COMM_WORLD);
 
         constexpr unsigned int n_loops = 20;
         std::atomic<int> counter(n_loops);
@@ -121,7 +121,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
 
         // Our simple counter should reach zero when all send/recv pairs are done
-        hpx::mpi::experimental::wait([&]() { return counter != 0; });
+        hpx::experimental::mpi::wait([&]() { return counter != 0; });
 
         // let the user polling go out of scope
     }

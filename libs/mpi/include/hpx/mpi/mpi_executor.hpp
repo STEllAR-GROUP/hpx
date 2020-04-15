@@ -17,7 +17,7 @@
 
 #include <mpi.h>
 
-namespace hpx { namespace mpi { namespace experimental {
+namespace hpx { namespace experimental { namespace mpi {
 
     struct executor
     {
@@ -58,7 +58,7 @@ namespace hpx { namespace mpi { namespace experimental {
     private:
         MPI_Comm communicator_;
     };
-}}}    // namespace hpx::mpi::experimental
+}}}    // namespace hpx::experimental::mpi
 
 namespace hpx { namespace parallel { namespace execution {
 

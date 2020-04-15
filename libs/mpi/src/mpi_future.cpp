@@ -20,7 +20,7 @@
 
 #include <mpi.h>
 
-namespace hpx { namespace mpi { namespace experimental {
+namespace hpx { namespace experimental { namespace mpi {
     namespace detail {
 
         // extract MPI error message
@@ -161,7 +161,7 @@ namespace hpx { namespace mpi { namespace experimental {
     }
 
     // Background progress function for MPI async operations
-    // Checks for completed MPI_Requests and sets mpi::experimental::future
+    // Checks for completed MPI_Requests and sets experimental::mpi::future
     // ready when found
     void poll()
     {
@@ -309,7 +309,7 @@ namespace hpx { namespace mpi { namespace experimental {
                     detail::get_active_futures().size())
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
-                        "hpx::mpi::experimental::poll",
+                        "hpx::experimental::mpi::poll",
                         "Fatal Error: Mismatch in vectors");
                 }
 
@@ -337,7 +337,7 @@ namespace hpx { namespace mpi { namespace experimental {
             }
 
             // always set polling function before enabling polling
-            sched->set_user_polling_function(&hpx::mpi::experimental::poll);
+            sched->set_user_polling_function(&hpx::experimental::mpi::poll);
             sched->add_remove_scheduler_mode(
                 threads::policies::enable_user_polling,
                 threads::policies::do_background_work);
@@ -365,10 +365,10 @@ namespace hpx { namespace mpi { namespace experimental {
             MPI_Init_thread(nullptr, nullptr, required, &provided);
             if (provided < MPI_THREAD_FUNNELED)
             {
-                mpi_debug.error(debug::str<>("hpx::mpi::experimental::init"),
+                mpi_debug.error(debug::str<>("hpx::experimental::mpi::init"),
                     "init failed");
                 HPX_THROW_EXCEPTION(invalid_status,
-                    "hpx::mpi::experimental::init",
+                    "hpx::experimental::mpi::init",
                     "the MPI installation doesn't allow multiple threads");
             }
             MPI_Comm_rank(MPI_COMM_WORLD, &detail::get_mpi_info().rank_);
@@ -378,7 +378,7 @@ namespace hpx { namespace mpi { namespace experimental {
 
         if (mpi_debug.is_enabled())
         {
-            mpi_debug.debug(debug::str<>("hpx::mpi::experimental::init"),
+            mpi_debug.debug(debug::str<>("hpx::experimental::mpi::init"),
                 detail::get_mpi_info());
         }
 
@@ -441,4 +441,4 @@ namespace hpx { namespace mpi { namespace experimental {
                 hpx::resource::get_thread_pool(pool_name));
         }
     }
-}}}    // namespace hpx::mpi::experimental
+}}}    // namespace hpx::experimental::mpi
