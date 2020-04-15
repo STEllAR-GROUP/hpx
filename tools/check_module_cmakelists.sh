@@ -50,7 +50,9 @@ function check_cmakelists_files() {
             # Check the presence of the header in the CMakeLists.txt of the module
             for header in "${module_files[@]}"
             do
-                check_failure $header $tmp_module ../CMakeLists.txt
+                if [[ ! "$header" =~ "detail" ]]; then
+                    check_failure $header $tmp_module ../CMakeLists.txt
+                fi
             done
 
         popd > /dev/null
