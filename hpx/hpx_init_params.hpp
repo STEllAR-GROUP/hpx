@@ -56,8 +56,6 @@ namespace hpx
 
     namespace detail
     {
-        HPX_EXPORT void on_exit() noexcept;
-        HPX_EXPORT void on_abort(int signal) noexcept;
         // Default params to initialize the init_params struct
         HPX_MAYBE_UNUSED static int dummy_argc = 1;
         HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;

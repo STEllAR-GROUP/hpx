@@ -34,6 +34,7 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/command_line_handling.hpp>
+#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/util/debugging.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>

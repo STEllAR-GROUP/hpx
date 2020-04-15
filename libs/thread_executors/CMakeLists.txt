@@ -80,6 +80,7 @@ add_hpx_module(thread_executors
     hpx_resource_partitioner
     hpx_static_reinit
     hpx_synchronization
+    hpx_threadmanager
     hpx_thread_pools
     hpx_thread_support
   CMAKE_SUBDIRS examples tests
