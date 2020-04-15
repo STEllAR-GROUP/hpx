@@ -12,8 +12,8 @@
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_AGGREGATED_DEC_20_2018_0624PM
 
 #include <hpx/config.hpp>
-#include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/is_executor.hpp>

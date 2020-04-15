@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async_launch_policy_dispatch.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>

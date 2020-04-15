@@ -10,13 +10,13 @@
 #define HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM
 
 #include <hpx/config.hpp>
-#include <hpx/async_launch_policy_dispatch.hpp>
+#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
+#include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/sync_launch_policy_dispatch.hpp>
 
 #include <hpx/execution/exception_list.hpp>
 

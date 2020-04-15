@@ -125,6 +125,7 @@ add_hpx_module(execution
   FORCE_LINKING_GEN
   SOURCES ${execution_sources}
   HEADERS ${execution_headers}
+  DEPRECATION_WARNINGS
   COMPATIBILITY_HEADERS ON    # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES
