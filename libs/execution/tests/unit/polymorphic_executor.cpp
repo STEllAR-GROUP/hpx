@@ -150,7 +150,7 @@ void static_check_executor()
     using namespace hpx::traits;
 
     static_assert(has_sync_execute_member<executor>::value,
-        "!has_sync_execute_member<executor>::value");
+        "has_sync_execute_member<executor>::value");
     static_assert(has_async_execute_member<executor>::value,
         "has_async_execute_member<executor>::value");
     static_assert(has_then_execute_member<executor>::value,
