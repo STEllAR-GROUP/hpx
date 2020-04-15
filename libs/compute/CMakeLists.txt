@@ -55,6 +55,7 @@ add_hpx_module(compute
     hpx_affinity
     hpx_algorithms
     hpx_assertion
+    hpx_async
     hpx_config
     hpx_coroutines
     hpx_execution

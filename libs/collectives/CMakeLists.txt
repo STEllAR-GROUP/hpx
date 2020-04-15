@@ -56,6 +56,7 @@ add_hpx_module(collectives
       hpx_affinity
       hpx_allocator_support
       hpx_assertion
+      hpx_async
       hpx_cache
       hpx_concurrency
       hpx_config

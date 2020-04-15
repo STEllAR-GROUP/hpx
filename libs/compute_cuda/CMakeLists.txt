@@ -49,6 +49,7 @@ add_hpx_module(compute_cuda
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
+    hpx_async
     hpx_compute
     hpx_config
     hpx_errors

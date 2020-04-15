@@ -141,6 +141,7 @@ add_hpx_module(algorithms
   # separate modules first.
   DEPENDENCIES
     hpx_assertion
+    hpx_async
     hpx_concepts
     hpx_concurrency
     hpx_config

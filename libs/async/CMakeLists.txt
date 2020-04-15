@@ -103,16 +103,20 @@ add_hpx_module(async
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES
     hpx_allocator_support
+    hpx_assertion
     hpx_config
     hpx_coroutines
     hpx_datastructures
+    hpx_errors
     hpx_execution
+    hpx_format
     hpx_functional
     hpx_local_async
     hpx_local_lcos
     hpx_memory
     hpx_runtime_configuration
     hpx_threading_base
+    hpx_threadmanager
     hpx_type_support
     hpx_util
   CMAKE_SUBDIRS examples tests
