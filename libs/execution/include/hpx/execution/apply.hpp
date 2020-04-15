@@ -33,8 +33,7 @@ namespace hpx { namespace detail {
         call(F&& f, Ts&&... ts)
         {
             parallel::execution::parallel_executor exec;
-            parallel::execution::post(
-                exec, std::forward<F>(f), std::forward<Ts>(ts)...);
+            exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
             return false;
         }
     };
