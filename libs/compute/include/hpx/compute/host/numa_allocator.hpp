@@ -10,12 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -29,13 +29,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace hpx { namespace parallel { namespace util
-{
+namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Executors>
     class numa_allocator
     {
         typedef typename Executors::value_type executor_type;
+
     public:
         // typedefs
         typedef T value_type;
@@ -56,77 +56,88 @@ namespace hpx { namespace parallel { namespace util
 
     public:
         numa_allocator(Executors const& executors, hpx::threads::topology& topo)
-          : executors_(executors), topo_(topo)
-        {}
+          : executors_(executors)
+          , topo_(topo)
+        {
+        }
 
         numa_allocator(numa_allocator const& rhs)
-          : executors_(rhs.executors_), topo_(rhs.topo_)
-        {}
+          : executors_(rhs.executors_)
+          , topo_(rhs.topo_)
+        {
+        }
 
         template <typename U>
         numa_allocator(numa_allocator<U, Executors> const& rhs)
-          : executors_(rhs.executors_), topo_(rhs.topo_)
-        {}
+          : executors_(rhs.executors_)
+          , topo_(rhs.topo_)
+        {
+        }
 
         // address
-        pointer address(reference r) { return &r; }
-        const_pointer address(const_reference r) { return &r; }
+        pointer address(reference r)
+        {
+            return &r;
+        }
+        const_pointer address(const_reference r)
+        {
+            return &r;
+        }
 
         // memory allocation
         pointer allocate(size_type cnt,
             typename std::allocator<void>::const_pointer = nullptr)
         {
             // allocate memory
-            pointer p = reinterpret_cast<pointer>(topo_.allocate(cnt * sizeof(T)));
+            pointer p =
+                reinterpret_cast<pointer>(topo_.allocate(cnt * sizeof(T)));
 
             // first touch policy, distribute evenly onto executors
             std::size_t part_size = cnt / executors_.size();
-            std::vector<hpx::future<void> > first_touch;
+            std::vector<hpx::future<void>> first_touch;
             first_touch.reserve(executors_.size());
 
             for (std::size_t i = 0; i != executors_.size(); ++i)
             {
                 pointer begin = p + i * part_size;
                 pointer end = begin + part_size;
-                first_touch.push_back(
-                    hpx::parallel::for_each(
-                        hpx::parallel::execution::par(hpx::parallel::execution::task)
-                            .on(executors_[i])
-                            .with(hpx::parallel::execution::static_chunk_size()),
-                        begin, end,
+                first_touch.push_back(hpx::parallel::for_each(
+                    hpx::parallel::execution::par(
+                        hpx::parallel::execution::task)
+                        .on(executors_[i])
+                        .with(hpx::parallel::execution::static_chunk_size()),
+                    begin, end,
 #if defined(HPX_DEBUG)
-                        [this, i]
+                    [this, i]
 #else
-                        []
+                    []
 #endif
-                        (T& val)
-                        {
-                            // touch first byte of every object
-                            *reinterpret_cast<char*>(&val) = 0;
+                    (T& val) {
+                        // touch first byte of every object
+                        *reinterpret_cast<char*>(&val) = 0;
 
 #if defined(HPX_DEBUG)
-                            // make sure memory was placed appropriately
-                            hpx::threads::mask_type mem_mask =
-                                topo_.get_thread_affinity_mask_from_lva(&val);
+                        // make sure memory was placed appropriately
+                        hpx::threads::mask_type mem_mask =
+                            topo_.get_thread_affinity_mask_from_lva(&val);
 
-                            std::size_t thread_num = hpx::get_worker_thread_num();
-                            hpx::threads::mask_cref_type thread_mask =
-                                hpx::parallel::execution::get_pu_mask(
-                                    executors_[i], topo_, thread_num);
+                        std::size_t thread_num = hpx::get_worker_thread_num();
+                        hpx::threads::mask_cref_type thread_mask =
+                            hpx::parallel::execution::get_pu_mask(
+                                executors_[i], topo_, thread_num);
 
-                            HPX_ASSERT(threads::mask_size(mem_mask) ==
-                                threads::mask_size(thread_mask));
-                            HPX_ASSERT(threads::bit_and(mem_mask, thread_mask,
-                                threads::mask_size(mem_mask)));
+                        HPX_ASSERT(threads::mask_size(mem_mask) ==
+                            threads::mask_size(thread_mask));
+                        HPX_ASSERT(threads::bit_and(mem_mask, thread_mask,
+                            threads::mask_size(mem_mask)));
 #endif
-                        })
-                );
+                    }));
             }
             hpx::wait_all(first_touch);
 
-            for (auto && f : first_touch)
+            for (auto&& f : first_touch)
             {
-                f.get();        // rethrow exceptions
+                f.get();    // rethrow exceptions
             }
 
             // return the overall memory block
@@ -145,8 +156,14 @@ namespace hpx { namespace parallel { namespace util
         }
 
         // construction/destruction
-        void construct(pointer p, const T& t) { new(p) T(t); }
-        void destroy(pointer p) { p->~T(); }
+        void construct(pointer p, const T& t)
+        {
+            new (p) T(t);
+        }
+        void destroy(pointer p)
+        {
+            p->~T();
+        }
 
         friend bool operator==(numa_allocator const&, numa_allocator const&)
         {
@@ -165,6 +182,6 @@ namespace hpx { namespace parallel { namespace util
         Executors const& executors_;
         hpx::threads::topology& topo_;
     };
-}}}
+}}}    // namespace hpx::parallel::util
 
 #endif

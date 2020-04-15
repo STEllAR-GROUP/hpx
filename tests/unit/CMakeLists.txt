@@ -14,7 +14,6 @@ set(subdirs
     lcos
     resource
     threads
-    topology
     traits
     util
    )

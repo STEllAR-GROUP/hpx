@@ -15,13 +15,13 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 //
-#include <hpx/parallel/algorithms/for_loop.hpp>
 #include <hpx/execution/executors.hpp>
+#include <hpx/parallel/algorithms/for_loop.hpp>
 //
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 #include <hpx/thread_executors/guided_pool_executor.hpp>
 #include <hpx/thread_executors/pool_executor.hpp>
+#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 //
 #include <hpx/include/iostreams.hpp>
@@ -37,7 +37,7 @@
 #include <string>
 #include <utility>
 // The allocator that binds pages to numa domains
-#include <hpx/parallel/util/numa_binding_allocator.hpp>
+#include <hpx/compute/host/numa_binding_allocator.hpp>
 // Example binder functions for different page binding mappings
 #include "allocator_binder_linear.hpp"
 #include "allocator_binder_matrix.hpp"

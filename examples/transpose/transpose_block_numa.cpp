@@ -15,7 +15,7 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
 
-#include <hpx/parallel/util/numa_allocator.hpp>
+#include <hpx/compute/host/numa_allocator.hpp>
 
 #include <boost/range/irange.hpp>
 
