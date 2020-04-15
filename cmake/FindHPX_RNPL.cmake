@@ -6,8 +6,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT SDF_ROOT AND NOT $ENV{SDF_ROOT} STREQUAL "")
-  set(SDF_ROOT "$ENV{SDF_ROOT}")
+# Set SDF_ROOT in case the other hints are used
+if(SDF_ROOT)
+  # The call to file is for compatibility with windows paths
+  file(TO_CMAKE_PATH ${SDF_ROOT} SDF_ROOT)
+elseif("$ENV{SDF_ROOT}")
+  file(TO_CMAKE_PATH $ENV{SDF_ROOT} SDF_ROOT)
 endif()
 
 if(SDF_ROOT)

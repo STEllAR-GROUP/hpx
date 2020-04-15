@@ -22,6 +22,17 @@ find_library(ORANGEFS_LIBRARY NAMES pvfs2 # orangefs pvfs2 orangefsposix
     ${PC_ORANGEFS_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
 
+# Set ORANGEFS_ROOT in case the other hints are used
+if(ORANGEFS_ROOT)
+  # The call to file is for compatibility with windows paths
+  file(TO_CMAKE_PATH ${ORANGEFS_ROOT} ORANGEFS_ROOT)
+elseif("$ENV{ORANGEFS_ROOT}")
+  file(TO_CMAKE_PATH $ENV{ORANGEFS_ROOT} ORANGEFS_ROOT)
+else()
+  file(TO_CMAKE_PATH "${ORANGEFS_INCLUDE_DIR}" ORANGEFS_INCLUDE_DIR)
+  string(REPLACE "/include" "" ORANGEFS_ROOT "${ORANGEFS_INCLUDE_DIR}")
+endif()
+
 set(ORANGEFS_LIBRARIES ${ORANGEFS_LIBRARY})
 set(ORANGEFS_INCLUDE_DIRS ${ORANGEFS_INCLUDE_DIR})
 

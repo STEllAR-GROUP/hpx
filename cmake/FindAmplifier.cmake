@@ -23,6 +23,18 @@ if(NOT TARGET Amplifier::amplifier)
       ${PC_AMPLIFIER_LIBRARY_DIRS}
     PATH_SUFFIXES lib lib64)
 
+
+  # Set AMPLIFIER_ROOT in case the other hints are used
+  if(AMPLIFIER_ROOT)
+    # The call to file is for compatibility for windows paths
+    file(TO_CMAKE_PATH ${AMPLIFIER_ROOT} AMPLIFIER_ROOT)
+  elseif("$ENV{AMPLIFIER_ROOT}")
+    file(TO_CMAKE_PATH $ENV{AMPLIFIER_ROOT} AMPLIFIER_ROOT)
+  else()
+    file(TO_CMAKE_PATH "${AMPLIFIER_INCLUDE_DIR}" AMPLIFIER_INCLUDE_DIR)
+    string(REPLACE "/include" "" AMPLIFIER_ROOT "${AMPLIFIER_INCLUDE_DIR}")
+  endif()
+
   set(AMPLIFIER_LIBRARIES ${AMPLIFIER_LIBRARY})
   set(AMPLIFIER_INCLUDE_DIRS ${AMPLIFIER_INCLUDE_DIR})
 

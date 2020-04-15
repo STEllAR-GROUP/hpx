@@ -22,6 +22,17 @@ find_library(QTHREADS_LIBRARY NAMES qthread libqthread
     ${PC_QTHREADS_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
 
+# Set QTHREADS_ROOT in case the other hints are used
+if(QTHREADS_ROOT)
+  # The call to file is for compatibility with windows paths
+  file(TO_CMAKE_PATH ${QTHREADS_ROOT} QTHREADS_ROOT)
+elseif("$ENV{QTHREADS_ROOT}")
+  file(TO_CMAKE_PATH $ENV{QTHREADS_ROOT} QTHREADS_ROOT)
+else()
+  file(TO_CMAKE_PATH "${QTHREADS_INCLUDE_DIR}" QTHREADS_INCLUDE_DIR)
+  string(REPLACE "/include" "" QTHREADS_ROOT "${QTHREADS_INCLUDE_DIR}")
+endif()
+
 set(QTHREADS_LIBRARIES ${QTHREADS_LIBRARY})
 set(QTHREADS_INCLUDE_DIRS ${QTHREADS_INCLUDE_DIR})
 

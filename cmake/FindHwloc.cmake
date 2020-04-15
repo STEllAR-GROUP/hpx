@@ -32,9 +32,13 @@ if (NOT TARGET Hwloc::hwloc)
     PATH_SUFFIXES lib lib64)
 
   # Set HWLOC_ROOT in case the other hints are used
-  if (NOT HWLOC_ROOT AND "$ENV{HWLOC_ROOT}")
-    set(HWLOC_ROOT $ENV{HWLOC_ROOT})
-  elseif(NOT HWLOC_ROOT)
+  if(HWLOC_ROOT)
+    # The call to file is for compatibility with windows paths
+    file(TO_CMAKE_PATH ${HWLOC_ROOT} HWLOC_ROOT)
+  elseif("$ENV{HWLOC_ROOT}")
+    file(TO_CMAKE_PATH $ENV{HWLOC_ROOT} HWLOC_ROOT)
+  else()
+    file(TO_CMAKE_PATH "${HWLOC_INCLUDE_DIR}" HWLOC_INCLUDE_DIR)
     string(REPLACE "/include" "" HWLOC_ROOT "${HWLOC_INCLUDE_DIR}")
   endif()
 

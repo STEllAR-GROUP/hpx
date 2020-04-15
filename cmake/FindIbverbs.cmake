@@ -24,6 +24,17 @@ find_library(IBVERBS_LIBRARY NAMES ibverbs libibverbs
     ${PC_IBVERBS_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
 
+  # Set IBVERBS_ROOT in case the other hints are used
+  if(IBVERBS_ROOT)
+    # The call to file is for compatibility with windows paths
+    file(TO_CMAKE_PATH ${IBVERBS_ROOT} IBVERBS_ROOT)
+  elseif("$ENV{IBVERBS_ROOT}")
+    file(TO_CMAKE_PATH $ENV{IBVERBS_ROOT} IBVERBS_ROOT)
+  else()
+    file(TO_CMAKE_PATH "${IBVERBS_INCLUDE_DIR}" IBVERBS_INCLUDE_DIR)
+    string(REPLACE "/include" "" IBVERBS_ROOT "${IBVERBS_INCLUDE_DIR}")
+  endif()
+
 set(IBVERBS_LIBRARIES ${IBVERBS_LIBRARY} CACHE INTERNAL "")
 set(IBVERBS_INCLUDE_DIRS ${IBVERBS_INCLUDE_DIR} CACHE INTERNAL "")
 
