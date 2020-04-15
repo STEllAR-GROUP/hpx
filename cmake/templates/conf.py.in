@@ -417,6 +417,8 @@ rst_prolog += '''
 .. |cpp20_p0443| replace:: P0443
 .. _cpp20_p0443: https://github.com/executors/issaquah_2016
 
+.. |semver| replace:: semver
+.. _semver: https://semver.org
 
 .. |ini_file_format| replace:: Windows INI file format
 .. _ini_file_format: https://en.wikipedia.org/wiki/INI_file
