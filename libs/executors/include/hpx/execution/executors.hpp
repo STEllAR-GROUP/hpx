@@ -17,6 +17,6 @@
 #include <hpx/execution/executors/service_executors.hpp>
 #include <hpx/execution/executors/thread_pool_attached_executors.hpp>
 #include <hpx/execution/executors/thread_pool_executor.hpp>
-#include <hpx/execution/executors/timed_executors.hpp>
+#include <hpx/executors/timed_executors.hpp>
 
 #endif

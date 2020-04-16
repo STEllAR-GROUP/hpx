@@ -21,6 +21,7 @@ set(executors_headers
   hpx/execution/executors/sequenced_executor.hpp
   hpx/execution/executors/service_executors.hpp
   hpx/execution/executors/thread_pool_attached_executors.hpp
+  hpx/executors/timed_executors.hpp
   )
 
 # Default location is $HPX_ROOT/libs/executors/include_compatibility

@@ -10,7 +10,6 @@
 #define HPX_PARALLEL_TIMED_EXECUTORS_JAN_06_2017_0802AM
 
 #include <hpx/config.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/threading.hpp>
@@ -407,54 +406,8 @@ namespace hpx { namespace parallel { namespace execution {
         std::chrono::steady_clock::time_point execute_at_;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    using sequenced_timed_executor =
-        timed_executor<execution::sequenced_executor>;
-
-    using parallel_timed_executor =
-        timed_executor<execution::parallel_executor>;
 }}}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution {
-    /// \cond NOINTERNAL
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename BaseExecutor>
-    struct is_one_way_executor<
-        parallel::execution::timed_executor<BaseExecutor>>
-      : is_one_way_executor<typename std::decay<BaseExecutor>::type>
-    {
-    };
-
-    template <typename BaseExecutor>
-    struct is_two_way_executor<
-        parallel::execution::timed_executor<BaseExecutor>>
-      : is_two_way_executor<typename std::decay<BaseExecutor>::type>
-    {
-    };
-
-    template <typename BaseExecutor>
-    struct is_never_blocking_one_way_executor<
-        parallel::execution::timed_executor<BaseExecutor>>
-      : is_never_blocking_one_way_executor<
-            typename std::decay<BaseExecutor>::type>
-    {
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <>
-    struct is_one_way_executor<parallel::execution::sequenced_timed_executor>
-      : std::true_type
-    {
-    };
-
-    template <>
-    struct is_two_way_executor<parallel::execution::parallel_timed_executor>
-      : std::true_type
-    {
-    };
-    /// \endcond
-}}}    // namespace hpx::parallel::execution
 
 //#include <hpx/execution/executors/timed_execution.hpp>
 
