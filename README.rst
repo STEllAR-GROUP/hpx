@@ -91,11 +91,11 @@ If you would like to work with the cutting edge version of this repository
 <https://stellar-group.github.io/hpx-docs/branches/master/html/index.html>`_.
 We strongly recommend that you follow the current health status of the master
 branch by looking at our `continuous integration results website
-<http://rostam.cct.lsu.edu/console>`_. While we try to keep the master branch
-stable and usable, sometimes new bugs trick their way into the code base. The
-`CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_ continuous integration
-service additionally tracks the current build status for the master branch:
-|circleci_status|.
+<https://cdash.cscs.ch//index.php?project=HPX>`_. While we try to keep the
+master branch stable and usable, sometimes new bugs trick their way into the
+code base. The `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_
+continuous integration service additionally tracks the current build status for
+the master branch: |circleci_status|.
 
 We use `Codacy <https://www.codacy.com/>`_ to assess the code quality of this
 project: |codacy|.
@@ -134,25 +134,35 @@ Acknowledgements
 ================
 
 We would like to acknowledge the NSF, DoE, DTIC, DARPA, the Center for
-Computation and Technology (CCT) at Louisiana State University, and the
+Computation and Technology (CCT) at Louisiana State University, The Swiss
+National Supercomputing Centre (CSCS), and the
 Department of Computer Science 3 - Computer Architecture at the University of
 Erlangen Nuremberg who fund and support our work.
 
 We would also like to thank the following organizations for granting us
-allocations of their compute resources: LSU HPC, LONI, XSEDE, NERSC, CSCS/ETHZ,
-and the Gauss Center for Supercomputing.
+allocations of their compute resources: LSU HPC, LONI, XSEDE, NERSC, ORNL,
+CSCS/ETHZ, and the Gauss Center for Supercomputing.
 
-HPX is currently funded by
+HPX is has been funded by:
 
-* The National Science Foundation through awards 1240655 (STAR), 1339782
-  (STORM), and 1737785 (Phylanx).
+* The National Science Foundation through awards 1117470 (APX), 1160602 (PXGL),
+  1240655 (STAR), 1447831 (PXFS), 1339782 (STORM), and 1737785 (Phylanx).
 
   Any opinions, findings, and conclusions or recommendations expressed in this
   material are those of the author(s) and do not necessarily reflect the views
   of the National Science Foundation.
 
-* The Department of Energy (DoE) through the awards DE-AC52-06NA25396 (FLeCSI)
-  and DE-NA0003525 (Resilience).
+* The Department of Energy (DoE) through the awards DE-SC0008714 (XPRESS),
+  DE-AC52-06NA25396 (FLeCSI), and DE-NA0003525 (Resilience).
+
+  This work is partially supported by the Scientific Discovery through Advanced
+  Computing (SciDAC) program funded by U.S. DOE, Office of Science, Advanced
+  Computing Scientific Computing Research (ASCR) and Basic Energy Sciences (BES),
+  Division of Materials Science and Engineering.
+
+  This research used resources of the Oak Ridge Leadership Computing Facility
+  at the Oak Ridge National Laboratory, which is supported by the Office of
+  Science of the U.S. Department of Energy under Contract No. DE-AC05-00OR22725.
 
   Neither the United States Government nor any agency thereof, nor any of their
   employees makes any warranty, express or implied, or assumes any legal
