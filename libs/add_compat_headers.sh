@@ -12,18 +12,6 @@
 
 # There is a possibility to specify the files manually
 
-script_sourced=0
-# Important to be at the beginning
-if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
-    script_sourced=1
-fi
-
-function _exit() {
-    if [[ $script_sourced -eq 0 ]]; then
-        exit
-    fi
-}
-
 function extra_usage_message() {
     echo
     echo "- Can specify the --project_path if different from the environmental"
@@ -38,8 +26,7 @@ if [[ $# -lt 1 ]]; then
     echo "Usage : "$arg" -m <module_name> --old_path <include_path> --new_path <include_path>"
     echo "Example: "$arg" -m cache -o hpx/util/cache -n hpx/cache"
     extra_usage_message
-    _exit
-    return
+    exit
 fi
 
 function parse_arguments() {
@@ -89,8 +76,7 @@ function parse_arguments() {
                 echo "[-f, --files \"<value1> <value2>\"]"
                 echo "Example: "$0" -m cache -o hpx/util/cache -n hpx/cache"
                 extra_usage_message
-                _exit
-                return
+                exit
         esac
     done
 
@@ -131,15 +117,13 @@ fi
 # Project path not set (full specified path to be sure which source is used)
 if [[ -z $HPX_ROOT && -z $project_path ]]; then
     "HPX_ROOT env var doesn't exists and project_path option not specified !"
-    _exit
-    return
+    exit
 fi
 
 pushd $module_path/include_compatibility > /dev/null
 if [[ $? -eq 1 ]]; then
     echo "Please specify a correct project_path"
-    _exit
-    return
+    exit
 fi
 
 # To enable **

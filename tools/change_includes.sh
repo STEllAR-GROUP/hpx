@@ -25,19 +25,6 @@ new_filenames=(
   hpx/cache/lru_cache.hpp
 )
 
-
-script_sourced=0
-# Important to be at the beginning
-if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
-    script_sourced=1
-fi
-
-function _exit() {
-    if [[ $script_sourced -eq 0 ]]; then
-        exit
-    fi
-}
-
 function extra_usage_message() {
     echo
     echo "Can specify the --project_path if different from the \$PWD variable"
@@ -52,8 +39,7 @@ if [[ $# -lt 1 ]]; then
     echo "Usage : "$arg" -m <module_name> -p <project_path>"
     echo "Example: "$arg" -m cache"
     extra_usage_message
-    _exit
-    return
+    exit
 fi
 
 function parse_arguments() {
@@ -89,7 +75,7 @@ function parse_arguments() {
                 echo
                 echo "- Can specify the --project_path if different from the environmental"
                 echo "variable \$PWD"
-                _exit
+                exit
                 return
         esac
     done
