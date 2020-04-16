@@ -13,10 +13,8 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp>
-#include <hpx/runtime/threads/executors/default_executor.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
-#include <hpx/runtime/threads/policies/shared_priority_queue_scheduler.hpp>
+#include <hpx/thread_executors/default_executor.hpp>
+#include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
