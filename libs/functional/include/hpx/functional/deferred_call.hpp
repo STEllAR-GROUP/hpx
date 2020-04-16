@@ -77,7 +77,7 @@ namespace hpx { namespace util {
 
             template <typename F_, typename... Ts_,
                 typename = typename std::enable_if<
-                    std::is_constructible<F, F_>::value>::type>
+                    std::is_constructible<F, F_&&>::value>::type>
             explicit constexpr HPX_HOST_DEVICE deferred(F_&& f, Ts_&&... vs)
               : _f(std::forward<F_>(f))
               , _args(std::piecewise_construct, std::forward<Ts_>(vs)...)

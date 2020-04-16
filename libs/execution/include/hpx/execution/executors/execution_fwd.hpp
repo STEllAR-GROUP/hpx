@@ -364,7 +364,7 @@ namespace hpx { namespace parallel { namespace execution {
     // define customization points
     namespace {
         ///////////////////////////////////////////////////////////////////////
-        // OneWayExecutor customization point: execution::execute
+        // OneWayExecutor customization point: execution::sync_execute
 
         /// Customization point for synchronous execution agent creation.
         ///

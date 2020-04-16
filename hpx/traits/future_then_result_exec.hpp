@@ -31,11 +31,33 @@ namespace hpx { namespace traits
             typename Enable = void>
         struct executor_future;
 
-        template <typename Executor, typename T, typename ...Ts>
+        template <typename Executor, typename T, typename Enable = void>
+        struct exposes_future_type : std::false_type
+        {
+        };
+
+        template <typename Executor, typename T>
+        struct exposes_future_type<Executor, T,
+            typename hpx::util::always_void<
+                typename Executor::template future_type<T>>::type>
+          : std::true_type
+        {
+        };
+
+        template <typename Executor, typename T, typename... Ts>
         struct executor_future<Executor, T, hpx::util::pack<Ts...>,
             typename std::enable_if<
-                hpx::traits::is_two_way_executor<Executor>::value
-            >::type>
+                hpx::traits::is_two_way_executor<Executor>::value &&
+                exposes_future_type<Executor, T>::value>::type>
+        {
+            using type = typename Executor::template future_type<T>;
+        };
+
+        template <typename Executor, typename T, typename... Ts>
+        struct executor_future<Executor, T, hpx::util::pack<Ts...>,
+            typename std::enable_if<
+                hpx::traits::is_two_way_executor<Executor>::value &&
+                !exposes_future_type<Executor, T>::value>::type>
         {
             using type = decltype(
                 std::declval<Executor&&>().async_execute(

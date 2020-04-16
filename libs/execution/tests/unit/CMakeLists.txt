@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 Hartmut Kaiser
+# Copyright (c) 2014-2020 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@ set(tests
     parallel_fork_executor
     parallel_policy_executor
     persistent_executor_parameters
+    polymorphic_executor
     sequenced_executor
     service_executors
     shared_parallel_executor
