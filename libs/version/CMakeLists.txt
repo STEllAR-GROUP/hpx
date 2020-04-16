@@ -31,4 +31,4 @@ add_hpx_module(version
   CMAKE_SUBDIRS
 )
 
-target_include_directories(hpx_version PRIVATE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)
+target_include_directories(hpx_version PRIVATE $<BUILD_INTERFACE:${HPX_BINARY_DIR}>)
