@@ -282,6 +282,10 @@ libs_cmakelists += '''
 hpx_info("")
 hpx_info("Configuring modules:")
 
+# Generate a file that lists all enabled modules for checks that might be
+# optional based on the presence of a library or not
+set(MODULE_ENABLED_LIB_DEFINES)
+
 # variables needed for modules.cpp
 set(MODULE_FORCE_LINKING_INCLUDES)
 set(MODULE_FORCE_LINKING_CALLS)
@@ -298,6 +302,11 @@ foreach(lib ${HPX_CANDIDATE_LIBS})
   if (HPX_${lib}_LIBRARY_ENABLED)
     set(HPX_LIBS ${HPX_LIBS} ${lib} CACHE INTERNAL "list of Enabled HPX modules" FORCE)
 
+    string(TOUPPER ${lib} uppercase_lib)
+
+    set(MODULE_ENABLED_LIB_DEFINES
+      "${MODULE_ENABLED_LIB_DEFINES}#define HPX_HAVE_LIB_${uppercase_lib}\\n")
+
     set(MODULE_FORCE_LINKING_INCLUDES
       "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\\n")
 
@@ -312,18 +321,23 @@ foreach(lib ${HPX_CANDIDATE_LIBS})
 endforeach()
 
 configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/libs_enabled.hpp.in"
+    "${PROJECT_BINARY_DIR}/libs/config/include/hpx/config/libs_enabled.hpp"
+    @ONLY)
+
+configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
     "${PROJECT_BINARY_DIR}/libs/modules.cpp"
     @ONLY)
 
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
-  @ONLY)
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
+    "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp"
+    @ONLY)
 configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
-  @ONLY)
+    "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
+    @ONLY)
 '''
 
 f = open(os.path.join(cwd, 'CMakeLists.txt'), 'w')
