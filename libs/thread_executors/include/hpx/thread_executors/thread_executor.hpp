@@ -466,9 +466,11 @@ namespace hpx { namespace threads {
                 ->get_stacksize();
         }
 
-        thread_schedule_hint get_schedulehint() const {
-            return static_cast<detail::scheduled_executor_base*>
-                    (executor_data_.get())->get_schedulehint();
+        thread_schedule_hint get_schedulehint() const
+        {
+            return static_cast<detail::scheduled_executor_base*>(
+                executor_data_.get())
+                ->get_schedulehint();
         }
     };
 }}    // namespace hpx::threads
