@@ -26,10 +26,11 @@ function _exit() {
 
 function extra_usage_message() {
     echo
-    echo "- Can specify the --project_path if different from $HPX_ROOT"
+    echo "- Can specify the --project_path if different from the environmental"
+    echo "variable \$HPX_ROOT"
     echo "- Can also specify some target files if no globbing (without any extension) with:"
     echo "--files \"<filename1> <filename2>\""
-    echo "Example with files: ./libs/add_compat_headers.sh -m module --files file -o hpx/util -p \$PWD"
+    echo "Example with files: $0 -m module --files file -o hpx/util -n hpx/module -p \$PWD"
 }
 
 if [[ $# -lt 1 ]]; then
@@ -107,10 +108,10 @@ old_path_set=false
 all_files=1
 files=
 
+echo
 # Parsing arguments
 parse_arguments "$@"
 
-echo
 echo "project_path: ${project_path}"
 # Usual vars (depend on the parsing step)
 libs_path=$project_path/libs
@@ -140,7 +141,6 @@ if [[ $? -eq 1 ]]; then
     _exit
     return
 fi
-echo "current path: $module_path/include_compatibility"
 
 # To enable **
 shopt -s globstar
