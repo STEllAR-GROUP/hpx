@@ -5,10 +5,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# This if statement is specific to GSL, and should not be copied into other
-# Find cmake scripts.
-if(NOT GSL_ROOT AND NOT $ENV{HOME_GSL} STREQUAL "")
-  set(GSL_ROOT "$ENV{HOME_GSL}")
+# Set GSL_ROOT in case the other hints are used
+if(GSL_ROOT)
+  # The call to file is for compatibility with windows paths
+  file(TO_CMAKE_PATH ${GSL_ROOT} GSL_ROOT)
+elseif("$ENV{HOME_GSL}")
+  # This if statement is specific to GSL, and should not be copied into other
+  # Find cmake scripts.
+  file(TO_CMAKE_PATH $ENV{HOME_GSL} GSL_ROOT)
 endif()
 
 if(GSL_USE_SYSTEM)

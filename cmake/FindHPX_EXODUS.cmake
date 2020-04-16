@@ -10,12 +10,11 @@ hpx_find_package(EXODUS
   HEADERS exodusII.h
   HEADER_PATHS include cbind/include)
 
-if($ENV{EXODUS_ROOT})
-  set(EXODUS_FORTRAN_ROOT "$ENV{EXODUS_ROOT}")
-endif()
-
+# Compatibility for windows paths
 if(EXODUS_ROOT)
-  set(EXODUS_FORTRAN_ROOT "${EXODUS_ROOT}")
+  file(TO_CMAKE_PATH ${EXODUS_ROOT} EXODUS_FORTRAN_ROOT)
+elseif("$ENV{EXODUS_ROOT}")
+  file(TO_CMAKE_PATH $ENV{EXODUS_ROOT} EXODUS_FORTRAN_ROOT)
 endif()
 
 hpx_find_package(EXODUS_FORTRAN

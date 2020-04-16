@@ -32,6 +32,17 @@ find_library(PMI_LIBRARY NAMES pmi
     ${PC_PMI_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
 
+# Set PMI_ROOT in case the other hints are used
+if(PMI_ROOT)
+  # The call to file is for compatibility with windows paths
+  file(TO_CMAKE_PATH ${PMI_ROOT} PMI_ROOT)
+elseif("$ENV{PMI_ROOT}")
+  file(TO_CMAKE_PATH $ENV{PMI_ROOT} PMI_ROOT)
+else()
+  file(TO_CMAKE_PATH "${PMI_INCLUDE_DIR}" PMI_INCLUDE_DIR)
+  string(REPLACE "/include" "" PMI_ROOT "${PMI_INCLUDE_DIR}")
+endif()
+
 if (NOT PMI_LIBRARY OR NOT PMI_INCLUDE_DIR)
   hpx_error("PMI_LIBRARY OR PMI_INCLUDE_DIR not found, please install PMI or set \
   the right PMI_ROOT path")

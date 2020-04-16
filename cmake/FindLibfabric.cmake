@@ -18,6 +18,17 @@ find_library(LIBFABRIC_LIBRARY NAMES fabric
     ${LIBFABRIC_ROOT} ENV LIBFABRIC_ROOT
   PATH_SUFFIXES lib lib64)
 
+# Set LIBFABRIC_ROOT in case the other hints are used
+if(LIBFABRIC_ROOT)
+  # The call to file is for compatibility with windows paths
+  file(TO_CMAKE_PATH ${LIBFABRIC_ROOT} LIBFABRIC_ROOT)
+elseif("$ENV{LIBFABRIC_ROOT}")
+  file(TO_CMAKE_PATH $ENV{LIBFABRIC_ROOT} LIBFABRIC_ROOT)
+else()
+  file(TO_CMAKE_PATH "${LIBFABRIC_INCLUDE_DIR}" LIBFABRIC_INCLUDE_DIR)
+  string(REPLACE "/include" "" LIBFABRIC_ROOT "${LIBFABRIC_INCLUDE_DIR}")
+endif()
+
 if (NOT LIBFABRIC_INCLUDE_DIR OR NOT LIBFABRIC_LIBRARY)
   hpx_error("Could not find LIBFABRIC_INCLUDE_DIR or LIBFABRIC_LIBRARY please \
   set the LIBFABRIC_ROOT environment variable")

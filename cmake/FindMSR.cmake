@@ -25,6 +25,17 @@ find_library(MSR_LIBRARY NAMES msr libmsr
     ${PC_MSR_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64)
 
+# Set MSR_ROOT in case the other hints are used
+if(MSR_ROOT)
+  # The call to file is for compatibility with windows paths
+  file(TO_CMAKE_PATH ${MSR_ROOT} MSR_ROOT)
+elseif("$ENV{MSR_ROOT}")
+  file(TO_CMAKE_PATH $ENV{MSR_ROOT} MSR_ROOT)
+else()
+  file(TO_CMAKE_PATH "${MSR_INCLUDE_DIR}" MSR_INCLUDE_DIR)
+  string(REPLACE "/include" "" MSR_ROOT "${MSR_INCLUDE_DIR}")
+endif()
+
 set(MSR_LIBRARIES ${MSR_LIBRARY})
 set(MSR_INCLUDE_DIRS ${MSR_INCLUDE_DIR})
 

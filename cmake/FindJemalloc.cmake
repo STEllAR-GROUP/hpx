@@ -35,6 +35,17 @@ if(MSVC)
     PATH_SUFFIXES include)
 endif()
 
+  # Set JEMALLOC_ROOT in case the other hints are used
+  if(JEMALLOC_ROOT)
+    # The call to file is for compatibility with windows paths
+    file(TO_CMAKE_PATH ${JEMALLOC_ROOT} JEMALLOC_ROOT)
+  elseif("$ENV{JEMALLOC_ROOT}")
+    file(TO_CMAKE_PATH $ENV{JEMALLOC_ROOT} JEMALLOC_ROOT)
+  else()
+    file(TO_CMAKE_PATH "${JEMALLOC_INCLUDE_DIR}" JEMALLOC_INCLUDE_DIR)
+    string(REPLACE "/include" "" JEMALLOC_ROOT "${JEMALLOC_INCLUDE_DIR}")
+  endif()
+
 find_library(JEMALLOC_LIBRARY NAMES jemalloc libjemalloc
   HINTS
     ${JEMALLOC_ROOT} ENV JEMALLOC_ROOT

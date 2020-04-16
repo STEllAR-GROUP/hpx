@@ -5,10 +5,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# This if statement is specific to Lorene, and should not be copied into other
-# Find cmake scripts.
-if(NOT LORENE_ROOT AND NOT $ENV{HOME_LORENE} STREQUAL "")
-  set(LORENE_ROOT "$ENV{HOME_LORENE}")
+# Set LORENE_ROOT in case the other hints are used
+if(LORENE_ROOT)
+  # The call to file is for compatibility with windows paths
+  file(TO_CMAKE_PATH ${LORENE_ROOT} LORENE_ROOT)
+elseif("$ENV{HOME_LORENE}")
+  # This if statement is specific to Lorene, and should not be copied into other
+  # Find cmake scripts.
+  file(TO_CMAKE_PATH $ENV{HOME_LORENE} LORENE_ROOT)
 endif()
 
 if(LORENE_USE_SYSTEM)
