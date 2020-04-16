@@ -17,18 +17,18 @@
 #define BOOST_NO_CXX11_ALLOCATOR
 #endif
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/version.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/include/compute.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_copy.hpp>
+#include <hpx/include/parallel_executor_parameters.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_fill.hpp>
 #include <hpx/include/parallel_transform.hpp>
-#include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/include/compute.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/version.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -61,9 +61,10 @@ int checktick()
     double t1, t2, timesfound[M];
 
     // Collect a sequence of M unique time values from the system.
-    for (std::size_t i = 0; i < M; i++) {
+    for (std::size_t i = 0; i < M; i++)
+    {
         t1 = mysecond();
-        while( ((t2=mysecond()) - t1) < 1.0E-6 )
+        while (((t2 = mysecond()) - t1) < 1.0E-6)
             ;
         timesfound[i] = t1 = t2;
     }
@@ -72,34 +73,35 @@ int checktick()
     // This result will be our estimate (in microseconds) for the
     // clock granularity.
     minDelta = 1000000;
-    for (std::size_t i = 1; i < M; i++) {
-        Delta = (int)( 1.0E6 * (timesfound[i]-timesfound[i-1]));
-        minDelta = (std::min)(minDelta, (std::max)(Delta,0));
+    for (std::size_t i = 1; i < M; i++)
+    {
+        Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
+        minDelta = (std::min)(minDelta, (std::max)(Delta, 0));
     }
 
-    return(minDelta);
+    return (minDelta);
 }
 
 template <typename Vector>
-void check_results(std::size_t iterations,
-    Vector const & a_res, Vector const & b_res, Vector const & c_res)
+void check_results(std::size_t iterations, Vector const& a_res,
+    Vector const& b_res, Vector const& c_res)
 {
     std::vector<STREAM_TYPE> a(a_res.size());
     std::vector<STREAM_TYPE> b(b_res.size());
     std::vector<STREAM_TYPE> c(c_res.size());
 
-    hpx::parallel::copy(hpx::parallel::execution::par,
-        a_res.begin(), a_res.end(), a.begin());
-    hpx::parallel::copy(hpx::parallel::execution::par,
-        b_res.begin(), b_res.end(), b.begin());
-    hpx::parallel::copy(hpx::parallel::execution::par,
-        c_res.begin(), c_res.end(), c.begin());
+    hpx::parallel::copy(
+        hpx::parallel::execution::par, a_res.begin(), a_res.end(), a.begin());
+    hpx::parallel::copy(
+        hpx::parallel::execution::par, b_res.begin(), b_res.end(), b.begin());
+    hpx::parallel::copy(
+        hpx::parallel::execution::par, c_res.begin(), c_res.end(), c.begin());
 
-    STREAM_TYPE aj,bj,cj,scalar;
-    STREAM_TYPE aSumErr,bSumErr,cSumErr;
-    STREAM_TYPE aAvgErr,bAvgErr,cAvgErr;
+    STREAM_TYPE aj, bj, cj, scalar;
+    STREAM_TYPE aSumErr, bSumErr, cSumErr;
+    STREAM_TYPE aAvgErr, bAvgErr, cAvgErr;
     double epsilon;
-    int ierr,err;
+    int ierr, err;
 
     /* reproduce initialization */
     aj = 1.0;
@@ -109,19 +111,20 @@ void check_results(std::size_t iterations,
     aj = 2.0E0 * aj;
     /* now execute timing loop */
     scalar = 3.0;
-    for (std::size_t k=0; k<iterations; k++)
-        {
-            cj = aj;
-            bj = scalar*cj;
-            cj = aj+bj;
-            aj = bj+scalar*cj;
-        }
+    for (std::size_t k = 0; k < iterations; k++)
+    {
+        cj = aj;
+        bj = scalar * cj;
+        cj = aj + bj;
+        aj = bj + scalar * cj;
+    }
 
     /* accumulate deltas between observed and expected results */
     aSumErr = 0.0;
     bSumErr = 0.0;
     cSumErr = 0.0;
-    for (std::size_t j=0; j<a.size(); j++) {
+    for (std::size_t j = 0; j < a.size(); j++)
+    {
         aSumErr += std::abs(a[j] - aj);
         bSumErr += std::abs(b[j] - bj);
         cSumErr += std::abs(c[j] - cj);
@@ -131,93 +134,110 @@ void check_results(std::size_t iterations,
     bAvgErr = bSumErr / (STREAM_TYPE) a.size();
     cAvgErr = cSumErr / (STREAM_TYPE) a.size();
 
-    if (sizeof(STREAM_TYPE) == 4) {
+    if (sizeof(STREAM_TYPE) == 4)
+    {
         epsilon = 1.e-6;
     }
-    else if (sizeof(STREAM_TYPE) == 8) {
+    else if (sizeof(STREAM_TYPE) == 8)
+    {
         epsilon = 1.e-13;
     }
-    else {
+    else
+    {
         printf("WEIRD: sizeof(STREAM_TYPE) = %zu\n", sizeof(STREAM_TYPE));
         epsilon = 1.e-6;
     }
 
     err = 0;
-    if (std::abs(aAvgErr/aj) > epsilon) {
+    if (std::abs(aAvgErr / aj) > epsilon)
+    {
         err++;
-        printf ("Failed Validation on array a[], AvgRelAbsErr > epsilon (%e)\n",
+        printf("Failed Validation on array a[], AvgRelAbsErr > epsilon (%e)\n",
             epsilon);
-        printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",
-            aj,aAvgErr,std::abs(aAvgErr)/aj);
+        printf("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n", aj,
+            aAvgErr, std::abs(aAvgErr) / aj);
         ierr = 0;
-        for (std::size_t j=0; j<a.size(); j++) {
-            if (std::abs(a[j]/aj-1.0) > epsilon) {
+        for (std::size_t j = 0; j < a.size(); j++)
+        {
+            if (std::abs(a[j] / aj - 1.0) > epsilon)
+            {
                 ierr++;
 #ifdef VERBOSE
-                if (ierr < 10) {
+                if (ierr < 10)
+                {
                     printf("         array a: index: %ld, expected: %e, "
-                        "observed: %e, relative error: %e\n",
-                        j,aj,a[j],std::abs((aj-a[j])/aAvgErr));
+                           "observed: %e, relative error: %e\n",
+                        j, aj, a[j], std::abs((aj - a[j]) / aAvgErr));
                 }
 #endif
             }
         }
-        printf("     For array a[], %d errors were found.\n",ierr);
+        printf("     For array a[], %d errors were found.\n", ierr);
     }
-    if (std::abs(bAvgErr/bj) > epsilon) {
+    if (std::abs(bAvgErr / bj) > epsilon)
+    {
         err++;
-        printf ("Failed Validation on array b[], AvgRelAbsErr > epsilon (%e)\n",
+        printf("Failed Validation on array b[], AvgRelAbsErr > epsilon (%e)\n",
             epsilon);
-        printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",
-            bj,bAvgErr,std::abs(bAvgErr)/bj);
-        printf ("     AvgRelAbsErr > Epsilon (%e)\n",epsilon);
+        printf("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n", bj,
+            bAvgErr, std::abs(bAvgErr) / bj);
+        printf("     AvgRelAbsErr > Epsilon (%e)\n", epsilon);
         ierr = 0;
-        for (std::size_t j=0; j<a.size(); j++) {
-            if (std::abs(b[j]/bj-1.0) > epsilon) {
+        for (std::size_t j = 0; j < a.size(); j++)
+        {
+            if (std::abs(b[j] / bj - 1.0) > epsilon)
+            {
                 ierr++;
 #ifdef VERBOSE
-                if (ierr < 10) {
+                if (ierr < 10)
+                {
                     printf("         array b: index: %ld, expected: %e, "
-                        "observed: %e, relative error: %e\n",
-                        j,bj,b[j],std::abs((bj-b[j])/bAvgErr));
+                           "observed: %e, relative error: %e\n",
+                        j, bj, b[j], std::abs((bj - b[j]) / bAvgErr));
                 }
 #endif
             }
         }
-        printf("     For array b[], %d errors were found.\n",ierr);
+        printf("     For array b[], %d errors were found.\n", ierr);
     }
-    if (std::abs(cAvgErr/cj) > epsilon) {
+    if (std::abs(cAvgErr / cj) > epsilon)
+    {
         err++;
-        printf ("Failed Validation on array c[], AvgRelAbsErr > epsilon (%e)\n",
+        printf("Failed Validation on array c[], AvgRelAbsErr > epsilon (%e)\n",
             epsilon);
-        printf ("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n",
-            cj,cAvgErr,std::abs(cAvgErr)/cj);
-        printf ("     AvgRelAbsErr > Epsilon (%e)\n",epsilon);
+        printf("     Expected Value: %e, AvgAbsErr: %e, AvgRelAbsErr: %e\n", cj,
+            cAvgErr, std::abs(cAvgErr) / cj);
+        printf("     AvgRelAbsErr > Epsilon (%e)\n", epsilon);
         ierr = 0;
-        for (std::size_t j=0; j<a.size(); j++) {
-            if (std::abs(c[j]/cj-1.0) > epsilon) {
+        for (std::size_t j = 0; j < a.size(); j++)
+        {
+            if (std::abs(c[j] / cj - 1.0) > epsilon)
+            {
                 ierr++;
 #ifdef VERBOSE
-                if (ierr < 10) {
+                if (ierr < 10)
+                {
                     printf("         array c: index: %ld, expected: %e, "
-                        "observed: %e, relative error: %e\n",
-                        j,cj,c[j],std::abs((cj-c[j])/cAvgErr));
+                           "observed: %e, relative error: %e\n",
+                        j, cj, c[j], std::abs((cj - c[j]) / cAvgErr));
                 }
 #endif
             }
         }
-        printf("     For array c[], %d errors were found.\n",ierr);
+        printf("     For array c[], %d errors were found.\n", ierr);
     }
-    if (err == 0) {
-        printf ("Solution Validates: avg error less than %e on all three arrays\n",
+    if (err == 0)
+    {
+        printf(
+            "Solution Validates: avg error less than %e on all three arrays\n",
             epsilon);
     }
 #ifdef VERBOSE
-    printf ("Results Validation Verbose Results: \n");
-    printf ("    Expected a(1), b(1), c(1): %f %f %f \n",aj,bj,cj);
-    printf ("    Observed a(1), b(1), c(1): %f %f %f \n",a[1],b[1],c[1]);
-    printf ("    Rel Errors on a, b, c:     %e %e %e \n",std::abs(aAvgErr/aj),
-        std::abs(bAvgErr/bj),std::abs(cAvgErr/cj));
+    printf("Results Validation Verbose Results: \n");
+    printf("    Expected a(1), b(1), c(1): %f %f %f \n", aj, bj, cj);
+    printf("    Observed a(1), b(1), c(1): %f %f %f \n", a[1], b[1], c[1]);
+    printf("    Rel Errors on a, b, c:     %e %e %e \n", std::abs(aAvgErr / aj),
+        std::abs(bAvgErr / bj), std::abs(cAvgErr / cj));
 #endif
 }
 
@@ -225,13 +245,16 @@ void check_results(std::size_t iterations,
 template <typename T>
 struct multiply_step
 {
-    multiply_step(T factor) : factor_(factor) {}
+    multiply_step(T factor)
+      : factor_(factor)
+    {
+    }
 
     // FIXME : call operator of multiply_step is momentarily defined with
     //         a generic parameter to allow the host_side invoke_result<>
     //         (used in invoke()) to get the return type
 
-    template<typename U>
+    template <typename U>
     HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val) const
     {
         return val * factor_;
@@ -247,7 +270,7 @@ struct add_step
     //         generic parameters to allow the host_side invoke_result<>
     //         (used in invoke()) to get the return type
 
-    template<typename U>
+    template <typename U>
     HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
     {
         return val1 + val2;
@@ -257,13 +280,16 @@ struct add_step
 template <typename T>
 struct triad_step
 {
-    triad_step(T factor) : factor_(factor) {}
+    triad_step(T factor)
+      : factor_(factor)
+    {
+    }
 
     // FIXME : call operator of triad_step is momentarily defined with
     //         generic parameters to allow the host_side invoke_result<>
     //         (used in invoke()) to get the return type
 
-    template<typename U>
+    template <typename U>
     HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
     {
         return val1 + val2 * factor_;
@@ -274,12 +300,11 @@ struct triad_step
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Allocator, typename Policy>
-std::vector<std::vector<double> >
-run_benchmark(
-    std::size_t iterations, std::size_t size, Allocator && alloc, Policy && policy)
+std::vector<std::vector<double>> run_benchmark(std::size_t iterations,
+    std::size_t size, Allocator&& alloc, Policy&& policy)
 {
     // Allocate our data
-    typedef hpx::compute::vector<STREAM_TYPE, Allocator> vector_type;
+    using vector_type = hpx::compute::vector<STREAM_TYPE, Allocator>;
 
     vector_type a(size, alloc);
     vector_type b(size, alloc);
@@ -293,49 +318,43 @@ run_benchmark(
     // Check clock ticks ...
     double t = mysecond();
     hpx::parallel::transform(
-        policy, a.begin(), a.end(), a.begin(),
-        multiply_step<STREAM_TYPE>(2.0));
+        policy, a.begin(), a.end(), a.begin(), multiply_step<STREAM_TYPE>(2.0));
     t = 1.0E6 * (mysecond() - t);
 
     // Get initial value for system clock.
     int quantum = checktick();
-    if(quantum >= 1)
+    if (quantum >= 1)
     {
-        std::cout
-            << "Your clock granularity/precision appears to be " << quantum
-            << " microseconds.\n"
-            ;
+        std::cout << "Your clock granularity/precision appears to be "
+                  << quantum << " microseconds.\n";
     }
     else
     {
-        std::cout
-            << "Your clock granularity appears to be less than one microsecond.\n"
-            ;
+        std::cout << "Your clock granularity appears to be less than one "
+                     "microsecond.\n";
         quantum = 1;
     }
 
     std::cout
         << "Each test below will take on the order"
         << " of " << (int) t << " microseconds.\n"
-        << "   (= " << (int) (t/quantum) << " clock ticks)\n"
+        << "   (= " << (int) (t / quantum) << " clock ticks)\n"
         << "Increase the size of the arrays if this shows that\n"
         << "you are not getting at least 20 clock ticks per test.\n"
-        << "-------------------------------------------------------------\n"
-        ;
+        << "-------------------------------------------------------------\n";
 
     std::cout
         << "WARNING -- The above is only a rough guideline.\n"
         << "For best results, please be sure you know the\n"
         << "precision of your system timer.\n"
-        << "-------------------------------------------------------------\n"
-        ;
+        << "-------------------------------------------------------------\n";
 
     ///////////////////////////////////////////////////////////////////////////
     // Main Loop
-    std::vector<std::vector<double> > timing(4, std::vector<double>(iterations));
+    std::vector<std::vector<double>> timing(4, std::vector<double>(iterations));
 
     double scalar = 3.0;
-    for(std::size_t iteration = 0; iteration != iterations; ++iteration)
+    for (std::size_t iteration = 0; iteration != iterations; ++iteration)
     {
         // Copy
         timing[0][iteration] = mysecond();
@@ -344,26 +363,20 @@ run_benchmark(
 
         // Scale
         timing[1][iteration] = mysecond();
-        hpx::parallel::transform(policy,
-            c.begin(), c.end(), b.begin(),
-            multiply_step<STREAM_TYPE>(scalar)
-        );
+        hpx::parallel::transform(policy, c.begin(), c.end(), b.begin(),
+            multiply_step<STREAM_TYPE>(scalar));
         timing[1][iteration] = mysecond() - timing[1][iteration];
 
         // Add
         timing[2][iteration] = mysecond();
-        hpx::parallel::transform(policy,
-            a.begin(), a.end(), b.begin(), b.end(), c.begin(),
-            add_step<STREAM_TYPE>()
-        );
+        hpx::parallel::transform(policy, a.begin(), a.end(), b.begin(), b.end(),
+            c.begin(), add_step<STREAM_TYPE>());
         timing[2][iteration] = mysecond() - timing[2][iteration];
 
         // Triad
         timing[3][iteration] = mysecond();
-        hpx::parallel::transform(policy,
-            b.begin(), b.end(), c.begin(), c.end(), a.begin(),
-            triad_step<STREAM_TYPE>(scalar)
-        );
+        hpx::parallel::transform(policy, b.begin(), b.end(), c.begin(), c.end(),
+            a.begin(), triad_step<STREAM_TYPE>(scalar));
         timing[3][iteration] = mysecond() - timing[3][iteration];
     }
 
@@ -371,8 +384,7 @@ run_benchmark(
     check_results(iterations, a, b, c);
 
     std::cout
-        << "-------------------------------------------------------------\n"
-        ;
+        << "-------------------------------------------------------------\n";
 
     return timing;
 }
@@ -390,6 +402,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     std::string chunker = vm["chunker"].as<std::string>();
 
+    // clang-format off
     std::cout
         << "-------------------------------------------------------------\n"
         << "Modified STREAM benchmark based on\nHPX version: "
@@ -412,117 +425,124 @@ int hpx_main(hpx::program_options::variables_map& vm)
         << "Number of Threads requested = "
             << hpx::get_os_thread_count() << "\n"
         << "Chunking policy requested: " << chunker << "\n"
+        << "Executor requested: " << executor << "\n"
         << "-------------------------------------------------------------\n"
         ;
+    // clang-format on
 
     double time_total = mysecond();
-    std::vector<std::vector<double> > timing;
+    std::vector<std::vector<double>> timing;
 
 #if defined(HPX_HAVE_COMPUTE)
     bool use_accel = false;
-    if(vm.count("use-accelerator"))
+    if (vm.count("use-accelerator"))
         use_accel = true;
 
-    if(use_accel)
+    if (use_accel)
     {
 #if defined(HPX_HAVE_CUDA)
+        using executor_type = hpx::compute::cuda::concurrent_executor<>;
+        using allocator_type = hpx::compute::cuda::allocator<STREAM_TYPE>;
+
         // Get the cuda targets we want to run on
         hpx::compute::cuda::target target;
 
         // Get the host targets we want to run on
         auto host_targets = hpx::compute::host::get_local_targets();
 
-        typedef hpx::compute::cuda::concurrent_executor<> executor_type;
-        //typedef hpx::compute::cuda::default_executor executor_type;
-        typedef hpx::compute::cuda::allocator<STREAM_TYPE> allocator_type;
+        auto numa_nodes = hpx::compute::host::numa_domains();
+        allocator_type alloc(target);
+        executor_type exec(target, host_targets);
+        auto policy = hpx::parallel::execution::par.on(exec);
+
 #else
 #error "The STREAM benchmark currently requires CUDA to run on an accelerator"
 #endif
         // perform benchmark
-        timing =
-            run_benchmark<allocator_type, executor_type>(
-                iterations, vector_size, std::move(target), std::move(host_targets));
-                //iterations, vector_size, std::move(target));
+        timing = run_benchmark<>(
+            iterations, vector_size, std::move(alloc), std::move(policy));
+        //iterations, vector_size, std::move(target));
     }
     else
 #endif
     {
-        if (executor == 3)
+        if (executor == 0)
         {
-            // perform benchmark
-            timing = run_benchmark<>(iterations, vector_size, std::allocator<STREAM_TYPE>{}, hpx::parallel::execution::par);
-        }
-        else if (executor == 0)
-        {
-            typedef hpx::compute::host::block_executor<> executor_type;
-            typedef hpx::compute::host::block_allocator<STREAM_TYPE> allocator_type;
-
-            //auto numa_nodes = hpx::compute::host::numa_domains();
-            ////allocator_type alloc(numa_nodes);
-            //std::allocator<STREAM_TYPE> alloc{};
-            //executor_type exec();//numa_nodes);
-            //auto policy = hpx::parallel::execution::par.on(exec);
-
-            //std::allocator<STREAM_TYPE> alloc{};
-            //auto policy = hpx::parallel::execution::par;
-
-            //// perform benchmark
-            //timing = run_benchmark<>(iterations, vector_size, alloc, policy);
+            // Default parallel policy with serial allocator.
+            timing = run_benchmark<>(iterations, vector_size,
+                std::allocator<STREAM_TYPE>{}, hpx::parallel::execution::par);
         }
         else if (executor == 1)
         {
-            typedef hpx::parallel::execution::parallel_executor executor_type;
-            auto policy = hpx::parallel::execution::par.on(executor_type());
+            // Block executor with block allocator.
+            using executor_type = hpx::compute::host::block_executor<>;
+            using allocator_type =
+                hpx::compute::host::block_allocator<STREAM_TYPE>;
 
-            typedef hpx::compute::host::detail::policy_allocator<STREAM_TYPE, decltype(policy)> allocator_type;
+            auto numa_nodes = hpx::compute::host::numa_domains();
+            allocator_type alloc(numa_nodes);
+            executor_type exec(numa_nodes);
+            auto policy = hpx::parallel::execution::par.on(exec);
 
-            allocator_type alloc(policy);
-
-            // perform benchmark
-            timing = run_benchmark<>(iterations, vector_size, alloc, policy);
+            timing = run_benchmark<>(
+                iterations, vector_size, std::move(alloc), std::move(policy));
         }
         else if (executor == 2)
         {
-            //typedef hpx::parallel::execution::thread_pool_executor executor_type;
-            //auto policy = hpx::parallel::execution::par.on(executor_type());
+            // Default parallel policy and allocator with default parallel policy.
+            auto policy = hpx::parallel::execution::par;
+            hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
+                decltype(policy)>
+                alloc(policy);
 
-            //typedef hpx::compute::host::detail::policy_allocator<STREAM_TYPE, decltype(policy)> allocator_type;
+            timing = run_benchmark<>(
+                iterations, vector_size, std::move(alloc), std::move(policy));
+        }
+        else if (executor == 3)
+        {
+            // Thread pool executor and allocator with thread pool executor.
+            using executor_type =
+                hpx::parallel::execution::thread_pool_executor;
 
-            //allocator_type alloc(policy);
+            auto policy = hpx::parallel::execution::par.on(executor_type());
+            hpx::compute::host::detail::policy_allocator<STREAM_TYPE,
+                decltype(policy)>
+                alloc(policy);
 
-            //// perform benchmark
-            //timing = run_benchmark<>(iterations, vector_size, alloc, policy);
+            timing = run_benchmark<>(
+                iterations, vector_size, std::move(alloc), std::move(policy));
         }
         else
         {
-            // TODO
-            HPX_ASSERT(false);
+            HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
+                "Invalid executor id given (0-3 allowed");
         }
     }
     time_total = mysecond() - time_total;
 
     /* --- SUMMARY --- */
+    // clang-format off
     const char *label[4] = {
         "Copy:      ",
         "Scale:     ",
         "Add:       ",
         "Triad:     "
     };
+    // clang-format on
 
     const double bytes[4] = {
         2 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
         2 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
         3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
-        3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size)
-    };
+        3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size)};
 
     // Note: skip first iteration
     std::vector<double> avgtime(4, 0.0);
     std::vector<double> mintime(4, (std::numeric_limits<double>::max)());
     std::vector<double> maxtime(4, 0.0);
-    for(std::size_t iteration = 1; iteration != iterations; ++iteration)
+    for (std::size_t iteration = 1; iteration != iterations; ++iteration)
     {
-        for (std::size_t j=0; j<4; j++)
+        for (std::size_t j = 0; j < 4; j++)
         {
             avgtime[j] = avgtime[j] + timing[j][iteration];
             mintime[j] = (std::min)(mintime[j], timing[j][iteration]);
@@ -531,23 +551,20 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     printf("Function    Best Rate MB/s  Avg time     Min time     Max time\n");
-    for (std::size_t j=0; j<4; j++) {
-        avgtime[j] = avgtime[j]/(double)(iterations-1);
+    for (std::size_t j = 0; j < 4; j++)
+    {
+        avgtime[j] = avgtime[j] / (double) (iterations - 1);
 
         printf("%s%12.1f  %11.6f  %11.6f  %11.6f\n", label[j],
-           1.0E-06 * bytes[j]/mintime[j],
-           avgtime[j],
-           mintime[j],
-           maxtime[j]);
+            1.0E-06 * bytes[j] / mintime[j], avgtime[j], mintime[j],
+            maxtime[j]);
     }
 
-    std::cout
-        << "\nTotal time: " << time_total
-        << " (per iteration: " << time_total/iterations << ")\n";
+    std::cout << "\nTotal time: " << time_total
+              << " (per iteration: " << time_total / iterations << ")\n";
 
     std::cout
-        << "-------------------------------------------------------------\n"
-        ;
+        << "-------------------------------------------------------------\n";
 
     return hpx::finalize();
 }
@@ -558,6 +575,7 @@ int main(int argc, char* argv[])
 
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
         (   "vector_size",
             hpx::program_options::value<std::size_t>()->default_value(1024),
@@ -576,30 +594,29 @@ int main(int argc, char* argv[])
              hpx::program_options::value<std::size_t>()->default_value(0),
             "size of vector (default: 1024)")
         (   "executor",
-             hpx::program_options::value<std::size_t>()->default_value(0),
-            "executor to use")
+            hpx::program_options::value<std::size_t>()->default_value(3),
+            "executor to use (0-3) (default: 3, thread_pool_executor)")
 
 #if defined(HPX_HAVE_COMPUTE)
         (   "use-accelerator",
             "Use this flag to run the stream benchmark on the GPU")
 #endif
         ;
+    // clang-format on
 
     // parse command line here to extract the necessary settings for HPX
-    parsed_options opts =
-        command_line_parser(argc, argv)
-            .allow_unregistered()
-            .options(cmdline)
-            .style(command_line_style::unix_style)
-            .run();
+    parsed_options opts = command_line_parser(argc, argv)
+                              .allow_unregistered()
+                              .options(cmdline)
+                              .style(command_line_style::unix_style)
+                              .run();
 
     variables_map vm;
     store(opts, vm);
 
     std::vector<std::string> cfg = {
-        "hpx.numa_sensitive=2"  // no-cross NUMA stealing
+        "hpx.numa_sensitive=2"    // no-cross NUMA stealing
     };
 
     return hpx::init(cmdline, argc, argv, cfg);
 }
-
