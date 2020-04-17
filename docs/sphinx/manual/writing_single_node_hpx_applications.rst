@@ -42,64 +42,36 @@ Channels
 
 Channels combine communication (the exchange of a value) with synchronization
 (guaranteeing that two calculations (tasks) are in a known state). A channel can
-transport any number of values of a given type from a sender to a receiver::
+transport any number of values of a given type from a sender to a receiver:
 
-    hpx::lcos::local::channel<int> c;
-    c.set(42);
-    cout << c.get();      // will print '42'
+.. literalinclude:: ../../examples/quickstart/local_channel_docs.cpp
+   :language: c++
+   :start-after: //[local_channel_minimal
+   :end-before: //]
 
 Channels can be handed to another thread (or in case of channel components, to
 other localities), thus establishing a communication channel between two
-independent places in the program::
+independent places in the program:
 
-    void do_something(
-        hpx::lcos::local::receive_channel<int> c,
-        hpx::lcos::local::send_channel<> done)
-    {
-        cout << c.get();        // prints 42
-        done.set();             // signal back
-    }
+.. literalinclude:: ../../examples/quickstart/local_channel_docs.cpp
+   :language: c++
+   :start-after: //[local_channel_send_receive
+   :end-before: //]
 
-    {
-        hpx::lcos::local::channel<int> c;
-        hpx::lcos::local::channel<> done;
-
-        hpx::apply(&do_something, c, done);
-
-        c.set(42);              // send some value
-        done.get();             // wait for thread to be done
-    }
+Note how :cpp:member:`hpx::lcos::local::channel::get` without any arguments
+returns a future which is ready when a value has been set on the channel. The
+launch policy ``hpx::launch::sync`` can be used to make
+:cpp:member:`hpx::lcos::local::channel::get` block until a value is set and
+return the value directly.
 
 A channel component is created on one :term:`locality` and can be sent to
 another :term:`locality` using an action. This example also demonstrates how a
-channel can be used as a range of values::
+channel can be used as a range of values:
 
-    // channel components need to be registered for each used type (not needed
-    // for hpx::lcos::local::channel)
-    HPX_REGISTER_CHANNEL(double);
-
-    void some_action(hpx::lcos::channel<double> c)
-    {
-        for (double d : c)
-            hpx::cout << d << std::endl;
-    }
-    HPX_REGISTER_ACTION(some_action);
-
-    {
-        // create the channel on this locality
-        hpx::lcos::channel<double> c(hpx::find_here());
-
-        // pass the channel to a (possibly remote invoked) action
-        hpx::apply(some_action(), hpx::find_here(), c);
-
-        // send some values to the receiver
-        std::vector<double> v = { 1.2, 3.4, 5.0 };
-        for (double d : v)
-            c.set(d);
-
-        // explicitly close the communication channel (implicit at destruction)
-        c.close();
-    }
+.. literalinclude:: ../../examples/quickstart/channel_docs.cpp
+   :language: c++
+   :start-after: //[channel
+   :end-before: //]
 
 Composable guards
 -----------------
