@@ -91,7 +91,7 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct moodycamel_fifo_backend
     {
-        using container_type = moodycamel::ConcurrentQueue<T>;
+        using container_type = hpx::concurrency::ConcurrentQueue<T>;
 
         using value_type = T;
         using reference = T&;
