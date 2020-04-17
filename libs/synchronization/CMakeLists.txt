@@ -69,9 +69,6 @@ add_hpx_module(synchronization
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/synchronization/detail/condition_variable.hpp"
-    "hpx/synchronization/detail/counting_semaphore.hpp"
-    "hpx/synchronization/detail/sliding_semaphore.hpp"
     "hpx/synchronization/force_linking.hpp"
   SOURCES ${synchronization_sources}
   HEADERS ${synchronization_headers}

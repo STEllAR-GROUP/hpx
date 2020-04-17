@@ -35,8 +35,6 @@ add_hpx_module(util
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/util/detail/reserve.hpp"
   SOURCES ${util_sources}
   HEADERS ${util_headers}
   COMPAT_HEADERS ${util_compat_headers}

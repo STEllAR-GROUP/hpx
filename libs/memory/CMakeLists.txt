@@ -26,7 +26,6 @@ add_hpx_module(memory
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/memory/detail/sp_convertible.hpp"
     "hpx/memory/serialization/intrusive_ptr.hpp"
   SOURCES ${memory_sources}
   HEADERS ${memory_headers}
