@@ -19,8 +19,10 @@ set(tests
 if(HPX_WITH_SHARED_PRIORITY_SCHEDULER)
   set(tests ${tests}
       cross_pool_injection
+      scheduler_binding_check
     )
   set(cross_pool_injection_PARAMETERS THREADS_PER_LOCALITY -1)
+  set(scheduler_binding_check_PARAMETERS THREADS_PER_LOCALITY -1)
 endif()
 
 # NB. threads = -2 = threads = 'cores'
