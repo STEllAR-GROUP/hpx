@@ -122,7 +122,7 @@ fi
 
 pushd $module_path/include_compatibility > /dev/null
 if [[ $? -eq 1 ]]; then
-    echo "Please specify a correct project_path"
+    echo -e "\e[31mPlease specify a correct project_path"
     exit
 fi
 
@@ -139,7 +139,7 @@ else
 fi
 
 echo
-echo "Files overwritten :"
+echo -e "\e[32mFiles overwritten :"
 # Create the corresponding compatibility headers
 for full_file in "${files[@]}"; do
     # basename not used otherwise we lose hierarchy if any
