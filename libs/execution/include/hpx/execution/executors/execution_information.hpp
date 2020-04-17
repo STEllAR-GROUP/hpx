@@ -20,6 +20,7 @@
 
 // TODO: Remove this dependency.
 #include <hpx/resource_partitioner.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 
 #include <cstddef>
 #include <type_traits>
