@@ -174,8 +174,7 @@ namespace hpx { namespace lcos { namespace detail {
             // simply schedule new thread
             parallel::execution::parallel_policy_executor<launch::async_policy>
                 exec{policy};
-            parallel::execution::post(
-                exec,
+            exec.post(
                 [this_ = std::move(this_)](Futures&& futures) -> void {
                     return this_->done(std::move(futures));
                 },
@@ -226,8 +225,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             parallel::execution::parallel_policy_executor<launch::fork_policy>
                 exec{policy};
-            parallel::execution::post(
-                exec,
+            exec.post(
                 [this_ = std::move(this_)](Futures&& futures) -> void {
                     return this_->done(std::move(futures));
                 },

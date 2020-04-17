@@ -13,7 +13,7 @@
 #include <utility>
 
 namespace hpx { namespace detail {
-    // dispatch point used for async implementations
+    // dispatch point used for sync implementations
     template <typename Func, typename Enable = void>
     struct sync_dispatch;
 }}    // namespace hpx::detail
