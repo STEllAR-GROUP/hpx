@@ -95,7 +95,8 @@ function(add_hpx_module name)
     set(module_headers)
     foreach(header_file ${${name}_HEADERS})
       # Exclude the files specified
-      if (NOT (${header_file} IN_LIST ${name}_EXCLUDE_FROM_GLOBAL_HEADER))
+      if ((NOT (${header_file} IN_LIST ${name}_EXCLUDE_FROM_GLOBAL_HEADER)) AND
+        (NOT("${header_file}" MATCHES "detail")))
         set(module_headers "${module_headers}#include <${header_file}>\n")
       endif()
     endforeach(header_file)
