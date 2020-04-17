@@ -81,8 +81,16 @@ namespace boost
       string_set m_skip_signatures;
     };
 
+    // for inspection of header files
+    class header_inspector : public inspector
+    {
+    public:
+      // registers the basic set of known source signatures
+      header_inspector();
+    };
+
     // for inspection of source code of one form or other
-    class source_inspector : public inspector
+    class source_inspector : public header_inspector
     {
     public:
       // registers the basic set of known source signatures

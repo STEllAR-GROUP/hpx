@@ -71,6 +71,7 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 #include "endline_whitespace_check.hpp"
 #include "length_check.hpp"
 #include "include_check.hpp"
+#include "pragma_once_check.hpp"
 #include "deprecated_include_check.hpp"
 #include "deprecated_name_check.hpp"
 
@@ -293,7 +294,7 @@ namespace
     string name( file_path.filename().string() );
     if ( signatures.find( name ) == signatures.end() )
     {
-      string::size_type pos( name.rfind( '.' ) );
+      string::size_type pos( name.find( '.' ) );
       if ( pos == string::npos
         || signatures.find( name.substr( pos ) )
           == signatures.end() ) return false;
@@ -705,6 +706,21 @@ namespace boost
 
     }
 
+    header_inspector::header_inspector()
+    {
+      // Header files
+      register_signature( ".h" );
+      register_signature( ".hpp" );
+      register_signature( ".hxx" );
+      register_signature( ".inc" );
+      register_signature( ".ipp" );
+      register_signature( ".h.in" );
+      register_signature( ".hpp.in" );
+      register_signature( ".hxx.in" );
+      register_signature( ".inc.in" );
+      register_signature( ".ipp.in" );
+    }
+
     source_inspector::source_inspector()
     {
       // C/C++ source code...
@@ -712,11 +728,6 @@ namespace boost
       register_signature( ".cpp" );
       register_signature( ".css" );
       register_signature( ".cxx" );
-      register_signature( ".h" );
-      register_signature( ".hpp" );
-      register_signature( ".hxx" );
-      register_signature( ".inc" );
-      register_signature( ".ipp" );
 
       // Boost.Build BJam source code...
 //       register_signature( "Jamfile" );
@@ -824,6 +835,7 @@ int cpp_main( int argc_param, char * argv_param[] )
     bool whitespace_ck = false;
     bool length_ck = false;
     bool include_ck = false;
+    bool pragma_once_ck = false;
     bool deprecated_include_ck = false;
     bool deprecated_names_ck = false;
 
@@ -871,6 +883,8 @@ int cpp_main( int argc_param, char * argv_param[] )
             "check for exceeding character limit (default: off)")
         ("include", value<bool>(&include_ck)->implicit_value(false),
             "check for certain #include's (default: off)")
+        ("pragma_once", value<bool>(&pragma_once_ck)->implicit_value(false),
+            "check for #pragma once (default: off)")
         ("deprecated_include",
             value<bool>(&deprecated_include_ck)->implicit_value(false),
             "check for deprecated #include's (default: off)")
@@ -954,6 +968,7 @@ int cpp_main( int argc_param, char * argv_param[] )
         whitespace_ck = true;
         length_ck = true;
         include_ck = true;
+        pragma_once_ck = true;
         deprecated_include_ck = true;
         deprecated_names_ck = true;
     }
@@ -1018,6 +1033,9 @@ int cpp_main( int argc_param, char * argv_param[] )
   if ( include_ck)
       inspectors.push_back(inspector_element (
           new boost::inspect::include_check()) );
+  if ( pragma_once_ck)
+      inspectors.push_back(inspector_element (
+          new boost::inspect::pragma_once_check()) );
   if ( deprecated_include_ck)
       inspectors.push_back(inspector_element (
           new boost::inspect::deprecated_include_check()) );
