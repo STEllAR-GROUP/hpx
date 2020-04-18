@@ -27,6 +27,7 @@ jobs:
               -Bbuild \
               -GNinja \
               -DCMAKE_BUILD_TYPE=Debug \
+              -DHPX_MPI_WITH_FUTURES=OFF \
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON
     - name: Build

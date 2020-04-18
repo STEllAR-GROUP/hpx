@@ -7,7 +7,8 @@
 #ifndef HPX_PLUGINS_PARCELPORT_MPI_MPI_HPP
 #define HPX_PLUGINS_PARCELPORT_MPI_MPI_HPP
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
+    defined(HPX_HAVE_LIB_MPI)
 
 #if defined(__clang__)
 #  pragma clang diagnostic push

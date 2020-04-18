@@ -606,8 +606,11 @@ namespace hpx { namespace util {
             {
                 return false;
             }
-
-            return true;
+#elif defined(HPX_HAVE_LIB_MPI)
+            // if MPI futures are enabled while networking is off we need to
+            // check whether we were run using mpirun
+            return detail::detect_mpi_environment(
+                cfg, HPX_HAVE_PARCELPORT_MPI_ENV);
 #else
             return false;
 #endif

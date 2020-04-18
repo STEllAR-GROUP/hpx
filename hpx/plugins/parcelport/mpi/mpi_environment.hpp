@@ -9,7 +9,8 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
+    defined(HPX_HAVE_LIB_MPI)
 
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>

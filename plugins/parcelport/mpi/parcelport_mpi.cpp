@@ -10,7 +10,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_MPI) || defined(HPX_HAVE_LIB_MPI)
 #include <hpx/plugins/parcelport/mpi/mpi.hpp>
 #endif
 

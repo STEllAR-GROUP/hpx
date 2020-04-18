@@ -180,6 +180,7 @@ jobs:
                 -DHPX_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
                 -DHPX_WITH_GIT_TAG="${CIRCLE_TAG}" \
                 -DHPX_WITH_TOOLS=On \
+                -DHPX_MPI_WITH_FUTURES=Off \
                 -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
                 -DHPX_WITH_TESTS_HEADERS=On \
                 -DHPX_WITH_COMPILER_WARNINGS=On \
@@ -209,6 +210,7 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
+                -DHPX_MPI_WITH_FUTURES=Off \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_TESTS=On \
                 -DHPX_WITH_EXAMPLES=Off
@@ -219,6 +221,7 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
+                -DHPX_MPI_WITH_FUTURES=Off \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_TESTS=Off \
                 -DHPX_WITH_EXAMPLES=On
@@ -229,6 +232,7 @@ jobs:
             cmake \
                 /hpx/source \
                 -G "Ninja" \
+                -DHPX_MPI_WITH_FUTURES=Off \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_APEX=On \
                 -DHPX_WITH_TESTS=On \
@@ -420,7 +424,7 @@ jobs:
           name: Installing HPX for build unit tests
           command: |
               # Disable documentation just for this step
-              cmake -DHPX_WITH_DOCUMENTATION=OFF .
+              cmake -DHPX_MPI_WITH_FUTURES=Off -DHPX_WITH_DOCUMENTATION=OFF .
               ninja -j1 install
       - run:
           name: Building Unit Tests

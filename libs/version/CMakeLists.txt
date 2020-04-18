@@ -12,7 +12,8 @@ set(version_headers hpx/version.hpp)
 
 set(version_sources version.cpp)
 
-if(HPX_WITH_PARCELPORT_MPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_MPI_WITH_FUTURES)
+  include(HPX_SetupMPI)
   set(mpi_dependencies Mpi::mpi)
 endif()
 

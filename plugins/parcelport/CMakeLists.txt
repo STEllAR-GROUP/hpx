@@ -15,6 +15,9 @@ if(HPX_WITH_NETWORKING)
     verbs
     mpi
     tcp)
+elseif(HPX_MPI_WITH_FUTURES)
+  set(parcelport_plugins ${parcelport_plugins}
+    mpi)
 endif()
 
 set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
