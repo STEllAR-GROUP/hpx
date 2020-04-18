@@ -12,24 +12,13 @@
 
 # There is a possibility to specify the files manually
 
-script_sourced=0
-# Important to be at the beginning
-if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
-    script_sourced=1
-fi
-
-function _exit() {
-    if [[ $script_sourced -eq 0 ]]; then
-        exit
-    fi
-}
-
 function extra_usage_message() {
     echo
-    echo "- Can specify the --project_path if different from $HPX_ROOT"
+    echo "- Can specify the --project_path if different from the environmental"
+    echo "variable \$HPX_ROOT"
     echo "- Can also specify some target files if no globbing (without any extension) with:"
     echo "--files \"<filename1> <filename2>\""
-    echo "Example with files: ./libs/add_compat_headers.sh -m module --files file -o hpx/util -p \$PWD"
+    echo "Example with files: $0 -m module --files file -o hpx/util -n hpx/module -p \$PWD"
 }
 
 if [[ $# -lt 1 ]]; then
@@ -37,8 +26,7 @@ if [[ $# -lt 1 ]]; then
     echo "Usage : "$arg" -m <module_name> --old_path <include_path> --new_path <include_path>"
     echo "Example: "$arg" -m cache -o hpx/util/cache -n hpx/cache"
     extra_usage_message
-    _exit
-    return
+    exit
 fi
 
 function parse_arguments() {
@@ -88,8 +76,7 @@ function parse_arguments() {
                 echo "[-f, --files \"<value1> <value2>\"]"
                 echo "Example: "$0" -m cache -o hpx/util/cache -n hpx/cache"
                 extra_usage_message
-                _exit
-                return
+                exit
         esac
     done
 
@@ -107,10 +94,10 @@ old_path_set=false
 all_files=1
 files=
 
+echo
 # Parsing arguments
 parse_arguments "$@"
 
-echo
 echo "project_path: ${project_path}"
 # Usual vars (depend on the parsing step)
 libs_path=$project_path/libs
@@ -130,17 +117,14 @@ fi
 # Project path not set (full specified path to be sure which source is used)
 if [[ -z $HPX_ROOT && -z $project_path ]]; then
     "HPX_ROOT env var doesn't exists and project_path option not specified !"
-    _exit
-    return
+    exit
 fi
 
 pushd $module_path/include_compatibility > /dev/null
 if [[ $? -eq 1 ]]; then
-    echo "Please specify a correct project_path"
-    _exit
-    return
+    echo -e "\e[31mPlease specify a correct project_path"
+    exit
 fi
-echo "current path: $module_path/include_compatibility"
 
 # To enable **
 shopt -s globstar
@@ -155,7 +139,7 @@ else
 fi
 
 echo
-echo "Files overwritten :"
+echo -e "\e[32mFiles overwritten :"
 # Create the corresponding compatibility headers
 for full_file in "${files[@]}"; do
     # basename not used otherwise we lose hierarchy if any
