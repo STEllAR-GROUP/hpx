@@ -48,6 +48,12 @@ namespace hpx { namespace resource
     /// Return the thread pool given its internal index
     HPX_API_EXPORT threads::thread_pool_base& get_thread_pool(
         std::size_t pool_index);
+
+    /// Return true if the pool with the given name exists
+    HPX_API_EXPORT bool pool_exists(std::string const& pool_name);
+
+    /// Return true if the pool with the given index exists
+    HPX_API_EXPORT bool pool_exists(std::size_t pool_index);
 }}
 
 namespace hpx { namespace threads {

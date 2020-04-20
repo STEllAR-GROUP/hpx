@@ -24,7 +24,7 @@ namespace hpx { namespace parallel { namespace execution {
     class HPX_EXPORT pool_executor : public thread_pool_executor
     {
     public:
-        pool_executor(std::string const& pool_name,
+        pool_executor(std::string const& pool_name = "default",
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default)
           : thread_pool_executor(

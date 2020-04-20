@@ -761,6 +761,35 @@ namespace hpx { namespace threads {
         return get_pool(threads_lookup_[thread_index]);
     }
 
+    bool threadmanager::pool_exists(std::string const& pool_name) const
+    {
+        // if the given pool_name is default, we don't need to look for it
+        // we must always return pool 0
+        if (pool_name == "default" ||
+            pool_name == resource::get_partitioner().get_default_pool_name())
+        {
+            return true;
+        }
+
+        // now check the other pools - no need to check pool 0 again, so ++begin
+        auto pool = std::find_if(++pools_.begin(), pools_.end(),
+            [&pool_name](pool_type const& itp) -> bool {
+                return (itp->get_pool_name() == pool_name);
+            });
+
+        if (pool != pools_.end())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool threadmanager::pool_exists(std::size_t pool_index) const
+    {
+        return pool_index < pools_.size();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     std::int64_t threadmanager::get_thread_count(thread_state_enum state,
         thread_priority priority, std::size_t num_thread, bool reset)
