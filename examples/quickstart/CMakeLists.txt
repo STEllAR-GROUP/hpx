@@ -8,6 +8,7 @@
 set(example_programs
     1d_wave_equation
     allow_unknown_options
+    channel_docs
     command_line_handling
     component_ctors
     component_in_executable
@@ -41,6 +42,7 @@ set(example_programs
     latch_local
     latch_remote
     local_channel
+    local_channel_docs
     partitioned_vector_spmd_foreach
     pingpong
     pipeline1
@@ -71,6 +73,7 @@ set(disabled_tests
 
 set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(channel_docs_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(command_line_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_in_executable_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(component_ctors_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -91,6 +94,7 @@ else()
 endif()
 set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(local_channel_FLAGS COMPONENT_DEPENDENCIES iostreams)
+set(local_channel_docs_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(sierpinski_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(partitioned_vector_spmd_foreach_FLAGS
     COMPONENT_DEPENDENCIES iostreams partitioned_vector)
