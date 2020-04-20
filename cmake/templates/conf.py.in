@@ -124,7 +124,7 @@ api_ref_file = '''
 '''
 
 
-for lib in breathe_projects_source:
+for lib in sorted(breathe_projects_source.keys()):
     lib_sources = breathe_projects_source[lib]
     if len(lib_sources[1]) == 0:
         continue
