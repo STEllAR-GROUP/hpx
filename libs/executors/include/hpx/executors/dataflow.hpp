@@ -222,8 +222,7 @@ namespace hpx { namespace lcos { namespace detail
             parallel::execution::parallel_policy_executor<launch::async_policy>
                 exec{policy};
 
-            parallel::execution::post(
-                exec,
+            exec.post(
                 std::move(this_f_),
                 std::move(futures));
         }
@@ -236,7 +235,6 @@ namespace hpx { namespace lcos { namespace detail
                 exec{policy};
 
             exec.post(
-                exec,
                 std::move(this_f_),
                 std::move(futures));
         }

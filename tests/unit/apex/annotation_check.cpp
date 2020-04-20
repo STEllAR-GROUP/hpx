@@ -16,7 +16,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
+#include <hpx/execution/executors/pool_executor.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
@@ -203,8 +203,8 @@ void test_none()
 int hpx_main()
 {
     // setup executors
-    hpx::threads::scheduled_executor NP_executor =
-        hpx::threads::executors::pool_executor(
+    hpx::parallel::execution::pool_executor NP_executor =
+        hpx::parallel::execution::pool_executor(
             "default", hpx::threads::thread_priority_default);
     hpx::parallel::execution::parallel_executor par_exec{};
 

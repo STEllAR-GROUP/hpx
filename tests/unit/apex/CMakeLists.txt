@@ -27,20 +27,16 @@ endforeach()
 # dataflow support works for the following (add sync - if it ever works)
 foreach(
   launch
-  ""
-  "Executor non-threaded "
-  "Executor threaded "
-  "apply "
-  "async "
-  "deferred "
-  "fork "
+  "" "Executor non-threaded "
+  # "Executor threaded "
+  "apply " "async " "deferred " "fork "
 )
   set(REGEX_MATCH_D_ "${REGEX_MATCH_D_}.*1-${launch}Dataflow")
 endforeach()
 
 # continuation support works for the following
-foreach(launch "" "Executor non-threaded " "Executor threaded " "async "
-               "fork "
+foreach(launch "" "Executor non-threaded " # Executor threaded "
+               "async " "fork "
 )
   set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*2-${launch}Continuation")
 endforeach()
