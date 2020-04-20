@@ -56,6 +56,9 @@ int hpx_main(int argc, char* argv[])
         HPX_TEST_EQ(std::size_t(1), hpx::resource::get_num_threads(i));
     }
 
+    // Make sure default construction works
+    hpx::parallel::execution::pool_executor exec_default;
+
     // setup executors for different task priorities on the pools
     // segfaults or exceptions in any of the following will cause
     // the test to fail
