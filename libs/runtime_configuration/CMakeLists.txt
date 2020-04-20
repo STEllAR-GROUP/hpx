@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@ set(runtime_configuration_headers
   hpx/runtime_configuration/init_ini_data.hpp
   hpx/runtime_configuration/plugin_registry_base.hpp
   hpx/runtime_configuration/runtime_configuration.hpp
+  hpx/runtime_configuration/runtime_configuration_fwd.hpp
   hpx/runtime_configuration/runtime_mode.hpp
   hpx/runtime_configuration/static_factory_data.hpp
 )

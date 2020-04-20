@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/plugin.hpp>
-#include <hpx/util_fwd.hpp>
+#include <hpx/runtime_configuration/runtime_configuration_fwd.hpp>
 
 #include <string>
 #include <vector>
@@ -37,7 +37,7 @@ namespace hpx { namespace plugins {
         virtual bool get_plugin_info(std::vector<std::string>& fillini) = 0;
 
         virtual void init(
-            int* /*argc*/, char*** /*argv*/, util::command_line_handling&)
+            int* /*argc*/, char*** /*argv*/, util::runtime_configuration&)
         {
         }
     };

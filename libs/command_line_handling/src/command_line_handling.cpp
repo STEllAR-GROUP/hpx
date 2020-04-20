@@ -1556,7 +1556,7 @@ namespace hpx { namespace util {
         for (std::shared_ptr<plugins::plugin_registry_base>& reg :
             plugin_registries)
         {
-            reg->init(&argc, &argv, *this);
+            reg->init(&argc, &argv, rtcfg_);
         }
 
         // Now re-parse the command line using the node number (if given).
