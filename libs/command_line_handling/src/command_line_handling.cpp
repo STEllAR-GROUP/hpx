@@ -1,33 +1,26 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/command_line_handling/command_line_handling.hpp>
-
-#include <hpx/config/asio.hpp>
+#include <hpx/config.hpp>
+#include <hpx/asio.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/batch_environments.hpp>
-#include <hpx/command_line_handling/parse_command_line.hpp>
+#include <hpx/command_line_handling.hpp>
 #include <hpx/debugging.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
+#include <hpx/mpi_base.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime_configuration/plugin_registry_base.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/util/asio_util.hpp>
+#include <hpx/program_options.hpp>
+#include <hpx/runtime_configuration.hpp>
+#include <hpx/topology.hpp>
+#include <hpx/util.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/manage_config.hpp>
-#include <hpx/util/map_hostnames.hpp>
-#include <hpx/util/sed_transform.hpp>
 #include <hpx/version.hpp>
 
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/variables_map.hpp>
-#include <boost/asio/ip/host_name.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -562,59 +555,6 @@ namespace hpx { namespace util {
             check_networking_option(vm, "hpx:expect-connecting-localities");
 #endif
         }
-
-        bool detect_mpi_environment(
-            util::runtime_configuration const& cfg, char const* default_env)
-        {
-#if defined(__bgq__)
-            // If running on BG/Q, we can safely assume to always run in an
-            // MPI environment
-            return true;
-#else
-            std::string mpi_environment_strings =
-                cfg.get_entry("hpx.parcel.mpi.env", default_env);
-
-            typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-            boost::char_separator<char> sep(";,: ");
-            tokenizer tokens(mpi_environment_strings, sep);
-            for (tokenizer::iterator it = tokens.begin(); it != tokens.end();
-                 ++it)
-            {
-                char* env = std::getenv(it->c_str());
-                if (env)
-                    return true;
-            }
-            return false;
-#endif
-        }
-
-        bool check_mpi_environment(runtime_configuration const& cfg)
-        {
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
-            if (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) == 0)
-                return false;
-
-            // We disable the MPI parcelport if the application is not run using
-            // mpirun and the tcp/ip parcelport is not explicitly disabled
-            //
-            // The bottom line is that we use the MPI parcelport either when the
-            // application was executed using mpirun or if the tcp/ip parcelport
-            // was disabled.
-            if (!detail::detect_mpi_environment(
-                    cfg, HPX_HAVE_PARCELPORT_MPI_ENV) &&
-                get_entry_as(cfg, "hpx.parcel.tcp.enable", 1))
-            {
-                return false;
-            }
-#elif defined(HPX_HAVE_LIB_MPI)
-            // if MPI futures are enabled while networking is off we need to
-            // check whether we were run using mpirun
-            return detail::detect_mpi_environment(
-                cfg, HPX_HAVE_PARCELPORT_MPI_ENV);
-#else
-            return false;
-#endif
-        }
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////
@@ -850,7 +790,7 @@ namespace hpx { namespace util {
         }
 #endif
 
-        bool have_mpi = detail::check_mpi_environment(rtcfg_);
+        bool have_mpi = util::mpi_environment::check_mpi_environment(rtcfg_);
 
         util::batch_environment env(
             nodelist, have_mpi, debug_clp, enable_batch_env);
@@ -1091,6 +1031,8 @@ namespace hpx { namespace util {
         ini_config.emplace_back("hpx.pu_step=" + std::to_string(pu_step_));
 
         pu_offset_ = detail::handle_pu_offset(cfgmap, vm, std::size_t(-1));
+
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (pu_offset_ != std::size_t(-1))
         {
 #if defined(__APPLE__)

@@ -47,6 +47,7 @@ add_hpx_module(command_line_handling
     hpx_filesystem
     hpx_format
     hpx_memory
+    hpx_mpi_base
     hpx_prefix
     hpx_program_options
     hpx_runtime_configuration

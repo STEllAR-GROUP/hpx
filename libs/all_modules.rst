@@ -52,6 +52,7 @@ All modules
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
    /libs/mpi/docs/index.rst
+   /libs/mpi_base/docs/index.rst
    /libs/naming_base/docs/index.rst
    /libs/pack_traversal/docs/index.rst
    /libs/performance_counters/docs/index.rst

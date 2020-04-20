@@ -10,11 +10,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI) || defined(HPX_HAVE_LIB_MPI)
-#include <hpx/plugins/parcelport/mpi/mpi.hpp>
-#endif
-
-#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+#include <hpx/mpi_base.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 
@@ -274,7 +270,10 @@ namespace hpx { namespace traits
         }
         static void init(int *argc, char ***argv, util::command_line_handling &cfg)
         {
-            util::mpi_environment::init(argc, argv, cfg);
+            util::mpi_environment::init(argc, argv, cfg.rtcfg_);
+            cfg.num_localities_ =
+                static_cast<std::size_t>(util::mpi_environment::size());
+            cfg.node_ = static_cast<std::size_t>(util::mpi_environment::rank());
         }
 
         static char const* call()

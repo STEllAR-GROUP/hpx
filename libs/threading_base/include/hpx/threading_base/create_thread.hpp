@@ -92,6 +92,7 @@ namespace hpx { namespace threads { namespace detail {
         // create the new thread
         scheduler->create_thread(data, &id, initial_state, run_now, ec);
 
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         LTM_(info) << "register_thread(" << id << "): initial_state("
                    << get_thread_state_name(initial_state) << "), "
                    << "run_now(" << (run_now ? "true" : "false")

@@ -794,7 +794,7 @@ if(HPX_WITH_NETWORKING)
   hpx_option(HPX_MPI_WITH_FUTURES BOOL
     "Enable support for returning futures from MPI asynchronous calls"
     " (default: ON if networking+MPI already enabled)"
-    ON CATEGORY "MPI")
+    ${HPX_WITH_PARCELPORT_MPI} CATEGORY "MPI")
 
   hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
     "Enable the TCP based parcelport."

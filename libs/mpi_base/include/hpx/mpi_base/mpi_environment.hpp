@@ -12,20 +12,21 @@
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_LIB_MPI)
 
+#include <hpx/mpi_base/mpi.hpp>
+#include <hpx/runtime_configuration.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/plugins/parcelport/mpi/mpi.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <cstdlib>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     struct HPX_EXPORT mpi_environment
     {
-        static void init(int *argc, char ***argv, command_line_handling& cfg);
+        static bool check_mpi_environment(runtime_configuration const& cfg);
+
+        static void init(int* argc, char*** argv, runtime_configuration& cfg);
         static void finalize();
 
         static bool enabled();
@@ -61,7 +62,6 @@ namespace hpx { namespace util
         typedef hpx::lcos::local::spinlock mutex_type;
 
     private:
-
         static mutex_type mtx_;
 
         static bool enabled_;
@@ -71,7 +71,22 @@ namespace hpx { namespace util
 
         static int is_initialized_;
     };
-}}
+}}    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>
+
+#else
+
+#include <hpx/runtime_configuration.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
+
+namespace hpx { namespace util {
+    struct HPX_EXPORT mpi_environment
+    {
+        static bool check_mpi_environment(runtime_configuration const& cfg);
+    };
+}}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
 
