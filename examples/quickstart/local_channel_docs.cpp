@@ -7,6 +7,8 @@
 // This example is meant for inclusion in the documentation.
 
 #include <hpx/hpx_main.hpp>
+
+#include <hpx/assertion.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
