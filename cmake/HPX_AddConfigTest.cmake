@@ -295,6 +295,13 @@ function(hpx_check_for_cxx17_fallthrough_attribute)
 endfunction()
 
 ###############################################################################
+function(hpx_check_for_cxx17_nodiscard_attribute)
+  add_hpx_config_test(HPX_WITH_CXX17_NODISCARD_ATTRIBUTE
+    SOURCE cmake/tests/cxx17_nodiscard_attribute.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
 function(hpx_check_for_cxx17_hardware_destructive_interference_size)
   add_hpx_config_test(HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE
     SOURCE cmake/tests/cxx17_hardware_destructive_interference_size.cpp
@@ -310,8 +317,15 @@ endfunction()
 
 ###############################################################################
 function(hpx_check_for_cxx17_maybe_unused)
-  add_hpx_config_test(HPX_HAVE_CXX17_MAYBE_UNUSED
+  add_hpx_config_test(HPX_WITH_CXX17_MAYBE_UNUSED
     SOURCE cmake/tests/cxx17_maybe_unused.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx17_deduction_guides)
+  add_hpx_config_test(HPX_WITH_CXX17_DEDUCTION_GUIDES
+    SOURCE cmake/tests/cxx17_deduction_guides.cpp
     FILE ${ARGN})
 endfunction()
 
@@ -326,6 +340,13 @@ endfunction()
 function(hpx_check_for_cxx17_if_constexpr)
   add_hpx_config_test(HPX_WITH_CXX17_IF_CONSTEXPR
     SOURCE cmake/tests/cxx17_if_constexpr.cpp
+    FILE ${ARGN})
+endfunction()
+
+###############################################################################
+function(hpx_check_for_cxx17_inline_constexpr_variable)
+  add_hpx_config_test(HPX_WITH_CXX17_INLINE_CONSTEXPR_VALUE
+    SOURCE cmake/tests/cxx17_inline_constexpr_variable.cpp
     FILE ${ARGN})
 endfunction()
 

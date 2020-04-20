@@ -419,11 +419,11 @@ namespace hpx { namespace threads {
         return topo.get();
     }
 
-    HPX_API_EXPORT std::size_t hardware_concurrency();
+    HPX_API_EXPORT HPX_NODISCARD std::size_t hardware_concurrency();
 
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are
-    // expensive, so return a value initializaed at startup
+    // expensive, so return a value initialized at startup
     inline std::size_t get_memory_page_size()
     {
         return hpx::threads::topology::memory_page_size_;

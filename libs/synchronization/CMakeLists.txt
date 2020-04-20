@@ -20,6 +20,7 @@ set(synchronization_headers
   hpx/synchronization/channel_mpmc.hpp
   hpx/synchronization/channel_mpsc.hpp
   hpx/synchronization/channel_spsc.hpp
+  hpx/synchronization/force_linking.hpp
   hpx/synchronization/latch.hpp
   hpx/synchronization/mutex.hpp
   hpx/synchronization/no_mutex.hpp
@@ -30,6 +31,7 @@ set(synchronization_headers
   hpx/synchronization/spinlock.hpp
   hpx/synchronization/spinlock_no_backoff.hpp
   hpx/synchronization/spinlock_pool.hpp
+  hpx/synchronization/stop_token.hpp
   )
 
 # Default location is $HPX_ROOT/libs/synchronization/include_compatibility
@@ -55,20 +57,22 @@ set(synchronization_compat_headers
 
 set(synchronization_sources
   detail/condition_variable.cpp
+  force_linking.cpp
   local_barrier.cpp
   mutex.cpp
+  stop_token.cpp
   )
 
 include(HPX_AddModule)
 add_hpx_module(synchronization
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/synchronization/detail/condition_variable.hpp"
     "hpx/synchronization/detail/counting_semaphore.hpp"
     "hpx/synchronization/detail/sliding_semaphore.hpp"
+    "hpx/synchronization/force_linking.hpp"
   SOURCES ${synchronization_sources}
   HEADERS ${synchronization_headers}
   COMPAT_HEADERS ${synchronization_compat_headers}

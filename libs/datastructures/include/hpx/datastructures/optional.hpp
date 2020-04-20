@@ -299,6 +299,7 @@ namespace hpx { namespace util {
             if (!empty_)
             {
                 reinterpret_cast<T*>(&storage_)->~T();
+                empty_ = true;
             }
         }
 

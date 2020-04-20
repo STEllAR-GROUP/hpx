@@ -18,14 +18,25 @@
 /// keyword. Prefer using ``constexpr`` directly instead.
 #define HPX_CONSTEXPR constexpr
 
-///  This macro evaluates to ``constexpr`` if the compiler supports it, ``const``
+/// This macro evaluates to ``constexpr`` if the compiler supports it, ``const``
 /// otherwise.
 ///
 /// This macro is deprecated. It is always replaced with the ``constexpr``
 /// keyword. Prefer using ``constexpr`` directly instead.
 #define HPX_CONSTEXPR_OR_CONST constexpr
 
-///  This macro evaluates to ``static constexpr`` if the compiler supports it,
+/// This macro evaluates to ``inline constexpr`` if the compiler supports it,
+/// ``constexpr`` otherwise.
+///
+/// This macro is deprecated. It is always replaced with the ``constexpr``
+/// keyword. Prefer using ``constexpr`` directly instead.
+#ifdef HPX_HAVE_CXX17_INLINE_CONSTEXPR_VARIABLE
+#define HPX_INLINE_CONSTEXPR_VARIABLE inline constexpr
+#else
+#define HPX_INLINE_CONSTEXPR_VARIABLE constexpr
+#endif
+
+/// This macro evaluates to ``static constexpr`` if the compiler supports it,
 /// ``static const`` otherwise.
 ///
 /// This macro is deprecated. It is always replaced with the ``static

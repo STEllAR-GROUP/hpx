@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(threading_headers
+  hpx/threading/jthread.hpp
   hpx/threading/thread.hpp)
 
 set(threading_compat_headers
@@ -28,12 +29,16 @@ add_hpx_module(threading
   COMPAT_HEADERS ${threading_compat_headers}
   DEPENDENCIES
     hpx_assertion
+    hpx_basic_execution
     hpx_config
     hpx_coroutines
     hpx_errors
     hpx_execution
     hpx_functional
+    hpx_memory
+    hpx_synchronization
     hpx_threading_base
+    hpx_thread_support
     hpx_timing
   CMAKE_SUBDIRS examples tests
 )
