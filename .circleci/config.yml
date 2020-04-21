@@ -500,32 +500,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.lcos
 
-  tests.unit.parallel_block:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.parallel_block
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.parallel_block
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parallel_block
-      - store_artifacts:
-          path: tests.unit.parallel_block
-
   tests.unit.parcelset:
     <<: *defaults
     steps:
@@ -603,34 +577,6 @@ jobs:
           path: tests.unit.threads
       - store_artifacts:
           path: tests.unit.threads
-
-  tests.unit.topology:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.topology
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure \
-                  -R tests.unit.topology \
-                  -E tests.unit.topology.numa_allocator
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.topology
-      - store_artifacts:
-          path: tests.unit.topology
 
   tests.unit.traits:
     <<: *defaults
@@ -742,7 +688,6 @@ jobs:
                   tests.unit.modules.threading_base \
                   tests.unit.modules.threadmanager \
                   tests.unit.modules.timing \
-                  tests.unit.modules.topology \
                   tests.unit.modules.type_support \
                   tests.unit.modules.util
       - run:
@@ -759,7 +704,8 @@ jobs:
               "tests.unit.modules.algorithms|\
               tests.unit.modules.compute_cuda|\
               tests.unit.modules.execution|\
-              tests.unit.modules.segmented_algorithms"
+              tests.unit.modules.segmented_algorithms|\
+              tests.unit.modules.compute.numa_allocator"
 
       - run:
           <<: *convert_xml
@@ -1082,15 +1028,11 @@ workflows:
           <<: *core_dependency
       - tests.unit.lcos:
           <<: *core_dependency
-      - tests.unit.parallel_block:
-          <<: *core_dependency
       - tests.unit.parcelset:
           <<: *core_dependency
       - tests.unit.resource:
           <<: *core_dependency
       - tests.unit.threads:
-          <<: *core_dependency
-      - tests.unit.topology:
           <<: *core_dependency
       - tests.unit.traits:
           <<: *core_dependency
@@ -1129,11 +1071,9 @@ workflows:
             - tests.unit.component
             - tests.unit.diagnostics
             - tests.unit.lcos
-            - tests.unit.parallel_block
             - tests.unit.parcelset
             - tests.unit.resource
             - tests.unit.threads
-            - tests.unit.topology
             - tests.unit.traits
             - tests.unit.util
             - tests.unit.modules
