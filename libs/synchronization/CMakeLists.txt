@@ -17,6 +17,7 @@ set(synchronization_headers
   hpx/synchronization/detail/counting_semaphore.hpp
   hpx/synchronization/detail/sliding_semaphore.hpp
   hpx/synchronization/event.hpp
+  hpx/synchronization/futex.hpp
   hpx/synchronization/channel_mpmc.hpp
   hpx/synchronization/channel_mpsc.hpp
   hpx/synchronization/channel_spsc.hpp
@@ -58,6 +59,7 @@ set(synchronization_compat_headers
 set(synchronization_sources
   detail/condition_variable.cpp
   force_linking.cpp
+  futex.cpp
   local_barrier.cpp
   mutex.cpp
   stop_token.cpp

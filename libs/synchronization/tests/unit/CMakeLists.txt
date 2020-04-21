@@ -13,6 +13,7 @@ set(tests
   channel_spsc_shift
   condition_variable
   counting_semaphore
+  futex
   local_latch
   local_barrier
   local_barrier_count_up
