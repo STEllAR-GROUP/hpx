@@ -134,7 +134,7 @@ Acknowledgements
 ================
 
 We would like to acknowledge the NSF, DoE, DTIC, DARPA, the Center for
-Computation and Technology (CCT) at Louisiana State University, The Swiss
+Computation and Technology (CCT) at Louisiana State University, the Swiss
 National Supercomputing Centre (CSCS), and the
 Department of Computer Science 3 - Computer Architecture at the University of
 Erlangen Nuremberg who fund and support our work.
