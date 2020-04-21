@@ -11,9 +11,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(execution_headers
   hpx/execution/algorithms/detail/is_negative.hpp
   hpx/execution/algorithms/detail/predicates.hpp
-  hpx/execution/apply.hpp
-  hpx/execution/async.hpp
-  hpx/execution/dataflow.hpp
   hpx/execution/datapar/execution_policy_fwd.hpp
   hpx/execution/datapar/execution_policy.hpp
   hpx/execution/detail/async_launch_policy_dispatch.hpp
@@ -45,7 +42,6 @@ set(execution_headers
   hpx/execution/executors/timed_execution.hpp
   hpx/execution/executors/timed_executors.hpp
   hpx/execution/force_linking.hpp
-  hpx/execution/sync.hpp
   hpx/execution/traits/detail/vc/vector_pack_alignment_size.hpp
   hpx/execution/traits/detail/vc/vector_pack_count_bits.hpp
   hpx/execution/traits/detail/vc/vector_pack_load_store.hpp

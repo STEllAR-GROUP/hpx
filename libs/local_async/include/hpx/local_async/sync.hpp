@@ -9,6 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/sync.hpp>
-#include <hpx/execution/sync.hpp>
+#include <hpx/executors/sync.hpp>
 
 #endif

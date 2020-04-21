@@ -13,6 +13,10 @@ set(executors_headers
   hpx/executors/current_executor.hpp
   hpx/executors/guided_pool_executor.hpp
   hpx/executors.hpp
+  hpx/executors/apply.hpp
+  hpx/executors/async.hpp
+  hpx/executors/dataflow.hpp
+  hpx/executors/sync.hpp
   hpx/executors/limiting_executor.hpp
   hpx/executors/parallel_executor_aggregated.hpp
   hpx/executors/parallel_executor.hpp
