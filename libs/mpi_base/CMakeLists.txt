@@ -10,10 +10,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_MPI_WITH_FUTURES)
   # setup MPI, if necessary
-  if(NOT TARGET Mpi::mpi)
-    include(HPX_SetupMPI)
-    setup_mpi()
-  endif()
+  include(HPX_SetupMPI)
+  setup_mpi()
   set(additional_dependencies Mpi::mpi)
 endif()
 

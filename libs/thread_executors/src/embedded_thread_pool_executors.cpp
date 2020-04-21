@@ -529,9 +529,7 @@ namespace hpx { namespace threads { namespace executors {
     }
 
     // this is only needed to force linking of the corresponding cpp file
-    void local_priority_queue_executor::dummy()
-    {
-    }
+    void local_priority_queue_executor::dummy() {}
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
