@@ -80,6 +80,9 @@ namespace hpx { namespace threads {
         thread_pool_base& get_pool(pool_id_type const& pool_id) const;
         thread_pool_base& get_pool(std::size_t thread_index) const;
 
+        bool pool_exists(std::string const& pool_name) const;
+        bool pool_exists(std::size_t pool_index) const;
+
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
         /// the task parameters (function, initial state and description) to

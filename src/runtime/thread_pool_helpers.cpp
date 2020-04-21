@@ -61,6 +61,17 @@ namespace hpx { namespace resource
     {
         return get_thread_pool(get_pool_name(pool_index));
     }
+
+    bool pool_exists(
+        std::string const& pool_name)
+    {
+        return get_runtime().get_thread_manager().pool_exists(pool_name);
+    }
+
+    bool pool_exists(std::size_t pool_index)
+    {
+        return get_runtime().get_thread_manager().pool_exists(pool_index);
+    }
 }}    // namespace hpx::resource
 
 namespace hpx { namespace threads {

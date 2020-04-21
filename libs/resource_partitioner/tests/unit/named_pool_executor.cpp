@@ -40,6 +40,14 @@ int hpx_main(int argc, char* argv[])
     HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_thread_pools());
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("default"));
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("pool-0"));
+    HPX_TEST(hpx::resource::pool_exists("default"));
+    HPX_TEST(hpx::resource::pool_exists("pool-0"));
+    HPX_TEST(!hpx::resource::pool_exists("nonexistent"));
+    for (int pool_index = 0; pool_index < max_threads; ++pool_index)
+    {
+        HPX_TEST(hpx::resource::pool_exists(pool_index));
+    }
+    HPX_TEST(!hpx::resource::pool_exists(max_threads));
 
     for (int i = 0; i < max_threads; ++i)
     {
@@ -47,6 +55,9 @@ int hpx_main(int argc, char* argv[])
         HPX_TEST_EQ(pool_name, hpx::resource::get_pool_name(i));
         HPX_TEST_EQ(std::size_t(1), hpx::resource::get_num_threads(i));
     }
+
+    // Make sure default construction works
+    hpx::parallel::execution::pool_executor exec_default;
 
     // setup executors for different task priorities on the pools
     // segfaults or exceptions in any of the following will cause
