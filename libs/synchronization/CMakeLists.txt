@@ -81,8 +81,10 @@ add_hpx_module(synchronization
     hpx_functional
     hpx_hashing
     hpx_logging
+    hpx_memory
     hpx_threading_base
     hpx_thread_support
+    hpx_topology
     hpx_timing
   CMAKE_SUBDIRS examples tests
 )

@@ -85,5 +85,6 @@ add_hpx_module(thread_executors
     hpx_threadmanager
     hpx_thread_pools
     hpx_thread_support
+    hpx_topology
   CMAKE_SUBDIRS examples tests
 )
