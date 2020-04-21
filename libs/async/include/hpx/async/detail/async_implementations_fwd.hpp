@@ -11,6 +11,7 @@
 #include <hpx/async/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/extract_action.hpp>
 
 namespace hpx { namespace detail {

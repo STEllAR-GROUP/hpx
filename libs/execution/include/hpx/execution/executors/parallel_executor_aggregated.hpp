@@ -12,6 +12,7 @@
 #define HPX_PARALLEL_EXECUTORS_PARALLEL_EXECUTOR_AGGREGATED_DEC_20_2018_0624PM
 
 #include <hpx/config.hpp>
+#include <hpx/assertion.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -113,9 +114,12 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename F, typename S, typename... Ts>
             void operator()(F&& f, S const& shape, Ts&&... ts) const
             {
+                threads::thread_pool_base* pool =
+                    threads::detail::get_self_or_default_pool();
+                HPX_ASSERT(pool);
                 // lazily initialize once
                 static std::size_t global_num_tasks =
-                    (std::min)(std::size_t(128), hpx::get_os_thread_count());
+                    (std::min)(std::size_t(128), pool->get_os_thread_count());
 
                 std::size_t num_tasks = (num_tasks_ == std::size_t(-1)) ?
                     global_num_tasks :
@@ -313,9 +317,12 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename F, typename S, typename... Ts>
             void operator()(F&& f, S const& shape, Ts&&... ts) const
             {
+                threads::thread_pool_base* pool =
+                    threads::detail::get_self_or_default_pool();
+                HPX_ASSERT(pool);
                 // lazily initialize once
                 static std::size_t global_num_tasks =
-                    (std::min)(std::size_t(128), hpx::get_os_thread_count());
+                    (std::min)(std::size_t(128), pool->get_os_thread_count());
 
                 std::size_t num_tasks = (num_tasks_ == std::size_t(-1)) ?
                     global_num_tasks :
