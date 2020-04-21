@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/execution/executors.hpp>
+#include <hpx/executors.hpp>
 #include <hpx/execution/executors/default_executor.hpp>
 #include <hpx/execution/executors/this_thread_executors.hpp>
 #include <hpx/execution/executors/thread_pool_executors.hpp>

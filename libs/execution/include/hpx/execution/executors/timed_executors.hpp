@@ -20,8 +20,8 @@
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/parallel_executor.hpp>
-#include <hpx/execution/executors/sequenced_executor.hpp>
+#include <hpx/executors/parallel_executor.hpp>
+#include <hpx/executors/sequenced_executor.hpp>
 
 #include <chrono>
 #include <functional>

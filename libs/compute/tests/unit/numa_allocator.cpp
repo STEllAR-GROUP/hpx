@@ -15,7 +15,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 //
-#include <hpx/execution/executors.hpp>
+#include <hpx/executors.hpp>
 #include <hpx/parallel/algorithms/for_loop.hpp>
 //
 #include <hpx/resource_partitioner/partitioner.hpp>

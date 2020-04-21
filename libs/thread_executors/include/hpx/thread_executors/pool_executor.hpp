@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/execution/executors/pool_executor.hpp>
+#include <hpx/executors/pool_executor.hpp>
 
 namespace hpx { namespace threads { namespace executors {
     using pool_executor = parallel::execution::pool_executor;

@@ -15,7 +15,7 @@
 #include <hpx/async/detail/async_implementations.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/parallel_executor.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/traits/is_action.hpp>

@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/apply.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/parallel_executor.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 

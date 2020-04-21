@@ -7,7 +7,7 @@
 #ifndef HPX_RUNTIME_THREADS_GUIDED_POOL_EXECUTOR
 #define HPX_RUNTIME_THREADS_GUIDED_POOL_EXECUTOR
 
-#include <hpx/execution/executors/guided_pool_executor.hpp>
+#include <hpx/executors/guided_pool_executor.hpp>
 
 namespace hpx { namespace threads { namespace executors {
     using hpx::parallel::execution::guided_pool_executor;

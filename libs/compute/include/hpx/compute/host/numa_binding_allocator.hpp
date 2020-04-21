@@ -11,8 +11,8 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/execution/execution_policy.hpp>
-#include <hpx/execution/executors/guided_pool_executor.hpp>
-#include <hpx/execution/executors/pool_executor.hpp>
+#include <hpx/executors/guided_pool_executor.hpp>
+#include <hpx/executors/pool_executor.hpp>
 #include <hpx/local_async/async.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>

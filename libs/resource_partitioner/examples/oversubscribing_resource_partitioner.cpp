@@ -10,7 +10,7 @@
 #include <hpx/execution/execution.hpp>
 #include <hpx/parallel/algorithms/for_loop.hpp>
 //
-#include <hpx/execution/executors/pool_executor.hpp>
+#include <hpx/executors/pool_executor.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 #include <hpx/topology/cpu_mask.hpp>

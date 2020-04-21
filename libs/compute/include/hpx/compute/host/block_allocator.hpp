@@ -18,7 +18,7 @@
 #include <hpx/compute/host/target.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/execution_policy.hpp>
-#include <hpx/execution/executors/restricted_thread_pool_executor.hpp>
+#include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/iterator_support/range.hpp>

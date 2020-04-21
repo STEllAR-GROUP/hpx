@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/timed_executors.hpp>
-#include <hpx/execution/executors/parallel_executor.hpp>
-#include <hpx/execution/executors/sequenced_executor.hpp>
+#include <hpx/executors/parallel_executor.hpp>
+#include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 
 #include <type_traits>

@@ -16,7 +16,7 @@
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/execution/dataflow.hpp>
-#include <hpx/execution/executors/pool_executor.hpp>
+#include <hpx/executors/pool_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>

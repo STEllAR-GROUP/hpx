@@ -7,7 +7,7 @@
 #if !defined(HPX_PARALLEL_EXECUTORS_MAY_11_2015_0622PM)
 #define HPX_PARALLEL_EXECUTORS_MAY_11_2015_0622PM
 
-#include <hpx/execution/executors.hpp>
+#include <hpx/executors.hpp>
 // Added here to avoid a circular dependency
 #include <hpx/parallel/executors/thread_timed_execution.hpp>
 #include <hpx/thread_executors/executors.hpp>

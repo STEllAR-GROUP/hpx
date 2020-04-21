@@ -8,7 +8,7 @@
     HPX_PARALLEL_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_AUG_28_2015_0511PM)
 #define HPX_PARALLEL_EXECUTORS_THREAD_POOL_ATTACHED_EXECUTORS_AUG_28_2015_0511PM
 
-#include <hpx/execution/executors/restricted_thread_pool_executor.hpp>
+#include <hpx/executors/restricted_thread_pool_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)

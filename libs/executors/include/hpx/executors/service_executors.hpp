@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/execution/executors/current_executor.hpp>
+#include <hpx/executors/current_executor.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>

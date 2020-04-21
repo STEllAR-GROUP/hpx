@@ -10,6 +10,22 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/executors/include
 set(executors_headers
+  hpx/executors/current_executor.hpp
+  hpx/executors/guided_pool_executor.hpp
+  hpx/executors.hpp
+  hpx/executors/limiting_executor.hpp
+  hpx/executors/parallel_executor_aggregated.hpp
+  hpx/executors/parallel_executor.hpp
+  hpx/executors/pool_executor.hpp
+  hpx/executors/restricted_thread_pool_executor.hpp
+  hpx/executors/sequenced_executor.hpp
+  hpx/executors/service_executors.hpp
+  hpx/executors/thread_pool_attached_executors.hpp
+  hpx/executors/timed_executors.hpp
+  )
+
+# Default location is $HPX_ROOT/libs/executors/include_compatibility
+set(executors_compat_headers
   hpx/execution/executors/current_executor.hpp
   hpx/execution/executors/guided_pool_executor.hpp
   hpx/execution/executors.hpp
@@ -21,11 +37,6 @@ set(executors_headers
   hpx/execution/executors/sequenced_executor.hpp
   hpx/execution/executors/service_executors.hpp
   hpx/execution/executors/thread_pool_attached_executors.hpp
-  hpx/executors/timed_executors.hpp
-  )
-
-# Default location is $HPX_ROOT/libs/executors/include_compatibility
-set(executors_compat_headers
   hpx/parallel/executors.hpp
   hpx/parallel/executors/parallel_executor_aggregated.hpp
   hpx/parallel/executors/parallel_executor.hpp
