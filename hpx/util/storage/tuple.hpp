@@ -10,7 +10,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/serializable_any.hpp>
+#include <hpx/serialization/serializable_any.hpp>
 
 #include <type_traits>
 #include <vector>

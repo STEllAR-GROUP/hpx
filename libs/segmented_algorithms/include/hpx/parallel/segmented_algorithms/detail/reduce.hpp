@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/zip_iterator.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

@@ -300,6 +300,11 @@ namespace hpx
         HPX_API_EXPORT topology const& get_topology();
         /// \endcond
     }
+
+    namespace detail {
+        HPX_EXPORT void on_exit() noexcept;
+        HPX_EXPORT void on_abort(int signal) noexcept;
+    }
 }
 
 #endif

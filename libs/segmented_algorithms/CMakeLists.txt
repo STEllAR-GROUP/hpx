@@ -24,16 +24,23 @@ set(segmented_algorithms_headers
   hpx/parallel/segmented_algorithms/inclusive_scan.hpp
   hpx/parallel/segmented_algorithms/minmax.hpp
   hpx/parallel/segmented_algorithms/reduce.hpp
+  hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp
   hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp
   hpx/parallel/segmented_algorithms/transform.hpp
   hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp
   hpx/parallel/segmented_algorithms/transform_reduce.hpp
 )
 
+set(segmented_algorithms_compat_headers
+  hpx/util/zip_iterator.hpp)
+
 include(HPX_AddModule)
 add_hpx_module(segmented_algorithms
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   HEADERS ${segmented_algorithms_headers}
+  COMPAT_HEADERS ${segmented_algorithms_compat_headers}
   DEPENDENCIES
     hpx_algorithms
     hpx_assertion

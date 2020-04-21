@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
@@ -29,3 +31,4 @@ namespace hpx { namespace util
     }
 }}
 
+#endif

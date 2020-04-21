@@ -30,9 +30,11 @@ set(serialization_headers
   hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
   hpx/serialization/detail/raw_ptr.hpp
   hpx/serialization/detail/serialize_collection.hpp
+  hpx/serialization/detail/vc.hpp
   hpx/serialization/array.hpp
   hpx/serialization/bitset.hpp
   hpx/serialization/complex.hpp
+  hpx/serialization/datapar.hpp
   hpx/serialization/deque.hpp
   hpx/serialization/dynamic_bitset.hpp
   hpx/serialization/list.hpp
@@ -62,6 +64,7 @@ set(serialization_headers
   hpx/serialization/input_container.hpp
   hpx/serialization/output_archive.hpp
   hpx/serialization/output_container.hpp
+  hpx/serialization/serializable_any.hpp
   hpx/serialization/serialization_chunk.hpp
   hpx/serialization/serialization_fwd.hpp
   hpx/serialization/serialize.hpp
@@ -88,10 +91,12 @@ set(serialization_compat_headers
   hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
   hpx/runtime/serialization/detail/raw_ptr.hpp
   hpx/runtime/serialization/detail/serialize_collection.hpp
+  hpx/runtime/serialization/detail/vc.hpp
   hpx/runtime/serialization/array.hpp
   hpx/runtime/serialization/bitset.hpp
   hpx/runtime/serialization/complex.hpp
   hpx/runtime/serialization/container.hpp
+  hpx/runtime/serialization/datapar.hpp
   hpx/runtime/serialization/deque.hpp
   hpx/runtime/serialization/dynamic_bitset.hpp
   hpx/runtime/serialization/list.hpp
@@ -127,6 +132,7 @@ set(serialization_compat_headers
   hpx/traits/needs_automatic_registration.hpp
   hpx/traits/polymorphic_traits.hpp
   hpx/traits/serialization_access_data.hpp
+  hpx/util/serializable_any.hpp
 )
 
 # Default location is $HPX_ROOT/libs/serialization/src
@@ -135,6 +141,7 @@ set(serialization_sources
   detail/polymorphic_id_factory.cpp
   detail/polymorphic_intrusive_factory.cpp
   detail/polymorphic_nonintrusive_factory.cpp
+  serializable_any.cpp
 )
 
 include(HPX_AddModule)
@@ -167,6 +174,10 @@ add_hpx_module(serialization
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
+
+if (TARGET Vc::vc)
+  target_link_libraries(hpx_serialization PUBLIC Vc::vc)
+endif()
 
 # Temporary needs hpx_util cause still depending on custom_exception_info which
 # is itself depending on hpx/naming_base.hpp

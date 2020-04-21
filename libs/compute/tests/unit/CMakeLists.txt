@@ -1,3 +1,4 @@
+# Copyright (c) 2019 John Biddiscombe
 # Copyright (c) 2016 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -7,6 +8,21 @@
 set(tests
     block_allocator
    )
+
+if(HPX_WITH_SHARED_PRIORITY_SCHEDULER)
+  set(tests ${tests}
+    numa_allocator
+  )
+endif()
+
+# NB. threads = -2 = threads = 'cores'
+# NB. threads = -1 = threads = 'all'
+set(numa_allocator_PARAMETERS
+  THREADS_PER_LOCALITY -2
+  ARGS --size=128 --nb=512 --tiles-per-domain=2 --col-proc=1 --row-proc=1)
+set(numa_allocator_FLAGS
+  DEPENDENCIES iostreams_component
+  DEPENDENCIES PRIVATE Hwloc::hwloc)
 
 foreach(test ${tests})
   set(sources

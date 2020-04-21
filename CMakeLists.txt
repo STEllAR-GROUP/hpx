@@ -1597,6 +1597,14 @@ if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 endif()
 
+# Compatibility for thread aware timer, introduced in V1.5.0
+hpx_option(HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY
+  BOOL "Enable deprecated thread_aware_timer (default: ON)"
+  ON ADVANCED)
+if(HPX_WITH_THREAD_AWARE_TIMER_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
+endif()
+
 ################################################################################
 # Find Our dependencies:
 #   These are all dependencies needed to build the core library. Dependencies

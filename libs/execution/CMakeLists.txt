@@ -145,7 +145,6 @@ add_hpx_module(execution
     hpx_errors
     hpx_functional
     hpx_iterator_support
-    hpx_local_lcos
     hpx_preprocessor
     hpx_synchronization
     hpx_thread_support

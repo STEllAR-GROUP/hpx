@@ -53,6 +53,7 @@ add_hpx_module(local_lcos
     hpx_allocator_support
     hpx_assertion
     hpx_errors
+    hpx_execution
     hpx_functional
     hpx_iterator_support
     hpx_memory
@@ -65,7 +66,6 @@ add_hpx_module(local_lcos
 
 # Temporary because of the dependency to main hpx/ includes
 target_link_libraries(hpx_local_lcos PUBLIC
-  hpx_execution
   hpx_plugin
   hpx_topology
   hpx_threadmanager

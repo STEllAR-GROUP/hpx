@@ -20,7 +20,6 @@
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/init_logging.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/sed_transform.hpp>

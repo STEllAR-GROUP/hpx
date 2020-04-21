@@ -16,8 +16,8 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
-#include <hpx/util/tagged_pair.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

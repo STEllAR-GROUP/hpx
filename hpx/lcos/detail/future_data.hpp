@@ -17,10 +17,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -659,11 +656,6 @@ namespace hpx { namespace lcos { namespace detail {
 
         ~future_data() noexcept override = default;
     };
-
-    // Specialization for shared state of id_type, additionally (optionally)
-    // holds a registered name for the object it refers to.
-    template <>
-    struct future_data<id_type>;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename Allocator>

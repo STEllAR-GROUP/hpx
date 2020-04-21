@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/util/tagged_pair.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/tagspec.hpp>

@@ -109,7 +109,9 @@ add_hpx_module(async
     hpx_execution
     hpx_functional
     hpx_local_async
+    hpx_local_lcos
     hpx_memory
+    hpx_runtime_configuration
     hpx_threading_base
     hpx_type_support
     hpx_util

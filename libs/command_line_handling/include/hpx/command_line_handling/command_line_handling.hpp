@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>

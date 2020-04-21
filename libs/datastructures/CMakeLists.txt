@@ -22,6 +22,9 @@ set(datastructures_headers
   hpx/datastructures/member_pack.hpp
   hpx/datastructures/optional.hpp
   hpx/datastructures/tuple.hpp
+  hpx/datastructures/tagged.hpp
+  hpx/datastructures/tagged_pair.hpp
+  hpx/datastructures/tagged_tuple.hpp
   hpx/datastructures/traits/supports_streaming_with_any.hpp
   hpx/datastructures/traits/is_tuple_like.hpp
   hpx/datastructures/variant_helper.hpp
@@ -34,6 +37,7 @@ set(datastructures_compat_headers
   hpx/util/detail/pack.hpp
   hpx/util/any.hpp
   hpx/util/optional.hpp
+  hpx/util/tagged.hpp
   hpx/util/tuple.hpp
 )
 

@@ -9,7 +9,6 @@
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY) &&                        \
     defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
 
-#include <hpx/runtime/threads/resource_manager.hpp>
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #endif
@@ -27,6 +26,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/thread_executors/manage_thread_executor.hpp>
+#include <hpx/thread_executors/resource_manager.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>

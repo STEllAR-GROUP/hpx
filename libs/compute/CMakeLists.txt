@@ -17,6 +17,8 @@ set(compute_headers
   hpx/compute/host/block_executor.hpp
   hpx/compute/host/get_targets.hpp
   hpx/compute/host.hpp
+  hpx/compute/host/numa_allocator.hpp
+  hpx/compute/host/numa_binding_allocator.hpp
   hpx/compute/host/numa_domains.hpp
   hpx/compute/host/target_distribution_policy.hpp
   hpx/compute/host/target.hpp
@@ -29,6 +31,8 @@ set(compute_headers
 )
 
 set(compute_compat_headers
+  hpx/parallel/util/numa_allocator.hpp
+  hpx/parallel/util/numa_binding_allocator.hpp
   hpx/util/functional/new.hpp
 )
 
@@ -66,6 +70,7 @@ add_hpx_module(compute
     hpx_threading
     hpx_threading_base
     hpx_threadmanager
+    hpx_topology
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

@@ -23,9 +23,9 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/thread_executors/manage_thread_executor.hpp>
+#include <hpx/thread_executors/resource_manager.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>

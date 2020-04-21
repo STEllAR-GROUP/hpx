@@ -11,7 +11,7 @@
 #define HPX_PARALLEL_CONTAINER_ALGORITHM_TAGSPEC_DEC_23_2015_1156AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/tagged.hpp>
+#include <hpx/datastructures/tagged.hpp>
 
 namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEFINE_TAG_SPECIFIER(in)       // defines tag::in
