@@ -45,8 +45,6 @@ add_hpx_module(local_lcos
   SOURCES ${local_lcos_sources}
   HEADERS ${local_lcos_headers}
   COMPAT_HEADERS ${local_lcos_compat_headers}
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/local_lcos/force_linking.hpp"
   DEPENDENCIES
     hpx_config
     hpx_basic_execution

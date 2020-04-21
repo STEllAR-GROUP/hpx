@@ -138,8 +138,6 @@ add_hpx_module(execution
   DEPRECATION_WARNINGS
   COMPATIBILITY_HEADERS ON    # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/execution/force_linking.hpp"
   DEPENDENCIES
     hpx_assertion
     hpx_async_base

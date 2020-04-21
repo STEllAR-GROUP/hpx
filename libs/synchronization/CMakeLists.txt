@@ -68,8 +68,6 @@ add_hpx_module(synchronization
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/synchronization/force_linking.hpp"
   SOURCES ${synchronization_sources}
   HEADERS ${synchronization_headers}
   COMPAT_HEADERS ${synchronization_compat_headers}
