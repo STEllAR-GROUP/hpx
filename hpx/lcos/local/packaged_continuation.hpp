@@ -20,7 +20,6 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -33,53 +32,8 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-// forward declare the type we will get function annotations from
 namespace hpx { namespace lcos { namespace detail
 {
-    template <typename Continuation>
-    struct continuation_finalization;
-}}}
-
-namespace hpx { namespace traits {
-    #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        ///////////////////////////////////////////////////////////////////////////
-        // traits specialization to get annotation from dataflow_finalization
-        template <typename Continuation>
-        struct get_function_annotation<lcos::detail::continuation_finalization
-            <Continuation>>
-        {
-            using function_type = typename Continuation::function_type;
-            static char const* call(
-                lcos::detail::continuation_finalization<Continuation> const& f) noexcept
-            {
-                char const* annotation = hpx::traits::get_function_annotation<
-                    typename hpx::util::decay<function_type>::type>::call(f.this_->f_);
-                return annotation;
-            }
-        };
-    #endif
-}}
-
-namespace hpx { namespace lcos { namespace detail
-{
-    template <typename Continuation>
-    struct continuation_finalization {
-        //
-        explicit continuation_finalization(Continuation* c)
-          : this_(c)
-        {
-        }
-        //
-        template <typename Future>
-        void operator()(Future&& f) const
-        {
-            return this_->async_exec_impl(std::forward<Future>(f));
-        }
-
-        // keep the dataflow frame alive with this pointer reference
-        hpx::intrusive_ptr<Continuation> this_;
-    };
-
     template <typename Source, typename Destination>
     HPX_FORCEINLINE void transfer_result_impl(std::false_type,
         Source&& src, Destination& dest)
@@ -226,12 +180,6 @@ namespace hpx { namespace lcos { namespace detail
 
         typedef typename base_type::mutex_type mutex_type;
         typedef typename base_type::result_type result_type;
-        typedef typename std::decay<F>::type function_type;
-        typedef continuation<Future, F, ContResult> continuation_type;
-
-        friend struct continuation_finalization<continuation_type>;
-        friend struct traits::get_function_annotation<continuation_finalization
-            <continuation_type>>;
 
     protected:
         threads::thread_id_type get_id() const
@@ -429,9 +377,8 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             hpx::intrusive_ptr<continuation> this_(this);
-            char const* annotation = hpx::traits::get_function_annotation<
-                function_type>::call(f_);
-            hpx::util::thread_description desc(f_, annotation);
+            hpx::util::thread_description desc(f_,
+                "hpx::parallel::execution::parallel_executor::post");
 
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
@@ -476,9 +423,8 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             hpx::intrusive_ptr<continuation> this_(this);
-            char const* annotation = hpx::traits::get_function_annotation<
-                function_type>::call(f_);
-            hpx::util::thread_description desc(f_, annotation);
+            hpx::util::thread_description desc(f_,
+                "hpx::parallel::execution::parallel_executor::post");
 
             parallel::execution::detail::post_policy_dispatch<
                     hpx::launch::async_policy
@@ -522,12 +468,13 @@ namespace hpx { namespace lcos { namespace detail
                 started_ = true;
             }
 
-            continuation_finalization<continuation_type> this_f_(this);
-
-            parallel::execution::post(
-                std::forward<Executor>(exec),
-                std::move(this_f_),
-                std::move(f));
+            hpx::intrusive_ptr<continuation> this_(this);
+            parallel::execution::post(std::forward<Executor>(exec),
+                [this_ = std::move(this_),
+                    f = std::move(f)
+                ]() mutable -> void {
+                    this_->async_exec_impl(std::move(f));
+                });
 
             if (&ec != &throws)
                 ec = make_success_code();
