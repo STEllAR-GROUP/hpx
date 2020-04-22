@@ -142,10 +142,14 @@ namespace hpx { namespace threads { namespace detail {
                         << "), new state(" << get_thread_state_name(new_state)
                         << ")";
 
+                    auto* scheduler =
+                        get_thread_id_data(thrd)->get_scheduler_base();
                     thread_init_data data(
                         util::bind(&set_active_state, thrd, new_state,
                             new_state_ex, priority, previous_state),
-                        "set state for active thread", priority);
+                        "set state for active thread", priority,
+                        thread_schedule_hint(),
+                        scheduler->get_stack_size(thread_stacksize_small));
 
                     create_work(get_thread_id_data(thrd)->get_scheduler_base(),
                         data, pending, ec);
@@ -348,7 +352,8 @@ namespace hpx { namespace threads { namespace detail {
         thread_init_data data(
             util::bind_front(&wake_timer_thread, thrd, newstate, newstate_ex,
                 priority, self_id, triggered, retry_on_active),
-            "wake_timer", priority);
+            "wake_timer", priority, thread_schedule_hint(),
+            scheduler.get_stack_size(thread_stacksize_small));
 
         thread_id_type wake_id = invalid_thread_id;
         create_thread(&scheduler, data, wake_id, suspended);
@@ -424,7 +429,8 @@ namespace hpx { namespace threads { namespace detail {
             util::bind(&at_timer<SchedulingPolicy>, std::ref(scheduler),
                 abs_time.value(), thrd, newstate, newstate_ex, priority,
                 started, retry_on_active),
-            "at_timer (expire at)", priority, schedulehint);
+            "at_timer (expire at)", priority, schedulehint,
+            scheduler.get_stack_size(thread_stacksize_small));
 
         thread_id_type newid = invalid_thread_id;
         create_thread(&scheduler, data, newid, pending, true, ec);    //-V601
