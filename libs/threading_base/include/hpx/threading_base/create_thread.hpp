@@ -20,11 +20,10 @@
 namespace hpx { namespace threads { namespace detail {
     inline void create_thread(policies::scheduler_base* scheduler,
         thread_init_data& data, threads::thread_id_type& id,
-        thread_state_enum initial_state = pending, bool run_now = true,
         error_code& ec = throws)
     {
         // verify parameters
-        switch (initial_state)
+        switch (data.initial_state)
         {
         // NOLINTNEXTLINE(bugprone-branch-clone)
         case pending:
@@ -40,7 +39,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             std::ostringstream strm;
             strm << "invalid initial state: "
-                 << get_thread_state_name(initial_state);
+                 << get_thread_state_name(data.initial_state);
             HPX_THROWS_IF(ec, bad_parameter, "threads::detail::create_thread",
                 strm.str());
             return;
@@ -90,12 +89,13 @@ namespace hpx { namespace threads { namespace detail {
             data.priority = thread_priority_normal;
 
         // create the new thread
-        scheduler->create_thread(data, &id, initial_state, run_now, ec);
+        scheduler->create_thread(
+            data, &id, data.initial_state, data.run_now, ec);
 
         // NOLINTNEXTLINE(bugprone-branch-clone)
         LTM_(info) << "register_thread(" << id << "): initial_state("
-                   << get_thread_state_name(initial_state) << "), "
-                   << "run_now(" << (run_now ? "true" : "false")
+                   << get_thread_state_name(data.initial_state) << "), "
+                   << "run_now(" << (data.run_now ? "true" : "false")
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                    << "), description(" << data.description
 #endif

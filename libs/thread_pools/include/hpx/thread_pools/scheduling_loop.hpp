@@ -441,7 +441,8 @@ namespace hpx { namespace threads { namespace detail {
             },
             hpx::util::thread_description("background_work"),
             thread_priority_high_recursive, schedulehint,
-            scheduler.get_stack_size(thread_stacksize_large), &scheduler);
+            scheduler.get_stack_size(thread_stacksize_large), pending, false,
+            &scheduler);
 
         // Create in suspended to prevent the thread from being scheduled
         // directly...

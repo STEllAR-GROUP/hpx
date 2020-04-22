@@ -233,10 +233,9 @@ namespace hpx { namespace threads {
 
         virtual std::size_t get_active_os_thread_count() const;
 
-        virtual void create_thread(thread_init_data& data, thread_id_type& id,
-            thread_state_enum initial_state, bool run_now, error_code& ec) = 0;
-        virtual void create_work(thread_init_data& data,
-            thread_state_enum initial_state, error_code& ec) = 0;
+        virtual void create_thread(
+            thread_init_data& data, thread_id_type& id, error_code& ec) = 0;
+        virtual void create_work(thread_init_data& data, error_code& ec) = 0;
 
         virtual thread_state set_state(thread_id_type const& id,
             thread_state_enum new_state, thread_state_ex_enum new_state_ex,

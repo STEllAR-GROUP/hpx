@@ -98,15 +98,7 @@ namespace hpx { namespace threads {
         ///               information is used for logging purposes mainly, but
         ///               might be useful for debugging as well. This parameter
         ///               is optional and defaults to an empty string.
-        /// \param initial_state
-        ///               [in] The value of this parameter defines the initial
-        ///               state of the newly created \a thread. This must be
-        ///               one of the values as defined by the \a thread_state
-        ///               enumeration (thread_state#pending, or \a
-        ///               thread_state#suspended, any other value will throw a
-        ///               hpx#bad_parameter exception).
-        void register_work(thread_init_data& data,
-            thread_state_enum initial_state = pending, error_code& ec = throws);
+        void register_work(thread_init_data& data, error_code& ec = throws);
 
         /// The function \a register_thread adds a new work item to the thread
         /// manager. It creates a new \a thread, adds it to the internal
@@ -124,23 +116,7 @@ namespace hpx { namespace threads {
         ///               information is used for logging purposes mainly, but
         ///               might be useful for debugging as well. This parameter
         ///               is optional and defaults to an empty string.
-        /// \param initial_state
-        ///               [in] The value of this parameter defines the initial
-        ///               state of the newly created \a thread. This must be
-        ///               one of the values as defined by the \a thread_state
-        ///               enumeration (thread_state#pending, or \a
-        ///               thread_state#suspended, any other value will throw a
-        ///               hpx#bad_parameter exception).
-        /// \param run_now [in] If this parameter is \a true and the initial
-        ///               state is given as \a thread_state#pending the thread
-        ///               will be run immediately, otherwise it will be
-        ///               scheduled to run later (either this function is
-        ///               called for another thread using \a true for the
-        ///               parameter \a run_now or the function \a
-        ///               threadmanager#do_some_work is called). This parameter
-        ///               is optional and defaults to \a true.
         void register_thread(thread_init_data& data, thread_id_type& id,
-            thread_state_enum initial_state = pending, bool run_now = true,
             error_code& ec = throws);
 
         /// \brief  Run the thread manager's work queue. This function

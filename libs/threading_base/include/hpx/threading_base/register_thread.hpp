@@ -112,7 +112,9 @@ namespace hpx { namespace threads {
     {
         HPX_ASSERT(pool);
         threads::thread_id_type id = threads::invalid_thread_id;
-        pool->create_thread(data, id, initial_state, run_now, ec);
+        data.initial_state = initial_state;
+        data.run_now = run_now;
+        pool->create_thread(data, id, ec);
         return id;
     }
 
@@ -416,7 +418,8 @@ namespace hpx { namespace threads {
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
-        pool->create_work(data, initial_state, ec);
+        data.initial_state = initial_state;
+        pool->create_work(data, ec);
     }
 
     inline void register_non_suspendable_work_plain(

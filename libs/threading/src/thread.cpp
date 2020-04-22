@@ -169,14 +169,14 @@ namespace hpx {
         threads::thread_init_data data(
             util::one_shot(
                 util::bind(&thread::thread_function_nullary, std::move(func))),
-            "thread::thread_function_nullary", threads::thread_priority_normal,
-            threads::thread_schedule_hint(),
-            scheduler->get_stack_size(threads::thread_stacksize_default));
+            "thread::thread_function_nullary");
+        data.initial_state = threads::pending;
+        data.run_now = true;
 
         // create the new thread, note that id_ is guaranteed to be valid
         // before the thread function is executed
         error_code ec(lightweight);
-        pool->create_thread(data, id_, threads::pending, true, ec);
+        pool->create_thread(data, id_, ec);
         if (ec)
         {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",

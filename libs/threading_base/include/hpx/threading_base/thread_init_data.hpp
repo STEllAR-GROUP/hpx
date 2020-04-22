@@ -45,6 +45,8 @@ namespace hpx { namespace threads {
           , priority(thread_priority_normal)
           , schedulehint()
           , stacksize(HPX_SMALL_STACK_SIZE)
+          , initial_state(pending)
+          , run_now(false)
           , scheduler_base(nullptr)
         {
         }
@@ -55,6 +57,8 @@ namespace hpx { namespace threads {
             priority = rhs.priority;
             schedulehint = rhs.schedulehint;
             stacksize = rhs.stacksize;
+            initial_state = rhs.initial_state;
+            run_now = rhs.run_now;
             scheduler_base = rhs.scheduler_base;
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             description = rhs.description;
@@ -91,6 +95,8 @@ namespace hpx { namespace threads {
           , priority(rhs.priority)
           , schedulehint(rhs.schedulehint)
           , stacksize(rhs.stacksize)
+          , initial_state(rhs.initial_state)
+          , run_now(rhs.run_now)
           , scheduler_base(rhs.scheduler_base)
         {
             if (stacksize == 0)
@@ -102,6 +108,7 @@ namespace hpx { namespace threads {
             thread_priority priority_ = thread_priority_normal,
             thread_schedule_hint os_thread = thread_schedule_hint(),
             std::ptrdiff_t stacksize_ = HPX_SMALL_STACK_SIZE,
+            thread_state_enum initial_state_ = pending, bool run_now_ = false,
             policies::scheduler_base* scheduler_base_ = nullptr)
           : func(std::forward<F>(f))
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -121,6 +128,8 @@ namespace hpx { namespace threads {
           , priority(priority_)
           , schedulehint(os_thread)
           , stacksize(stacksize_)
+          , initial_state(initial_state_)
+          , run_now(run_now_)
           , scheduler_base(scheduler_base_)
         {
             if (stacksize == 0)
@@ -146,6 +155,8 @@ namespace hpx { namespace threads {
         thread_priority priority;
         thread_schedule_hint schedulehint;
         std::ptrdiff_t stacksize;
+        thread_state_enum initial_state;
+        bool run_now;
 
         policies::scheduler_base* scheduler_base;
     };
