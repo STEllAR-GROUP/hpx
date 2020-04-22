@@ -26,7 +26,6 @@ jobs:
               -H. \
               -Bbuild \
               -GNinja \
-              -DHPX_MPI_WITH_FUTURES=Off \
               -DCMAKE_BUILD_TYPE=Debug \
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON
