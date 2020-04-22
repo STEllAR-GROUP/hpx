@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             if (cores == 1)
             {
-                return 1;
+                return num_tasks;
             }
 
             // Make sure the internal round robin counter of the executor is
