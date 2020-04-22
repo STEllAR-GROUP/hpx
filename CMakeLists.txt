@@ -792,8 +792,7 @@ if(HPX_WITH_NETWORKING)
 
   # we have to decide here whether we want to have MPI futures
   hpx_option(HPX_MPI_WITH_FUTURES BOOL
-    "Enable support for returning futures from MPI asynchronous calls"
-    " (default: ON if networking+MPI already enabled)"
+    "Enable support for returning futures from MPI asynchronous calls (default: ON if networking+MPI already enabled)"
     ${HPX_WITH_PARCELPORT_MPI} CATEGORY "MPI")
 
   hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
@@ -812,8 +811,7 @@ else(HPX_WITH_NETWORKING)
   # if networking is off,  then allow the option of using our asynchronous MPI
   # features
   hpx_option(HPX_MPI_WITH_FUTURES BOOL
-    "Enable support for returning futures from MPI asynchronous calls"
-    " (default: ON if networking+MPI already enabled)"
+    "Enable support for returning futures from MPI asynchronous calls (default: ON if networking+MPI already enabled)"
     OFF CATEGORY "MPI")
 endif(HPX_WITH_NETWORKING)
 
