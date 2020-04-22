@@ -28,6 +28,7 @@ set(tests
     multiple_init
     multiple_init_2918
     options_as_config_3339
+    stack_size_config_4543
     unhandled_exception_582
    )
 
