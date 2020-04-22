@@ -23,7 +23,7 @@
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    class memory
+    class HPX_EXPORT memory
     {
     public:
         typedef memory type_holder;
