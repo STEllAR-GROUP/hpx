@@ -124,8 +124,7 @@ namespace hpx { namespace threads {
         bool run_now = true, error_code& ec = throws)
     {
         HPX_ASSERT(pool);
-        data.stacksize = pool->get_scheduler()->get_stack_size(
-            threads::thread_stacksize_nostack);
+        data.stacksize = threads::thread_stacksize_nostack;
         return register_thread_plain(pool, data, initial_state, run_now, ec);
     }
 
@@ -146,8 +145,8 @@ namespace hpx { namespace threads {
             util::thread_description(func, "register_thread_plain");
 
         HPX_ASSERT(pool);
-        threads::thread_init_data data(std::move(func), d, priority,
-            schedulehint, pool->get_scheduler()->get_stack_size(stacksize));
+        threads::thread_init_data data(
+            std::move(func), d, priority, schedulehint, stacksize);
 
         return register_thread_plain(pool, data, initial_state, run_now, ec);
     }
@@ -428,8 +427,7 @@ namespace hpx { namespace threads {
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
-        data.stacksize = pool->get_scheduler()->get_stack_size(
-            threads::thread_stacksize_nostack);
+        data.stacksize = threads::thread_stacksize_nostack;
         register_work_plain(pool, data, initial_state, ec);
     }
 
@@ -449,8 +447,8 @@ namespace hpx { namespace threads {
             util::thread_description(func, "register_work_plain");
 
         HPX_ASSERT(pool);
-        threads::thread_init_data data(std::move(func), d, priority,
-            schedulehint, pool->get_scheduler()->get_stack_size(stacksize));
+        threads::thread_init_data data(
+            std::move(func), d, priority, schedulehint, stacksize);
 
         register_work_plain(pool, data, initial_state, ec);
     }

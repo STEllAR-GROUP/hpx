@@ -134,8 +134,7 @@ namespace hpx { namespace threads { namespace policies {
 
         static util::internal_allocator<threads::thread_data> thread_alloc_;
 
-        typedef util::tuple<thread_init_data, thread_state_enum>
-            task_description;
+        typedef util::tuple<thread_init_data> task_description;
 
         // -------------------------------------
         // thread map stores every task in this queue set
@@ -414,12 +413,11 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         void create_thread(thread_init_data& data, thread_id_type* tid,
-            thread_state_enum state, bool run_now, std::size_t thread_num,
-            error_code& ec)
+            std::size_t thread_num, error_code& ec)
         {
             if (thread_num != thread_num_)
             {
-                run_now = false;
+                data.run_now = false;
             }
 
             // create the thread using priority to select queue
@@ -427,15 +425,15 @@ namespace hpx { namespace threads { namespace policies {
             {
                 tq_deb.debug(debug::str<>("create_thread "),
                     queue_data_print(this), "thread_priority_normal",
-                    "run_now ", run_now);
-                return np_queue_->create_thread(data, tid, state, run_now, ec);
+                    "run_now ", data.run_now);
+                return np_queue_->create_thread(data, tid, ec);
             }
             else if (bp_queue_ && (data.priority == thread_priority_bound))
             {
                 tq_deb.debug(debug::str<>("create_thread "),
                     queue_data_print(this), "thread_priority_bound", "run_now ",
-                    run_now);
-                return bp_queue_->create_thread(data, tid, state, run_now, ec);
+                    data.run_now);
+                return bp_queue_->create_thread(data, tid, ec);
             }
             else if (hp_queue_ &&
                 (data.priority == thread_priority_high ||
@@ -449,15 +447,15 @@ namespace hpx { namespace threads { namespace policies {
                 }
                 tq_deb.debug(debug::str<>("create_thread "),
                     queue_data_print(this), "thread_priority_high", "run_now ",
-                    run_now);
-                return hp_queue_->create_thread(data, tid, state, run_now, ec);
+                    data.run_now);
+                return hp_queue_->create_thread(data, tid, ec);
             }
             else if (lp_queue_ && (data.priority == thread_priority_low))
             {
                 tq_deb.debug(debug::str<>("create_thread "),
                     queue_data_print(this), "thread_priority_low", "run_now ",
-                    run_now);
-                return lp_queue_->create_thread(data, tid, state, run_now, ec);
+                    data.run_now);
+                return lp_queue_->create_thread(data, tid, ec);
             }
 
             tq_deb.error(debug::str<>("create_thread "), "priority?");
@@ -472,12 +470,13 @@ namespace hpx { namespace threads { namespace policies {
         // If a thread data object is available on one of the heaps
         // it will use that, otherwise a new one is created.
         // Heaps store data ordered/sorted by stack size
-        void create_thread_object(threads::thread_id_type& tid,
-            threads::thread_init_data& data, thread_state_enum state)
+        void create_thread_object(
+            threads::thread_id_type& tid, threads::thread_init_data& data)
         {
             HPX_ASSERT(data.stacksize != 0);
 
-            std::ptrdiff_t stacksize = data.stacksize;
+            std::ptrdiff_t const stacksize =
+                data.scheduler_base->get_stack_size(data.stacksize);
 
             thread_heap_type* heap = nullptr;
             if (stacksize == get_stack_size(thread_stacksize_small))
@@ -502,9 +501,10 @@ namespace hpx { namespace threads { namespace policies {
             }
             HPX_ASSERT(heap);
 
-            if (state == pending_do_not_schedule || state == pending_boost)
+            if (data.initial_state == pending_do_not_schedule ||
+                data.initial_state == pending_boost)
             {
-                state = pending;
+                data.initial_state = pending;
             }
 
             // Check for an unused thread object.
@@ -513,7 +513,7 @@ namespace hpx { namespace threads { namespace policies {
                 // Take ownership of the thread object and rebind it.
                 tid = heap->front();
                 heap->pop_front();
-                get_thread_id_data(tid)->rebind(data, state);
+                get_thread_id_data(tid)->rebind(data);
                 tq_deb.debug(debug::str<>("create_thread_object"), "rebind",
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_id_type*>(&tid));
@@ -525,12 +525,12 @@ namespace hpx { namespace threads { namespace policies {
                 if (stacksize == get_stack_size(thread_stacksize_nostack))
                 {
                     p = threads::thread_data_stackless::create(
-                        data, this, state);
+                        data, this, stacksize);
                 }
                 else
                 {
                     p = threads::thread_data_stackful::create(
-                        data, this, state);
+                        data, this, stacksize);
                 }
                 tid = thread_id_type(p);
                 tq_deb.debug(debug::str<>("create_thread_object"), "new",

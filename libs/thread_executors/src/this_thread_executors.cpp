@@ -155,8 +155,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                 util::bind(&this_thread_executor::thread_function_nullary, this,
                     std::move(f))),
             desc);
-        data.stacksize =
-            this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
+        data.stacksize = stacksize;
         data.initial_state = initial_state;
         data.run_now = run_now;
 
@@ -200,8 +199,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                 util::bind(&this_thread_executor::thread_function_nullary, this,
                     std::move(f))),
             desc);
-        data.stacksize =
-            this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
+        data.stacksize = stacksize;
         data.initial_state = suspended;
         data.run_now = true;
 

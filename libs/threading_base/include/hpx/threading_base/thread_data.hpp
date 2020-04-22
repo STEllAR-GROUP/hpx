@@ -548,8 +548,7 @@ namespace hpx { namespace threads {
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 
-        virtual void rebind(
-            thread_init_data& init_data, thread_state_enum newstate) = 0;
+        virtual void rebind(thread_init_data& init_data) = 0;
 
 #if defined(HPX_HAVE_APEX)
         std::shared_ptr<util::external_timer::task_wrapper> get_timer_data()
@@ -566,14 +565,13 @@ namespace hpx { namespace threads {
 
         // Construct a new \a thread
         thread_data(thread_init_data& init_data, void* queue,
-            thread_state_enum newstate, bool is_stackless = false);
+            std::ptrdiff_t stacksize, bool is_stackless = false);
 
         virtual ~thread_data();
         virtual void destroy() = 0;
 
     protected:
-        void rebind_base(
-            thread_init_data& init_data, thread_state_enum newstate);
+        void rebind_base(thread_init_data& init_data);
 
     private:
         mutable std::atomic<thread_state> current_state_;

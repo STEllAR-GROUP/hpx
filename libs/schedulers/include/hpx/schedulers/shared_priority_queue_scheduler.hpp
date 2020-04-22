@@ -306,7 +306,6 @@ namespace hpx { namespace threads { namespace policies {
                 // create a new thread and schedule it if the initial state
                 // is equal to pending
                 void create_thread(thread_init_data& data, thread_id_type* thrd,
-                    thread_state_enum initial_state, bool run_now,
                     error_code& ec) override
                 {
                     // safety check that task was created by this thread/scheduler
@@ -437,7 +436,7 @@ namespace hpx { namespace threads { namespace policies {
                     // as this causes cross-thread allocations and map accesses
                     if (local_num != thread_num)
                     {
-                        run_now = false;
+                        data.run_now = false;
                         // clang-format off
                         spq_deb.debug(debug::str<>("create_thread")
                             , "pool", parent_pool_->get_pool_name()
@@ -448,7 +447,7 @@ namespace hpx { namespace threads { namespace policies {
                             , "this"
                             , "D", debug::dec<2>(d_lookup_[local_num])
                             , "Q", debug::dec<3>(local_num)
-                            , "run_now OVERRIDE ", run_now
+                            , "run_now OVERRIDE ", data.run_now
                             , debug::threadinfo<thread_init_data>(data));
                         // clang-format on
                     }
@@ -464,14 +463,13 @@ namespace hpx { namespace threads { namespace policies {
                             , "this"
                             , "D", debug::dec<2>(d_lookup_[local_num])
                             , "Q", debug::dec<3>(local_num)
-                            , "run_now", run_now
+                            , "run_now", data.run_now
                             , debug::threadinfo<thread_init_data>(data));
                         // clang-format on
                     }
                     numa_holder_[domain_num]
                         .thread_queue(static_cast<std::size_t>(q_index))
-                        ->create_thread(
-                            data, thrd, initial_state, run_now, local_num, ec);
+                        ->create_thread(data, thrd, local_num, ec);
                 }
 
                 template <typename T>

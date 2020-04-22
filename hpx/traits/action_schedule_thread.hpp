@@ -25,40 +25,37 @@ namespace hpx { namespace traits
             // by default we return an empty value
             template <typename Action>
             static void
-            call(wrap_int, naming::address_type,
-                    naming::component_type,
-                    threads::thread_init_data& data,
-                    threads::thread_state_enum initial_state)
+            call(wrap_int, naming::address::address_type,
+                    naming::address::component_type,
+                    threads::thread_init_data& data)
             {
-                hpx::threads::register_work_plain(data, initial_state); //-V106
+                hpx::threads::register_work(data); //-V106
             }
 
             // forward the call if the component implements the function
             template <typename Action>
             static auto
-            call(int, naming::address_type lva,
-                    naming::component_type comptype,
-                    threads::thread_init_data& data,
-                    threads::thread_state_enum initial_state)
+            call(int, naming::address::address_type lva,
+                    naming::address::component_type comptype,
+                    threads::thread_init_data& data)
             ->  decltype(
                     Action::component_type::schedule_thread(
-                        lva, comptype, data, initial_state)
+                        lva, comptype, data)
                 )
             {
                 // by default we forward this to the component type
                 typedef typename Action::component_type component_type;
-                component_type::schedule_thread(lva, comptype, data, initial_state);
+                component_type::schedule_thread(lva, comptype, data);
             }
         };
 
         template <typename Action>
-        void call_schedule_thread(naming::address_type lva,
-            naming::component_type comptype,
-            threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
+        void call_schedule_thread(naming::address::address_type lva,
+            naming::address::component_type comptype,
+            threads::thread_init_data& data)
         {
             schedule_thread_helper::template call<Action>(
-                0, lva, comptype, data, initial_state);
+                0, lva, comptype, data);
         }
     }
 
@@ -67,13 +64,12 @@ namespace hpx { namespace traits
     {
         // returns whether target was migrated to another locality
         static void
-        call(naming::address_type lva,
-            naming::component_type comptype,
-            threads::thread_init_data& data,
-            threads::thread_state_enum initial_state)
+        call(naming::address::address_type lva,
+            naming::address::component_type comptype,
+            threads::thread_init_data& data)
         {
             return detail::call_schedule_thread<Action>(
-                lva, comptype, data, initial_state);
+                lva, comptype, data);
         }
     };
 }}

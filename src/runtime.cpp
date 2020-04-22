@@ -1342,7 +1342,7 @@ namespace hpx {
                                            func, std::ref(result_), true),
             "run_helper", threads::thread_priority_normal,
             threads::thread_schedule_hint(0),
-            threads::get_stack_size(threads::thread_stacksize_large));
+            threads::thread_stacksize_large);
 
         this->runtime::starting();
         threads::thread_id_type id = threads::invalid_thread_id;

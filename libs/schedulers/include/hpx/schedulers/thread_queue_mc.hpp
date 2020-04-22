@@ -77,8 +77,8 @@ namespace hpx { namespace threads { namespace policies {
         using thread_heap_type =
             std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
 
-        typedef util::tuple<thread_init_data, thread_state_enum>
-            task_description;
+        // TODO: This doesn't need to be a tuple anymore?
+        typedef util::tuple<thread_init_data> task_description;
 
         typedef thread_data thread_description;
 
@@ -115,10 +115,9 @@ namespace hpx { namespace threads { namespace policies {
             {
                 // create the new thread
                 threads::thread_init_data& data = util::get<0>(task);
-                thread_state_enum state = util::get<1>(task);
                 threads::thread_id_type tid;
 
-                holder_->create_thread_object(tid, data, state);
+                holder_->create_thread_object(tid, data);
                 holder_->add_to_thread_map(tid);
                 // Decrement only after thread_map_count_ has been incremented
                 --addfrom->new_tasks_count_.data_;
@@ -127,7 +126,7 @@ namespace hpx { namespace threads { namespace policies {
                     debug::threadinfo<threads::thread_id_type*>(&tid));
 
                 // insert the thread into work-items queue if in pending state
-                if (state == pending)
+                if (data.initial_state == pending)
                 {
                     // pushing the new thread into the pending queue of the
                     // specified thread_queue
@@ -198,21 +197,21 @@ namespace hpx { namespace threads { namespace policies {
 
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now, error_code& ec)
+        void create_thread(
+            thread_init_data& data, thread_id_type* id, error_code& ec)
         {
             // thread has not been created yet
             if (id)
                 *id = invalid_thread_id;
 
-            if (run_now)
+            if (data.run_now)
             {
                 threads::thread_id_type tid;
-                holder_->create_thread_object(tid, data, initial_state);
+                holder_->create_thread_object(tid, data);
                 holder_->add_to_thread_map(tid);
 
                 // push the new thread in the pending queue thread
-                if (initial_state == pending)
+                if (data.initial_state == pending)
                     schedule_work(get_thread_id_data(tid), false);
 
                 // return the thread_id of the newly created thread
@@ -228,8 +227,7 @@ namespace hpx { namespace threads { namespace policies {
             // later thread creation
             ++new_tasks_count_.data_;
 
-            new_task_items_.push(
-                task_description(std::move(data), initial_state));
+            new_task_items_.push(task_description(std::move(data)));
 
             if (&ec != &throws)
                 ec = make_success_code();

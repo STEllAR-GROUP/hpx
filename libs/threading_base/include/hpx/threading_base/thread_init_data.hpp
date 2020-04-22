@@ -44,7 +44,7 @@ namespace hpx { namespace threads {
 #endif
           , priority(thread_priority_normal)
           , schedulehint()
-          , stacksize(HPX_SMALL_STACK_SIZE)
+          , stacksize(thread_stacksize_default)
           , initial_state(pending)
           , run_now(false)
           , scheduler_base(nullptr)
@@ -99,15 +99,13 @@ namespace hpx { namespace threads {
           , run_now(rhs.run_now)
           , scheduler_base(rhs.scheduler_base)
         {
-            if (stacksize == 0)
-                stacksize = HPX_SMALL_STACK_SIZE;
         }
 
         template <typename F>
         thread_init_data(F&& f, util::thread_description const& desc,
             thread_priority priority_ = thread_priority_normal,
             thread_schedule_hint os_thread = thread_schedule_hint(),
-            std::ptrdiff_t stacksize_ = HPX_SMALL_STACK_SIZE,
+            thread_stacksize stacksize_ = thread_stacksize_default,
             thread_state_enum initial_state_ = pending, bool run_now_ = false,
             policies::scheduler_base* scheduler_base_ = nullptr)
           : func(std::forward<F>(f))
@@ -132,8 +130,6 @@ namespace hpx { namespace threads {
           , run_now(run_now_)
           , scheduler_base(scheduler_base_)
         {
-            if (stacksize == 0)
-                stacksize = HPX_SMALL_STACK_SIZE;
         }
 
         threads::thread_function_type func;
@@ -154,7 +150,7 @@ namespace hpx { namespace threads {
 
         thread_priority priority;
         thread_schedule_hint schedulehint;
-        std::ptrdiff_t stacksize;
+        thread_stacksize stacksize;
         thread_state_enum initial_state;
         bool run_now;
 

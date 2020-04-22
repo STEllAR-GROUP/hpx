@@ -89,8 +89,7 @@ namespace hpx { namespace threads { namespace detail {
             data.priority = thread_priority_normal;
 
         // create the new thread
-        scheduler->create_thread(
-            data, &id, data.initial_state, data.run_now, ec);
+        scheduler->create_thread(data, &id, ec);
 
         // NOLINTNEXTLINE(bugprone-branch-clone)
         LTM_(info) << "register_thread(" << id << "): initial_state("

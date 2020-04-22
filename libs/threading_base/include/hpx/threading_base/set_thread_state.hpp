@@ -145,8 +145,6 @@ namespace hpx { namespace threads { namespace detail {
                         << "), new state(" << get_thread_state_name(new_state)
                         << ")";
 
-                    auto* scheduler =
-                        get_thread_id_data(thrd)->get_scheduler_base();
                     thread_init_data data(
                         util::bind(&set_active_state, thrd, new_state,
                             new_state_ex, priority, previous_state),

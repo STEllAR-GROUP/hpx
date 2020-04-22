@@ -507,9 +507,8 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now,
-            error_code& ec) override
+        void create_thread(
+            thread_init_data& data, thread_id_type* id, error_code& ec) override
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread =
@@ -543,21 +542,18 @@ namespace hpx { namespace threads { namespace policies {
                 }
                 std::size_t num = num_thread % num_high_priority_queues_;
 
-                high_priority_queues_[num].data_->create_thread(
-                    data, id, initial_state, run_now, ec);
+                high_priority_queues_[num].data_->create_thread(data, id, ec);
                 return;
             }
 
             if (data.priority == thread_priority_low)
             {
-                low_priority_queue_.create_thread(
-                    data, id, initial_state, run_now, ec);
+                low_priority_queue_.create_thread(data, id, ec);
                 return;
             }
 
             HPX_ASSERT(num_thread < num_queues_);
-            queues_[num_thread].data_->create_thread(
-                data, id, initial_state, run_now, ec);
+            queues_[num_thread].data_->create_thread(data, id, ec);
         }
 
         /// Return the next thread to be executed, return false if none is
