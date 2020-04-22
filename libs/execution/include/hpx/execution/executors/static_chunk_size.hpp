@@ -56,6 +56,10 @@ namespace hpx { namespace parallel { namespace execution {
         std::size_t get_chunk_size(
             Executor& exec, F&&, std::size_t cores, std::size_t num_tasks)
         {
+            // Make sure the internal round robin counter of the executor is
+            // reset
+            execution::reset_thread_distribution(*this, exec);
+
             // use the given chunk size if given
             if (chunk_size_ != 0)
             {
@@ -66,10 +70,6 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 return num_tasks;
             }
-
-            // Make sure the internal round robin counter of the executor is
-            // reset
-            execution::reset_thread_distribution(*this, exec);
 
             // Return a chunk size that is a power of two; and that leads to at
             // least 2 chunks per core, and at most 4 chunks per core.
