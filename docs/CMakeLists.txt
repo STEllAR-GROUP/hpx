@@ -13,7 +13,6 @@ set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/hpx/hpx_start.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_finalize.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/hpx_suspend.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/parallel/task_block.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/basename_registration_fwd.hpp"
     "${PROJECT_SOURCE_DIR}/hpx/runtime/find_here.hpp"

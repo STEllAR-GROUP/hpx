@@ -57,6 +57,7 @@ add_hpx_module(datastructures
   DEPENDENCIES
     hpx_assertion
     hpx_config
+    hpx_concepts
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
