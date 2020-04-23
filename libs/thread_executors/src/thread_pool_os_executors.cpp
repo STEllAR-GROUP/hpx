@@ -178,10 +178,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(
                 util::bind(&thread_pool_os_executor::thread_function_nullary,
                     std::move(f))),
-            desc);
-        data.stacksize = stacksize;
-        data.initial_state = initial_state;
-        data.run_now = run_now;
+            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            initial_state, run_now);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         pool_->create_thread(data, id, ec);
@@ -208,10 +206,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(
                 util::bind(&thread_pool_os_executor::thread_function_nullary,
                     std::move(f))),
-            desc);
-        data.stacksize = stacksize;
-        data.initial_state = suspended;
-        data.run_now = true;
+            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         pool_->create_thread(data, id, ec);

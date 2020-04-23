@@ -134,7 +134,7 @@ namespace hpx { namespace threads { namespace policies {
 
         static util::internal_allocator<threads::thread_data> thread_alloc_;
 
-        typedef util::tuple<thread_init_data> task_description;
+        using task_description = thread_init_data;
 
         // -------------------------------------
         // thread map stores every task in this queue set

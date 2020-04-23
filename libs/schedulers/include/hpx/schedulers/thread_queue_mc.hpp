@@ -77,10 +77,8 @@ namespace hpx { namespace threads { namespace policies {
         using thread_heap_type =
             std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
 
-        // TODO: This doesn't need to be a tuple anymore?
-        typedef util::tuple<thread_init_data> task_description;
-
-        typedef thread_data thread_description;
+        using task_description = thread_init_data;
+        using thread_description = thread_data;
 
         typedef
             typename PendingQueuing::template apply<thread_description*>::type
@@ -114,7 +112,7 @@ namespace hpx { namespace threads { namespace policies {
             while (add_count-- && addfrom->new_task_items_.pop(task, stealing))
             {
                 // create the new thread
-                threads::thread_init_data& data = util::get<0>(task);
+                threads::thread_init_data& data = task;
                 threads::thread_id_type tid;
 
                 holder_->create_thread_object(tid, data);

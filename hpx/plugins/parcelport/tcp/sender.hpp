@@ -198,8 +198,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             {
                 // the handler needs to be reset on an HPX thread (it destroys
                 // the parcel, which in turn might invoke HPX functions)
-                threads::register_thread_nullary(util::deferred_call(
-                    &sender::reset_handler, std::move(handler)));
+                threads::thread_init_data data(
+                    threads::make_thread_function_nullary(util::deferred_call(
+                        &sender::reset_handler, std::move(handler))), "sender::reset_handler");
+                threads::register_thread_plain(data);
             }
             else
             {

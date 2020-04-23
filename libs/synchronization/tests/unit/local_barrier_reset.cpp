@@ -79,8 +79,11 @@ int hpx_main(variables_map& vm)
         {
             //call count_up to increase number of threads waiting when create a new thread
             b.count_up();
-            register_work(
-                hpx::util::bind(&local_barrier_test, std::ref(b), std::ref(c)));
+            thread_init_data data(
+                make_thread_function_nullary(hpx::util::bind(
+                    &local_barrier_test, std::ref(b), std::ref(c))),
+                "local_barrier_test");
+            register_work(data);
         }
 
         b.wait();    // wait for all threads to enter the barrier
@@ -92,8 +95,11 @@ int hpx_main(variables_map& vm)
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             // create the threads which will wait on the barrier
-            register_work(
-                hpx::util::bind(&local_barrier_test, std::ref(b), std::ref(c)));
+            thread_init_data data(
+                make_thread_function_nullary(hpx::util::bind(
+                    &local_barrier_test, std::ref(b), std::ref(c))),
+                "local_barrier_test");
+            register_work(data);
         }
 
         b.wait();    // wait for all threads to enter the barrier
@@ -109,8 +115,11 @@ int hpx_main(variables_map& vm)
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             // create the threads which will wait on the barrier
-            register_work(
-                hpx::util::bind(&local_barrier_test, std::ref(b), std::ref(c)));
+            thread_init_data data(
+                make_thread_function_nullary(hpx::util::bind(
+                    &local_barrier_test, std::ref(b), std::ref(c))),
+                "local_barrier_test");
+            register_work(data);
         }
 
         b.wait();    // wait for all threads to enter the barrier

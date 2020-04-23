@@ -117,22 +117,26 @@ namespace hpx { namespace lcos { namespace local {
 
                 if (policy == launch::fork)
                 {
-                    return threads::register_thread_nullary(pool,
-                        util::deferred_call(
-                            &base_type::run_impl, std::move(this_)),
+                    threads::thread_init_data data(
+                        threads::make_thread_function_nullary(
+                            util::deferred_call(
+                                &base_type::run_impl, std::move(this_))),
                         util::thread_description(f_, annotation),
-                        threads::pending_do_not_schedule, true,
                         threads::thread_priority_boost,
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(get_worker_thread_num())),
-                        stacksize, ec);
+                        stacksize, threads::pending_do_not_schedule, true);
+
+                    return threads::register_thread_plain(pool, data, ec);
                 }
 
-                threads::register_thread_nullary(pool,
-                    util::deferred_call(&base_type::run_impl, std::move(this_)),
-                    util::thread_description(f_, annotation),
-                    threads::pending, false, priority, schedulehint, stacksize,
-                    ec);
+                threads::thread_init_data data(
+                    threads::make_thread_function_nullary(util::deferred_call(
+                        &base_type::run_impl, std::move(this_))),
+                    util::thread_description(f_, annotation), priority,
+                    schedulehint, stacksize, threads::pending, false);
+
+                threads::register_thread_plain(pool, data, ec);
                 return threads::invalid_thread_id;
             }
         };

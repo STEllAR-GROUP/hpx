@@ -149,7 +149,6 @@ namespace hpx { namespace threads { namespace detail {
                         util::bind(&set_active_state, thrd, new_state,
                             new_state_ex, priority, previous_state),
                         "set state for active thread", priority);
-                    data.initial_state = pending;
 
                     create_work(get_thread_id_data(thrd)->get_scheduler_base(),
                         data, ec);
@@ -357,8 +356,8 @@ namespace hpx { namespace threads { namespace detail {
         thread_init_data data(
             util::bind_front(&wake_timer_thread, thrd, newstate, newstate_ex,
                 priority, self_id, triggered, retry_on_active),
-            "wake_timer", priority);
-        data.initial_state = suspended;
+            "wake_timer", priority, thread_schedule_hint(),
+            thread_stacksize_small, suspended, true);
 
         thread_id_type wake_id = invalid_thread_id;
         create_thread(&scheduler, data, wake_id);
@@ -434,9 +433,8 @@ namespace hpx { namespace threads { namespace detail {
             util::bind(&at_timer<SchedulingPolicy>, std::ref(scheduler),
                 abs_time.value(), thrd, newstate, newstate_ex, priority,
                 started, retry_on_active),
-            "at_timer (expire at)", priority, schedulehint);
-        data.initial_state = pending;
-        data.run_now = true;
+            "at_timer (expire at)", priority, schedulehint,
+            thread_stacksize_small, pending, true);
 
         thread_id_type newid = invalid_thread_id;
         create_thread(&scheduler, data, newid, ec);    //-V601

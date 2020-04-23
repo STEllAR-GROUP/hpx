@@ -319,16 +319,16 @@ namespace hpx { namespace parcelset
             if (operations_in_flight_ != 0)
             {
                 error_code ec(lightweight);
-                hpx::threads::register_thread_nullary(
-                    util::deferred_call(
+                hpx::threads::thread_init_data data(
+                    hpx::threads::make_thread_function_nullary(util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache,
-                        this, loc),
-                    "remove_from_connection_cache_delayed",
-                    threads::pending, true, threads::thread_priority_normal,
+                        this, loc)),
+                    "remove_from_connection_cache_delayed", threads::thread_priority_normal,
                     threads::thread_schedule_hint(
                         static_cast<std::int16_t>(get_next_num_thread())),
                     threads::thread_stacksize_default,
-                    ec);
+                    threads::pending, true);
+                hpx::threads::register_thread_plain(data, ec);
                 if (!ec) return;
             }
 
@@ -338,17 +338,17 @@ namespace hpx { namespace parcelset
         void remove_from_connection_cache(locality const& loc) override
         {
             error_code ec(lightweight);
-            threads::thread_id_type id =
-                hpx::threads::register_thread_nullary(
-                    util::deferred_call(
+            hpx::threads::thread_init_data data(
+                    hpx::threads::make_thread_function_nullary(util::deferred_call(
                         &parcelport_impl::remove_from_connection_cache_delayed,
-                        this, loc),
-                    "remove_from_connection_cache",
-                    threads::suspended, true, threads::thread_priority_normal,
+                        this, loc)),
+                    "remove_from_connection_cache", threads::thread_priority_normal,
                     threads::thread_schedule_hint(
                         static_cast<std::int16_t>(get_next_num_thread())),
                     threads::thread_stacksize_default,
-                    ec);
+                    threads::suspended, true);
+            threads::thread_id_type id =
+                hpx::threads::register_thread_plain( data, ec);
             if (ec) return;
 
             threads::set_thread_state(id, std::chrono::milliseconds(100),

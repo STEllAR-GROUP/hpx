@@ -25,7 +25,7 @@ using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 
-using hpx::threads::register_thread_nullary;
+using hpx::threads::register_thread;
 
 using hpx::async;
 using hpx::lcos::future;
@@ -184,8 +184,10 @@ int hpx_main(variables_map& vm)
     {
         id_type const prefix = find_here();
 
-        thread_id_type thread = register_thread_nullary(
-            hpx::util::deferred_call(&test_dummy_thread, futures));
+        hpx::threads::thread_init_data data(hpx::threads::make_thread_function_nullary(
+            hpx::util::deferred_call(&test_dummy_thread, futures)),
+            "test_dummy_thread");
+        thread_id_type thread = register_thread(data);
 
         tree_boot(futures, grain_size, prefix,
             reinterpret_cast<std::uint64_t>(thread.get()));

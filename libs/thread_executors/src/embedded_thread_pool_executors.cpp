@@ -178,10 +178,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(util::bind(
                 &embedded_thread_pool_executor::thread_function_nullary, this,
                 std::move(f))),
-            desc);
-        data.stacksize = stacksize;
-        data.initial_state = initial_state;
-        data.run_now = run_now;
+            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            initial_state, run_now);
 
         // update statistics
         ++tasks_scheduled_;
@@ -212,10 +210,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(util::bind(
                 &embedded_thread_pool_executor::thread_function_nullary, this,
                 std::move(f))),
-            desc);
-        data.stacksize = stacksize;
-        data.initial_state = suspended;
-        data.run_now = true;
+            desc, thread_priority_default, thread_schedule_hint(),
+            thread_stacksize_default, suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(    //-V601
@@ -451,14 +447,16 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         if (state.compare_exchange_strong(expected, state_starting))
         {
             ++curr_punits_;
-            register_thread_nullary(
-                util::deferred_call(&embedded_thread_pool_executor::run, this,
-                    virt_core, thread_num),
-                "embedded_thread_pool_executor thread", threads::pending, true,
+            thread_init_data data(
+                make_thread_function_nullary(
+                    util::deferred_call(&embedded_thread_pool_executor::run,
+                        this, virt_core, thread_num)),
+                "embedded_thread_pool_executor thread",
                 threads::thread_priority_normal,
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(thread_num)),
-                threads::thread_stacksize_default, ec);
+                threads::thread_stacksize_default, threads::pending, true);
+            register_thread_plain(data, ec);
         }
     }
 
