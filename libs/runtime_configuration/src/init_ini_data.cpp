@@ -143,8 +143,8 @@ namespace hpx { namespace util {
         }
 #endif
 
-        result = handle_ini_file_env(ini, "HOME", "/.hpx.ini") || result;
-        result = handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
+        result = handle_ini_file_env(ini, "HOME", ".hpx.ini") || result;
+        result = handle_ini_file_env(ini, "PWD", ".hpx.ini") || result;
 
         if (!hpx_ini_file.empty())
         {
