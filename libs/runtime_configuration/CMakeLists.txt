@@ -12,6 +12,7 @@ set(runtime_configuration_headers
   hpx/runtime_configuration/agas_service_mode.hpp
   hpx/runtime_configuration/component_registry_base.hpp
   hpx/runtime_configuration/ini.hpp
+  hpx/runtime_configuration/init_ini_data.hpp
   hpx/runtime_configuration/plugin_registry_base.hpp
   hpx/runtime_configuration/runtime_configuration.hpp
   hpx/runtime_configuration/runtime_mode.hpp
@@ -20,6 +21,7 @@ set(runtime_configuration_headers
 
 set(runtime_configuration_compat_headers
   hpx/util/ini.hpp
+  hpx/util/init_ini_data.hpp
   hpx/util/runtime_configuration.hpp
   hpx/plugins/plugin_registry_base.hpp
   hpx/runtime/components/component_registry_base.hpp
@@ -49,7 +51,9 @@ add_hpx_module(runtime_configuration
     hpx_config
     hpx_coroutines
     hpx_errors
+    hpx_filesystem
     hpx_functional
+    hpx_logging
     hpx_plugin
     hpx_prefix
     hpx_serialization

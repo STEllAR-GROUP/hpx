@@ -49,13 +49,11 @@ add_hpx_module(collectives
     SOURCES ${collectives_sources}
     HEADERS ${collectives_headers}
     COMPAT_HEADERS ${collectives_compat_headers}
-    EXCLUDE_FROM_GLOBAL_HEADER
-      hpx/collectives/detail/barrier_node.hpp
-      hpx/collectives/detail/latch.hpp
     DEPENDENCIES
       hpx_affinity
       hpx_allocator_support
       hpx_assertion
+      hpx_async
       hpx_cache
       hpx_concurrency
       hpx_config

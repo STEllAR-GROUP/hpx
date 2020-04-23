@@ -49,8 +49,6 @@ add_hpx_module(mpi
   GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_sources}
   HEADERS ${mpi_headers}
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/mpi/force_linking.hpp"
   DEPENDENCIES
     hpx_assertion
     hpx_basic_execution

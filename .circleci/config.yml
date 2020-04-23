@@ -117,6 +117,27 @@ jobs:
           path: /tmp/circular_deps.svg
           destination: /hpx/artifacts/circular_deps.svg
 
+  # Check if the files of the module are listed in the CMakeLists.txt
+  # Check if all the module dependencies are listed
+  check_module_cmakelists:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check if the headers of the modules are listed in their CMakeLists.txt
+          command: |
+              /hpx/source/tools/check_module_cmakelists.sh
+              if [[ $(wc -l /tmp/missing_files.txt | awk '{print $1}') -gt 1 ]] \
+                  || [[ $(wc -l /tmp/missing_deps.txt | awk '{print $1}') -gt 1 ]]; \
+                  then exit 1; fi
+      - store_artifacts:
+          path: /tmp/missing_files.txt
+          destination: /hpx/artifacts/missing_files.txt
+      - store_artifacts:
+          path: /tmp/missing_deps.txt
+          destination: /hpx/artifacts/missing_deps.txt
+
   # Ensure that the modules stay clang-formatted
   clang_format:
     <<: *defaults
@@ -978,6 +999,10 @@ workflows:
       - checkout_code:
           <<: *gh_pages_filter
       - check_circular_deps:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
+      - check_module_cmakelists:
           requires:
             - checkout_code
           <<: *gh_pages_filter

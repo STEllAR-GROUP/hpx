@@ -35,6 +35,7 @@ add_hpx_module(static_reinit
   COMPAT_HEADERS ${static_reinit_compat_headers}
   DEPENDENCIES
     hpx_config
+    hpx_assertion
     hpx_concurrency
     hpx_functional
     hpx_type_support

@@ -20,7 +20,7 @@ set(plugin_headers
   hpx/plugin/plugin_wrapper.hpp
   hpx/plugin/virtual_constructor.hpp
   hpx/plugin/detail/dll_dlopen.hpp
-  hpx/plugin/detail/dll_dlopen.hpp
+  hpx/plugin/detail/dll_windows.hpp
   hpx/plugin/traits/plugin_config_data.hpp
 )
 

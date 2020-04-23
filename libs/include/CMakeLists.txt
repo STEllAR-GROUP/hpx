@@ -101,6 +101,11 @@ add_hpx_module(include
   HEADERS ${include_headers}
   DEPENDENCIES
     hpx_algorithms
+    hpx_assertion
+    hpx_async
+    hpx_config
+    hpx_errors
+    hpx_format
     hpx_local_lcos
     hpx_naming_base
     hpx_pack_traversal
@@ -108,7 +113,9 @@ add_hpx_module(include
     hpx_resource_partitioner
     hpx_segmented_algorithms
     hpx_serialization
+    hpx_synchronization
     hpx_thread_executors
+    hpx_thread_pools
     hpx_threadmanager
     hpx_threading
     hpx_util

@@ -68,16 +68,13 @@ add_hpx_module(coroutines
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/threading/coroutines/detail/context_linux_x86.hpp"
-    "hpx/threading/coroutines/detail/context_posix.hpp"
-    "hpx/threading/coroutines/detail/context_windows_fibers.hpp"
   SOURCES ${coroutines_sources}
   HEADERS ${coroutines_headers}
   COMPAT_HEADERS ${coroutines_compat_headers}
   DEPENDENCIES
     hpx_assertion
     hpx_config
+    hpx_errors
     hpx_format
     hpx_functional
     hpx_util

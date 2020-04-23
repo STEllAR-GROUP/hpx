@@ -29,6 +29,9 @@ add_hpx_module(checkpoint
   SOURCES ${checkpoint_sources}
   HEADERS ${checkpoint_headers}
   COMPAT_HEADERS ${checkpoint_compat_headers}
-  DEPENDENCIES hpx_serialization
+  DEPENDENCIES
+    hpx_config
+    hpx_format
+    hpx_serialization
   CMAKE_SUBDIRS examples tests
 )

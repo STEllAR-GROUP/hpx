@@ -26,6 +26,9 @@ if(HPX_WITH_CUDA)
     hpx/compute/cuda/traits/access_target.hpp
     hpx/compute/cuda/transfer.hpp
     hpx/compute/cuda/value_proxy.hpp
+    hpx/compute/detail/get_proxy_type.hpp
+    hpx/compute/detail/iterator.hpp
+    hpx/compute/detail/target_distribution_policy.hpp
   )
 
   set(compute_cuda_compat_headers)
@@ -46,6 +49,7 @@ add_hpx_module(compute_cuda
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
+    hpx_async
     hpx_compute
     hpx_config
     hpx_errors
@@ -54,6 +58,7 @@ add_hpx_module(compute_cuda
     hpx_hardware
     hpx_plugin
     hpx_program_options
+    hpx_timing
     hpx_topology
     hpx_type_support
     hpx_serialization

@@ -153,15 +153,6 @@ add_hpx_module(serialization
   SOURCES ${serialization_sources}
   HEADERS ${serialization_headers}
   COMPAT_HEADERS ${serialization_compat_headers}
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/serialization/detail/non_default_constructible.hpp"
-    "hpx/serialization/detail/pointer.hpp"
-    "hpx/serialization/detail/polymorphic_id_factory.hpp"
-    "hpx/serialization/detail/polymorphic_intrusive_factory.hpp"
-    "hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp"
-    "hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp"
-    "hpx/serialization/detail/raw_ptr.hpp"
-    "hpx/serialization/detail/serialize_collection.hpp"
   DEPENDENCIES
     hpx_assertion
     hpx_config

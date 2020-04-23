@@ -17,6 +17,7 @@ set(thread_executors_headers
   hpx/thread_executors/current_executor.hpp
   hpx/thread_executors/default_executor.hpp
   hpx/thread_executors/embedded_thread_pool_executors.hpp
+  hpx/thread_executors/executors.hpp
   hpx/thread_executors/guided_pool_executor.hpp
   hpx/thread_executors/limiting_executor.hpp
   hpx/thread_executors/manage_thread_executor.hpp
@@ -69,6 +70,7 @@ add_hpx_module(thread_executors
   COMPAT_HEADERS ${thread_executors_compat_headers}
   DEPENDENCIES
     hpx_config
+    hpx_assertion
     hpx_affinity
     hpx_coroutines
     hpx_datastructures
@@ -83,5 +85,6 @@ add_hpx_module(thread_executors
     hpx_threadmanager
     hpx_thread_pools
     hpx_thread_support
+    hpx_topology
   CMAKE_SUBDIRS examples tests
 )

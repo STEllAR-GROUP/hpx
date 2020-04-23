@@ -41,8 +41,11 @@ add_hpx_module(command_line_handling
     hpx_concurrency
     hpx_config
     hpx_datastructures
+    hpx_debugging
     hpx_errors
     hpx_execution
+    hpx_filesystem
+    hpx_format
     hpx_memory
     hpx_prefix
     hpx_program_options

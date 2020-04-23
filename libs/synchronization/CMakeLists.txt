@@ -68,11 +68,6 @@ add_hpx_module(synchronization
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/synchronization/detail/condition_variable.hpp"
-    "hpx/synchronization/detail/counting_semaphore.hpp"
-    "hpx/synchronization/detail/sliding_semaphore.hpp"
-    "hpx/synchronization/force_linking.hpp"
   SOURCES ${synchronization_sources}
   HEADERS ${synchronization_headers}
   COMPAT_HEADERS ${synchronization_compat_headers}
@@ -86,8 +81,10 @@ add_hpx_module(synchronization
     hpx_functional
     hpx_hashing
     hpx_logging
+    hpx_memory
     hpx_threading_base
     hpx_thread_support
+    hpx_topology
     hpx_timing
   CMAKE_SUBDIRS examples tests
 )
