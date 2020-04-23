@@ -140,7 +140,7 @@ You could have an output like this:
         }
 
     private:
-        // recomputes the write steps - note taht this takes place after
+        // recomputes the write steps - note that this takes place after
         // each operation for instance, the user might have first set the
         // string and later added the formatters
         void compute_write_steps();
@@ -209,7 +209,7 @@ As an extra feature:
 
 This is useful if you want to set this format string in a config file.
 The good thing is that this way you can easily turn on/off
-certain destinations, while seing all the available destinations as well.
+certain destinations, while seeing all the available destinations as well.
 
 Example: \n <tt>+out_file -debug_window +console</tt> \n
 In the above example, I know that the available destinations are @c out_file,
@@ -256,7 +256,7 @@ In the above example, I know that the available destinations are @c out_file,
         }
 
     private:
-        // recomputes the write steps - note taht this takes place after
+        // recomputes the write steps - note that this takes place after
         // each operation for instance, the user might have first set the
         // string and later added the formatters
         void compute_write_steps();
