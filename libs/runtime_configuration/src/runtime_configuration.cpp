@@ -179,6 +179,7 @@ namespace hpx { namespace util {
 #else
             "attach_debugger = ${HPX_ATTACH_DEBUGGER}",
 #endif
+            "exception_verbosity = ${HPX_EXCEPTION_VERBOSITY:2}",
 
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
