@@ -608,6 +608,10 @@ namespace hpx
         // stop runtime_impl services (threads)
         thread_manager_->stop(false);    // just initiate shutdown
 
+#ifdef HPX_HAVE_APEX
+        util::external_timer::finalize();
+#endif
+
         if (threads::get_self_ptr())
         {
             // schedule task on separate thread to execute stopped() below
@@ -652,9 +656,6 @@ namespace hpx
         io_pool_.stop();                    // stops io_pool_ as well
 #endif
 //         deinit_tss();
-#ifdef HPX_HAVE_APEX
-        util::external_timer::finalize();
-#endif
     }
 
     // Second step in termination: shut down all services.
