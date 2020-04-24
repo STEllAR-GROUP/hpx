@@ -32,11 +32,14 @@ void blocker(
     // reschedule if we are not on the correct OS thread...
     if (worker != hpx::get_worker_thread_num())
     {
-        hpx::threads::register_work(
-            hpx::util::bind(&blocker, entered, started, blocked_threads, worker),
-            "blocker", hpx::threads::pending,
+        hpx::threads::thread_init_data data(
+            hpx::threads::make_thread_function_nullary(
+                hpx::util::bind(
+                    &blocker, entered, started, blocked_threads, worker)),
+            "blocker",
             hpx::threads::thread_priority_normal,
             hpx::threads::thread_schedule_hint(worker));
+        hpx::threads::register_work(data);
         return;
     }
 
@@ -77,11 +80,14 @@ int hpx_main()
             if (i == hpx::get_worker_thread_num())
                 continue;
 
-            hpx::threads::register_work(
-                hpx::util::bind(&blocker, &entered, &started, &blocked_threads, i),
-                "blocker", hpx::threads::pending,
+            hpx::threads::thread_init_data data(
+                hpx::threads::make_thread_function_nullary(
+                    hpx::util::bind(
+                        &blocker, &entered, &started, &blocked_threads, i)),
+                "blocker",
                 hpx::threads::thread_priority_normal,
                 hpx::threads::thread_schedule_hint(i));
+            hpx::threads::register_work(data);
             ++scheduled;
         }
         HPX_TEST_EQ(scheduled, os_thread_count - 1);

@@ -31,7 +31,9 @@ using hpx::init;
 using hpx::finalize;
 using hpx::get_os_thread_count;
 
-using hpx::applier::register_work;
+using hpx::threads::register_work;
+using hpx::threads::thread_init_data;
+using hpx::threads::make_thread_function_nullary;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -206,7 +208,13 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Queue the tasks in a serial loop.
         for (std::uint64_t i = 0; i < tasks; ++i)
-            register_work(hpx::util::bind(&worker_timed, payloads[i] * 1000));
+        {
+            thread_init_data data(
+                make_thread_function_nullary(
+                    hpx::util::bind(&worker_timed, payloads[i] * 1000)),
+                "worker_timed");
+            register_work(data);
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Wait for the work to finish.

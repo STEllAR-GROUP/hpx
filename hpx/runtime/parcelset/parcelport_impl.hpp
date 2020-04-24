@@ -320,15 +320,16 @@ namespace hpx { namespace parcelset
             {
                 error_code ec(lightweight);
                 hpx::threads::thread_init_data data(
-                    hpx::threads::make_thread_function_nullary(util::deferred_call(
-                        &parcelport_impl::remove_from_connection_cache,
-                        this, loc)),
-                    "remove_from_connection_cache_delayed", threads::thread_priority_normal,
+                    hpx::threads::make_thread_function_nullary(
+                        util::deferred_call(
+                            &parcelport_impl::remove_from_connection_cache,
+                            this, loc)),
+                    "remove_from_connection_cache_delayed",
+                    threads::thread_priority_normal,
                     threads::thread_schedule_hint(
                         static_cast<std::int16_t>(get_next_num_thread())),
-                    threads::thread_stacksize_default,
-                    threads::pending, true);
-                hpx::threads::register_thread_plain(data, ec);
+                    threads::thread_stacksize_default, threads::pending, true);
+                hpx::threads::register_thread(data, ec);
                 if (!ec) return;
             }
 
@@ -348,7 +349,7 @@ namespace hpx { namespace parcelset
                     threads::thread_stacksize_default,
                     threads::suspended, true);
             threads::thread_id_type id =
-                hpx::threads::register_thread_plain( data, ec);
+                hpx::threads::register_thread(data, ec);
             if (ec) return;
 
             threads::set_thread_state(id, std::chrono::milliseconds(100),

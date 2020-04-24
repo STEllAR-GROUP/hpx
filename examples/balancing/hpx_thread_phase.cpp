@@ -33,6 +33,8 @@ using hpx::lcos::local::barrier;
 using hpx::lcos::local::mutex;
 
 using hpx::threads::register_thread;
+using hpx::threads::thread_init_data;
+using hpx::threads::make_thread_function_nullary;
 
 using hpx::threads::get_thread_phase;
 using hpx::threads::get_self_id;
@@ -122,13 +124,15 @@ int hpx_main(variables_map& vm)
             // Compute the mutex to be used for this thread.
             const std::size_t index = j % mutex_count;
 
-            register_thread(hpx::util::bind
+            thread_init_data data(make_thread_function_nullary(
+                hpx::util::bind
                 (&lock_and_wait, std::ref(m[index])
                                , std::ref(b0)
                                , std::ref(b1)
                                , std::ref(hpxthreads[j])
-                               , wait)
+                               , wait))
               , "lock_and_wait");
+            register_thread(data);
         }
 
         // Tell all hpxthreads that they can start running.

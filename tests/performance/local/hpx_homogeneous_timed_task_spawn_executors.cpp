@@ -27,8 +27,6 @@ using hpx::init;
 using hpx::finalize;
 using hpx::get_os_thread_count;
 
-using hpx::applier::register_work;
-
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
 

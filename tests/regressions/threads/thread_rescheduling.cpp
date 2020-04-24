@@ -24,7 +24,7 @@ using std::chrono::milliseconds;
 
 using hpx::naming::id_type;
 
-using hpx::threads::register_thread_nullary;
+using hpx::threads::register_thread;
 
 using hpx::lcos::future;
 using hpx::async;
@@ -158,8 +158,11 @@ int hpx_main(variables_map& vm)
     std::uint64_t const grain_size = vm["grain-size"].as<std::uint64_t>();
 
     {
-        thread_id_type thread_id = register_thread_nullary(
-            hpx::util::deferred_call(&test_dummy_thread, futures));
+        hpx::threads::thread_init_data data(
+            hpx::threads::make_thread_function_nullary(
+                hpx::util::deferred_call(&test_dummy_thread, futures)),
+            "test_dummy_thread");
+        thread_id_type thread_id = register_thread(data);
         HPX_TEST_NEQ(thread_id, hpx::threads::invalid_thread_id);
 
         // Flood the queues with suspension operations before the rescheduling

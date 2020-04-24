@@ -292,7 +292,7 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize_default,
                 threads::suspended, true);
-            id = hpx::threads::register_thread_plain(data, ec);
+            id = hpx::threads::register_thread(data, ec);
         }
 
         if (ec) {

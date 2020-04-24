@@ -163,7 +163,7 @@ namespace hpx { namespace util
                 hpx::threads::make_thread_function_nullary(util::bind_front(
                     &one_size_heap_list::free, this, p, count)),
                 "one_size_heap_list::free");
-                hpx::threads::register_work_plain(data);
+                hpx::threads::register_work(data);
             return true;
         }
         return false;

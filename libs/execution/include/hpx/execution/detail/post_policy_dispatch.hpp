@@ -36,7 +36,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
                 desc, priority, hint, stacksize, threads::pending, false);
-            threads::register_thread_plain(pool, data);
+            threads::register_work(data, pool);
         }
 
         template <typename F, typename... Ts>
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
                 desc, priority, hint, stacksize, threads::pending, false);
-            threads::register_thread_plain(data);
+            threads::register_work(data);
         }
 
         template <typename F, typename... Ts>
@@ -62,7 +62,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     std::forward<F>(f), std::forward<Ts>(ts)...)),
                 desc, policy.priority(), threads::thread_schedule_hint(),
                 threads::thread_stacksize_default, threads::pending, false);
-            threads::register_thread_plain(data);
+            threads::register_work(data);
         }
     };
 

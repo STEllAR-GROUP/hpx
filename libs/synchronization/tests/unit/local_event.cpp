@@ -21,8 +21,6 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::applier::register_work;
-
 using hpx::threads::get_thread_count;
 
 using hpx::this_thread::suspend;

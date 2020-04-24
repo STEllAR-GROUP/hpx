@@ -468,7 +468,7 @@ namespace hpx { namespace parcelset
                     threads::thread_schedule_hint(),
                     threads::thread_stacksize_medium,
                     threads::pending, true);
-                threads::register_thread_plain(data);
+                threads::register_thread(data);
                 return;
             }
         }
@@ -567,7 +567,7 @@ namespace hpx { namespace parcelset
                     threads::thread_schedule_hint(),
                     threads::thread_stacksize_medium,
                     threads::pending, true);
-                threads::register_thread_plain(data);
+                threads::register_thread(data);
                 return;
             }
         }

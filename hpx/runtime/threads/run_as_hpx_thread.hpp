@@ -74,7 +74,7 @@ namespace hpx { namespace threads
                     }
                     cond->notify_all();
                 }), "run_as_hpx_thread (non-void)");
-            hpx::threads::register_thread_plain(data);
+            hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
@@ -123,7 +123,7 @@ namespace hpx { namespace threads
                     }
                     cond->notify_all();
                 }), "run_as_hpx_thread (void)");
-            hpx::threads::register_thread_plain(data);
+            hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);

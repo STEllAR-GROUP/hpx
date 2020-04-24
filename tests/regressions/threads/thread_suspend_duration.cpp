@@ -21,7 +21,7 @@ using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
 
-using hpx::applier::register_work;
+using hpx::threads::register_work;
 
 using hpx::lcos::local::barrier;
 
@@ -68,8 +68,14 @@ int hpx_main(variables_map& vm)
 
         // Create the hpx-threads.
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work(hpx::util::bind
-                (&suspend_test, std::ref(b), iterations, suspend_duration));
+        {
+            hpx::threads::thread_init_data data(
+                hpx::threads::make_thread_function_nullary(
+                    hpx::util::bind(
+                        &suspend_test, std::ref(b), iterations, suspend_duration)),
+                "suspend_test");
+            register_work(data);
+        }
 
         b.wait(); // Wait for all hpx-threads to enter the barrier.
     }

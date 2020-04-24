@@ -744,7 +744,7 @@ namespace hpx { namespace lcos { namespace detail {
                 threads::thread_priority_boost, threads::thread_schedule_hint(),
                 threads::thread_stacksize_current, threads::suspended, true);
             threads::thread_id_type id =
-                threads::register_thread_plain(data, ec);
+                threads::register_thread(data, ec);
             if (ec)
             {
                 // thread creation failed, report error to the new future

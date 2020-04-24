@@ -80,30 +80,30 @@ struct hpx_driver : htts2::driver
         if (this_osthread != target_osthread)
         {
             // Reschedule in an attempt to correct.
-            hpx::threads::register_work(
-                hpx::util::bind(&hpx_driver::stage_tasks,
-                    std::ref(*this), target_osthread)
+            hpx::threads::thread_init_data data(
+                hpx::threads::make_thread_function_nullary(
+                    hpx::util::bind(&hpx_driver::stage_tasks,
+                        std::ref(*this), target_osthread))
               , nullptr // No HPX-thread name.
-              , hpx::threads::pending
               , hpx::threads::thread_priority_normal
               // Place in the target OS-thread's queue.
               , hpx::threads::thread_schedule_hint(target_osthread)
             );
+            hpx::threads::register_work(data);
         }
 
         for (std::uint64_t i = 0; i < this->tasks_; ++i)
         {
             using hpx::util::placeholders::_1;
-            hpx::threads::register_thread_plain(
+            hpx::threads::thread_init_data data(
                 hpx::util::bind(&hpx_driver::payload_thread_function,
                     std::ref(*this), _1)
               , nullptr // No HPX-thread name.
-              , hpx::threads::pending
-              , false // Do not run immediately.
               , hpx::threads::thread_priority_normal
               // Place in the target OS-thread's queue.
               , hpx::threads::thread_schedule_hint(target_osthread)
             );
+            hpx::threads::register_work(data);
         }
     }
 
@@ -120,13 +120,14 @@ struct hpx_driver : htts2::driver
 
             if (all_count != 1)
             {
-                register_work(
-                        hpx::util::bind(&hpx_driver::wait_for_tasks
-                                  , std::ref(*this)
-                                  , std::ref(finished)
-                                   )
-                      , nullptr, hpx::threads::pending
-                      , hpx::threads::thread_priority_low);
+                hpx::threads::thread_init_data data(
+                        hpx::threads::make_thread_function_nullary(
+                            hpx::util::bind(&hpx_driver::wait_for_tasks
+                                      , std::ref(*this)
+                                      , std::ref(finished)
+                                       ))
+                      , nullptr, hpx::threads::thread_priority_low);
+                register_work(data);
                 return;
             }
         }
@@ -154,14 +155,15 @@ struct hpx_driver : htts2::driver
         {
             if (this_osthread == i) continue;
 
-            hpx::threads::register_work(
-                hpx::util::bind(&hpx_driver::stage_tasks, std::ref(*this), i)
+            hpx::threads::thread_init_data data(
+                hpx::threads::make_thread_function_nullary(
+                    hpx::util::bind(&hpx_driver::stage_tasks, std::ref(*this), i))
               , nullptr // No HPX-thread name.
-              , hpx::threads::pending
               , hpx::threads::thread_priority_normal
               // Place in the target OS-thread's queue.
               , hpx::threads::thread_schedule_hint(i)
             );
+            hpx::threads::register_work(data);
         }
 
         stage_tasks(this_osthread);
@@ -183,12 +185,15 @@ struct hpx_driver : htts2::driver
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
-        register_work(hpx::util::bind(&hpx_driver::wait_for_tasks
+        hpx::threads::thread_init_data data(
+            hpx::threads::make_thread_function_nullary(
+                hpx::util::bind(&hpx_driver::wait_for_tasks
                                 , std::ref(*this)
                                 , std::ref(finished)
-                                 )
-            , nullptr, hpx::threads::pending
+                                 ))
+            , nullptr
             , hpx::threads::thread_priority_low);
+        register_work(data);
 
         finished.wait();
 

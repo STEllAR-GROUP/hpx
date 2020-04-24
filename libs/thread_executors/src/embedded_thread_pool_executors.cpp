@@ -456,7 +456,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(thread_num)),
                 threads::thread_stacksize_default, threads::pending, true);
-            register_thread_plain(data, ec);
+            register_thread(data, ec);
         }
     }
 

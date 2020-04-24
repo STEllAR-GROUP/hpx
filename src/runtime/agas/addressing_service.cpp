@@ -1524,7 +1524,7 @@ void addressing_service::route(
             threads::thread_priority_normal,
             threads::thread_schedule_hint(),
             threads::thread_stacksize_default, threads::pending, true);
-        threads::register_thread_plain(data);
+        threads::register_thread(data);
         return;
     }
 
@@ -1678,7 +1678,7 @@ void addressing_service::decref(
             threads::thread_priority_normal,
             threads::thread_schedule_hint(),
             threads::thread_stacksize_default, threads::pending, true);
-        threads::register_thread_plain(data, ec);
+        threads::register_thread(data, ec);
 
         return;
     }
@@ -1943,7 +1943,7 @@ void addressing_service::update_cache_entry(
             threads::thread_priority_normal,
             threads::thread_schedule_hint(),
             threads::thread_stacksize_default, threads::pending, true);
-        threads::register_thread_plain(data, ec);
+        threads::register_thread(data, ec);
     }
 
     try {

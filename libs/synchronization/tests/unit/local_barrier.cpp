@@ -22,7 +22,9 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::applier::register_work;
+using hpx::threads::make_thread_function_nullary;
+using hpx::threads::register_work;
+using hpx::threads::thread_init_data;
 
 using hpx::lcos::local::barrier;
 
@@ -61,8 +63,13 @@ int hpx_main(variables_map& vm)
 
         // create the threads which will wait on the barrier
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work(
-                hpx::util::bind(&local_barrier_test, std::ref(b), std::ref(c)));
+        {
+            thread_init_data data(
+                make_thread_function_nullary(hpx::util::bind(
+                    &local_barrier_test, std::ref(b), std::ref(c))),
+                "local_barrier_test");
+            register_work(data);
+        }
 
         b.wait();    // wait for all threads to enter the barrier
         HPX_TEST_EQ(pxthreads, c);

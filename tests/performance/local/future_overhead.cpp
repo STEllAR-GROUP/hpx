@@ -371,10 +371,12 @@ void measure_function_futures_register_work(std::uint64_t count, bool csv)
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
     {
-        hpx::threads::register_work_nullary([&l]() {
-            null_function();
-            l.count_down(1);
-        });
+        hpx::threads::thread_init_data data(
+            hpx::threads::make_thread_function_nullary([&l]() {
+                null_function();
+                l.count_down(1);
+            }), "null_function");
+        hpx::threads::register_work(data);
     }
     l.wait();
 
@@ -397,8 +399,7 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     auto const desc = hpx::util::thread_description();
     auto const prio = hpx::threads::thread_priority_normal;
     auto const hint = hpx::threads::thread_schedule_hint();
-    auto const stack_size =
-        hpx::threads::get_stack_size(hpx::threads::thread_stacksize_small);
+    auto const stack_size = hpx::threads::thread_stacksize_small;
     hpx::error_code ec;
 
     // start the clock
@@ -407,8 +408,8 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     {
         auto init = hpx::threads::thread_init_data(
             hpx::threads::thread_function_type(thread_func), desc, prio, hint,
-            stack_size, sched);
-        sched->create_thread(init, nullptr, hpx::threads::pending, false, ec);
+            stack_size, hpx::threads::pending, false, sched);
+        sched->create_thread(init, nullptr, ec);
     }
     l.wait();
 
@@ -445,8 +446,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
     auto const desc = hpx::util::thread_description();
     auto prio = hpx::threads::thread_priority_normal;
-    auto const stack_size =
-        hpx::threads::get_stack_size(hpx::threads::thread_stacksize_small);
+    auto const stack_size = hpx::threads::thread_stacksize_small;
     auto const num_threads = hpx::get_num_worker_threads();
     hpx::error_code ec;
 
@@ -457,7 +457,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
         auto const hint =
             hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
         auto spawn_func = [&thread_func, sched, hint, t, count, num_threads,
-                              desc, stack_size, prio]() {
+                              desc, prio]() {
             std::uint64_t const count_start = t * count / num_threads;
             std::uint64_t const count_end = (t + 1) * count / num_threads;
             hpx::error_code ec;
@@ -465,9 +465,9 @@ void measure_function_futures_create_thread_hierarchical_placement(
             {
                 hpx::threads::thread_init_data init(
                     hpx::threads::thread_function_type(thread_func), desc, prio,
-                    hint, stack_size, sched);
+                    hint, stack_size, hpx::threads::pending, false, sched);
                 sched->create_thread(
-                    init, nullptr, hpx::threads::pending, false, ec);
+                    init, nullptr, ec);
             }
         };
         auto const thread_spawn_func =
@@ -476,8 +476,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
 
         hpx::threads::thread_init_data init(
             hpx::threads::thread_function_type(thread_spawn_func), desc, prio,
-            hint, stack_size, sched);
-        sched->create_thread(init, nullptr, hpx::threads::pending, false, ec);
+            hint, stack_size, hpx::threads::pending, false, sched);
+        sched->create_thread(init, nullptr, ec);
     }
     l.wait();
 
