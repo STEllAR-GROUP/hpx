@@ -5,17 +5,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/executors/parallel_executor.hpp>
+#include <hpx/executors/config/defines.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/parallel_executor.hpp is deprecated, \
-    please include hpx/execution/executors/parallel_executor.hpp instead")
+    please include hpx/executors/parallel_executor.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/parallel/executors/parallel_executor.hpp is deprecated, \
-    please include hpx/execution/executors/parallel_executor.hpp instead"
+    please include hpx/executors/parallel_executor.hpp instead"
 #endif
 #endif

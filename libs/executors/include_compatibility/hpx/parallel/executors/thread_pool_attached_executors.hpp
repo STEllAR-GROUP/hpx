@@ -5,19 +5,19 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/executors/thread_pool_attached_executors.hpp>
+#include <hpx/executors/config/defines.hpp>
+#include <hpx/executors/thread_pool_attached_executors.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/thread_pool_attached_executors.hpp is \
     deprecated, please include \
-    hpx/execution/executors/thread_pool_attached_executors.hpp instead")
+    hpx/executors/thread_pool_attached_executors.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/parallel/executors/thread_pool_attached_executors.hpp is \
     deprecated, please include \
-    hpx/execution/executors/thread_pool_attached_executors.hpp instead"
+    hpx/executors/thread_pool_attached_executors.hpp instead"
 #endif
 #endif
