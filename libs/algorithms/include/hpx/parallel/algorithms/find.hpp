@@ -16,7 +16,7 @@
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

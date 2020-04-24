@@ -11,7 +11,7 @@
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/functional/invoke.hpp>
 
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>

@@ -11,8 +11,8 @@
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
 #include <hpx/config.hpp>
-#include <hpx/execution/datapar/execution_policy.hpp>
-#include <hpx/execution/execution_policy_fwd.hpp>
+#include <hpx/executors/datapar/execution_policy.hpp>
+#include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/parallel_executor.hpp>

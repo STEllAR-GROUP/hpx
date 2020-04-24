@@ -26,7 +26,7 @@
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>

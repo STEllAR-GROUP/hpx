@@ -47,6 +47,7 @@ add_hpx_module(segmented_algorithms
     hpx_config
     hpx_datastructures
     hpx_execution
+    hpx_executors
     hpx_functional
     hpx_iterator_support
     hpx_pack_traversal

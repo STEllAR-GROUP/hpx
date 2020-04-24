@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/lcos/future.hpp>
 

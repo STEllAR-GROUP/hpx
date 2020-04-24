@@ -17,7 +17,7 @@
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
 #include <hpx/parallel/tagspec.hpp>

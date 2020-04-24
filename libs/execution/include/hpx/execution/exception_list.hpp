@@ -15,7 +15,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/execution/execution_policy_fwd.hpp>
+#include <hpx/executors/execution_policy_fwd.hpp>
 
 #include <exception>
 #include <utility>

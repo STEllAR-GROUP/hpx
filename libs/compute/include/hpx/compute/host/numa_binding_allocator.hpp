@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/guided_pool_executor.hpp>
 #include <hpx/executors/pool_executor.hpp>
 #include <hpx/local_async/async.hpp>

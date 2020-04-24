@@ -21,7 +21,7 @@
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/exception_list.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 

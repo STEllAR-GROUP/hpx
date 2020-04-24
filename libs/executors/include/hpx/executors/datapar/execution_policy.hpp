@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/datapar/execution_policy_fwd.hpp>
+#include <hpx/executors/datapar/execution_policy_fwd.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>

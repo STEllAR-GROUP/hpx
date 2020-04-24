@@ -22,7 +22,7 @@
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/exception_list.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>

@@ -11,8 +11,8 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/datapar/execution_policy_fwd.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/datapar/execution_policy_fwd.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>

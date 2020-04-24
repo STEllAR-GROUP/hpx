@@ -5,17 +5,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/datapar/execution_policy_fwd.hpp>
+#include <hpx/executors/config/defines.hpp>
+#include <hpx/executors/datapar/execution_policy_fwd.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/datapar/execution_policy_fwd.hpp is deprecated, \
-    please include hpx/execution/datapar/execution_policy_fwd.hpp instead")
+    please include hpx/executors/datapar/execution_policy_fwd.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/parallel/datapar/execution_policy_fwd.hpp is deprecated, \
-    please include hpx/execution/datapar/execution_policy_fwd.hpp instead"
+    please include hpx/executors/datapar/execution_policy_fwd.hpp instead"
 #endif
 #endif

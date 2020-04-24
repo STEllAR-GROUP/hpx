@@ -13,7 +13,7 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/set_operation.hpp>

@@ -7,7 +7,7 @@
 #if !defined(HPX_LCOS_LOCAL_SPMD_BLOCK_HPP)
 #define HPX_LCOS_LOCAL_SPMD_BLOCK_HPP
 
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/first_argument.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
