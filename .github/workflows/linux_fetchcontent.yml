@@ -1,0 +1,36 @@
+# Copyright (c) 2020 ETH Zurich
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: Linux CI (FetchContent)
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: stellargroup/build_env:ubuntu
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      shell: bash
+      run: |
+          cmake \
+              tests/unit/build/fetchcontent \
+              -Bbuild \
+              -GNinja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_APEX=ON \
+              -DHPX_WITH_EXAMPLES=ON \
+              -DHPX_WITH_TESTS=OFF \
+              -DHPX_REPOSITORY="file:////$(pwd)" \
+              -DHPX_TAG="$GITHUB_SHA"
+    - name: Build
+      shell: bash
+      run: |
+          cmake --build build --target all
+          cmake --build build --target examples
