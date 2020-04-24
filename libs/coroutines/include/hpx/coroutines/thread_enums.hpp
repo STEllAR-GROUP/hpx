@@ -199,7 +199,7 @@ namespace hpx { namespace threads {
         {
         }
 
-        constexpr thread_schedule_hint(std::int16_t thread_hint)
+        constexpr explicit thread_schedule_hint(std::int16_t thread_hint)
           : mode(thread_schedule_hint_mode_thread)
           , hint(thread_hint)
         {

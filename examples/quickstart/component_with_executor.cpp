@@ -24,9 +24,8 @@ struct hello_world_server
             executor_type, hpx::components::component_base<hello_world_server>
         > base_type;
 
-    // run on all available cores
     hello_world_server()
-      : base_type(executor_type(hpx::get_num_worker_threads()))
+      : base_type(executor_type{})
     {}
 
     void print() const

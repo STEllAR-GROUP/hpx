@@ -164,11 +164,14 @@ namespace hpx {
         util::unique_function_nonser<void()>&& func)
     {
         HPX_ASSERT(pool);
+        threads::policies::scheduler_base* scheduler = pool->get_scheduler();
 
         threads::thread_init_data data(
             util::one_shot(
                 util::bind(&thread::thread_function_nullary, std::move(func))),
-            "thread::thread_function_nullary");
+            "thread::thread_function_nullary", threads::thread_priority_normal,
+            threads::thread_schedule_hint(),
+            scheduler->get_stack_size(threads::thread_stacksize_default));
 
         // create the new thread, note that id_ is guaranteed to be valid
         // before the thread function is executed
