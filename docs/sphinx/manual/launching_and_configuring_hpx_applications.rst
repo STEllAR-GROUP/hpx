@@ -182,6 +182,7 @@ The ``hpx`` configuration section
    max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:<hpx_idle_loop_count_max>}
    max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:<hpx_busy_loop_count_max>}
    max_idle_backoff_time = ${HPX_MAX_IDLE_BACKOFF_TIME:<hpx_idle_backoff_time_max>}
+   exception_verbosity = ${HPX_EXCEPTION_VERBOSITY:2}
 
    [hpx.stacks]
    small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -272,6 +273,14 @@ The ``hpx`` configuration section
        |cmake|. By default this is defined by the preprocessor constant
        ``HPX_IDLE_BACKOFF_TIME_MAX``. This is an internal setting which you
        should change only if you know exactly what you are doing.
+   * * ``hpx.exception_verbosity``
+     * This setting defines the verbosity of exceptions. Valid values are
+       integers. A setting of ``2`` or higher prints all available information.
+       A setting of ``1`` leaves out the build configuration and environment
+       variables. A setting of ``0`` or lower prints only the description of the
+       thrown exception and the file name, function, and line number where the
+       exception was thrown. The default value is ``2`` or the value of the
+       environment variable ``HPX_EXCEPTION_VERBOSITY``.
    * * ``hpx.stacks.small_size``
      * This is initialized to the small stack size to be used by |hpx|-threads.
        Set by default to the value of the compile time preprocessor constant
