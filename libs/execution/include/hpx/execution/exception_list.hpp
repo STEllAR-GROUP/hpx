@@ -15,10 +15,29 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/executors/execution_policy_fwd.hpp>
-
 #include <exception>
 #include <utility>
+
+namespace hpx { namespace parallel { namespace execution {
+    ///////////////////////////////////////////////////////////////////////////
+    // forward declarations, see execution_policy.hpp
+    struct sequenced_task_policy;
+
+    template <typename Executor, typename Parameters>
+    struct sequenced_task_policy_shim;
+
+    struct parallel_task_policy;
+
+    template <typename Executor, typename Parameters>
+    struct parallel_task_policy_shim;
+
+    struct parallel_unsequenced_policy;
+
+    inline namespace v1 {
+        struct dataseq_task_policy;
+    }   // namespace v1
+
+}}}  // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
