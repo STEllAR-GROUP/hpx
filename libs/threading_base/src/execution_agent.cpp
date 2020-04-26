@@ -13,12 +13,14 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 
+#include <hpx/threading_base/detail/reset_lco_description.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/debugging/backtrace.hpp>
+#include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
 
 #include <cstddef>
@@ -108,27 +110,6 @@ namespace hpx { namespace threads {
         }
     }
 
-    namespace detail {
-        struct reset_lco_description
-        {
-            reset_lco_description(threads::thread_id_type const& id,
-                util::thread_description const& description)
-              : id_(id)
-            {
-                old_desc_ =
-                    threads::set_thread_lco_description(id_, description);
-            }
-
-            ~reset_lco_description()
-            {
-                threads::set_thread_lco_description(id_, old_desc_);
-            }
-
-            threads::thread_id_type id_;
-            util::thread_description old_desc_;
-        };
-    }    // namespace detail
-
     hpx::threads::thread_state_ex_enum execution_agent::do_yield(
         const char* desc, threads::thread_state_enum state)
     {
@@ -152,11 +133,11 @@ namespace hpx { namespace threads {
 
         {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            detail::reset_lco_description desc(
+            threads::detail::reset_lco_description desc(
                 id, util::thread_description(desc));
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            detail::reset_backtrace bt(id, ec);
+            threads::detail::reset_backtrace bt(id);
 #endif
             HPX_ASSERT(thrd_data->get_state().state() == active);
             HPX_ASSERT(state != active);

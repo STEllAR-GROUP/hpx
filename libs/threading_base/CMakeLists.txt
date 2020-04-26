@@ -13,6 +13,8 @@ set(threading_base_headers
   hpx/threading_base/callback_notifier.hpp
   hpx/threading_base/create_thread.hpp
   hpx/threading_base/create_work.hpp
+  hpx/threading_base/detail/reset_backtrace.hpp
+  hpx/threading_base/detail/reset_lco_description.hpp
   hpx/threading_base/execution_agent.hpp
   hpx/threading_base/external_timer.hpp
   hpx/threading_base/network_background_callback.hpp
@@ -70,6 +72,10 @@ set(threading_base_sources
   thread_num_tss.cpp
   thread_pool_base.cpp)
 
+if(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
+  set(additional_dependencies hpx_debugging)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(threading_base
   COMPATIBILITY_HEADERS ON
@@ -95,5 +101,6 @@ add_hpx_module(threading_base
     hpx_logging
     hpx_memory
     hpx_naming_base
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )
