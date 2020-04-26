@@ -326,9 +326,17 @@ namespace hpx { namespace naming
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            for (std::size_t k = 0; !acquire_lock(); ++k)
+            for (;;)
             {
-                util::detail::yield_k(k, "hpx::naming::gid_type::lock");
+                if (acquire_lock())
+                {
+                    break;
+                }
+
+                for (std::size_t k = 0; is_locked(); ++k)
+                {
+                    util::detail::yield_k(k, "hpx::naming::gid_type::lock");
+                }
             }
 
             util::register_lock(this);

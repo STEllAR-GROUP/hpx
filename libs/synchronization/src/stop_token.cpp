@@ -69,7 +69,10 @@ namespace hpx { namespace detail {
     void stop_state::lock() noexcept
     {
         auto old_state = state_.load(std::memory_order_relaxed);
-        do
+
+        while (!state_.compare_exchange_weak(old_state,
+            old_state | stop_state::locked_flag, std::memory_order_acquire,
+            std::memory_order_relaxed))
         {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
@@ -77,21 +80,22 @@ namespace hpx { namespace detail {
                     k, "stop_state::lock");
                 old_state = state_.load(std::memory_order_relaxed);
             }
-
-        } while (!state_.compare_exchange_weak(old_state,
-            old_state | stop_state::locked_flag, std::memory_order_acquire,
-            std::memory_order_relaxed));
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool stop_state::lock_and_request_stop() noexcept
     {
         std::uint64_t old_state = state_.load(std::memory_order_acquire);
-        do
-        {
-            if (stop_requested(old_state))
-                return false;
 
+        if (stop_requested(old_state))
+            return false;
+
+        while (!state_.compare_exchange_weak(old_state,
+            old_state | stop_state::stop_requested_flag |
+                stop_state::locked_flag,
+            std::memory_order_acquire, std::memory_order_relaxed))
+        {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
                 hpx::basic_execution::this_thread::yield_k(
@@ -101,12 +105,7 @@ namespace hpx { namespace detail {
                 if (stop_requested(old_state))
                     return false;
             }
-
-        } while (!state_.compare_exchange_weak(old_state,
-            old_state | stop_state::stop_requested_flag |
-                stop_state::locked_flag,
-            std::memory_order_acquire, std::memory_order_relaxed));
-
+        }
         return true;
     }
 
@@ -114,18 +113,21 @@ namespace hpx { namespace detail {
     bool stop_state::lock_if_not_stopped(stop_callback_base* cb) noexcept
     {
         std::uint64_t old_state = state_.load(std::memory_order_acquire);
-        do
-        {
-            if (stop_requested(old_state))
-            {
-                cb->execute();
-                return false;
-            }
-            else if (!stop_possible(old_state))
-            {
-                return false;
-            }
 
+        if (stop_requested(old_state))
+        {
+            cb->execute();
+            return false;
+        }
+        else if (!stop_possible(old_state))
+        {
+            return false;
+        }
+
+        while (!state_.compare_exchange_weak(old_state,
+            old_state | stop_state::locked_flag, std::memory_order_acquire,
+            std::memory_order_relaxed))
+        {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
                 hpx::basic_execution::this_thread::yield_k(
@@ -142,11 +144,7 @@ namespace hpx { namespace detail {
                     return false;
                 }
             }
-
-        } while (!state_.compare_exchange_weak(old_state,
-            old_state | stop_state::locked_flag, std::memory_order_acquire,
-            std::memory_order_relaxed));
-
+        }
         return true;
     }
 
@@ -213,7 +211,7 @@ namespace hpx { namespace detail {
             // Callback is currently executing on another thread,
             // block until it finishes executing.
             for (std::size_t k = 0; !cb->callback_finished_executing_.load(
-                     std::memory_order_acquire);
+                     std::memory_order_relaxed);
                  ++k)
             {
                 hpx::basic_execution::this_thread::yield_k(
