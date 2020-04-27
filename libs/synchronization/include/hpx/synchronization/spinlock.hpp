@@ -50,18 +50,10 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            for (;;)
+            while (!acquire_lock())
             {
-                if (acquire_lock())
-                {
-                    break;
-                }
-
-                for (std::size_t k = 0; is_locked(); ++k)
-                {
-                    util::detail::yield_k(
-                        k, "hpx::lcos::local::spinlock::lock");
-                }
+                util::yield_while([this] { return is_locked(); },
+                    "hpx::lcos::local::spinlock::lock");
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);

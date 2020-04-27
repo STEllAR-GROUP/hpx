@@ -13,6 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 
 #include <atomic>
@@ -47,17 +48,10 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            for (;;)
+            while (!acquire_lock())
             {
-                if (acquire_lock())
-                {
-                    break;
-                }
-
-                while (is_locked())
-                {
-                    /**/;
-                }
+                util::yield_while([this] { return is_locked(); },
+                    "hpx::lcos::local::spinlock_no_backoff::lock", false);
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);

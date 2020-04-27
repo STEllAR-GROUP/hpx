@@ -94,7 +94,7 @@ namespace hpx { namespace util {
         {
             for (std::size_t k = 0; predicate(); ++k)
             {
-                detail::yield_k(k % 32, thread_name);
+                detail::yield_k(k % 16, thread_name);
             }
         }
     }
