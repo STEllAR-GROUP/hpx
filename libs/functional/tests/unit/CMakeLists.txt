@@ -25,6 +25,13 @@ set(function_tests
   function_ref_wrapper
   function_target
   function_test
+  mem_fn_derived_test
+  mem_fn_dm_test
+  #mem_fn_eq_test
+  mem_fn_rv_test
+  mem_fn_test
+  mem_fn_unary_addr_test
+  mem_fn_void_test
   nothrow_swap
   protect_test
   stateless_test
@@ -34,7 +41,7 @@ set(function_tests
 add_hpx_pseudo_target(tests.unit.modules.functional.function)
 
 foreach(test ${function_tests})
-  set(sources test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 

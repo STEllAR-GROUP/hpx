@@ -1,12 +1,3 @@
-#include <hpx/config.hpp>
-
-#if defined(HPX_MSVC)
-#pragma warning(disable: 4786)  // identifier truncated in debug info
-#pragma warning(disable: 4710)  // function not inlined
-#pragma warning(disable: 4711)  // function selected for automatic inline expansion
-#pragma warning(disable: 4514)  // unreferenced inline removed
-#endif
-
 // Taken from the Boost.Bind library
 //
 //  mem_fn_eq_test.cpp - boost::mem_fn equality operator
@@ -18,7 +9,15 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-//
+
+#include <hpx/config.hpp>
+
+#if defined(HPX_MSVC)
+#pragma warning(disable: 4786)  // identifier truncated in debug info
+#pragma warning(disable: 4710)  // function not inlined
+#pragma warning(disable: 4711)  // function selected for automatic inline expansion
+#pragma warning(disable: 4514)  // unreferenced inline removed
+#endif
 
 #include <hpx/functional/mem_fn.hpp>
 

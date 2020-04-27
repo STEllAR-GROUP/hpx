@@ -1,5 +1,17 @@
+// Taken from the Boost.Bind library
+//
+//  mem_fn_unary_addr_test.cpp - poisoned operator& test
+//
+//  Copyright (c) 2009 Peter Dimov
+//  Copyright (c) 2013 Agustin Berge
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0.
+//  See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt
+//
+
 #include <hpx/config.hpp>
-#include <hpx/hpx_init.hpp>
 
 #if defined(HPX_MSVC)
 #pragma warning(disable: 4786)  // identifier truncated in debug info
@@ -8,24 +20,9 @@
 #pragma warning(disable: 4514)  // unreferenced inline removed
 #endif
 
-// Taken from the Boost.Bind library
-//
-//  mem_fn_test.cpp - mem_fn.hpp with rvalues
-//
-//  Copyright (c) 2001, 2002 Peter Dimov and Multi Media Ltd.
-//  Copyright (c) 2005 Peter Dimov
-//  Copyright (c) 2013 Agustin Berge
-//
-//  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0. (See
-// accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
-//
-
 #include <hpx/functional/mem_fn.hpp>
 
 #include <iostream>
-#include <memory>
 
 #include <hpx/testing.hpp>
 
@@ -69,39 +66,60 @@ struct X
         const { g7(a1, a2, a3, a4, a5, a6, a7); g1(a8); return 0; }
 };
 
-std::shared_ptr<X> make()
+template<class T> class Y
 {
-    return std::shared_ptr<X>(new X);
-}
+private:
+
+    T * pt_;
+
+    void operator& ();
+    void operator& () const;
+
+public:
+
+    explicit Y(T * pt): pt_(pt)
+    {
+    }
+
+    T& operator*() const
+    {
+        return *pt_;
+    }
+};
 
 int main()
 {
-    hpx::util::mem_fn(&X::f0)(make());
-    hpx::util::mem_fn(&X::g0)(make());
+    X x;
 
-    hpx::util::mem_fn(&X::f1)(make(), 1);
-    hpx::util::mem_fn(&X::g1)(make(), 1);
+    Y<X> px(&x);
+    Y<X const> pcx(&x);
 
-    hpx::util::mem_fn(&X::f2)(make(), 1, 2);
-    hpx::util::mem_fn(&X::g2)(make(), 1, 2);
+    hpx::util::mem_fn(&X::f0)(px);
+    hpx::util::mem_fn(&X::g0)(pcx);
 
-    hpx::util::mem_fn(&X::f3)(make(), 1, 2, 3);
-    hpx::util::mem_fn(&X::g3)(make(), 1, 2, 3);
+    hpx::util::mem_fn(&X::f1)(px, 1);
+    hpx::util::mem_fn(&X::g1)(pcx, 1);
 
-    hpx::util::mem_fn(&X::f4)(make(), 1, 2, 3, 4);
-    hpx::util::mem_fn(&X::g4)(make(), 1, 2, 3, 4);
+    hpx::util::mem_fn(&X::f2)(px, 1, 2);
+    hpx::util::mem_fn(&X::g2)(pcx, 1, 2);
 
-    hpx::util::mem_fn(&X::f5)(make(), 1, 2, 3, 4, 5);
-    hpx::util::mem_fn(&X::g5)(make(), 1, 2, 3, 4, 5);
+    hpx::util::mem_fn(&X::f3)(px, 1, 2, 3);
+    hpx::util::mem_fn(&X::g3)(pcx, 1, 2, 3);
 
-    hpx::util::mem_fn(&X::f6)(make(), 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn(&X::g6)(make(), 1, 2, 3, 4, 5, 6);
+    hpx::util::mem_fn(&X::f4)(px, 1, 2, 3, 4);
+    hpx::util::mem_fn(&X::g4)(pcx, 1, 2, 3, 4);
 
-    hpx::util::mem_fn(&X::f7)(make(), 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn(&X::g7)(make(), 1, 2, 3, 4, 5, 6, 7);
+    hpx::util::mem_fn(&X::f5)(px, 1, 2, 3, 4, 5);
+    hpx::util::mem_fn(&X::g5)(pcx, 1, 2, 3, 4, 5);
 
-    hpx::util::mem_fn(&X::f8)(make(), 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn(&X::g8)(make(), 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::util::mem_fn(&X::f6)(px, 1, 2, 3, 4, 5, 6);
+    hpx::util::mem_fn(&X::g6)(pcx, 1, 2, 3, 4, 5, 6);
+
+    hpx::util::mem_fn(&X::f7)(px, 1, 2, 3, 4, 5, 6, 7);
+    hpx::util::mem_fn(&X::g7)(pcx, 1, 2, 3, 4, 5, 6, 7);
+
+    hpx::util::mem_fn(&X::f8)(px, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::util::mem_fn(&X::g8)(pcx, 1, 2, 3, 4, 5, 6, 7, 8);
 
     HPX_TEST_EQ(hash, 2155u);
 
