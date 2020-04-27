@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2018 Hartmut Kaiser
+//  Copyright (c) 2011-2020 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2008 Peter Dimov
 //  Copyright (c) 2018 Patrick Diehl
@@ -19,24 +19,9 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
-
-// clang-format off
-#if defined(HPX_WINDOWS)
-#  include <boost/smart_ptr/detail/spinlock.hpp>
-#  if !defined(BOOST_SP_HAS_SYNC)
-#    include <boost/detail/interlocked.hpp>
-#  endif
-#else
-#  if !defined(__ANDROID__) && !defined(ANDROID)
-#    include <boost/smart_ptr/detail/spinlock.hpp>
-#    if defined(__ia64__) && defined(__INTEL_COMPILER)
-#      include <ia64intrin.h>
-#    endif
-#  endif
-#endif
-// clang-format on
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace local {
@@ -47,15 +32,11 @@ namespace hpx { namespace lcos { namespace local {
         HPX_NON_COPYABLE(spinlock);
 
     private:
-#if defined(__ANDROID__) && defined(ANDROID)
-        int v_;
-#else
-        std::uint64_t v_;
-#endif
+        std::atomic<bool> v_;
 
     public:
         spinlock(char const* const desc = "hpx::lcos::local::spinlock")
-          : v_(0)
+          : v_(false)
         {
             HPX_ITT_SYNC_CREATE(this, desc, "");
         }
@@ -69,9 +50,10 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            for (std::size_t k = 0; !acquire_lock(); ++k)
+            while (!acquire_lock())
             {
-                util::detail::yield_k(k, "hpx::lcos::local::spinlock::lock");
+                util::yield_while([this] { return is_locked(); },
+                    "hpx::lcos::local::spinlock::lock");
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);
@@ -109,23 +91,18 @@ namespace hpx { namespace lcos { namespace local {
         // returns whether the mutex has been acquired
         bool acquire_lock()
         {
-#if !defined(BOOST_SP_HAS_SYNC)
-            std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            HPX_COMPILER_FENCE;
-#else
-            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
-#endif
-            return r == 0;
+            return !v_.exchange(true, std::memory_order_acquire);
         }
 
+        // relinquish lock
         void relinquish_lock()
         {
-#if !defined(BOOST_SP_HAS_SYNC)
-            HPX_COMPILER_FENCE;
-            *const_cast<std::uint64_t volatile*>(&v_) = 0;
-#else
-            __sync_lock_release(&v_);
-#endif
+            v_.store(false, std::memory_order_release);
+        }
+
+        bool is_locked() const
+        {
+            return v_.load(std::memory_order_relaxed);
         }
     };
 }}}    // namespace hpx::lcos::local

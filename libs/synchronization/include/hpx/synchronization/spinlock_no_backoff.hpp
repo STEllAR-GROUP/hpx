@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2012 Hartmut Kaiser
+//  Copyright (c) 2011-2020 Hartmut Kaiser
 //  Copyright (c) 2008 Peter Dimov
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,25 +13,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 
-// clang-format off
-#if defined(HPX_WINDOWS)
-#  include <boost/smart_ptr/detail/spinlock.hpp>
-#  if !defined( BOOST_SP_HAS_SYNC )
-#    include <hpx/config/compiler_fence.hpp>
-#    include <boost/detail/interlocked.hpp>
-#  endif
-#else
-#  if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__arm__)
-#    include <boost/smart_ptr/detail/spinlock.hpp>
-#    if defined( __ia64__ ) && defined( __INTEL_COMPILER )
-#      include <ia64intrin.h>
-#    endif
-#  endif
-#endif
-// clang-format on
-
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 
@@ -44,7 +29,7 @@ namespace hpx { namespace lcos { namespace local {
         HPX_NON_COPYABLE(spinlock_no_backoff);
 
     private:
-        std::uint64_t v_;
+        std::atomic<bool> v_;
 
     public:
         spinlock_no_backoff()
@@ -63,8 +48,10 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            for (std::size_t k = 0; !try_lock(); ++k)
+            while (!acquire_lock())
             {
+                util::yield_while([this] { return is_locked(); },
+                    "hpx::lcos::local::spinlock_no_backoff::lock", false);
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);
@@ -75,12 +62,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if !defined(BOOST_SP_HAS_SYNC)
-            std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            HPX_COMPILER_FENCE;
-#else
-            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
-#endif
+            bool r = acquire_lock();    //-V707
 
             if (r == 0)
             {
@@ -97,15 +79,28 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-#if !defined(BOOST_SP_HAS_SYNC)
-            HPX_COMPILER_FENCE;
-            *const_cast<std::uint64_t volatile*>(&v_) = 0;
-#else
-            __sync_lock_release(&v_);
-#endif
+            relinquish_lock();
 
             HPX_ITT_SYNC_RELEASED(this);
             util::unregister_lock(this);
+        }
+
+    private:
+        // returns whether the mutex has been acquired
+        bool acquire_lock()
+        {
+            return !v_.exchange(true, std::memory_order_acquire);
+        }
+
+        // relinquish lock
+        void relinquish_lock()
+        {
+            v_.store(false, std::memory_order_release);
+        }
+
+        bool is_locked() const
+        {
+            return v_.load(std::memory_order_relaxed);
         }
     };
 }}}    // namespace hpx::lcos::local
