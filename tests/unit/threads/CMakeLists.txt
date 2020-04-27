@@ -5,7 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    schedule_last
     stack_check
     error_callback
     start_stop_callbacks
@@ -15,6 +14,10 @@ set(tests
     thread_mf
     thread_yield
    )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests} set_thread_state)
+endif()
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set(tests ${tests} thread_stacksize_overflow)
