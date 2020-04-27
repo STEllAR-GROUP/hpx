@@ -11,11 +11,10 @@
 #include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/mpi/mpi_future.hpp>
+#include <hpx/mpi_base.hpp>
 
 #include <type_traits>
 #include <utility>
-
-#include <mpi.h>
 
 namespace hpx { namespace mpi { namespace experimental {
 

@@ -9,8 +9,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 //
 #include <hpx/mpi/mpi_future.hpp>
 //
