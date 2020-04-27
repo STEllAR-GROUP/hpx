@@ -90,18 +90,18 @@ namespace hpx { namespace lcos { namespace local {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         HPX_ITT_SYNC_RELEASING(this);
+        // Unregister lock early as the lock guard below may suspend.
+        util::unregister_lock(this);
         std::unique_lock<mutex_type> l(mtx_);
 
         threads::thread_id_type self_id = threads::get_self_id();
         if (HPX_UNLIKELY(owner_id_ != self_id))
         {
-            util::unregister_lock(this);
             HPX_THROWS_IF(ec, lock_error, "mutex::unlock",
                 "The calling thread does not own the mutex");
             return;
         }
 
-        util::unregister_lock(this);
         HPX_ITT_SYNC_RELEASED(this);
         owner_id_ = threads::invalid_thread_id;
 
