@@ -16,19 +16,6 @@ set(tests
     thread_yield
    )
 
-if(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
-  set(tests ${tests}
-    resource_manager
-    thread_suspension_executor)
-endif()
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests}
-    set_thread_state
-    thread_affinity
-    thread_stacksize)
-endif()
-
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set(tests ${tests} thread_stacksize_overflow)
   set(tests ${tests} thread_stacksize_overflow_v2)
@@ -37,8 +24,6 @@ endif()
 if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
-
-set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
