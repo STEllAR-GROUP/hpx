@@ -8,17 +8,18 @@
 #include <hpx/testing.hpp>
 
 #include <sstream>
+#include <string>
 
 int main(int argc, char* argv[])
 {
     std::stringstream strm;
 
     // testing macros
-    HPX_TEST(0 == 0);
-    HPX_TEST(strm, 0 == 0);
+    HPX_TEST(true);
+    HPX_TEST(strm, true);
 
-    HPX_TEST_MSG(0 == 0, "should be true");
-    HPX_TEST_MSG(strm, 0 == 0, "should be true");
+    HPX_TEST_MSG(true, "should be true");
+    HPX_TEST_MSG(strm, true, "should be true");
 
     HPX_TEST_EQ(0, 0);
     HPX_TEST_EQ(strm, 0, 0);
@@ -51,11 +52,11 @@ int main(int argc, char* argv[])
     HPX_TEST_RANGE_MSG(strm, 1, 1, 1, "should be in range");
 
     // sanity macro tests
-    HPX_SANITY(0 == 0);
-    HPX_SANITY(strm, 0 == 0);
+    HPX_SANITY(true);
+    HPX_SANITY(strm, true);
 
-    HPX_SANITY_MSG(0 == 0, "should be true");
-    HPX_SANITY_MSG(strm, 0 == 0, "should be true");
+    HPX_SANITY_MSG(true, "should be true");
+    HPX_SANITY_MSG(strm, true, "should be true");
 
     HPX_SANITY_EQ(0, 0);
     HPX_SANITY_EQ(strm, 0, 0);
@@ -78,5 +79,10 @@ int main(int argc, char* argv[])
     // there shouldn't be any output being generated
     HPX_TEST(strm.str().empty());
 
-    return hpx::util::report_errors();
+    // now test that something gets written to the stream if an error occurs
+    HPX_TEST(strm, false);
+    HPX_TEST(strm.str().find("test 'false'") != std::string::npos);
+
+    // we have intentionally generated one error
+    return (hpx::util::report_errors() == 1) ? 0 : -1;
 }

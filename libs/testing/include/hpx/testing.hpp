@@ -19,6 +19,7 @@
 
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -45,15 +46,13 @@ namespace hpx { namespace util {
 
         private:
             std::ostream& stream_;
-            std::size_t sanity_failures_;
-            std::size_t test_failures_;
+            static std::atomic<std::size_t> sanity_failures_;
+            static std::atomic<std::size_t> test_failures_;
             mutex_type mutex_ = BOOST_DETAIL_SPINLOCK_INIT;
 
         public:
             fixture(std::ostream& stream)
               : stream_(stream)
-              , sanity_failures_(0)
-              , test_failures_(0)
             {
             }
 

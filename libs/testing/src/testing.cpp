@@ -11,6 +11,7 @@
 #include <hpx/testing.hpp>
 #include <hpx/util.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -26,6 +27,10 @@ namespace hpx { namespace util {
     }
 
     namespace detail {
+
+        std::atomic<std::size_t> fixture::sanity_failures_(0);
+        std::atomic<std::size_t> fixture::test_failures_(0);
+
         void fixture::increment(counter_type c)
         {
             if (test_failure_handler)
