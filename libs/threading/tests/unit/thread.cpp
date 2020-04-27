@@ -14,8 +14,8 @@
 #include <chrono>
 #include <functional>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void set_description(char const* test_name)

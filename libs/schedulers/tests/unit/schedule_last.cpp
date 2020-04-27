@@ -8,9 +8,9 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/schedulers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <cstddef>
 #include <memory>

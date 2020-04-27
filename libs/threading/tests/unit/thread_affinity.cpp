@@ -8,13 +8,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/functional/bind.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/functional/bind.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 
 #include <cstddef>
@@ -24,7 +24,7 @@
 #include <vector>
 
 #if !defined(__APPLE__)
-#  include <hwloc.h>
+#include <hwloc.h>
 #endif
 
 std::size_t thread_affinity_worker(std::size_t desired)
@@ -36,7 +36,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
     {
 #if !defined(__APPLE__)
         // extract the desired affinity mask
-        hpx::runtime & rt = hpx::get_runtime();
+        hpx::runtime& rt = hpx::get_runtime();
         hpx::threads::topology const& t = rt.get_topology();
         hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(
             hpx::resource::get_partitioner().get_pu_num(current));
@@ -50,14 +50,15 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hwloc_topology_load(topo);
 
         int const pu_depth = hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
-        hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(topo, pu_depth, logical_idx);
+        hwloc_obj_t const pu_obj =
+            hwloc_get_obj_by_depth(topo, pu_depth, logical_idx);
         idx = pu_obj->os_index;
-
 
         // retrieve the current affinity mask
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
         hwloc_bitmap_zero(cpuset);
-        if (0 == hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD)) {
+        if (0 == hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
+        {
             // sadly get_cpubind is not implemented for Windows based systems
             hwloc_cpuset_t cpuset_cmp = hwloc_bitmap_alloc();
             hwloc_bitmap_zero(cpuset_cmp);
@@ -114,7 +115,7 @@ void thread_affinity_foreman()
         // Each iteration, we create a task for each element in the set of
         // OS-threads that have not said "Hello world". Each of these tasks
         // is encapsulated in a future.
-        std::vector<hpx::lcos::future<std::size_t> > futures;
+        std::vector<hpx::lcos::future<std::size_t>> futures;
         futures.reserve(attendance.size());
 
         for (std::size_t worker : attendance)
@@ -133,8 +134,9 @@ void thread_affinity_foreman()
         // return value of the future. hpx::lcos::wait doesn't return until
         // all the futures in the vector have returned.
         using hpx::util::placeholders::_1;
-        hpx::lcos::wait_each(hpx::util::unwrapping(
-            hpx::util::bind(&check_in, std::ref(attendance), _1)), futures);
+        hpx::lcos::wait_each(hpx::util::unwrapping(hpx::util::bind(
+                                 &check_in, std::ref(attendance), _1)),
+            futures);
     }
 }
 
@@ -149,7 +151,7 @@ int hpx_main(hpx::program_options::variables_map& /*vm*/)
             hpx::find_all_localities();
 
         // Reserve storage space for futures, one for each locality.
-        std::vector<hpx::lcos::future<void> > futures;
+        std::vector<hpx::lcos::future<void>> futures;
         futures.reserve(localities.size());
 
         for (hpx::naming::id_type const& node : localities)
@@ -176,10 +178,9 @@ int hpx_main(hpx::program_options::variables_map& /*vm*/)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    hpx::program_options::options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX.
     return hpx::init(desc_commandline, argc, argv);
 }
-

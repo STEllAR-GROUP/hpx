@@ -6,20 +6,20 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/threadmanager.hpp>
 #include <hpx/testing.hpp>
 
 #include <functional>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 ///////////////////////////////////////////////////////////////////////////////
 void do_nothing(hpx::lcos::local::barrier& b1, hpx::lcos::local::barrier& b2)
 {
     b1.wait();
-    hpx::this_thread::suspend(100);     // wait for 100 ms
+    hpx::this_thread::suspend(100);    // wait for 100 ms
     b2.wait();
 }
 
@@ -105,27 +105,27 @@ void test_thread_ids_have_a_total_order()
     HPX_TEST((t2_id <= t3_id) == (t3_id > t2_id));
     HPX_TEST((t3_id <= t2_id) == (t2_id > t3_id));
 
-    if((t1_id < t2_id) && (t2_id < t3_id))
+    if ((t1_id < t2_id) && (t2_id < t3_id))
     {
         HPX_TEST_LT(t1_id, t3_id);
     }
-    else if((t1_id < t3_id) && (t3_id < t2_id))
+    else if ((t1_id < t3_id) && (t3_id < t2_id))
     {
         HPX_TEST_LT(t1_id, t2_id);
     }
-    else if((t2_id < t3_id) && (t3_id < t1_id))
+    else if ((t2_id < t3_id) && (t3_id < t1_id))
     {
         HPX_TEST_LT(t2_id, t1_id);
     }
-    else if((t2_id < t1_id) && (t1_id < t3_id))
+    else if ((t2_id < t1_id) && (t1_id < t3_id))
     {
         HPX_TEST_LT(t2_id, t3_id);
     }
-    else if((t3_id < t1_id) && (t1_id < t2_id))
+    else if ((t3_id < t1_id) && (t1_id < t2_id))
     {
         HPX_TEST_LT(t3_id, t2_id);
     }
-    else if((t3_id < t2_id) && (t2_id < t1_id))
+    else if ((t3_id < t2_id) && (t2_id < t1_id))
     {
         HPX_TEST_LT(t3_id, t1_id);
     }
@@ -197,4 +197,3 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv);
 }
-

@@ -8,8 +8,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstring>
 #include <vector>
@@ -24,7 +24,7 @@ void test_small_stacksize()
             hpx::threads::thread_stacksize_small));
 
     // allocate HPX_SMALL_STACK_SIZE - HPX_THREADS_STACK_OVERHEAD memory on the stack
-    char array[HPX_SMALL_STACK_SIZE*HPX_THREADS_STACK_OVERHEAD];
+    char array[HPX_SMALL_STACK_SIZE * HPX_THREADS_STACK_OVERHEAD];
 
     // do something to that array
     std::memset(array, '\0', sizeof(array));
@@ -43,9 +43,7 @@ int main()
             test_small_stacksize_action test_action;
             test_action(id);
         }
-
     }
 
     return hpx::util::report_errors();
 }
-

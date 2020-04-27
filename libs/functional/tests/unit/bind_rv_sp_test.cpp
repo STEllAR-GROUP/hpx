@@ -12,10 +12,11 @@
 //
 
 #if defined(HPX_MSVC)
-#pragma warning(disable: 4786)  // identifier truncated in debug info
-#pragma warning(disable: 4710)  // function not inlined
-#pragma warning(disable: 4711)  // function selected for automatic inline expansion
-#pragma warning(disable: 4514)  // unreferenced inline removed
+#pragma warning(disable : 4786)    // identifier truncated in debug info
+#pragma warning(disable : 4710)    // function not inlined
+#pragma warning(                                                               \
+    disable : 4711)    // function selected for automatic inline expansion
+#pragma warning(disable : 4514)    // unreferenced inline removed
 #endif
 
 #include <hpx/functional/bind.hpp>
@@ -31,7 +32,8 @@ struct X
 {
     int v_;
 
-    X( int v ): v_( v )
+    X(int v)
+      : v_(v)
     {
     }
 
@@ -45,7 +47,7 @@ struct Y
 {
     std::shared_ptr<X> f()
     {
-        return std::shared_ptr<X>( new X( 42 ) );
+        return std::shared_ptr<X>(new X(42));
     }
 };
 
@@ -53,7 +55,7 @@ int main()
 {
     Y y;
 
-    HPX_TEST_EQ( hpx::util::bind( &X::f, hpx::util::bind( &Y::f, &y ) )(), 42 );
+    HPX_TEST_EQ(hpx::util::bind(&X::f, hpx::util::bind(&Y::f, &y))(), 42);
 
     return hpx::util::report_errors();
 }

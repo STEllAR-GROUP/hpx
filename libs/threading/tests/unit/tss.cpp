@@ -7,14 +7,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/threads.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 
 #include <chrono>
 #include <mutex>
-#include <vector>
 #include <utility>
+#include <vector>
 
 hpx::lcos::local::spinlock check_mutex;
 hpx::lcos::local::spinlock tss_mutex;
@@ -64,7 +64,7 @@ void test_tss()
 
     int const NUMTHREADS = 5;
 
-    std::vector<hpx::future<void> > threads(NUMTHREADS);
+    std::vector<hpx::future<void>> threads(NUMTHREADS);
     for (int i = 0; i < NUMTHREADS; ++i)
     {
         hpx::lcos::local::promise<void> p;
@@ -83,7 +83,9 @@ void test_tss()
 ///////////////////////////////////////////////////////////////////////////////
 bool tss_cleanup_called = false;
 
-struct Dummy {};
+struct Dummy
+{
+};
 
 void tss_custom_cleanup(Dummy* d)
 {
@@ -207,7 +209,7 @@ void test_tss_cleanup_not_called_for_null_pointer()
     HPX_TEST(!tss_cleanup_called);
 }
 
-int main(int argc, char**argv)
+int main(int argc, char** argv)
 {
     test_tss();
     test_tss_with_custom_cleanup();

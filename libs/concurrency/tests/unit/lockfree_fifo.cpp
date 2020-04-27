@@ -11,12 +11,12 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/testing.hpp>
 
-#include <boost/lockfree/queue.hpp>
 #include <hpx/program_options.hpp>
+#include <boost/lockfree/queue.hpp>
 
-#include <thread>
 #include <cstdint>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 std::vector<boost::lockfree::queue<std::uint64_t>*> queues;
@@ -34,7 +34,8 @@ bool get_next_thread(std::uint64_t num_thread)
 
     for (std::uint64_t i = 0; i < threads; ++i)
     {
-        if (i == num_thread) continue;
+        if (i == num_thread)
+            continue;
 
         if ((*queues[i]).pop(r))
         {
@@ -48,8 +49,8 @@ bool get_next_thread(std::uint64_t num_thread)
 
 void worker_thread(std::uint64_t num_thread)
 {
-//    while (get_next_thread(num_thread))
-//        {}
+    //    while (get_next_thread(num_thread))
+    //        {}
     for (std::uint64_t i = 0; i < items; ++i)
     {
         bool result = get_next_thread(num_thread);
@@ -59,18 +60,19 @@ void worker_thread(std::uint64_t num_thread)
 
 int main(int argc, char** argv)
 {
-    using hpx::program_options::variables_map;
-    using hpx::program_options::options_description;
-    using hpx::program_options::value;
-    using hpx::program_options::store;
     using hpx::program_options::command_line_parser;
     using hpx::program_options::notify;
+    using hpx::program_options::options_description;
+    using hpx::program_options::store;
+    using hpx::program_options::value;
+    using hpx::program_options::variables_map;
 
     variables_map vm;
 
-    options_description
-        desc_cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_cmdline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     desc_cmdline.add_options()
         ("help,h", "print out program usage (this message)")
         ("threads,t", value<std::uint64_t>(&threads)->default_value(2),
@@ -78,10 +80,13 @@ int main(int argc, char** argv)
         ("items,i", value<std::uint64_t>(&items)->default_value(500000),
          "the number of items to create per queue")
     ;
+    // clang-format on
 
-    store(
-        command_line_parser(argc,
-            argv).options(desc_cmdline).allow_unregistered().run(),vm);
+    store(command_line_parser(argc, argv)
+              .options(desc_cmdline)
+              .allow_unregistered()
+              .run(),
+        vm);
 
     notify(vm);
 
@@ -128,4 +133,3 @@ int main(int argc, char** argv)
 
     return hpx::util::report_errors();
 }
-

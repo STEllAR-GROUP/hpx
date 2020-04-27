@@ -76,7 +76,8 @@ int hpx_main(int argc, char* argv[])
 
     p = threads.equal_range("timer-thread");
     auto cfg = hpx::get_config_entry("hpx.threadpools.timer_pool_size", "0");
-    HPX_TEST_EQ(std::distance(p.first, p.second), hpx::util::from_string<int>(cfg));
+    HPX_TEST_EQ(
+        std::distance(p.first, p.second), hpx::util::from_string<int>(cfg));
 
 #if defined(HPX_HAVE_NETWORKING)
     if (hpx::is_networking_enabled())
@@ -90,7 +91,8 @@ int hpx_main(int argc, char* argv[])
 
     p = threads.equal_range("io-thread");
     cfg = hpx::get_config_entry("hpx.threadpools.io_pool_size", "0");
-    HPX_TEST_EQ(std::distance(p.first, p.second), hpx::util::from_string<int>(cfg));
+    HPX_TEST_EQ(
+        std::distance(p.first, p.second), hpx::util::from_string<int>(cfg));
 
     return hpx::finalize();
 }

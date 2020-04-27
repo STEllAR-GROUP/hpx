@@ -20,28 +20,27 @@
 #define NUM_SUSPEND_TESTS 1000
 #define NUM_YIELD_TESTS 1000
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     std::ostream& operator<<(std::ostream& os, executor const& exec)
     {
         os << exec.get_id();
         return os;
     }
-}}
+}}    // namespace hpx::threads
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_executor_association_yield()
 {
     hpx::threads::thread_id_type id = hpx::threads::get_self_id();
-    hpx::threads::executors::current_executor exec_before
-            = hpx::threads::get_executor(id);
+    hpx::threads::executors::current_executor exec_before =
+        hpx::threads::get_executor(id);
 
     for (int i = 0; i != NUM_YIELD_TESTS; ++i)
     {
         hpx::this_thread::yield();
 
-        hpx::threads::executors::current_executor exec_after
-                = hpx::threads::get_executor(id);
+        hpx::threads::executors::current_executor exec_after =
+            hpx::threads::get_executor(id);
         HPX_TEST(exec_before == exec_after);
     }
 }
@@ -55,8 +54,8 @@ void wakeup_thread(hpx::threads::thread_id_type id)
 void test_executor_association_suspend()
 {
     hpx::threads::thread_id_type id = hpx::threads::get_self_id();
-    hpx::threads::executors::current_executor exec_before
-            = hpx::threads::get_executor(id);
+    hpx::threads::executors::current_executor exec_before =
+        hpx::threads::get_executor(id);
 
     for (int i = 0; i != NUM_YIELD_TESTS; ++i)
     {
@@ -64,8 +63,8 @@ void test_executor_association_suspend()
 
         hpx::this_thread::suspend(hpx::threads::suspended);
 
-        hpx::threads::executors::current_executor exec_after
-                = hpx::threads::get_executor(id);
+        hpx::threads::executors::current_executor exec_after =
+            hpx::threads::get_executor(id);
         HPX_TEST(exec_before == exec_after);
     }
 }
@@ -77,7 +76,7 @@ int hpx_main()
         hpx::threads::executors::local_priority_queue_executor exec(
             hpx::get_os_thread_count());
 
-        std::vector<hpx::future<void> > result;
+        std::vector<hpx::future<void>> result;
         for (std::size_t i = 0; i != hpx::get_os_thread_count(); ++i)
         {
             hpx::apply(exec, &test_executor_association_yield);
@@ -91,11 +90,13 @@ int hpx_main()
         hpx::threads::executors::local_priority_queue_executor exec(
             hpx::get_os_thread_count());
 
-        std::vector<hpx::future<void> > result;
+        std::vector<hpx::future<void>> result;
         for (std::size_t i = 0; i != hpx::get_os_thread_count(); ++i)
         {
-            result.push_back(hpx::async(exec, &test_executor_association_yield));
-            result.push_back(hpx::async(exec, &test_executor_association_suspend));
+            result.push_back(
+                hpx::async(exec, &test_executor_association_yield));
+            result.push_back(
+                hpx::async(exec, &test_executor_association_suspend));
         }
         hpx::wait_all();
     }
@@ -107,7 +108,7 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(0, hpx::init(argc, argv), "hpx::init returned non-zero value");
+    HPX_TEST_EQ_MSG(
+        0, hpx::init(argc, argv), "hpx::init returned non-zero value");
     return hpx::util::report_errors();
 }
-

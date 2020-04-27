@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/threadmanager.hpp>
 #include <hpx/testing.hpp>
 
 #include <cstddef>
@@ -26,7 +26,7 @@ int hpx_main()
 {
     std::size_t num_cores = hpx::get_os_thread_count();
 
-    std::vector<hpx::future<void> > finished;
+    std::vector<hpx::future<void>> finished;
     finished.reserve(num_cores);
 
     for (std::size_t i = 0; i != num_cores; ++i)
@@ -41,11 +41,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // By default this test should run on all available cores
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     HPX_TEST_EQ(hpx::init(argc, argv, cfg), 0);
     return hpx::util::report_errors();
 }
-

@@ -17,9 +17,9 @@
 #include <iostream>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using std::chrono::milliseconds;
 
@@ -27,32 +27,29 @@ using hpx::naming::id_type;
 
 using hpx::threads::register_thread_nullary;
 
-using hpx::lcos::future;
 using hpx::async;
+using hpx::lcos::future;
 
-using hpx::threads::thread_id_type;
-using hpx::threads::thread_data;
 using hpx::this_thread::suspend;
-using hpx::threads::set_thread_state;
-using hpx::threads::thread_state_ex_enum;
 using hpx::threads::pending;
+using hpx::threads::set_thread_state;
 using hpx::threads::suspended;
+using hpx::threads::thread_data;
+using hpx::threads::thread_id_type;
+using hpx::threads::thread_state_ex_enum;
 using hpx::threads::wait_signaled;
-using hpx::threads::wait_timeout;
 using hpx::threads::wait_terminate;
+using hpx::threads::wait_timeout;
 
-using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
+using hpx::init;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace detail
-{
+namespace detail {
     template <typename T1>
-    std::uint64_t wait(
-        std::vector<future<T1> > const& lazy_values
-      , std::int32_t suspend_for = 10
-        )
+    std::uint64_t wait(std::vector<future<T1>> const& lazy_values,
+        std::int32_t suspend_for = 10)
     {
         boost::dynamic_bitset<> handled(lazy_values.size());
         std::uint64_t handled_count = 0;
@@ -84,45 +81,35 @@ namespace detail
         }
         return handled.count();
     }
-}
+}    // namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
-void change_thread_state(
-    std::uint64_t thread
-    )
+void change_thread_state(std::uint64_t thread)
 {
-//    std::cout << "waking up thread (wait_signaled)\n";
+    //    std::cout << "waking up thread (wait_signaled)\n";
     thread_id_type id(reinterpret_cast<thread_data*>(thread));
     set_thread_state(id, pending, wait_signaled);
 
-//    std::cout << "suspending thread (wait_timeout)\n";
+    //    std::cout << "suspending thread (wait_timeout)\n";
     set_thread_state(id, suspended, wait_timeout);
 }
 
 HPX_PLAIN_ACTION(change_thread_state, change_thread_state_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-void tree_boot(
-    std::uint64_t count
-  , std::uint64_t grain_size
-  , id_type const& prefix
-  , std::uint64_t thread
-    );
+void tree_boot(std::uint64_t count, std::uint64_t grain_size,
+    id_type const& prefix, std::uint64_t thread);
 
 HPX_PLAIN_ACTION(tree_boot, tree_boot_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-void tree_boot(
-    std::uint64_t count
-  , std::uint64_t grain_size
-  , id_type const& prefix
-  , std::uint64_t thread
-    )
+void tree_boot(std::uint64_t count, std::uint64_t grain_size,
+    id_type const& prefix, std::uint64_t thread)
 {
     HPX_TEST(grain_size);
     HPX_TEST(count);
 
-    std::vector<future<void> > promises;
+    std::vector<future<void>> promises;
 
     std::uint64_t const actors = (count > grain_size) ? grain_size : count;
 
@@ -147,8 +134,8 @@ void tree_boot(
 
     for (std::uint64_t i = 0; i < children; ++i)
     {
-        promises.push_back(async<tree_boot_action>
-            (prefix, child_count, grain_size, prefix, thread));
+        promises.push_back(async<tree_boot_action>(
+            prefix, child_count, grain_size, prefix, thread));
     }
 
     for (std::uint64_t i = 0; i < actors; ++i)
@@ -158,13 +145,9 @@ void tree_boot(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_dummy_thread(
-    std::uint64_t futures
-    )
+void test_dummy_thread(std::uint64_t futures)
 {
-    std::uint64_t woken = 0
-                  , signaled = 0
-                  , timed_out = 0;
+    std::uint64_t woken = 0, signaled = 0, timed_out = 0;
 
     while (true)
     {
@@ -221,6 +204,7 @@ int main(int argc, char* argv[])
     // Configure application-specific options
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
         ( "futures"
         , value<std::uint64_t>()->default_value(64)
@@ -230,8 +214,8 @@ int main(int argc, char* argv[])
         , value<std::uint64_t>()->default_value(4)
         , "grain size of the future tree")
     ;
+    // clang-format on
 
     // Initialize and run HPX
     return init(cmdline, argc, argv);
 }
-

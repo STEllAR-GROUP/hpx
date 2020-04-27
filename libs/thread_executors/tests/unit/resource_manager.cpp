@@ -22,23 +22,21 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace test
-{
+namespace test {
     struct dummy_parameters
     {
         dummy_parameters() = default;
     };
 
     static constexpr dummy_parameters dummy{};
-}
+}    // namespace test
 
-namespace hpx { namespace parallel { namespace execution
-{
+namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct is_executor_parameters<test::dummy_parameters>
-      : std::true_type
-    {};
-}}}
+    struct is_executor_parameters<test::dummy_parameters> : std::true_type
+    {
+    };
+}}}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void verify_resource_allocation(std::size_t num_execs, std::size_t num_pus)
@@ -74,33 +72,28 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
         // give executors a chance to get started
         hpx::this_thread::yield();
 
-        for(Executor& exec : execs)
+        for (Executor& exec : execs)
         {
-            HPX_TEST_EQ(
-                hpx::parallel::execution::processing_units_count(
-                    exec, test::dummy),
+            HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
+                            exec, test::dummy),
                 num_pus);
         }
 
         // schedule a couple of tasks on each of the executors
-        for(Executor& exec : execs)
+        for (Executor& exec : execs)
         {
             for (int i = 0; i != num_tasks; ++i)
             {
-                hpx::parallel::execution::post(exec,
-                    [&count_invocations]()
-                    {
-                        ++count_invocations;
-                    });
+                hpx::parallel::execution::post(
+                    exec, [&count_invocations]() { ++count_invocations; });
             }
         }
 
         // test again
-        for(Executor& exec : execs)
+        for (Executor& exec : execs)
         {
-            HPX_TEST_EQ(
-                hpx::parallel::execution::processing_units_count(
-                    exec, test::dummy),
+            HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
+                            exec, test::dummy),
                 num_pus);
         }
     }
@@ -140,12 +133,11 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
     // give the executor a chance to get started
     hpx::this_thread::yield();
 
-    HPX_TEST_EQ(
-        hpx::parallel::execution::processing_units_count(
-            shrink_exec, test::dummy),
+    HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
+                    shrink_exec, test::dummy),
         processing_units);
 
-    std::size_t num_execs = (processing_units-1) / num_pus;
+    std::size_t num_execs = (processing_units - 1) / num_pus;
 
     {
         // create as many executors as we have cores available using num_pus
@@ -157,46 +149,39 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
         // give executors a chance to get started
         hpx::this_thread::yield();
 
-        for(Executor& exec : execs)
+        for (Executor& exec : execs)
         {
-            HPX_TEST_EQ(
-                hpx::parallel::execution::processing_units_count(
-                    exec, test::dummy),
+            HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
+                            exec, test::dummy),
                 num_pus);
         }
 
         // the main executor should run on a reduced amount of cores
-        HPX_TEST_EQ(
-            hpx::parallel::execution::processing_units_count(
-                shrink_exec, test::dummy),
+        HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
+                        shrink_exec, test::dummy),
             processing_units - num_execs * num_pus);
 
         // schedule a couple of tasks on each of the executors
-        for(Executor& exec : execs)
+        for (Executor& exec : execs)
         {
             for (int i = 0; i != num_tasks; ++i)
             {
-                hpx::parallel::execution::post(exec,
-                    [&count_invocations]()
-                    {
-                        ++count_invocations;
-                    });
+                hpx::parallel::execution::post(
+                    exec, [&count_invocations]() { ++count_invocations; });
             }
         }
 
         // test again
-        for(Executor& exec : execs)
+        for (Executor& exec : execs)
         {
-            HPX_TEST_EQ(
-                hpx::parallel::execution::processing_units_count(
-                    exec, test::dummy),
+            HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
+                            exec, test::dummy),
                 num_pus);
         }
 
         // the main executor should run on a reduced amount of cores
-        HPX_TEST_EQ(
-            hpx::parallel::execution::processing_units_count(
-                shrink_exec, test::dummy),
+        HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
+                        shrink_exec, test::dummy),
             processing_units - num_execs * num_pus);
     }
 
@@ -216,9 +201,11 @@ void test_executors_shrink(std::size_t num_pus)
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
     test_executors_shrink<static_queue_executor>(processing_units, num_pus);
 #endif
-    test_executors_shrink<local_priority_queue_executor>(processing_units, num_pus);
+    test_executors_shrink<local_priority_queue_executor>(
+        processing_units, num_pus);
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-    test_executors_shrink<static_priority_queue_executor>(processing_units, num_pus);
+    test_executors_shrink<static_priority_queue_executor>(
+        processing_units, num_pus);
 #endif
 }
 
@@ -245,9 +232,8 @@ int main(int argc, char* argv[])
     std::vector<std::string> cfg;
     cfg.push_back("hpx.os_threads=all");
 
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, cfg), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv, cfg), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
-

@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 ///////////////////////////////////////////////////////////////////////////////
 bool normal_function_called = false;
@@ -131,13 +131,14 @@ struct callable_multiple_arg
     static std::vector<int> called_three_arg2;
     static int called_three_arg3;
 
-    void operator()(int arg1,double arg2) const
+    void operator()(int arg1, double arg2) const
     {
         called_two = true;
         called_two_arg1 = arg1;
         called_two_arg2 = arg2;
     }
-    void operator()(std::string const& arg1,std::vector<int> const& arg2,int arg3) const
+    void operator()(
+        std::string const& arg1, std::vector<int> const& arg2, int arg3) const
     {
         called_three = true;
         called_three_arg1 = arg1;
@@ -157,9 +158,9 @@ int callable_multiple_arg::called_three_arg3;
 void test_thread_callable_object_multiple_arguments()
 {
     std::vector<int> x;
-    for(int i = 0; i < 7; ++i)
+    for (int i = 0; i < 7; ++i)
     {
-        x.push_back(i*i);
+        x.push_back(i * i);
     }
 
     callable_multiple_arg func;
@@ -169,7 +170,7 @@ void test_thread_callable_object_multiple_arguments()
     HPX_TEST(callable_multiple_arg::called_three);
     HPX_TEST_EQ(callable_multiple_arg::called_three_arg1, "hello");
     HPX_TEST_EQ(callable_multiple_arg::called_three_arg2.size(), x.size());
-    for(unsigned j = 0; j < x.size(); ++j)
+    for (unsigned j = 0; j < x.size(); ++j)
     {
         HPX_TEST_EQ(callable_multiple_arg::called_three_arg2.at(j), x[j]);
     }
@@ -192,9 +193,10 @@ struct X
     int arg_value;
 
     X()
-      : function_called(false),
-        arg_value(0)
-    {}
+      : function_called(false)
+      , arg_value(0)
+    {
+    }
 
     void f0()
     {
@@ -205,7 +207,6 @@ struct X
     {
         arg_value = i;
     }
-
 };
 
 void test_thread_member_function_no_arguments()
@@ -252,4 +253,3 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv);
 }
-
