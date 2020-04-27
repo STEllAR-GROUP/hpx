@@ -13,16 +13,19 @@
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/basic_execution/register_locks.hpp>
 #endif
+#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/threading_base/detail/reset_lco_description.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/timing/steady_clock.hpp>
+
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/debugging/backtrace.hpp>
+#include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
-#include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -330,62 +333,6 @@ namespace hpx { namespace threads {
 }}    // namespace hpx::threads
 
 namespace hpx { namespace this_thread {
-    namespace detail {
-        struct reset_lco_description
-        {
-            reset_lco_description(threads::thread_id_type const& id,
-                util::thread_description const& description, error_code& ec)
-              : id_(id)
-              , ec_(ec)
-            {
-                old_desc_ =
-                    threads::set_thread_lco_description(id_, description, ec_);
-            }
-
-            ~reset_lco_description()
-            {
-                threads::set_thread_lco_description(id_, old_desc_, ec_);
-            }
-
-            threads::thread_id_type id_;
-            util::thread_description old_desc_;
-            error_code& ec_;
-        };
-
-#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-        struct reset_backtrace
-        {
-            reset_backtrace(threads::thread_id_type const& id, error_code& ec)
-              : id_(id)
-              , backtrace_(new hpx::util::backtrace())
-              ,
-#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-              full_backtrace_(backtrace_->trace())
-              ,
-#endif
-              ec_(ec)
-            {
-#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-                threads::set_thread_backtrace(
-                    id_, full_backtrace_.c_str(), ec_);
-#else
-                threads::set_thread_backtrace(id_, backtrace_.get(), ec_);
-#endif
-            }
-            ~reset_backtrace()
-            {
-                threads::set_thread_backtrace(id_, 0, ec_);
-            }
-
-            threads::thread_id_type id_;
-            std::unique_ptr<hpx::util::backtrace> backtrace_;
-#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-            std::string full_backtrace_;
-#endif
-            error_code& ec_;
-        };
-#endif
-    }    // namespace detail
 
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
@@ -414,10 +361,10 @@ namespace hpx { namespace this_thread {
             util::verify_no_locks();
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            detail::reset_lco_description desc(id, description, ec);
+            threads::detail::reset_lco_description desc(id, description, ec);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            detail::reset_backtrace bt(id, ec);
+            threads::detail::reset_backtrace bt(id, ec);
 #endif
             // We might need to dispatch 'nextid' to it's correct scheduler
             // only if our current scheduler is the same, we should yield the id
@@ -482,10 +429,10 @@ namespace hpx { namespace this_thread {
             util::verify_no_locks();
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            detail::reset_lco_description desc(id, description, ec);
+            threads::detail::reset_lco_description desc(id, description, ec);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            detail::reset_backtrace bt(id, ec);
+            threads::detail::reset_backtrace bt(id, ec);
 #endif
             std::atomic<bool> timer_started(false);
             threads::thread_id_type timer_id =
