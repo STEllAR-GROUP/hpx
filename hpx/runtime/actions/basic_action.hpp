@@ -775,7 +775,7 @@ namespace hpx { namespace serialization
         template <>                                                           \
         struct action_stacksize< action>                                      \
         {                                                                     \
-            enum { value = size };                                            \
+            HPX_STATIC_CONSTEXPR threads::thread_stacksize value = size;      \
         };                                                                    \
     }}                                                                        \
 /**/
@@ -827,7 +827,7 @@ namespace hpx { namespace serialization
         template <>                                                           \
         struct action_priority< action>                                       \
         {                                                                     \
-            enum { value = priority };                                        \
+            HPX_STATIC_CONSTEXPR threads::thread_priority value = priority;   \
         };                                                                    \
         /* make sure the action is not executed directly */                   \
         template <>                                                           \
