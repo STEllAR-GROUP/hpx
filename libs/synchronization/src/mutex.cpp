@@ -45,6 +45,7 @@ namespace hpx { namespace lcos { namespace local {
         if (owner_id_ == self_id)
         {
             HPX_ITT_SYNC_CANCEL(this);
+            l.unlock();
             HPX_THROWS_IF(ec, deadlock, description,
                 "The calling thread already owns the mutex");
             return;
@@ -97,6 +98,7 @@ namespace hpx { namespace lcos { namespace local {
         threads::thread_id_type self_id = threads::get_self_id();
         if (HPX_UNLIKELY(owner_id_ != self_id))
         {
+            l.unlock();
             HPX_THROWS_IF(ec, lock_error, "mutex::unlock",
                 "The calling thread does not own the mutex");
             return;
