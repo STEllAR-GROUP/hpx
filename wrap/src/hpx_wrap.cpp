@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/init/config/defines.hpp>
+#include <hpx/wrap/config/defines.hpp>
 
 // The following implementation has been divided for Linux and Mac OSX
 #if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) && \

@@ -585,24 +585,37 @@ if(MSVC AND HPX_WITH_SWAP_CONTEXT_EMULATION)
   target_link_options(hpx_some_name PRIVATE "/EXPORT:switch_to_fiber")
 endif()
 
+################################################################################
+# Exported targets
+################################################################################
 set(_library_types "STATIC_LIBRARY;MODULE_LIBRARY;SHARED_LIBRARY;OBJECT_LIBRARY;INTERFACE_LIBRARY")
 set(_is_executable "$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>")
 set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 
-# The main exported target
+add_library(hpx_no_wrap_main INTERFACE)
 add_library(hpx INTERFACE)
+
+target_link_libraries(hpx_no_wrap_main INTERFACE hpx_some_name)
 target_link_libraries(hpx INTERFACE hpx_some_name)
 
-# hpx_interface contains additional interface options to be passed to dependent
-# targets. We create this as a separate target to easily filter out the
-# generator expressions that can't be handled by the pkgconfig file generation.
+# hpx_interface and hpx_interface_no_wrap_main contain additional interface
+# options to be passed to dependent targets. We create these as separate
+# targets to easily filter out the generator expressions that can't be handled
+# by the pkgconfig file generation.
+add_library(hpx_interface_no_wrap_main INTERFACE)
+target_link_libraries(hpx_interface_no_wrap_main INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>)
+target_link_libraries(hpx_interface_no_wrap_main INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>)
+target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>")
+target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">")
+target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>")
+target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>")
+
 add_library(hpx_interface INTERFACE)
-target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>)
-target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>)
-target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>")
-target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">")
-target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>")
-target_compile_definitions(hpx_interface INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>")
+target_link_libraries(hpx_interface INTERFACE hpx_interface_no_wrap_main)
+target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_wrap>>)
+target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_wrap>>)
+
+target_link_libraries(hpx_no_wrap_main INTERFACE hpx_interface_no_wrap_main)
 target_link_libraries(hpx INTERFACE hpx_interface)
 
 # HPX::component is to be linked privately to all HPX components
@@ -620,8 +633,8 @@ target_compile_definitions(component INTERFACE "$<${_is_library}:HPX_COMPONENT_E
 add_library(plugin INTERFACE)
 target_compile_definitions(plugin INTERFACE "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>")
 
-set(hpx_targets hpx plugin component)
-set(hpx_internal_targets hpx_some_name hpx_interface)
+set(hpx_targets hpx hpx_no_wrap_main plugin component)
+set(hpx_internal_targets hpx_core hpx_interface hpx_interface_no_wrap_main)
 
 install(
   TARGETS ${hpx_targets}

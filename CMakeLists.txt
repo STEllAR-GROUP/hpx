@@ -1844,9 +1844,10 @@ endif()
 add_subdirectory(src)
 
 ################################################################################
-# Add static init library
+# Add static init and wrap library
 ################################################################################
 add_subdirectory(init)
+add_subdirectory(wrap)
 
 ################################################################################
 # Add components

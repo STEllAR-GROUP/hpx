@@ -9,7 +9,7 @@
 #define HPX_HPX_MAIN_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/init/config/defines.hpp>
+#include <hpx/wrap/config/defines.hpp>
 #include <hpx/hpx_init.hpp>
 
 // We support different implementation depending upon the Operating
