@@ -9,7 +9,6 @@ set(subdirs
     build
     lcos
     resource
-    threads
     traits
     util
    )
