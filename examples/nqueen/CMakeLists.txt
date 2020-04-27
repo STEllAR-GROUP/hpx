@@ -12,6 +12,7 @@ endif()
 
 add_hpx_component(nqueen
   INTERNAL_FLAGS
+  NOEXPORT
   SOURCE_GLOB "nqueen.cp*"
   HEADER_GLOB "nqueen.hp*"
   FOLDER "Examples/Applications/NQueen"

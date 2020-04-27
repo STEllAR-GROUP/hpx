@@ -6,6 +6,7 @@
 
 add_hpx_component(jacobi
     INTERNAL_FLAGS
+    NOEXPORT
     AUTOGLOB
     SOURCE_GLOB "*.c*"
     HEADER_GLOB "*.h*"

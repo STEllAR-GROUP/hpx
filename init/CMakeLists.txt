@@ -111,7 +111,7 @@ endif()
 
 install(
   TARGETS hpx_init
-  EXPORT HPXTargets
+  EXPORT HPXInternalTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -144,6 +144,6 @@ if(MSVC)
   endforeach()
 endif()
 
-hpx_export_targets(hpx_init)
+hpx_export_internal_targets(hpx_init)
 
 add_hpx_pseudo_dependencies(core hpx_init)

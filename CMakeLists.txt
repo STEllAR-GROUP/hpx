@@ -114,7 +114,7 @@ hpx_info("HPX version: ${HPX_VERSION}")
 # reset cached variables that need to be re-filled
 unset(HPX_COMPONENTS CACHE)
 unset(HPX_EXPORT_TARGETS CACHE)
-unset(HPX_EXPORT_MODULES_TARGETS CACHE)
+unset(HPX_EXPORT_INTERNAL_TARGETS CACHE)
 unset(HPX_LIBS CACHE)
 unset(HPX_STATIC_PARCELPORT_PLUGINS CACHE)
 
@@ -2004,13 +2004,13 @@ create_configuration_summary("Configuration summary:\n--" "hpx")
 
 include(HPX_ExportTargets)
 # Modules can't link to this if not exported
-install(TARGETS hpx_base_libraries EXPORT HPXTargets
+install(TARGETS hpx_base_libraries EXPORT HPXInternalTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT hpx_base_libraries
 )
-hpx_export_targets(hpx_base_libraries)
+hpx_export_internal_targets(hpx_base_libraries)
 
 ################################################################################
 # store cache vars and their values in order for them to be forwarded to the

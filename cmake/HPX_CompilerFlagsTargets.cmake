@@ -21,17 +21,17 @@ target_compile_definitions(hpx_public_flags INTERFACE $<$<CONFIG:Debug>:HPX_DEBU
 
 include(HPX_ExportTargets)
 # Modules can't link to this if not exported
-install(TARGETS hpx_private_flags EXPORT HPXModulesTargets
+install(TARGETS hpx_private_flags EXPORT HPXInternalTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT hpx_private_flags
 )
-install(TARGETS hpx_public_flags EXPORT HPXModulesTargets
+install(TARGETS hpx_public_flags EXPORT HPXInternalTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT hpx_public_flags
 )
-hpx_export_modules_targets(hpx_private_flags)
-hpx_export_modules_targets(hpx_public_flags)
+hpx_export_internal_targets(hpx_private_flags)
+hpx_export_internal_targets(hpx_public_flags)

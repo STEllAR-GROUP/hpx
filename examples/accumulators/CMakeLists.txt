@@ -28,6 +28,7 @@ foreach(example_program ${example_programs})
   # add example components
   add_hpx_component(${example_program}
     INTERNAL_FLAGS
+    NOEXPORT
     SOURCES ${component_sources}
     HEADERS ${component_headers}
     FOLDER "Examples/Quickstart/Accumulators/${example_program}")

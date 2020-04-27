@@ -242,13 +242,13 @@ function(add_hpx_module name)
   endif()
 
   # Install the static library for the module
-  install(TARGETS hpx_${name} EXPORT HPXModulesTargets
+  install(TARGETS hpx_${name} EXPORT HPXInternalTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT ${name}
   )
-  hpx_export_modules_targets(hpx_${name})
+  hpx_export_internal_targets(hpx_${name})
 
   # Install the headers from the source
   install(

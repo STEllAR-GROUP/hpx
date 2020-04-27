@@ -11,13 +11,9 @@ cmake_policy(VERSION 3.13)
 # Forward HPX_* cache variables
 include("${CMAKE_CURRENT_LIST_DIR}/HPXCacheVariables.cmake")
 
-# include exported targets if not already defined
-if (NOT TARGET hpx_config)
-  include("${CMAKE_CURRENT_LIST_DIR}/HPXModulesTargets.cmake")
-endif()
-if (NOT TARGET hpx)
-  include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
-endif()
+# include exported targets
+include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 
 # include HPX cmake utilities
 include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")

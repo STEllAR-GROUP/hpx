@@ -10,6 +10,7 @@ endif()
 
 add_hpx_component(startup_shutdown
   INTERNAL_FLAGS
+  NOEXPORT
   FOLDER "Examples/StartupShutdown"
   AUTOGLOB)
 

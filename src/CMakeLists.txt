@@ -596,7 +596,7 @@ set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 # generator expressions that can't be handled by the pkgconfig file generation.
 add_library(hpx_interface INTERFACE)
 target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>)
-target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPX::hpx_init>>)
+target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>)
 target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>")
 target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">")
 target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>")
@@ -618,11 +618,21 @@ target_compile_definitions(component INTERFACE "$<${_is_library}:HPX_COMPONENT_E
 add_library(plugin INTERFACE)
 target_compile_definitions(plugin INTERFACE "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>")
 
-set(hpx_targets ${hpx_targets} hpx_interface plugin component)
+set(hpx_targets ${hpx_targets} plugin component)
 
 install(
   TARGETS ${hpx_targets}
   EXPORT HPXTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  COMPONENT runtime
+  ${_optional}
+)
+
+install(
+  TARGETS hpx_interface
+  EXPORT HPXInternalTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -641,6 +651,7 @@ if(MSVC)
 endif()
 
 hpx_export_targets(${hpx_targets})
+hpx_export_internal_targets(hpx_interface)
 
 foreach(target ${hpx_targets})
   add_hpx_pseudo_dependencies(core ${target})
