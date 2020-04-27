@@ -28,8 +28,6 @@ if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
 
-set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
-
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE Hwloc::hwloc)
 
