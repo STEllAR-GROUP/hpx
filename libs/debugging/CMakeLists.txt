@@ -34,6 +34,8 @@ add_hpx_module(debugging
   SOURCES ${debugging_sources}
   HEADERS ${debugging_headers}
   COMPAT_HEADERS ${debugging_compat_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER
+    "hpx/debugging/backtrace/backtrace.hpp"
   DEPENDENCIES
     hpx_config
   CMAKE_SUBDIRS examples tests
