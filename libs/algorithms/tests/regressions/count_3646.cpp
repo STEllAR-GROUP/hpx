@@ -39,6 +39,32 @@ struct BitCountingIterator : public Iterator<std::int64_t, stopValue>
         return countBits(this->state + n);
     }
 
+    BitCountingIterator& operator++()
+    {
+        ++(this->state);
+        return *this;
+    }
+
+    BitCountingIterator operator++(int)
+    {
+        auto copy = *this;
+        ++(*this);
+        return copy;
+    }
+
+    BitCountingIterator& operator--()
+    {
+        --(this->state);
+        return *this;
+    }
+
+    BitCountingIterator operator--(int)
+    {
+        auto copy = *this;
+        --(*this);
+        return copy;
+    }
+
 private:
     std::int64_t countBits(std::int64_t v) const
     {

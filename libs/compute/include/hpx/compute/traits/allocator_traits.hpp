@@ -80,7 +80,7 @@ namespace hpx { namespace compute { namespace traits {
         template <typename Allocator, typename Enable = void>
         struct target_helper_result
         {
-            typedef compute::host::target& type;
+            typedef compute::host::target type;
         };
 
         template <typename Allocator>
@@ -95,11 +95,10 @@ namespace hpx { namespace compute { namespace traits {
         struct target_helper
         {
             template <typename Allocator>
-            HPX_HOST_DEVICE static compute::host::target& call(
+            HPX_HOST_DEVICE static compute::host::target call(
                 hpx::traits::detail::wrap_int, Allocator const& alloc)
             {
-                static compute::host::target t;
-                return t;
+                return compute::host::target();
             }
 
             template <typename Allocator>
