@@ -5,7 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    lockfree_fifo
     schedule_last
     stack_check
     error_callback
@@ -38,19 +37,6 @@ endif()
 if(HPX_WITH_THREAD_LOCAL_STORAGE)
   set(tests ${tests} tss)
 endif()
-
-set(lockfree_fifo_FLAGS NOLIBS)
-set(lockfree_fifo_LIBRARIES
-  DEPENDENCIES
-    hpx_dependencies_boost
-    hpx_assertion
-    hpx_config
-    hpx_concurrency
-    hpx_datastructures
-    hpx_functional
-    hpx_program_options
-    hpx_testing
-    hpx_type_support)
 
 set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -91,11 +77,6 @@ foreach(test ${tests})
   add_hpx_unit_test("threads" ${test} ${${test}_PARAMETERS})
 
 endforeach()
-
-target_compile_definitions(lockfree_fifo_test
-  PRIVATE HPX_MODULE_STATIC_LINKING HPX_NO_VERSION_CHECK)
-target_include_directories(lockfree_fifo_test
-  PRIVATE ${HPX_SOURCE_DIR})
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set_tests_properties(tests.unit.threads.thread_stacksize_overflow PROPERTIES
