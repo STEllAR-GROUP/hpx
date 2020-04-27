@@ -81,8 +81,10 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
+            auto data = data_;    // keep data alive
+
             util::ignore_all_while_checking ignore_lock;
-            std::unique_lock<mutex_type> l(data_->mtx_);
+            std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<std::unique_lock<mutex>> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
@@ -90,8 +92,7 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
-            auto data = data_;    // keep data alive
-            data_->cond_.wait(l, ec);
+            data->cond_.wait(l, ec);
         }
 
         template <typename Predicate>
@@ -111,8 +112,10 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
+            auto data = data_;    // keep data alive
+
             util::ignore_all_while_checking ignore_lock;
-            std::unique_lock<mutex_type> l(data_->mtx_);
+            std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<std::unique_lock<mutex>> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
@@ -120,9 +123,8 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
-            auto data = data_;    // keep data alive
             threads::thread_state_ex_enum const reason =
-                data_->cond_.wait_until(l, abs_time, ec);
+                data->cond_.wait_until(l, abs_time, ec);
 
             if (ec)
                 return cv_status::error;
@@ -216,8 +218,10 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
+            auto data = data_;    // keep data alive
+
             util::ignore_all_while_checking ignore_lock;
-            std::unique_lock<mutex_type> l(data_->mtx_);
+            std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
@@ -225,8 +229,7 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
-            auto data = data_;    // keep data alive
-            data_->cond_.wait(l, ec);
+            data->cond_.wait(l, ec);
         }
 
         template <typename Lock, typename Predicate>
@@ -246,8 +249,10 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
+            auto data = data_;    // keep data alive
+
             util::ignore_all_while_checking ignore_lock;
-            std::unique_lock<mutex_type> l(data_->mtx_);
+            std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
@@ -255,9 +260,8 @@ namespace hpx { namespace lcos { namespace local {
             std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                 l, std::adopt_lock);
 
-            auto data = data_;    // keep data alive
             threads::thread_state_ex_enum const reason =
-                data_->cond_.wait_until(l, abs_time, ec);
+                data->cond_.wait_until(l, abs_time, ec);
 
             if (ec)
                 return cv_status::error;
@@ -317,7 +321,7 @@ namespace hpx { namespace lcos { namespace local {
             while (!pred())
             {
                 util::ignore_all_while_checking ignore_lock;
-                std::unique_lock<mutex_type> l(data_->mtx_);
+                std::unique_lock<mutex_type> l(data->mtx_);
                 if (stoken.stop_requested())
                 {
                     // pred() has already evaluated to false since we last
@@ -332,7 +336,7 @@ namespace hpx { namespace lcos { namespace local {
                 std::lock_guard<std::unique_lock<mutex_type>> unlock_next(
                     l, std::adopt_lock);
 
-                data_->cond_.wait(l, ec);
+                data->cond_.wait(l, ec);
             }
 
             return true;
@@ -361,7 +365,7 @@ namespace hpx { namespace lcos { namespace local {
                 bool should_stop;
                 {
                     util::ignore_all_while_checking ignore_lock;
-                    std::unique_lock<mutex_type> l(data_->mtx_);
+                    std::unique_lock<mutex_type> l(data->mtx_);
                     if (stoken.stop_requested())
                     {
                         // pred() has already evaluated to false since we last
@@ -377,7 +381,7 @@ namespace hpx { namespace lcos { namespace local {
                         l, std::adopt_lock);
 
                     threads::thread_state_ex_enum const reason =
-                        data_->cond_.wait_until(l, abs_time, ec);
+                        data->cond_.wait_until(l, abs_time, ec);
 
                     if (ec)
                         return false;

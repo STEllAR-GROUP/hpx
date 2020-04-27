@@ -12,9 +12,9 @@ set(threading_tests
     condition_variable_race
     jthread1
     jthread2
-    stop_tokencb1
-    stop_tokenrace
-    stop_tokenrace2
+    stop_token_cb1
+    stop_token_race
+    stop_token_race2
 )
 
 set(condition_variable2_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -23,9 +23,9 @@ set(condition_variable4_PARAMETERS THREADS_PER_LOCALITY 4)
 set(condition_variable_race_PARAMETERS THREADS_PER_LOCALITY 4)
 set(jthread1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(jthread2_PARAMETERS THREADS_PER_LOCALITY 4)
-set(stop_tokencb1_PARAMETERS THREADS_PER_LOCALITY 4)
-set(stop_tokenrace_PARAMETERS THREADS_PER_LOCALITY 4)
-set(stop_tokenrace2_PARAMETERS THREADS_PER_LOCALITY 1)
+set(stop_token_cb1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stop_token_race_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stop_token_race2_PARAMETERS THREADS_PER_LOCALITY 1)
 
 foreach(test ${threading_tests})
   set(sources ${test}.cpp)
@@ -43,6 +43,6 @@ foreach(test ${threading_tests})
 endforeach()
 
 set_tests_properties(
-  tests.unit.modules.threading.stop_tokenrace2
+  tests.unit.modules.threading.stop_token_race2
   PROPERTIES
     PASS_REGULAR_EXPRESSION "std::terminate called\n")
