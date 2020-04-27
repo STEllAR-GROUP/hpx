@@ -37,6 +37,7 @@ set(serialization_headers
   hpx/serialization/datapar.hpp
   hpx/serialization/deque.hpp
   hpx/serialization/dynamic_bitset.hpp
+  hpx/serialization/force_linking.hpp
   hpx/serialization/list.hpp
   hpx/serialization/map.hpp
   hpx/serialization/multi_array.hpp
@@ -141,6 +142,7 @@ set(serialization_sources
   detail/polymorphic_id_factory.cpp
   detail/polymorphic_intrusive_factory.cpp
   detail/polymorphic_nonintrusive_factory.cpp
+  force_linking.cpp
   serializable_any.cpp
 )
 
@@ -148,7 +150,6 @@ include(HPX_AddModule)
 add_hpx_module(serialization
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${serialization_sources}
   HEADERS ${serialization_headers}
