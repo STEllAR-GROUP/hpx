@@ -9,7 +9,6 @@ set(tests
    )
 
 set(subdirs
-    bind
     function
     mem_fn
    )

@@ -6,7 +6,17 @@
 
 # Function tests
 set(function_tests
-    #allocator_test
+  #allocator_test
+  bind_const_test
+  bind_cv_test
+  bind_dm2_test
+  bind_dm3_test
+  bind_dm_test
+  bind_placeholder_test
+  bind_rv_sp_test
+  bind_rvalue_test
+  bind_stateful_test
+  bind_test
   contains_test
   function_args
   function_arith
@@ -16,6 +26,7 @@ set(function_tests
   function_target
   function_test
   nothrow_swap
+  protect_test
   stateless_test
   sum_avg
 )
@@ -23,7 +34,7 @@ set(function_tests
 add_hpx_pseudo_target(tests.unit.modules.functional.function)
 
 foreach(test ${function_tests})
-  set(sources function/${test}.cpp)
+  set(sources test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
@@ -33,7 +44,7 @@ foreach(test ${function_tests})
     NOLIBS
     DEPENDENCIES hpx_functional hpx_testing
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/Functional/Function")
+    FOLDER "Tests/Unit/Modules/Functional")
 
   add_hpx_unit_test("modules.functional.function" ${test})
 
