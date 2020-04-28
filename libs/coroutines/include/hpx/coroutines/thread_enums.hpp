@@ -177,7 +177,7 @@ namespace hpx { namespace threads {
     /// constant.
     ///
     /// \param size this represents the stack size
-    HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
+    HPX_API_EXPORT char const* get_stack_size_enum_name(thread_stacksize size);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_schedule_hint_mode

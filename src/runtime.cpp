@@ -1635,4 +1635,26 @@ namespace hpx
         return false;
 #endif
     }
+
+    namespace threads
+    {
+        char const* get_stack_size_name(std::ptrdiff_t size)
+        {
+            thread_stacksize size_enum = thread_stacksize_unknown;
+
+            util::runtime_configuration const& rtcfg = hpx::get_config();
+            if (rtcfg.get_stack_size(thread_stacksize_small) == size)
+                size_enum = thread_stacksize_small;
+            else if (rtcfg.get_stack_size(thread_stacksize_medium) == size)
+                size_enum = thread_stacksize_medium;
+            else if (rtcfg.get_stack_size(thread_stacksize_large) == size)
+                size_enum = thread_stacksize_large;
+            else if (rtcfg.get_stack_size(thread_stacksize_huge) == size)
+                size_enum = thread_stacksize_huge;
+            else if (rtcfg.get_stack_size(thread_stacksize_nostack) == size)
+                size_enum = thread_stacksize_nostack;
+
+            return get_stack_size_enum_name(size_enum);
+        }
+    }
 }
