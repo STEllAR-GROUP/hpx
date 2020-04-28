@@ -34,6 +34,7 @@ add_hpx_module(command_line_handling
   COMPAT_HEADERS ${command_line_handling_compat_headers}
   DEPENDENCIES
     hpx_allocator_support
+    hpx_asio
     hpx_assertion
     hpx_affinity
     hpx_basic_execution
@@ -45,11 +46,15 @@ add_hpx_module(command_line_handling
     hpx_errors
     hpx_execution
     hpx_filesystem
+    hpx_functional
     hpx_format
     hpx_memory
+    hpx_mpi_base
     hpx_prefix
     hpx_program_options
     hpx_runtime_configuration
+    hpx_topology
+    hpx_util
     hpx_version
   CMAKE_SUBDIRS
 )

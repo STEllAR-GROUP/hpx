@@ -100,12 +100,15 @@ namespace hpx { namespace lcos { namespace detail
 
         int state = future_state::invalid;
         ar >> state;
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (state == future_state::has_value)
         {
             serialize_future_load(
                 ar, f, std::is_default_constructible<value_type>());
 
-        } else if (state == future_state::has_exception) {
+        } else
+        // NOLINTNEXTLINE(bugprone-branch-clone)
+        if (state == future_state::has_exception) {
             std::exception_ptr exception;
             ar >> exception;
 
@@ -114,9 +117,12 @@ namespace hpx { namespace lcos { namespace detail
                 false);
 
             f = hpx::traits::future_access<Future>::create(std::move(p));
-        } else if (state == future_state::invalid) {
+        } else
+        // NOLINTNEXTLINE(bugprone-branch-clone)
+        if (state == future_state::invalid) {
             f = Future();
-        } else {
+        }
+        else {
             HPX_THROW_EXCEPTION(invalid_status,
                 "serialize_future_load",
                 "attempting to deserialize a future with an unknown state");

@@ -141,7 +141,8 @@ if((HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
 set(fractals_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()
 
-if(HPX_WITH_TUPLE_RVALUE_SWAP)
+# the following example fails compiling on someversions of MSVC
+if(HPX_WITH_TUPLE_RVALUE_SWAP AND (NOT MSVC))
   set(example_programs ${example_programs}
       sort_by_key_demo
      )

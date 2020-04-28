@@ -183,6 +183,9 @@ namespace hpx { namespace threads { namespace executors {
 
         explicit local_priority_queue_executor(
             std::size_t max_punits, std::size_t min_punits = 1);
+
+        // this is only needed to force linking of the corresponding cpp file
+        static void dummy();
     };
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)

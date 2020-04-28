@@ -6,12 +6,13 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+
+#include <hpx/async.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/local_async.hpp>
 #include <hpx/mpi.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime/threads/policies/scheduler_base.hpp>
-#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 
 #include <array>
 #include <atomic>

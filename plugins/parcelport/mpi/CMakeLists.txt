@@ -10,18 +10,16 @@ include(HPX_AddLibrary)
 ################################################################################
 # Decide whether to use the MPI based parcelport
 ################################################################################
-if(HPX_WITH_PARCELPORT_MPI)
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
   hpx_debug("add_parcelport_mpi_module")
   include(HPX_AddParcelport)
   add_parcelport(mpi
     STATIC
     SOURCES
-      "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/mpi_environment.cpp"
       "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
     HEADERS
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
-      "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/mpi_environment.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/receiver_connection.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender.hpp"
@@ -31,6 +29,7 @@ if(HPX_WITH_PARCELPORT_MPI)
       hpx_asio
       hpx_allocator_support
       hpx_cache
+      hpx_command_line_handling
       hpx_config
       hpx_concurrency
       hpx_coroutines
@@ -38,9 +37,11 @@ if(HPX_WITH_PARCELPORT_MPI)
       hpx_filesystem
       hpx_hardware
       hpx_memory
+      hpx_mpi_base
       hpx_performance_counters
       hpx_plugin
       hpx_program_options
+      hpx_runtime_configuration
       hpx_serialization
       hpx_threading
       hpx_threadmanager

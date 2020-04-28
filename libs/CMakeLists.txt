@@ -49,6 +49,7 @@ set(HPX_CANDIDATE_LIBS
   logging
   memory
   mpi
+  mpi_base
   naming_base
   pack_traversal
   performance_counters
@@ -78,7 +79,6 @@ set(HPX_CANDIDATE_LIBS
   type_support
   util
   version
-  CACHE INTERNAL "list of HPX modules" FORCE
 )
 
 

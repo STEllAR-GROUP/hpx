@@ -9,6 +9,7 @@
 #include <hpx/async/apply.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/mpi_base.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
@@ -51,9 +52,6 @@
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
 
-#if defined(HPX_HAVE_NETWORKING)
-#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
-#endif
 
 #include <boost/tokenizer.hpp>
 

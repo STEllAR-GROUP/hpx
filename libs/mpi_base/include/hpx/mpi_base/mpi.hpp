@@ -7,22 +7,23 @@
 #ifndef HPX_PLUGINS_PARCELPORT_MPI_MPI_HPP
 #define HPX_PLUGINS_PARCELPORT_MPI_MPI_HPP
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
+    defined(HPX_HAVE_LIB_MPI)
 
 #if defined(__clang__)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wcast-qual"
-#elif defined (__GNUC__)
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wcast-qual"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
 #include <mpi.h>
 
 #if defined(__clang__)
-#  pragma clang diagnostic pop
-#elif defined (__GNUC__)
-#  pragma GCC diagnostic pop
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
 #endif
 
 #endif

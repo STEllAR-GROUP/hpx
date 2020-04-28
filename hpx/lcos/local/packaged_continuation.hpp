@@ -215,6 +215,7 @@ namespace hpx { namespace lcos { namespace detail
             std::enable_if<
                 !std::is_same<typename std::decay<Func>::type,
                     continuation>::value>::type>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         continuation(Func && f)
           : started_(false), id_(threads::invalid_thread_id)
           , f_(std::forward<Func>(f))

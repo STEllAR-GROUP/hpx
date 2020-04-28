@@ -36,10 +36,6 @@
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 
-#if defined(HPX_HAVE_LIB_MPI)
-#include <mpi.h>
-#endif
-
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>

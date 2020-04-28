@@ -420,7 +420,8 @@ jobs:
           name: Installing HPX for build unit tests
           command: |
               # Disable documentation just for this step
-              cmake -DHPX_WITH_DOCUMENTATION=OFF .
+              cmake \
+              -DHPX_WITH_DOCUMENTATION=Off .
               ninja -j1 install
       - run:
           name: Building Unit Tests

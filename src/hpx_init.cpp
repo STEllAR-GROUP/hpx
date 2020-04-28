@@ -21,6 +21,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/mpi_base.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -46,11 +47,6 @@
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/register_locks_globally.hpp>
-
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_LIB_MPI)
-#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
-#endif
 
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -386,11 +382,13 @@ namespace hpx
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_LIB_MPI)
             // getting localities from MPI environment (support mpirun)
-            if (util::detail::check_mpi_environment(cms.rtcfg_))
+            if (util::mpi_environment::check_mpi_environment(cms.rtcfg_))
             {
-                util::mpi_environment::init(&argc, &argv, cms);
+                util::mpi_environment::init(&argc, &argv, cms.rtcfg_);
                 cms.num_localities_ =
                     static_cast<std::size_t>(util::mpi_environment::size());
+                cms.node_ =
+                    static_cast<std::size_t>(util::mpi_environment::rank());
             }
 #endif
 

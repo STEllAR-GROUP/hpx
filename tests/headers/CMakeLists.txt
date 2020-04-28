@@ -16,7 +16,7 @@ set(exclude_from_headers
   "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
 )
 
-if(HPX_WITH_PARCELPORT_MPI)
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
   set(test_deps Mpi::mpi)
 endif()
 

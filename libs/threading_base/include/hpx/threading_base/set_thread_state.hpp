@@ -59,6 +59,7 @@ namespace hpx { namespace threads { namespace detail {
         if (current_state.state() == previous_state.state() &&
             current_state != previous_state)
         {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LTM_(warning)
                 << "set_active_state: thread is still active, however "
                    "it was non-active since the original set_state "
@@ -111,6 +112,7 @@ namespace hpx { namespace threads { namespace detail {
             // nothing to do here if the state doesn't change
             if (new_state == previous_state_val)
             {
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LTM_(warning)
                     << "set_thread_state: old thread state is the same as new "
                        "thread state, aborting state change, thread("
@@ -134,6 +136,7 @@ namespace hpx { namespace threads { namespace detail {
                 if (retry_on_active)
                 {
                     // schedule a new thread to set the state
+                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(warning)
                         << "set_thread_state: thread is currently active, "
                            "scheduling new thread, thread("
@@ -159,6 +162,7 @@ namespace hpx { namespace threads { namespace detail {
                 }
                 else
                 {
+                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(warning)
                         << "set_thread_state: thread is currently active, "
                            "but not scheduling new thread because "
@@ -175,6 +179,7 @@ namespace hpx { namespace threads { namespace detail {
             break;
             case terminated:
             {
+                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LTM_(warning) << "set_thread_state: thread is terminated, "
                                  "aborting state "
                                  "change, thread("
@@ -206,6 +211,7 @@ namespace hpx { namespace threads { namespace detail {
                          << "), new state(" << get_thread_state_name(new_state)
                          << ")";
 
+                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(fatal) << strm.str();
 
                     HPX_THROWS_IF(ec, bad_parameter,
@@ -235,6 +241,7 @@ namespace hpx { namespace threads { namespace detail {
             // at some point will ignore this thread by simply skipping it
             // (if it's not pending anymore).
 
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LTM_(info) << "set_thread_state: thread(" << thrd
                        << "), description("
                        << get_thread_id_data(thrd)->get_description()
@@ -250,6 +257,7 @@ namespace hpx { namespace threads { namespace detail {
             }
 
             // state has changed since we fetched it from the thread, retry
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             LTM_(error) << "set_thread_state: state has been changed since it "
                            "was fetched, "
                            "retrying, thread("

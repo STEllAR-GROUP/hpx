@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 
-#include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
+#include <hpx/mpi_base.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/util/ios_flags_saver.hpp>

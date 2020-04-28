@@ -15,6 +15,7 @@
 #include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
+#include <hpx/runtime_configuration/runtime_configuration_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 
@@ -32,7 +33,7 @@ namespace hpx { namespace util {
     // The runtime_configuration class is a wrapper for the runtime
     // configuration data allowing to extract configuration information in a
     // more convenient way
-    class HPX_EXPORT runtime_configuration : public section
+    class runtime_configuration : public section
     {
         std::string hpx_ini_file;
         std::vector<std::string> cmdline_ini_defs;

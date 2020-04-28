@@ -20,9 +20,7 @@ namespace hpx { namespace detail {
 
 namespace hpx {
     template <typename F, typename... Ts>
-    HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
-        -> decltype(detail::async_dispatch<typename util::decay<F>::type>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...))
+    HPX_FORCEINLINE decltype(auto) async(F&& f, Ts&&... ts)
     {
         return detail::async_dispatch<typename util::decay<F>::type>::call(
             std::forward<F>(f), std::forward<Ts>(ts)...);

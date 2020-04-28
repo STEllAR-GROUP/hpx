@@ -12,6 +12,7 @@
 #include <hpx/concurrency.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/memory.hpp>
+#include <hpx/mpi_base/mpi.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/threading_base.hpp>
 
@@ -21,8 +22,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <mpi.h>
 
 namespace hpx { namespace mpi { namespace experimental {
 
