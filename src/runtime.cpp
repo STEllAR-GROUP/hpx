@@ -73,12 +73,23 @@ namespace hpx
 
         if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
         {
-            std::cerr
+            int const verbosity = util::from_string<int>(
+                get_config_entry("hpx.exception_verbosity", ""));
+
+            if (verbosity >= 2)
+            {
+                std::cerr << full_build_string() << "\n";
+            }
+
 #if defined(HPX_HAVE_STACKTRACES)
-                << "{stack-trace}: " << hpx::util::trace() << "\n"
+            if (verbosity >= 1)
+            {
+                std::cerr << "{stack-trace}: " << hpx::util::trace() << "\n";
+            }
 #endif
-                << "{what}: " << (reason ? reason : "Unknown reason") << "\n"
-                << full_build_string();           // add full build information
+
+            std::cerr << "{what}: " << (reason ? reason : "Unknown reason")
+                      << "\n";
         }
     }
 
@@ -131,13 +142,25 @@ namespace hpx
 
         if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
         {
+            int const verbosity = util::from_string<int>(
+                get_config_entry("hpx.exception_verbosity", ""));
+
             char* reason = strsignal(signum);
-            std::cerr
+
+            if (verbosity >= 2)
+            {
+                std::cerr << full_build_string() << "\n";
+            }
+
 #if defined(HPX_HAVE_STACKTRACES)
-                << "{stack-trace}: " << hpx::util::trace() << "\n"
+            if (verbosity >= 1)
+            {
+                std::cerr << "{stack-trace}: " << hpx::util::trace() << "\n";
+            }
 #endif
-                << "{what}: " << (reason ? reason : "Unknown signal") << "\n"
-                << full_build_string();           // add full build information
+
+            std::cerr << "{what}: " << (reason ? reason : "Unknown reason")
+                      << "\n";
         }
         std::abort();
     }
