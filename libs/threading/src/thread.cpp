@@ -155,7 +155,7 @@ namespace hpx {
         return id(native_handle());
     }
 
-    std::size_t thread::hardware_concurrency() noexcept
+    unsigned int thread::hardware_concurrency() noexcept
     {
         return hpx::threads::hardware_concurrency();
     }

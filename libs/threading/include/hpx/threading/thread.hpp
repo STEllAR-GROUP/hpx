@@ -109,7 +109,7 @@ namespace hpx {
             return id_;
         }
 
-        static std::size_t hardware_concurrency() noexcept;
+        HPX_NODISCARD static unsigned int hardware_concurrency() noexcept;
 
         // extensions
         void interrupt(bool flag = true);
