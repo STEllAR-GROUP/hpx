@@ -14,8 +14,6 @@
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/async_combinators/wait_each.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -25,6 +23,11 @@
 #include <hpx/thread_executors/limiting_executor.hpp>
 #include <hpx/thread_executors/pool_executor.hpp>
 #include <hpx/synchronization.hpp>
+
+#ifdef HPX_HAVE_NETWORKING
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
+#endif
 
 #include <array>
 #include <atomic>
@@ -131,8 +134,6 @@ double null_function() noexcept
     return 0.0;
 }
 
-HPX_PLAIN_ACTION(null_function, null_action)
-
 struct scratcher
 {
     void operator()(future<double> r) const
@@ -140,6 +141,9 @@ struct scratcher
         global_scratch += r.get();
     }
 };
+
+#ifdef HPX_HAVE_NETWORKING
+HPX_PLAIN_ACTION(null_function, null_action)
 
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_each(std::uint64_t count, bool csv)
@@ -176,6 +180,7 @@ void measure_action_futures_wait_all(std::uint64_t count, bool csv)
     const double duration = walltime.elapsed();
     print_stats("action", "WaitAll", "no-executor", count, duration, csv);
 }
+#endif
 
 // Time async execution using wait each on futures vector
 template <typename Executor>
@@ -568,8 +573,10 @@ int hpx_main(variables_map& vm)
             if (test_all)
             {
                 measure_function_futures_limiting_executor(count, csv, tpe);
+#ifdef HPX_HAVE_NETWORKING
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
+#endif
                 measure_function_futures_wait_each(count, csv, par);
                 measure_function_futures_wait_each(count, csv, tpe);
                 measure_function_futures_wait_all(count, csv, par);
