@@ -404,7 +404,6 @@ namespace hpx { namespace performance_counters {
     counter_status registry::create_raw_counter_value(counter_info const& info,
         std::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
-        using util::placeholders::_1;
         hpx::util::function_nonser<std::int64_t(bool)> func(
             util::bind_front(wrap_counter, countervalue));
         return create_raw_counter(info, func, id, ec);
@@ -426,7 +425,6 @@ namespace hpx { namespace performance_counters {
         hpx::util::function_nonser<std::int64_t()> const& f,
         naming::gid_type& id, error_code& ec)
     {
-        using util::placeholders::_1;
         hpx::util::function_nonser<std::int64_t(bool)> func(
             util::bind_front(&wrap_raw_counter, f));
         return create_raw_counter(info, func, id, ec);
@@ -510,7 +508,6 @@ namespace hpx { namespace performance_counters {
         hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
         naming::gid_type& id, error_code& ec)
     {
-        using util::placeholders::_1;
         hpx::util::function_nonser<std::vector<std::int64_t>(bool)> func(
             util::bind_front(&wrap_raw_values_counter, f));
         return create_raw_counter(info, func, id, ec);
