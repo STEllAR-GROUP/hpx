@@ -788,8 +788,8 @@ namespace hpx { namespace threads { namespace policies {
 
                 if (get_maintain_queue_wait_times_enabled())
                 {
-                    work_items_wait_ += util::high_resolution_clock::now() -
-                        tdesc->waittime;
+                    work_items_wait_ +=
+                        util::high_resolution_clock::now() - tdesc->waittime;
                     ++work_items_wait_count_;
                 }
 
@@ -813,8 +813,8 @@ namespace hpx { namespace threads { namespace policies {
         {
             ++work_items_count_.data_;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            work_items_.push(new thread_description{
-                                 thrd, util::high_resolution_clock::now()},
+            work_items_.push(new thread_description{thrd,
+                                 util::high_resolution_clock::now()},
                 other_end);
 #else
             work_items_.push(thrd, other_end);

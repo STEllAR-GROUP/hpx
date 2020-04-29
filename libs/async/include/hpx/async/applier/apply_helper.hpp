@@ -85,8 +85,7 @@ namespace hpx { namespace applier { namespace detail {
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
-        traits::action_schedule_thread<Action>::call(
-            lva, comptype, data);
+        traits::action_schedule_thread<Action>::call(lva, comptype, data);
     }
 
     template <typename Action, typename Continuation, typename... Ts>
@@ -122,8 +121,7 @@ namespace hpx { namespace applier { namespace detail {
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
-        traits::action_schedule_thread<Action>::call(
-            lva, comptype, data);
+        traits::action_schedule_thread<Action>::call(lva, comptype, data);
     }
 
     template <typename Action, typename... Ts>
