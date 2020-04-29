@@ -383,7 +383,12 @@ namespace hpx { namespace detail
         std::string const& file, long line, std::string const& auxinfo)
     {
         std::int64_t pid = ::getpid();
-        std::string back_trace(hpx::util::trace_on_new_stack());
+
+        std::size_t const trace_depth =
+            util::from_string<std::size_t>(get_config_entry(
+                "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
+
+        std::string back_trace(hpx::util::trace_on_new_stack(trace_depth));
 
         std::string state_name("not running");
         std::string hostname;
