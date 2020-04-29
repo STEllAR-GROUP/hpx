@@ -21,6 +21,7 @@
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
