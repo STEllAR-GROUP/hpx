@@ -60,6 +60,7 @@ set(coroutines_sources
   detail/posix_utility.cpp
   detail/tss.cpp
   swapcontext.cpp
+  thread_enums.cpp
   )
 
 include(HPX_AddModule)
