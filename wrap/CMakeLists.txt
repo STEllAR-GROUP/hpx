@@ -62,7 +62,7 @@ add_hpx_source_group(
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   add_library(hpx_wrap STATIC ${hpx_wrap_SOURCES} ${hpx_wrap_HEADERS})
   set_target_properties(hpx_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(hpx_wrap PRIVATE hpx_some_name)
+  target_link_libraries(hpx_wrap PRIVATE hpx_core)
   target_link_libraries(hpx_wrap PRIVATE hpx_private_flags)
   target_compile_definitions(hpx_wrap PRIVATE HPX_APPLICATION_EXPORTS)
   target_include_directories(hpx_wrap
