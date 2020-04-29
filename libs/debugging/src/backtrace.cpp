@@ -19,31 +19,32 @@
 
 #if (defined(__linux) || defined(__APPLE__) || defined(__sun)) &&              \
     (!defined(__ANDROID__) || !defined(ANDROID))
-#define BOOST_HAVE_EXECINFO
-#define BOOST_HAVE_DLFCN
+#define HPX_HAVE_EXECINFO
+#define HPX_HAVE_DLFCN
 #if defined(__GNUC__) && !defined(__clang__)
-#define BOOST_HAVE_UNWIND
+#define HPX_HAVE_UNWIND
 #endif
 #endif
 
 #if defined(__GNUC__) && !defined(__bgq__)
-#define BOOST_HAVE_ABI_CXA_DEMANGLE
+#define HPX_HAVE_ABI_CXA_DEMANGLE
 #endif
 
-#ifdef BOOST_HAVE_EXECINFO
+#ifdef HPX_HAVE_EXECINFO
 #include <execinfo.h>
 #endif
 
-#ifdef BOOST_HAVE_ABI_CXA_DEMANGLE
+#ifdef HPX_HAVE_ABI_CXA_DEMANGLE
 #include <cxxabi.h>
 #endif
 
-#ifdef BOOST_HAVE_DLFCN
+#ifdef HPX_HAVE_DLFCN
 #include <dlfcn.h>
 #endif
-#ifdef BOOST_HAVE_UNWIND
+#ifdef HPX_HAVE_UNWIND
 #include <unwind.h>
 #endif
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -64,7 +65,7 @@
 #endif
 
 namespace hpx { namespace util { namespace stack_trace {
-#if defined(BOOST_HAVE_EXECINFO) && defined(BOOST_HAVE_UNWIND)
+#if defined(HPX_HAVE_EXECINFO) && defined(HPX_HAVE_UNWIND)
     struct trace_data
     {
         trace_data(void** array, std::size_t size)
@@ -128,7 +129,7 @@ namespace hpx { namespace util { namespace stack_trace {
         return (std::size_t(-1) != d.count_) ? d.count_ : 0;
     }
 
-#elif defined(BOOST_HAVE_EXECINFO)
+#elif defined(HPX_HAVE_EXECINFO)
 
     HPX_API_EXPORT std::size_t trace(void** array, std::size_t n)
     {
@@ -156,12 +157,34 @@ namespace hpx { namespace util { namespace stack_trace {
 
 #endif
 
-#if defined(BOOST_HAVE_DLFCN) && defined(BOOST_HAVE_ABI_CXA_DEMANGLE)
+#if defined(HPX_HAVE_EXECINFO)
+    std::string get_symbol_exec_info(void* address)
+    {
+        char** ptr = backtrace_symbols(&address, 1);
+        try
+        {
+            if (ptr == nullptr)
+                return std::string("???");
+            std::string res = ptr[0];
+            free(ptr);
+            ptr = nullptr;
+            return res;
+        }
+        catch (...)
+        {
+            free(ptr);
+            throw;
+        }
+    }
+#endif
 
+#if defined(HPX_HAVE_DLFCN) && defined(HPX_HAVE_ABI_CXA_DEMANGLE)
     HPX_API_EXPORT std::string get_symbol(void* ptr)
     {
         if (!ptr)
             return std::string();
+
+        bool need_offset = true;
         std::ostringstream res;
         res.imbue(std::locale::classic());
         res << std::left << std::setw(sizeof(void*) * 2) << std::setfill(' ')
@@ -169,7 +192,12 @@ namespace hpx { namespace util { namespace stack_trace {
         Dl_info info = {nullptr, nullptr, nullptr, nullptr};
         if (dladdr(ptr, &info) == 0)
         {
+#if !defined(HPX_HAVE_EXECINFO)
             res << "???";
+#else
+            res << get_symbol_exec_info(ptr);
+            need_offset = false;
+#endif
         }
         else
         {
@@ -190,15 +218,25 @@ namespace hpx { namespace util { namespace stack_trace {
             }
             else
             {
+#if !defined(HPX_HAVE_EXECINFO)
                 res << "???";
+#else
+                res << get_symbol_exec_info(ptr);
+                need_offset = false;
+#endif
             }
 
             std::ptrdiff_t offset = reinterpret_cast<char*>(ptr) -
                 reinterpret_cast<char*>(info.dli_saddr);
-            res << std::hex << " + 0x" << offset;
+            if (need_offset)
+            {
+                res << std::hex << " [0x" << offset << "]";
+            }
 
             if (info.dli_fname)
+            {
                 res << " in " << info.dli_fname;
+            }
         }
         return res.str();
     }
@@ -234,25 +272,11 @@ namespace hpx { namespace util { namespace stack_trace {
         out << std::flush;
     }
 
-#elif defined(BOOST_HAVE_EXECINFO)
+#elif defined(HPX_HAVE_EXECINFO)
 
     HPX_API_EXPORT std::string get_symbol(void* address)
     {
-        char** ptr = backtrace_symbols(&address, 1);
-        try
-        {
-            if (ptr == nullptr)
-                return std::string();
-            std::string res = ptr[0];
-            free(ptr);
-            ptr = nullptr;
-            return res;
-        }
-        catch (...)
-        {
-            free(ptr);
-            throw;
-        }
+        return get_symbol_exec_info(address);
     }
 
     HPX_API_EXPORT std::string get_symbols(
