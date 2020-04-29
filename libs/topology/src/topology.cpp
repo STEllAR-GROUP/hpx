@@ -1524,6 +1524,6 @@ namespace hpx { namespace threads {
     unsigned int hardware_concurrency()
     {
         util::static_<hw_concurrency, hardware_concurrency_tag> hwc;
-        return static_cast<std::size_t>(hwc.get().num_of_cores_);
+        return static_cast<unsigned int>(hwc.get().num_of_cores_);
     }
 }}    // namespace hpx::threads
