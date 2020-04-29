@@ -8,7 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 
-HPX_REGISTER_CHANNEL(int);      // add to one source file
+HPX_REGISTER_CHANNEL(int);    // add to one source file
 
 void send_values(hpx::lcos::channel<int> buffer)
 {
@@ -25,7 +25,7 @@ void receive_values()
     HPX_TEST_EQ(42, buffer.get(hpx::launch::sync));
 }
 
-int hpx_main(int argc, char **argv)
+int hpx_main(int argc, char** argv)
 {
     {
         hpx::lcos::channel<int> buffer(hpx::find_here());
@@ -36,12 +36,12 @@ int hpx_main(int argc, char **argv)
 
         hpx::wait_all(f1, f2);
 
-    }   // unregisters 'buffer'
+    }    // unregisters 'buffer'
 
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     HPX_TEST_EQ(0, hpx::init(argc, argv));
     return hpx::util::report_errors();

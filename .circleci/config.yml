@@ -634,6 +634,7 @@ jobs:
                   tests.unit.modules.hardware \
                   tests.unit.modules.hashing \
                   tests.unit.modules.iterator_support \
+                  tests.unit.modules.lcos \
                   tests.unit.modules.local_async \
                   tests.unit.modules.local_lcos \
                   tests.unit.modules.logging \

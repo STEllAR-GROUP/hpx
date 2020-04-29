@@ -19,7 +19,6 @@ set(tests
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests}
-      channel
       client_then
       future_wait
       packaged_action

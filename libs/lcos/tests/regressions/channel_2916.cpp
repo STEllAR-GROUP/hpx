@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
 
 #include <cstddef>
@@ -39,20 +39,16 @@ int hpx_main()
 
         // Do some work, once we have acquired resources
         hpx::shared_future<int> result = target.then(
-            [](hpx::shared_future<locality_id_t> t)
-            ->  hpx::shared_future<int>
-            {
+            [](hpx::shared_future<locality_id_t> t) -> hpx::shared_future<int> {
                 --count;
                 return hpx::make_ready_future(0);
             });
 
         // Free resources
-        result.then(
-            [free_resources, target](hpx::shared_future<int>) mutable
-            {
-                ++count;
-                free_resources.set(target.get());
-            });
+        result.then([free_resources, target](hpx::shared_future<int>) mutable {
+            ++count;
+            free_resources.set(target.get());
+        });
 
         result.get();
     }

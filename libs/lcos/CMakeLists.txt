@@ -1,0 +1,30 @@
+# Copyright (c) 2019-2020 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+set(lcos_headers
+  hpx/lcos/channel.hpp
+  hpx/lcos/server/channel.hpp)
+
+set(lcos_sources)
+
+include(HPX_AddModule)
+add_hpx_module(lcos
+  FORCE_LINKING_GEN
+  GLOBAL_HEADER_GEN ON
+  SOURCES ${lcos_sources}
+  HEADERS ${lcos_headers}
+  DEPENDENCIES
+    hpx_assertion
+    hpx_async
+    hpx_config
+    hpx_local_lcos
+    hpx_preprocessor
+  CMAKE_SUBDIRS examples tests
+)

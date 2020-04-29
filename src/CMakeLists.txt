@@ -215,7 +215,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/components_fwd.hpp
     hpx/lcos/base_lco.hpp
     hpx/lcos/base_lco_with_value.hpp
-    hpx/lcos/channel.hpp
     hpx/lcos/detail/future_await_traits.hpp
     hpx/lcos/detail/future_data.hpp
     hpx/lcos/detail/future_traits.hpp
@@ -225,7 +224,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/lcos/object_semaphore.hpp
     hpx/lcos/packaged_action.hpp
     hpx/lcos/promise.hpp
-    hpx/lcos/server/channel.hpp
     hpx/lcos/server/object_semaphore.hpp
     hpx/plugins/binary_filter_factory_base.hpp
     hpx/plugins/binary_filter_factory.hpp
