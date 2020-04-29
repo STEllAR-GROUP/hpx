@@ -12,7 +12,7 @@
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <hpx/parallel/traits/projected.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
 
 #include <iterator>
 #include <type_traits>

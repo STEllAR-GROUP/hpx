@@ -10,13 +10,13 @@
 #define HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/execution_policy.hpp>

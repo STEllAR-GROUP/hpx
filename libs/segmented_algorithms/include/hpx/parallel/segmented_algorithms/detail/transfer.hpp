@@ -8,9 +8,9 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHMS_TRANSFER
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async/dataflow.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

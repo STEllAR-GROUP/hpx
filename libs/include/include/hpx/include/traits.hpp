@@ -8,6 +8,7 @@
 #define HPX_TRAITS_JAN_31_2015_0130PM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/concepts/has_xxx.hpp>
@@ -70,7 +71,6 @@
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #endif
 
 #endif

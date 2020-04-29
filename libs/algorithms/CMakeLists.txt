@@ -7,6 +7,10 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(algorithms_headers
+  hpx/algorithms/traits/is_value_proxy.hpp
+  hpx/algorithms/traits/projected.hpp
+  hpx/algorithms/traits/projected_range.hpp
+  hpx/algorithms/traits/segmented_iterator_traits.hpp
   hpx/parallel/algorithm.hpp
   hpx/parallel/algorithms/adjacent_difference.hpp
   hpx/parallel/algorithms/adjacent_find.hpp
@@ -97,8 +101,6 @@ set(algorithms_headers
   hpx/parallel/spmd_block.hpp
   hpx/parallel/tagspec.hpp
   hpx/parallel/task_block.hpp
-  hpx/parallel/traits/projected.hpp
-  hpx/parallel/traits/projected_range.hpp
   hpx/parallel/util/cancellation_token.hpp
   hpx/parallel/util/compare_projected.hpp
   hpx/parallel/util/detail/algorithm_result.hpp
@@ -122,11 +124,13 @@ set(algorithms_headers
   hpx/parallel/util/transfer.hpp
   hpx/parallel/util/transform_loop.hpp
   hpx/parallel/util/zip_iterator.hpp
-  hpx/traits/is_value_proxy.hpp
-  hpx/traits/segmented_iterator_traits.hpp
 )
 
-set(datastructures_compat_headers
+set(algorithms_compat_headers
+  hpx/parallel/traits/projected.hpp
+  hpx/parallel/traits/projected_range.hpp
+  hpx/traits/is_value_proxy.hpp
+  hpx/traits/segmented_iterator_traits.hpp
   hpx/util/tagged_pair.hpp
   hpx/util/tagged_tuple.hpp)
 
@@ -136,9 +140,7 @@ add_hpx_module(algorithms
   DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   HEADERS ${algorithms_headers}
-  # TODO: Really depends on main HPX library, but cannot add that as a
-  # dependency yet. Need to have the parts that algorithms depends on in
-  # separate modules first.
+  COMPAT_HEADERS ${algorithms_compat_headers}
   DEPENDENCIES
     hpx_assertion
     hpx_concepts

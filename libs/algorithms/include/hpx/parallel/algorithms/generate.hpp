@@ -11,9 +11,9 @@
 #define HPX_PARALLEL_DETAIL_GENERATE_JULY_15_2014_0224PM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/execution_policy.hpp>

@@ -17,9 +17,9 @@
 #include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
 
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/tagspec.hpp>
-#include <hpx/parallel/traits/projected_range.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>

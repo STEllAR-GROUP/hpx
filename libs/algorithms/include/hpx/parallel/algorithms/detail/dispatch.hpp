@@ -8,10 +8,10 @@
 #define HPX_PARALLEL_DISPATCH_JUN_25_2014_1145PM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/datastructures/tuple.hpp>

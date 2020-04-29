@@ -6,16 +6,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/parallel/traits/detail/vc/vector_pack_type.hpp>
+#include <hpx/execution/traits/detail/vc/vector_pack_type.hpp>
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/traits/detail/vc/vector_pack_type.hpp is deprecated, \
-    please include hpx/execution/parallel/traits/detail/vc/vector_pack_type.hpp instead")
+    please include hpx/execution/traits/detail/vc/vector_pack_type.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/parallel/traits/detail/vc/vector_pack_type.hpp is deprecated, \
-    please include hpx/execution/parallel/traits/detail/vc/vector_pack_type.hpp instead"
+    please include hpx/execution/traits/detail/vc/vector_pack_type.hpp instead"
 #endif
 #endif

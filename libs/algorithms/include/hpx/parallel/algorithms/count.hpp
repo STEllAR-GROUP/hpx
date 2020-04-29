@@ -10,17 +10,17 @@
 #define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
+#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/execution_policy.hpp>
-#include <hpx/execution/parallel/traits/vector_pack_count_bits.hpp>
+#include <hpx/execution/traits/vector_pack_count_bits.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>

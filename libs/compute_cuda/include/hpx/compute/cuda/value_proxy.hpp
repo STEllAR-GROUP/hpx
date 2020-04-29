@@ -13,9 +13,9 @@
 
 #if defined(HPX_HAVE_CUDA)
 
+#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
-#include <hpx/traits/is_value_proxy.hpp>
 
 #include <type_traits>
 

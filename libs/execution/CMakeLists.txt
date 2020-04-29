@@ -56,20 +56,20 @@ set(execution_headers
   hpx/execution/executors/timed_execution.hpp
   hpx/execution/executors/timed_executors.hpp
   hpx/execution/force_linking.hpp
-  hpx/execution/parallel/traits/detail/vc/vector_pack_alignment_size.hpp
-  hpx/execution/parallel/traits/detail/vc/vector_pack_count_bits.hpp
-  hpx/execution/parallel/traits/detail/vc/vector_pack_load_store.hpp
-  hpx/execution/parallel/traits/detail/vc/vector_pack_type.hpp
-  hpx/execution/parallel/traits/vector_pack_alignment_size.hpp
-  hpx/execution/parallel/traits/vector_pack_count_bits.hpp
-  hpx/execution/parallel/traits/vector_pack_load_store.hpp
-  hpx/execution/parallel/traits/vector_pack_type.hpp
   hpx/execution/sync.hpp
+  hpx/execution/traits/detail/vc/vector_pack_alignment_size.hpp
+  hpx/execution/traits/detail/vc/vector_pack_count_bits.hpp
+  hpx/execution/traits/detail/vc/vector_pack_load_store.hpp
+  hpx/execution/traits/detail/vc/vector_pack_type.hpp
   hpx/execution/traits/executor_traits.hpp
   hpx/execution/traits/is_execution_policy.hpp
   hpx/execution/traits/is_executor.hpp
   hpx/execution/traits/is_executor_parameters.hpp
   hpx/execution/traits/is_timed_executor.hpp
+  hpx/execution/traits/vector_pack_alignment_size.hpp
+  hpx/execution/traits/vector_pack_count_bits.hpp
+  hpx/execution/traits/vector_pack_load_store.hpp
+  hpx/execution/traits/vector_pack_type.hpp
 )
 
 set(execution_sources

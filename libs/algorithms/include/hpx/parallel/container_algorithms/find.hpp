@@ -15,9 +15,9 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 
+#include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
-#include <hpx/parallel/traits/projected.hpp>
-#include <hpx/parallel/traits/projected_range.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>

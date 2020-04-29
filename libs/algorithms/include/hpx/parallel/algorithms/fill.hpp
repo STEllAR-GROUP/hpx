@@ -11,8 +11,8 @@
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/traits/is_value_proxy.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>

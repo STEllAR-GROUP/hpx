@@ -16,10 +16,10 @@
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
 
+#include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
 #include <hpx/parallel/tagspec.hpp>
-#include <hpx/parallel/traits/projected.hpp>
-#include <hpx/parallel/traits/projected_range.hpp>
 
 #include <type_traits>
 #include <utility>

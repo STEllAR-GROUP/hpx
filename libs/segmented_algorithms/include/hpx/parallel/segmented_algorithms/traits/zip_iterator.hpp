@@ -11,10 +11,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/functional/segmented_iterator_helpers.hpp>
 
 #include <cstddef>

@@ -8,7 +8,7 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_ALL_ANY_NONE_AUG_12_2017_0836PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
