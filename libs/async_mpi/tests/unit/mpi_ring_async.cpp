@@ -155,9 +155,10 @@ int main(int argc, char* argv[])
         std::cout << "Provided MPI is not : MPI_THREAD_MULTIPLE " << provided
                   << std::endl;
     }
-    return hpx::init(argc, argv);
-    //
+    int result = hpx::init(argc, argv);
+
     // Finalize MPI
-    //
     MPI_Finalize();
+
+    return result;
 }
