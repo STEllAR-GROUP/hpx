@@ -184,8 +184,9 @@ int hpx_main(variables_map& vm)
     {
         id_type const prefix = find_here();
 
-        hpx::threads::thread_init_data data(hpx::threads::make_thread_function_nullary(
-            hpx::util::deferred_call(&test_dummy_thread, futures)),
+        hpx::threads::thread_init_data data(
+            hpx::threads::make_thread_function_nullary(
+                hpx::util::deferred_call(&test_dummy_thread, futures)),
             "test_dummy_thread");
         thread_id_type thread = register_thread(data);
 

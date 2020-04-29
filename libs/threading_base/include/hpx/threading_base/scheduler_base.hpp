@@ -241,6 +241,11 @@ namespace hpx { namespace threads { namespace policies {
 
         std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize) const
         {
+            if (stacksize == thread_stacksize_current)
+            {
+                stacksize = get_self_stacksize_enum();
+            }
+
             switch (stacksize)
             {
             case thread_stacksize_small:
@@ -258,10 +263,6 @@ namespace hpx { namespace threads { namespace policies {
 
             case thread_stacksize_nostack:
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
-
-            case thread_stacksize_current:
-                return get_self_stacksize();
-                break;
 
             default:
                 HPX_ASSERT_MSG(

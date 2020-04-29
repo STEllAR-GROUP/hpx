@@ -69,6 +69,7 @@ namespace hpx { namespace threads {
       , scheduler_base_(init_data.scheduler_base)
       , last_worker_thread_num_(std::size_t(-1))
       , stacksize_(stacksize)
+      , stacksize_enum_(init_data.stacksize)
       , queue_(queue)
       , is_stackless_(is_stackless)
     {
@@ -293,10 +294,17 @@ namespace hpx { namespace threads {
         return nullptr;
     }
 
-    std::size_t get_self_stacksize()
+    std::ptrdiff_t get_self_stacksize()
     {
         thread_data* thrd_data = get_self_id_data();
         return thrd_data ? thrd_data->get_stack_size() : 0;
+    }
+
+    thread_stacksize get_self_stacksize_enum()
+    {
+        thread_data* thrd_data = get_self_id_data();
+        return thrd_data ? thrd_data->get_stack_size_enum() :
+                           thread_stacksize_default;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
