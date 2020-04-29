@@ -11,7 +11,7 @@
 local_lcos
 ==========
 
-This module provides local LCOs which return futures:
+This module provides the following local :term:`LCO`\ s:
 
 * :cpp:class:`hpx::lcos::local::and_gate`
 * :cpp:class:`hpx::lcos::local::channel`
@@ -26,6 +26,11 @@ This module provides local LCOs which return futures:
 * :cpp:class:`hpx::lcos::local::promise`
 * :cpp:class:`hpx::lcos::local::receive_buffer`
 * :cpp:class:`hpx::lcos::local::trigger`
+
+See :ref:`libs_lcos` for distributed LCOs. Basic synchronization primitives for
+use in |hpx| threads can be found in :ref:`libs_synchronization`.
+:ref:`async_combinators` contains useful utility functions for combining
+futures.
 
 See the :ref:`API reference <libs_local_lcos_api>` of this module for more
 details.

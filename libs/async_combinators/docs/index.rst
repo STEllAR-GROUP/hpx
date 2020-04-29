@@ -19,6 +19,9 @@ equivalent to the ``when_*`` functions except that they do not return a future.
 The ``split_future`` combinator takes a single future of a container (e.g.
 ``tuple``) and turns it into a container of futures.
 
+See :ref:`libs_local_lcos`, :ref:`libs_synchronization`, and :ref:`libs_async`
+for other synchronization facilities.
+
 See the :ref:`API reference <libs_async_combinators_api>` of this module for more
 details.
 
