@@ -800,7 +800,6 @@ void test_read(
                 ++FuturesWaiting[send_rank];
                 std::lock_guard<hpx::lcos::local::spinlock> lk(FuturesMutex);
 #endif
-                using hpx::util::placeholders::_1;
                 std::size_t buffer_address =
                     reinterpret_cast<std::size_t>(general_buffer.data());
                 //

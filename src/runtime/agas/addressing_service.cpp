@@ -1865,7 +1865,6 @@ future<hpx::id_type> addressing_service::on_symbol_namespace_event(
     hpx::future<bool> f =
         symbol_ns_.on_event(name, call_for_past_events, p.get_id());
 
-    using util::placeholders::_1;
     return f.then(
         hpx::launch::sync,
         util::one_shot(util::bind_back(
@@ -2357,6 +2356,8 @@ void addressing_service::register_counter_types()
         util::bind_front(
             &addressing_service::get_cache_erase_entry_time, this));
 
+    using util::placeholders::_1;
+    using util::placeholders::_2;
     performance_counters::generic_counter_type_data const counter_types[] =
     {
         { "/agas/count/cache/entries", performance_counters::counter_raw,
