@@ -17,9 +17,9 @@
 #include <hpx/local_async/dataflow.hpp>
 #endif
 
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>

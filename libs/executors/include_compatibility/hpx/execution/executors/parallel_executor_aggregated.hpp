@@ -10,12 +10,12 @@
 
 #if defined(HPX_EXECUTORS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/execution/executors/parallel_executor_aggregated.hpp is \
     deprecated, \
     please include hpx/executors/parallel_executor_aggregated.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/execution/executors/parallel_executor_aggregated.hpp is \
     deprecated, \
     please include hpx/executors/parallel_executor_aggregated.hpp instead"

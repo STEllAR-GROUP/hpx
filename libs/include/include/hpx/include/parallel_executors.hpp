@@ -8,7 +8,7 @@
 #define HPX_PARALLEL_EXECUTORS_MAY_11_2015_0622PM
 
 #include <hpx/executors.hpp>
-#include <hpx/timed_execution.hpp>
 #include <hpx/thread_executors.hpp>
+#include <hpx/timed_execution.hpp>
 
 #endif

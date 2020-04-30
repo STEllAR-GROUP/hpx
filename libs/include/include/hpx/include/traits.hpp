@@ -16,7 +16,6 @@
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
-#include <hpx/timed_execution/traits/is_timed_executor.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
@@ -30,6 +29,7 @@
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/serialization/traits/serialization_access_data.hpp>
+#include <hpx/timed_execution/traits/is_timed_executor.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/traits/future_access.hpp>

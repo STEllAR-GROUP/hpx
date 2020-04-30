@@ -11,8 +11,8 @@
 #include <hpx/async_base/sync.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 
 #include <type_traits>

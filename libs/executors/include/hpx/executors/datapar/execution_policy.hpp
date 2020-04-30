@@ -10,14 +10,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/executors/datapar/execution_policy_fwd.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
-#include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/executors/datapar/execution_policy_fwd.hpp>
+#include <hpx/executors/parallel_executor.hpp>
+#include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 

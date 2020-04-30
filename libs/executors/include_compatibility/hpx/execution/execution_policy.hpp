@@ -10,7 +10,8 @@
 
 #if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message("The header hpx/execution/execution_policy.hpp is deprecated, \
+#pragma message(                                                               \
+    "The header hpx/execution/execution_policy.hpp is deprecated, \
     please include hpx/executors/execution_policy.hpp instead")
 #else
 #warning "The header hpx/execution/execution_policy.hpp is deprecated, \

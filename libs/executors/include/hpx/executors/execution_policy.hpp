@@ -11,17 +11,17 @@
 #define HPX_PARALLEL_EXECUTION_POLICY_MAY_27_2014_0908PM
 
 #include <hpx/config.hpp>
-#include <hpx/executors/datapar/execution_policy.hpp>
-#include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
-#include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
+#include <hpx/executors/datapar/execution_policy.hpp>
+#include <hpx/executors/execution_policy_fwd.hpp>
+#include <hpx/executors/parallel_executor.hpp>
+#include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>

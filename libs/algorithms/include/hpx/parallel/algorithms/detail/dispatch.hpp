@@ -16,8 +16,8 @@
 
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/exception_list.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 

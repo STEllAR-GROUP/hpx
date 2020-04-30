@@ -35,9 +35,9 @@ namespace hpx { namespace parallel { namespace execution {
 
     inline namespace v1 {
         struct dataseq_task_policy;
-    }   // namespace v1
+    }    // namespace v1
 
-}}}  // namespace hpx::parallel::execution
+}}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {

@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>

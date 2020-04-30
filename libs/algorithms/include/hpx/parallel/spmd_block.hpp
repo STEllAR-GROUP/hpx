@@ -7,8 +7,8 @@
 #if !defined(HPX_PARALLEL_SPMD_BLOCK_HPP)
 #define HPX_PARALLEL_SPMD_BLOCK_HPP
 
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/local_lcos/spmd_block.hpp>
 

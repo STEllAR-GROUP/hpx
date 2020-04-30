@@ -16,8 +16,8 @@
 #include <hpx/local_async.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>

@@ -10,11 +10,11 @@
 
 #if defined(HPX_EXECUTORS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/execution/executors/current_executor.hpp is deprecated, \
     please include hpx/executors/current_executor.hpp instead")
 #else
-#warning \
+#warning                                                                       \
     "The header hpx/execution/executors/current_executor.hpp is deprecated, \
     please include hpx/executors/current_executor.hpp instead"
 #endif
