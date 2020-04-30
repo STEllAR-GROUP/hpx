@@ -55,7 +55,7 @@ namespace hpx { namespace util {
         thread_description() noexcept
           : type_(data_type_description)
         {
-            data_.desc_ = "<unknown>";
+            data_.desc_ = "<anonymous task>";
         }
 
         thread_description(char const* desc) noexcept
