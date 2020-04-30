@@ -7,16 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/executors/execution_fwd.hpp>
+#include <hpx/basic_execution/config/defines.hpp>
+#include <hpx/basic_execution/execution_fwd.hpp>
 
-#if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if defined(HPX_BASIC_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/execution_fwd.hpp is deprecated, \
-    please include hpx/execution/executors/execution_fwd.hpp instead")
+    please include hpx/basic_executors/execution_fwd.hpp instead")
 #else
 #warning "The header hpx/parallel/executors/execution_fwd.hpp is deprecated, \
-    please include hpx/execution/executors/execution_fwd.hpp instead"
+    please include hpx/basic_executors/execution_fwd.hpp instead"
 #endif
 #endif

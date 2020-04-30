@@ -8,11 +8,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/detected.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+
+namespace hpx { namespace threads
+{
+    class executor;
+}}
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////

@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/basic_execution/execution_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -20,8 +21,6 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-
-#include <hpx/execution/executors/execution.hpp>
 
 #include <cstddef>
 #include <cstdint>

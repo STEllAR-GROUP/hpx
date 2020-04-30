@@ -44,6 +44,7 @@ All modules
    /libs/filesystem/docs/index.rst
    /libs/format/docs/index.rst
    /libs/functional/docs/index.rst
+   /libs/futures/docs/index.rst
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
    /libs/include/docs/index.rst

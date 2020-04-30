@@ -7,6 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/execution.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/executors.hpp>
-#include <hpx/thread_executors/executors.hpp>
+#include <hpx/thread_executors.hpp>

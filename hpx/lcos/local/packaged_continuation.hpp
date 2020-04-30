@@ -12,7 +12,6 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/future_exec.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/future_access.hpp>
@@ -1073,22 +1072,3 @@ namespace hpx { namespace lcos { namespace detail
         return unwrap_impl(std::forward<Future>(future), ec);
     }
 }}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail
-{
-    template <typename Future>
-    inline typename traits::detail::shared_state_ptr<void>::type
-    downcast_to_void(Future& future, bool addref)
-    {
-        typedef typename traits::detail::shared_state_ptr<void>::type
-            shared_state_type;
-        typedef typename shared_state_type::element_type element_type;
-
-        // same as static_pointer_cast, but with addref option
-        return shared_state_type(static_cast<element_type*>(
-                traits::detail::get_shared_state(future).get()
-            ), addref);
-    }
-}}}
-

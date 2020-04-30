@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/basic_execution/execution_fwd.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>

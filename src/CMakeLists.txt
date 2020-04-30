@@ -10,25 +10,23 @@
 # gather sources
 
 set(hpx_SOURCES
-    custom_exception_info.cpp
-    lcos/detail/future_data.cpp
-    lcos/future.cpp
-    hpx_init.cpp
-    hpx_main_winsocket.cpp
-    runtime.cpp
-    runtime_handlers.cpp
-    runtime/launch_policy.cpp
-    runtime/thread_pool_helpers.cpp
-    runtime/threads/thread_pool_suspension_helpers.cpp
-    state.cpp
-    util/debugging.cpp
-    util/debug/thread_stacktrace.cpp
-    util/interval_timer.cpp
-    util/pool_timer.cpp
-    util/register_locks_globally.cpp
-    util/serialize_exception.cpp
-    util/thread_aware_timer.cpp
-    util/thread_mapper.cpp
+  custom_exception_info.cpp
+  lcos/future.cpp
+  hpx_init.cpp
+  hpx_main_winsocket.cpp
+  runtime.cpp
+  runtime_handlers.cpp
+  runtime/thread_pool_helpers.cpp
+  runtime/threads/thread_pool_suspension_helpers.cpp
+  state.cpp
+  util/debugging.cpp
+  util/debug/thread_stacktrace.cpp
+  util/interval_timer.cpp
+  util/pool_timer.cpp
+  util/register_locks_globally.cpp
+  util/serialize_exception.cpp
+  util/thread_aware_timer.cpp
+  util/thread_mapper.cpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -158,67 +156,53 @@ endif()
 
 # List all headers (local and distributed)
 set(hpx_HEADERS
-    hpx/custom_exception_info.hpp
-    hpx/hpx_finalize.hpp
-    hpx/hpx_init.hpp
-    hpx/hpx_init_impl.hpp
-    hpx/hpx_init_params.hpp
-    hpx/hpx_main_winsocket.hpp
-    hpx/hpx_start.hpp
-    hpx/hpx_start_impl.hpp
-    hpx/hpx_suspend.hpp
-    hpx/hpx_user_main_config.hpp
-    hpx/lcos/future.hpp
-    hpx/lcos/future_wait.hpp
-    hpx/lcos_fwd.hpp
-    hpx/lcos/local/futures_factory.hpp
-    hpx/lcos/local/packaged_continuation.hpp
-    hpx/runtime/config_entry.hpp
-    hpx/runtime_fwd.hpp
-    hpx/runtime/get_num_localities.hpp
-    hpx/runtime/get_os_thread_count.hpp
-    hpx/runtime/get_thread_name.hpp
-    hpx/runtime/get_worker_thread_num.hpp
-    hpx/runtime_handlers.hpp
-    hpx/runtime.hpp
-    hpx/runtime/launch_policy.hpp
-    hpx/runtime/report_error.hpp
-    hpx/runtime/runtime_fwd.hpp
-    hpx/runtime/serialization/detail/preprocess_container.hpp
-    hpx/runtime/serialization/detail/preprocess_futures.hpp
-    hpx/runtime/serialization/detail/preprocess_gid_types.hpp
-    hpx/runtime/shutdown_function.hpp
-    hpx/runtime/startup_function.hpp
-    hpx/runtime/thread_hooks.hpp
-    hpx/runtime/thread_pool_helpers.hpp
-    hpx/runtime/threads_fwd.hpp
-    hpx/runtime/threads/run_as_hpx_thread.hpp
-    hpx/runtime/threads/run_as_os_thread.hpp
-    hpx/runtime/threads/thread_pool_suspension_helpers.hpp
-    hpx/state.hpp
-    hpx/traits/acquire_future.hpp
-    hpx/traits/acquire_shared_state.hpp
-    hpx/traits/future_access.hpp
-    hpx/traits/future_then_result.hpp
-    hpx/traits/future_traits.hpp
-    hpx/traits/is_future.hpp
-    hpx/traits/is_future_range.hpp
-    hpx/traits/is_future_tuple.hpp
-    hpx/traits/is_launch_policy.hpp
-    hpx/traits/managed_component_policies.hpp
-    hpx/traits/pointer_category.hpp
-    hpx/traits/promise_local_result.hpp
-    hpx/traits/promise_remote_result.hpp
-    hpx/traits/rma_memory_region_traits.hpp
-    hpx/util/debugging.hpp
-    hpx/util/debug/thread_stacktrace.hpp
-    hpx/util_fwd.hpp
-    hpx/util/interval_timer.hpp
-    hpx/util/pool_timer.hpp
-    hpx/util/register_locks_globally.hpp
-    hpx/util/serialize_exception.hpp
-    hpx/util/thread_aware_timer.hpp
-    hpx/util/thread_mapper.hpp
+  hpx/custom_exception_info.hpp
+  hpx/hpx_finalize.hpp
+  hpx/hpx_init.hpp
+  hpx/hpx_init_impl.hpp
+  hpx/hpx_init_params.hpp
+  hpx/hpx_main_winsocket.hpp
+  hpx/hpx_start.hpp
+  hpx/hpx_start_impl.hpp
+  hpx/hpx_suspend.hpp
+  hpx/hpx_user_main_config.hpp
+  hpx/lcos/future_wait.hpp
+  hpx/lcos_fwd.hpp
+  hpx/runtime/config_entry.hpp
+  hpx/runtime_fwd.hpp
+  hpx/runtime/get_num_localities.hpp
+  hpx/runtime/get_os_thread_count.hpp
+  hpx/runtime/get_thread_name.hpp
+  hpx/runtime/get_worker_thread_num.hpp
+  hpx/runtime_handlers.hpp
+  hpx/runtime.hpp
+  hpx/runtime/report_error.hpp
+  hpx/runtime/runtime_fwd.hpp
+  hpx/runtime/serialization/detail/preprocess_container.hpp
+  hpx/runtime/serialization/detail/preprocess_futures.hpp
+  hpx/runtime/serialization/detail/preprocess_gid_types.hpp
+  hpx/runtime/shutdown_function.hpp
+  hpx/runtime/startup_function.hpp
+  hpx/runtime/thread_hooks.hpp
+  hpx/runtime/thread_pool_helpers.hpp
+  hpx/runtime/threads_fwd.hpp
+  hpx/runtime/threads/run_as_hpx_thread.hpp
+  hpx/runtime/threads/run_as_os_thread.hpp
+  hpx/runtime/threads/thread_pool_suspension_helpers.hpp
+  hpx/state.hpp
+  hpx/traits/managed_component_policies.hpp
+  hpx/traits/pointer_category.hpp
+  hpx/traits/promise_remote_result.hpp
+  hpx/traits/rma_memory_region_traits.hpp
+  hpx/util/debugging.hpp
+  hpx/util/debug/thread_stacktrace.hpp
+  hpx/util_fwd.hpp
+  hpx/util/interval_timer.hpp
+  hpx/util/pool_timer.hpp
+  hpx/util/register_locks_globally.hpp
+  hpx/util/serialize_exception.hpp
+  hpx/util/thread_aware_timer.hpp
+  hpx/util/thread_mapper.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -229,10 +213,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/components_fwd.hpp
     hpx/lcos/base_lco.hpp
     hpx/lcos/base_lco_with_value.hpp
-    hpx/lcos/detail/future_await_traits.hpp
-    hpx/lcos/detail/future_data.hpp
-    hpx/lcos/detail/future_traits.hpp
-    hpx/lcos/detail/future_transforms.hpp
     hpx/lcos/detail/promise_base.hpp
     hpx/lcos/detail/promise_lco.hpp
     hpx/lcos/object_semaphore.hpp

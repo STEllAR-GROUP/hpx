@@ -16,13 +16,8 @@
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/threading.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/runtime/components/client_base.hpp>
-#endif
 
 #include <cstddef>
 #include <exception>
@@ -71,7 +66,7 @@ namespace hpx { namespace lcos { namespace detail
         if (is_hpx_thread)
         {
             // make sure this thread is executed last
-            hpx::this_thread::yield_to(thread::id(std::move(tid)));
+            this_thread::suspend(threads::pending, std::move(tid));
             return p.get_future().get();
         }
         // If we are not on a HPX thread, we need to return immediately, to
@@ -152,6 +147,7 @@ namespace hpx { namespace lcos { namespace detail
         catch (...) {
             // If the completion handler throws an exception, there's nothing
             // we can do, report the exception and terminate.
+            // TODO: This should not be here.
             hpx::detail::report_exception_and_terminate(std::current_exception());
         }
     }

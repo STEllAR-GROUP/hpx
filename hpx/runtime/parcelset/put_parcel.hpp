@@ -12,6 +12,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>

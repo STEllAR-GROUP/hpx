@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/execution.hpp>
 #include <hpx/executors.hpp>
 #include <hpx/thread_executors.hpp>
 #include <hpx/timed_execution.hpp>

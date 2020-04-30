@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution_fwd.hpp>
+#include <hpx/basic_execution/execution_fwd.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>

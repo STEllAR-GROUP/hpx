@@ -117,6 +117,7 @@ add_hpx_module(
     hpx_execution
     hpx_format
     hpx_functional
+    hpx_futures
     hpx_local_async
     hpx_local_lcos
     hpx_memory

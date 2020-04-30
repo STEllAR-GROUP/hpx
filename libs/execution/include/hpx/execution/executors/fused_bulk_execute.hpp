@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/basic_execution/execution_fwd.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>

@@ -180,6 +180,7 @@ namespace hpx {
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>

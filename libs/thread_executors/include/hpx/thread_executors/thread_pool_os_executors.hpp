@@ -13,6 +13,7 @@
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>

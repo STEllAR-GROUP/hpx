@@ -12,19 +12,19 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 
 #include <boost/container/small_vector.hpp>
 
@@ -871,10 +871,8 @@ namespace hpx { namespace lcos { namespace detail {
 
         // run in a separate thread
         virtual threads::thread_id_type apply(
-            threads::thread_pool_base* /*pool*/,
-            const char* /*annotation*/,
-            launch /*policy*/,
-            threads::thread_priority /*priority*/,
+            threads::thread_pool_base* /*pool*/, const char* /*annotation*/,
+            launch /*policy*/, threads::thread_priority /*priority*/,
             threads::thread_stacksize /*stacksize*/,
             threads::thread_schedule_hint /*schedulehint*/, error_code& /*ec*/)
         {

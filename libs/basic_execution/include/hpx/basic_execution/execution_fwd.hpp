@@ -9,11 +9,10 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <type_traits>
 #include <utility>
-
-#include <hpx/config.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////

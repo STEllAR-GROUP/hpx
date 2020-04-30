@@ -14,7 +14,8 @@
 
 #include <hpx/synchronization.hpp>
 
-#include <hpx/lcos/future.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/futures.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/local_lcos/and_gate.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
