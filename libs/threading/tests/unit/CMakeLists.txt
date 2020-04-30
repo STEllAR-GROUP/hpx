@@ -17,13 +17,17 @@ set(threading_tests
     stop_tokencb1
     stop_tokenrace
     thread
-    thread_affinity
     thread_id
     thread_launching
     thread_mf
-    thread_stacksize
     thread_yield
 )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests}
+    thread_affinity
+    thread_stacksize)
+endif()
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set(threading_tests ${threading_tests} thread_stacksize_overflow)

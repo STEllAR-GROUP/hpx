@@ -4,9 +4,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    set_thread_state
-   )
+set(tests)
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests} set_thread_state)
+endif()
 
 set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
 
