@@ -8,8 +8,12 @@
 #if !defined(HPX_PARALLEL_ALL_ANY_NONE_OF_JUL_07_2014_1246PM)
 #define HPX_PARALLEL_ALL_ANY_NONE_OF_JUL_07_2014_1246PM
 
+#include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/all_any_none.hpp>
+#endif
 
 #endif

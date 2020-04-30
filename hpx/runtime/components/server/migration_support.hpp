@@ -197,7 +197,7 @@ namespace hpx { namespace components
         /// action.
         template <typename F>
         static threads::thread_function_type
-        decorate_action(naming::address::address_type lva, F && f)
+        decorate_action(naming::address_type lva, F && f)
         {
             // Make sure we pin the component at construction of the bound object
             // which will also unpin it once the thread runs to completion (the
@@ -214,7 +214,7 @@ namespace hpx { namespace components
         // migrated, it also returns a pinned pointer.
         static std::pair<bool, components::pinned_ptr>
         was_object_migrated(hpx::naming::gid_type const& id,
-            naming::address::address_type lva)
+            naming::address_type lva)
         {
             return agas::was_object_migrated(id,
                 [lva]() -> components::pinned_ptr

@@ -9,8 +9,8 @@
 #define HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM
 
 #include <hpx/config.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
-#include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/is_component.hpp>
 
 #include <type_traits>
@@ -64,7 +64,7 @@ namespace hpx
         }
 
         static Component*
-        call(naming::address::address_type lva)
+        call(naming::address_type lva)
         {
             return call(lva, detail::is_simple_or_fixed_component<Component>());
         }
@@ -91,7 +91,7 @@ namespace hpx
         }
 
         static Component const*
-        call(naming::address::address_type lva)
+        call(naming::address_type lva)
         {
             return call(lva, detail::is_simple_or_fixed_component<Component>());
         }
@@ -104,7 +104,7 @@ namespace hpx
         // for server::runtime_support the provided lva is directly usable
         // as the required local address
         static components::server::runtime_support*
-        call(naming::address::address_type lva)
+        call(naming::address_type lva)
         {
             return reinterpret_cast<components::server::runtime_support*>(lva);
         }
@@ -115,7 +115,7 @@ namespace hpx
         // for server::runtime_support the provided lva is directly usable
         // as the required local address
         static components::server::runtime_support const*
-        call(naming::address::address_type lva)
+        call(naming::address_type lva)
         {
             return reinterpret_cast<components::server::runtime_support const*>(lva);
         }
@@ -128,7 +128,7 @@ namespace hpx
         // for server::memory the provided lva is directly usable as the
         // required local address
         static components::server::memory*
-        call(naming::address::address_type lva)
+        call(naming::address_type lva)
         {
             return reinterpret_cast<components::server::memory*>(lva);
         }
@@ -139,7 +139,7 @@ namespace hpx
         // for server::memory the provided lva is directly usable as the
         // required local address
         static components::server::memory const*
-        call(naming::address::address_type lva)
+        call(naming::address_type lva)
         {
             return reinterpret_cast<components::server::memory const*>(lva);
         }

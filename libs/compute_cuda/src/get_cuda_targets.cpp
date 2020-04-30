@@ -9,17 +9,20 @@
 #if defined(HPX_HAVE_CUDA)
 
 #include <hpx/async.hpp>
+#include <hpx/compute/cuda/target.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/find_here.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
-#include <hpx/compute/cuda/target.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#endif
 
 #include <string>
 #include <vector>
@@ -50,6 +53,7 @@ namespace hpx { namespace compute { namespace cuda {
     }
 }}}    // namespace hpx::compute::cuda
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION(
     hpx::compute::cuda::get_local_targets, compute_cuda_get_targets_action);
 
@@ -62,5 +66,6 @@ namespace hpx { namespace compute { namespace cuda {
         return hpx::async(compute_cuda_get_targets_action(), locality);
     }
 }}}    // namespace hpx::compute::cuda
+#endif
 
 #endif

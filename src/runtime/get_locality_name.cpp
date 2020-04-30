@@ -8,9 +8,13 @@
 #include <hpx/async.hpp>
 #include <hpx/async/apply.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
 #include <hpx/runtime.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime_distributed.hpp>
+#endif
 
 #include <string>
 
@@ -18,8 +22,8 @@ namespace hpx { namespace detail
 {
     std::string get_locality_base_name()
     {
-#if defined(HPX_HAVE_NETWORKING)
-        runtime* rt = get_runtime_ptr();
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+        runtime_distributed* rt = get_runtime_distributed_ptr();
         if (rt == nullptr)
         {
             HPX_THROW_EXCEPTION(invalid_status,
@@ -40,8 +44,10 @@ namespace hpx { namespace detail
     }
 }}
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 HPX_PLAIN_ACTION_ID(hpx::detail::get_locality_name, hpx_get_locality_name_action,
         hpx::actions::hpx_get_locality_name_action_id)
+#endif
 
 namespace hpx
 {
@@ -51,8 +57,10 @@ namespace hpx
         return detail::get_locality_name();
     }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     future<std::string> get_locality_name(naming::id_type const& id)
     {
         return async<hpx_get_locality_name_action>(id);
     }
+#endif
 }

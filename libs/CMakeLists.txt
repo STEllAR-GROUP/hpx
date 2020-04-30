@@ -16,14 +16,11 @@ set(HPX_CANDIDATE_LIBS
   allocator_support
   asio
   assertion
-  async
   async_base
   async_combinators
   basic_execution
   batch_environments
   cache
-  checkpoint
-  collectives
   command_line_handling
   compute
   compute_cuda
@@ -33,7 +30,6 @@ set(HPX_CANDIDATE_LIBS
   coroutines
   datastructures
   debugging
-  distributed_executors
   errors
   execution
   filesystem
@@ -52,7 +48,6 @@ set(HPX_CANDIDATE_LIBS
   mpi_base
   naming_base
   pack_traversal
-  performance_counters
   plugin
   prefix
   preprocessor
@@ -61,7 +56,6 @@ set(HPX_CANDIDATE_LIBS
   resource_partitioner
   runtime_configuration
   schedulers
-  segmented_algorithms
   serialization
   static_reinit
   statistics
@@ -80,6 +74,18 @@ set(HPX_CANDIDATE_LIBS
   util
   version
 )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(HPX_CANDIDATE_LIBS ${HPX_CANDIDATE_LIBS}
+    async
+    checkpoint
+    collectives
+    distributed_executors
+    performance_counters
+    segmented_algorithms
+    CACHE INTERNAL "list of HPX modules" FORCE
+  )
+endif()
 
 
 # add example pseudo targets needed for modules

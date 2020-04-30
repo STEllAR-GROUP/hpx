@@ -15,6 +15,7 @@
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -446,8 +447,8 @@ void register_worker(registration_header const& header)
     // its dtor calls big_boot_barrier::notify().
     big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
-    runtime& rt = get_runtime();
-    naming::resolver_client& agas_client = rt.get_agas_client();
+    runtime_distributed& rtd = get_runtime_distributed();
+    naming::resolver_client& agas_client = rtd.get_agas_client();
 
     if (HPX_UNLIKELY(agas_client.is_connecting()))
     {
@@ -515,7 +516,7 @@ void register_worker(registration_header const& header)
             agas_client.symbol_ns_.ptr());
 
     // assign cores to the new locality
-    std::uint32_t first_core = rt.assign_cores(header.hostname,
+    std::uint32_t first_core = rtd.assign_cores(header.hostname,
         header.cores_needed);
 
     big_boot_barrier & bbb = get_big_boot_barrier();
@@ -524,7 +525,7 @@ void register_worker(registration_header const& header)
     detail::assigned_id_sequence assigned_ids(header.typenames);
 
     notification_header hdr (prefix, bbb.here(), locality_addr, primary_addr
-      , component_addr, symbol_addr, rt.get_config().get_num_localities()
+      , component_addr, symbol_addr, rtd.get_config().get_num_localities()
       , first_core, bbb.get_endpoints(), assigned_ids);
 
     parcelset::locality dest;
@@ -585,19 +586,19 @@ void notify_worker(notification_header const& header)
     // register all ids with this locality
     header.ids.register_ids_on_worker_loc();
 
-    runtime& rt = get_runtime();
-    naming::resolver_client& agas_client = rt.get_agas_client();
+    runtime_distributed& rtd = get_runtime_distributed();
+    naming::resolver_client& agas_client = rtd.get_agas_client();
 
     if (HPX_UNLIKELY(agas_client.get_status() != state_starting))
     {
         std::ostringstream strm;
-        strm << "locality " << rt.here() << " has launched early";
+        strm << "locality " << rtd.here() << " has launched early";
         HPX_THROW_EXCEPTION(internal_server_error,
             "agas::notify_worker",
             strm.str());
     }
 
-    util::runtime_configuration& cfg = rt.get_config();
+    util::runtime_configuration& cfg = rtd.get_config();
 
     // set our prefix
     agas_client.set_local_locality(header.prefix);
@@ -615,20 +616,20 @@ void notify_worker(notification_header const& header)
 
     // register runtime support component
     naming::gid_type runtime_support_gid(header.prefix.get_msb()
-      , rt.get_runtime_support_lva());
+      , rtd.get_runtime_support_lva());
     naming::address const runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
-      , rt.get_runtime_support_lva());
+      , rtd.get_runtime_support_lva());
     agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
     runtime_support_gid.set_lsb(std::uint64_t(0));
     agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
     naming::gid_type const memory_gid(header.prefix.get_msb()
-      , rt.get_memory_lva());
+      , rtd.get_memory_lva());
     naming::address const memory_address(here
       , components::get_component_type<components::server::memory>()
-      , rt.get_memory_lva());
+      , rtd.get_memory_lva());
     agas_client.bind_local(memory_gid, memory_address);
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
@@ -636,14 +637,14 @@ void notify_worker(notification_header const& header)
     naming::gid_type parcel_lower, parcel_upper;
     agas_client.get_id_range(1000, parcel_lower, parcel_upper);
 
-    rt.get_id_pool().set_range(parcel_lower, parcel_upper);
+    rtd.get_id_pool().set_range(parcel_lower, parcel_upper);
 
     // store number of initial localities
     cfg.set_num_localities(header.num_localities);
 
     // store number of used cores by other localities
     cfg.set_first_used_core(header.used_cores);
-    rt.assign_cores();
+    rtd.assign_cores();
 
     // pre-cache all known locality endpoints in local AGAS
     agas_client.pre_cache_endpoints(header.endpoints);
@@ -680,7 +681,8 @@ void big_boot_barrier::spin()
     // pre-cache all known locality endpoints in local AGAS on locality 0 as well
     if (service_mode_bootstrap == service_type)
     {
-        naming::resolver_client& agas_client = get_runtime().get_agas_client();
+        naming::resolver_client& agas_client =
+            get_runtime_distributed().get_agas_client();
         agas_client.pre_cache_endpoints(localities);
     }
 }
@@ -764,17 +766,17 @@ void big_boot_barrier::wait_hosted(
     HPX_ASSERT(0 != primary_ns_server);
     HPX_ASSERT(0 != symbol_ns_server);
 
-    runtime& rt = get_runtime();
+    runtime_distributed& rtd = get_runtime_distributed();
 
     // get the number of cores we need for our locality. This respects the
     // affinity description. Cores that are partially used are counted as well
-    std::uint32_t cores_needed = rt.assign_cores();
+    std::uint32_t cores_needed = rtd.assign_cores();
     std::uint32_t num_threads =
-        std::uint32_t(rt.get_config().get_os_thread_count());
+        std::uint32_t(rtd.get_config().get_os_thread_count());
 
     naming::gid_type suggested_prefix;
 
-    std::string locality_str = rt.get_config().get_entry("hpx.locality", "-1");
+    std::string locality_str = rtd.get_config().get_entry("hpx.locality", "-1");
     if(locality_str != "-1")
     {
         suggested_prefix = naming::get_gid_from_locality_id(
@@ -786,7 +788,7 @@ void big_boot_barrier::wait_hosted(
 
     // contact the bootstrap AGAS node
     registration_header hdr(
-          rt.endpoints()
+          rtd.endpoints()
         , primary_ns_server
         , symbol_ns_server
         , cores_needed
@@ -808,8 +810,8 @@ void big_boot_barrier::wait_hosted(
 
 void big_boot_barrier::notify()
 {
-    runtime& rt = get_runtime();
-    naming::resolver_client& agas_client = rt.get_agas_client();
+    runtime_distributed& rtd = get_runtime_distributed();
+    naming::resolver_client& agas_client = rtd.get_agas_client();
 
     bool notify = false;
     {

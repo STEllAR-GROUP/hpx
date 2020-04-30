@@ -7,6 +7,11 @@
 #if !defined(HPX_DATAFLOW_DEC_08_2015_1132AM)
 #define HPX_DATAFLOW_DEC_08_2015_1132AM
 
+#include <hpx/config.hpp>
+#include <hpx/local_async/dataflow.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async/dataflow.hpp>
+#endif
 
 #endif

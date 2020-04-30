@@ -6,18 +6,56 @@
 
 add_subdirectory(components)
 
-set(tests
-    find_clients_from_prefix
-    find_ids_from_prefix
-    get_colocation_id
-    gid_type
-    local_address_rebind
-    local_embedded_ref_to_local_object
-    refcnted_symbol_to_local_object
-    scoped_ref_to_local_object
-    split_credit
-    uncounted_symbol_to_local_object
-   )
+set(tests)
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests
+      find_clients_from_prefix
+      find_ids_from_prefix
+      get_colocation_id
+      gid_type
+      local_address_rebind
+      local_embedded_ref_to_local_object
+      refcnted_symbol_to_local_object
+      scoped_ref_to_local_object
+      split_credit
+      uncounted_symbol_to_local_object
+     )
+
+  set(find_ids_from_prefix_PARAMETERS LOCALITIES 2)
+  set(find_clients_from_prefix_PARAMETERS LOCALITIES 2)
+
+  set(get_colocation_id_PARAMETERS LOCALITIES 2)
+
+  set(local_address_rebind_FLAGS
+      DEPENDENCIES iostreams_component simple_mobile_object_component)
+  set(local_address_rebind_PARAMETERS THREADS_PER_LOCALITY 4)
+
+  set(scoped_ref_to_local_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(scoped_ref_to_local_object_PARAMETERS THREADS_PER_LOCALITY 4)
+
+  set(local_embedded_ref_to_local_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(local_embedded_ref_to_local_object_PARAMETERS THREADS_PER_LOCALITY 4)
+
+  set(refcnted_symbol_to_local_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(refcnted_symbol_to_local_object_PARAMETERS THREADS_PER_LOCALITY 4)
+
+  set(uncounted_symbol_to_local_object_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(uncounted_symbol_to_local_object_PARAMETERS THREADS_PER_LOCALITY 4)
+
+  set(split_credit_FLAGS
+      DEPENDENCIES simple_refcnt_checker_component
+                   managed_refcnt_checker_component)
+  set(split_credit_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+endif()
 
 if(HPX_WITH_NETWORKING)
   set(tests ${tests}
@@ -71,40 +109,6 @@ if(HPX_WITH_NETWORKING)
   set(uncounted_symbol_to_remote_object_PARAMETERS
     LOCALITIES 2 THREADS_PER_LOCALITY 2)
 endif()
-
-set(find_ids_from_prefix_PARAMETERS LOCALITIES 2)
-set(find_clients_from_prefix_PARAMETERS LOCALITIES 2)
-
-set(get_colocation_id_PARAMETERS LOCALITIES 2)
-
-set(local_address_rebind_FLAGS
-    DEPENDENCIES iostreams_component simple_mobile_object_component)
-set(local_address_rebind_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(scoped_ref_to_local_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(scoped_ref_to_local_object_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(local_embedded_ref_to_local_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(local_embedded_ref_to_local_object_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(refcnted_symbol_to_local_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(refcnted_symbol_to_local_object_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(uncounted_symbol_to_local_object_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(uncounted_symbol_to_local_object_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(split_credit_FLAGS
-    DEPENDENCIES simple_refcnt_checker_component
-                 managed_refcnt_checker_component)
-set(split_credit_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 foreach(test ${tests})
   set(sources

@@ -5,28 +5,31 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_RUNTIME_IMPL_HPP)
-#define HPX_RUNTIME_RUNTIME_IMPL_HPP
+#if !defined(HPX_RUNTIME_RUNTIME_DISTRIBUTED_HPP)
+#define HPX_RUNTIME_RUNTIME_DISTRIBUTED_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/async/applier/applier.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/async/applier/applier.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/util/query_counters.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -35,40 +38,26 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx
-{
+namespace hpx {
+    // \brief Returns if HPX continues past connection signals
+    // caused by crashed nodes
+    HPX_EXPORT bool tolerate_node_faults();
+
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.
-    class HPX_EXPORT runtime_impl : public runtime
+    class HPX_EXPORT runtime_distributed : public runtime
     {
-    private:
-        // avoid warnings about usage of this in member initializer list
-        runtime_impl* This() { return this; }
-
-        //
-        static void default_errorsink(std::string const&);
-
-        //
-        threads::thread_result_type run_helper(
-            util::function_nonser<runtime::hpx_main_function_type> const& func,
-            int& result);
-
-        void wait_helper(std::mutex& mtx, std::condition_variable& cond,
-            bool& running);
-
     public:
-        typedef threads::policies::callback_notifier notification_policy_type;
-
         /// Construct a new HPX runtime instance
         ///
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
-        explicit runtime_impl(util::runtime_configuration & rtcfg);
+        explicit runtime_distributed(util::runtime_configuration& rtcfg);
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
-        ~runtime_impl();
+        ~runtime_distributed();
 
         /// \brief Start the runtime system
         ///
@@ -89,9 +78,9 @@ namespace hpx
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
         int start(util::function_nonser<hpx_main_function_type> const& func,
-                bool blocking = false) override;
+            bool blocking = false) override;
 
-        /// \brief Start the runtime system
+        ///  \brief Start the runtime system
         ///
         /// \param blocking   [in] This allows to control whether this
         ///                   call blocks until the runtime system has been
@@ -123,6 +112,8 @@ namespace hpx
         ///                   all internal work to be completed.
         void stop(bool blocking = true) override;
 
+        int finalize(double shutdown_timeout) override;
+
         /// \brief Stop the runtime system, wait for termination
         ///
         /// \param blocking   [in] This allows to control whether this
@@ -132,8 +123,8 @@ namespace hpx
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stopped(bool blocking, std::condition_variable& cond,
-            std::mutex& mtx);
+        void stop_helper(
+            bool blocking, std::condition_variable& cond, std::mutex& mtx);
 
         /// \brief Suspend the runtime system
         ///
@@ -199,53 +190,64 @@ namespace hpx
         /// \returns          This function will always return 0 (zero).
         int run() override;
 
-        /// Rethrow any stored exception (to be called after stop())
-        void rethrow_exception() override;
+        bool is_networking_enabled() override;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F>
-        components::server::console_error_dispatcher::sink_type
-        set_error_sink(F&& sink)
+        components::server::console_error_dispatcher::sink_type set_error_sink(
+            F&& sink)
         {
-            return components::server::get_error_dispatcher().
-                set_error_sink(std::forward<F>(sink));
+            return components::server::get_error_dispatcher().set_error_sink(
+                std::forward<F>(sink));
         }
+
+        /// \brief Allow access to the registry counter registry instance used
+        ///        by the HPX runtime.
+        performance_counters::registry& get_counter_registry();
+
+        /// \brief Allow access to the registry counter registry instance used
+        ///        by the HPX runtime.
+        performance_counters::registry const& get_counter_registry() const;
+
+        /// \brief Install all performance counters related to this runtime
+        ///        instance
+        void register_counter_types();
+
+        ///////////////////////////////////////////////////////////////////////
+        // management API for active performance counters
+        void register_query_counters(
+            std::shared_ptr<util::query_counters> const& active_counters);
+
+        void start_active_counters(error_code& ec = throws);
+        void stop_active_counters(error_code& ec = throws);
+        void reset_active_counters(error_code& ec = throws);
+        void reinit_active_counters(bool reset = true, error_code& ec = throws);
+        void evaluate_active_counters(bool reset = false,
+            char const* description = nullptr, error_code& ec = throws);
+
+        // stop periodic evaluation of counters during shutdown
+        void stop_evaluating_counters(bool terminate = false);
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Allow access to the AGAS client instance used by the HPX
         ///        runtime.
-        naming::resolver_client& get_agas_client() override
-        {
-            return agas_client_;
-        }
+        naming::resolver_client& get_agas_client();
 
 #if defined(HPX_HAVE_NETWORKING)
         /// \brief Allow access to the parcel handler instance used by the HPX
         ///        runtime.
-        parcelset::parcelhandler const& get_parcel_handler() const override
-        {
-            return parcel_handler_;
-        }
+        parcelset::parcelhandler const& get_parcel_handler() const;
 
-        parcelset::parcelhandler& get_parcel_handler() override
-        {
-            return parcel_handler_;
-        }
+        parcelset::parcelhandler& get_parcel_handler();
 #endif
 
         /// \brief Allow access to the thread manager instance used by the HPX
         ///        runtime.
-        hpx::threads::threadmanager& get_thread_manager() override
-        {
-            return *thread_manager_;
-        }
+        hpx::threads::threadmanager& get_thread_manager() override;
 
         /// \brief Allow access to the applier instance used by the HPX
         ///        runtime.
-        applier::applier& get_applier() override
-        {
-            return applier_;
-        }
+        applier::applier& get_applier();
 
 #if defined(HPX_HAVE_NETWORKING)
         /// \brief Allow access to the locality endpoints this runtime instance is
@@ -253,40 +255,31 @@ namespace hpx
         ///
         /// This accessor returns a reference to the locality endpoints this runtime
         /// instance is associated with.
-        parcelset::endpoints_type const& endpoints() const override
-        {
-            return parcel_handler_.endpoints();
-        }
+        parcelset::endpoints_type const& endpoints() const;
 #endif
 
         /// \brief Returns a string of the locality endpoints (usable in debug output)
-        std::string here() const override
-        {
+        std::string here() const override;
+
+        std::uint64_t get_runtime_support_lva() const;
+
+        std::uint64_t get_memory_lva() const;
+
+        naming::gid_type get_next_id(std::size_t count = 1);
+
+        util::unique_id_ranges& get_id_pool();
+
 #if defined(HPX_HAVE_NETWORKING)
-            std::ostringstream strm;
-            strm << get_runtime().endpoints();
-            return strm.str();
-#else
-            return "console";
+        void register_message_handler(char const* message_handler_type,
+            char const* action, error_code& ec = throws);
+        parcelset::policies::message_handler* create_message_handler(
+            char const* message_handler_type, char const* action,
+            parcelset::parcelport* pp, std::size_t num_messages,
+            std::size_t interval, error_code& ec = throws);
+        serialization::binary_filter* create_binary_filter(
+            char const* binary_filter_type, bool compress,
+            serialization::binary_filter* next_filter, error_code& ec = throws);
 #endif
-        }
-
-        std::uint64_t get_runtime_support_lva() const override
-        {
-            return reinterpret_cast<std::uint64_t>(runtime_support_.get());
-        }
-
-        std::uint64_t get_memory_lva() const override
-        {
-            return reinterpret_cast<std::uint64_t>(memory_.get());
-        }
-
-        naming::gid_type get_next_id(std::size_t count = 1) override;
-
-        util::unique_id_ranges& get_id_pool() override
-        {
-            return id_pool_;
-        }
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         /// but guaranteed to be executed before any startup function registered
@@ -351,34 +344,58 @@ namespace hpx
         notification_policy_type get_notification_policy(
             char const* prefix) override;
 
+        std::uint32_t get_locality_id(error_code& ec) const override;
+
+        std::size_t get_num_worker_threads() const override;
+
+        std::uint32_t get_num_localities(
+            hpx::launch::sync_policy, error_code& ec) const override;
+
+        std::uint32_t get_initial_num_localities() const override;
+
+        lcos::future<std::uint32_t> get_num_localities() const override;
+
+        std::uint32_t get_num_localities(hpx::launch::sync_policy,
+            components::component_type type, error_code& ec) const;
+
+        lcos::future<std::uint32_t> get_num_localities(
+            components::component_type type) const;
+
+        std::uint32_t assign_cores(
+            std::string const& locality_basename, std::uint32_t num_threads);
+
+        std::uint32_t assign_cores();
+
     private:
-        void deinit_tss(char const* context, std::size_t num);
+        // avoid warnings about usage of this in member initializer list
+        runtime_distributed* This()
+        {
+            return this;
+        }
+
+        //
+        threads::thread_result_type run_helper(
+            util::function_nonser<runtime::hpx_main_function_type> const& func,
+            int& result);
+
+        void wait_helper(
+            std::mutex& mtx, std::condition_variable& cond, bool& running);
+
+        void init_tss_helper(char const* context, std::size_t local_thread_num,
+            std::size_t global_thread_num, char const* pool_name,
+            char const* postfix, bool service_thread);
+
+        void deinit_tss_helper(char const* context, std::size_t num);
 
         void init_tss_ex(std::string const& locality, char const* context,
             std::size_t local_thread_num, std::size_t global_thread_num,
             char const* pool_name, char const* postfix, bool service_thread,
             error_code& ec);
 
-        void init_tss(char const* context, std::size_t local_thread_num,
-            std::size_t global_thread_num, char const* pool_name,
-            char const* postfix, bool service_thread);
+        static void default_errorsink(std::string const&);
 
-    private:
-        util::unique_id_ranges id_pool_;
         runtime_mode mode_;
-        int result_;
-        notification_policy_type main_pool_notifier_;
-        util::io_service_pool main_pool_;
-#ifdef HPX_HAVE_IO_POOL
-        notification_policy_type io_pool_notifier_;
-        util::io_service_pool io_pool_;
-#endif
-#ifdef HPX_HAVE_TIMER_POOL
-        notification_policy_type timer_pool_notifier_;
-        util::io_service_pool timer_pool_;
-#endif
-        notification_policy_type notifier_;
-        std::unique_ptr<hpx::threads::threadmanager> thread_manager_;
+        util::unique_id_ranges id_pool_;
 #if defined(HPX_HAVE_NETWORKING)
         notification_policy_type parcel_handler_notifier_;
         parcelset::parcelhandler parcel_handler_;
@@ -386,10 +403,16 @@ namespace hpx
         naming::resolver_client agas_client_;
         applier::applier applier_;
 
-        std::mutex mtx_;
-        std::exception_ptr exception_;
+        // locality basename -> used cores
+        using used_cores_map_type = std::map<std::string, std::uint32_t>;
+        used_cores_map_type used_cores_map_;
+
+        std::unique_ptr<components::server::memory> memory_;
+        std::unique_ptr<components::server::runtime_support> runtime_support_;
+        std::shared_ptr<performance_counters::registry> counters_;
+        std::shared_ptr<util::query_counters> active_counters_;
     };
-}
+}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
 

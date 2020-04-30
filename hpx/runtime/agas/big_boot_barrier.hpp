@@ -18,6 +18,7 @@
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/util_fwd.hpp>

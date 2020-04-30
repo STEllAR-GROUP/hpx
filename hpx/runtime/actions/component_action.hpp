@@ -54,8 +54,8 @@ namespace hpx { namespace actions
         ///////////////////////////////////////////////////////////////////////
         template <typename Component, typename R, typename F, typename ...Ts>
         R component_invoke(std::false_type,
-            naming::address::address_type lva,
-            naming::address::component_type /*comptype*/,
+            naming::address_type lva,
+            naming::component_type /*comptype*/,
             F Component::*f, Ts&&... vs)
         {
             Component* component = get_lva<Component>::call(lva);
@@ -64,8 +64,8 @@ namespace hpx { namespace actions
 
         template <typename Component, typename R, typename F, typename ...Ts>
         R component_invoke(std::true_type,
-            naming::address::address_type lva,
-            naming::address::component_type comptype,
+            naming::address_type lva,
+            naming::component_type comptype,
             F Component::*f, Ts&&... vs)
         {
             // additional pinning is required such that the object becomes
@@ -103,7 +103,7 @@ namespace hpx { namespace actions
             action, Derived
         >::type derived_type;
 
-        static std::string get_action_name(naming::address::address_type lva)
+        static std::string get_action_name(naming::address_type lva)
         {
             return detail::make_component_action_name(
                 detail::get_action_name<derived_type>(),
@@ -112,8 +112,8 @@ namespace hpx { namespace actions
 
         template <typename ...Ts>
         static R invoke(
-            naming::address::address_type lva,
-            naming::address::component_type comptype, Ts&&... vs)
+            naming::address_type lva,
+            naming::component_type comptype, Ts&&... vs)
         {
             basic_action<Component, R(Ps...), derived_type>::
                 increment_invocation_count();
@@ -144,7 +144,7 @@ namespace hpx { namespace actions
             action, Derived
         >::type derived_type;
 
-        static std::string get_action_name(naming::address::address_type lva)
+        static std::string get_action_name(naming::address_type lva)
         {
             return detail::make_component_action_name(
                 detail::get_action_name<derived_type>(),
@@ -153,8 +153,8 @@ namespace hpx { namespace actions
 
         template <typename ...Ts>
         static R invoke(
-            naming::address::address_type lva,
-            naming::address::component_type comptype, Ts&&... vs)
+            naming::address_type lva,
+            naming::component_type comptype, Ts&&... vs)
         {
             basic_action<Component const, R(Ps...), derived_type>::
                 increment_invocation_count();
@@ -190,7 +190,7 @@ namespace hpx { namespace actions
             action, Derived
         >::type derived_type;
 
-        static std::string get_action_name(naming::address::address_type lva)
+        static std::string get_action_name(naming::address_type lva)
         {
             return detail::make_component_action_name(
                 detail::get_action_name<derived_type>(),
@@ -199,8 +199,8 @@ namespace hpx { namespace actions
 
         template <typename ...Ts>
         static R invoke(
-            naming::address::address_type lva,
-            naming::address::component_type comptype, Ts&&... vs)
+            naming::address_type lva,
+            naming::component_type comptype, Ts&&... vs)
         {
             basic_action<Component, R(Ps...), derived_type>::
                 increment_invocation_count();
@@ -231,7 +231,7 @@ namespace hpx { namespace actions
             action, Derived
         >::type derived_type;
 
-        static std::string get_action_name(naming::address::address_type lva)
+        static std::string get_action_name(naming::address_type lva)
         {
             return detail::make_component_action_name(
                 detail::get_action_name<derived_type>(),
@@ -240,8 +240,8 @@ namespace hpx { namespace actions
 
         template <typename ...Ts>
         static R invoke(
-            naming::address::address_type lva,
-            naming::address::component_type comptype, Ts&&... vs)
+            naming::address_type lva,
+            naming::component_type comptype, Ts&&... vs)
         {
             basic_action<Component const, R(Ps...), derived_type>::
                 increment_invocation_count();

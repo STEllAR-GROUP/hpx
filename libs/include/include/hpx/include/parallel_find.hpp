@@ -8,8 +8,12 @@
 #if !defined(HPX_PARALLEL_FIND_JUL_21_2014_0248PM)
 #define HPX_PARALLEL_FIND_JUL_21_2014_0248PM
 
+#include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
 #include <hpx/parallel/container_algorithms/find.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/find.hpp>
+#endif
 
 #endif

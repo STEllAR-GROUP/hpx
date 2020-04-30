@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM)
 #define HPX_PARALLEL_TEST_ITERATOR_MAY_29_2014_0110PM
 
-#include <hpx/include/lcos.hpp>
+#include <hpx/include/local_lcos.hpp>
 #include <hpx/include/parallel_execution_policy.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/runtime_fwd.hpp>
@@ -222,7 +222,8 @@ namespace test {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void make_ready(std::vector<hpx::promise<std::size_t>>& p,
+    inline void make_ready(
+        std::vector<hpx::lcos::local::promise<std::size_t>>& p,
         std::vector<std::size_t>& idx)
     {
         std::for_each(std::begin(idx), std::end(idx),
@@ -230,11 +231,13 @@ namespace test {
     }
 
     inline std::vector<hpx::future<std::size_t>> fill_with_futures(
-        std::vector<hpx::promise<std::size_t>>& p)
+        std::vector<hpx::lcos::local::promise<std::size_t>>& p)
     {
         std::vector<hpx::future<std::size_t>> f;
         std::transform(std::begin(p), std::end(p), std::back_inserter(f),
-            [](hpx::promise<std::size_t>& pr) { return pr.get_future(); });
+            [](hpx::lcos::local::promise<std::size_t>& pr) {
+                return pr.get_future();
+            });
 
         return f;
     }

@@ -9,6 +9,8 @@
 #define HPX_COMPONENTS_JUN_01_2007_0526PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/components/component_registry.hpp>
 
 #include <hpx/runtime/components/component_factory.hpp>
@@ -56,5 +58,6 @@
 #include <hpx/runtime/components/unwrapping_result_policy.hpp>
 
 #include <hpx/runtime/get_ptr.hpp>
+#endif
 
 #endif

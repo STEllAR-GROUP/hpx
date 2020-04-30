@@ -10,6 +10,8 @@
 #define HPX_LCOS_PROMISE_HPP
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/lcos/detail/promise_base.hpp>
 
 #include <exception>
@@ -270,5 +272,6 @@ namespace std {
     {
     };
 }    // namespace std
+#endif
 
 #endif /*HPX_LCOS_PROMISE_HPP*/

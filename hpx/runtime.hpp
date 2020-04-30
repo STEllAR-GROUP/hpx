@@ -9,220 +9,307 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/async/applier_fwd.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime/thread_hooks.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/topology.hpp>
+#include <hpx/util/thread_mapper.hpp>
+#include <hpx/util_fwd.hpp>
 
 #include <atomic>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    // \brief Returns if HPX continues past connection signals
-    // caused by crashed nodes
-    HPX_EXPORT bool tolerate_node_faults();
-    namespace util
-    {
-        class thread_mapper;
-        class query_counters;
-        class unique_id_ranges;
-    }
-    namespace components
-    {
-        struct static_factory_load_data_type;
-
-        namespace server
-        {
-            class runtime_support;
-            class HPX_EXPORT memory;
-        }
-    }
-
-    namespace performance_counters
-    {
-        class registry;
-    }
-
-    int pre_main(runtime_mode);
+namespace hpx {
+    namespace detail {
+        ///////////////////////////////////////////////////////////////////////
+        // There is no need to protect these global from thread concurrent
+        // access as they are access during early startup only.
+        extern std::list<startup_function_type> global_pre_startup_functions;
+        extern std::list<startup_function_type> global_startup_functions;
+        extern std::list<shutdown_function_type> global_pre_shutdown_functions;
+        extern std::list<shutdown_function_type> global_shutdown_functions;
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT runtime_impl;
-
     class HPX_EXPORT runtime
     {
     public:
+        /// Generate a new notification policy instance for the given thread
+        /// name prefix
+        using notification_policy_type = threads::policies::callback_notifier;
+        virtual notification_policy_type get_notification_policy(
+            char const* prefix);
 
-        state get_state() const { return state_.load(); }
+        state get_state() const;
+        void set_state(state s);
 
         /// The \a hpx_main_function_type is the default function type usable
         /// as the main HPX thread function.
-        typedef int hpx_main_function_type();
+        using hpx_main_function_type = int();
 
-        ///
-        typedef void hpx_errorsink_function_type(
+        using hpx_errorsink_function_type = void(
             std::uint32_t, std::string const&);
 
-        /// construct a new instance of a runtime
-        runtime(util::runtime_configuration & rtcfg);
+        /// Construct a new HPX runtime instance
+        explicit runtime(
+            util::runtime_configuration& rtcfg, bool initialize = true);
 
+    protected:
+        runtime(util::runtime_configuration& rtcfg,
+            notification_policy_type&& notifier,
+            notification_policy_type&& main_pool_notifier
+#ifdef HPX_HAVE_IO_POOL
+            ,
+            notification_policy_type&& io_pool_notifier
+#endif
+#ifdef HPX_HAVE_IO_POOL
+            ,
+            notification_policy_type&& timer_pool_notifier
+#endif
+#ifdef HPX_HAVE_NETWORKING
+            ,
+            threads::detail::network_background_callback_type
+                network_background_callback
+#endif
+            ,
+            bool initialize);
+
+        /// Common initialization for different constructors
+        void init();
+
+    public:
+        /// \brief The destructor makes sure all HPX runtime services are
+        ///        properly shut down before exiting.
         virtual ~runtime();
 
         /// \brief Manage list of functions to call on exit
-        void on_exit(util::function_nonser<void()> const& f)
-        {
-            std::lock_guard<std::mutex> l(mtx_);
-            on_exit_functions_.push_back(f);
-        }
+        void on_exit(util::function_nonser<void()> const& f);
 
         /// \brief Manage runtime 'stopped' state
-        void starting()
-        {
-            state_.store(state_pre_main);
-        }
+        void starting();
 
         /// \brief Call all registered on_exit functions
-        void stopping()
-        {
-            state_.store(state_stopped);
-
-            typedef util::function_nonser<void()> value_type;
-
-            std::lock_guard<std::mutex> l(mtx_);
-            for (value_type const& f : on_exit_functions_)
-                f();
-        }
+        void stopping();
 
         /// This accessor returns whether the runtime instance has been stopped
-        bool stopped() const
-        {
-            return state_.load() == state_stopped;
-        }
+        bool stopped() const;
 
         /// \brief access configuration information
-        util::runtime_configuration& get_config()
-        {
-            return ini_;
-        }
-        util::runtime_configuration const& get_config() const
-        {
-            return ini_;
-        }
+        util::runtime_configuration& get_config();
 
-        std::size_t get_instance_number() const
-        {
-            return static_cast<std::size_t>(instance_number_);
-        }
+        util::runtime_configuration const& get_config() const;
+
+        std::size_t get_instance_number() const;
 
         /// \brief Return the system uptime measure on the thread executing this call
         static std::uint64_t get_system_uptime();
 
-        /// \brief Allow access to the registry counter registry instance used
-        ///        by the HPX runtime.
-        performance_counters::registry& get_counter_registry();
-
-        /// \brief Allow access to the registry counter registry instance used
-        ///        by the HPX runtime.
-        performance_counters::registry const& get_counter_registry() const;
-
         /// \brief Return a reference to the internal PAPI thread manager
         util::thread_mapper& get_thread_mapper();
 
-        threads::topology const& get_topology() const
-        {
-            return topology_;
-        }
+        threads::topology const& get_topology() const;
 
-        std::uint32_t assign_cores(std::string const& locality_basename,
-            std::uint32_t num_threads);
+        /// \brief Run the HPX runtime system, use the given function for the
+        ///        main \a thread and block waiting for all threads to
+        ///        finish
+        ///
+        /// \param func       [in] This is the main function of an HPX
+        ///                   application. It will be scheduled for execution
+        ///                   by the thread manager as soon as the runtime has
+        ///                   been initialized. This function is expected to
+        ///                   expose an interface as defined by the typedef
+        ///                   \a hpx_main_function_type. This parameter is
+        ///                   optional and defaults to none main thread
+        ///                   function, in which case all threads have to be
+        ///                   scheduled explicitly.
+        ///
+        /// \note             The parameter \a func is optional. If no function
+        ///                   is supplied, the runtime system will simply wait
+        ///                   for the shutdown action without explicitly
+        ///                   executing any main thread.
+        ///
+        /// \returns          This function will return the value as returned
+        ///                   as the result of the invocation of the function
+        ///                   object given by the parameter \p func.
+        virtual int run(
+            util::function_nonser<hpx_main_function_type> const& func);
 
-        std::uint32_t assign_cores();
+        /// \brief Run the HPX runtime system, initially use the given number
+        ///        of (OS) threads in the thread-manager and block waiting for
+        ///        all threads to finish.
+        ///
+        /// \returns          This function will always return 0 (zero).
+        virtual int run();
 
-        /// \brief Install all performance counters related to this runtime
-        ///        instance
-        void register_counter_types();
+        /// Rethrow any stored exception (to be called after stop())
+        virtual void rethrow_exception();
 
-        ///////////////////////////////////////////////////////////////////////
-        virtual int run(util::function_nonser<hpx_main_function_type> const& func) = 0;
+        /// \brief Start the runtime system
+        ///
+        /// \param func       [in] This is the main function of an HPX
+        ///                   application. It will be scheduled for execution
+        ///                   by the thread manager as soon as the runtime has
+        ///                   been initialized. This function is expected to
+        ///                   expose an interface as defined by the typedef
+        ///                   \a hpx_main_function_type.
+        /// \param blocking   [in] This allows to control whether this
+        ///                   call blocks until the runtime system has been
+        ///                   stopped. If this parameter is \a true the
+        ///                   function \a runtime#start will call
+        ///                   \a runtime#wait internally.
+        ///
+        /// \returns          If a blocking is a true, this function will
+        ///                   return the value as returned as the result of the
+        ///                   invocation of the function object given by the
+        ///                   parameter \p func. Otherwise it will return zero.
+        virtual int start(
+            util::function_nonser<hpx_main_function_type> const& func,
+            bool blocking = false);
 
-        virtual int run() = 0;
+        /// \brief Start the runtime system
+        ///
+        /// \param blocking   [in] This allows to control whether this
+        ///                   call blocks until the runtime system has been
+        ///                   stopped. If this parameter is \a true the
+        ///                   function \a runtime#start will call
+        ///                   \a runtime#wait internally .
+        ///
+        /// \returns          If a blocking is a true, this function will
+        ///                   return the value as returned as the result of the
+        ///                   invocation of the function object given by the
+        ///                   parameter \p func. Otherwise it will return zero.
+        virtual int start(bool blocking = false);
 
-        virtual void rethrow_exception() = 0;
+        /// \brief Wait for the shutdown action to be executed
+        ///
+        /// \returns          This function will return the value as returned
+        ///                   as the result of the invocation of the function
+        ///                   object given by the parameter \p func.
+        virtual int wait();
 
-        virtual int start(util::function_nonser<hpx_main_function_type> const& func,
-            bool blocking = false) = 0;
+        /// \brief Initiate termination of the runtime system
+        ///
+        /// \param blocking   [in] This allows to control whether this
+        ///                   call blocks until the runtime system has been
+        ///                   fully stopped. If this parameter is \a false then
+        ///                   this call will initiate the stop action but will
+        ///                   return immediately. Use a second call to stop
+        ///                   with this parameter set to \a true to wait for
+        ///                   all internal work to be completed.
+        virtual void stop(bool blocking = true);
 
-        virtual int start(bool blocking = false) = 0;
+        /// \brief Suspend the runtime system
+        virtual int suspend();
 
-        virtual int wait() = 0;
+        ///    \brief Resume the runtime system
+        virtual int resume();
 
-        virtual void stop(bool blocking = true) = 0;
+        virtual int finalize(double /*shutdown_timeout*/);
 
-        virtual int suspend() = 0;
-        virtual int resume() = 0;
+        ///  \brief Return true if networking is enabled.
+        virtual bool is_networking_enabled();
 
-        virtual threads::threadmanager& get_thread_manager() = 0;
-        virtual naming::resolver_client& get_agas_client() = 0;
+        /// \brief Allow access to the thread manager instance used by the HPX
+        ///        runtime.
+        virtual hpx::threads::threadmanager& get_thread_manager();
 
-#if defined(HPX_HAVE_NETWORKING)
-        virtual parcelset::parcelhandler& get_parcel_handler() = 0;
-        virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
-        virtual parcelset::endpoints_type const& endpoints() const = 0;
-#endif
-        virtual std::string here() const = 0;
+        /// \brief Returns a string of the locality endpoints (usable in debug output)
+        virtual std::string here() const;
 
-        virtual applier::applier& get_applier() = 0;
-
-        virtual std::uint64_t get_runtime_support_lva() const = 0;
-
-        virtual std::uint64_t get_memory_lva() const = 0;
-
+        /// \brief Report a non-recoverable error to the runtime system
+        ///
+        /// \param num_thread [in] The number of the operating system thread
+        ///                   the error has been detected in.
+        /// \param e          [in] This is an instance encapsulating an
+        ///                   exception which lead to this function call.
         virtual bool report_error(std::size_t num_thread,
-            std::exception_ptr const& e, bool terminate_all = true) = 0;
+            std::exception_ptr const& e, bool terminate_all = true);
 
+        /// \brief Report a non-recoverable error to the runtime system
+        ///
+        /// \param e          [in] This is an instance encapsulating an
+        ///                   exception which lead to this function call.
+        ///
+        /// \note This function will retrieve the number of the current
+        ///       shepherd thread and forward to the report_error function
+        ///       above.
         virtual bool report_error(
-            std::exception_ptr const& e, bool terminate_all = true) = 0;
+            std::exception_ptr const& e, bool terminate_all = true);
 
-        virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
+        /// Add a function to be executed inside a HPX thread before hpx_main
+        /// but guaranteed to be executed before any startup function registered
+        /// with \a add_startup_function.
+        ///
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread before hpx_main is executed. This is very useful
+        ///             to setup the runtime environment of the application
+        ///             (install performance counters, etc.)
+        ///
+        /// \note       The difference to a startup function is that all
+        ///             pre-startup functions will be (system-wide) executed
+        ///             before any startup function.
+        virtual void add_pre_startup_function(startup_function_type f);
 
-        virtual util::unique_id_ranges& get_id_pool() = 0;
+        /// Add a function to be executed inside a HPX thread before hpx_main
+        ///
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread before hpx_main is executed. This is very useful
+        ///             to setup the runtime environment of the application
+        ///             (install performance counters, etc.)
+        virtual void add_startup_function(startup_function_type f);
 
-        virtual void add_pre_startup_function(startup_function_type f) = 0;
+        /// Add a function to be executed inside a HPX thread during
+        /// hpx::finalize, but guaranteed before any of the shutdown functions
+        /// is executed.
+        ///
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread while hpx::finalize is executed. This is very
+        ///             useful to tear down the runtime environment of the
+        ///             application (uninstall performance counters, etc.)
+        ///
+        /// \note       The difference to a shutdown function is that all
+        ///             pre-shutdown functions will be (system-wide) executed
+        ///             before any shutdown function.
+        virtual void add_pre_shutdown_function(shutdown_function_type f);
 
-        virtual void add_startup_function(startup_function_type f) = 0;
-
-        virtual void add_pre_shutdown_function(shutdown_function_type f) = 0;
-
-        virtual void add_shutdown_function(shutdown_function_type f) = 0;
+        /// Add a function to be executed inside a HPX thread during hpx::finalize
+        ///
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread while hpx::finalize is executed. This is very
+        ///             useful to tear down the runtime environment of the
+        ///             application (uninstall performance counters, etc.)
+        virtual void add_shutdown_function(shutdown_function_type f);
 
         /// Access one of the internal thread pools (io_service instances)
         /// HPX is using to perform specific tasks. The three possible values
         /// for the argument \p name are "main_pool", "io_pool", "parcel_pool",
         /// and "timer_pool". For any other argument value the function will
         /// return zero.
-        virtual hpx::util::io_service_pool* get_thread_pool(char const* name) = 0;
+        virtual hpx::util::io_service_pool* get_thread_pool(char const* name);
 
         /// \brief Register an external OS-thread with HPX
         ///
@@ -255,7 +342,7 @@ namespace hpx
         ///          succeeded or not.
         ///
         virtual bool register_thread(char const* name, std::size_t num = 0,
-            bool service_thread = true, error_code& ec = throws) = 0;
+            bool service_thread = true, error_code& ec = throws);
 
         /// \brief Unregister an external OS-thread with HPX
         ///
@@ -269,41 +356,7 @@ namespace hpx
         /// \returns This function will return whether th erequested operation
         ///          succeeded or not.
         ///
-        virtual bool unregister_thread() = 0;
-
-        /// Generate a new notification policy instance for the given thread
-        /// name prefix
-        typedef threads::policies::callback_notifier notification_policy_type;
-        virtual notification_policy_type
-            get_notification_policy(char const* prefix) = 0;
-
-        ///////////////////////////////////////////////////////////////////////
-        // management API for active performance counters
-        void register_query_counters(
-            std::shared_ptr<util::query_counters> const& active_counters);
-
-        void start_active_counters(error_code& ec = throws);
-        void stop_active_counters(error_code& ec = throws);
-        void reset_active_counters(error_code& ec = throws);
-        void reinit_active_counters(bool reset = true, error_code& ec = throws);
-        void evaluate_active_counters(bool reset = false,
-            char const* description = nullptr, error_code& ec = throws);
-
-        // stop periodic evaluation of counters during shutdown
-        void stop_evaluating_counters(bool terminate = false);
-
-#if defined(HPX_HAVE_NETWORKING)
-        void register_message_handler(char const* message_handler_type,
-            char const* action, error_code& ec = throws);
-
-        parcelset::policies::message_handler* create_message_handler(
-            char const* message_handler_type, char const* action,
-            parcelset::parcelport* pp, std::size_t num_messages,
-            std::size_t interval, error_code& ec = throws);
-        serialization::binary_filter* create_binary_filter(
-            char const* binary_filter_type, bool compress,
-            serialization::binary_filter* next_filter, error_code& ec = throws);
-#endif
+        virtual bool unregister_thread();
 
         notification_policy_type::on_startstop_type on_start_func() const;
         notification_policy_type::on_startstop_type on_stop_func() const;
@@ -316,22 +369,34 @@ namespace hpx
         notification_policy_type::on_error_type on_error_func(
             notification_policy_type::on_error_type&&);
 
+        virtual std::uint32_t get_locality_id(error_code& ec) const;
+
+        virtual std::size_t get_num_worker_threads() const;
+
+        virtual std::uint32_t get_num_localities(
+            hpx::launch::sync_policy, error_code& ec) const;
+
+        virtual std::uint32_t get_initial_num_localities() const;
+
+        virtual lcos::future<std::uint32_t> get_num_localities() const;
+
     protected:
         void init_tss();
         void deinit_tss();
 
-    public:
-        void set_state(state s);
+        threads::thread_result_type run_helper(
+            util::function_nonser<runtime::hpx_main_function_type> const& func,
+            int& result, bool call_startup_functions);
 
-    protected:
+        void wait_helper(
+            std::mutex& mtx, std::condition_variable& cond, bool& running);
+
         // list of functions to call on exit
-        typedef std::vector<util::function_nonser<void()> > on_exit_type;
+        using on_exit_type = std::vector<util::function_nonser<void()>>;
         on_exit_type on_exit_functions_;
         mutable std::mutex mtx_;
 
         util::runtime_configuration ini_;
-        std::shared_ptr<performance_counters::registry> counters_;
-        std::shared_ptr<util::query_counters> active_counters_;
 
         long instance_number_;
         static std::atomic<int> instance_number_counter_;
@@ -343,19 +408,72 @@ namespace hpx
         // topology and affinity data
         threads::topology& topology_;
 
-        // locality basename -> used cores
-        typedef std::map<std::string, std::uint32_t> used_cores_map_type;
-        used_cores_map_type used_cores_map_;
-
         std::atomic<state> state_;
-
-        std::unique_ptr<components::server::memory> memory_;
-        std::unique_ptr<components::server::runtime_support> runtime_support_;
 
         // support tying in external functions to be called for thread events
         notification_policy_type::on_startstop_type on_start_func_;
         notification_policy_type::on_startstop_type on_stop_func_;
         notification_policy_type::on_error_type on_error_func_;
+
+        int result_;
+
+        std::exception_ptr exception_;
+
+        notification_policy_type main_pool_notifier_;
+        util::io_service_pool main_pool_;
+#ifdef HPX_HAVE_IO_POOL
+        notification_policy_type io_pool_notifier_;
+        util::io_service_pool io_pool_;
+#endif
+#ifdef HPX_HAVE_TIMER_POOL
+        notification_policy_type timer_pool_notifier_;
+        util::io_service_pool timer_pool_;
+#endif
+        notification_policy_type notifier_;
+        std::unique_ptr<hpx::threads::threadmanager> thread_manager_;
+
+    private:
+        /// \brief Helper function to stop the runtime.
+        ///
+        /// \param blocking   [in] This allows to control whether this
+        ///                   call blocks until the runtime system has been
+        ///                   fully stopped. If this parameter is \a false then
+        ///                   this call will initiate the stop action but will
+        ///                   return immediately. Use a second call to stop
+        ///                   with this parameter set to \a true to wait for
+        ///                   all internal work to be completed.
+        void stop_helper(
+            bool blocking, std::condition_variable& cond, std::mutex& mtx);
+
+        void deinit_tss_helper(char const* context, std::size_t num);
+
+        void init_tss_ex(char const* context, std::size_t local_thread_num,
+            std::size_t global_thread_num, char const* pool_name,
+            char const* postfix, bool service_thread, error_code& ec);
+
+        void init_tss_helper(char const* context, std::size_t local_thread_num,
+            std::size_t global_thread_num, char const* pool_name,
+            char const* postfix, bool service_thread);
+
+        void notify_finalize();
+        void wait_finalize();
+
+        // avoid warnings about usage of this in member initializer list
+        runtime* This()
+        {
+            return this;
+        }
+
+        void call_startup_functions(bool pre_startup);
+
+        std::list<startup_function_type> pre_startup_functions_;
+        std::list<startup_function_type> startup_functions_;
+        std::list<shutdown_function_type> pre_shutdown_functions_;
+        std::list<shutdown_function_type> shutdown_functions_;
+
+        bool stop_called_;
+        bool stop_done_;
+        std::condition_variable wait_condition_;
     };
 
     namespace util {
@@ -368,19 +486,19 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////////
         // retrieve the command line arguments for the current locality
         HPX_API_EXPORT bool retrieve_commandline_arguments(
-            std::string const& appname, hpx::program_options::variables_map& vm);
+            std::string const& appname,
+            hpx::program_options::variables_map& vm);
     }    // namespace util
 
-    namespace threads
-    {
+    namespace threads {
         /// \brief Returns the stack size name.
         ///
         /// Get the readable string representing the given stack size constant.
         ///
         /// \param size this represents the stack size
         HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
-    }
-}   // namespace hpx
+    }    // namespace threads
+}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
 

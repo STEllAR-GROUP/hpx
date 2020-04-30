@@ -11,6 +11,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -56,6 +57,7 @@ namespace hpx { namespace agas { namespace server
         resolved_type cache_address;
 
         runtime& rt = get_runtime();
+        runtime_distributed& rtd = get_runtime_distributed();
 
         // resolve destination addresses, we should be able to resolve all of
         // them, otherwise it's an error
@@ -109,7 +111,7 @@ namespace hpx { namespace agas { namespace server
         else
         {
             // destination is remote
-            rt.get_parcel_handler().put_parcel(std::move(p));
+            rtd.get_parcel_handler().put_parcel(std::move(p));
         }
 
         if (rt.get_state() < state_pre_shutdown)

@@ -6,23 +6,27 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    channel
-    client_then
     future
     future_ref
     future_then
     future_then_executor
-    future_wait
     local_promise_allocator
     make_future
     make_ready_future
-    packaged_action
-    promise
-    promise_allocator
-    promise_emplace
     shared_future
     use_allocator
    )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests}
+      channel
+      client_then
+      future_wait
+      packaged_action
+      promise
+      promise_allocator
+      promise_emplace)
+endif()
 
 if(HPX_WITH_AWAIT)
   set(tests ${tests} await)

@@ -5,10 +5,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    function_argument
-    function_serialization_728
-   )
+set(tests)
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests}
+      function_argument
+      function_serialization_728
+    )
+endif()
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
 set(function_serialization_728_dependencies iostreams_component)

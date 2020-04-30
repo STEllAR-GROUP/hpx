@@ -9,7 +9,6 @@
 
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime_impl.hpp>
 
 #include <iostream>
 

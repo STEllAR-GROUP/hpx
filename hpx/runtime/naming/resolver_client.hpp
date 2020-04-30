@@ -8,6 +8,7 @@
 #ifndef HPX_RUNTIME_NAMING_RESOLVER_CLIENT_HPP
 #define HPX_RUNTIME_NAMING_RESOLVER_CLIENT_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 
 #endif /*HPX_RUNTIME_NAMING_RESOLVER_CLIENT_HPP*/

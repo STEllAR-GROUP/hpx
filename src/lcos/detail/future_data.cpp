@@ -15,11 +15,14 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/runtime/components/client_base.hpp>
+#endif
 
 #include <cstddef>
 #include <exception>

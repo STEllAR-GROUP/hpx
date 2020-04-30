@@ -21,7 +21,6 @@
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -32,11 +31,15 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/util/activate_counters.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
+#include <hpx/util/activate_counters.hpp>
+#endif
 
 #endif

@@ -13,11 +13,11 @@
 #include <hpx/format.hpp>
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/naming_base.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/runtime/naming/name.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/state.hpp>

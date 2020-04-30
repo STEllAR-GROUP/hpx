@@ -13,9 +13,12 @@
 
 #include <hpx/compute/host/get_targets.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/runtime/find_here.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/topology/topology.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/runtime/find_here.hpp>
+#endif
 
 #include <cstddef>
 #include <utility>
@@ -59,17 +62,22 @@ namespace hpx { namespace compute { namespace host {
         // Constructs default target
         target()
           : handle_()
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
           , locality_(hpx::find_here())
+#endif
         {
         }
 
         // Constructs target from a given mask of processing units
         explicit target(hpx::threads::mask_type mask)
           : handle_(mask)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
           , locality_(hpx::find_here())
+#endif
         {
         }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         explicit target(hpx::id_type const& locality)
           : handle_()
           , locality_(locality)
@@ -81,6 +89,7 @@ namespace hpx { namespace compute { namespace host {
           , locality_(locality)
         {
         }
+#endif
 
         native_handle_type& native_handle() noexcept
         {
@@ -91,10 +100,12 @@ namespace hpx { namespace compute { namespace host {
             return handle_;
         }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         hpx::id_type const& get_locality() const noexcept
         {
             return locality_;
         }
+#endif
 
         std::pair<std::size_t, std::size_t> num_pus() const;
 
@@ -120,8 +131,12 @@ namespace hpx { namespace compute { namespace host {
 
         friend bool operator==(target const& lhs, target const& rhs)
         {
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             return lhs.handle_.get_device() == rhs.handle_.get_device() &&
                 lhs.locality_ == rhs.locality_;
+#else
+            return lhs.handle_.get_device() == rhs.handle_.get_device();
+#endif
         }
 
     private:
@@ -131,7 +146,9 @@ namespace hpx { namespace compute { namespace host {
         void serialize(serialization::output_archive& ar, const unsigned int);
 
         native_handle_type handle_;
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         hpx::id_type locality_;
+#endif
     };
 }}}    // namespace hpx::compute::host
 

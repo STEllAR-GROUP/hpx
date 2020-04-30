@@ -417,29 +417,29 @@ public:
     ///                   of hpx#exception.
     lcos::future<std::uint32_t> get_num_localities_async(
         components::component_type type = components::component_invalid
-        );
+        ) const;
 
     std::uint32_t get_num_localities(
         components::component_type type
       , error_code& ec = throws
-        );
+        ) const;
 
-    std::uint32_t get_num_localities(error_code& ec = throws)
+    std::uint32_t get_num_localities(error_code& ec = throws) const
     {
         return get_num_localities(components::component_invalid, ec);
     }
 
-    lcos::future<std::uint32_t> get_num_overall_threads_async();
+    lcos::future<std::uint32_t> get_num_overall_threads_async() const;
 
     std::uint32_t get_num_overall_threads(
         error_code& ec = throws
-        );
+        ) const;
 
-    lcos::future<std::vector<std::uint32_t> > get_num_threads_async();
+    lcos::future<std::vector<std::uint32_t> > get_num_threads_async() const;
 
     std::vector<std::uint32_t> get_num_threads(
         error_code& ec = throws
-        );
+        ) const;
 
     /// \brief Return a unique id usable as a component type.
     ///

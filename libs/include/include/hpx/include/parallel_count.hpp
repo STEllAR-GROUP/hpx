@@ -8,8 +8,12 @@
 #if !defined(HPX_PARALLEL_COUNT_JUN_28_2014_0827AM)
 #define HPX_PARALLEL_COUNT_JUN_28_2014_0827AM
 
+#include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/count.hpp>
+#endif
 
 #endif

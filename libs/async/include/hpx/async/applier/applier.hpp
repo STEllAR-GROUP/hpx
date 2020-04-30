@@ -10,6 +10,8 @@
 #define HPX_APPLIER_APPLIER_JUN_03_2008_0438PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/assertion.hpp>
 #include <hpx/async/applier_fwd.hpp>    // this needs to go first
 #include <hpx/runtime/agas_fwd.hpp>
@@ -180,4 +182,5 @@ namespace hpx { namespace applier {
 
 #include <hpx/config/warnings_suffix.hpp>
 
+#endif
 #endif

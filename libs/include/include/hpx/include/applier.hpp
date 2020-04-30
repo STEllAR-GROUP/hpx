@@ -9,11 +9,14 @@
 #define HPX_APPLIER_JUNE_05_0115PM
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async/applier/applier.hpp>
 #include <hpx/async/applier/apply.hpp>
 #include <hpx/async/applier/bind_naming_wrappers.hpp>
 #include <hpx/async/applier/detail/apply_colocated.hpp>
 #include <hpx/async/applier/detail/apply_colocated_callback.hpp>
 #include <hpx/async/applier/trigger.hpp>
+#endif
 
 #endif

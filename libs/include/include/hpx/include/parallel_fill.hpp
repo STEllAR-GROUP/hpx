@@ -8,8 +8,12 @@
 #if !defined(HPX_PARALLEL_FILL_JUL_07_2014_1222PM)
 #define HPX_PARALLEL_FILL_JUL_07_2014_1222PM
 
+#include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/fill.hpp>
 #include <hpx/parallel/container_algorithms/fill.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/fill.hpp>
+#endif
 
 #endif

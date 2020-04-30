@@ -5,7 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    bind_action
     config_entry
    )
 
@@ -14,6 +13,10 @@ set(subdirs
     function
     mem_fn
    )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests} bind_action)
+endif()
 
 ###############################################################################
 set(serialize_buffer_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)

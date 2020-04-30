@@ -7,11 +7,16 @@
 #if !defined(HPX_MAR_24_2008_1118AM)
 #define HPX_MAR_24_2008_1118AM
 
-#include <hpx/async.hpp>
+#include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/local_async.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/async.hpp>
+#include <hpx/include/performance_counters.hpp>
+#endif
 
 #endif

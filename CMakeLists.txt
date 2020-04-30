@@ -226,16 +226,15 @@ endif()
 hpx_option(HPX_WITH_LOGGING BOOL
   "Build HPX with logging enabled (default: ON)."
   ON ADVANCED)
+if(HPX_WITH_LOGGING)
+  hpx_add_config_define(HPX_HAVE_LOGGING)
+endif()
 
 hpx_option(HPX_WITH_FAULT_TOLERANCE BOOL
   "Build HPX to tolerate failures of nodes, i.e. ignore errors in active communication channels (default: OFF)"
   OFF ADVANCED)
 if(HPX_WITH_FAULT_TOLERANCE)
   hpx_add_config_define(HPX_HAVE_FAULT_TOLERANCE)
-endif()
-
-if(HPX_WITH_LOGGING)
-  hpx_add_config_define(HPX_HAVE_LOGGING)
 endif()
 
 ## Compiler related build options
@@ -340,9 +339,17 @@ if(NOT HPX_WITH_TESTS)
   hpx_set_option(HPX_WITH_TESTS_EXAMPLES VALUE OFF FORCE)
 endif()
 
+hpx_option(HPX_WITH_DISTRIBUTED_RUNTIME BOOL
+  "Enable the distributed runtime (default: ON). Turning off the distributed runtime completely disallows the creation and use of components and actions. Turning this option off is experimental!"
+  ON CATEGORY "Build Targets" ADVANCED)
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  hpx_add_config_define(HPX_HAVE_DISTRIBUTED_RUNTIME)
+endif()
+
 # Enable IO-counters on linux systems only
 set(HPX_WITH_IO_COUNTERS_DEFAULT OFF)
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND HPX_WITH_DISTRIBUTED_RUNTIME)
   set(HPX_WITH_IO_COUNTERS_DEFAULT ON)
 endif()
 
@@ -352,6 +359,9 @@ hpx_option(HPX_WITH_IO_COUNTERS BOOL
 if(HPX_WITH_IO_COUNTERS)
   if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     hpx_error("HPX_WITH_IO_COUNTERS was set to ON, but IO counters are only available on Linux (this is \"${CMAKE_SYSTEM_NAME}\")")
+  endif()
+  if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+    hpx_error("HPX_WITH_IO_COUNTERS was set to ON, but performance counters cannot be used with HPX_WITH_DISTRIBUTED_RUNTIME=OFF")
   endif()
   hpx_add_config_define(HPX_HAVE_IO_COUNTERS)
 endif()
@@ -657,6 +667,9 @@ endif()
 hpx_option(HPX_WITH_PAPI BOOL
   "Enable the PAPI based performance counter." OFF CATEGORY "Profiling")
 if(HPX_WITH_PAPI)
+  if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+    hpx_error("HPX_WITH_PAPI was set to ON, but PAPI cannot currently be used with HPX_WITH_DISTRIBUTED_RUNTIME=OFF")
+  endif()
   hpx_add_config_define(HPX_HAVE_PAPI)
 endif()
 hpx_option(HPX_WITH_GOOGLE_PERFTOOLS BOOL
@@ -749,6 +762,18 @@ endif()
 hpx_option(HPX_WITH_NETWORKING BOOL
   "Enable support for networking and multi-node runs (default: ON)"
   ON CATEGORY "Parcelport")
+
+if(HPX_WITH_NETWORKING AND NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  hpx_error("HPX_WITH_NETWORKING=ON requires HPX_WITH_DISTRIBUTED_RUNTIME=ON")
+endif()
+
+if(HPX_WITH_LOGGING AND NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  hpx_error("HPX_WITH_DISTRIBUTED_RUNTIME=OFF requires HPX_WITH_LOGGING=OFF")
+endif()
+
+if(HPX_WITH_APEX AND NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  hpx_error("HPX_WITH_DISTRIBUTED_RUNTIME=OFF requires HPX_WITH_APEX=OFF")
+endif()
 
 if(HPX_WITH_NETWORKING)
   hpx_add_config_define(HPX_HAVE_NETWORKING)
@@ -1755,14 +1780,16 @@ endif()
 set(CMAKE_DEBUG_POSTFIX "d")
 set(HPX_DEBUG_POSTFIX "d")
 
-if(HPX_WITH_COMPRESSION_BZIP2)
-  hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
-endif()
-if(HPX_WITH_COMPRESSION_SNAPPY)
-  hpx_add_config_define(HPX_HAVE_COMPRESSION_SNAPPY)
-endif()
-if(HPX_WITH_COMPRESSION_ZLIB)
-  hpx_add_config_define(HPX_HAVE_COMPRESSION_ZLIB)
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  if(HPX_WITH_COMPRESSION_BZIP2)
+    hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
+  endif()
+  if(HPX_WITH_COMPRESSION_SNAPPY)
+    hpx_add_config_define(HPX_HAVE_COMPRESSION_SNAPPY)
+  endif()
+  if(HPX_WITH_COMPRESSION_ZLIB)
+    hpx_add_config_define(HPX_HAVE_COMPRESSION_ZLIB)
+  endif()
 endif()
 
 ################################################################################

@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/async.hpp>
+#include <hpx/local_async.hpp>
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>

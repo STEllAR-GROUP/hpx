@@ -10,9 +10,9 @@
 #define HPX_PARALLEL_DETAIL_ROTATE_AUG_05_2014_0138PM
 
 #include <hpx/config.hpp>
-#include <hpx/async/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/local_async/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 

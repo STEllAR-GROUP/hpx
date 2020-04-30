@@ -18,12 +18,12 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
@@ -510,10 +510,10 @@ namespace hpx { namespace performance_counters {
         create_counter_func const& create_counter,
         discover_counters_func const& discover_counters, error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
-        return rt ? rt->get_counter_registry().add_counter_type(
-                        info, create_counter, discover_counters, ec) :
-                    status_generic_error;
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
+        return rtd ? rtd->get_counter_registry().add_counter_type(
+                         info, create_counter, discover_counters, ec) :
+                     status_generic_error;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -522,10 +522,10 @@ namespace hpx { namespace performance_counters {
         discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
-        return rt ? rt->get_counter_registry().discover_counter_types(
-                        discover_counter, mode, ec) :
-                    status_generic_error;
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
+        return rtd ? rtd->get_counter_registry().discover_counter_types(
+                         discover_counter, mode, ec) :
+                     status_generic_error;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -534,20 +534,20 @@ namespace hpx { namespace performance_counters {
         discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
-        return rt ? rt->get_counter_registry().discover_counter_type(
-                        info, discover_counter, mode, ec) :
-                    status_generic_error;
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
+        return rtd ? rtd->get_counter_registry().discover_counter_type(
+                         info, discover_counter, mode, ec) :
+                     status_generic_error;
     }
 
     counter_status discover_counter_type(std::string const& name,
         discover_counter_func const& discover_counter,
         discover_counters_mode mode, error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
-        return rt ? rt->get_counter_registry().discover_counter_type(
-                        name, discover_counter, mode, ec) :
-                    status_generic_error;
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
+        return rtd ? rtd->get_counter_registry().discover_counter_type(
+                         name, discover_counter, mode, ec) :
+                     status_generic_error;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -593,9 +593,9 @@ namespace hpx { namespace performance_counters {
     counter_status remove_counter_type(counter_info const& info, error_code& ec)
     {
         // the runtime might not be available any more
-        runtime* rt = get_runtime_ptr();
-        return rt ? rt->get_counter_registry().remove_counter_type(info, ec) :
-                    status_generic_error;
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
+        return rtd ? rtd->get_counter_registry().remove_counter_type(info, ec) :
+                     status_generic_error;
     }
 
     /// \brief Retrieve the counter type for the given counter name from the
@@ -604,9 +604,9 @@ namespace hpx { namespace performance_counters {
         std::string const& name, counter_info& info, error_code& ec)
     {
         // the runtime might not be available any more
-        runtime* rt = get_runtime_ptr();
-        return rt ?
-            rt->get_counter_registry().get_counter_type(name, info, ec) :
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
+        return rtd ?
+            rtd->get_counter_registry().get_counter_type(name, info, ec) :
             status_generic_error;
     }
 
@@ -615,8 +615,9 @@ namespace hpx { namespace performance_counters {
             std::int64_t* countervalue, error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime().get_counter_registry().create_raw_counter_value(
-                info, countervalue, gid, ec);
+            get_runtime_distributed()
+                .get_counter_registry()
+                .create_raw_counter_value(info, countervalue, gid, ec);
             return gid;
         }
 
@@ -624,7 +625,7 @@ namespace hpx { namespace performance_counters {
             hpx::util::function_nonser<std::int64_t()> const& f, error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime().get_counter_registry().create_raw_counter(
+            get_runtime_distributed().get_counter_registry().create_raw_counter(
                 info, f, gid, ec);
             return gid;
         }
@@ -634,7 +635,7 @@ namespace hpx { namespace performance_counters {
             error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime().get_counter_registry().create_raw_counter(
+            get_runtime_distributed().get_counter_registry().create_raw_counter(
                 info, f, gid, ec);
             return gid;
         }
@@ -644,7 +645,7 @@ namespace hpx { namespace performance_counters {
             error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime().get_counter_registry().create_raw_counter(
+            get_runtime_distributed().get_counter_registry().create_raw_counter(
                 info, f, gid, ec);
             return gid;
         }
@@ -655,7 +656,7 @@ namespace hpx { namespace performance_counters {
             error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime().get_counter_registry().create_raw_counter(
+            get_runtime_distributed().get_counter_registry().create_raw_counter(
                 info, f, gid, ec);
             return gid;
         }
@@ -666,7 +667,8 @@ namespace hpx { namespace performance_counters {
             counter_info const& info, error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime().get_counter_registry().create_counter(info, gid, ec);
+            get_runtime_distributed().get_counter_registry().create_counter(
+                info, gid, ec);
             return gid;
         }
 
@@ -678,8 +680,10 @@ namespace hpx { namespace performance_counters {
             std::vector<std::size_t> const& parameters, error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime().get_counter_registry().create_statistics_counter(
-                info, base_counter_name, parameters, gid, ec);
+            get_runtime_distributed()
+                .get_counter_registry()
+                .create_statistics_counter(
+                    info, base_counter_name, parameters, gid, ec);
             return gid;
         }
 
@@ -690,8 +694,9 @@ namespace hpx { namespace performance_counters {
             std::vector<std::string> const& base_counter_names, error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime().get_counter_registry().create_arithmetics_counter(
-                info, base_counter_names, gid, ec);
+            get_runtime_distributed()
+                .get_counter_registry()
+                .create_arithmetics_counter(info, base_counter_names, gid, ec);
             return gid;
         }
 
@@ -703,7 +708,7 @@ namespace hpx { namespace performance_counters {
             std::vector<std::string> const& base_counter_names, error_code& ec)
         {
             naming::gid_type gid;
-            get_runtime()
+            get_runtime_distributed()
                 .get_counter_registry()
                 .create_arithmetics_counter_extended(
                     info, base_counter_names, gid, ec);
@@ -714,15 +719,16 @@ namespace hpx { namespace performance_counters {
         counter_status add_counter(
             naming::id_type const& id, counter_info const& info, error_code& ec)
         {
-            return get_runtime().get_counter_registry().add_counter(
+            return get_runtime_distributed().get_counter_registry().add_counter(
                 id, info, ec);
         }
 
         counter_status remove_counter(
             counter_info const& info, naming::id_type const& id, error_code& ec)
         {
-            return get_runtime().get_counter_registry().remove_counter(
-                info, id, ec);
+            return get_runtime_distributed()
+                .get_counter_registry()
+                .remove_counter(info, id, ec);
         }
 
         // create an arbitrary counter on this locality
@@ -732,8 +738,9 @@ namespace hpx { namespace performance_counters {
             error_code ec;
 
             create_counter_func f;
-            get_runtime().get_counter_registry().get_counter_create_function(
-                info, f, ec);
+            get_runtime_distributed()
+                .get_counter_registry()
+                .get_counter_create_function(info, f, ec);
             if (ec)
             {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",

@@ -6,10 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    actions
-    agas
     build
-    component
     diagnostics
     lcos
     resource
@@ -17,6 +14,13 @@ set(subdirs
     traits
     util
    )
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(subdirs ${subdirs}
+    actions
+    agas
+    component)
+endif()
 
 if(HPX_WITH_NETWORKING)
   set(subdirs ${subdirs} parcelset)

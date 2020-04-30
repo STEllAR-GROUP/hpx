@@ -7,16 +7,13 @@
 set(tests
     lockfree_fifo
     schedule_last
-    set_thread_state
     stack_check
     error_callback
     start_stop_callbacks
     thread
-    thread_affinity
     thread_id
     thread_launching
     thread_mf
-    thread_stacksize
     thread_yield
    )
 
@@ -24,6 +21,13 @@ if(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
   set(tests ${tests}
     resource_manager
     thread_suspension_executor)
+endif()
+
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(tests ${tests}
+    set_thread_state
+    thread_affinity
+    thread_stacksize)
 endif()
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)

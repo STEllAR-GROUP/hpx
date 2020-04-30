@@ -71,12 +71,14 @@ foreach(test ${tests})
 
 endforeach()
 
-add_hpx_regression_test(
-  "lcos" after_588_4
-  EXECUTABLE after_588
-  PSEUDO_DEPS_NAME after_588
-  LOCALITIES 2
-  THREADS_PER_LOCALITY 4)
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  add_hpx_regression_test(
+    "lcos" after_588_4
+    EXECUTABLE after_588
+    PSEUDO_DEPS_NAME after_588
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
+endif()
 
 # compile only tests
 if(HPX_WITH_COMPILE_ONLY_TESTS)

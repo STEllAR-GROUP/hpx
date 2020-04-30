@@ -97,7 +97,7 @@ namespace hpx { namespace compute { namespace host {
                 size_type n, std::allocator<void>::const_pointer hint = nullptr)
             {
                 return reinterpret_cast<pointer>(
-                    hpx::threads::get_topology().allocate(n * sizeof(T)));
+                    hpx::threads::create_topology().allocate(n * sizeof(T)));
             }
 
             // Deallocates the storage referenced by the pointer p, which must be a
@@ -106,7 +106,7 @@ namespace hpx { namespace compute { namespace host {
             // originally produced p; otherwise, the behavior is undefined.
             void deallocate(pointer p, size_type n)
             {
-                hpx::threads::get_topology().deallocate(p, n);
+                hpx::threads::create_topology().deallocate(p, n);
             }
 
             // Returns the maximum theoretically possible value of n, for which the

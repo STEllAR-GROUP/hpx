@@ -8,7 +8,7 @@
 // tasks bound to that core incrementally.
 // Tasks should always report the right core number when they run.
 
-#include <hpx/async.hpp>
+#include <hpx/local_async.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/hpx_init.hpp>

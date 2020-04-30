@@ -32,6 +32,7 @@ int main()
         >::value,
         "std::uses_allocator<local::promise<void>, test_allocator<void> >::value");
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     // hpx::lcos::promise
     static_assert(
         std::uses_allocator<
@@ -43,6 +44,7 @@ int main()
             hpx::lcos::promise<void>, test_allocator<void>
         >::value,
         "std::uses_allocator<promise<void>, test_allocator<void> >::value");
+#endif
 
     // hpx::lcos::local::packaged_task
     static_assert(

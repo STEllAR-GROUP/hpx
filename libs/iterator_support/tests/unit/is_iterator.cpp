@@ -5,10 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/testing.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
+#endif
 
 #include <cstddef>
 #include <forward_list>
@@ -839,8 +842,10 @@ void is_iterator()
             "random access traversal input iterator");
     }
     {
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         using iterator = hpx::vector_iterator<int, std::vector<int>>;
         HPX_TEST_MSG((is_iterator<iterator>::value), "hpx-specific iterator");
+#endif
     }
 }
 
@@ -987,9 +992,11 @@ void is_forward_iterator()
             "random access traversal input iterator");
     }
     {
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         using iterator = hpx::vector_iterator<int, std::vector<int>>;
         HPX_TEST_MSG(
             (is_forward_iterator<iterator>::value), "hpx-specific iterator");
+#endif
     }
     {
         using base_iterator = std::vector<std::size_t>::iterator;

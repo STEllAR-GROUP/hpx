@@ -8,7 +8,10 @@
 #define HPX_3C373507_9301_4368_B718_39D25FDF06F4
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#endif
 
 #endif
