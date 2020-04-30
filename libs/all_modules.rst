@@ -78,6 +78,7 @@ All modules
    /libs/threading/docs/index.rst
    /libs/threading_base/docs/index.rst
    /libs/threadmanager/docs/index.rst
+   /libs/timed_execution/docs/index.rst
    /libs/timing/docs/index.rst
    /libs/topology/docs/index.rst
    /libs/type_support/docs/index.rst

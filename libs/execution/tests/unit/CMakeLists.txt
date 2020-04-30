@@ -11,8 +11,6 @@ set(tests
     executor_parameters_timer_hooks
     minimal_async_executor
     minimal_sync_executor
-    minimal_timed_async_executor
-    minimal_timed_sync_executor
     parallel_executor
     parallel_fork_executor
     parallel_policy_executor

@@ -16,7 +16,7 @@
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
-#include <hpx/execution/traits/is_timed_executor.hpp>
+#include <hpx/timed_execution/traits/is_timed_executor.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>

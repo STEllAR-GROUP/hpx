@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Ste||ar Group
+//  Copyright (c) 2020 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,16 +6,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/thread_executors/config/defines.hpp>
-#include <hpx/execution/executors/thread_pool_executors.hpp>
+#include <hpx/thread_executors/thread_timed_execution.hpp>
 
 #if defined(HPX_THREAD_EXECUTORS_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
-    "The header hpx/parallel/executors/thread_pool_executors.hpp is deprecated, \
-    please include hpx/execution/executors/thread_pool_executors.hpp instead")
+    "The header hpx/parallel/executors/default_executor.hpp is deprecated, \
+    please include hpx/execution/executors/default_executor.hpp instead")
 #else
 #warning                                                                       \
-    "The header hpx/parallel/executors/thread_pool_executors.hpp is deprecated, \
-    please include hpx/execution/executors/thread_pool_executors.hpp instead"
+    "The header hpx/parallel/executors/default_executor.hpp is deprecated, \
+    please include hpx/execution/executors/default_executor.hpp instead"
 #endif
 #endif

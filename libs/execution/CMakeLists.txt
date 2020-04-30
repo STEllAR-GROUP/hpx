@@ -34,9 +34,6 @@ set(execution_headers
   hpx/execution/executors/thread_execution.hpp
   hpx/execution/executors/thread_execution_information.hpp
   hpx/execution/executors/thread_pool_executor.hpp
-  hpx/execution/executors/timed_execution_fwd.hpp
-  hpx/execution/executors/timed_execution.hpp
-  hpx/execution/executors/timed_executors.hpp
   hpx/execution/force_linking.hpp
   hpx/execution/traits/detail/vc/vector_pack_alignment_size.hpp
   hpx/execution/traits/detail/vc/vector_pack_count_bits.hpp
@@ -46,7 +43,6 @@ set(execution_headers
   hpx/execution/traits/is_execution_policy.hpp
   hpx/execution/traits/is_executor.hpp
   hpx/execution/traits/is_executor_parameters.hpp
-  hpx/execution/traits/is_timed_executor.hpp
   hpx/execution/traits/vector_pack_alignment_size.hpp
   hpx/execution/traits/vector_pack_count_bits.hpp
   hpx/execution/traits/vector_pack_load_store.hpp
@@ -81,9 +77,6 @@ set(execution_compat_headers
   hpx/parallel/executors/thread_execution.hpp
   hpx/parallel/executors/thread_execution_information.hpp
   hpx/parallel/executors/thread_pool_executor.hpp
-  hpx/parallel/executors/timed_execution_fwd.hpp
-  hpx/parallel/executors/timed_execution.hpp
-  hpx/parallel/executors/timed_executors.hpp
   hpx/parallel/traits/detail/vc/vector_pack_alignment_size.hpp
   hpx/parallel/traits/detail/vc/vector_pack_count_bits.hpp
   hpx/parallel/traits/detail/vc/vector_pack_load_store.hpp
@@ -97,7 +90,6 @@ set(execution_compat_headers
   hpx/traits/is_execution_policy.hpp
   hpx/traits/is_executor.hpp
   hpx/traits/is_executor_parameters.hpp
-  hpx/traits/is_timed_executor.hpp
 )
 
 include(HPX_AddModule)

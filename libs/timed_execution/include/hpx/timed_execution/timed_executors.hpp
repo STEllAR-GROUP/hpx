@@ -405,9 +405,53 @@ namespace hpx { namespace parallel { namespace execution {
         std::chrono::steady_clock::time_point execute_at_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    using sequenced_timed_executor =
+        timed_executor<execution::sequenced_executor>;
+
+    using parallel_timed_executor =
+        timed_executor<execution::parallel_executor>;
 }}}    // namespace hpx::parallel::execution
 
+namespace hpx { namespace parallel { namespace execution {
+    /// \cond NOINTERNAL
 
-//#include <hpx/execution/executors/timed_execution.hpp>
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename BaseExecutor>
+    struct is_one_way_executor<
+        parallel::execution::timed_executor<BaseExecutor>>
+      : is_one_way_executor<typename std::decay<BaseExecutor>::type>
+    {
+    };
+
+    template <typename BaseExecutor>
+    struct is_two_way_executor<
+        parallel::execution::timed_executor<BaseExecutor>>
+      : is_two_way_executor<typename std::decay<BaseExecutor>::type>
+    {
+    };
+
+    template <typename BaseExecutor>
+    struct is_never_blocking_one_way_executor<
+        parallel::execution::timed_executor<BaseExecutor>>
+      : is_never_blocking_one_way_executor<
+            typename std::decay<BaseExecutor>::type>
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct is_one_way_executor<parallel::execution::sequenced_timed_executor>
+      : std::true_type
+    {
+    };
+
+    template <>
+    struct is_two_way_executor<parallel::execution::parallel_timed_executor>
+      : std::true_type
+    {
+    };
+    /// \endcond
+}}}    // namespace hpx::parallel::execution
 
 #endif

@@ -29,6 +29,7 @@ set(thread_executors_headers
   hpx/thread_executors/thread_executor.hpp
   hpx/thread_executors/thread_pool_attached_executors.hpp
   hpx/thread_executors/thread_pool_os_executors.hpp
+  hpx/thread_executors/thread_timed_execution.hpp
   )
 
 # Default location is $HPX_ROOT/libs/thread_executors/include_compatibility
@@ -76,6 +77,7 @@ add_hpx_module(thread_executors
     hpx_coroutines
     hpx_datastructures
     hpx_errors
+    hpx_executors
     hpx_functional
     hpx_io_service
     hpx_threading_base
@@ -86,6 +88,7 @@ add_hpx_module(thread_executors
     hpx_threadmanager
     hpx_thread_pools
     hpx_thread_support
+    hpx_timed_execution
     hpx_topology
   CMAKE_SUBDIRS examples tests
 )

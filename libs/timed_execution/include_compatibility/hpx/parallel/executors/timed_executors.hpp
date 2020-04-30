@@ -5,17 +5,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/executors/timed_execution.hpp>
+#include <hpx/timed_execution/config/defines.hpp>
+#include <hpx/timed_execution/timed_executors.hpp>
 
-#if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if defined(HPX_TIMED_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
-    "The header hpx/parallel/executors/timed_execution.hpp is deprecated, \
-    please include hpx/execution/executors/timed_execution.hpp instead")
+    "The header hpx/parallel/executors/timed_executors.hpp is deprecated, \
+    please include hpx/timed_execution/timed_executors.hpp instead")
 #else
 #warning                                                                       \
-    "The header hpx/parallel/executors/timed_execution.hpp is deprecated, \
-    please include hpx/execution/executors/timed_execution.hpp instead"
+    "The header hpx/parallel/executors/timed_executors.hpp is deprecated, \
+    please include hpx/timed_execution/timed_executors.hpp instead"
 #endif
 #endif

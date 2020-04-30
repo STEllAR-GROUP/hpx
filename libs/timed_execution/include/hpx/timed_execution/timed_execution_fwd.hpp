@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
-#include <hpx/execution/executors/timed_executors.hpp>
+#include <hpx/timed_execution/timed_executors.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 
 #include <type_traits>

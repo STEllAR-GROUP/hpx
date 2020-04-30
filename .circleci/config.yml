@@ -659,6 +659,7 @@ jobs:
                   tests.unit.modules.threading \
                   tests.unit.modules.threading_base \
                   tests.unit.modules.threadmanager \
+                  tests.unit.modules.timed_execution \
                   tests.unit.modules.timing \
                   tests.unit.modules.type_support \
                   tests.unit.modules.util

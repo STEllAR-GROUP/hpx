@@ -9,7 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_TIMED_EXECUTION_JAN_07_2017_0735AM
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/timed_execution_fwd.hpp>
+#include <hpx/timed_execution/timed_execution_fwd.hpp>
 
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
@@ -18,7 +18,7 @@
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/timed_executors.hpp>
+#include <hpx/timed_execution/timed_executors.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -118,6 +118,7 @@ add_hpx_module(include
     hpx_thread_pools
     hpx_threadmanager
     hpx_threading
+    hpx_timed_execution
     hpx_util
   CMAKE_SUBDIRS tests
 )
