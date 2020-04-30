@@ -25,6 +25,8 @@ set(thread_executors_headers
   hpx/thread_executors/resource_manager.hpp
   hpx/thread_executors/service_executors.hpp
   hpx/thread_executors/this_thread_executors.hpp
+  hpx/thread_executors/thread_execution.hpp
+  hpx/thread_executors/thread_execution_information.hpp
   hpx/thread_executors/thread_executor.hpp
   hpx/thread_executors/thread_pool_attached_executors.hpp
   hpx/thread_executors/thread_pool_os_executors.hpp
@@ -35,6 +37,8 @@ set(thread_executors_headers
 set(thread_executors_compat_headers
   hpx/parallel/executors/default_executor.hpp
   hpx/parallel/executors/this_thread_executors.hpp
+  hpx/parallel/executors/thread_execution.hpp
+  hpx/parallel/executors/thread_execution_information.hpp
   hpx/parallel/executors/thread_pool_executors.hpp
   hpx/parallel/executors/thread_pool_os_executors.hpp
   hpx/runtime/threads/executors/current_executor.hpp

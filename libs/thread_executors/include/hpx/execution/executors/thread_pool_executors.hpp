@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
-#include <hpx/execution/executors/thread_execution.hpp>
+#include <hpx/thread_executors/thread_execution.hpp>
 #include <hpx/thread_executors/embedded_thread_pool_executors.hpp>
 
 namespace hpx { namespace parallel { namespace execution {

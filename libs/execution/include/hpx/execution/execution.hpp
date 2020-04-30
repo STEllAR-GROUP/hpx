@@ -9,7 +9,5 @@
 
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution/executors/thread_execution.hpp>
-#include <hpx/execution/executors/thread_execution_information.hpp>
 
 #endif
