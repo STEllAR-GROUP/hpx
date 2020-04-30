@@ -7,7 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/thread_executors/executors.hpp>
+#include <hpx/executors.hpp>
+#include <hpx/thread_executors.hpp>
 
 #include <algorithm>
 #include <cstddef>

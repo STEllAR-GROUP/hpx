@@ -18,6 +18,7 @@ set(executors_headers
   hpx/executors/apply.hpp
   hpx/executors/async.hpp
   hpx/executors/dataflow.hpp
+  hpx/executors/exception_list.hpp
   hpx/executors/execution_policy_fwd.hpp
   hpx/executors/execution_policy.hpp
   hpx/executors/limiting_executor.hpp
@@ -50,6 +51,7 @@ set(executors_compat_headers
   hpx/execution/executors/thread_pool_attached_executors.hpp
   hpx/parallel/datapar/execution_policy_fwd.hpp
   hpx/parallel/datapar/execution_policy.hpp
+  hpx/parallel/exception_list.hpp
   hpx/parallel/execution_policy_fwd.hpp
   hpx/parallel/execution_policy.hpp
   hpx/parallel/executors.hpp
@@ -79,6 +81,7 @@ add_hpx_module(executors
     hpx_assertion
     hpx_basic_execution
     hpx_config
+    hpx_errors
     hpx_execution
     hpx_functional
     hpx_iterator_support

@@ -14,7 +14,6 @@ set(execution_headers
   hpx/execution/detail/async_launch_policy_dispatch.hpp
   hpx/execution/detail/post_policy_dispatch.hpp
   hpx/execution/detail/sync_launch_policy_dispatch.hpp
-  hpx/execution/exception_list.hpp
   hpx/execution/execution.hpp
   hpx/execution/executor_parameters.hpp
   hpx/execution/executors/auto_chunk_size.hpp
@@ -57,7 +56,6 @@ set(execution_compat_headers
   hpx/async_launch_policy_dispatch.hpp
   hpx/parallel/algorithms/detail/is_negative.hpp
   hpx/parallel/algorithms/detail/predicates.hpp
-  hpx/parallel/exception_list.hpp
   hpx/parallel/execution.hpp
   hpx/parallel/executor_parameters.hpp
   hpx/parallel/executors/auto_chunk_size.hpp
