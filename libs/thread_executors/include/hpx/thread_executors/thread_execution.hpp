@@ -204,16 +204,23 @@ namespace hpx { namespace threads {
         typedef hpx::future<vector_result_type> result_future_type;
 
         typedef typename hpx::traits::detail::shared_state_ptr<
-            vector_result_type>::type shared_state_type;
+            result_future_type>::type shared_state_type;
 
         typedef typename std::decay<Future>::type future_type;
 
+        thread_id_type id = hpx::threads::get_self_id();
+        parallel::execution::current_executor exec_current =
+            hpx::threads::get_executor(id);
+
         shared_state_type p =
-            lcos::detail::make_continuation_exec<vector_result_type>(
+            lcos::detail::make_continuation_exec<result_future_type>(
                 std::forward<Future>(predecessor), std::forward<Executor>(exec),
-                [func = std::move(func)](
-                    future_type&& predecessor) mutable -> vector_result_type {
-                    return hpx::util::unwrap(func(std::move(predecessor)));
+                [func = std::move(func),
+                    exec_current = std::move(exec_current)](
+                    future_type&& predecessor) mutable -> result_future_type {
+                    return hpx::parallel::execution::async_execute(exec_current,
+                        hpx::util::functional::unwrap{},
+                        func(std::move(predecessor)));
                 });
 
         return hpx::traits::future_access<result_future_type>::create(
