@@ -41,7 +41,6 @@ foreach(launch "" "Executor non-threaded " # Executor threaded "
   set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*2-${launch}Continuation")
 endforeach()
 
-message("REGEX is now ${REGEX_MATCH_D_}${REGEX_MATCH_C_}")
 set_tests_properties(
   tests.unit.apex.annotation_check
   PROPERTIES PASS_REGULAR_EXPRESSION "${REGEX_MATCH_D_}${REGEX_MATCH_C_}"
