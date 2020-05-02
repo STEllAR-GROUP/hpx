@@ -8,23 +8,17 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(prefix_headers
-  hpx/prefix/find_prefix.hpp
-)
+set(prefix_headers hpx/prefix/find_prefix.hpp)
 
-set(prefix_compat_headers
-  hpx/util/find_prefix.hpp
-)
+set(prefix_compat_headers hpx/util/find_prefix.hpp)
 
-set(prefix_sources
-  find_prefix.cpp
-)
+set(prefix_sources find_prefix.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(prefix
+add_hpx_module(
+  prefix
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${prefix_sources}
   HEADERS ${prefix_headers}

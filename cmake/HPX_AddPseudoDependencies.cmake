@@ -44,4 +44,3 @@ function(add_hpx_pseudo_dependencies_no_shortening)
     add_dependencies(${ARGV})
   endif()
 endfunction()
-

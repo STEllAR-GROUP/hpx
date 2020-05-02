@@ -10,38 +10,35 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if(HPX_WITH_CUDA)
   set(compute_cuda_headers
-    hpx/compute/cuda/allocator.hpp
-    hpx/compute/cuda/concurrent_executor.hpp
-    hpx/compute/cuda/concurrent_executor_parameters.hpp
-    hpx/compute/cuda/default_executor.hpp
-    hpx/compute/cuda/default_executor_parameters.hpp
-    hpx/compute/cuda/detail/launch.hpp
-    hpx/compute/cuda/detail/scoped_active_target.hpp
-    hpx/compute/cuda/get_targets.hpp
-    hpx/compute/cuda.hpp
-    hpx/compute/cuda/serialization/value_proxy.hpp
-    hpx/compute/cuda/target_distribution_policy.hpp
-    hpx/compute/cuda/target.hpp
-    hpx/compute/cuda/target_ptr.hpp
-    hpx/compute/cuda/traits/access_target.hpp
-    hpx/compute/cuda/transfer.hpp
-    hpx/compute/cuda/value_proxy.hpp
-    hpx/compute/detail/get_proxy_type.hpp
-    hpx/compute/detail/iterator.hpp
-    hpx/compute/detail/target_distribution_policy.hpp
+      hpx/compute/cuda/allocator.hpp
+      hpx/compute/cuda/concurrent_executor.hpp
+      hpx/compute/cuda/concurrent_executor_parameters.hpp
+      hpx/compute/cuda/default_executor.hpp
+      hpx/compute/cuda/default_executor_parameters.hpp
+      hpx/compute/cuda/detail/launch.hpp
+      hpx/compute/cuda/detail/scoped_active_target.hpp
+      hpx/compute/cuda/get_targets.hpp
+      hpx/compute/cuda.hpp
+      hpx/compute/cuda/serialization/value_proxy.hpp
+      hpx/compute/cuda/target_distribution_policy.hpp
+      hpx/compute/cuda/target.hpp
+      hpx/compute/cuda/target_ptr.hpp
+      hpx/compute/cuda/traits/access_target.hpp
+      hpx/compute/cuda/transfer.hpp
+      hpx/compute/cuda/value_proxy.hpp
+      hpx/compute/detail/get_proxy_type.hpp
+      hpx/compute/detail/iterator.hpp
+      hpx/compute/detail/target_distribution_policy.hpp
   )
 
   set(compute_cuda_compat_headers)
 
-  set(compute_cuda_sources
-    cuda_target.cpp
-    get_cuda_targets.cpp
-  )
+  set(compute_cuda_sources cuda_target.cpp get_cuda_targets.cpp)
 endif()
 
 include(HPX_AddModule)
-add_hpx_module(compute_cuda
-  FORCE_LINKING_GEN
+add_hpx_module(
+  compute_cuda FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
   CUDA
   SOURCES ${compute_cuda_sources}
@@ -65,6 +62,5 @@ add_hpx_module(compute_cuda
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  target_link_libraries(hpx_compute_cuda
-    PUBLIC hpx_async)
+  target_link_libraries(hpx_compute_cuda PUBLIC hpx_async)
 endif()

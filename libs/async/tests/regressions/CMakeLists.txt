@@ -19,7 +19,7 @@ set(tests
     dataflow_launch_775
     dataflow_recursion_1613
     dataflow_using_774
-   )
+)
 
 set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -36,12 +36,12 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Regressions/Modules/Async")
+    FOLDER "Tests/Regressions/Modules/Async"
+  )
 
   add_hpx_regression_test("modules.async" ${test} ${${test}_PARAMETERS})
 endforeach()
@@ -51,16 +51,18 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests dataflow_future_ref_3639)
 
   foreach(compile_test ${compile_tests})
-    set(sources
-        ${compile_test}.cpp)
+    set(sources ${compile_test}.cpp)
 
     source_group("Source Files" FILES ${sources})
 
     add_hpx_regression_compile_test(
       "modules.async"
       ${compile_test}
-      SOURCES ${sources}
+      SOURCES
+      ${sources}
       ${${compile_test}_FLAGS}
-      FOLDER "Tests/Regressions/Modules/Async/CompileOnly")
+      FOLDER
+      "Tests/Regressions/Modules/Async/CompileOnly"
+    )
   endforeach()
 endif()

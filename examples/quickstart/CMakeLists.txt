@@ -20,10 +20,11 @@ set(example_programs
     timed_wake
     use_main_thread
     wait_composition
-   )
+)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(example_programs ${example_programs}
+  set(example_programs
+      ${example_programs}
       1d_wave_equation
       allow_unknown_options
       channel_docs
@@ -63,17 +64,13 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       vector_counting_dotproduct
       vector_zip_dotproduct
       zerocopy_rdma
-     )
+  )
 endif()
 
 # TODO: These examples currently fail. Disabled until they are fixed.
-set(disabled_tests
-    error_handling
-    fibonacci_await
-    non_atomic_rma
-    shared_mutex
-    zerocopy_rdma
-   )
+set(disabled_tests error_handling fibonacci_await non_atomic_rma shared_mutex
+                   zerocopy_rdma
+)
 
 set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -92,7 +89,9 @@ set(fractals_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
 if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-  set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams DEPENDENCIES compress_snappy)
+  set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams
+                                    DEPENDENCIES compress_snappy
+  )
 else()
   set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
@@ -100,8 +99,9 @@ set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(local_channel_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(local_channel_docs_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(sierpinski_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(partitioned_vector_spmd_foreach_FLAGS
-    COMPONENT_DEPENDENCIES iostreams partitioned_vector)
+set(partitioned_vector_spmd_foreach_FLAGS COMPONENT_DEPENDENCIES iostreams
+                                          partitioned_vector
+)
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -111,7 +111,9 @@ set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
-set(1d_wave_equation_PARAMETERS THREADS_PER_LOCALITY 4 "-Ihpx.stacks.use_guard_pages=0")
+set(1d_wave_equation_PARAMETERS THREADS_PER_LOCALITY 4
+                                "-Ihpx.stacks.use_guard_pages=0"
+)
 set(allow_unknown_options_PARAMETERS THREADS_PER_LOCALITY 4)
 set(command_line_handling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(component_in_executable_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -137,42 +139,47 @@ set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 
 if((HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
-    AND HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY
-    AND HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(example_programs ${example_programs}
-      fractals_executor
-     )
+   AND HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY
+   AND HPX_WITH_DISTRIBUTED_RUNTIME
+)
+  set(example_programs ${example_programs} fractals_executor)
   set(fractals_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(fractals_executor_PARAMETERS THREADS_PER_LOCALITY 4)
+  set(fractals_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()
 
 # the following example fails compiling on someversions of MSVC
-if(HPX_WITH_TUPLE_RVALUE_SWAP AND (NOT MSVC) AND HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(example_programs ${example_programs}
-      sort_by_key_demo
-     )
+if(HPX_WITH_TUPLE_RVALUE_SWAP
+   AND (NOT MSVC)
+   AND HPX_WITH_DISTRIBUTED_RUNTIME
+)
+  set(example_programs ${example_programs} sort_by_key_demo)
   set(sort_by_key_demo_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
 
 foreach(example_program ${example_programs})
-  set(sources
-      ${example_program}.cpp)
+  set(sources ${example_program}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${example_program}
-                     INTERNAL_FLAGS
-                     SOURCES ${sources}
-                     ${${example_program}_FLAGS}
-                     FOLDER "Examples/Quickstart")
+  add_hpx_executable(
+    ${example_program} INTERNAL_FLAGS
+    SOURCES ${sources} ${${example_program}_FLAGS}
+    FOLDER "Examples/Quickstart"
+  )
 
-  target_link_libraries(${example_program} PRIVATE ${${example_program}_LIBRARIES})
+  target_link_libraries(
+    ${example_program} PRIVATE ${${example_program}_LIBRARIES}
+  )
   add_hpx_example_target_dependencies("quickstart" ${example_program})
 
-  if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES AND
-      NOT ("${example_program}" IN_LIST disabled_tests))
-    add_hpx_example_test("quickstart" ${example_program} ${${example_program}_PARAMETERS})
+  if(HPX_WITH_TESTS
+     AND HPX_WITH_TESTS_EXAMPLES
+     AND NOT ("${example_program}" IN_LIST disabled_tests)
+  )
+    add_hpx_example_test(
+      "quickstart" ${example_program} ${${example_program}_PARAMETERS}
+    )
   endif()
 
 endforeach()

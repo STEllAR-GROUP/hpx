@@ -26,9 +26,7 @@ set(threading_tests
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests}
-    thread_affinity
-    thread_stacksize)
+  set(tests ${tests} thread_affinity thread_stacksize)
 endif()
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
@@ -63,11 +61,12 @@ foreach(test ${threading_tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/Threading")
+    FOLDER "Tests/Unit/Modules/Threading"
+  )
 
   add_hpx_unit_test("modules.threading" ${test})
 
@@ -79,9 +78,15 @@ set_tests_properties(
     PASS_REGULAR_EXPRESSION "std::terminate called\n")
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
-  set_tests_properties(tests.unit.threads.thread_stacksize_overflow PROPERTIES
-    PASS_REGULAR_EXPRESSION "Stack overflow in coroutine at address 0x[0-9a-fA-F]*")
+  set_tests_properties(
+    tests.unit.threads.thread_stacksize_overflow
+    PROPERTIES PASS_REGULAR_EXPRESSION
+               "Stack overflow in coroutine at address 0x[0-9a-fA-F]*"
+  )
 
-  set_tests_properties(tests.unit.threads.thread_stacksize_overflow_v2 PROPERTIES
-    PASS_REGULAR_EXPRESSION "Stack overflow in coroutine at address 0x[0-9a-fA-F]*")
+  set_tests_properties(
+    tests.unit.threads.thread_stacksize_overflow_v2
+    PROPERTIES PASS_REGULAR_EXPRESSION
+               "Stack overflow in coroutine at address 0x[0-9a-fA-F]*"
+  )
 endif()

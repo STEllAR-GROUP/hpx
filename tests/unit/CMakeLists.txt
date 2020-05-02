@@ -5,19 +5,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(subdirs
-    build
-    lcos
-    resource
-    traits
-    util
-   )
+set(subdirs build lcos resource traits util)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(subdirs ${subdirs}
-    actions
-    agas
-    component)
+  set(subdirs ${subdirs} actions agas component)
 endif()
 
 if(HPX_WITH_NETWORKING)
@@ -35,4 +26,3 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(tests.unit tests.unit.${subdir})
 endforeach()
-

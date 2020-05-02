@@ -47,24 +47,23 @@ set(tests
     transform_range_binary2
     unique_range
     unique_copy_range
-   )
+)
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Modules/Algorithms/Container")
+    FOLDER "Tests/Unit/Modules/Algorithms/Container"
+  )
 
   add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 endforeach()

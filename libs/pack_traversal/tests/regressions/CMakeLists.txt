@@ -5,21 +5,21 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    unwrapped_1528
-   )
+set(tests unwrapped_1528)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Regressions/Modules/PackTraversal")
+    FOLDER "Tests/Regressions/Modules/PackTraversal"
+  )
 
-  add_hpx_regression_test("modules.pack_traversal" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test(
+    "modules.pack_traversal" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

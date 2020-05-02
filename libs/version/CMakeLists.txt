@@ -18,19 +18,17 @@ if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_MPI_WITH_FUTURES)
 endif()
 
 include(HPX_AddModule)
-add_hpx_module(version
+add_hpx_module(
+  version
   COMPATIBILITY_HEADERS OFF
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
   SOURCES ${version_sources}
   HEADERS ${version_headers}
-  DEPENDENCIES
-    hpx_config
-    hpx_format
-    hpx_prefix
-    Hwloc::hwloc
-    ${mpi_dependencies}
+  DEPENDENCIES hpx_config hpx_format hpx_prefix Hwloc::hwloc ${mpi_dependencies}
   CMAKE_SUBDIRS
 )
 
-target_include_directories(hpx_version PRIVATE $<BUILD_INTERFACE:${HPX_BINARY_DIR}>)
+target_include_directories(
+  hpx_version PRIVATE $<BUILD_INTERFACE:${HPX_BINARY_DIR}>
+)

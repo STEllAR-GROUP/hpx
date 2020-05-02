@@ -8,30 +8,23 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 # Default location is $HPX_ROOT/libs/memory/include
 set(memory_headers
-  hpx/memory/intrusive_ptr.hpp
-  hpx/memory/detail/sp_convertible.hpp
-  hpx/memory/serialization/intrusive_ptr.hpp
+    hpx/memory/intrusive_ptr.hpp hpx/memory/detail/sp_convertible.hpp
+    hpx/memory/serialization/intrusive_ptr.hpp
 )
 
 # Default location is $HPX_ROOT/libs/memory/include_compatibility
-set(memory_compat_headers
-)
+set(memory_compat_headers)
 
 # Default location is $HPX_ROOT/libs/memory/src
-set(memory_sources
-)
+set(memory_sources)
 
 include(HPX_AddModule)
-add_hpx_module(memory
-  FORCE_LINKING_GEN
+add_hpx_module(
+  memory FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/memory/serialization/intrusive_ptr.hpp"
+  EXCLUDE_FROM_GLOBAL_HEADER "hpx/memory/serialization/intrusive_ptr.hpp"
   SOURCES ${memory_sources}
   HEADERS ${memory_headers}
-  DEPENDENCIES
-    hpx_config
-    hpx_assertion
-    hpx_serialization
+  DEPENDENCIES hpx_config hpx_assertion hpx_serialization
   CMAKE_SUBDIRS examples tests
 )

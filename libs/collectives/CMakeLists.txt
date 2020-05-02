@@ -10,36 +10,32 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/collectives/include
 set(collectives_headers
-  hpx/collectives/all_reduce.hpp
-  hpx/collectives/all_to_all.hpp
-  hpx/collectives/barrier.hpp
-  hpx/collectives/broadcast.hpp
-  hpx/collectives/fold.hpp
-  hpx/collectives/gather.hpp
-  hpx/collectives/latch.hpp
-  hpx/collectives/reduce.hpp
-  hpx/collectives/spmd_block.hpp
-  hpx/collectives/detail/barrier_node.hpp
-  hpx/collectives/detail/latch.hpp
+    hpx/collectives/all_reduce.hpp
+    hpx/collectives/all_to_all.hpp
+    hpx/collectives/barrier.hpp
+    hpx/collectives/broadcast.hpp
+    hpx/collectives/fold.hpp
+    hpx/collectives/gather.hpp
+    hpx/collectives/latch.hpp
+    hpx/collectives/reduce.hpp
+    hpx/collectives/spmd_block.hpp
+    hpx/collectives/detail/barrier_node.hpp
+    hpx/collectives/detail/latch.hpp
 )
 
 # Default location is $HPX_ROOT/libs/collectives/include_compatibility
 set(collectives_compat_headers
-  hpx/lcos/barrier.hpp
-  hpx/lcos/broadcast.hpp
-  hpx/lcos/fold.hpp
-  hpx/lcos/gather.hpp
-  hpx/lcos/latch.hpp
-  hpx/lcos/reduce.hpp
-  hpx/lcos/spmd_block.hpp
+    hpx/lcos/barrier.hpp
+    hpx/lcos/broadcast.hpp
+    hpx/lcos/fold.hpp
+    hpx/lcos/gather.hpp
+    hpx/lcos/latch.hpp
+    hpx/lcos/reduce.hpp
+    hpx/lcos/spmd_block.hpp
 )
 
 # Default location is $HPX_ROOT/libs/collectives/src
-set(collectives_sources
-  barrier.cpp
-  latch.cpp
-  detail/barrier_node.cpp
-)
+set(collectives_sources barrier.cpp latch.cpp detail/barrier_node.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(collectives
@@ -89,6 +85,4 @@ add_hpx_module(collectives
 )
 
 # Temporary since the module still depends on some runtime files
-target_link_libraries(hpx_collectives PUBLIC
-  hpx_static_reinit
-  )
+target_link_libraries(hpx_collectives PUBLIC hpx_static_reinit)

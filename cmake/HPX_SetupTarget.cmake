@@ -13,11 +13,31 @@ hpx_set_cmake_policy(CMP0060 NEW)
 
 function(hpx_setup_target target)
   # retrieve arguments
-  set(options EXPORT INSTALL INSTALL_HEADERS INTERNAL_FLAGS NOLIBS PLUGIN
-    NONAMEPREFIX NOTLLKEYWORD)
-  set(one_value_args TYPE FOLDER NAME SOVERSION VERSION HPX_PREFIX HEADER_ROOT)
-  set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS LINK_FLAGS INSTALL_FLAGS INSTALL_PDB)
-  cmake_parse_arguments(target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  set(options
+      EXPORT
+      INSTALL
+      INSTALL_HEADERS
+      INTERNAL_FLAGS
+      NOLIBS
+      PLUGIN
+      NONAMEPREFIX
+      NOTLLKEYWORD
+  )
+  set(one_value_args
+      TYPE
+      FOLDER
+      NAME
+      SOVERSION
+      VERSION
+      HPX_PREFIX
+      HEADER_ROOT
+  )
+  set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS
+                       LINK_FLAGS INSTALL_FLAGS INSTALL_PDB
+  )
+  cmake_parse_arguments(
+    target "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
+  )
 
   if(NOT TARGET ${target})
     hpx_error("${target} does not represent a target")
@@ -53,8 +73,9 @@ function(hpx_setup_target target)
     foreach(source ${target_SOURCES})
       get_filename_component(extension ${source} EXT)
       if(${extension} STREQUAL ".cu")
-        SET_SOURCE_FILES_PROPERTIES(${source} PROPERTIES
-          COMPILE_FLAGS "${HPX_CUDA_CLANG_FLAGS}")
+        set_source_files_properties(
+          ${source} PROPERTIES COMPILE_FLAGS "${HPX_CUDA_CLANG_FLAGS}"
+        )
       endif()
     endforeach()
   endif()
@@ -96,10 +117,10 @@ function(hpx_setup_target target)
   endif()
 
   if("${_type}" STREQUAL "EXECUTABLE")
-    target_compile_definitions(${target}
-      PRIVATE
-      "HPX_APPLICATION_NAME=${name}"
-      "HPX_APPLICATION_STRING=\"${name}\"")
+    target_compile_definitions(
+      ${target} PRIVATE "HPX_APPLICATION_NAME=${name}"
+                        "HPX_APPLICATION_STRING=\"${name}\""
+    )
 
     if(target_HPX_PREFIX)
       set(_prefix ${target_HPX_PREFIX})
@@ -108,53 +129,57 @@ function(hpx_setup_target target)
         string(REPLACE ";" ":" _prefix "${_prefix}")
       endif()
 
-      target_compile_definitions(${target} PRIVATE
-        "HPX_PREFIX=\"${_prefix}\"")
+      target_compile_definitions(${target} PRIVATE "HPX_PREFIX=\"${_prefix}\"")
     endif()
   endif()
 
   if("${_type}" STREQUAL "LIBRARY" OR "${_type}" STREQUAL "COMPONENT")
     if(DEFINED HPX_LIBRARY_VERSION AND DEFINED HPX_SOVERSION)
-    # set properties of generated shared library
-      set_target_properties(${target}
-        PROPERTIES
-        VERSION ${HPX_LIBRARY_VERSION}
-        SOVERSION ${HPX_SOVERSION})
+      # set properties of generated shared library
+      set_target_properties(
+        ${target} PROPERTIES VERSION ${HPX_LIBRARY_VERSION} SOVERSION
+                                                            ${HPX_SOVERSION}
+      )
     endif()
     if(NOT target_NONAMEPREFIX)
       hpx_set_lib_name(${target} ${name})
     endif()
-    set_target_properties(${target}
-      PROPERTIES
-      # create *nix style library versions + symbolic links
-      # allow creating static and shared libs without conflicts
-      CLEAN_DIRECT_OUTPUT 1
-      OUTPUT_NAME ${name})
+    set_target_properties(
+      ${target}
+      PROPERTIES # create *nix style library versions + symbolic links
+                 # allow creating static and shared libs without conflicts
+                 CLEAN_DIRECT_OUTPUT 1 OUTPUT_NAME ${name}
+    )
   endif()
 
   if("${_type}" STREQUAL "LIBRARY" AND target_PLUGIN)
     set(plugin_name "HPX_PLUGIN_NAME=hpx_${name}")
-    target_link_libraries(${target} ${__tll_private}
-      $<TARGET_NAME_IF_EXISTS:plugin>
-      $<TARGET_NAME_IF_EXISTS:HPX::plugin>)
+    target_link_libraries(
+      ${target} ${__tll_private} $<TARGET_NAME_IF_EXISTS:plugin>
+      $<TARGET_NAME_IF_EXISTS:HPX::plugin>
+    )
   endif()
 
   if("${_type}" STREQUAL "COMPONENT")
-    target_compile_definitions(${target}
-      PRIVATE
-      "HPX_COMPONENT_NAME=hpx_${name}"
-      "HPX_COMPONENT_STRING=\"hpx_${name}\"")
-    target_link_libraries(${target} ${__tll_private}
-      $<TARGET_NAME_IF_EXISTS:component>
-      $<TARGET_NAME_IF_EXISTS:HPX::component>)
+    target_compile_definitions(
+      ${target} PRIVATE "HPX_COMPONENT_NAME=hpx_${name}"
+                        "HPX_COMPONENT_STRING=\"hpx_${name}\""
+    )
+    target_link_libraries(
+      ${target} ${__tll_private} $<TARGET_NAME_IF_EXISTS:component>
+      $<TARGET_NAME_IF_EXISTS:HPX::component>
+    )
   endif()
 
   if(NOT target_NOLIBS)
-    target_link_libraries(${target} ${__tll_public}
-      $<TARGET_NAME_IF_EXISTS:hpx>
-      $<TARGET_NAME_IF_EXISTS:HPX::hpx>)
+    target_link_libraries(
+      ${target} ${__tll_public} $<TARGET_NAME_IF_EXISTS:hpx>
+      $<TARGET_NAME_IF_EXISTS:HPX::hpx>
+    )
     hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)
-    target_link_libraries(${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES})
+    target_link_libraries(
+      ${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES}
+    )
   endif()
 
   target_link_libraries(${target} ${__tll_public} ${target_DEPENDENCIES})
@@ -171,10 +196,7 @@ function(hpx_setup_target target)
   endif()
 
   if(target_INSTALL AND NOT target_EXCLUDE_FROM_ALL)
-    install(TARGETS ${target}
-      ${install_export}
-      ${target_INSTALL_FLAGS}
-    )
+    install(TARGETS ${target} ${install_export} ${target_INSTALL_FLAGS})
     if(target_INSTALL_PDB)
       install(${target_INSTALL_PDB})
     endif()
@@ -182,7 +204,8 @@ function(hpx_setup_target target)
       install(
         DIRECTORY "${target_HEADER_ROOT}/"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-        COMPONENT ${name})
+        COMPONENT ${name}
+      )
     endif()
   endif()
 endfunction()

@@ -10,39 +10,36 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/errors/include
 set(errors_headers
-  hpx/errors/error.hpp
-  hpx/errors/error_code.hpp
-  hpx/errors/exception.hpp
-  hpx/errors/exception_fwd.hpp
-  hpx/errors/exception_info.hpp
-  hpx/errors/exception_list.hpp
-  hpx/errors/throw_exception.hpp
+    hpx/errors/error.hpp
+    hpx/errors/error_code.hpp
+    hpx/errors/exception.hpp
+    hpx/errors/exception_fwd.hpp
+    hpx/errors/exception_info.hpp
+    hpx/errors/exception_list.hpp
+    hpx/errors/throw_exception.hpp
 )
 
 # Default location is $HPX_ROOT/libs/errors/include_compatibility
 set(errors_compat_headers
-  hpx/error.hpp
-  hpx/error_code.hpp
-  hpx/exception.hpp
-  hpx/exception_fwd.hpp
-  hpx/exception_info.hpp
-  hpx/exception_list.hpp
-  hpx/throw_exception.hpp
+    hpx/error.hpp
+    hpx/error_code.hpp
+    hpx/exception.hpp
+    hpx/exception_fwd.hpp
+    hpx/exception_info.hpp
+    hpx/exception_list.hpp
+    hpx/throw_exception.hpp
 )
 
 # Default location is $HPX_ROOT/libs/errors/src
-set(errors_sources
-  error_code.cpp
-  exception.cpp
-  exception_list.cpp
-  throw_exception.cpp
+set(errors_sources error_code.cpp exception.cpp exception_list.cpp
+                   throw_exception.cpp
 )
 
 include(HPX_AddModule)
-add_hpx_module(errors
-  COMPATIBILITY_HEADERS ON    # Added in 1.4.0
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+add_hpx_module(
+  errors
+  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${errors_sources}
   HEADERS ${errors_headers}
@@ -57,4 +54,3 @@ add_hpx_module(errors
     hpx_thread_support
   CMAKE_SUBDIRS examples tests
 )
-

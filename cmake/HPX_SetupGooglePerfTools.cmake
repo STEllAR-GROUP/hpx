@@ -19,6 +19,7 @@ if(HPX_WITH_GOOGLE_PERFTOOLS)
   if(NOT GOOGLE_PERFTOOLS_FOUND)
     hpx_error("Google Perftools could not be found and \
     HPX_WITH_GOOGLE_PERFTOOLS=On, please specify GOOGLE_PERFTOOLS to point to \
-    the root of your Google Perftools installation")
+    the root of your Google Perftools installation"
+    )
   endif()
 endif()

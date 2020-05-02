@@ -5,16 +5,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    spmd_block
-   )
+set(tests spmd_block)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests}
-      task_block
-      task_block_executor
-      task_block_par
-     )
+  set(tests ${tests} task_block task_block_executor task_block_par)
 endif()
 
 set(task_block_FLAGS DEPENDENCIES iostreams_component)
@@ -28,13 +22,13 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Modules/Algorithms/Block")
+    FOLDER "Tests/Unit/Modules/Algorithms/Block"
+  )
 
   add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 endforeach()

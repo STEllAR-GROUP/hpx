@@ -6,20 +6,20 @@
 
 include(HPX_SetupVerbs)
 
-if (HPX_WITH_PARCELPORT_VERBS)
+if(HPX_WITH_PARCELPORT_VERBS)
   hpx_debug("add_parcelport_verbs_module")
 
   include(HPX_AddParcelport)
-  add_parcelport(verbs
-    STATIC
+  add_parcelport(
+    verbs STATIC
     SOURCES
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/rdma/rdma_controller.cpp"
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/parcelport_verbs.cpp"
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/rdma/rdma_controller.cpp"
     # do we need to declare any of these headers?
     HEADERS
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/header.hpp"
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/locality.hpp"
-        "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/pinned_memory_vector.hpp"
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/header.hpp"
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/locality.hpp"
+      "${PROJECT_SOURCE_DIR}/plugins/parcelport/verbs/pinned_memory_vector.hpp"
     DEPENDENCIES
       hpx_asio
       hpx_assertion
@@ -32,9 +32,7 @@ if (HPX_WITH_PARCELPORT_VERBS)
       hpx_threading
       Verbs::verbs
       hpx_dependencies_boost
-    INCLUDE_DIRS
-      ${PROJECT_BINARY_DIR}
-      ${PROJECT_SOURCE_DIR}
-    FOLDER
-      "Core/Plugins/Parcelport/verbs")
+    INCLUDE_DIRS ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}
+    FOLDER "Core/Plugins/Parcelport/verbs"
+  )
 endif()

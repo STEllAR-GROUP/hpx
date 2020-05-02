@@ -10,42 +10,38 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/concurrency/include
 set(concurrency_headers
-  hpx/concurrency/barrier.hpp
-  hpx/concurrency/cache_line_data.hpp
-  hpx/concurrency/concurrentqueue.hpp
-  hpx/concurrency/deque.hpp
-  hpx/concurrency/detail/freelist.hpp
-  hpx/concurrency/detail/tagged_ptr_pair.hpp
-  hpx/concurrency/itt_notify.hpp
-  hpx/concurrency/spinlock.hpp
-  hpx/concurrency/spinlock_pool.hpp
-  hpx/concurrency/thread_name.hpp
+    hpx/concurrency/barrier.hpp
+    hpx/concurrency/cache_line_data.hpp
+    hpx/concurrency/concurrentqueue.hpp
+    hpx/concurrency/deque.hpp
+    hpx/concurrency/detail/freelist.hpp
+    hpx/concurrency/detail/tagged_ptr_pair.hpp
+    hpx/concurrency/itt_notify.hpp
+    hpx/concurrency/spinlock.hpp
+    hpx/concurrency/spinlock_pool.hpp
+    hpx/concurrency/thread_name.hpp
 )
 
 # Default location is $HPX_ROOT/libs/concurrency/include_compatibility
 set(concurrency_compat_headers
-  hpx/compat/barrier.hpp
-  hpx/util/lockfree/concurrentqueue.hpp
-  hpx/util/lockfree/deque.hpp
-  hpx/util/lockfree/detail/tagged_ptr_pair.hpp
-  hpx/util/lockfree/freelist.hpp
-  hpx/util/itt_notify.hpp
-  hpx/util/spinlock.hpp
-  hpx/util/spinlock_pool.hpp
+    hpx/compat/barrier.hpp
+    hpx/util/lockfree/concurrentqueue.hpp
+    hpx/util/lockfree/deque.hpp
+    hpx/util/lockfree/detail/tagged_ptr_pair.hpp
+    hpx/util/lockfree/freelist.hpp
+    hpx/util/itt_notify.hpp
+    hpx/util/spinlock.hpp
+    hpx/util/spinlock_pool.hpp
 )
 
 # Default location is $HPX_ROOT/libs/concurrency/src
-set(concurrency_sources
-  barrier.cpp
-  itt_notify.cpp
-  thread_name.cpp
-)
+set(concurrency_sources barrier.cpp itt_notify.cpp thread_name.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(concurrency
+add_hpx_module(
+  concurrency
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${concurrency_sources}
   HEADERS ${concurrency_headers}

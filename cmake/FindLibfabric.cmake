@@ -7,16 +7,18 @@
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_LIBFABRIC QUIET libfabric)
 
-find_path(LIBFABRIC_INCLUDE_DIR rdma/fabric.h
-  HINTS
-    ${LIBFABRIC_ROOT} ENV LIBFABRIC_ROOT
-    ${LIBFABRIC_DIR} ENV LIBFABRIC_DIR
-  PATH_SUFFIXES include)
+find_path(
+  LIBFABRIC_INCLUDE_DIR rdma/fabric.h
+  HINTS ${LIBFABRIC_ROOT} ENV LIBFABRIC_ROOT ${LIBFABRIC_DIR} ENV LIBFABRIC_DIR
+  PATH_SUFFIXES include
+)
 
-find_library(LIBFABRIC_LIBRARY NAMES fabric
-  HINTS
-    ${LIBFABRIC_ROOT} ENV LIBFABRIC_ROOT
-  PATH_SUFFIXES lib lib64)
+find_library(
+  LIBFABRIC_LIBRARY
+  NAMES fabric
+  HINTS ${LIBFABRIC_ROOT} ENV LIBFABRIC_ROOT
+  PATH_SUFFIXES lib lib64
+)
 
 # Set LIBFABRIC_ROOT in case the other hints are used
 if(LIBFABRIC_ROOT)
@@ -29,23 +31,20 @@ else()
   string(REPLACE "/include" "" LIBFABRIC_ROOT "${LIBFABRIC_INCLUDE_DIR}")
 endif()
 
-if (NOT LIBFABRIC_INCLUDE_DIR OR NOT LIBFABRIC_LIBRARY)
+if(NOT LIBFABRIC_INCLUDE_DIR OR NOT LIBFABRIC_LIBRARY)
   hpx_error("Could not find LIBFABRIC_INCLUDE_DIR or LIBFABRIC_LIBRARY please \
-  set the LIBFABRIC_ROOT environment variable")
+  set the LIBFABRIC_ROOT environment variable"
+  )
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Libfabric DEFAULT_MSG
-  LIBFABRIC_LIBRARY LIBFABRIC_INCLUDE_DIR)
+find_package_handle_standard_args(
+  Libfabric DEFAULT_MSG LIBFABRIC_LIBRARY LIBFABRIC_INCLUDE_DIR
+)
 
-#foreach(v LIBFABRIC_ROOT)
-#  get_property(_type CACHE ${v} PROPERTY TYPE)
-#  if(_type)
-#    set_property(CACHE ${v} PROPERTY ADVANCED 1)
-#    if("x${_type}" STREQUAL "xUNINITIALIZED")
-#      set_property(CACHE ${v} PROPERTY TYPE PATH)
-#    endif()
-#  endif()
-#endforeach()
+# foreach(v LIBFABRIC_ROOT) get_property(_type CACHE ${v} PROPERTY TYPE)
+# if(_type) set_property(CACHE ${v} PROPERTY ADVANCED 1) if("x${_type}" STREQUAL
+# "xUNINITIALIZED") set_property(CACHE ${v} PROPERTY TYPE PATH) endif() endif()
+# endforeach()
 
 mark_as_advanced(LIBFABRIC_ROOT)

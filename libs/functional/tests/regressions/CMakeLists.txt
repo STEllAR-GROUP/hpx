@@ -8,10 +8,7 @@
 set(tests)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests}
-      function_argument
-      function_serialization_728
-    )
+  set(tests ${tests} function_argument function_serialization_728)
 endif()
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
@@ -19,28 +16,30 @@ set(function_serialization_728_dependencies iostreams_component)
 
 if(HPX_WITH_COMPRESSION_ZLIB)
   set(function_serialization_728_dependencies
-    ${function_serialization_728_dependencies}
-    compression_zlib)
+      ${function_serialization_728_dependencies} compression_zlib
+  )
 endif()
 if(WITH_PARCEL_COALESCING)
   set(function_serialization_728_dependencies
-    ${function_serialization_728_dependencies}
-    parcel_coalescing)
+      ${function_serialization_728_dependencies} parcel_coalescing
+  )
 endif()
-set(function_serialization_728_FLAGS DEPENDENCIES ${function_serialization_728_dependencies})
+set(function_serialization_728_FLAGS DEPENDENCIES
+                                     ${function_serialization_728_dependencies}
+)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/Functional")
+    FOLDER "Tests/Regressions/Modules/Functional"
+  )
 
   add_hpx_regression_test("modules.functional" ${test} ${${test}_PARAMETERS})
 endforeach()

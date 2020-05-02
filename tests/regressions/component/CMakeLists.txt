@@ -12,12 +12,10 @@ set(tests
     new_2848
     new_4369
     returned_client_2150
-   )
+)
 
 if(HPX_WITH_NETWORKING)
-  set(tests ${tests}
-    create_remote_component_2334
-  )
+  set(tests ${tests} create_remote_component_2334)
   set(bulk_new_3054_PARAMETERS LOCALITIES 2)
   set(create_remote_component_2334_PARAMETERS LOCALITIES 2)
   set(new_2848_PARAMETERS LOCALITIES 2)
@@ -25,21 +23,19 @@ if(HPX_WITH_NETWORKING)
 endif()
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Components")
+    FOLDER "Tests/Regressions/Components"
+  )
 
   add_hpx_regression_test("components" ${test} ${${test}_PARAMETERS})
 
 endforeach()
-

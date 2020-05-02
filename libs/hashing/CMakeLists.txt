@@ -6,28 +6,21 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-set(hashing_headers
-  hpx/hashing/fibhash.hpp
-  hpx/hashing/jenkins_hash.hpp
-)
+set(hashing_headers hpx/hashing/fibhash.hpp hpx/hashing/jenkins_hash.hpp)
 
-set(hashing_compat_headers
-  hpx/util/fibhash.hpp
-  hpx/util/jenkins_hash.hpp
-)
+set(hashing_compat_headers hpx/util/fibhash.hpp hpx/util/jenkins_hash.hpp)
 
 set(hashing_sources)
 
 include(HPX_AddModule)
-add_hpx_module(hashing
+add_hpx_module(
+  hashing
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${hashing_sources}
   HEADERS ${hashing_headers}
   COMPAT_HEADERS ${hashing_compat_headers}
-  DEPENDENCIES
-    hpx_config
+  DEPENDENCIES hpx_config
   CMAKE_SUBDIRS examples tests
 )

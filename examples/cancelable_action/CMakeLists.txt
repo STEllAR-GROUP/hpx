@@ -17,14 +17,19 @@ set(sources cancelable_action_client.cpp)
 source_group("Source Files" FILES ${sources})
 
 # add example executable
-add_hpx_executable(cancelable_action_client
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    DEPENDENCIES cancelable_action_component
-    FOLDER "Examples/CancelableAction")
+add_hpx_executable(
+  cancelable_action_client INTERNAL_FLAGS
+  SOURCES ${sources}
+  DEPENDENCIES cancelable_action_component
+  FOLDER "Examples/CancelableAction"
+)
 
-add_hpx_example_target_dependencies("cancelable_action" cancelable_action_client)
+add_hpx_example_target_dependencies(
+  "cancelable_action" cancelable_action_client
+)
 
 if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-  add_hpx_example_test("cancelable_action" cancelable_action_client THREADS_PER_LOCALITY 4)
+  add_hpx_example_test(
+    "cancelable_action" cancelable_action_client THREADS_PER_LOCALITY 4
+  )
 endif()

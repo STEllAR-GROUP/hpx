@@ -10,14 +10,12 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
 
-set(components
-  unordered
-  partitioned_vector
-)
+set(components unordered partitioned_vector)
 
 foreach(component ${components})
   add_hpx_pseudo_target(components.containers.${component})
   add_subdirectory(${component})
-  add_hpx_pseudo_dependencies(components.containers
-    components.containers.${component})
+  add_hpx_pseudo_dependencies(
+    components.containers components.containers.${component}
+  )
 endforeach()

@@ -9,7 +9,9 @@ function(add_hpx_compile_test category name)
   set(one_value_args SOURCE_ROOT FOLDER)
   set(multi_value_args SOURCES COMPONENT_DEPENDENCIES DEPENDENCIES)
 
-  cmake_parse_arguments(${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    ${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
+  )
 
   set(_additional_flags)
   if(${name}_NOLIBS)
@@ -22,19 +24,18 @@ function(add_hpx_compile_test category name)
     ${test_name}
     SOURCE_ROOT ${${name}_SOURCE_ROOT}
     SOURCES ${${name}_SOURCES}
-    EXCLUDE_FROM_ALL
-    EXCLUDE_FROM_DEFAULT_BUILD
+    EXCLUDE_FROM_ALL EXCLUDE_FROM_DEFAULT_BUILD
     FOLDER ${${name}_FOLDER}
     COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
-    DEPENDENCIES ${${name}_DEPENDENCIES}
-    ${_additional_flags})
+    DEPENDENCIES ${${name}_DEPENDENCIES} ${_additional_flags}
+  )
 
-  add_test(NAME "${category}.${name}"
-    COMMAND ${CMAKE_COMMAND}
-    --build ${PROJECT_BINARY_DIR}
-      --target ${test_name}
-      --config $<CONFIGURATION>
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+  add_test(
+    NAME "${category}.${name}"
+    COMMAND ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --target ${test_name}
+            --config $<CONFIGURATION>
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+  )
 
   if(${name}_FAILURE_EXPECTED)
     set_tests_properties("${category}.${name}" PROPERTIES WILL_FAIL TRUE)
@@ -50,12 +51,14 @@ endfunction(add_hpx_compile_test_target_dependencies)
 
 # To add test to the category root as in tests/regressions/ with correct name
 function(add_test_and_deps_compile_test category subcategory name)
-  if ("${subcategory}" STREQUAL "")
+  if("${subcategory}" STREQUAL "")
     add_hpx_compile_test(tests.${category} ${name} ${ARGN})
     add_hpx_compile_test_target_dependencies(tests.${category} ${name})
   else()
     add_hpx_compile_test(tests.${category}.${subcategory} ${name} ${ARGN})
-    add_hpx_compile_test_target_dependencies(tests.${category}.${subcategory} ${name})
+    add_hpx_compile_test_target_dependencies(
+      tests.${category}.${subcategory} ${name}
+    )
   endif()
 endfunction(add_test_and_deps_compile_test)
 
@@ -68,17 +71,21 @@ function(add_hpx_regression_compile_test subcategory name)
 endfunction(add_hpx_regression_compile_test)
 
 function(add_hpx_headers_compile_test subcategory name)
-  # Important to keep the double quotes around subcategory otherwise
-  # don't consider empty argument but just remove it
+  # Important to keep the double quotes around subcategory otherwise don't
+  # consider empty argument but just remove it
   add_test_and_deps_compile_test("headers" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_headers_compile_test)
 
 function(add_hpx_header_tests category)
   set(options NOLIBS)
   set(one_value_args HEADER_ROOT)
-  set(multi_value_args HEADERS EXCLUDE EXCLUDE_FROM_ALL COMPONENT_DEPENDENCIES DEPENDENCIES)
+  set(multi_value_args HEADERS EXCLUDE EXCLUDE_FROM_ALL COMPONENT_DEPENDENCIES
+                       DEPENDENCIES
+  )
 
-  cmake_parse_arguments(${category} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    ${category} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
+  )
 
   set(_additional_flags)
   if(${category}_NOLIBS)
@@ -106,10 +113,9 @@ function(add_hpx_header_tests category)
 
       # generate the test
       file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}
-        "#include <${relpath}>\n"
-        "#ifndef HPX_MAIN_DEFINED\n"
-        "int main(int argc, char** argv) { return 0; }\n"
-        "#endif\n")
+           "#include <${relpath}>\n" "#ifndef HPX_MAIN_DEFINED\n"
+           "int main(int argc, char** argv) { return 0; }\n" "#endif\n"
+      )
 
       set(exclude_all_pos -1)
       list(FIND ${category}_EXCLUDE_FROM_ALL "${header}" exclude_all_pos)
@@ -122,12 +128,18 @@ function(add_hpx_header_tests category)
       add_hpx_headers_compile_test(
         "${category}"
         ${test_name}
-        SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
-        SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
-        FOLDER "Tests/Headers/${header_dir}"
-        COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
-        DEPENDENCIES ${${category}_DEPENDENCIES}
-        ${_additional_flags})
+        SOURCES
+        "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
+        SOURCE_ROOT
+        "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
+        FOLDER
+        "Tests/Headers/${header_dir}"
+        COMPONENT_DEPENDENCIES
+        ${${category}_COMPONENT_DEPENDENCIES}
+        DEPENDENCIES
+        ${${category}_DEPENDENCIES}
+        ${_additional_flags}
+      )
 
     endif()
   endforeach()
@@ -135,19 +147,23 @@ function(add_hpx_header_tests category)
   set(test_name "all_headers")
   set(all_headers_test_file "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.cpp")
   file(WRITE ${all_headers_test_file}
-    ${all_headers}
-    "#ifndef HPX_MAIN_DEFINED\n"
-    "int main(int argc, char** argv) { return 0; }\n"
-    "#endif\n")
+       ${all_headers} "#ifndef HPX_MAIN_DEFINED\n"
+       "int main(int argc, char** argv) { return 0; }\n" "#endif\n"
+  )
 
   add_hpx_headers_compile_test(
     "${category}"
     ${test_name}
-    SOURCES "${all_headers_test_file}"
-    SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}"
-    FOLDER "Tests/Headers"
-    COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
-    DEPENDENCIES ${${category}_DEPENDENCIES}
-    ${_additional_flags})
+    SOURCES
+    "${all_headers_test_file}"
+    SOURCE_ROOT
+    "${CMAKE_CURRENT_BINARY_DIR}"
+    FOLDER
+    "Tests/Headers"
+    COMPONENT_DEPENDENCIES
+    ${${category}_COMPONENT_DEPENDENCIES}
+    DEPENDENCIES
+    ${${category}_DEPENDENCIES}
+    ${_additional_flags}
+  )
 endfunction()
-

@@ -87,11 +87,12 @@ set(execution_compat_headers
 )
 
 include(HPX_AddModule)
-add_hpx_module(execution
+add_hpx_module(
+  execution
   SOURCES ${execution_sources}
   HEADERS ${execution_headers}
   DEPRECATION_WARNINGS
-  COMPATIBILITY_HEADERS ON    # Added in 1.5.0
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES
     hpx_assertion

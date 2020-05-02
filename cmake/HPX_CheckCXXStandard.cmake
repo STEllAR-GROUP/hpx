@@ -13,27 +13,41 @@ set(HPX_CXX_STANDARD 14)
 
 # Compatibility for old HPX_WITH_CXXAB options.
 if(HPX_WITH_CXX11)
-  hpx_error("HPX_WITH_CXX11 is deprecated and the minimum C++ standard required by HPX is 14. Avoid setting the standard explicitly or use CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD if you must set it.")
+  hpx_error(
+    "HPX_WITH_CXX11 is deprecated and the minimum C++ standard required by HPX is 14. Avoid setting the standard explicitly or use CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD if you must set it."
+  )
 elseif(HPX_WITH_CXX14)
-  hpx_warn("HPX_WITH_CXX14 is deprecated. Avoid setting the standard explicitly or use CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD if you must set it.")
+  hpx_warn(
+    "HPX_WITH_CXX14 is deprecated. Avoid setting the standard explicitly or use CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD if you must set it."
+  )
   set(HPX_CXX_STANDARD 14)
 elseif(HPX_WITH_CXX17)
-  hpx_warn("HPX_WITH_CXX17 is deprecated. Avoid setting the standard explicitly or use CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD if you must set it.")
+  hpx_warn(
+    "HPX_WITH_CXX17 is deprecated. Avoid setting the standard explicitly or use CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD if you must set it."
+  )
   set(HPX_CXX_STANDARD 17)
 elseif(HPX_WITH_CXX20)
-  hpx_warn("HPX_WITH_CXX20 is deprecated. Avoid setting the standard explicitly or use CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD if you must set it.")
+  hpx_warn(
+    "HPX_WITH_CXX20 is deprecated. Avoid setting the standard explicitly or use CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD if you must set it."
+  )
   set(HPX_CXX_STANDARD 20)
 endif()
 
 if(CMAKE_CXX_STANDARD)
   if(CMAKE_CXX_STANDARD LESS 14)
-    hpx_error("You've set CMAKE_CXX_STANDARD to ${CMAKE_CXX_STANDARD}, which is less than 14 which is the minimum required by HPX")
+    hpx_error(
+      "You've set CMAKE_CXX_STANDARD to ${CMAKE_CXX_STANDARD}, which is less than 14 which is the minimum required by HPX"
+    )
   else()
     if(HPX_USE_CMAKE_CXX_STANDARD)
-      hpx_warn("You've set CMAKE_CXX_STANDARD manually, which is not recommended. However, HPX_USE_CMAKE_CXX_STANDARD=ON so we're taking it into account.")
+      hpx_warn(
+        "You've set CMAKE_CXX_STANDARD manually, which is not recommended. However, HPX_USE_CMAKE_CXX_STANDARD=ON so we're taking it into account."
+      )
       set(HPX_CXX_STANDARD ${CMAKE_CXX_STANDARD})
     else()
-      hpx_error("You've set CMAKE_CXX_STANDARD manually, which is not recommended. If you really want to set CMAKE_CXX_STANDARD, set HPX_USE_CMAKE_CXX_STANDARD=ON.")
+      hpx_error(
+        "You've set CMAKE_CXX_STANDARD manually, which is not recommended. If you really want to set CMAKE_CXX_STANDARD, set HPX_USE_CMAKE_CXX_STANDARD=ON."
+      )
     endif()
   endif()
 endif()

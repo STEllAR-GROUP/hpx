@@ -9,29 +9,26 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(resource_partitioner_headers
-  hpx/resource_partitioner/detail/create_partitioner.hpp
-  hpx/resource_partitioner/detail/partitioner.hpp
-  hpx/resource_partitioner/partitioner.hpp
-  hpx/resource_partitioner/partitioner_fwd.hpp
-  )
+    hpx/resource_partitioner/detail/create_partitioner.hpp
+    hpx/resource_partitioner/detail/partitioner.hpp
+    hpx/resource_partitioner/partitioner.hpp
+    hpx/resource_partitioner/partitioner_fwd.hpp
+)
 
 set(resource_partitioner_compat_headers
-  hpx/runtime/resource/detail/create_partitioner.hpp
-  hpx/runtime/resource/detail/partitioner.hpp
-  hpx/runtime/resource/partitioner.hpp
-  hpx/runtime/resource/partitioner_fwd.hpp
-  )
+    hpx/runtime/resource/detail/create_partitioner.hpp
+    hpx/runtime/resource/detail/partitioner.hpp
+    hpx/runtime/resource/partitioner.hpp
+    hpx/runtime/resource/partitioner_fwd.hpp
+)
 
-set(resource_partitioner_sources
-  detail_partitioner.cpp
-  partitioner.cpp
-  )
+set(resource_partitioner_sources detail_partitioner.cpp partitioner.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(resource_partitioner
+add_hpx_module(
+  resource_partitioner
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${resource_partitioner_sources}
   HEADERS ${resource_partitioner_headers}
@@ -62,4 +59,3 @@ add_hpx_module(resource_partitioner
     hpx_topology
   CMAKE_SUBDIRS examples tests
 )
-

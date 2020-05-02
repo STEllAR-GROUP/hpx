@@ -57,16 +57,13 @@ set(thread_executors_compat_headers
   )
 
 set(thread_executors_sources
-  embedded_thread_pool_executors.cpp
-  force_linking.cpp
-  resource_manager.cpp
-  this_thread_executors.cpp
-  thread_executor.cpp
-  thread_pool_os_executors.cpp
-  )
+    embedded_thread_pool_executors.cpp force_linking.cpp resource_manager.cpp
+    this_thread_executors.cpp thread_executor.cpp thread_pool_os_executors.cpp
+)
 
 include(HPX_AddModule)
-add_hpx_module(thread_executors
+add_hpx_module(
+  thread_executors
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON

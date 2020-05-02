@@ -16,7 +16,10 @@ function(_to_string var)
     endif()
   endforeach()
 
-  set(${var} ${_var} PARENT_SCOPE)
+  set(${var}
+      ${_var}
+      PARENT_SCOPE
+  )
 endfunction()
 
 function(hpx_info)
@@ -58,24 +61,45 @@ function(hpx_message level)
   elseif("${level}" MATCHES "INFO|info|Info")
     hpx_info(${ARGN})
   else()
-    hpx_error("message" "\"${level}\" is not an HPX configuration logging level.")
+    hpx_error("message"
+              "\"${level}\" is not an HPX configuration logging level."
+    )
   endif()
 endfunction()
 
 function(hpx_config_loglevel level return)
-  set(${return} FALSE PARENT_SCOPE)
-  if(    "${HPX_CMAKE_LOGLEVEL}" MATCHES "ERROR|error|Error"
-     AND "${level}" MATCHES "ERROR|error|Error")
-    set(${return} TRUE PARENT_SCOPE)
+  set(${return}
+      FALSE
+      PARENT_SCOPE
+  )
+  if("${HPX_CMAKE_LOGLEVEL}" MATCHES "ERROR|error|Error"
+     AND "${level}" MATCHES "ERROR|error|Error"
+  )
+    set(${return}
+        TRUE
+        PARENT_SCOPE
+    )
   elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "WARN|warn|Warn"
-     AND "${level}" MATCHES "WARN|warn|Warn")
-    set(${return} TRUE PARENT_SCOPE)
+         AND "${level}" MATCHES "WARN|warn|Warn"
+  )
+    set(${return}
+        TRUE
+        PARENT_SCOPE
+    )
   elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug"
-     AND "${level}" MATCHES "DEBUG|debug|Debug")
-    set(${return} TRUE PARENT_SCOPE)
+         AND "${level}" MATCHES "DEBUG|debug|Debug"
+  )
+    set(${return}
+        TRUE
+        PARENT_SCOPE
+    )
   elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "INFO|info|Info"
-     AND "${level}" MATCHES "INFO|info|Info")
-    set(${return} TRUE PARENT_SCOPE)
+         AND "${level}" MATCHES "INFO|info|Info"
+  )
+    set(${return}
+        TRUE
+        PARENT_SCOPE
+    )
   endif()
 endfunction()
 
@@ -92,4 +116,3 @@ function(hpx_print_list level message list)
     endif()
   endif()
 endfunction()
-

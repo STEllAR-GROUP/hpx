@@ -8,18 +8,20 @@ if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
   set(__boost_program_options Boost::program_options)
 endif()
 
-if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY AND NOT TARGET
-    Boost::program_options)
+if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
+   AND NOT TARGET Boost::program_options
+)
 
   hpx_add_config_define_namespace(
     DEFINE HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY
-    NAMESPACE PROGRAM_OPTIONS)
+    NAMESPACE PROGRAM_OPTIONS
+  )
 
-  find_package(Boost ${Boost_MINIMUM_VERSION}
-    MODULE
-    COMPONENTS program_options)
+  find_package(Boost ${Boost_MINIMUM_VERSION} MODULE COMPONENTS program_options)
 
   if(NOT Boost_PROGRAM_OPTIONS_FOUND)
-    hpx_error("Could not find Boost.ProgramOptions. Provide a boost installation including the program_options library")
+    hpx_error(
+      "Could not find Boost.ProgramOptions. Provide a boost installation including the program_options library"
+    )
   endif()
 endif()

@@ -10,8 +10,10 @@ if(NOT TARGET Boost::iostreams)
   if(Boost_IOSTREAMS_FOUND)
     hpx_info("  iostreams")
   else()
-    hpx_error("Could not find Boost.Iostreams but HPX_WITH_COMPRESSION_BZIP2=On or \
+    hpx_error(
+      "Could not find Boost.Iostreams but HPX_WITH_COMPRESSION_BZIP2=On or \
     HPX_WITH_COMPRESSION_LIB=On. Either set it to off or provide a boost installation including \
-    the iostreams library")
+    the iostreams library"
+    )
   endif()
 endif()

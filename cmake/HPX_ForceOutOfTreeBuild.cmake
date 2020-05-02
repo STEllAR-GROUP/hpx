@@ -12,4 +12,3 @@ function(hpx_force_out_of_tree_build message)
     hpx_error("in_tree" "${message}")
   endif()
 endfunction()
-

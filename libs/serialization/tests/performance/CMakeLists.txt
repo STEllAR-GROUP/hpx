@@ -4,15 +4,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks
-  serialization_performance
-)
+set(benchmarks serialization_performance)
 set(serialization_performance_PARAMETERS 100)
 
 if(HPX_WITH_NETWORKING)
-  set(benchmarks ${benchmarks}
-    serialization_overhead
-  )
+  set(benchmarks ${benchmarks} serialization_overhead)
   set(serialization_overhead_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
@@ -24,14 +20,14 @@ foreach(benchmark ${benchmarks})
   set(folder_name "Benchmarks/Modules/Serialization")
 
   # add example executable
-  add_hpx_executable(${benchmark}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${benchmark}_FLAGS}
+  add_hpx_executable(
+    ${benchmark}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${benchmark}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER ${folder_name})
+    FOLDER ${folder_name}
+  )
 
-  add_hpx_performance_test("modules.serialization"
-    ${benchmark} ${${benchmark}_PARAMETERS})
+  add_hpx_performance_test(
+    "modules.serialization" ${benchmark} ${${benchmark}_PARAMETERS}
+  )
 endforeach()
-

@@ -12,7 +12,10 @@ function(hpx_add_target_compile_option FLAG)
   set(options PUBLIC)
   set(one_value_args)
   set(multi_value_args CONFIGURATIONS LANGUAGES)
-  cmake_parse_arguments(HPX_ADD_TARGET_COMPILE_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_ADD_TARGET_COMPILE_OPTION "${options}" "${one_value_args}"
+    "${multi_value_args}" ${ARGN}
+  )
 
   if(HPX_ADD_TARGET_COMPILE_OPTION_PUBLIC)
     set(_dest hpx_public_flags)
@@ -34,22 +37,25 @@ function(hpx_add_target_compile_option FLAG)
     foreach(_config ${_configurations})
       set(_conf "${FLAG}")
       if(NOT _config STREQUAL "none")
-        set(_conf "$<$<AND:$<CONFIG:${_config}>,$<COMPILE_LANGUAGE:${_lang}>>:${FLAG}>")
+        set(_conf
+            "$<$<AND:$<CONFIG:${_config}>,$<COMPILE_LANGUAGE:${_lang}>>:${FLAG}>"
+        )
       endif()
       target_compile_options(${_dest} INTERFACE "${_conf}")
     endforeach()
   endforeach()
 
-#  if(HPX_WITH_CUDA AND (NOT MSVC))
-#      hpx_add_compile_flag(${FLAG})
-#  endif()
+  # if(HPX_WITH_CUDA AND (NOT MSVC)) hpx_add_compile_flag(${FLAG}) endif()
 endfunction()
 
 function(hpx_add_target_compile_option_if_available FLAG)
   set(options PUBLIC)
   set(one_value_args NAME)
   set(multi_value_args CONFIGURATIONS LANGUAGES)
-  cmake_parse_arguments(HPX_ADD_TARGET_COMPILE_OPTION_IA "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_ADD_TARGET_COMPILE_OPTION_IA "${options}" "${one_value_args}"
+    "${multi_value_args}" ${ARGN}
+  )
 
   if(HPX_ADD_TARGET_COMPILE_OPTION_IA_PUBLIC)
     set(_modifier PUBLIC)
@@ -79,13 +85,17 @@ function(hpx_add_target_compile_option_if_available FLAG)
     elseif(_lang STREQUAL "C")
       check_c_compiler_flag(${FLAG} HPX_WITH_${_lang}_FLAG_${_name})
     elseif(_lang STREQUAL "Fortran")
-      ## Assuming the C compiler accepts the same flags as the fortran one ...
+      # Assuming the C compiler accepts the same flags as the fortran one ...
       check_c_compiler_flag(${FLAG} HPX_WITH_${_lang}_FLAG_${_name})
     else()
       hpx_error("Unsupported language ${_lang}.")
     endif()
     if(HPX_WITH_${_lang}_FLAG_${_name})
-      hpx_add_target_compile_option(${FLAG} ${_modifier} CONFIGURATIONS ${HPX_ADD_TARGET_COMPILE_OPTION_IA_CONFIGURATIONS} LANGUAGES ${_lang})
+      hpx_add_target_compile_option(
+        ${FLAG} ${_modifier}
+        CONFIGURATIONS ${HPX_ADD_TARGET_COMPILE_OPTION_IA_CONFIGURATIONS}
+        LANGUAGES ${_lang}
+      )
     else()
       hpx_info("\"${FLAG}\" not available for language ${_lang}.")
     endif()
@@ -97,15 +107,24 @@ function(hpx_remove_target_compile_option FLAG)
   set(options PUBLIC)
   set(one_value_args)
   set(multi_value_args CONFIGURATIONS)
-  cmake_parse_arguments(HPX_ADD_TARGET_COMPILE_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_ADD_TARGET_COMPILE_OPTION "${options}" "${one_value_args}"
+    "${multi_value_args}" ${ARGN}
+  )
 
   set(_configurations "none")
   if(HPX_ADD_TARGET_COMPILE_OPTION_CONFIGURATIONS)
     set(_configurations "${HPX_ADD_TARGET_COMPILE_OPTION_CONFIGURATIONS}")
   endif()
 
-  get_property(HPX_TARGET_COMPILE_OPTIONS_PUBLIC_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS_PUBLIC)
-  get_property(HPX_TARGET_COMPILE_OPTIONS_PRIVATE_VAR GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS_PRIVATE)
+  get_property(
+    HPX_TARGET_COMPILE_OPTIONS_PUBLIC_VAR GLOBAL
+    PROPERTY HPX_TARGET_COMPILE_OPTIONS_PUBLIC
+  )
+  get_property(
+    HPX_TARGET_COMPILE_OPTIONS_PRIVATE_VAR GLOBAL
+    PROPERTY HPX_TARGET_COMPILE_OPTIONS_PRIVATE
+  )
   set_property(GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS_PUBLIC "")
   set_property(GLOBAL PROPERTY HPX_TARGET_COMPILE_OPTIONS_PRIVATE "")
 
@@ -116,12 +135,16 @@ function(hpx_remove_target_compile_option FLAG)
     endif()
     foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_PUBLIC_VAR})
       if(NOT ${_flag} STREQUAL ${_conf})
-        set_property(GLOBAL APPEND PROPERTY HPX_TARGET_COMPILE_OPTIONS_PUBLIC "${_flag}")
+        set_property(
+          GLOBAL APPEND PROPERTY HPX_TARGET_COMPILE_OPTIONS_PUBLIC "${_flag}"
+        )
       endif()
     endforeach()
     foreach(_flag ${HPX_TARGET_COMPILE_OPTIONS_PRIVATE_VAR})
       if(NOT ${_flag} STREQUAL ${_conf})
-        set_property(GLOBAL APPEND PROPERTY HPX_TARGET_COMPILE_OPTIONS_PRIVATE "${_flag}")
+        set_property(
+          GLOBAL APPEND PROPERTY HPX_TARGET_COMPILE_OPTIONS_PRIVATE "${_flag}"
+        )
       endif()
     endforeach()
   endforeach()
@@ -131,7 +154,10 @@ function(hpx_add_target_compile_definition FLAG)
   set(options PUBLIC)
   set(one_value_args)
   set(multi_value_args CONFIGURATIONS)
-  cmake_parse_arguments(HPX_ADD_TARGET_COMPILE_DEFINITION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_ADD_TARGET_COMPILE_DEFINITION "${options}" "${one_value_args}"
+    "${multi_value_args}" ${ARGN}
+  )
 
   if(HPX_ADD_TARGET_COMPILE_DEFINITION_PUBLIC)
     set(_dest hpx_public_flags)
@@ -152,9 +178,7 @@ function(hpx_add_target_compile_definition FLAG)
     target_compile_definitions(${_dest} INTERFACE "${_conf}")
   endforeach()
 
-#  if(HPX_WITH_CUDA AND (NOT MSVC))
-#    hpx_add_compile_flag(-D${FLAG})
-#  endif()
+  # if(HPX_WITH_CUDA AND (NOT MSVC)) hpx_add_compile_flag(-D${FLAG}) endif()
 endfunction()
 
 function(hpx_add_compile_flag)
@@ -165,7 +189,10 @@ endfunction()
 function(hpx_add_compile_flag_if_available FLAG)
   set(one_value_args NAME)
   set(multi_value_args CONFIGURATIONS LANGUAGES)
-  cmake_parse_arguments(HPX_ADD_COMPILE_FLAG_IA "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_ADD_COMPILE_FLAG_IA "${options}" "${one_value_args}"
+    "${multi_value_args}" ${ARGN}
+  )
 
   if(HPX_ADD_COMPILE_FLAG_IA_NAME)
     string(TOUPPER ${HPX_ADD_COMPILE_FLAG_IA_NAME} _name)
@@ -189,13 +216,16 @@ function(hpx_add_compile_flag_if_available FLAG)
     elseif(_lang STREQUAL "C")
       check_c_compiler_flag(${FLAG} HPX_WITH_${_lang}_FLAG_${_name})
     elseif(_lang STREQUAL "Fortran")
-      ## Assuming the C compiler accepts the same flags as the fortran one ...
+      # Assuming the C compiler accepts the same flags as the fortran one ...
       check_c_compiler_flag(${FLAG} HPX_WITH_${_lang}_FLAG_${_name})
     else()
       hpx_error("Unsupported language ${_lang}.")
     endif()
     if(HPX_WITH_${_lang}_FLAG_${_name})
-      hpx_add_compile_flag(${FLAG} CONFIGURATIONS ${HPX_ADD_COMPILE_FLAG_IA_CONFIGURATIONS} LANGUAGES ${_lang})
+      hpx_add_compile_flag(
+        ${FLAG} CONFIGURATIONS ${HPX_ADD_COMPILE_FLAG_IA_CONFIGURATIONS}
+        LANGUAGES ${_lang}
+      )
     else()
       hpx_info("\"${FLAG}\" not available for language ${_lang}.")
     endif()

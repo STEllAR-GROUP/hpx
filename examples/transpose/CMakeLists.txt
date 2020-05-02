@@ -5,25 +5,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(example_programs
-  transpose_serial
-  transpose_serial_block
-  transpose_smp
-  transpose_smp_block
+set(example_programs transpose_serial transpose_serial_block transpose_smp
+                     transpose_smp_block
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(example_programs
-    ${example_programs}
-    transpose_block
-    transpose_block_numa
-    transpose_serial_vector)
+  set(example_programs ${example_programs} transpose_block transpose_block_numa
+                       transpose_serial_vector
+  )
 endif()
 
 if(HPX_WITH_AWAIT OR HPX_WITH_CXX20_COROUTINES)
-  set(example_programs
-    ${example_programs}
-    transpose_await)
+  set(example_programs ${example_programs} transpose_await)
 endif()
 
 set(transpose_serial_vector_FLAGS DEPENDENCIES partitioned_vector_component)
@@ -31,8 +24,9 @@ set(transpose_serial_vector_FLAGS DEPENDENCIES partitioned_vector_component)
 set(transpose_smp_PARAMETERS THREADS_PER_LOCALITY 4)
 set(transpose_smp_block_PARAMETERS THREADS_PER_LOCALITY 4)
 set(transpose_block_PARAMETERS THREADS_PER_LOCALITY 4)
-set(transpose_block_numa_PARAMETERS THREADS_PER_LOCALITY 4
-    "--transpose-threads=4" "--transpose-numa-domains=1")
+set(transpose_block_numa_PARAMETERS
+    THREADS_PER_LOCALITY 4 "--transpose-threads=4" "--transpose-numa-domains=1"
+)
 
 foreach(example_program ${example_programs})
 
@@ -41,15 +35,17 @@ foreach(example_program ${example_programs})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${example_program}
-                     INTERNAL_FLAGS
-                     SOURCES ${sources}
-                     ${${example_program}_FLAGS}
-                     FOLDER "Examples/Transpose")
+  add_hpx_executable(
+    ${example_program} INTERNAL_FLAGS
+    SOURCES ${sources} ${${example_program}_FLAGS}
+    FOLDER "Examples/Transpose"
+  )
 
   add_hpx_example_target_dependencies("transpose" ${example_program})
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_example_test("transpose" ${example_program} ${${example_program}_PARAMETERS})
+    add_hpx_example_test(
+      "transpose" ${example_program} ${${example_program}_PARAMETERS}
+    )
   endif()
 endforeach()

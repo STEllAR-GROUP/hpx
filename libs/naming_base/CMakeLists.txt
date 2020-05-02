@@ -7,9 +7,7 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 # Default location is $HPX_ROOT/libs/naming_base/include
-set(naming_base_headers
-  hpx/naming_base.hpp
-  )
+set(naming_base_headers hpx/naming_base.hpp)
 
 # Default location is $HPX_ROOT/libs/naming_base/include_compatibility
 set(naming_base_compat_headers)
@@ -17,13 +15,12 @@ set(naming_base_compat_headers)
 set(naming_base_sources)
 
 include(HPX_AddModule)
-add_hpx_module(naming_base
+add_hpx_module(
+  naming_base
   COMPATIBILITY_HEADERS OFF
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
   HEADERS ${naming_base_headers}
-  DEPENDENCIES
-    hpx_config
+  DEPENDENCIES hpx_config
   CMAKE_SUBDIRS examples tests
 )

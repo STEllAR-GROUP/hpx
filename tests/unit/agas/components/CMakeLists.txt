@@ -7,29 +7,26 @@
 
 set(root "${PROJECT_SOURCE_DIR}/tests/unit/agas/components")
 
-add_hpx_component(simple_refcnt_checker
-  INTERNAL_FLAGS
+add_hpx_component(
+  simple_refcnt_checker INTERNAL_FLAGS
   DEPENDENCIES iostreams_component
   HEADER_GLOB "${root}/simple_refcnt_checker.h*"
   SOURCE_GLOB "${root}/simple_refcnt_checker.c*"
   FOLDER "Tests/Unit/AGAS"
-  EXCLUDE_FROM_ALL
-  AUTOGLOB)
+  EXCLUDE_FROM_ALL AUTOGLOB
+)
 
-add_hpx_component(managed_refcnt_checker
-  INTERNAL_FLAGS
+add_hpx_component(
+  managed_refcnt_checker INTERNAL_FLAGS
   DEPENDENCIES iostreams_component
   HEADER_GLOB "${root}/managed_refcnt_checker.h*"
   SOURCE_GLOB "${root}/managed_refcnt_checker.c*"
-  FOLDER "Tests/Unit/AGAS"
-  EXCLUDE_FROM_ALL
-  AUTOGLOB)
+  FOLDER "Tests/Unit/AGAS" EXCLUDE_FROM_ALL AUTOGLOB
+)
 
-add_hpx_component(simple_mobile_object
-  INTERNAL_FLAGS
+add_hpx_component(
+  simple_mobile_object INTERNAL_FLAGS
   HEADER_GLOB "${root}/simple_mobile_object.h*"
   SOURCE_GLOB "${root}/simple_mobile_object.c*"
-  FOLDER "Tests/Unit/AGAS"
-  EXCLUDE_FROM_ALL
-  AUTOGLOB)
-
+  FOLDER "Tests/Unit/AGAS" EXCLUDE_FROM_ALL AUTOGLOB
+)

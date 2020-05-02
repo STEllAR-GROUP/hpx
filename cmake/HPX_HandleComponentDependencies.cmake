@@ -19,6 +19,8 @@ function(hpx_handle_component_dependencies components)
     hpx_debug("hpx_handle_component_dependencies: ${tmp}")
   endforeach()
 
-  set(${components} ${tmp} PARENT_SCOPE)
+  set(${components}
+      ${tmp}
+      PARENT_SCOPE
+  )
 endfunction()
-

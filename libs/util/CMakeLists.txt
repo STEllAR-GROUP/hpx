@@ -7,43 +7,32 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(util_headers
-  hpx/util/detail/reserve.hpp
-  hpx/util/calculate_fanout.hpp
-  hpx/util/get_and_reset_value.hpp
-  hpx/util/get_entry_as.hpp
-  hpx/util/insert_checked.hpp
-  hpx/util/ios_flags_saver.hpp
-  hpx/util/manage_config.hpp
-  hpx/util/regex_from_pattern.hpp
-  hpx/util/sed_transform.hpp
-  hpx/util/traits/await_traits.hpp
+    hpx/util/detail/reserve.hpp
+    hpx/util/calculate_fanout.hpp
+    hpx/util/get_and_reset_value.hpp
+    hpx/util/get_entry_as.hpp
+    hpx/util/insert_checked.hpp
+    hpx/util/ios_flags_saver.hpp
+    hpx/util/manage_config.hpp
+    hpx/util/regex_from_pattern.hpp
+    hpx/util/sed_transform.hpp
+    hpx/util/traits/await_traits.hpp
 )
 
-set(util_compat_headers
-  hpx/traits/detail/reserve.hpp
-  hpx/util/await_traits.hpp
-)
+set(util_compat_headers hpx/traits/detail/reserve.hpp hpx/util/await_traits.hpp)
 
-set(util_sources
-  manage_config.cpp
-  regex_from_pattern.cpp
-  sed_transform.cpp
-)
+set(util_sources manage_config.cpp regex_from_pattern.cpp sed_transform.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(util
+add_hpx_module(
+  util
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${util_sources}
   HEADERS ${util_headers}
   COMPAT_HEADERS ${util_compat_headers}
-  DEPENDENCIES
-    hpx_config
-    hpx_concepts
-    hpx_errors
-    hpx_format
-    hpx_iterator_support
+  DEPENDENCIES hpx_config hpx_concepts hpx_errors hpx_format
+               hpx_iterator_support
   CMAKE_SUBDIRS examples tests
 )

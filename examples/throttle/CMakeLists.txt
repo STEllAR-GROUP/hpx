@@ -10,8 +10,7 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 # just recurse into all components subdirectories and execute the scripts there
-set(subdirs
-    throttle)
+set(subdirs throttle)
 
 # TODO: Add non-interactive version that can be tested.
 
@@ -19,25 +18,26 @@ set(subdirs
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 
-  set(sources
-      ${subdir}_client.cpp)
+  set(sources ${subdir}_client.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${subdir}_client
-    INTERNAL_FLAGS
+  add_hpx_executable(
+    ${subdir}_client INTERNAL_FLAGS
     SOURCES ${sources}
     DEPENDENCIES ${subdir}_component
-    FOLDER "Examples/Throttle")
+    FOLDER "Examples/Throttle"
+  )
 
   add_hpx_example_target_dependencies("throttle" ${subdir}_client)
 
 endforeach()
 
-add_hpx_executable(spin
-  INTERNAL_FLAGS
+add_hpx_executable(
+  spin INTERNAL_FLAGS
   SOURCES spin.cpp
-  FOLDER "Examples/Throttle")
+  FOLDER "Examples/Throttle"
+)
 
 add_hpx_example_target_dependencies("throttle" spin)

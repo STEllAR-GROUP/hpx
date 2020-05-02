@@ -8,23 +8,22 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(io_service_headers
-  hpx/io_service/io_service_pool.hpp
-  hpx/io_service/io_service_thread_pool.hpp)
+set(io_service_headers hpx/io_service/io_service_pool.hpp
+                       hpx/io_service/io_service_thread_pool.hpp
+)
 
 set(io_service_compat_headers
-  hpx/runtime/threads/detail/io_service_thread_pool.hpp
-  hpx/util/io_service_pool.hpp)
+    hpx/runtime/threads/detail/io_service_thread_pool.hpp
+    hpx/util/io_service_pool.hpp
+)
 
-set(io_service_sources
-  io_service_pool.cpp
-  io_service_thread_pool.cpp)
+set(io_service_sources io_service_pool.cpp io_service_thread_pool.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(io_service
+add_hpx_module(
+  io_service
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${io_service_sources}
   HEADERS ${io_service_headers}

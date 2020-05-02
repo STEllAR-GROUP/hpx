@@ -19,24 +19,31 @@ function(create_configuration_summary message module_name)
     set(upper_option_suffix "_${module_name_uc}")
   endif()
 
-  get_property(DEFINITIONS_VARS GLOBAL
-    PROPERTY HPX_CONFIG_DEFINITIONS${upper_option_suffix})
+  get_property(
+    DEFINITIONS_VARS GLOBAL
+    PROPERTY HPX_CONFIG_DEFINITIONS${upper_option_suffix}
+  )
   if(DEFINED DEFINITIONS_VARS)
     list(SORT DEFINITIONS_VARS)
     list(REMOVE_DUPLICATES DEFINITIONS_VARS)
   endif()
 
   get_cmake_property(_variableNames CACHE_VARIABLES)
-  foreach (_variableName ${_variableNames})
+  foreach(_variableName ${_variableNames})
     if(${_variableName}Category)
 
       # handle only options which start with HPX_WITH_
       string(FIND ${_variableName} "${upper_cfg_name}_WITH_" __pos)
 
-#      hpx_info("  ${_variableName} ${module_name} ${module_name_uc}, ${upper_cfg_name} ${__pos}")
+      # hpx_info("  ${_variableName} ${module_name} ${module_name_uc},
+      # ${upper_cfg_name} ${__pos}")
 
       if(${__pos} EQUAL 0)
-        get_property(_value CACHE "${_variableName}" PROPERTY VALUE)
+        get_property(
+          _value
+          CACHE "${_variableName}"
+          PROPERTY VALUE
+        )
         hpx_info("    ${_variableName}=${_value}")
 
         string(REPLACE "_WITH_" "_HAVE_" __variableName ${_variableName})
@@ -44,13 +51,20 @@ function(create_configuration_summary message module_name)
         if(NOT ${__pos} EQUAL -1)
           set(hpx_config_information
               "${hpx_config_information}"
-              "\n        \"${_variableName}=${_value}\",")
-        elseif(NOT ${_variableName}Category STREQUAL "Generic" AND NOT ${_variableName}Category STREQUAL "Build Targets")
-          get_property(_type CACHE "${_variableName}" PROPERTY TYPE)
+              "\n        \"${_variableName}=${_value}\","
+          )
+        elseif(NOT ${_variableName}Category STREQUAL "Generic"
+               AND NOT ${_variableName}Category STREQUAL "Build Targets"
+        )
+          get_property(
+            _type
+            CACHE "${_variableName}"
+            PROPERTY TYPE
+          )
           if(_type STREQUAL "BOOL")
-            set(hpx_config_information
-                "${hpx_config_information}"
-                "\n        \"${_variableName}=OFF\",")
+            set(hpx_config_information "${hpx_config_information}"
+                                       "\n        \"${_variableName}=OFF\","
+            )
           endif()
         endif()
 
@@ -78,12 +92,12 @@ function(create_configuration_summary message module_name)
 
   configure_file(
     "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
-    "${HPX_BINARY_DIR}/${_base_dir_local}/config_strings.hpp"
-    @ONLY)
+    "${HPX_BINARY_DIR}/${_base_dir_local}/config_strings.hpp" @ONLY
+  )
   configure_file(
     "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
     "${HPX_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${_base_dir}/config_strings.hpp"
-    @ONLY)
+    @ONLY
+  )
 
 endfunction()
-

@@ -25,15 +25,14 @@ if(HPX_WITH_HPXMP)
     set(_hpxmp_no_update NO_UPDATE)
   endif()
 
-  if (NOT HPXMP_ROOT)
+  if(NOT HPXMP_ROOT)
     # handle hpxMP library
     include(GitExternal)
-    git_external(hpxmp
-      https://github.com/STEllAR-GROUP/hpxMP.git
-      ${HPX_WITH_HPXMP_TAG}
-      ${_hpxmp_no_update}
-      VERBOSE)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/hpxmp)
+    git_external(
+      hpxmp https://github.com/STEllAR-GROUP/hpxMP.git ${HPX_WITH_HPXMP_TAG}
+      ${_hpxmp_no_update} VERBOSE
+    )
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/hpxmp)
       set(HPXMP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/hpxmp)
     else()
       hpx_error("hpxMP could not be found and HPX_WITH_HPXMP=On")

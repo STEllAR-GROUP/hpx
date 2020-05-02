@@ -26,7 +26,7 @@ set(tests
     async_unwrap_result
     remote_dataflow
     sync_remote
-   )
+)
 
 set(apply_colocated_PARAMETERS LOCALITIES 2)
 set(apply_remote_PARAMETERS LOCALITIES 2)
@@ -49,19 +49,18 @@ set(remote_dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
 set(remote_dataflow_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   set(folder_name "Tests/Unit/Modules/Async")
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER ${folder_name})
+    FOLDER ${folder_name}
+  )
 
   add_hpx_unit_test("modules.async" ${test} ${${test}_PARAMETERS})
 endforeach()

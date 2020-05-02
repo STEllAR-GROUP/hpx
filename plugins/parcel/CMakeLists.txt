@@ -7,8 +7,7 @@
 set(parcel_plugins)
 
 if(HPX_WITH_NETWORKING)
-  set(parcel_plugins ${parcel_plugins}
-    coalescing)
+  set(parcel_plugins ${parcel_plugins} coalescing)
 endif()
 
 foreach(type ${parcel_plugins})

@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # In case find_package(HPX) is called multiple times
-if (NOT TARGET hpx_dependencies_boost)
+if(NOT TARGET hpx_dependencies_boost)
   # We first try to find the required minimum set of Boost libraries. This will
   # also give us the version of the found boost installation
   if(HPX_WITH_STATIC_LINKING)
@@ -16,35 +16,63 @@ if (NOT TARGET hpx_dependencies_boost)
   # Add additional version to recognize
   set(Boost_ADDITIONAL_VERSIONS
       ${Boost_ADDITIONAL_VERSIONS}
-      "1.71.0" "1.71"
-      "1.70.0" "1.70"
-      "1.69.0" "1.69"
-      "1.68.0" "1.68"
-      "1.67.0" "1.67"
-      "1.66.0" "1.66"
-      "1.65.0" "1.65" "1.65.1" "1.65.1"
-      "1.64.0" "1.64"
-      "1.63.0" "1.63"
-      "1.62.0" "1.62"
-      "1.61.0" "1.61"
-      "1.60.0" "1.60"
-      "1.59.0" "1.59"
-      "1.58.0" "1.58"
-      "1.57.0" "1.57")
-  set(Boost_MINIMUM_VERSION "1.61" CACHE  INTERNAL "1.61" FORCE)
+      "1.71.0"
+      "1.71"
+      "1.70.0"
+      "1.70"
+      "1.69.0"
+      "1.69"
+      "1.68.0"
+      "1.68"
+      "1.67.0"
+      "1.67"
+      "1.66.0"
+      "1.66"
+      "1.65.0"
+      "1.65"
+      "1.65.1"
+      "1.65.1"
+      "1.64.0"
+      "1.64"
+      "1.63.0"
+      "1.63"
+      "1.62.0"
+      "1.62"
+      "1.61.0"
+      "1.61"
+      "1.60.0"
+      "1.60"
+      "1.59.0"
+      "1.59"
+      "1.58.0"
+      "1.58"
+      "1.57.0"
+      "1.57"
+  )
+  set(Boost_MINIMUM_VERSION
+      "1.61"
+      CACHE INTERNAL "1.61" FORCE
+  )
 
   set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
 
   # Find the headers and get the version
   find_package(Boost ${Boost_MINIMUM_VERSION} REQUIRED)
   if(NOT Boost_VERSION_STRING)
-    set(Boost_VERSION_STRING "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+    set(Boost_VERSION_STRING
+        "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}"
+    )
   endif()
 
   set(__boost_libraries "")
-  if(HPX_PARCELPORT_VERBS_WITH_LOGGING OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE OR
-     HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE)
-    set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono thread)
+  if(HPX_PARCELPORT_VERBS_WITH_LOGGING
+     OR HPX_PARCELPORT_VERBS_WITH_DEV_MODE
+     OR HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
+     OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE
+  )
+    set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono
+                          thread
+    )
   endif()
 
   # Boost.System is header-only from 1.69 onwards. But filesystem is needed the
@@ -64,16 +92,19 @@ if (NOT TARGET hpx_dependencies_boost)
 
   list(REMOVE_DUPLICATES __boost_libraries)
 
-  find_package(Boost ${Boost_MINIMUM_VERSION}
-    MODULE REQUIRED
-    COMPONENTS ${__boost_libraries})
+  find_package(
+    Boost ${Boost_MINIMUM_VERSION} MODULE REQUIRED
+    COMPONENTS ${__boost_libraries}
+  )
 
   if(NOT Boost_FOUND)
-    hpx_error("Could not find Boost. Please set BOOST_ROOT to point to your Boost installation.")
+    hpx_error(
+      "Could not find Boost. Please set BOOST_ROOT to point to your Boost installation."
+    )
   endif()
 
   # We are assuming that there is only one Boost Root
-  if (NOT BOOST_ROOT AND "$ENV{BOOST_ROOT}")
+  if(NOT BOOST_ROOT AND "$ENV{BOOST_ROOT}")
     set(BOOST_ROOT $ENV{BOOST_ROOT})
   elseif(NOT BOOST_ROOT)
     string(REPLACE "/include" "" BOOST_ROOT "${Boost_INCLUDE_DIRS}")
@@ -82,15 +113,19 @@ if (NOT TARGET hpx_dependencies_boost)
   add_library(hpx_dependencies_boost INTERFACE IMPORTED)
 
   # If we compile natively for the MIC, we need some workarounds for certain
-  # Boost headers
-  # FIXME: push changes upstream
+  # Boost headers FIXME: push changes upstream
   if(HPX_PLATFORM_UC STREQUAL "XEONPHI")
-    target_include_directories(hpx_dependencies_boost SYSTEM BEFORE INTERFACE ${PROJECT_SOURCE_DIR}/external/asio)
+    target_include_directories(
+      hpx_dependencies_boost SYSTEM BEFORE
+      INTERFACE ${PROJECT_SOURCE_DIR}/external/asio
+    )
   endif()
 
   target_link_libraries(hpx_dependencies_boost INTERFACE Boost::boost)
   foreach(__boost_library ${__boost_libraries})
-    target_link_libraries(hpx_dependencies_boost INTERFACE Boost::${__boost_library})
+    target_link_libraries(
+      hpx_dependencies_boost INTERFACE Boost::${__boost_library}
+    )
   endforeach()
 
   include(HPX_AddDefinitions)
@@ -109,5 +144,7 @@ if (NOT TARGET hpx_dependencies_boost)
     hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
   endif()
   hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
-  target_link_libraries(hpx_dependencies_boost INTERFACE Boost::disable_autolinking)
+  target_link_libraries(
+    hpx_dependencies_boost INTERFACE Boost::disable_autolinking
+  )
 endif()

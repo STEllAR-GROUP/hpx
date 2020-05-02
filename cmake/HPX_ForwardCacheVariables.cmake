@@ -16,22 +16,21 @@ list(FILTER cache_vars EXCLUDE REGEX "Category$")
 
 # Generate HPXCacheVariables.cmake in the BUILD directory
 set(_cache_var_file
-  ${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/${HPX_PACKAGE_NAME}CacheVariables.cmake)
+    ${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/${HPX_PACKAGE_NAME}CacheVariables.cmake
+)
 set(_cache_var_file_template
-  "${HPX_SOURCE_DIR}/cmake/templates/${HPX_PACKAGE_NAME}CacheVariables.cmake.in")
+    "${HPX_SOURCE_DIR}/cmake/templates/${HPX_PACKAGE_NAME}CacheVariables.cmake.in"
+)
 set(_cache_variables)
 foreach(_var IN LISTS cache_vars)
   set(_cache_variables "${_cache_variables}set(${_var} ${${_var}})\n")
 endforeach()
 
-configure_file(
-  ${_cache_var_file_template}
-  ${_cache_var_file})
+configure_file(${_cache_var_file_template} ${_cache_var_file})
 
 # Install the HPXCacheVariables.cmake in the INSTALL directory
 install(
   FILES ${_cache_var_file}
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
   COMPONENT cmake
-  )
-
+)

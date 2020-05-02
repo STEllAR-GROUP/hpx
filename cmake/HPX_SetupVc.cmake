@@ -4,34 +4,22 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Locate the Vc template library.
-# Vc can be found at https://github.com/VcDevel/Vc
+# Locate the Vc template library. Vc can be found at
+# https://github.com/VcDevel/Vc
 #
 # This file is meant to be copied into projects that want to use Vc. It will
 # search for VcConfig.cmake, which ships with Vc and will provide up-to-date
 # buildsystem changes. Thus there should not be any need to update FindVc.cmake
 # again after you integrated it into your project.
 #
-# This module defines the following variables:
-# Vc_FOUND
-# Vc_INCLUDE_DIR
-# Vc_LIBRARIES
-# Vc_DEFINITIONS
-# Vc_COMPILE_FLAGS
-# Vc_ARCHITECTURE_FLAGS
-# Vc_ALL_FLAGS (the union of the above three variables)
-# Vc_VERSION_MAJOR
-# Vc_VERSION_MINOR
-# Vc_VERSION_PATCH
-# Vc_VERSION
-# Vc_VERSION_STRING
-# Vc_INSTALL_DIR
-# Vc_LIB_DIR
-# Vc_CMAKE_MODULES_DIR
+# This module defines the following variables: Vc_FOUND Vc_INCLUDE_DIR
+# Vc_LIBRARIES Vc_DEFINITIONS Vc_COMPILE_FLAGS Vc_ARCHITECTURE_FLAGS
+# Vc_ALL_FLAGS (the union of the above three variables) Vc_VERSION_MAJOR
+# Vc_VERSION_MINOR Vc_VERSION_PATCH Vc_VERSION Vc_VERSION_STRING Vc_INSTALL_DIR
+# Vc_LIB_DIR Vc_CMAKE_MODULES_DIR
 #
 # The following two variables are set according to the compiler used. Feel free
-# to use them to skip whole compilation units.
-# Vc_SSE_INTRINSICS_BROKEN
+# to use them to skip whole compilation units. Vc_SSE_INTRINSICS_BROKEN
 # Vc_AVX_INTRINSICS_BROKEN
 
 if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
@@ -40,17 +28,23 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
   if(NOT Vc_FOUND)
     if(NOT Vc_VERSION_STRING)
       # didn't find any version of Vc
-      hpx_error("Vc was not found while datapar support was requested. Set Vc_DIR to the installation path of Vc")
+      hpx_error(
+        "Vc was not found while datapar support was requested. Set Vc_DIR to the installation path of Vc"
+      )
     elseif(${Vc_VERSION_STRING} VERSION_LESS "1.70.0")
       # didn't find current version of Vc
-      hpx_error("The Vc was found for requested datapar support was too old. Set Vc_DIR to the installation path of Vc (V1.70.0 is required)")
+      hpx_error(
+        "The Vc was found for requested datapar support was too old. Set Vc_DIR to the installation path of Vc (V1.70.0 is required)"
+      )
     endif()
   endif()
 
   if(Vc_VERSION_STRING AND (NOT ${Vc_VERSION_STRING} VERSION_LESS "1.70.0"))
     # found Vc V2
     if(NOT Vc_INCLUDE_DIR)
-      hpx_error("Vc was not found while datapar support was requested. Set Vc_DIR to the installation path of Vc")
+      hpx_error(
+        "Vc was not found while datapar support was requested. Set Vc_DIR to the installation path of Vc"
+      )
     endif()
     set(HPX_WITH_DATAPAR_VC_NO_LIBRARY On)
   endif()
@@ -79,7 +73,9 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
   # do not include Vc build flags for MSVC builds as this breaks building the
   # core HPX libraries itself
   if(NOT MSVC)
-    target_compile_options(Vc::vc INTERFACE ${Vc_COMPILE_FLAGS} ${Vc_ARCHITECTURE_FLAGS})
+    target_compile_options(
+      Vc::vc INTERFACE ${Vc_COMPILE_FLAGS} ${Vc_ARCHITECTURE_FLAGS}
+    )
   else()
     hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
   endif()
@@ -87,5 +83,7 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
   hpx_add_config_define(HPX_HAVE_DATAPAR)
   hpx_add_config_define(HPX_HAVE_DATAPAR_VC)
 
-  hpx_info("Found Vc (vectorization):" ${Vc_INCLUDE_DIR} "- version:" ${Vc_VERSION_STRING})
+  hpx_info("Found Vc (vectorization):" ${Vc_INCLUDE_DIR} "- version:"
+           ${Vc_VERSION_STRING}
+  )
 endif()

@@ -9,31 +9,28 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(batch_environments_headers
-  hpx/batch_environments/alps_environment.hpp
-  hpx/batch_environments/batch_environment.hpp
-  hpx/batch_environments/pbs_environment.hpp
-  hpx/batch_environments/slurm_environment.hpp
+    hpx/batch_environments/alps_environment.hpp
+    hpx/batch_environments/batch_environment.hpp
+    hpx/batch_environments/pbs_environment.hpp
+    hpx/batch_environments/slurm_environment.hpp
 )
 
 set(batch_environments_compat_headers
-  hpx/util/batch_environments/alps_environment.hpp
-  hpx/util/batch_environment.hpp
-  hpx/util/batch_environments/pbs_environment.hpp
-  hpx/util/batch_environments/slurm_environment.hpp
+    hpx/util/batch_environments/alps_environment.hpp
+    hpx/util/batch_environment.hpp
+    hpx/util/batch_environments/pbs_environment.hpp
+    hpx/util/batch_environments/slurm_environment.hpp
 )
 
-set(batch_environments_sources
-  alps_environment.cpp
-  batch_environment.cpp
-  pbs_environment.cpp
-  slurm_environment.cpp
+set(batch_environments_sources alps_environment.cpp batch_environment.cpp
+                               pbs_environment.cpp slurm_environment.cpp
 )
 
 include(HPX_AddModule)
-add_hpx_module(batch_environments
+add_hpx_module(
+  batch_environments
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${batch_environments_sources}
   HEADERS ${batch_environments_headers}

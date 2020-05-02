@@ -7,38 +7,37 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(segmented_algorithms_headers
-  hpx/parallel/segmented_algorithm.hpp
-  hpx/parallel/segmented_algorithms/adjacent_difference.hpp
-  hpx/parallel/segmented_algorithms/adjacent_find.hpp
-  hpx/parallel/segmented_algorithms/all_any_none.hpp
-  hpx/parallel/segmented_algorithms/count.hpp
-  hpx/parallel/segmented_algorithms/detail/dispatch.hpp
-  hpx/parallel/segmented_algorithms/detail/reduce.hpp
-  hpx/parallel/segmented_algorithms/detail/scan.hpp
-  hpx/parallel/segmented_algorithms/detail/transfer.hpp
-  hpx/parallel/segmented_algorithms/exclusive_scan.hpp
-  hpx/parallel/segmented_algorithms/fill.hpp
-  hpx/parallel/segmented_algorithms/find.hpp
-  hpx/parallel/segmented_algorithms/for_each.hpp
-  hpx/parallel/segmented_algorithms/generate.hpp
-  hpx/parallel/segmented_algorithms/inclusive_scan.hpp
-  hpx/parallel/segmented_algorithms/minmax.hpp
-  hpx/parallel/segmented_algorithms/reduce.hpp
-  hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp
-  hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp
-  hpx/parallel/segmented_algorithms/transform.hpp
-  hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp
-  hpx/parallel/segmented_algorithms/transform_reduce.hpp
+    hpx/parallel/segmented_algorithm.hpp
+    hpx/parallel/segmented_algorithms/adjacent_difference.hpp
+    hpx/parallel/segmented_algorithms/adjacent_find.hpp
+    hpx/parallel/segmented_algorithms/all_any_none.hpp
+    hpx/parallel/segmented_algorithms/count.hpp
+    hpx/parallel/segmented_algorithms/detail/dispatch.hpp
+    hpx/parallel/segmented_algorithms/detail/reduce.hpp
+    hpx/parallel/segmented_algorithms/detail/scan.hpp
+    hpx/parallel/segmented_algorithms/detail/transfer.hpp
+    hpx/parallel/segmented_algorithms/exclusive_scan.hpp
+    hpx/parallel/segmented_algorithms/fill.hpp
+    hpx/parallel/segmented_algorithms/find.hpp
+    hpx/parallel/segmented_algorithms/for_each.hpp
+    hpx/parallel/segmented_algorithms/generate.hpp
+    hpx/parallel/segmented_algorithms/inclusive_scan.hpp
+    hpx/parallel/segmented_algorithms/minmax.hpp
+    hpx/parallel/segmented_algorithms/reduce.hpp
+    hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp
+    hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp
+    hpx/parallel/segmented_algorithms/transform.hpp
+    hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp
+    hpx/parallel/segmented_algorithms/transform_reduce.hpp
 )
 
-set(segmented_algorithms_compat_headers
-  hpx/util/zip_iterator.hpp)
+set(segmented_algorithms_compat_headers hpx/util/zip_iterator.hpp)
 
 include(HPX_AddModule)
-add_hpx_module(segmented_algorithms
+add_hpx_module(
+  segmented_algorithms
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   HEADERS ${segmented_algorithms_headers}
   COMPAT_HEADERS ${segmented_algorithms_compat_headers}
   DEPENDENCIES

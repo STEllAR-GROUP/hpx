@@ -132,11 +132,10 @@ set(tests
     uninitialized_value_constructn
     unique
     unique_copy
-   )
+)
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -145,13 +144,13 @@ foreach(test ${tests})
   set(folder_name "Tests/Unit/Modules/Algorithms")
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER ${folder_name})
+    FOLDER ${folder_name}
+  )
 
   add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
 endforeach()

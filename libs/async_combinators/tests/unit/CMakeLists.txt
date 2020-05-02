@@ -16,22 +16,21 @@ set(tests
     when_each
     when_some
     when_some_std_array
-   )
+)
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   set(folder_name "Tests/Unit/Modules/AsyncCombinators")
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER ${folder_name})
+    FOLDER ${folder_name}
+  )
 
   add_hpx_unit_test("modules.async_combinators" ${test} ${${test}_PARAMETERS})
 endforeach()

@@ -10,17 +10,25 @@
 set(parcelport_plugins)
 
 if(HPX_WITH_NETWORKING)
-  set(parcelport_plugins ${parcelport_plugins}
-    libfabric
-    verbs
-    mpi
-    tcp)
+  set(parcelport_plugins ${parcelport_plugins} libfabric verbs mpi tcp)
 endif()
 
-set(HPX_STATIC_PARCELPORT_PLUGINS "" CACHE INTERNAL "" FORCE)
-set(HPX_STATIC_PARCELPORT_PLUGINS_HEADERS "" CACHE INTERNAL "" FORCE)
-set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES "" CACHE INTERNAL "" FORCE)
-set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES "" CACHE INTERNAL "" FORCE)
+set(HPX_STATIC_PARCELPORT_PLUGINS
+    ""
+    CACHE INTERNAL "" FORCE
+)
+set(HPX_STATIC_PARCELPORT_PLUGINS_HEADERS
+    ""
+    CACHE INTERNAL "" FORCE
+)
+set(HPX_STATIC_PARCELPORT_PLUGINS_SOURCES
+    ""
+    CACHE INTERNAL "" FORCE
+)
+set(HPX_STATIC_PARCELPORT_PLUGINS_PROPERTIES
+    ""
+    CACHE INTERNAL "" FORCE
+)
 
 foreach(type ${parcelport_plugins})
   add_hpx_pseudo_target(plugins.parcelport.${type})
@@ -36,30 +44,35 @@ set(_parcelport_export)
 set(_parcelport_init)
 foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
   set(_parcelport_export
-    "${_parcelport_export}HPX_EXPORT hpx::plugins::parcelport_factory_base *${parcelport}_factory_init(\n")
+      "${_parcelport_export}HPX_EXPORT hpx::plugins::parcelport_factory_base *${parcelport}_factory_init(\n"
+  )
   set(_parcelport_export
-    "${_parcelport_export}    std::vector<hpx::plugins::parcelport_factory_base *>& factories);\n")
+      "${_parcelport_export}    std::vector<hpx::plugins::parcelport_factory_base *>& factories);\n"
+  )
   set(_parcelport_init
-    "${_parcelport_init}        ${parcelport}_factory_init(factories);\n")
+      "${_parcelport_init}        ${parcelport}_factory_init(factories);\n"
+  )
 endforeach()
 
-configure_file("${PROJECT_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
-  "${PROJECT_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp"
-  @ONLY)
+configure_file(
+  "${PROJECT_SOURCE_DIR}/cmake/templates/static_parcelports.hpp.in"
+  "${PROJECT_BINARY_DIR}/hpx/runtime/parcelset/static_parcelports.hpp" @ONLY
+)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Write parcelport_defines.hpp
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # write config to build dir
 write_config_defines_file(
   TEMPLATE ""
   NAMESPACE "parcelport"
-  FILENAME "${PROJECT_BINARY_DIR}/hpx/config/parcelport_defines.hpp")
+  FILENAME "${PROJECT_BINARY_DIR}/hpx/config/parcelport_defines.hpp"
+)
 
 # write config to install dir
 write_config_defines_file(
   TEMPLATE ""
   NAMESPACE "parcelport"
   FILENAME
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/parcelport_defines.hpp")
-
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/parcelport_defines.hpp"
+)
