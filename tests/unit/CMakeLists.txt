@@ -7,10 +7,8 @@
 
 set(subdirs
     build
-    diagnostics
     lcos
     resource
-    threads
     traits
     util
    )

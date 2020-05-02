@@ -9,9 +9,7 @@ set(tests
    )
 
 set(subdirs
-    bind
     function
-    mem_fn
    )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)

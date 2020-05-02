@@ -22,16 +22,19 @@ if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
 
   if(HPX_WITH_EMBEDDED_THREAD_POOLS_COMPATIBILITY)
     set(tests ${tests}
+      resource_manager
       thread_pool_executors
+      thread_suspension_executor
       timed_this_thread_executors
       timed_thread_pool_executors
       )
   endif()
 endif()
 
+set(resource_manager_PARAMETERS THREADS_PER_LOCALITY 4)
+
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
 

@@ -470,32 +470,6 @@ jobs:
       - store_artifacts:
           path: tests.unit.component
 
-  tests.unit.diagnostics:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.diagnostics
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.diagnostics
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.diagnostics
-      - store_artifacts:
-          path: tests.unit.diagnostics
-
   tests.unit.lcos:
     <<: *defaults
     steps:
@@ -573,32 +547,6 @@ jobs:
           path: tests.unit.resource
       - store_artifacts:
           path: tests.unit.resource
-
-  tests.unit.threads:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.threads
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.threads
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.threads
-      - store_artifacts:
-          path: tests.unit.threads
 
   tests.unit.traits:
     <<: *defaults
@@ -698,6 +646,7 @@ jobs:
                   tests.unit.modules.resiliency \
                   tests.unit.modules.resource_partitioner \
                   tests.unit.modules.runtime_configuration \
+                  tests.unit.modules.schedulers \
                   tests.unit.modules.serialization \
                   tests.unit.modules.static_reinit \
                   tests.unit.modules.statistics \
@@ -1050,15 +999,11 @@ workflows:
           <<: *core_dependency
       - tests.unit.component:
           <<: *core_dependency
-      - tests.unit.diagnostics:
-          <<: *core_dependency
       - tests.unit.lcos:
           <<: *core_dependency
       - tests.unit.parcelset:
           <<: *core_dependency
       - tests.unit.resource:
-          <<: *core_dependency
-      - tests.unit.threads:
           <<: *core_dependency
       - tests.unit.traits:
           <<: *core_dependency
@@ -1095,11 +1040,9 @@ workflows:
             - tests.unit.agas
             - tests.unit.build
             - tests.unit.component
-            - tests.unit.diagnostics
             - tests.unit.lcos
             - tests.unit.parcelset
             - tests.unit.resource
-            - tests.unit.threads
             - tests.unit.traits
             - tests.unit.util
             - tests.unit.modules
