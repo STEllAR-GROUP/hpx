@@ -100,7 +100,7 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
   endif()
 endif()
 
-if(HPX_WITH_STACKTRACES)
+if(HPX_WITH_STACKTRACES AND HPX_WITH_STACKTRACES_STATIC_SYMBOLS)
   # Add -Wl,-E to linker for executables on Linux(Clang or gcc)
   # this will add all symbols to the dynamic symbol table
   if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") AND

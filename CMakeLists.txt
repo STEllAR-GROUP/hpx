@@ -541,6 +541,19 @@ if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
     CATEGORY "Thread Manager" ADVANCED)
   hpx_add_config_define(HPX_HAVE_THREAD_BACKTRACE_DEPTH
     ${HPX_WITH_THREAD_BACKTRACE_DEPTH})
+
+  if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") AND
+     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+
+    # This option is OFF by default as we have seen random segfaults out in the
+    # wild if this is enabled.
+    hpx_option(HPX_WITH_STACKTRACES_STATIC_SYMBOLS BOOL
+      "Thread stack back trace will resolve static symbols (default: OFF)"
+      OFF
+      CATEGORY "Thread Manager" ADVANCED)
+    hpx_add_config_define(HPX_HAVE_STACKTRACES_STATIC_SYMBOLS
+      ${HPX_WITH_STACKTRACES_STATIC_SYMBOLS})
+  endif()
 endif()
 
 if(HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)

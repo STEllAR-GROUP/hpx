@@ -244,6 +244,13 @@ namespace hpx { namespace util { namespace stack_trace {
     HPX_API_EXPORT std::string get_symbols(
         void* const* addresses, std::size_t size)
     {
+        // the first two stack frames are from the back tracing facility itself
+        if (size > 2)
+        {
+            addresses += 2;
+            size -= 2;
+        }
+
         std::string res =
             std::to_string(size) + ((1 == size) ? " frame:" : " frames:");
         for (std::size_t i = 0; i < size; i++)
@@ -282,6 +289,13 @@ namespace hpx { namespace util { namespace stack_trace {
     HPX_API_EXPORT std::string get_symbols(
         void* const* address, std::size_t size)
     {
+        // the first two stack frames are from the back tracing facility itself
+        if (size > 2)
+        {
+            addresses += 2;
+            size -= 2;
+        }
+
         char** ptr = backtrace_symbols(address, size);
         try
         {
@@ -383,6 +397,13 @@ namespace hpx { namespace util { namespace stack_trace {
     HPX_API_EXPORT std::string get_symbols(
         void* const* addresses, std::size_t size)
     {
+        // the first two stack frames are from the back tracing facility itself
+        if (size > 2)
+        {
+            addresses += 2;
+            size -= 2;
+        }
+
         std::string res =
             std::to_string(size) + ((1 == size) ? " frame:" : " frames:");
         for (std::size_t i = 0; i < size; i++)
@@ -429,6 +450,14 @@ namespace hpx { namespace util { namespace stack_trace {
     {
         if (!ptrs)
             return std::string();
+
+        // the first two stack frames are from the back tracing facility itself
+        if (size > 2)
+        {
+            ptrs += 2;
+            size -= 2;
+        }
+
         std::ostringstream res;
         res.imbue(std::locale::classic());
         write_symbols(ptrs, size, res);
