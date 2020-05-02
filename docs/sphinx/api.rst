@@ -19,7 +19,6 @@ We do not provide any ABI compatibility guarantees between any versions, debug
 and release builds, and builds with different C++ standards.
 
 ..
-
    We follow |semver|_ for our API (starting from |hpx| 2.0.0). This means that
    patch releases never change the public API, neither with additions nor
    removals. Minor releases may add new functionality to the public API. Major
