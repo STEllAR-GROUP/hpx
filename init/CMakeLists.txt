@@ -100,6 +100,15 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (
   endif()
 endif()
 
+if(HPX_WITH_STACKTRACES)
+  # Add -Wl,-E to linker for executables on Linux(Clang or gcc)
+  # this will add all symbols to the dynamic symbol table
+  if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") AND
+     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+    target_link_libraries(hpx_init INTERFACE "-Wl,-E")
+  endif()
+endif()
+
 install(
   TARGETS hpx_init
   EXPORT HPXTargets
