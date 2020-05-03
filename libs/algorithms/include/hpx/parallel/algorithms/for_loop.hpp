@@ -49,7 +49,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts, std::size_t... Is>
-        HPX_HOST_DEVICE HPX_FORCEINLINE void init_iteration(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void init_iteration(
             hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
             std::size_t part_index)
         {
@@ -59,7 +59,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         }
 
         template <typename... Ts, std::size_t... Is, typename F, typename B>
-        HPX_HOST_DEVICE HPX_FORCEINLINE void invoke_iteration(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void invoke_iteration(
             hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>, F&& f,
             B part_begin)
         {
@@ -68,7 +68,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         }
 
         template <typename... Ts, std::size_t... Is>
-        HPX_HOST_DEVICE HPX_FORCEINLINE void next_iteration(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
             hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
             std::size_t part_index)
         {
@@ -78,7 +78,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         }
 
         template <typename... Ts, std::size_t... Is>
-        HPX_HOST_DEVICE HPX_FORCEINLINE void exit_iteration(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void exit_iteration(
             hpx::util::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
             std::size_t size)
         {
