@@ -6,7 +6,6 @@
 
 #pragma once
 
-// #define BOOST_NO_CXX11_ALLOCATOR
 #define CUDA_API_PER_THREAD_DEFAULT_STREAM
 //
 #include <hpx/cuda_support/target.hpp>

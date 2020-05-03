@@ -114,11 +114,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
+    // create a cuda target using device number 0,1,2...
     hpx::cuda::target target(device);
-    //
+
+    // create a stream helper object
     hpx::cuda::cuda_future_helper helper(device);
+    // for debug purposes, print out available targets
     helper.print_local_targets();
-    //
+
     float testf = 2.345;
     cuda_trivial_kernel(testf, helper.get_stream());
 
