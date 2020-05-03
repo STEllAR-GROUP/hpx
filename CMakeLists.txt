@@ -498,13 +498,13 @@ hpx_option(HPX_WITH_CUDA_COMPUTE BOOL
 hpx_option(HPX_WITH_CUDA_SUPPORT BOOL
   "Enable basic support for CUDA futures (default: OFF)" OFF ADVANCED)
 if(HPX_WITH_CUDA)
-  set(HPX_WITH_CUDA_COMPUTE ON CACHE BOOL "Enable full hpx compute capability with cuda backend" FORCE)
-  set(HPX_WITH_CUDA_SUPPORT ON CACHE BOOL "Enable generation of hpx futures from cuda invocations" FORCE)
+  set(HPX_WITH_CUDA_COMPUTE ON CACHE BOOL "Enable full HPX compute capability with CUDA backend" FORCE)
+  set(HPX_WITH_CUDA_SUPPORT ON CACHE BOOL "Enable generation of HPX futures from CUDA invocations" FORCE)
 endif()
 if (HPX_WITH_CUDA_COMPUTE)
-  set(HPX_WITH_CUDA ON CACHE BOOL "Enable cuda compute backend as well as cuda/hpx futures" FORCE)
+  set(HPX_WITH_CUDA ON CACHE BOOL "Enable CUDA compute backend as well as CUDA/HPX futures" FORCE)
 else()
-  set(HPX_WITH_CUDA OFF CACHE BOOL "Disable hpc compute cuda backend" FORCE)
+  set(HPX_WITH_CUDA OFF CACHE BOOL "Disable HPX compute CUDA backend and support" FORCE)
 endif()
 
 # ##############################################################################
