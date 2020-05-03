@@ -23,20 +23,20 @@ namespace hpx { namespace util {
 
         struct lock_data
         {
-            lock_data()
+            lock_data(std::size_t trace_depth)
               : ignore_(false)
               , user_data_(nullptr)
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-              , backtrace_(hpx::util::trace())
+              , backtrace_(hpx::util::trace(trace_depth))
 #endif
             {
             }
 
-            lock_data(register_lock_data* data)
+            lock_data(register_lock_data* data, std::size_t trace_depth)
               : ignore_(false)
               , user_data_(data)
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-              , backtrace_(hpx::detail::trace())
+              , backtrace_(hpx::detail::trace(trace_depth))
 #endif
             {
             }
@@ -73,6 +73,7 @@ namespace hpx { namespace util {
             static thread_local held_locks_data held_locks_;
 
             static bool lock_detection_enabled_;
+            static std::size_t lock_detection_trace_depth_;
 
             static held_locks_map& get_lock_map()
             {
@@ -103,6 +104,8 @@ namespace hpx { namespace util {
         thread_local register_locks::held_locks_data
             register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
+        std::size_t register_locks::lock_detection_trace_depth_ =
+            HPX_HAVE_THREAD_BACKTRACE_DEPTH;
 
         struct reset_lock_enabled_on_exit
         {
@@ -129,6 +132,11 @@ namespace hpx { namespace util {
     void disable_lock_detection()
     {
         detail::register_locks::lock_detection_enabled_ = false;
+    }
+
+    void trace_depth_lock_detection(std::size_t value)
+    {
+        detail::register_locks::lock_detection_trace_depth_ = value;
     }
 
     static registered_locks_error_handler_type registered_locks_error_handler;
@@ -164,13 +172,15 @@ namespace hpx { namespace util {
             std::pair<register_locks::held_locks_map::iterator, bool> p;
             if (!data)
             {
-                p = held_locks.insert(
-                    std::make_pair(lock, detail::lock_data()));
+                p = held_locks.insert(std::make_pair(lock,
+                    detail::lock_data(
+                        register_locks::lock_detection_trace_depth_)));
             }
             else
             {
-                p = held_locks.insert(
-                    std::make_pair(lock, detail::lock_data(data)));
+                p = held_locks.insert(std::make_pair(lock,
+                    detail::lock_data(
+                        data, register_locks::lock_detection_trace_depth_)));
             }
             return p.second;
         }

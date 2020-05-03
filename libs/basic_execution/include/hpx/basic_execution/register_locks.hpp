@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 
+#include <cstddef>
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -39,6 +40,7 @@ namespace hpx { namespace util {
     HPX_API_EXPORT void force_error_on_lock();
     HPX_API_EXPORT void enable_lock_detection();
     HPX_API_EXPORT void disable_lock_detection();
+    HPX_API_EXPORT void trace_depth_lock_detection(std::size_t value);
     HPX_API_EXPORT void ignore_lock(void const* lock);
     HPX_API_EXPORT void reset_ignored(void const* lock);
     HPX_API_EXPORT void ignore_all_locks();
@@ -113,23 +115,25 @@ namespace hpx { namespace util {
         ignore_all_while_checking() {}
     };
 
-    inline bool register_lock(void const*, util::register_lock_data* = nullptr)
+    constexpr inline bool register_lock(
+        void const*, util::register_lock_data* = nullptr)
     {
         return true;
     }
-    inline bool unregister_lock(void const*)
+    constexpr inline bool unregister_lock(void const*)
     {
         return true;
     }
-    inline void verify_no_locks() {}
-    inline void force_error_on_lock() {}
-    inline void enable_lock_detection() {}
-    inline void disable_lock_detection() {}
-    inline void ignore_lock(void const* /*lock*/) {}
-    inline void reset_ignored(void const* /*lock*/) {}
+    constexpr inline void verify_no_locks() {}
+    constexpr inline void force_error_on_lock() {}
+    constexpr inline void enable_lock_detection() {}
+    constexpr inline void disable_lock_detection() {}
+    constexpr inline void trace_depth_lock_detection(std::size_t /*value*/) {}
+    constexpr inline void ignore_lock(void const* /*lock*/) {}
+    constexpr inline void reset_ignored(void const* /*lock*/) {}
 
-    inline void ignore_all_locks() {}
-    inline void reset_ignored_all() {}
+    constexpr inline void ignore_all_locks() {}
+    constexpr inline void reset_ignored_all() {}
 #endif
 }}    // namespace hpx::util
 

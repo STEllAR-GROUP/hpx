@@ -37,6 +37,7 @@ namespace hpx { namespace util {
         {
             if (frames_no == 0)
                 return;
+            frames_no += 2;    // we omit two frames from printing
             frames_.resize(frames_no, nullptr);
             std::size_t size = stack_trace::trace(&frames_.front(), frames_no);
             if (size != 0)

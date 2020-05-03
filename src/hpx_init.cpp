@@ -365,6 +365,7 @@ namespace hpx
             if (cms.rtcfg_.enable_lock_detection())
             {
                 util::enable_lock_detection();
+                util::trace_depth_lock_detection(cms.rtcfg_.trace_depth());
             }
             else
             {

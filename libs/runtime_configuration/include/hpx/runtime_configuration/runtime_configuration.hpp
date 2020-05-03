@@ -110,6 +110,9 @@ namespace hpx { namespace util {
         bool use_stack_guard_pages() const;
 #endif
 
+        // return trace_depth for stack-backtraces
+        std::size_t trace_depth() const;
+
         // Returns the number of OS threads this locality is running.
         std::size_t get_os_thread_count() const;
 

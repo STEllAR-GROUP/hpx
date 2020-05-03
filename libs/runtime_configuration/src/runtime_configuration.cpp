@@ -180,6 +180,8 @@ namespace hpx { namespace util {
             "attach_debugger = ${HPX_ATTACH_DEBUGGER}",
 #endif
             "exception_verbosity = ${HPX_EXCEPTION_VERBOSITY:2}",
+            "trace_depth = ${HPX_TRACE_DEPTH:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_HAVE_THREAD_BACKTRACE_DEPTH)) "}",
 
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
@@ -1072,6 +1074,20 @@ namespace hpx { namespace util {
 #else
         return std::size_t(-1);
 #endif
+    }
+
+    std::size_t runtime_configuration::trace_depth() const
+    {
+        if (has_section("hpx"))
+        {
+            util::section const* sec = get_section("hpx");
+            if (nullptr != sec)
+            {
+                return hpx::util::get_entry_as<std::size_t>(
+                    *sec, "trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH);
+            }
+        }
+        return HPX_HAVE_THREAD_BACKTRACE_DEPTH;
     }
 
     std::size_t runtime_configuration::get_os_thread_count() const

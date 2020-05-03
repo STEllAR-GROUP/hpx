@@ -79,7 +79,11 @@ namespace hpx {
 #if defined(HPX_HAVE_STACKTRACES)
             if (verbosity >= 1)
             {
-                std::cerr << "{stack-trace}: " << hpx::util::trace() << "\n";
+                std::size_t const trace_depth =
+                    util::from_string<std::size_t>(get_config_entry(
+                        "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
+                std::cerr << "{stack-trace}: " << hpx::util::trace(trace_depth)
+                          << "\n";
             }
 #endif
 
@@ -150,7 +154,11 @@ namespace hpx {
 #if defined(HPX_HAVE_STACKTRACES)
             if (verbosity >= 1)
             {
-                std::cerr << "{stack-trace}: " << hpx::util::trace() << "\n";
+                std::size_t const trace_depth =
+                    util::from_string<std::size_t>(get_config_entry(
+                        "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
+                std::cerr << "{stack-trace}: " << hpx::util::trace(trace_depth)
+                          << "\n";
             }
 #endif
 
