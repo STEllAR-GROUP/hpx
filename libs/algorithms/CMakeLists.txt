@@ -126,6 +126,7 @@ set(algorithms_headers
     hpx/parallel/util/zip_iterator.hpp
 )
 
+# cmake-format: off
 set(algorithms_compat_headers
     hpx/parallel/traits/projected.hpp
     hpx/parallel/traits/projected_range.hpp
@@ -134,6 +135,7 @@ set(algorithms_compat_headers
     hpx/util/tagged_pair.hpp
     hpx/util/tagged_tuple.hpp
 )
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(
