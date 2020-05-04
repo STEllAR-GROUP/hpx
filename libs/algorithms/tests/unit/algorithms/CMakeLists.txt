@@ -54,6 +54,7 @@ set(tests
     foreachn_projection_exception
     foreachn_projection_bad_alloc
     for_loop
+    for_loop_exception
     for_loop_induction
     for_loop_induction_async
     for_loop_n
