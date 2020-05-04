@@ -29,7 +29,7 @@
 #include <hpx/util/serialize_exception.hpp>
 
 #if defined(HPX_HAVE_AWAIT)
-    #include <hpx/lcos/detail/future_await_traits.hpp>
+#include <hpx/lcos/detail/future_await_traits.hpp>
 #endif
 
 #include <exception>
@@ -741,19 +741,18 @@ namespace hpx { namespace lcos { namespace detail
         }
 
 #if defined(HPX_HAVE_AWAIT)
-        bool await_ready() const
+        bool await_ready() const noexcept
         {
             return detail::await_ready(*static_cast<Derived const*>(this));
         }
 
         template <typename Promise>
-        void await_suspend(std::experimental::coroutine_handle<Promise> rh)
+        void await_suspend(lcos::detail::coroutine_handle<Promise> rh)
         {
             detail::await_suspend(*static_cast<Derived*>(this), rh);
         }
 
-        auto await_resume()
-        ->  decltype(detail::await_resume(std::declval<Derived>()))
+        decltype(auto) await_resume()
         {
             return detail::await_resume(*static_cast<Derived*>(this));
         }

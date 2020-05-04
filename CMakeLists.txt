@@ -1162,22 +1162,30 @@ if(((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER
   if(HPX_WITH_AWAIT)
     hpx_add_config_define(HPX_HAVE_AWAIT)
 
-    hpx_option(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY BOOL
-        "Use hpx/util/await_traits.hpp instead of <experimental/coroutine>"
-        OFF ADVANCED CATEGORY "LCOs")
-
-    if(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-      hpx_add_config_define(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-    endif()
-
     if((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64)
       hpx_add_target_compile_option(-await PUBLIC)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       hpx_add_target_compile_option(-Xclang -fcoroutines-ts PUBLIC)
+
+      # older Clang versions don't have <experimental/coroutine> yet
+      hpx_option(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY BOOL
+          "Use hpx/util/await_traits.hpp instead of <experimental/coroutine>"
+          OFF ADVANCED CATEGORY "LCOs")
+      if(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY)
+        hpx_add_config_define(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
+      endif()
     endif()
   endif()
+elseif(${HPX_CXX_STANDARD} GREATER_EQUAL 20)
+  # C++20 conforming compilers fully support co_await (should we turn this into
+  # a feature test?)
+  hpx_option(HPX_WITH_AWAIT BOOL
+      "Enable the use of C++20 co_await functionality"
+      ON ADVANCED CATEGORY "LCOs")
+  hpx_add_config_define(HPX_HAVE_AWAIT)
+  hpx_add_config_define(HPX_HAVE_CXX20_COROUTINES)
 endif()
 
 ################################################################################
