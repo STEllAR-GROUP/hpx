@@ -290,8 +290,9 @@ namespace hpx { namespace lcos { namespace detail {
         typename traits::detail::shared_state_ptr<ContResult>::type p(
             new shared_state(init_no_addref{}, std::forward<F>(f)), false);
         static_cast<shared_state*>(p.get())
-            ->template attach_nounwrap<spawner_type>(
-                future, spawner_type{std::forward<Executor>(exec)});
+            ->template attach_nounwrap<spawner_type>(future,
+                spawner_type{std::forward<Executor>(exec)},
+                launch::async_policy{});
         return p;
     }
 }}}    // namespace hpx::lcos::detail
