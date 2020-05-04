@@ -12,27 +12,25 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-if(HPX_WITH_CUDA)
-  set(compute_cuda_headers
-      hpx/compute/cuda/allocator.hpp
-      hpx/compute/cuda/concurrent_executor.hpp
-      hpx/compute/cuda/concurrent_executor_parameters.hpp
-      hpx/compute/cuda/default_executor.hpp
-      hpx/compute/cuda/default_executor_parameters.hpp
-      hpx/compute/cuda/detail/launch.hpp
-      hpx/compute/cuda/detail/scoped_active_target.hpp
-      hpx/compute/cuda.hpp
-      hpx/compute/cuda/serialization/value_proxy.hpp
-      hpx/compute/cuda/target_distribution_policy.hpp
-      hpx/compute/cuda/target_ptr.hpp
-      hpx/compute/cuda/traits/access_target.hpp
-      hpx/compute/cuda/transfer.hpp
-      hpx/compute/cuda/value_proxy.hpp
-      hpx/compute/detail/get_proxy_type.hpp
-      hpx/compute/detail/iterator.hpp
-      hpx/compute/detail/target_distribution_policy.hpp
-  )
-endif()
+set(compute_cuda_headers
+  hpx/compute/cuda/allocator.hpp
+  hpx/compute/cuda/concurrent_executor.hpp
+  hpx/compute/cuda/concurrent_executor_parameters.hpp
+  hpx/compute/cuda/default_executor.hpp
+  hpx/compute/cuda/default_executor_parameters.hpp
+  hpx/compute/cuda/detail/launch.hpp
+  hpx/compute/cuda/detail/scoped_active_target.hpp
+  hpx/compute/cuda.hpp
+  hpx/compute/cuda/serialization/value_proxy.hpp
+  hpx/compute/cuda/target_distribution_policy.hpp
+  hpx/compute/cuda/target_ptr.hpp
+  hpx/compute/cuda/traits/access_target.hpp
+  hpx/compute/cuda/transfer.hpp
+  hpx/compute/cuda/value_proxy.hpp
+  hpx/compute/detail/get_proxy_type.hpp
+  hpx/compute/detail/iterator.hpp
+  hpx/compute/detail/target_distribution_policy.hpp
+)
 
 set(compute_cuda_compat_headers)
 
