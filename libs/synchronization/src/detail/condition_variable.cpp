@@ -11,6 +11,7 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
+#include <hpx/memory.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -260,4 +261,19 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         queue.splice(queue.end(), queue_);
         queue_.swap(queue);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void intrusive_ptr_add_ref(condition_variable_data* p)
+    {
+        ++p->count_;
+    }
+
+    void intrusive_ptr_release(condition_variable_data* p)
+    {
+        if (0 == --p->count_)
+        {
+            delete p;
+        }
+    }
+
 }}}}    // namespace hpx::lcos::local::detail

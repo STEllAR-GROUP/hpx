@@ -10,9 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/agent_ref.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <boost/intrusive/slist.hpp>
@@ -161,6 +164,31 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     private:
         queue_type queue_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct condition_variable_data;
+
+    HPX_EXPORT void intrusive_ptr_add_ref(condition_variable_data* p);
+    HPX_EXPORT void intrusive_ptr_release(condition_variable_data* p);
+
+    struct condition_variable_data
+    {
+        typedef lcos::local::spinlock mutex_type;
+
+        condition_variable_data()
+          : count_(1)
+        {
+        }
+
+        util::cache_aligned_data_derived<mutex_type> mtx_;
+        util::cache_aligned_data_derived<detail::condition_variable> cond_;
+
+    private:
+        friend HPX_EXPORT void intrusive_ptr_add_ref(condition_variable_data*);
+        friend HPX_EXPORT void intrusive_ptr_release(condition_variable_data*);
+
+        hpx::util::atomic_count count_;
     };
 
 }}}}    // namespace hpx::lcos::local::detail

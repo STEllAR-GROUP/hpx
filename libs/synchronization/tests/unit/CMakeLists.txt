@@ -21,7 +21,7 @@ set(tests
   local_mutex
   sliding_semaphore
   stop_token
-  stop_tokencb2
+  stop_token_cb2
   )
 
 set(channel_mpmc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -40,7 +40,7 @@ set(local_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(sliding_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 
-set(stop_tokencb2_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stop_token_cb2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(stop_token_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})

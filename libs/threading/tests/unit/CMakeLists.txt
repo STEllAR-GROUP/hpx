@@ -9,13 +9,15 @@ set(threading_tests
     condition_variable2
     condition_variable3
     condition_variable4
+    condition_variable_race
     error_callback
     jthread1
     jthread2
     stack_check
     start_stop_callbacks
-    stop_tokencb1
-    stop_tokenrace
+    stop_token_cb1
+    stop_token_race
+    stop_token_race2
     thread
     thread_id
     thread_launching
@@ -41,10 +43,12 @@ endif()
 set(condition_variable2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(condition_variable3_PARAMETERS THREADS_PER_LOCALITY 4)
 set(condition_variable4_PARAMETERS THREADS_PER_LOCALITY 4)
+set(condition_variable_race_PARAMETERS THREADS_PER_LOCALITY 4)
 set(jthread1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(jthread2_PARAMETERS THREADS_PER_LOCALITY 4)
-set(stop_tokencb1_PARAMETERS THREADS_PER_LOCALITY 4)
-set(stop_tokenrace_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stop_token_cb1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stop_token_race_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stop_token_race2_PARAMETERS THREADS_PER_LOCALITY 1)
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_affinity_LIBRARIES DEPENDENCIES PRIVATE Hwloc::hwloc)
 set(thread_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -68,6 +72,11 @@ foreach(test ${threading_tests})
   add_hpx_unit_test("modules.threading" ${test})
 
 endforeach()
+
+set_tests_properties(
+  tests.unit.modules.threading.stop_token_race2
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "std::terminate called\n")
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set_tests_properties(tests.unit.threads.thread_stacksize_overflow PROPERTIES

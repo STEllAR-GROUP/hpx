@@ -71,8 +71,10 @@ namespace hpx {
             typename NeedsPadding = typename detail::needs_padding<Data>::type>
         struct cache_aligned_data
         {
+            // We have an explicit (non-default) constructor here to avoid for
+            // the entire cache-line to be initialized by the compiler.
             cache_aligned_data()
-              : data_{}
+              : data_()
             {
             }
 
@@ -98,10 +100,7 @@ namespace hpx {
         template <typename Data>
         struct cache_aligned_data<Data, std::false_type>
         {
-            cache_aligned_data()
-              : data_{}
-            {
-            }
+            cache_aligned_data() = default;
 
             cache_aligned_data(Data&& data)
               : data_{std::move(data)}
@@ -115,6 +114,53 @@ namespace hpx {
 
             // no need to pad to cache line size
             Data data_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////////
+        // special struct to ensure cache line alignment of a data type
+        template <typename Data,
+            typename NeedsPadding = typename detail::needs_padding<Data>::type>
+        struct cache_aligned_data_derived : Data
+        {
+            // We have an explicit (non-default) constructor here to avoid for
+            // the entire cache-line to be initialized by the compiler.
+            cache_aligned_data_derived()
+              : Data()
+            {
+            }
+
+            cache_aligned_data_derived(Data&& data)
+              : Data{std::move(data)}
+            {
+            }
+
+            cache_aligned_data_derived(Data const& data)
+              : Data{data}
+            {
+            }
+
+            //  cppcheck-suppress unusedVariable
+            char cacheline_pad[detail::get_cache_line_padding_size(
+                // NOLINTNEXTLINE(bugprone-sizeof-expression)
+                sizeof(Data))];
+        };
+
+        template <typename Data>
+        struct cache_aligned_data_derived<Data, std::false_type> : Data
+        {
+            cache_aligned_data_derived() = default;
+
+            cache_aligned_data_derived(Data&& data)
+              : Data{std::move(data)}
+            {
+            }
+
+            cache_aligned_data_derived(Data const& data)
+              : Data{data}
+            {
+            }
+
+            // no need to pad to cache line size
         };
 
         ///////////////////////////////////////////////////////////////////////////
