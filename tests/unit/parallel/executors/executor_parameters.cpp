@@ -10,6 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
+#include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/iterator_range.hpp>
 
@@ -132,6 +133,16 @@ void test_persistent_auto_chunk_size()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_splittable_executor()
+{
+    using hpx::parallel::execution::par;
+    hpx::parallel::execution::splittable_executor spt;
+
+    hpx::parallel::for_loop(par.on(spt), std::size_t(0), std::size_t(4),
+        [&](int i) { std::cout << "body" << std::endl; });
+}
+
+///////////////////////////////////////////////////////////////////////////////
 struct timer_hooks_parameters
 {
     timer_hooks_parameters(char const* name)
@@ -189,6 +200,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     test_auto_chunk_size();
     test_persistent_auto_chunk_size();
 
+    test_splittable_executor();
     test_combined_hooks();
 
     return hpx::finalize();
