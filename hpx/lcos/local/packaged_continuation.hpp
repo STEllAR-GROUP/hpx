@@ -19,9 +19,6 @@
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/detail/post_policy_dispatch.hpp>
-
 #include <exception>
 #include <functional>
 #include <memory>
@@ -228,18 +225,14 @@ namespace hpx { namespace lcos { namespace detail
 
     protected:
         void run_impl(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f)
+            typename traits::detail::shared_state_ptr_for<Future>::type&& f)
         {
             Future future = traits::future_access<Future>::create(std::move(f));
             invoke_continuation(f_, std::move(future), *this);
         }
 
         void run_impl_nounwrap(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f)
+            typename traits::detail::shared_state_ptr_for<Future>::type&& f)
         {
             using is_void =
                 std::is_void<typename util::invoke_result<F, Future>::type>;
@@ -251,15 +244,14 @@ namespace hpx { namespace lcos { namespace detail
 
     public:
         void run(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f, threads::thread_priority, error_code& ec)
+            typename traits::detail::shared_state_ptr_for<Future>::type&& f,
+            error_code& ec = throws)
         {
             {
                 std::lock_guard<mutex_type> l(this->mtx_);
-                if (started_) {
-                    HPX_THROWS_IF(ec, task_already_started,
-                        "continuation::run",
+                if (started_)
+                {
+                    HPX_THROWS_IF(ec, task_already_started, "continuation::run",
                         "this task has already been started");
                     return;
                 }
@@ -272,23 +264,14 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
         }
 
-        void run(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f, threads::thread_priority priority)
-        {
-            run(std::move(f), priority, throws);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         void run_nounwrap(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f, threads::thread_priority, error_code& ec)
+            typename traits::detail::shared_state_ptr_for<Future>::type&& f,
+            error_code& ec = throws)
         {
             {
                 std::lock_guard<mutex_type> l(this->mtx_);
-                if (started_) {
+                if (started_)
+                {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::run_nounwrap",
                         "this task has already been started");
@@ -303,19 +286,9 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
         }
 
-        void run_nounwrap(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f, threads::thread_priority priority)
-        {
-            run_nounwrap(std::move(f), priority, throws);
-        }
-
     protected:
         void async_impl(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f)
+            typename traits::detail::shared_state_ptr_for<Future>::type&& f)
         {
             reset_id r(*this);
 
@@ -324,24 +297,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         void async_impl_nounwrap(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f)
-        {
-            using is_void =
-                std::is_void<typename util::invoke_result<F, Future>::type>;
-
-            reset_id r(*this);
-
-            Future future = traits::future_access<Future>::create(std::move(f));
-            invoke_continuation_nounwrap(
-                f_, std::move(future), *this, is_void{});
-        }
-
-        void async_exec_impl(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f)
+            typename traits::detail::shared_state_ptr_for<Future>::type&& f)
         {
             using is_void =
                 std::is_void<typename util::invoke_result<F, Future>::type>;
@@ -355,16 +311,15 @@ namespace hpx { namespace lcos { namespace detail
 
     public:
         ///////////////////////////////////////////////////////////////////////
+        template <typename Spawner>
         void async(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            threads::thread_priority /*priority*/,
-            error_code& ec)
+            typename traits::detail::shared_state_ptr_for<Future>::type&& f,
+            Spawner&& spawner, error_code& ec = hpx::throws)
         {
             {
                 std::unique_lock<mutex_type> l(this->mtx_);
-                if (started_) {
+                if (started_)
+                {
                     l.unlock();
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation::async",
@@ -375,45 +330,30 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             hpx::intrusive_ptr<continuation> this_(this);
-            hpx::util::thread_description desc(f_,
-                "hpx::parallel::execution::parallel_executor::post");
-
-            parallel::execution::detail::post_policy_dispatch<
-                    hpx::launch::async_policy
-                >::call(hpx::launch::async, desc,
-                    [this_ = std::move(this_),
-                        f = std::move(f)
-                    ]() mutable -> void {
-                        this_->async_impl(std::move(f));
-                    });
+            hpx::util::thread_description desc(f_, "async");
+            spawner(
+                [this_ = std::move(this_), f = std::move(f)]() mutable -> void {
+                    this_->async_impl(std::move(f));
+                },
+                desc);
 
             if (&ec != &throws)
                 ec = make_success_code();
         }
 
-        void async(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            threads::thread_priority priority)
-        {
-            async(std::move(f), priority, throws);
-        }
-
         ///////////////////////////////////////////////////////////////////////
+        template <typename Spawner>
         void async_nounwrap(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            threads::thread_priority /*priority*/,
-            error_code& ec)
+            typename traits::detail::shared_state_ptr_for<Future>::type&& f,
+            Spawner&& spawner, error_code& ec = hpx::throws)
         {
             {
                 std::unique_lock<mutex_type> l(this->mtx_);
-                if (started_) {
+                if (started_)
+                {
                     l.unlock();
                     HPX_THROWS_IF(ec, task_already_started,
-                        "continuation::async",
+                        "continuation::async_nounwrap",
                         "this task has already been started");
                     return;
                 }
@@ -421,71 +361,15 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             hpx::intrusive_ptr<continuation> this_(this);
-            hpx::util::thread_description desc(f_,
-                "hpx::parallel::execution::parallel_executor::post");
-
-            parallel::execution::detail::post_policy_dispatch<
-                    hpx::launch::async_policy
-                >::call(hpx::launch::async, desc,
-                    [this_ = std::move(this_),
-                        f = std::move(f)
-                    ]() mutable -> void {
-                        this_->async_impl_nounwrap(std::move(f));
-                    });
+            hpx::util::thread_description desc(f_, "async_nounwrap");
+            spawner(
+                [this_ = std::move(this_), f = std::move(f)]() mutable -> void {
+                    this_->async_impl_nounwrap(std::move(f));
+                },
+                desc);
 
             if (&ec != &throws)
                 ec = make_success_code();
-        }
-
-        void async_nounwrap(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            threads::thread_priority priority)
-        {
-            async_nounwrap(std::move(f), priority, throws);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Executor>
-        void async_exec(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            Executor && exec, error_code& ec)
-        {
-            {
-                std::unique_lock<mutex_type> l(this->mtx_);
-                if (started_) {
-                    l.unlock();
-                    HPX_THROWS_IF(ec, task_already_started,
-                        "continuation::async_exec",
-                        "this task has already been started");
-                    return;
-                }
-                started_ = true;
-            }
-
-            hpx::intrusive_ptr<continuation> this_(this);
-            parallel::execution::post(std::forward<Executor>(exec),
-                [this_ = std::move(this_),
-                    f = std::move(f)
-                ]() mutable -> void {
-                    this_->async_exec_impl(std::move(f));
-                });
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-
-        template <typename Executor>
-        void async_exec(
-            typename traits::detail::shared_state_ptr_for<
-                Future
-            >::type && f,
-            Executor && exec)
-        {
-            async_exec(std::move(f), std::forward<Executor>(exec), throws);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -498,14 +382,16 @@ namespace hpx { namespace lcos { namespace detail
         void cancel()
         {
             std::unique_lock<mutex_type> l(this->mtx_);
-            try {
+            try
+            {
                 if (!this->started_)
                     HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
 
                 if (this->is_ready())
-                    return;   // nothing we can do
+                    return;    // nothing we can do
 
-                if (id_ != threads::invalid_thread_id) {
+                if (id_ != threads::invalid_thread_id)
+                {
                     // interrupt the executing thread
                     threads::interrupt_thread(id_);
 
@@ -516,14 +402,16 @@ namespace hpx { namespace lcos { namespace detail
                         "continuation<Future, ContResult>::cancel",
                         "future has been canceled");
                 }
-                else {
+                else
+                {
                     l.unlock();
                     HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
                         "continuation<Future, ContResult>::cancel",
                         "future can't be canceled at this time");
                 }
             }
-            catch (...) {
+            catch (...)
+            {
                 this->started_ = true;
                 this->set_exception(std::current_exception());
                 throw;
@@ -532,82 +420,159 @@ namespace hpx { namespace lcos { namespace detail
 
     public:
         ///////////////////////////////////////////////////////////////////////
-        template <typename Policy>
-        void attach(Future const& future, Policy && policy)
+        // TODO: Reduce duplication!
+        template <typename Spawner, typename Policy>
+        void attach(Future const& future,
+            typename std::remove_reference<Spawner>::type& spawner,
+            Policy&& policy, error_code& ec = throws)
         {
-            typedef
-                typename traits::detail::shared_state_ptr_for<Future>::type
+            typedef typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
             hpx::intrusive_ptr<continuation> this_(this);
-
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state,
-                    "continuation::attach",
+                HPX_THROW_EXCEPTION(no_state, "continuation::attach",
                     "the future to attach has no valid shared state");
             }
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_),
-                    state = std::move(state),
-                    policy = std::forward<Policy>(policy)
-                ]() mutable -> void {
+                [this_ = std::move(this_), state = std::move(state),
+                    policy = std::forward<Policy>(policy),
+                    &spawner]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
-                        this_->async(std::move(state), policy.priority());
+                    {
+                        this_->async(std::move(state), spawner);
+                    }
                     else
-                        this_->run(std::move(state), policy.priority());
+                    {
+                        this_->run(std::move(state));
+                    }
+                });
+        }
+
+        template <typename Spawner, typename Policy>
+        void attach(Future const& future,
+            typename std::remove_reference<Spawner>::type&& spawner,
+            Policy&& policy, error_code& ec = throws)
+        {
+            typedef typename traits::detail::shared_state_ptr_for<Future>::type
+                shared_state_ptr;
+
+            // bind an on_completed handler to this future which will invoke
+            // the continuation
+            hpx::intrusive_ptr<continuation> this_(this);
+            shared_state_ptr state = traits::detail::get_shared_state(future);
+            typename shared_state_ptr::element_type* ptr = state.get();
+
+            if (ptr == nullptr)
+            {
+                HPX_THROW_EXCEPTION(no_state, "continuation::attach",
+                    "the future to attach has no valid shared state");
+            }
+
+            ptr->execute_deferred();
+            ptr->set_on_completed(
+                [this_ = std::move(this_), state = std::move(state),
+                    policy = std::forward<Policy>(policy),
+                    spawner = std::move(spawner)]() mutable -> void {
+                    if (hpx::detail::has_async_policy(policy))
+                    {
+                        this_->async(std::move(state), spawner);
+                    }
+                    else
+                    {
+                        this_->run(std::move(state));
+                    }
                 });
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Policy>
-        void attach_nounwrap(Future const& future, Policy && policy)
+        template <typename Spawner, typename Policy>
+        void attach_nounwrap(Future const& future,
+            typename std::remove_reference<Spawner>::type& spawner,
+            Policy&& policy, error_code& ec = throws)
         {
-            typedef
-                typename traits::detail::shared_state_ptr_for<Future>::type
+            typedef typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
             hpx::intrusive_ptr<continuation> this_(this);
-
             shared_state_ptr state = traits::detail::get_shared_state(future);
             typename shared_state_ptr::element_type* ptr = state.get();
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state,
-                    "continuation::attach_nounwrap",
+                HPX_THROW_EXCEPTION(no_state, "continuation::attach_nounwrap",
                     "the future to attach has no valid shared state");
             }
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_),
-                    state = std::move(state),
-                    policy = std::forward<Policy>(policy)
-                ]() mutable -> void {
+                [this_ = std::move(this_), state = std::move(state),
+                    policy = std::forward<Policy>(policy),
+                    &spawner]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
-                        this_->async_nounwrap(std::move(state), policy.priority());
+                    {
+                        this_->async_nounwrap(std::move(state), spawner);
+                    }
                     else
-                        this_->run_nounwrap(std::move(state), policy.priority());
+                    {
+                        this_->run_nounwrap(std::move(state));
+                    }
+                });
+        }
+
+        template <typename Spawner, typename Policy>
+        void attach_nounwrap(Future const& future,
+            typename std::remove_reference<Spawner>::type&& spawner,
+            Policy&& policy, error_code& ec = throws)
+        {
+            typedef typename traits::detail::shared_state_ptr_for<Future>::type
+                shared_state_ptr;
+
+            // bind an on_completed handler to this future which will invoke
+            // the continuation
+            hpx::intrusive_ptr<continuation> this_(this);
+            shared_state_ptr state = traits::detail::get_shared_state(future);
+            typename shared_state_ptr::element_type* ptr = state.get();
+
+            if (ptr == nullptr)
+            {
+                HPX_THROW_EXCEPTION(no_state, "continuation::attach_nounwrap",
+                    "the future to attach has no valid shared state");
+            }
+
+            ptr->execute_deferred();
+            ptr->set_on_completed(
+                [this_ = std::move(this_), state = std::move(state),
+                    policy = std::forward<Policy>(policy),
+                    spawner = std::move(spawner)]() mutable -> void {
+                    if (hpx::detail::has_async_policy(policy))
+                    {
+                        this_->async_nounwrap(std::move(state), spawner);
+                    }
+                    else
+                    {
+                        this_->run_nounwrap(std::move(state));
+                    }
                 });
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor>
-        void attach_exec(Future const& future,
-            typename std::remove_reference<Executor>::type& exec)
+        template <typename Spawner>
+        void attach(Future const& future,
+            typename std::remove_reference<Spawner>::type& spawner,
+            error_code& ec = throws)
         {
-            typedef
-                typename traits::detail::shared_state_ptr_for<Future>::type
+            typedef typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
 
             // bind an on_completed handler to this future which will invoke
@@ -618,27 +583,24 @@ namespace hpx { namespace lcos { namespace detail
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state,
-                    "continuation::attach_exec",
+                HPX_THROW_EXCEPTION(no_state, "continuation::attach",
                     "the future to attach has no valid shared state");
             }
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_),
-                    state = std::move(state),
-                    &exec
-                ]() mutable -> void {
-                    this_->async_exec(std::move(state), exec);
+                [this_ = std::move(this_), state = std::move(state),
+                    &spawner]() mutable -> void {
+                    this_->async(std::move(state), spawner);
                 });
         }
 
-        template <typename Executor>
-        void attach_exec(Future const& future,
-            typename std::remove_reference<Executor>::type&& exec)
+        template <typename Spawner>
+        void attach(Future const& future,
+            typename std::remove_reference<Spawner>::type&& spawner,
+            error_code& ec = throws)
         {
-            typedef
-                typename traits::detail::shared_state_ptr_for<Future>::type
+            typedef typename traits::detail::shared_state_ptr_for<Future>::type
                 shared_state_ptr;
 
             // bind an on_completed handler to this future which will invoke
@@ -649,18 +611,73 @@ namespace hpx { namespace lcos { namespace detail
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state,
-                    "continuation::attach_exec",
+                HPX_THROW_EXCEPTION(no_state, "continuation::attach",
                     "the future to attach has no valid shared state");
             }
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_),
-                    state = std::move(state),
-                    exec = std::move(exec)
-                ]() mutable -> void {
-                    return this_->async_exec(std::move(state), std::move(exec));
+                [this_ = std::move(this_), state = std::move(state),
+                    spawner = std::move(spawner)]() mutable -> void {
+                    return this_->async(std::move(state), std::move(spawner));
+                });
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Spawner>
+        void attach_nounwrap(Future const& future,
+            typename std::remove_reference<Spawner>::type& spawner,
+            error_code& ec = throws)
+        {
+            typedef typename traits::detail::shared_state_ptr_for<Future>::type
+                shared_state_ptr;
+
+            // bind an on_completed handler to this future which will invoke
+            // the continuation
+            hpx::intrusive_ptr<continuation> this_(this);
+            shared_state_ptr state = traits::detail::get_shared_state(future);
+            typename shared_state_ptr::element_type* ptr = state.get();
+
+            if (ptr == nullptr)
+            {
+                HPX_THROW_EXCEPTION(no_state, "continuation::attach_nounwrap",
+                    "the future to attach has no valid shared state");
+            }
+
+            ptr->execute_deferred();
+            ptr->set_on_completed(
+                [this_ = std::move(this_), state = std::move(state),
+                    &spawner]() mutable -> void {
+                    this_->async_nounwrap(std::move(state), spawner);
+                });
+        }
+
+        template <typename Spawner>
+        void attach_nounwrap(Future const& future,
+            typename std::remove_reference<Spawner>::type&& spawner,
+            error_code& ec = throws)
+        {
+            typedef typename traits::detail::shared_state_ptr_for<Future>::type
+                shared_state_ptr;
+
+            // bind an on_completed handler to this future which will invoke
+            // the continuation
+            hpx::intrusive_ptr<continuation> this_(this);
+            shared_state_ptr state = traits::detail::get_shared_state(future);
+            typename shared_state_ptr::element_type* ptr = state.get();
+
+            if (ptr == nullptr)
+            {
+                HPX_THROW_EXCEPTION(no_state, "continuation::attach_nounwrap",
+                    "the future to attach has no valid shared state");
+            }
+
+            ptr->execute_deferred();
+            ptr->set_on_completed(
+                [this_ = std::move(this_), state = std::move(state),
+                    spawner = std::move(spawner)]() mutable -> void {
+                    return this_->async_nounwrap(
+                        std::move(state), std::move(spawner));
                 });
         }
 
@@ -721,137 +738,7 @@ namespace hpx { namespace traits { namespace detail
         typedef lcos::detail::continuation_allocator<
             Allocator, Future, F, ContResult> type;
     };
-}}}
-
-namespace hpx { namespace lcos { namespace detail
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ContResult, typename Future, typename Policy, typename F>
-    inline typename traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
-    make_continuation(Future const& future, Policy && policy, F && f)
-    {
-        typedef typename continuation_result<ContResult>::type result_type;
-        typedef detail::continuation<Future, F, result_type> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
-
-        // create a continuation
-        typename traits::detail::shared_state_ptr<result_type>::type p(
-            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
-        static_cast<shared_state*>(p.get())->attach(
-            future, std::forward<Policy>(policy));
-        return p;
-    }
-
-    // same as above, except with allocator
-    template <typename ContResult, typename Allocator, typename Future,
-        typename Policy, typename F>
-    inline typename traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
-    make_continuation_alloc(Allocator const& a,
-        Future const& future, Policy&& policy, F&& f)
-    {
-        using result_type = typename continuation_result<ContResult>::type;
-
-        using base_allocator = Allocator;
-        using shared_state = typename traits::detail::shared_state_allocator<
-                detail::continuation<Future, F, result_type>, base_allocator
-            >::type;
-
-        using other_allocator = typename std::allocator_traits<base_allocator>::
-            template rebind_alloc<shared_state>;
-        using traits = std::allocator_traits<other_allocator>;
-
-        using init_no_addref = typename shared_state::init_no_addref;
-
-        using unique_ptr = std::unique_ptr<shared_state,
-            util::allocator_deleter<other_allocator>>;
-
-        other_allocator alloc(a);
-        unique_ptr p(traits::allocate(alloc, 1),
-            util::allocator_deleter<other_allocator>{alloc});
-        traits::construct(
-            alloc, p.get(), init_no_addref{}, alloc, std::forward<F>(f));
-
-        // create a continuation
-        typename hpx::traits::detail::shared_state_ptr<result_type>::type r(
-            p.release(), false);
-
-        static_cast<shared_state*>(r.get())->attach(
-            future, std::forward<Policy>(policy));
-
-        return r;
-    }
-
-    // same as above, except with allocator and without unwrapping returned
-    // futures
-    template <typename ContResult, typename Allocator, typename Future,
-        typename Policy, typename F>
-    inline typename traits::detail::shared_state_ptr<ContResult>::type
-    make_continuation_alloc_nounwrap(Allocator const& a,
-        Future const& future, Policy&& policy, F&& f)
-    {
-        using result_type = ContResult;
-
-        using base_allocator = Allocator;
-        using shared_state = typename traits::detail::shared_state_allocator<
-                detail::continuation<Future, F, result_type>, base_allocator
-            >::type;
-
-        using other_allocator = typename std::allocator_traits<base_allocator>::
-            template rebind_alloc<shared_state>;
-        using traits = std::allocator_traits<other_allocator>;
-
-        using init_no_addref = typename shared_state::init_no_addref;
-
-        using unique_ptr = std::unique_ptr<shared_state,
-            util::allocator_deleter<other_allocator>>;
-
-        other_allocator alloc(a);
-        unique_ptr p(traits::allocate(alloc, 1),
-            util::allocator_deleter<other_allocator>{alloc});
-        traits::construct(
-            alloc, p.get(), init_no_addref{}, alloc, std::forward<F>(f));
-
-        // create a continuation
-        typename hpx::traits::detail::shared_state_ptr<result_type>::type r(
-            p.release(), false);
-
-        static_cast<shared_state*>(r.get())->attach_nounwrap(
-            future, std::forward<Policy>(policy));
-
-        return r;
-    }
-
-    template <typename ContResult, typename Future, typename Executor,
-        typename F>
-    inline typename traits::detail::shared_state_ptr<ContResult>::type
-    make_continuation_exec(Future const& future, Executor && exec, F && f)
-    {
-        typedef detail::continuation<Future, F, ContResult> shared_state;
-        typedef typename shared_state::init_no_addref init_no_addref;
-
-        // create a continuation
-        typename traits::detail::shared_state_ptr<ContResult>::type p(
-            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
-        static_cast<shared_state*>(p.get())->template attach_exec<Executor>(
-            future, exec);
-        return p;
-    }
-
-    template <typename Executor, typename Future, typename F>
-    inline typename hpx::traits::future_then_executor_result<
-        Executor, typename std::decay<Future>::type, F
-    >::type
-    then_execute_helper(Executor && exec, F && f, Future && predecessor)
-    {
-        // simply forward this to executor
-        return parallel::execution::then_execute(exec, std::forward<F>(f),
-            std::forward<Future>(predecessor));
-    }
-}}}
+}}}    // namespace hpx::traits::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail

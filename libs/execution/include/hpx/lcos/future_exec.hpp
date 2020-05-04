@@ -11,6 +11,7 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -33,12 +34,16 @@
 #include <type_traits>
 #include <utility>
 
-/* Beginning of the file that has to go with executors */
 namespace hpx { namespace lcos { namespace detail {
     template <typename Executor, typename Future, typename F>
     inline typename hpx::traits::future_then_executor_result<Executor,
         typename std::decay<Future>::type, F>::type
-    then_execute_helper(Executor&&, F&&, Future&&);
+    then_execute_helper(Executor&& exec, F&& f, Future&& predecessor)
+    {
+        // simply forward this to executor
+        return parallel::execution::then_execute(
+            exec, std::forward<F>(f), std::forward<Future>(predecessor));
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // launch
@@ -145,4 +150,148 @@ namespace hpx { namespace lcos { namespace detail {
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct post_policy_spawner
+    {
+        template <typename F>
+        void operator()(F&& f, hpx::util::thread_description desc)
+        {
+            parallel::execution::detail::post_policy_dispatch<
+                hpx::launch::async_policy>::call(hpx::launch::async, desc,
+                std::forward<F>(f));
+        }
+    };
+
+    template <typename Executor>
+    struct executor_spawner
+    {
+        Executor exec;
+
+        template <typename F>
+        void operator()(F&& f, hpx::util::thread_description)
+        {
+            hpx::parallel::execution::post(exec, std::forward<F>(f));
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ContResult, typename Future, typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<
+        typename continuation_result<ContResult>::type>::type
+    make_continuation(Future const& future, Policy&& policy, F&& f)
+    {
+        using result_type = typename continuation_result<ContResult>::type;
+        using shared_state = detail::continuation<Future, F, result_type>;
+        using init_no_addref = typename shared_state::init_no_addref;
+        using spawner_type = post_policy_spawner;
+
+        // create a continuation
+        typename traits::detail::shared_state_ptr<result_type>::type p(
+            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
+        static_cast<shared_state*>(p.get())->template attach<spawner_type>(
+            future, spawner_type{}, std::forward<Policy>(policy));
+        return p;
+    }
+
+    // same as above, except with allocator
+    template <typename ContResult, typename Allocator, typename Future,
+        typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<
+        typename continuation_result<ContResult>::type>::type
+    make_continuation_alloc(
+        Allocator const& a, Future const& future, Policy&& policy, F&& f)
+    {
+        using result_type = typename continuation_result<ContResult>::type;
+
+        using base_allocator = Allocator;
+        using shared_state = typename traits::detail::shared_state_allocator<
+            detail::continuation<Future, F, result_type>, base_allocator>::type;
+
+        using other_allocator = typename std::allocator_traits<
+            base_allocator>::template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<other_allocator>;
+
+        using init_no_addref = typename shared_state::init_no_addref;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<other_allocator>>;
+
+        using spawner_type = post_policy_spawner;
+
+        other_allocator alloc(a);
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<other_allocator>{alloc});
+        traits::construct(
+            alloc, p.get(), init_no_addref{}, alloc, std::forward<F>(f));
+
+        // create a continuation
+        typename hpx::traits::detail::shared_state_ptr<result_type>::type r(
+            p.release(), false);
+
+        static_cast<shared_state*>(r.get())->template attach<spawner_type>(
+            future, spawner_type{}, std::forward<Policy>(policy));
+
+        return r;
+    }
+
+    // same as above, except with allocator and without unwrapping returned
+    // futures
+    template <typename ContResult, typename Allocator, typename Future,
+        typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_alloc_nounwrap(
+        Allocator const& a, Future const& future, Policy&& policy, F&& f)
+    {
+        using result_type = ContResult;
+
+        using base_allocator = Allocator;
+        using shared_state = typename traits::detail::shared_state_allocator<
+            detail::continuation<Future, F, result_type>, base_allocator>::type;
+
+        using other_allocator = typename std::allocator_traits<
+            base_allocator>::template rebind_alloc<shared_state>;
+        using traits = std::allocator_traits<other_allocator>;
+
+        using init_no_addref = typename shared_state::init_no_addref;
+
+        using unique_ptr = std::unique_ptr<shared_state,
+            util::allocator_deleter<other_allocator>>;
+
+        using spawner_type = post_policy_spawner;
+
+        other_allocator alloc(a);
+        unique_ptr p(traits::allocate(alloc, 1),
+            util::allocator_deleter<other_allocator>{alloc});
+        traits::construct(
+            alloc, p.get(), init_no_addref{}, alloc, std::forward<F>(f));
+
+        // create a continuation
+        typename hpx::traits::detail::shared_state_ptr<result_type>::type r(
+            p.release(), false);
+
+        static_cast<shared_state*>(r.get())
+            ->template attach_nounwrap<spawner_type>(
+                future, spawner_type{}, std::forward<Policy>(policy));
+
+        return r;
+    }
+
+    template <typename ContResult, typename Future, typename Executor,
+        typename F>
+    inline typename traits::detail::shared_state_ptr<ContResult>::type
+    make_continuation_exec(Future const& future, Executor&& exec, F&& f)
+    {
+        using shared_state = detail::continuation<Future, F, ContResult>;
+        using init_no_addref = typename shared_state::init_no_addref;
+        using spawner_type =
+            executor_spawner<typename std::decay<Executor>::type>;
+
+        // create a continuation
+        typename traits::detail::shared_state_ptr<ContResult>::type p(
+            new shared_state(init_no_addref{}, std::forward<F>(f)), false);
+        static_cast<shared_state*>(p.get())
+            ->template attach_nounwrap<spawner_type>(
+                future, spawner_type{std::forward<Executor>(exec)});
+        return p;
+    }
 }}}    // namespace hpx::lcos::detail
