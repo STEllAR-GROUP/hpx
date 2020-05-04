@@ -209,59 +209,59 @@ int main()
     int i = 0;
     HPX_TEST_EQ(&mylib::bar(testlib::tag_invocable2{}, i), &i);
     static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int>,
-            int&&>,
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int>,
+            int&&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int const&>,
-            int const&>,
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int const&>,
+            int const&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int&>,
-            int&>,
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int&>,
+            int&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int const&&>,
-            int const&&>,
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int const&&>,
+            int const&&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int&&>,
-            int&&>,
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int&&>,
+            int&&>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int>,
-            decltype(
-                mylib::bar(testlib::tag_invocable2{}, std::declval<int>()))>,
-        "Result type needs to match");
-    static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int const&>,
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int>,
             decltype(mylib::bar(
-                testlib::tag_invocable2{}, std::declval<int const&>()))>,
+                testlib::tag_invocable2{}, std::declval<int>()))>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int&>,
-            decltype(
-                mylib::bar(testlib::tag_invocable2{}, std::declval<int&>()))>,
-        "Result type needs to match");
-    static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int const&&>,
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int const&>,
             decltype(mylib::bar(
-                testlib::tag_invocable2{}, std::declval<int const&&>()))>,
+                testlib::tag_invocable2{}, std::declval<int const&>()))>::value,
         "Result type needs to match");
     static_assert(
-        std::is_same_v<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
-                           testlib::tag_invocable2, int&&>,
-            decltype(
-                mylib::bar(testlib::tag_invocable2{}, std::declval<int&&>()))>,
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int&>,
+            decltype(mylib::bar(
+                testlib::tag_invocable2{}, std::declval<int&>()))>::value,
+        "Result type needs to match");
+    static_assert(
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int const&&>,
+            decltype(mylib::bar(testlib::tag_invocable2{},
+                std::declval<int const&&>()))>::value,
+        "Result type needs to match");
+    static_assert(
+        std::is_same<hpx::functional::tag_invoke_result_t<mylib::bar_fn,
+                         testlib::tag_invocable2, int&&>,
+            decltype(mylib::bar(
+                testlib::tag_invocable2{}, std::declval<int&&>()))>::value,
         "Result type needs to match");
     static_assert(mylib::bar(testlib::tag_invocable2{}, 42) == 42,
         "This function should be constexpr evaluated");
