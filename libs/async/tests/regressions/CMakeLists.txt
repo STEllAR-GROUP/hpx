@@ -56,13 +56,9 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     source_group("Source Files" FILES ${sources})
 
     add_hpx_regression_compile_test(
-      "modules.async"
-      ${compile_test}
-      SOURCES
-      ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER
-      "Tests/Regressions/Modules/Async/CompileOnly"
+      "modules.async" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Regressions/Modules/Async/CompileOnly"
     )
   endforeach()
 endif()

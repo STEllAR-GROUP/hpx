@@ -42,9 +42,4 @@ find_package_handle_standard_args(
   Libfabric DEFAULT_MSG LIBFABRIC_LIBRARY LIBFABRIC_INCLUDE_DIR
 )
 
-# foreach(v LIBFABRIC_ROOT) get_property(_type CACHE ${v} PROPERTY TYPE)
-# if(_type) set_property(CACHE ${v} PROPERTY ADVANCED 1) if("x${_type}" STREQUAL
-# "xUNINITIALIZED") set_property(CACHE ${v} PROPERTY TYPE PATH) endif() endif()
-# endforeach()
-
 mark_as_advanced(LIBFABRIC_ROOT)

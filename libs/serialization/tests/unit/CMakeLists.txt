@@ -104,13 +104,9 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     source_group("Source Files" FILES ${sources})
 
     add_hpx_unit_compile_test(
-      "modules.serialization"
-      ${compile_test}
-      SOURCES
-      ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER
-      "Tests/Unit/Modules/Serialization/CompileOnly"
+      "modules.serialization" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Unit/Modules/Serialization/CompileOnly"
     )
 
   endforeach()

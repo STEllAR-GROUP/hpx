@@ -1,15 +1,16 @@
-# - Try to find GooglePerftools
-# Once done this will define
-#  GOOGLE_PERFTOOLS_FOUND - System has GooglePerftools
-#  GOOGLE_PERFTOOLS_INCLUDE_DIRS - The GooglePerftools include directory
-#  GOOGLE_PERFTOOLS_LIBRARIES - Link these to use GooglePerftools
-
-# Copyright (c)      2014 Thomas Heller Copyright (c) 2007-2012 Hartmut Kaiser
-# Copyright (c) 2010-2011 Matt Anderson Copyright (c) 2011      Bryce Lelbach
+# Copyright (c)      2014 Thomas Heller
+# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2010-2011 Matt Anderson
+# Copyright (c) 2011      Bryce Lelbach
 #
-# SPDX-License-Identifier: BSL-1.0 Distributed under the Boost Software License,
-# Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt)
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# * Try to find GooglePerftools Once done this will define
+#   GOOGLE_PERFTOOLS_FOUND - System has GooglePerftools
+#   GOOGLE_PERFTOOLS_INCLUDE_DIRS - The GooglePerftools include directory
+#   GOOGLE_PERFTOOLS_LIBRARIES - Link these to use GooglePerftools
 
 if(NOT TARGET Gperftools::gperftools)
   find_package(PkgConfig QUIET)

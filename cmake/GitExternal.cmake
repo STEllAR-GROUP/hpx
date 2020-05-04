@@ -5,21 +5,27 @@
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-# configures an external git repository Usage: * Automatically reads, parses and
-# updates a .gitexternals file if it only contains lines in the form "#
-# <directory> <giturl> <gittag>". This function parses the file for this pattern
-# and then calls git_external on each found entry. Additionally it provides an
-# update target to bump the tag to the master revision by recreating
-# .gitexternals. * Provides function git_external(<directory> <giturl> <gittag>
-# [NO_UPDATE, VERBOSE] [RESET <files>]) git_external_manage(<file>)
 #
-# [optional] Flags which control behaviour NO_UPDATE When set, GitExternal will
-# not change a repo that has already been checked out. The purpose of this is to
-# allow one to set a default branch to be checked out, but stop GitExternal from
-# changing back to that branch if the user has checked out and is working on
-# another. VERBOSE When set, displays information about git commands that are
-# executed
+# configures an external git repository
+# Usage:
+#  * Automatically reads, parses and updates a .gitexternals file if it only
+#    contains lines in the form "# <directory> <giturl> <gittag>".
+#    This function parses the file for this pattern and then calls
+#    git_external on each found entry. Additionally it provides an
+#    update target to bump the tag to the master revision by
+#    recreating .gitexternals.
+#  * Provides function
+#    git_external(<directory> <giturl> <gittag> [NO_UPDATE, VERBOSE] [RESET <files>])
+#  git_external_manage(<file>)
+#
+# [optional] Flags which control behaviour
+#  NO_UPDATE
+#    When set, GitExternal will not change a repo that has already been checked out.
+#    The purpose of this is to allow one to set a default branch to be checked out,
+#    but stop GitExternal from changing back to that branch if the user has checked
+#    out and is working on another.
+#  VERBOSE
+#    When set, displays information about git commands that are executed
 #
 
 find_package(Git)
@@ -232,11 +238,14 @@ endif()"
             update_git_external update_git_external_${GIT_EXTERNAL_NAME}
           )
 
-          # Flattens a git external repository into its parent repo: * Clean any
-          # changes from external * Unlink external from git: Remove
-          # external/.git and .gitexternals * Add external directory to parent *
-          # Commit with flattened repo and tag info - Depend on release branch
-          # checked out
+          # cmake-format: off
+          # Flattens a git external repository into its parent repo:
+          # * Clean any changes from external
+          # * Unlink external from git: Remove external/.git and .gitexternals
+          # * Add external directory to parent
+          # * Commit with flattened repo and tag info
+          # - Depend on release branch checked out
+          # cmake-format: on
           add_custom_target(
             flatten_git_external_${GIT_EXTERNAL_NAME}
             COMMAND ${GIT_EXECUTABLE} clean -dfx

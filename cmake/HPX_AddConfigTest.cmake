@@ -117,6 +117,7 @@ function(add_hpx_config_test variable)
 
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
+        # cmake-format: off
         try_run(
           ${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
           ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests
@@ -126,15 +127,13 @@ function(add_hpx_config_test variable)
             "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
             "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
             "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
-            CXX_STANDARD
-            ${HPX_CXX_STANDARD}
-            CXX_STANDARD_REQUIRED
-            ON
-            CXX_EXTENSIONS
-            FALSE
+          CXX_STANDARD ${HPX_CXX_STANDARD}
+          CXX_STANDARD_REQUIRED ON
+          CXX_EXTENSIONS FALSE
           RUN_OUTPUT_VARIABLE ${variable}_OUTPUT
           ARGS ${${variable}_ARGS}
         )
+        # cmake-format: on
         if(${variable}_COMPILE_RESULT AND NOT ${variable}_RUN_RESULT)
           set(${variable}_RESULT TRUE)
         else()
@@ -144,6 +143,7 @@ function(add_hpx_config_test variable)
         set(${variable}_RESULT FALSE)
       endif()
     else()
+      # cmake-format: off
       try_compile(
         ${variable}_RESULT
         ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/config_tests
@@ -153,16 +153,13 @@ function(add_hpx_config_test variable)
           "-DLINK_DIRECTORIES=${CONFIG_TEST_LINK_DIRS}"
           "-DLINK_LIBRARIES=${CONFIG_TEST_LINK_LIBRARIES}"
           "-DCOMPILE_DEFINITIONS=${CONFIG_TEST_COMPILE_DEFINITIONS}"
-        OUTPUT_VARIABLE
-          ${variable}_OUTPUT
-          CXX_STANDARD
-          ${HPX_CXX_STANDARD}
-          CXX_STANDARD_REQUIRED
-          ON
-          CXX_EXTENSIONS
-          FALSE
+        OUTPUT_VARIABLE ${variable}_OUTPUT
+        CXX_STANDARD ${HPX_CXX_STANDARD}
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS FALSE
         COPY_FILE ${test_binary}
       )
+      # cmake-format: on
       hpx_debug("Compile test: ${variable}")
       hpx_debug("Compilation output: ${${variable}_OUTPUT}")
     endif()
@@ -254,11 +251,7 @@ function(hpx_cpuid target variable)
   add_hpx_config_test(
     ${variable}
     SOURCE cmake/tests/cpuid.cpp
-           FLAGS
-           "${boost_include_dir}"
-           "${include_dir}"
-           FILE
-           EXECUTE
+    COMPILE_DEFINITIONS "${boost_include_dir}" "${include_dir}" FILE EXECUTE
     ARGS "${target}" ${ARGN}
   )
 endfunction()

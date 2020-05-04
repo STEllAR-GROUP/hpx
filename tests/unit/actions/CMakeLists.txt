@@ -52,13 +52,9 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     source_group("Source Files" FILES ${sources})
 
     add_hpx_unit_compile_test(
-      "actions"
-      ${compile_test}
-      SOURCES
-      ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER
-      "Tests/Unit/Actions/CompileOnly"
+      "actions" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Unit/Actions/CompileOnly"
     )
 
   endforeach()

@@ -81,13 +81,9 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     set(sources ${compile_test}.cpp)
 
     add_hpx_unit_compile_test(
-      "modules.synchronization"
-      ${compile_test}
-      SOURCES
-      ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER
-      "Tests/Unit/Modules/Synchronization/CompileOnly"
+      "modules.synchronization" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Unit/Modules/Synchronization/CompileOnly"
     )
 
   endforeach()

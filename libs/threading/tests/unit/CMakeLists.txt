@@ -74,8 +74,8 @@ endforeach()
 
 set_tests_properties(
   tests.unit.modules.threading.stop_token_race2
-  PROPERTIES
-    PASS_REGULAR_EXPRESSION "std::terminate called\n")
+  PROPERTIES PASS_REGULAR_EXPRESSION "std::terminate called\n"
+)
 
 if(HPX_WITH_THREAD_STACKOVERFLOW_DETECTION)
   set_tests_properties(

@@ -99,13 +99,9 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     source_group("Source Files" FILES ${sources})
 
     add_hpx_regression_compile_test(
-      "lcos"
-      ${compile_test}
-      SOURCES
-      ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER
-      "Tests/Regressions/LCOs/CompileOnly"
+      "lcos" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Regressions/LCOs/CompileOnly"
     )
 
   endforeach()

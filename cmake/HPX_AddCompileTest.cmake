@@ -126,19 +126,12 @@ function(add_hpx_header_tests category)
       get_filename_component(header_dir "${relpath}" DIRECTORY)
 
       add_hpx_headers_compile_test(
-        "${category}"
-        ${test_name}
-        SOURCES
-        "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
-        SOURCE_ROOT
-        "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
-        FOLDER
-        "Tests/Headers/${header_dir}"
-        COMPONENT_DEPENDENCIES
-        ${${category}_COMPONENT_DEPENDENCIES}
-        DEPENDENCIES
-        ${${category}_DEPENDENCIES}
-        ${_additional_flags}
+        "${category}" ${test_name}
+        SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${full_test_file}"
+        SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${header_dir}"
+        FOLDER "Tests/Headers/${header_dir}"
+        COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
+        DEPENDENCIES ${${category}_DEPENDENCIES} ${_additional_flags}
       )
 
     endif()
@@ -152,18 +145,11 @@ function(add_hpx_header_tests category)
   )
 
   add_hpx_headers_compile_test(
-    "${category}"
-    ${test_name}
-    SOURCES
-    "${all_headers_test_file}"
-    SOURCE_ROOT
-    "${CMAKE_CURRENT_BINARY_DIR}"
-    FOLDER
-    "Tests/Headers"
-    COMPONENT_DEPENDENCIES
-    ${${category}_COMPONENT_DEPENDENCIES}
-    DEPENDENCIES
-    ${${category}_DEPENDENCIES}
-    ${_additional_flags}
+    "${category}" ${test_name}
+    SOURCES "${all_headers_test_file}"
+    SOURCE_ROOT "${CMAKE_CURRENT_BINARY_DIR}"
+    FOLDER "Tests/Headers"
+    COMPONENT_DEPENDENCIES ${${category}_COMPONENT_DEPENDENCIES}
+    DEPENDENCIES ${${category}_DEPENDENCIES} ${_additional_flags}
   )
 endfunction()

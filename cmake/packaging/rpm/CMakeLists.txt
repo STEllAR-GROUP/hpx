@@ -12,11 +12,17 @@ set(CPACK_PACKAGE_CONTACT "contact@stellar-group.org")
 set(CPACK_PACKAGE_VENDOR "STE||AR Group")
 set(CPACK_RPM_PACKAGE_LICENSE "BSL-1.0")
 set(CPACK_RPM_PACKAGE_URL "https://github.com/STEllAR-GROUP/hpx")
-set(CPACK_RPM_PACKAGE_SUMMARY "The C++ Standard Library for Parallelism and Concurrency (HPX)")
-set(CPACK_RPM_PACKAGE_DESCRIPTION "The C++ Standard Library for Parallelism and Concurrency compiled for educational usage")
+set(CPACK_RPM_PACKAGE_SUMMARY
+    "The C++ Standard Library for Parallelism and Concurrency (HPX)"
+)
+set(CPACK_RPM_PACKAGE_DESCRIPTION
+    "The C++ Standard Library for Parallelism and Concurrency compiled for educational usage"
+)
 set(CPACK_RPM_PACKAGE_REQUIRES "boost, hwloc, gperftools")
 set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
+set(CPACK_PACKAGE_FILE_NAME
+    "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}"
+)
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
     /etc/ld.so.conf.d
     /usr/local
@@ -25,7 +31,8 @@ set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
     /usr/local/include
     /usr/local/share
     /usr/local/lib
-  )
-set(CPACK_RPM_CHANGELOG_FILE "${CMAKE_HOME_DIRECTORY}/cmake/packaging/rpm/Changelog.txt")
+)
+set(CPACK_RPM_CHANGELOG_FILE
+    "${CMAKE_HOME_DIRECTORY}/cmake/packaging/rpm/Changelog.txt"
+)
 include(CPack)
-

@@ -44,10 +44,12 @@ if(MSVC)
 endif()
 
 if(HPX_WITH_STACKTRACES AND HPX_WITH_STACKTRACES_STATIC_SYMBOLS)
-  # Add -Wl,-E to linker for executables on Linux(Clang or gcc)
-  # this will add all symbols to the dynamic symbol table
-  if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") AND
-     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+  # Add -Wl,-E to linker for executables on Linux(Clang or gcc) this will add
+  # all symbols to the dynamic symbol table
+  if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+     AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+          OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  )
     target_link_libraries(hpx_init INTERFACE "-Wl,-E")
   endif()
 endif()

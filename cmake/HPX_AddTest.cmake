@@ -61,15 +61,15 @@ function(add_hpx_test category name)
     set(_script_location ${PROJECT_BINARY_DIR})
   endif()
 
+  # cmake-format: off
   set(cmd
       "${PYTHON_EXECUTABLE}"
       "${_script_location}/bin/hpxrun.py"
       ${_exe}
-      "-e"
-      "${expected}"
-      "-t"
-      "${${name}_THREADS_PER_LOCALITY}"
+        "-e" "${expected}"
+        "-t" "${${name}_THREADS_PER_LOCALITY}"
   )
+  # cmake-format: on
 
   if(HPX_WITH_NETWORKING)
     list(APPEND cmd "-l" "${${name}_LOCALITIES}")

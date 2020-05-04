@@ -161,15 +161,15 @@ function(add_hpx_executable name)
     set(_target_flags INSTALL INSTALL_FLAGS DESTINATION ${install_destination})
     # install PDB if needed
     if(MSVC)
-      # cmake-format off
+      # cmake-format: off
       set(_target_flags
           ${_target_flags}
-          INSTALL_PDB FILES $<TARGET_PDB_FILE:${name}>
-          DESTINATION ${install_destination}
+          INSTALL_PDB $<TARGET_PDB_FILE:${name}>
+            DESTINATION ${install_destination}
           CONFIGURATIONS Debug RelWithDebInfo
           OPTIONAL
       )
-      # cmake-format on
+      # cmake-format: on
     endif()
   endif()
 

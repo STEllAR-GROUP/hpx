@@ -190,26 +190,26 @@ function(add_hpx_component name)
       set(archive_install_destination ${${name}_INSTALL_SUFFIX})
       set(runtime_install_destination ${${name}_INSTALL_SUFFIX})
     endif()
-    # cmake-format off
+    # cmake-format: off
     set(_target_flags
         INSTALL INSTALL_FLAGS
           LIBRARY DESTINATION ${library_install_destination}
           ARCHIVE DESTINATION ${archive_install_destination}
           RUNTIME DESTINATION ${runtime_install_destination}
     )
-    # cmake-format on
+    # cmake-format: on
 
     # install PDB if needed
     if(MSVC)
-      # cmake-format off
+      # cmake-format: off
       set(_target_flags
           ${_target_flags}
-          INSTALL_PDB FILES $<TARGET_PDB_FILE:${name}_component>
+          INSTALL_PDB $<TARGET_PDB_FILE:${name}_component>
             DESTINATION ${runtime_install_destination}
           CONFIGURATIONS Debug RelWithDebInfo
           OPTIONAL
       )
-      # cmake-format on
+      # cmake-format: on
     endif()
   endif()
 

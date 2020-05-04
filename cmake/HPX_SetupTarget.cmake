@@ -198,7 +198,7 @@ function(hpx_setup_target target)
   if(target_INSTALL AND NOT target_EXCLUDE_FROM_ALL)
     install(TARGETS ${target} ${install_export} ${target_INSTALL_FLAGS})
     if(target_INSTALL_PDB)
-      install(${target_INSTALL_PDB})
+      install(FILES ${target_INSTALL_PDB})
     endif()
     if(target_INSTALL_HEADERS AND (NOT target_HEADER_ROOT STREQUAL ""))
       install(

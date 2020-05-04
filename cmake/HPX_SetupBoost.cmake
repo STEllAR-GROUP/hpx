@@ -14,45 +14,26 @@ if(NOT TARGET hpx_dependencies_boost)
   endif()
 
   # Add additional version to recognize
+  # cmake-format: off
   set(Boost_ADDITIONAL_VERSIONS
       ${Boost_ADDITIONAL_VERSIONS}
-      "1.71.0"
-      "1.71"
-      "1.70.0"
-      "1.70"
-      "1.69.0"
-      "1.69"
-      "1.68.0"
-      "1.68"
-      "1.67.0"
-      "1.67"
-      "1.66.0"
-      "1.66"
-      "1.65.0"
-      "1.65"
-      "1.65.1"
-      "1.65.1"
-      "1.64.0"
-      "1.64"
-      "1.63.0"
-      "1.63"
-      "1.62.0"
-      "1.62"
-      "1.61.0"
-      "1.61"
-      "1.60.0"
-      "1.60"
-      "1.59.0"
-      "1.59"
-      "1.58.0"
-      "1.58"
-      "1.57.0"
-      "1.57"
+      "1.74.0" "1.74"
+      "1.73.0" "1.73"
+      "1.72.0" "1.72"
+      "1.71.0" "1.71"
+      "1.70.0" "1.70"
+      "1.69.0" "1.69"
+      "1.68.0" "1.68"
+      "1.67.0" "1.67"
+      "1.66.0" "1.66"
+      "1.65.0" "1.65" "1.65.1"
+      "1.64.0" "1.64"
+      "1.63.0" "1.63"
+      "1.62.0" "1.62"
+      "1.61.0" "1.61"
   )
-  set(Boost_MINIMUM_VERSION
-      "1.61"
-      CACHE INTERNAL "1.61" FORCE
-  )
+  # cmake-format: on
+  set(Boost_MINIMUM_VERSION "1.61" CACHE  INTERNAL "1.61" FORCE)
 
   set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
 

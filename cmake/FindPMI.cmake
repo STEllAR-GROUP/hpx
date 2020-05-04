@@ -61,9 +61,4 @@ endif()
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PMI DEFAULT_MSG PMI_LIBRARY PMI_INCLUDE_DIR)
 
-# foreach(v PMI_ROOT) get_property(_type CACHE ${v} PROPERTY TYPE) if(_type)
-# set_property(CACHE ${v} PROPERTY ADVANCED 1) if("x${_type}" STREQUAL
-# "xUNINITIALIZED") set_property(CACHE ${v} PROPERTY TYPE PATH) endif() endif()
-# endforeach()
-
 mark_as_advanced(PMI_ROOT PMI_LIBRARY PMI_INCLUDE_DIR)
