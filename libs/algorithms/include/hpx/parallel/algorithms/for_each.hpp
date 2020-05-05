@@ -16,17 +16,17 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
+#include <hpx/algorithms/traits/is_value_proxy.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/traits/is_value_proxy.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/type_support/identity.hpp>
 
+#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>

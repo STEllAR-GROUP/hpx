@@ -18,8 +18,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/is_value_proxy.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/algorithms/traits/is_value_proxy.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 

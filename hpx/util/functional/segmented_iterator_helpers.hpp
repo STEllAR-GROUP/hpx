@@ -8,7 +8,7 @@
 #define HPX_UTIL_FUNCTIONAL_SEGMENTED_ITERATOR_HELPERS_JUL_20_2015_1105AM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 
 namespace hpx { namespace util { namespace functional
 {

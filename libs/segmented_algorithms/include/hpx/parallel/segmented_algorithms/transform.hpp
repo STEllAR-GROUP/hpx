@@ -8,10 +8,10 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_TRANSFORM_JUN_21_2017_1157AM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

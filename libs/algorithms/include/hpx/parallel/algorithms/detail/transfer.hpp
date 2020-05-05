@@ -9,12 +9,12 @@
 
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #endif
 #include <hpx/parallel/util/tagged_pair.hpp>
 
+#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/parallel/tagspec.hpp>
-#include <hpx/parallel/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>

@@ -8,7 +8,7 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_FOR_EACH_OCT_15_2014_0839PM
 
 #include <hpx/config.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

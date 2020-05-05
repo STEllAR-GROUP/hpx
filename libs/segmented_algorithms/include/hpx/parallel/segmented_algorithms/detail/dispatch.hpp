@@ -8,13 +8,13 @@
 #define HPX_PARALLEL_ALGORITHM_REMOTE_DISPATCH_OCT_15_2014_0938PM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/execution_policy.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Auriane Reverdell
+//  Copyright (c) 2020 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,14 +6,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/config/defines.hpp>
-#include <hpx/util/detail/reserve.hpp>
+#include <hpx/util/traits/await_traits.hpp>
 
 #if defined(HPX_UTIL_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message("The header hpx/util/detail/reserve.hpp is deprecated, \
-    please include hpx/util/detail/reserve.hpp instead")
+#pragma message("The header hpx/util/await_traits.hpp is deprecated, \
+    please include hpx/util/traits/await_traits.hpp instead")
 #else
-#warning "The header hpx/util/detail/reserve.hpp is deprecated, \
-    please include hpx/util/detail/reserve.hpp instead"
+#warning "The header hpx/util/await_traits.hpp is deprecated, \
+    please include hpx/util/traits/await_traits.hpp instead"
 #endif
 #endif

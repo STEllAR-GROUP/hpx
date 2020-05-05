@@ -8,8 +8,8 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_REDUCE_JUN_21_2017_1157AM
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>

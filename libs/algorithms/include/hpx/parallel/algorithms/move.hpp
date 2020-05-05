@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
+#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/execution/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -8,7 +8,6 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(util_headers
   hpx/util/detail/reserve.hpp
-  hpx/util/await_traits.hpp
   hpx/util/calculate_fanout.hpp
   hpx/util/get_and_reset_value.hpp
   hpx/util/get_entry_as.hpp
@@ -17,10 +16,12 @@ set(util_headers
   hpx/util/manage_config.hpp
   hpx/util/regex_from_pattern.hpp
   hpx/util/sed_transform.hpp
+  hpx/util/traits/await_traits.hpp
 )
 
 set(util_compat_headers
   hpx/traits/detail/reserve.hpp
+  hpx/util/await_traits.hpp
 )
 
 set(util_sources
