@@ -6,15 +6,15 @@
 
 // This tests verifies that #2032 remains fixed
 
-#include <hpx/include/traits.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/traits.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 
 #include <vector>
 
 typedef hpx::util::iterator_range<
-        std::vector<hpx::shared_future<void> >::iterator
-    > future_range;
+    std::vector<hpx::shared_future<void>>::iterator>
+    future_range;
 
 typedef hpx::traits::is_future_range<future_range>::type error1;
 

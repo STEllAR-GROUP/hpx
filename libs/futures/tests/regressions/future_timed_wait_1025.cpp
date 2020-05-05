@@ -5,20 +5,22 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/threadmanager.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 
 #include <chrono>
 
 void wait_for(hpx::lcos::shared_future<int> f)
 {
-    try {
+    try
+    {
         f.wait_for(std::chrono::nanoseconds(1));
         hpx::this_thread::suspend(hpx::threads::suspended);
     }
-    catch (hpx::thread_interrupted const&) {
+    catch (hpx::thread_interrupted const&)
+    {
         // we should get an error reporting hpx::thread_interrupted
         HPX_TEST(true);
         return;
@@ -28,11 +30,14 @@ void wait_for(hpx::lcos::shared_future<int> f)
 
 void wait_until(hpx::lcos::shared_future<int> f)
 {
-    try {
-        f.wait_until(std::chrono::system_clock::now() + std::chrono::nanoseconds(1));
+    try
+    {
+        f.wait_until(
+            std::chrono::system_clock::now() + std::chrono::nanoseconds(1));
         hpx::this_thread::suspend(hpx::threads::suspended);
     }
-    catch (hpx::thread_interrupted const&) {
+    catch (hpx::thread_interrupted const&)
+    {
         // we should get an error reporting hpx::thread_interrupted
         HPX_TEST(true);
         return;
@@ -89,8 +94,8 @@ void test_wait_until()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 int hpx_main(variables_map&)
 {

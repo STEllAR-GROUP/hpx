@@ -9,23 +9,12 @@ set(tests
     after_588
     call_promise_get_gid_more_than_once
     exception_from_continuation_1613
-    future_2667
-    future_790
-    future_hang_on_get_629
-    future_hang_on_then_629
-    future_hang_on_wait_with_callback_629
-    future_timed_wait_1025
-    future_serialization_1898
-    future_unwrap_878
-    future_unwrap_1182
     lifetime_588
     lifetime_588_1
     promise_leak_996
     promise_1620
     receive_buffer_1733
     set_hpx_limit_798
-    shared_future_continuation_order
-    shared_future_then_2166
     shared_stated_leaked_1211
     shared_future_then_with_executor_3634
     sliding_semaphore_2338
@@ -35,9 +24,7 @@ set(tests
 
 set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
 set(after_588_PARAMETERS LOCALITIES 2)
-set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
-set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
@@ -78,32 +65,4 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     THREADS_PER_LOCALITY
     4
   )
-endif()
-
-# compile only tests
-if(HPX_WITH_COMPILE_ONLY_TESTS)
-  set(compile_tests future_range_ambiguity_2032)
-
-  if(HPX_WITH_FAIL_COMPILE_TESTS)
-    set(fail_compile_tests fail_future_2667)
-    foreach(fail_compile_test ${fail_compile_tests})
-      set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
-    endforeach()
-
-    set(compile_tests ${compile_tests} ${fail_compile_tests})
-  endif()
-
-  foreach(compile_test ${compile_tests})
-    set(sources ${compile_test}.cpp)
-
-    source_group("Source Files" FILES ${sources})
-
-    add_hpx_regression_compile_test(
-      "lcos" ${compile_test}
-      SOURCES ${sources} ${${compile_test}_FLAGS}
-      FOLDER "Tests/Regressions/LCOs/CompileOnly"
-    )
-
-  endforeach()
-
 endif()

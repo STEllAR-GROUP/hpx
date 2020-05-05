@@ -21,21 +21,15 @@ int main()
     hpx::lcos::local::promise<int> p;
     hpx::shared_future<int> f1 = p.get_future();
 
-    hpx::future<int> f2 =
-        f1.then(
-            [](hpx::shared_future<int> && f)
-            {
-                HPX_TEST_EQ(f.get(), 42);
-                return ++invocation_count;
-            });
+    hpx::future<int> f2 = f1.then([](hpx::shared_future<int>&& f) {
+        HPX_TEST_EQ(f.get(), 42);
+        return ++invocation_count;
+    });
 
-    hpx::future<int> f3 =
-        f1.then(
-            [](hpx::shared_future<int> && f)
-            {
-                HPX_TEST_EQ(f.get(), 42);
-                return ++invocation_count;
-            });
+    hpx::future<int> f3 = f1.then([](hpx::shared_future<int>&& f) {
+        HPX_TEST_EQ(f.get(), 42);
+        return ++invocation_count;
+    });
 
     p.set_value(42);
 
@@ -45,4 +39,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-

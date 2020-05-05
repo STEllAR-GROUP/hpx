@@ -17,13 +17,15 @@
 
 int main()
 {
-    hpx::lcos::local::promise<hpx::future<int> > promise;
-    hpx::future<hpx::future<int> > future = promise.get_future();
+    hpx::lcos::local::promise<hpx::future<int>> promise;
+    hpx::future<hpx::future<int>> future = promise.get_future();
     try
     {
         //promise.set_value(42);
         throw hpx::bad_parameter;
-    } catch(...) {
+    }
+    catch (...)
+    {
         promise.set_exception(std::current_exception());
     }
     HPX_TEST(future.has_exception());

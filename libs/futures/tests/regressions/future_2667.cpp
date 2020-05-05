@@ -25,14 +25,9 @@ void do_more_work()
 
 int main()
 {
-    hpx::future<hpx::future<void> > fut =
-        hpx::async(
-            []() -> hpx::future<void> {
-                return hpx::async(
-                    []() -> void {
-                        do_more_work();
-                    });
-            });
+    hpx::future<hpx::future<void>> fut = hpx::async([]() -> hpx::future<void> {
+        return hpx::async([]() -> void { do_more_work(); });
+    });
 
     hpx::util::high_resolution_timer t;
 

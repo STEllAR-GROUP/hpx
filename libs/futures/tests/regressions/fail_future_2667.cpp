@@ -17,14 +17,9 @@
 
 int main()
 {
-    hpx::future<hpx::future<int> > fut =
-        hpx::async(
-            []() -> hpx::future<int> {
-                return hpx::async(
-                    []() -> int {
-                        return 42;
-                    });
-            });
+    hpx::future<hpx::future<int>> fut = hpx::async([]() -> hpx::future<int> {
+        return hpx::async([]() -> int { return 42; });
+    });
 
     hpx::future<void> fut2 = std::move(fut);
     fut2.get();
