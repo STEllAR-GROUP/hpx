@@ -9,8 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/type_support/unused.hpp>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename Enable = void>
     struct promise_local_result
@@ -23,5 +22,5 @@ namespace hpx { namespace traits
     {
         typedef void type;
     };
-}}
+}}    // namespace hpx::traits
 

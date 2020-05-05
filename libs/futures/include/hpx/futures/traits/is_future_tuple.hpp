@@ -6,22 +6,21 @@
 
 #pragma once
 
-#include <hpx/traits/is_future.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <type_traits>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename Tuple, typename Enable = void>
-    struct is_future_tuple
-      : std::false_type
-    {};
+    struct is_future_tuple : std::false_type
+    {
+    };
 
-    template <typename ...Ts>
-    struct is_future_tuple<util::tuple<Ts...> >
-      : util::all_of<is_future<Ts>...>
-    {};
-}}
+    template <typename... Ts>
+    struct is_future_tuple<util::tuple<Ts...>> : util::all_of<is_future<Ts>...>
+    {
+    };
+}}    // namespace hpx::traits
 

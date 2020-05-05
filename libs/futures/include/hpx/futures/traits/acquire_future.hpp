@@ -8,25 +8,22 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/util/detail/reserve.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/util/detail/reserve.hpp>
 
 #include <algorithm>
 #include <array>
-#include <cstddef>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits
-{
-    namespace detail
-    {
+namespace hpx { namespace traits {
+    namespace detail {
         template <typename T, typename Enable = void>
         struct acquire_future_impl;
     }
@@ -34,20 +31,19 @@ namespace hpx { namespace traits
     template <typename T, typename Enable = void>
     struct acquire_future
       : detail::acquire_future_impl<typename std::decay<T>::type>
-    {};
+    {
+    };
 
     struct acquire_future_disp
     {
         template <typename T>
-        HPX_FORCEINLINE typename acquire_future<T>::type
-        operator()(T && t) const
+        HPX_FORCEINLINE typename acquire_future<T>::type operator()(T&& t) const
         {
             return acquire_future<T>()(std::forward<T>(t));
         }
     };
 
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable>
         struct acquire_future_impl
@@ -57,8 +53,7 @@ namespace hpx { namespace traits
             typedef T type;
 
             template <typename T_>
-            HPX_FORCEINLINE
-            T operator()(T_ && value) const
+            HPX_FORCEINLINE T operator()(T_&& value) const
             {
                 return std::forward<T_>(value);
             }
@@ -66,36 +61,36 @@ namespace hpx { namespace traits
 
         ///////////////////////////////////////////////////////////////////////
         template <typename R>
-        struct acquire_future_impl<hpx::lcos::future<R> >
+        struct acquire_future_impl<hpx::lcos::future<R>>
         {
             typedef hpx::lcos::future<R> type;
 
-            HPX_FORCEINLINE hpx::lcos::future<R>
-            operator()(hpx::lcos::future<R>& future) const
+            HPX_FORCEINLINE hpx::lcos::future<R> operator()(
+                hpx::lcos::future<R>& future) const
             {
                 return std::move(future);
             }
 
-            HPX_FORCEINLINE hpx::lcos::future<R>
-            operator()(hpx::lcos::future<R>&& future) const
+            HPX_FORCEINLINE hpx::lcos::future<R> operator()(
+                hpx::lcos::future<R>&& future) const
             {
                 return std::move(future);
             }
         };
 
         template <typename R>
-        struct acquire_future_impl<hpx::lcos::shared_future<R> >
+        struct acquire_future_impl<hpx::lcos::shared_future<R>>
         {
             typedef hpx::lcos::shared_future<R> type;
 
-            HPX_FORCEINLINE hpx::lcos::shared_future<R>
-            operator()(hpx::lcos::shared_future<R> const& future) const
+            HPX_FORCEINLINE hpx::lcos::shared_future<R> operator()(
+                hpx::lcos::shared_future<R> const& future) const
             {
                 return future;
             }
 
-            HPX_FORCEINLINE hpx::lcos::shared_future<R>
-            operator()(hpx::lcos::shared_future<R>&& future) const
+            HPX_FORCEINLINE hpx::lcos::shared_future<R> operator()(
+                hpx::lcos::shared_future<R>&& future) const
             {
                 return std::move(future);
             }
@@ -106,12 +101,9 @@ namespace hpx { namespace traits
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Range>
-        struct acquire_future_impl<
-            Range,
+        struct acquire_future_impl<Range,
             typename std::enable_if<
-                traits::is_future_range<Range>::value
-            >::type
-        >
+                traits::is_future_range<Range>::value>::type>
         {
             typedef typename traits::future_range_traits<Range>::future_type
                 future_type;
@@ -120,21 +112,18 @@ namespace hpx { namespace traits
 
             template <typename Range_>
             typename std::enable_if<
-                has_push_back<typename std::decay<Range_>::type>::value
-            >::type
-            transform_future_disp(Range_ && futures, Range& values) const
+                has_push_back<typename std::decay<Range_>::type>::value>::type
+            transform_future_disp(Range_&& futures, Range& values) const
             {
                 detail::reserve_if_random_access_by_range(values, futures);
-                std::transform(
-                    util::begin(futures), util::end(futures),
+                std::transform(util::begin(futures), util::end(futures),
                     std::back_inserter(values), acquire_future_disp());
             }
 
             template <typename Range_>
             typename std::enable_if<
-                !has_push_back<typename std::decay<Range_>::type>::value
-            >::type
-            transform_future_disp(Range_ && futures, Range& values) const
+                !has_push_back<typename std::decay<Range_>::type>::value>::type
+            transform_future_disp(Range_&& futures, Range& values) const
             {
                 detail::reserve_if_random_access_by_range(values, futures);
                 std::transform(util::begin(futures), util::end(futures),
@@ -142,14 +131,13 @@ namespace hpx { namespace traits
             }
 
             template <typename Range_>
-            HPX_FORCEINLINE Range
-            operator()(Range_ && futures) const
+            HPX_FORCEINLINE Range operator()(Range_&& futures) const
             {
                 Range values;
                 transform_future_disp(std::forward<Range_>(futures), values);
                 return values;
             }
         };
-    }
-}}
+    }    // namespace detail
+}}       // namespace hpx::traits
 

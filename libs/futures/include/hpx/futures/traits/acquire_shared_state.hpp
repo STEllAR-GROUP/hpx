@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
@@ -24,10 +24,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits
-{
-    namespace detail
-    {
+namespace hpx { namespace traits {
+    namespace detail {
         template <typename T, typename Enable = void>
         struct acquire_shared_state_impl;
     }
@@ -35,21 +33,20 @@ namespace hpx { namespace traits
     template <typename T, typename Enable = void>
     struct acquire_shared_state
       : detail::acquire_shared_state_impl<typename std::decay<T>::type>
-    {};
+    {
+    };
 
     struct acquire_shared_state_disp
     {
         template <typename T>
-        HPX_FORCEINLINE typename acquire_shared_state<T>::type
-        operator()(T && t) const
+        HPX_FORCEINLINE typename acquire_shared_state<T>::type operator()(
+            T&& t) const
         {
             return acquire_shared_state<T>()(std::forward<T>(t));
         }
     };
 
-
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable>
         struct acquire_shared_state_impl
@@ -59,8 +56,7 @@ namespace hpx { namespace traits
             typedef T type;
 
             template <typename T_>
-            HPX_FORCEINLINE
-            T operator()(T_ && value) const
+            HPX_FORCEINLINE T operator()(T_&& value) const
             {
                 return std::forward<T_>(value);
             }
@@ -68,19 +64,13 @@ namespace hpx { namespace traits
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Future>
-        struct acquire_shared_state_impl<
-            Future,
-            typename std::enable_if<
-                is_future<Future>::value
-            >::type
-        >
+        struct acquire_shared_state_impl<Future,
+            typename std::enable_if<is_future<Future>::value>::type>
         {
             typedef typename traits::detail::shared_state_ptr<
-                typename traits::future_traits<Future>::type
-            >::type const& type;
+                typename traits::future_traits<Future>::type>::type const& type;
 
-            HPX_FORCEINLINE type
-            operator()(Future const& f) const
+            HPX_FORCEINLINE type operator()(Future const& f) const
             {
                 return traits::future_access<Future>::get_shared_state(f);
             }
@@ -88,23 +78,21 @@ namespace hpx { namespace traits
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Range>
-        struct acquire_shared_state_impl<
-            Range,
+        struct acquire_shared_state_impl<Range,
             typename std::enable_if<
-                traits::is_future_range<Range>::value
-            >::type
-        >
+                traits::is_future_range<Range>::value>::type>
         {
             typedef typename traits::future_range_traits<Range>::future_type
                 future_type;
 
-            typedef typename traits::detail::shared_state_ptr_for<future_type>::type
-                shared_state_ptr;
+            typedef
+                typename traits::detail::shared_state_ptr_for<future_type>::type
+                    shared_state_ptr;
             typedef std::vector<shared_state_ptr> type;
 
             template <typename Range_>
-            HPX_FORCEINLINE std::vector<shared_state_ptr>
-            operator()(Range_&& futures) const
+            HPX_FORCEINLINE std::vector<shared_state_ptr> operator()(
+                Range_&& futures) const
             {
                 std::vector<shared_state_ptr> values;
                 detail::reserve_if_random_access_by_range(values, futures);
@@ -115,23 +103,22 @@ namespace hpx { namespace traits
                 return values;
             }
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename T>
-        HPX_FORCEINLINE typename acquire_shared_state<T>::type
-        get_shared_state(T && t)
+        HPX_FORCEINLINE typename acquire_shared_state<T>::type get_shared_state(
+            T&& t)
         {
             return acquire_shared_state<T>()(std::forward<T>(t));
         }
 
         template <typename R>
         HPX_FORCEINLINE
-        hpx::intrusive_ptr<lcos::detail::future_data_base<R> > const&
-        get_shared_state(
-            hpx::intrusive_ptr<lcos::detail::future_data_base<R> > const& t)
+            hpx::intrusive_ptr<lcos::detail::future_data_base<R>> const&
+            get_shared_state(
+                hpx::intrusive_ptr<lcos::detail::future_data_base<R>> const& t)
         {
             return t;
         }
@@ -147,6 +134,6 @@ namespace hpx { namespace traits
                 return traits::detail::get_shared_state(f);
             }
         };
-    }
-}}
+    }    // namespace detail
+}}       // namespace hpx::traits
 

@@ -78,6 +78,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_errors
     hpx_executors
+    hpx_execution
     hpx_functional
     hpx_io_service
     hpx_threading_base

@@ -11,58 +11,58 @@
 
 #include <type_traits>
 
-namespace hpx { namespace lcos
-{
-    template <typename R> class future;
-    template <typename R> class shared_future;
-}}
+namespace hpx { namespace lcos {
+    template <typename R>
+    class future;
+    template <typename R>
+    class shared_future;
+}}    // namespace hpx::lcos
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename Future, typename Enable = void>
         struct future_traits_customization_point
-        {};
-    }
+        {
+        };
+    }    // namespace detail
 
     template <typename T>
-    struct future_traits
-      : detail::future_traits_customization_point<T>
-    {};
+    struct future_traits : detail::future_traits_customization_point<T>
+    {
+    };
 
     template <typename Future>
-    struct future_traits<Future const>
-      : future_traits<Future>
-    {};
+    struct future_traits<Future const> : future_traits<Future>
+    {
+    };
 
     template <typename Future>
-    struct future_traits<Future&>
-      : future_traits<Future>
-    {};
+    struct future_traits<Future&> : future_traits<Future>
+    {
+    };
 
     template <typename Future>
-    struct future_traits<Future const &>
-      : future_traits<Future>
-    {};
+    struct future_traits<Future const&> : future_traits<Future>
+    {
+    };
 
     template <typename R>
-    struct future_traits<lcos::future<R> >
+    struct future_traits<lcos::future<R>>
     {
         typedef R type;
         typedef R result_type;
     };
 
     template <typename R>
-    struct future_traits<lcos::shared_future<R> >
+    struct future_traits<lcos::shared_future<R>>
     {
         typedef R type;
         typedef R const& result_type;
     };
 
     template <>
-    struct future_traits<lcos::shared_future<void> >
+    struct future_traits<lcos::shared_future<void>>
     {
         typedef void type;
         typedef void result_type;
@@ -70,15 +70,14 @@ namespace hpx { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
-    struct is_future_void
-      : std::false_type
-    {};
+    struct is_future_void : std::false_type
+    {
+    };
 
     template <typename Future>
     struct is_future_void<Future,
-            typename std::enable_if<is_future<Future>::value>::type>
+        typename std::enable_if<is_future<Future>::value>::type>
       : std::is_void<typename future_traits<Future>::type>
-    {};
-}}
-
-
+    {
+    };
+}}    // namespace hpx::traits

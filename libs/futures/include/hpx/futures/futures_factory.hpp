@@ -18,9 +18,9 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>
-#include <hpx/threading_base/thread_description.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -101,8 +101,7 @@ namespace hpx { namespace lcos { namespace local {
         protected:
             // run in a separate thread
             threads::thread_id_type apply(threads::thread_pool_base* pool,
-                const char *annotation,
-                launch policy,
+                const char* annotation, launch policy,
                 threads::thread_priority priority,
                 threads::thread_stacksize stacksize,
                 threads::thread_schedule_hint schedulehint,
@@ -250,8 +249,8 @@ namespace hpx { namespace lcos { namespace local {
         protected:
             // run in a separate thread
             threads::thread_id_type apply(threads::thread_pool_base* pool,
-                const char *annotation,
-                launch policy, threads::thread_priority priority,
+                const char* annotation, launch policy,
+                threads::thread_priority priority,
                 threads::thread_stacksize stacksize,
                 threads::thread_schedule_hint schedulehint,
                 error_code& ec) override
@@ -270,9 +269,8 @@ namespace hpx { namespace lcos { namespace local {
                     return threads::invalid_thread_id;
                 }
 
-                return this->base_type::apply(
-                    pool, annotation, policy, priority, stacksize,
-                    schedulehint, ec);
+                return this->base_type::apply(pool, annotation, policy,
+                    priority, stacksize, schedulehint, ec);
             }
         };
 
@@ -762,7 +760,7 @@ namespace hpx { namespace lcos { namespace local {
 
         // asynchronous execution
         threads::thread_id_type apply(
-            const char *annotation = "futures_factory::apply",
+            const char* annotation = "futures_factory::apply",
             launch policy = launch::async,
             threads::thread_priority priority =
                 threads::thread_priority_default,
@@ -773,12 +771,11 @@ namespace hpx { namespace lcos { namespace local {
             error_code& ec = throws) const
         {
             return apply(threads::detail::get_self_or_default_pool(),
-                annotation, policy,
-                priority, stacksize, schedulehint, ec);
+                annotation, policy, priority, stacksize, schedulehint, ec);
         }
 
         threads::thread_id_type apply(threads::thread_pool_base* pool,
-            const char *annotation = "futures_factory::apply",
+            const char* annotation = "futures_factory::apply",
             launch policy = launch::async,
             threads::thread_priority priority =
                 threads::thread_priority_default,
@@ -795,8 +792,8 @@ namespace hpx { namespace lcos { namespace local {
                     "futures_factory invalid (has it been moved?)");
                 return threads::invalid_thread_id;
             }
-            return task_->apply(
-                pool, annotation, policy, priority, stacksize, schedulehint, ec);
+            return task_->apply(pool, annotation, policy, priority, stacksize,
+                schedulehint, ec);
         }
 
         // This is the same as get_future, except that it moves the

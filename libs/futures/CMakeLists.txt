@@ -9,27 +9,37 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(futures_headers
-  # TODO: Sort
-  hpx/lcos/detail/future_traits.hpp
-  hpx/lcos/future.hpp
-  hpx/lcos/local/futures_factory.hpp
-  hpx/lcos/local/packaged_continuation.hpp
-  hpx/traits/acquire_future.hpp
-  hpx/traits/acquire_shared_state.hpp
-  hpx/traits/future_access.hpp
-  hpx/traits/future_then_result.hpp
-  hpx/traits/future_traits.hpp
-  hpx/traits/is_future.hpp
-  hpx/traits/is_future_range.hpp
-  hpx/traits/is_future_tuple.hpp
-  hpx/traits/promise_local_result.hpp
+    hpx/futures/future.hpp
+    hpx/futures/futures_factory.hpp
+    hpx/futures/packaged_continuation.hpp
+    hpx/futures/traits/acquire_future.hpp
+    hpx/futures/traits/acquire_shared_state.hpp
+    hpx/futures/traits/future_access.hpp
+    hpx/futures/traits/future_then_result.hpp
+    hpx/futures/traits/future_traits.hpp
+    hpx/futures/traits/is_future.hpp
+    hpx/futures/traits/is_future_range.hpp
+    hpx/futures/traits/is_future_tuple.hpp
+    hpx/futures/traits/promise_local_result.hpp
 )
 
-set(futures_compat_headers)
-
-set(futures_sources
-  future_data.cpp
+set(futures_compat_headers
+    hpx/lcos/detail/future_traits.hpp
+    hpx/lcos/future.hpp
+    hpx/lcos/local/futures_factory.hpp
+    hpx/lcos/local/packaged_continuation.hpp
+    hpx/traits/acquire_future.hpp
+    hpx/traits/acquire_shared_state.hpp
+    hpx/traits/future_access.hpp
+    hpx/traits/future_then_result.hpp
+    hpx/traits/future_traits.hpp
+    hpx/traits/is_future.hpp
+    hpx/traits/is_future_range.hpp
+    hpx/traits/is_future_tuple.hpp
+    hpx/traits/promise_local_result.hpp
 )
+
+set(futures_sources future_data.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(futures

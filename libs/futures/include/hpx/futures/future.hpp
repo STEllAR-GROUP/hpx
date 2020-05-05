@@ -1283,14 +1283,16 @@ namespace hpx { namespace lcos {
     // Allow to convert any future<U> into any other future<R> based on a given
     // conversion function: R conv(U).
     template <typename R, typename U, typename Conv>
-    hpx::lcos::future<R> make_future(hpx::lcos::shared_future<U> const& f, Conv&& conv)
+    hpx::lcos::future<R> make_future(
+        hpx::lcos::shared_future<U> const& f, Conv&& conv)
     {
         static_assert(hpx::traits::is_invocable_r<R, Conv, U>::value,
             "the argument type must be convertible to the requested "
             "result type by using the supplied conversion function");
 
         return f.then(hpx::launch::sync,
-            [conv = std::forward<Conv>(conv)](hpx::lcos::shared_future<U> const& f) {
+            [conv = std::forward<Conv>(conv)](
+                hpx::lcos::shared_future<U> const& f) {
                 return hpx::util::invoke(conv, f.get());
             });
     }
@@ -1305,13 +1307,15 @@ namespace hpx { namespace lcos {
     }
 
     template <typename R>
-    hpx::lcos::shared_future<R>& make_shared_future(hpx::lcos::shared_future<R>& f)
+    hpx::lcos::shared_future<R>& make_shared_future(
+        hpx::lcos::shared_future<R>& f)
     {
         return f;
     }
 
     template <typename R>
-    hpx::lcos::shared_future<R>&& make_shared_future(hpx::lcos::shared_future<R>&& f)
+    hpx::lcos::shared_future<R>&& make_shared_future(
+        hpx::lcos::shared_future<R>&& f)
     {
         return f;
     }

@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_traits.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
@@ -18,17 +18,16 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        struct no_executor {};
-    }
+    namespace detail {
+        struct no_executor
+        {
+        };
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename Future, typename F>
         struct continuation_not_callable
         {
@@ -37,8 +36,8 @@ namespace hpx { namespace traits
                 f(std::move(future));
             }
 
-            using type = decltype(
-                error(std::declval<Future>(), std::declval<F&>()));
+            using type =
+                decltype(error(std::declval<Future>(), std::declval<F&>()));
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -49,33 +48,29 @@ namespace hpx { namespace traits
         };
 
         template <typename Future, typename F>
-        struct future_then_result<
-            Future, F,
+        struct future_then_result<Future, F,
             typename hpx::util::always_void<
-                typename hpx::util::invoke_result<F&, Future>::type
-            >::type
-        >
+                typename hpx::util::invoke_result<F&, Future>::type>::type>
         {
-            typedef typename hpx::util::invoke_result<F&, Future>::type
-                cont_result;
+            typedef
+                typename hpx::util::invoke_result<F&, Future>::type cont_result;
 
             // perform unwrapping of future<future<R>>
             typedef typename util::lazy_conditional<
-                    hpx::traits::detail::is_unique_future<cont_result>::value,
-                    hpx::traits::future_traits<cont_result>,
-                    hpx::util::identity<cont_result>
-                >::type result_type;
+                hpx::traits::detail::is_unique_future<cont_result>::value,
+                hpx::traits::future_traits<cont_result>,
+                hpx::util::identity<cont_result>>::type result_type;
 
             typedef hpx::lcos::future<result_type> type;
         };
 
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F>
-    struct future_then_result
-      : detail::future_then_result<Future, F>
-    {};
+    struct future_then_result : detail::future_then_result<Future, F>
+    {
+    };
 
-}}  // hpx::traits
+}}    // namespace hpx::traits
 
