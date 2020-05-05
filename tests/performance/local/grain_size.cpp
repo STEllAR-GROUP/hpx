@@ -122,18 +122,49 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv, std::uint6
     print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
 }
 
+void measure_function_futures_for_loopctr(std::uint64_t count, bool csv, std::uint64_t chunk_size, std::uint64_t iter_length)
+{
+    // start the clock
+    high_resolution_timer walltime;
+    hpx::evaluate_active_counters(true, "Initialization");
+
+    hpx::parallel::for_loop(hpx::parallel::execution::par.with(
+                                hpx::parallel::execution::dynamic_chunk_size( chunk_size )),
+        0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
+    hpx::evaluate_active_counters(false, "Done");
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
+}
+
 void measure_function_futures_for_loop_spt(std::uint64_t count, bool csv, std::uint64_t iter_length)
 {
     // start the clock
     high_resolution_timer walltime;
+    hpx::evaluate_active_counters(true, "Initialization");
+
     hpx::parallel::for_loop(hpx::parallel::execution::par.on(
                                  hpx::parallel::execution::splittable_executor()), 0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
     
+    hpx::evaluate_active_counters(false, "Done");
     // stop the clock
     const double duration = walltime.elapsed();
     print_stats("for_loop", "par", "splittable_executor", count, duration, csv);
 }
     
+
+void measure_function_futures_for_loop_sptctr(std::uint64_t count, bool csv, std::uint64_t iter_length)
+{
+    // start the clock
+    high_resolution_timer walltime;
+    hpx::parallel::for_loop(hpx::parallel::execution::par.on(
+                                 hpx::parallel::execution::splittable_executor()), 0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
+
+    // stop the clock
+    const double duration = walltime.elapsed();
+    print_stats("for_loop", "par", "splittable_executor", count, duration, csv);
+}
 
 void measure_function_futures_for_loop_seq(std::uint64_t count, bool csv, std::uint64_t iter_length)
 {
@@ -171,6 +202,7 @@ int hpx_main(variables_map& vm)
         bool csv = vm.count("csv") != 0;
         bool seq = vm.count("seq") != 0;
         bool spt = vm.count("spt") != 0;
+        bool ctr = vm.count("counter") != 0;
 
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
@@ -184,17 +216,38 @@ int hpx_main(variables_map& vm)
 	}
 	else
 	{
-      	  	if (spt)
-        	{
-                	for (int i = 0; i < repetitions; i++)
-                	{
-                    		measure_function_futures_for_loop_spt(count, csv, iter_length);
-                	}
+      	  	if (spt)        	
+		{
+			if (ctr)
+			{
+                                for (int i = 0; i < repetitions; i++)
+                                {
+                                        measure_function_futures_for_loop_sptctr(count, csv, iter_length);
+                                }
+			}
+			else
+			{	
+                		for (int i = 0; i < repetitions; i++)
+                		{
+                    			measure_function_futures_for_loop_spt(count, csv, iter_length);
+                		}
+			}
        	 	}	
-		for (int i = 0; i < repetitions; i++)
-                {
-                    measure_function_futures_for_loop(count, csv, chunk_size, iter_length);
-                }	
+		if (ctr)
+		{
+                        for (int i = 0; i < repetitions; i++)
+                        {
+                                 measure_function_futures_for_loopctr(count, csv, chunk_size, iter_length);
+                        }
+
+		}
+		else
+		{
+			for (int i = 0; i < repetitions; i++)
+               		{
+                   		 measure_function_futures_for_loop(count, csv, chunk_size, iter_length);
+               		}
+		}	
 	}
     }
 
@@ -218,7 +271,9 @@ int main(int argc, char* argv[])
         ("seq","run sequqntially or in parallel")
         ("spt","run using splittable executor")
         ("iter_length",value<std::uint64_t>()->default_value(1), "length of each iteration")
-    	("chunk_size",value<std::uint64_t>()->default_value(1), "chunk size");
+    	("chunk_size",value<std::uint64_t>()->default_value(1), "chunk size")
+        ("counter","print data collected from performance counters");
+
     // clang-format on
 
     // Initialize and run HPX.
