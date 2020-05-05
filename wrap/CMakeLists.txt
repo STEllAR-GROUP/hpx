@@ -11,26 +11,39 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR APPLE)
   set(HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT ON)
 endif()
 
-hpx_option(HPX_WITH_DYNAMIC_HPX_MAIN BOOL
+hpx_option(
+  HPX_WITH_DYNAMIC_HPX_MAIN
+  BOOL
   "Enable dynamic overload of system ``main()`` (Linux and Apple only, default: ON)"
-  ${HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT} ADVANCED)
+  ${HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT}
+  ADVANCED
+)
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   if(NOT HPX_WITH_DYNAMIC_HPX_MAIN_DEFAULT)
-    hpx_error("HPX_WITH_DYNAMIC_HPX_MAIN was set to ON, but the option is only available on Linux and Apple (this is \"${CMAKE_SYSTEM_NAME}\").")
+    hpx_error(
+      "HPX_WITH_DYNAMIC_HPX_MAIN was set to ON, but the option is only available on Linux and Apple (this is \"${CMAKE_SYSTEM_NAME}\")."
+    )
   endif()
-  hpx_add_config_define_namespace(DEFINE HPX_HAVE_DYNAMIC_HPX_MAIN NAMESPACE wrap)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_HAVE_DYNAMIC_HPX_MAIN NAMESPACE wrap
+  )
 endif()
 
 set(config_header
-  "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/wrap/config/defines.hpp")
+    "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/wrap/config/defines.hpp"
+)
 write_config_defines_file(NAMESPACE wrap FILENAME ${config_header})
 
-set(hpx_wrap_HEADERS "" CACHE INTERNAL "Headers for libhpx_wrap." FORCE)
-list(APPEND hpx_wrap_HEADERS
-  hpx/hpx_main.hpp
-  hpx/hpx_main_impl.hpp)
+set(hpx_wrap_HEADERS
+    ""
+    CACHE INTERNAL "Headers for libhpx_wrap." FORCE
+)
+list(APPEND hpx_wrap_HEADERS hpx/hpx_main.hpp hpx/hpx_main_impl.hpp)
 
-set(hpx_wrap_SOURCES "" CACHE INTERNAL "Sources for libhpx_wrap." FORCE)
+set(hpx_wrap_SOURCES
+    ""
+    CACHE INTERNAL "Sources for libhpx_wrap." FORCE
+)
 list(APPEND hpx_wrap_SOURCES main.cpp)
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   list(APPEND hpx_wrap_SOURCES hpx_wrap.cpp)
@@ -43,7 +56,8 @@ add_hpx_source_group(
   NAME hpx_wrap
   CLASS "Source Files"
   ROOT "${hpx_wrap_SOURCE_ROOT}"
-  TARGETS ${hpx_wrap_SOURCES})
+  TARGETS ${hpx_wrap_SOURCES}
+)
 
 set(hpx_wrap_HEADER_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include)
 list(TRANSFORM hpx_wrap_HEADERS PREPEND ${hpx_wrap_HEADER_ROOT}/)
@@ -51,12 +65,14 @@ add_hpx_source_group(
   NAME hpx_wrap
   CLASS "Header Files"
   ROOT "${hpx_wrap_HEADER_ROOT}"
-  TARGETS ${hpx_wrap_HEADERS})
+  TARGETS ${hpx_wrap_HEADERS}
+)
 add_hpx_source_group(
   NAME hpx_wrap
   CLASS "Generated Files"
   ROOT "${CMAKE_CURRENT_BINARY_DIR}/include/hpx"
-  TARGETS ${config_header})
+  TARGETS ${config_header}
+)
 
 add_library(
   hpx_wrap STATIC ${hpx_wrap_SOURCES} ${hpx_wrap_HEADERS} ${config_header}
@@ -101,8 +117,7 @@ install(
   EXPORT HPXInternalTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT runtime
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
 )
 
 install(

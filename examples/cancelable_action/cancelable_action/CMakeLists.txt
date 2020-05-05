@@ -4,11 +4,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-add_hpx_component(cancelable_action
-    INTERNAL_FLAGS
-    NOEXPORT
-    AUTOGLOB
-    HEADER_GLOB "cancelable_action.h*"
-    SOURCE_GLOB "cancelable_action.c*"
-    FOLDER "Examples/CancelableAction")
-
+add_hpx_component(
+  cancelable_action INTERNAL_FLAGS NOEXPORT AUTOGLOB
+  HEADER_GLOB "cancelable_action.h*"
+  SOURCE_GLOB "cancelable_action.c*"
+  FOLDER "Examples/CancelableAction"
+)

@@ -6,33 +6,34 @@
 
 set(root "${PROJECT_SOURCE_DIR}/examples/performance_counters/sine")
 
-###############################################################################
+# ##############################################################################
 # add component
-add_hpx_component(sine
-  INTERNAL_FLAGS
-  NOEXPORT
+add_hpx_component(
+  sine INTERNAL_FLAGS NOEXPORT
   FOLDER "Examples/PerformanceCounters/Sine"
   HEADER_GLOB "${root}/*.h*"
   SOURCE_GLOB "${root}/sine.c*"
-  AUTOGLOB
-  PLUGIN)
+  AUTOGLOB PLUGIN
+)
 
-###############################################################################
+# ##############################################################################
 # add example executable
-add_hpx_executable(sine_client
-  INTERNAL_FLAGS
+add_hpx_executable(
+  sine_client INTERNAL_FLAGS
   SOURCES sine_client.cpp
   DEPENDENCIES sine_component
-  FOLDER "Examples/PerformanceCounters/Sine")
+  FOLDER "Examples/PerformanceCounters/Sine"
+)
 
 # add a custom target for this example
 add_hpx_pseudo_target(examples.performance_counters.sine_client)
 
 # make pseudo-targets depend on master pseudo-target
-add_hpx_pseudo_dependencies(examples.performance_counters
-                            examples.performance_counters.sine_client)
+add_hpx_pseudo_dependencies(
+  examples.performance_counters examples.performance_counters.sine_client
+)
 
 # add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(examples.performance_counters.sine_client
-                            sine_client)
-
+add_hpx_pseudo_dependencies(
+  examples.performance_counters.sine_client sine_client
+)

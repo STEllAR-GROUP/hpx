@@ -9,19 +9,15 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
 
-set(components
-    simple_central_tuplespace
-   )
+set(components simple_central_tuplespace)
 
 foreach(component ${components})
 
-  add_hpx_component(${component}
-    INTERNAL_FLAGS
-    NOEXPORT
-    AUTOGLOB
+  add_hpx_component(
+    ${component} INTERNAL_FLAGS NOEXPORT AUTOGLOB
     HEADER_GLOB "${component}.h*"
     SOURCE_GLOB "${component}.c*"
-    FOLDER "Examples/TupleSpace/${component}")
+    FOLDER "Examples/TupleSpace/${component}"
+  )
 
 endforeach()
-

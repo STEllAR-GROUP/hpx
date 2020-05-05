@@ -38,50 +38,50 @@ set(collectives_compat_headers
 set(collectives_sources barrier.cpp latch.cpp detail/barrier_node.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(collectives
-    COMPATIBILITY_HEADERS ON    # Added in 1.4.0
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    SOURCES ${collectives_sources}
-    HEADERS ${collectives_headers}
-    COMPAT_HEADERS ${collectives_compat_headers}
-    DEPENDENCIES
-      hpx_affinity
-      hpx_allocator_support
-      hpx_assertion
-      hpx_async
-      hpx_cache
-      hpx_concurrency
-      hpx_config
-      hpx_coroutines
-      hpx_datastructures
-      hpx_errors
-      hpx_execution
-      hpx_executors
-      hpx_format
-      hpx_functional
-      hpx_hardware
-      hpx_hashing
-      hpx_iterator_support
-      hpx_local_lcos
-      hpx_logging
-      hpx_memory
-      hpx_pack_traversal
-      hpx_performance_counters
-      hpx_preprocessor
-      hpx_program_options
-      hpx_runtime_configuration
-      hpx_serialization
-      hpx_synchronization
-      hpx_timing
-      hpx_threading
-      hpx_thread_support
-      hpx_threading_base
-      hpx_threadmanager
-      hpx_topology
-      hpx_type_support
-      hpx_util
-    CMAKE_SUBDIRS examples tests
+add_hpx_module(
+  collectives
+  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  SOURCES ${collectives_sources}
+  HEADERS ${collectives_headers}
+  COMPAT_HEADERS ${collectives_compat_headers}
+  DEPENDENCIES
+    hpx_affinity
+    hpx_allocator_support
+    hpx_assertion
+    hpx_async
+    hpx_cache
+    hpx_concurrency
+    hpx_config
+    hpx_coroutines
+    hpx_datastructures
+    hpx_errors
+    hpx_execution
+    hpx_executors
+    hpx_format
+    hpx_functional
+    hpx_hardware
+    hpx_hashing
+    hpx_iterator_support
+    hpx_local_lcos
+    hpx_logging
+    hpx_memory
+    hpx_pack_traversal
+    hpx_performance_counters
+    hpx_preprocessor
+    hpx_program_options
+    hpx_runtime_configuration
+    hpx_serialization
+    hpx_synchronization
+    hpx_timing
+    hpx_threading
+    hpx_thread_support
+    hpx_threading_base
+    hpx_threadmanager
+    hpx_topology
+    hpx_type_support
+    hpx_util
+  CMAKE_SUBDIRS examples tests
 )
 
 # Temporary since the module still depends on some runtime files

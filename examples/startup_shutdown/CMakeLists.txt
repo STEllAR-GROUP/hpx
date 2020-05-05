@@ -8,11 +8,13 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
 
-add_hpx_component(startup_shutdown
-  INTERNAL_FLAGS
-  NOEXPORT
+add_hpx_component(
+  startup_shutdown INTERNAL_FLAGS NOEXPORT
   FOLDER "Examples/StartupShutdown"
-  AUTOGLOB)
+  AUTOGLOB
+)
 
 # make pseudo-targets depend on master pseudo-target
-add_hpx_pseudo_dependencies(examples.startup_shutdown startup_shutdown_component)
+add_hpx_pseudo_dependencies(
+  examples.startup_shutdown startup_shutdown_component
+)
