@@ -11,9 +11,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <hpx/runtime_distributed.hpp>

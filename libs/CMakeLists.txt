@@ -66,6 +66,7 @@ set(HPX_CANDIDATE_LIBS
     resiliency
     resource_partitioner
     runtime_configuration
+    runtime_local
     schedulers
     segmented_algorithms
     serialization

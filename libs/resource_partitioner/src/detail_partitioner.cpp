@@ -13,7 +13,6 @@
 #include <hpx/mpi_base.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/config_entry.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -234,7 +233,7 @@ namespace hpx { namespace resource { namespace detail {
 #endif
 
         std::string default_scheduler_mode_str =
-            hpx::get_config_entry("hpx.default_scheduler_mode", std::string());
+            cfg_.rtcfg_.get_entry("hpx.default_scheduler_mode", std::string());
         if (!default_scheduler_mode_str.empty())
         {
             default_scheduler_mode_ = threads::policies::scheduler_mode(
@@ -913,7 +912,7 @@ namespace hpx { namespace resource { namespace detail {
 
         pus_needed_ = affinity_data_.init(cfg_.num_threads_,
             hpx::util::from_string<std::size_t>(
-                get_config_entry("hpx.cores", 0), 0),
+                cfg_.rtcfg_.get_entry("hpx.cores", 0), 0),
             get_pu_offset(cfg_), get_pu_step(cfg_),
             static_cast<std::size_t>(cfg_.rtcfg_.get_first_used_core()),
             get_affinity_domain(cfg_), affinity_description,

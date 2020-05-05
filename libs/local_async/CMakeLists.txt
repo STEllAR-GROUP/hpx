@@ -24,6 +24,7 @@ add_hpx_module(
     hpx_coroutines
     hpx_datastructures
     hpx_execution
+    hpx_executors
     hpx_functional
     hpx_memory
     hpx_threading_base

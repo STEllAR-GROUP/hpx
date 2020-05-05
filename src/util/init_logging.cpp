@@ -17,7 +17,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/get_entry_as.hpp>

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>
 #include <hpx/runtime/threads/run_as_os_thread.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>

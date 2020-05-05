@@ -14,17 +14,17 @@
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/naming_base.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/util/debugging.hpp>
+#include <hpx/runtime_local/debugging.hpp>
 #include <hpx/version.hpp>
 
 #if defined(HPX_WINDOWS)

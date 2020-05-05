@@ -85,6 +85,7 @@ if(HPX_WITH_PARCELPORT_LIBFABRIC)
       hpx_performance_counters
       hpx_plugin
       hpx_program_options
+      hpx_runtime_local
       hpx_serialization
       hpx_threading
       hpx_threadmanager

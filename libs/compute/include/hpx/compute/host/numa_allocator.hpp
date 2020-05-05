@@ -15,7 +15,7 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <cstddef>

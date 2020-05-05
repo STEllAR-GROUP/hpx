@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>

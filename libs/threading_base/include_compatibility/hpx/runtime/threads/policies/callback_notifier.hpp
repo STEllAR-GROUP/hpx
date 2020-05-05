@@ -10,7 +10,7 @@
 #include <hpx/threading_base/config/defines.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
-#if defined(HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS)
+#if defined(HPX_THREADING_BASE_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/callback_notifier.hpp is deprecated, \

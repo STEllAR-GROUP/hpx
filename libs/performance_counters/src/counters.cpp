@@ -23,7 +23,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
-#include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>

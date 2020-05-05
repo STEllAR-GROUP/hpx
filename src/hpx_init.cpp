@@ -24,15 +24,15 @@
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/schedulers.hpp>
-#include <hpx/runtime_handlers.hpp>
+#include <hpx/runtime_local/runtime_handlers.hpp>
 #include <hpx/string_util/split.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/testing.hpp>
@@ -40,9 +40,8 @@
 #include <hpx/threading/thread.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/util/debugging.hpp>
+#include <hpx/runtime_local/debugging.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/register_locks_globally.hpp>
 
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -59,6 +58,7 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/init_logging.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/register_locks_globally.hpp>
 #endif
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
@@ -372,7 +372,7 @@ namespace hpx
                 util::disable_lock_detection();
             }
 #endif
-#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
             if (cms.rtcfg_.enable_global_lock_detection())
             {
                 util::enable_global_lock_detection();

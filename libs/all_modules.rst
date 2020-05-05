@@ -68,6 +68,7 @@ All modules
    /libs/resiliency/docs/index.rst
    /libs/resource_partitioner/docs/index.rst
    /libs/runtime_configuration/docs/index.rst
+   /libs/runtime_local/docs/index.rst
    /libs/schedulers/docs/index.rst
    /libs/segmented_algorithms/docs/index.rst
    /libs/serialization/docs/index.rst

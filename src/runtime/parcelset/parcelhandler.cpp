@@ -27,14 +27,14 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/message_handler_fwd.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/state.hpp>
 #include <hpx/string_util.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>

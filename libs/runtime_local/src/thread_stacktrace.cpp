@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/debug/thread_stacktrace.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
 
 #include <iomanip>
 #include <sstream>

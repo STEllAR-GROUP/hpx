@@ -7,8 +7,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/debugging/attach_debugger.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/util/debugging.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/debugging.hpp>
 
 #include <string>
 

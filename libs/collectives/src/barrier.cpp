@@ -10,7 +10,7 @@
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>

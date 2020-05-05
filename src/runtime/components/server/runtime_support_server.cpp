@@ -7,14 +7,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/mpi_base.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing.hpp>
 #include <hpx/util/from_string.hpp>
@@ -40,9 +40,9 @@
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/threadmanager.hpp>
 
 #include <hpx/collectives.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>

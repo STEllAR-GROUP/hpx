@@ -14,7 +14,7 @@
 #include <hpx/execution/traits/is_executor_parameters.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/get_os_thread_count.hpp>
+#include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>

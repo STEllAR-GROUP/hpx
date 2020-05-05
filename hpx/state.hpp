@@ -9,17 +9,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 
 namespace hpx
 {
-    namespace threads
-    {
-        // return whether thread manager is in the state described by 'mask'
-        HPX_EXPORT bool threadmanager_is(state st);
-        HPX_EXPORT bool threadmanager_is_at_least(state st);
-    }
-
     namespace agas
     {
         // return whether resolver client is in state described by 'mask'

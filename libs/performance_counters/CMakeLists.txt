@@ -73,6 +73,7 @@ add_hpx_module(
     hpx_functional
     hpx_logging
     hpx_pack_traversal
+    hpx_runtime_local
     hpx_serialization
     hpx_synchronization
     hpx_static_reinit

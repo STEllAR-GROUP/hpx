@@ -14,8 +14,8 @@
 #include <hpx/program_options.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/functional/function.hpp>

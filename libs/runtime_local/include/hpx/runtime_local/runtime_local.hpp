@@ -12,17 +12,17 @@
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/thread_hooks.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/thread_hooks.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
-#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/topology.hpp>
-#include <hpx/util/thread_mapper.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>
@@ -500,4 +500,3 @@ namespace hpx {
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
-

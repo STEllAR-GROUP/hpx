@@ -12,15 +12,14 @@
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/runtime_handlers.hpp>
+#include <hpx/runtime_local/runtime_handlers.hpp>
 #include <hpx/threadmanager.hpp>
 #include <hpx/debugging/backtrace.hpp>
-#include <hpx/util/debugging.hpp>
+#include <hpx/runtime_local/debugging.hpp>
 
 #include <cstddef>
 #include <iostream>
