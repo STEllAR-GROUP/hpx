@@ -4,11 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/future.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -25,8 +25,7 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace detail
-{
+namespace hpx { namespace lcos { namespace detail {
     future_data_refcnt_base::~future_data_refcnt_base() = default;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -59,8 +58,7 @@ namespace hpx { namespace lcos { namespace detail
         // launch a new thread executing the given function
         threads::thread_id_type tid = p.apply("run_on_completed_on_new_thread",
             policy, threads::thread_priority_boost,
-            threads::thread_stacksize_current,
-            threads::thread_schedule_hint());
+            threads::thread_stacksize_current, threads::thread_schedule_hint());
 
         // wait for the task to run
         if (is_hpx_thread)
@@ -74,18 +72,18 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    future_data_base<traits::detail::future_data_void>::
-        ~future_data_base()
-    {}
+    future_data_base<traits::detail::future_data_void>::~future_data_base() {}
 
     static util::unused_type unused_;
 
-    util::unused_type* future_data_base<traits::detail::future_data_void>::
-        get_result_void(void const* storage, error_code& ec)
+    util::unused_type*
+    future_data_base<traits::detail::future_data_void>::get_result_void(
+        void const* storage, error_code& ec)
     {
         // yields control if needed
         state s = wait(ec);
-        if (ec) return nullptr;
+        if (ec)
+            return nullptr;
 
         // No locking is required. Once a future has been made ready, which
         // is a postcondition of wait, either:
@@ -109,8 +107,7 @@ namespace hpx { namespace lcos { namespace detail
         if (s == empty)
         {
             // the value has already been moved out of this future
-            HPX_THROWS_IF(ec, no_state,
-                "future_data_base::get_result",
+            HPX_THROWS_IF(ec, no_state, "future_data_base::get_result",
                 "this future has no valid shared state");
             return nullptr;
         }
@@ -124,11 +121,13 @@ namespace hpx { namespace lcos { namespace detail
                 static_cast<std::exception_ptr const*>(storage);
             // an error has been reported in the meantime, throw or set
             // the error code
-            if (&ec == &throws) {
+            if (&ec == &throws)
+            {
                 std::rethrow_exception(*exception_ptr);
                 // never reached
             }
-            else {
+            else
+            {
                 ec = make_error_code(*exception_ptr);
             }
         }
@@ -140,22 +139,25 @@ namespace hpx { namespace lcos { namespace detail
     void future_data_base<traits::detail::future_data_void>::run_on_completed(
         completed_callback_type&& on_completed) noexcept
     {
-        try {
+        try
+        {
             hpx::util::annotate_function annotate(on_completed);
             on_completed();
         }
-        catch (...) {
+        catch (...)
+        {
             // If the completion handler throws an exception, there's nothing
             // we can do, report the exception and terminate.
             // TODO: This should not be here.
-            hpx::detail::report_exception_and_terminate(std::current_exception());
+            hpx::detail::report_exception_and_terminate(
+                std::current_exception());
         }
     }
 
     void future_data_base<traits::detail::future_data_void>::run_on_completed(
         completed_callback_vector_type&& on_completed) noexcept
     {
-        for (auto&& func: on_completed)
+        for (auto&& func : on_completed)
         {
             run_on_completed(std::move(func));
         }
@@ -164,8 +166,9 @@ namespace hpx { namespace lcos { namespace detail
     // make sure continuation invocation does not recurse deeper than
     // allowed
     template <typename Callback>
-    void future_data_base<traits::detail::future_data_void>::
-        handle_on_completed(Callback && on_completed)
+    void
+    future_data_base<traits::detail::future_data_void>::handle_on_completed(
+        Callback&& on_completed)
     {
         // We need to run the completion on a new thread if we are on a
         // non HPX thread.
@@ -190,16 +193,16 @@ namespace hpx { namespace lcos { namespace detail
 
             try
             {
-                run_on_completed_on_new_thread(
-                    util::deferred_call(
-                        p, std::forward<Callback>(on_completed)));
+                run_on_completed_on_new_thread(util::deferred_call(
+                    p, std::forward<Callback>(on_completed)));
             }
-            catch(...)
+            catch (...)
             {
                 // If an exception while creating the new task or inside the
                 // completion handler is thrown, there is nothing we can do...
                 // ... but terminate and report the error
-                hpx::detail::report_exception_and_terminate(std::current_exception());
+                hpx::detail::report_exception_and_terminate(
+                    std::current_exception());
             }
         }
     }
@@ -209,18 +212,18 @@ namespace hpx { namespace lcos { namespace detail
     using completed_callback_vector_type =
         future_data_refcnt_base::completed_callback_vector_type;
 
-    template HPX_EXPORT
-    void future_data_base<traits::detail::future_data_void>::
-        handle_on_completed<completed_callback_vector_type>(
-            completed_callback_vector_type&&);
+    template HPX_EXPORT void
+    future_data_base<traits::detail::future_data_void>::handle_on_completed<
+        completed_callback_vector_type>(completed_callback_vector_type&&);
 
     /// Set the callback which needs to be invoked when the future becomes
     /// ready. If the future is ready the function will be invoked
     /// immediately.
-    void future_data_base<traits::detail::future_data_void>::
-        set_on_completed(completed_callback_type data_sink)
+    void future_data_base<traits::detail::future_data_void>::set_on_completed(
+        completed_callback_type data_sink)
     {
-        if (!data_sink) return;
+        if (!data_sink)
+            return;
 
         if (is_ready())
         {
@@ -256,7 +259,8 @@ namespace hpx { namespace lcos { namespace detail
             if (s == empty)
             {
                 cond_.wait(l, "future_data_base::wait", ec);
-                if (ec) return s;
+                if (ec)
+                    return s;
             }
         }
 
@@ -265,8 +269,9 @@ namespace hpx { namespace lcos { namespace detail
         return s;
     }
 
-    future_status future_data_base<traits::detail::future_data_void>::
-        wait_until(util::steady_clock::time_point const& abs_time, error_code& ec)
+    future_status
+    future_data_base<traits::detail::future_data_void>::wait_until(
+        util::steady_clock::time_point const& abs_time, error_code& ec)
     {
         // block if this entry is empty
         if (state_.load(std::memory_order_acquire) == empty)
@@ -274,10 +279,10 @@ namespace hpx { namespace lcos { namespace detail
             std::unique_lock<mutex_type> l(mtx_);
             if (state_.load(std::memory_order_relaxed) == empty)
             {
-                threads::thread_state_ex_enum const reason =
-                    cond_.wait_until(l, abs_time,
-                        "future_data_base::wait_until", ec);
-                if (ec) return future_status::uninitialized;
+                threads::thread_state_ex_enum const reason = cond_.wait_until(
+                    l, abs_time, "future_data_base::wait_until", ec);
+                if (ec)
+                    return future_status::uninitialized;
 
                 if (reason == threads::wait_timeout)
                     return future_status::timeout;
@@ -287,6 +292,6 @@ namespace hpx { namespace lcos { namespace detail
         if (&ec != &throws)
             ec = make_success_code();
 
-        return future_status::ready; //-V110
+        return future_status::ready;    //-V110
     }
-}}}
+}}}    // namespace hpx::lcos::detail

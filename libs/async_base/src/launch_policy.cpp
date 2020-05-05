@@ -10,8 +10,7 @@
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     const detail::async_policy launch::async =
         detail::async_policy{threads::thread_priority_default};
@@ -32,15 +31,14 @@ namespace hpx
         detail::policy_holder<>{detail::launch_policy::async_policies};
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         void policy_holder_base::load(
             serialization::input_archive& ar, unsigned)
         {
             int value = 0;
-            ar & value;
+            ar& value;
             policy_ = static_cast<launch_policy>(value);
-            ar & value;
+            ar& value;
             priority_ = static_cast<threads::thread_priority>(value);
         }
 
@@ -48,10 +46,9 @@ namespace hpx
             serialization::output_archive& ar, unsigned) const
         {
             int value = static_cast<int>(policy_);
-            ar & value;
+            ar& value;
             value = static_cast<int>(priority_);
-            ar & value;
+            ar& value;
         }
-    }
-}
-
+    }    // namespace detail
+}    // namespace hpx

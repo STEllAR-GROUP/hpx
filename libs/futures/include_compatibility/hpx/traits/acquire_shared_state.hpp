@@ -10,12 +10,11 @@
 
 #if defined(HPX_FUTURES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/traits/acquire_shared_state.hpp is deprecated, \
     please include hpx/futures/traits/acquire_shared_state.hpp instead")
 #else
-#warning \
-    "The header hpx/traits/acquire_shared_state.hpp is deprecated, \
+#warning "The header hpx/traits/acquire_shared_state.hpp is deprecated, \
     please include hpx/futures/traits/acquire_shared_state.hpp instead"
 #endif
 #endif

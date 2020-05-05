@@ -10,12 +10,10 @@
 
 #if defined(HPX_FUTURES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/traits/future_then_result.hpp is deprecated, \
+#pragma message("The header hpx/traits/future_then_result.hpp is deprecated, \
     please include hpx/futures/traits/future_then_result.hpp instead")
 #else
-#warning \
-    "The header hpx/traits/future_then_result.hpp is deprecated, \
+#warning "The header hpx/traits/future_then_result.hpp is deprecated, \
     please include hpx/futures/traits/future_then_result.hpp instead"
 #endif
 #endif

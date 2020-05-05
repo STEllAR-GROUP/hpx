@@ -23,4 +23,3 @@ namespace hpx { namespace traits {
         typedef void type;
     };
 }}    // namespace hpx::traits
-

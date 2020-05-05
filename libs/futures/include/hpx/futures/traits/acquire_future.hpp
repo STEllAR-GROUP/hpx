@@ -140,4 +140,3 @@ namespace hpx { namespace traits {
         };
     }    // namespace detail
 }}       // namespace hpx::traits
-

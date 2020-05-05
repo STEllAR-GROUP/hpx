@@ -13,21 +13,20 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits
-{
-    namespace detail
-    {
+namespace hpx { namespace traits {
+    namespace detail {
         template <typename Policy>
         struct is_launch_policy
           : std::is_base_of<hpx::detail::policy_holder_base, Policy>
-        {};
-    }
+        {
+        };
+    }    // namespace detail
 
     template <typename Policy>
     struct is_launch_policy
       : detail::is_launch_policy<typename hpx::util::decay<Policy>::type>
-    {};
-}}
+    {
+    };
+}}    // namespace hpx::traits
 
 #endif
-

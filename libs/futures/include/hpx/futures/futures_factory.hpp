@@ -843,4 +843,3 @@ namespace hpx { namespace lcos { namespace local {
         bool future_obtained_;
     };
 }}}    // namespace hpx::lcos::local
-

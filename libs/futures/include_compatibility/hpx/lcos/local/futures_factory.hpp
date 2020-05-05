@@ -10,12 +10,11 @@
 
 #if defined(HPX_FUTURES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/lcos/local/futures_factory.hpp is deprecated, \
     please include hpx/futures/futures_factory.hpp instead")
 #else
-#warning \
-    "The header hpx/lcos/local/futures_factory.hpp is deprecated, \
+#warning "The header hpx/lcos/local/futures_factory.hpp is deprecated, \
     please include hpx/futures/futures_factory.hpp instead"
 #endif
 #endif

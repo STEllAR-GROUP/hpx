@@ -39,5 +39,4 @@ namespace hpx { namespace traits
             return std::move(rhs);
         }
     };
-}}
-
+}}    // namespace hpx::traits

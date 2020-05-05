@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/result_of.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/functional/result_of.hpp>
 #include <hpx/traits/future_then_result.hpp>
 #include <hpx/traits/future_traits.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
@@ -21,11 +21,9 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename Executor, typename T, typename Ts,
             typename Enable = void>
         struct executor_future;
@@ -58,35 +56,32 @@ namespace hpx { namespace traits
                 hpx::traits::is_two_way_executor<Executor>::value &&
                 !exposes_future_type<Executor, T>::value>::type>
         {
-            using type = decltype(
-                std::declval<Executor&&>().async_execute(
-                    std::declval<T(*)(Ts...)>(), std::declval<Ts>()...));
+            using type = decltype(std::declval<Executor&&>().async_execute(
+                std::declval<T (*)(Ts...)>(), std::declval<Ts>()...));
         };
 
         template <typename Executor, typename T, typename Ts>
         struct executor_future<Executor, T, Ts,
             typename std::enable_if<
-                !hpx::traits::is_two_way_executor<Executor>::value
-            >::type>
+                !hpx::traits::is_two_way_executor<Executor>::value>::type>
         {
             using type = hpx::lcos::future<T>;
         };
-    }
+    }    // namespace detail
 
-    template <typename Executor, typename T, typename ...Ts>
+    template <typename Executor, typename T, typename... Ts>
     struct executor_future
-      : detail::executor_future<
-            typename std::decay<Executor>::type,
-            T, hpx::util::pack<typename std::decay<Ts>::type...> >
-    {};
+      : detail::executor_future<typename std::decay<Executor>::type, T,
+            hpx::util::pack<typename std::decay<Ts>::type...>>
+    {
+    };
 
-    template <typename Executor, typename T, typename ...Ts>
+    template <typename Executor, typename T, typename... Ts>
     using executor_future_t =
         typename executor_future<Executor, T, Ts...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Future, typename F,
             typename Enable = void>
@@ -96,34 +91,30 @@ namespace hpx { namespace traits
         };
 
         template <typename Executor, typename Future, typename F>
-        struct future_then_executor_result<
-                Executor, Future, F,
-                typename hpx::util::always_void<
-                    typename hpx::util::invoke_result<F&, Future>::type
-                >::type>
+        struct future_then_executor_result<Executor, Future, F,
+            typename hpx::util::always_void<
+                typename hpx::util::invoke_result<F&, Future>::type>::type>
         {
             typedef typename hpx::util::invoke_result<F&, Future>::type
                 func_result_type;
 
-            typedef typename traits::executor_future<
-                    Executor, func_result_type, Future
-                >::type cont_result;
+            typedef typename traits::executor_future<Executor, func_result_type,
+                Future>::type cont_result;
 
             // perform unwrapping of future<future<R>>
             typedef typename util::lazy_conditional<
-                    hpx::traits::detail::is_unique_future<cont_result>::value,
-                    hpx::traits::future_traits<cont_result>,
-                    hpx::util::identity<cont_result>
-                >::type result_type;
+                hpx::traits::detail::is_unique_future<cont_result>::value,
+                hpx::traits::future_traits<cont_result>,
+                hpx::util::identity<cont_result>>::type result_type;
 
             typedef hpx::lcos::future<result_type> type;
         };
-    }
+    }    // namespace detail
 
     template <typename Executor, typename Future, typename F>
     struct future_then_executor_result
-      : detail::future_then_executor_result<
-            typename std::decay<Executor>::type, Future, F>
-    {};
-
-}}  // hpx::traits
+      : detail::future_then_executor_result<typename std::decay<Executor>::type,
+            Future, F>
+    {
+    };
+}}    // namespace hpx::traits

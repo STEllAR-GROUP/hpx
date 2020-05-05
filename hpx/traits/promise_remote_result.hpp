@@ -21,5 +21,4 @@ namespace hpx { namespace traits
     {
         typedef hpx::util::unused_type type;
     };
-}}
-
+}}    // namespace hpx::traits

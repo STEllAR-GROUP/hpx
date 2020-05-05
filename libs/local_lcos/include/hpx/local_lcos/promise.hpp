@@ -21,7 +21,8 @@
 
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename R, typename SharedState = lcos::detail::future_data<R>>
+        template <typename R,
+            typename SharedState = lcos::detail::future_data<R>>
         class promise_base;
 
         template <typename R, typename SharedState>

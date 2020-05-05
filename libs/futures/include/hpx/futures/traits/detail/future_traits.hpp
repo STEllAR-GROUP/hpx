@@ -30,4 +30,3 @@ namespace hpx { namespace lcos { namespace detail {
         typedef hpx::traits::future_traits<type> traits_type;
     };
 }}}    // namespace hpx::lcos::detail
-

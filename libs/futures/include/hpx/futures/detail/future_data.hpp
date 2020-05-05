@@ -1024,4 +1024,3 @@ namespace hpx { namespace traits { namespace detail {
 }}}    // namespace hpx::traits::detail
 
 #include <hpx/config/warnings_suffix.hpp>
-

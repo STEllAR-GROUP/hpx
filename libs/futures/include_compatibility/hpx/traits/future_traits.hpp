@@ -10,12 +10,10 @@
 
 #if defined(HPX_FUTURES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
-    "The header hpx/traits/future_traits.hpp is deprecated, \
+#pragma message("The header hpx/traits/future_traits.hpp is deprecated, \
     please include hpx/futures/traits/future_traits.hpp instead")
 #else
-#warning \
-    "The header hpx/traits/future_traits.hpp is deprecated, \
+#warning "The header hpx/traits/future_traits.hpp is deprecated, \
     please include hpx/futures/traits/future_traits.hpp instead"
 #endif
 #endif

@@ -10,7 +10,7 @@
 
 #if defined(HPX_FUTURES_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
-#pragma message( \
+#pragma message(                                                               \
     "The header hpx/lcos/detail/future_await_traits.hpp is deprecated, \
     please include hpx/futures/traits/detail/future_await_traits.hpp instead")
 #else
