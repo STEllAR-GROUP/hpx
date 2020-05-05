@@ -44,12 +44,8 @@ void test_make_future()
     {
         hpx::future<int> f1 = hpx::make_ready_future(42);
         hpx::future<std::string> f2 =
-            hpx::make_future<std::string>(
-                std::move(f1),
-                [](int value) -> std::string
-                {
-                    return std::to_string(value);
-                });
+            hpx::make_future<std::string>(std::move(f1),
+                [](int value) -> std::string { return std::to_string(value); });
 
         HPX_TEST_EQ(std::string("42"), f2.get());
     }
@@ -89,13 +85,8 @@ void test_make_shared_future()
     // test make_future<T>(shared_future<U>) with given T conv(U)
     {
         hpx::shared_future<int> f1 = hpx::make_ready_future(42);
-        hpx::shared_future<std::string> f2 =
-            hpx::make_future<std::string>(
-                f1,
-                [](int value) -> std::string
-                {
-                    return std::to_string(value);
-                });
+        hpx::shared_future<std::string> f2 = hpx::make_future<std::string>(
+            f1, [](int value) -> std::string { return std::to_string(value); });
 
         HPX_TEST_EQ(42, f1.get());
         HPX_TEST_EQ(std::string("42"), f2.get());

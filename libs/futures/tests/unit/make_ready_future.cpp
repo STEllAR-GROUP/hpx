@@ -35,7 +35,10 @@ void test_nullary()
 
 struct B
 {
-    B(int i) : i_(i) {}
+    B(int i)
+      : i_(i)
+    {
+    }
 
     int i_;
 };
@@ -67,11 +70,23 @@ void test_unary()
 
 struct C
 {
-    C(int i) : i_(i), j_(0) {}
-    C(int i, int j) : i_(i), j_(j) {}
+    C(int i)
+      : i_(i)
+      , j_(0)
+    {
+    }
+    C(int i, int j)
+      : i_(i)
+      , j_(j)
+    {
+    }
 
     C(C const&) = delete;
-    C(C&& rhs) : i_(rhs.i_), j_(rhs.j_) {}
+    C(C&& rhs)
+      : i_(rhs.i_)
+      , j_(rhs.j_)
+    {
+    }
 
     int i_;
     int j_;
@@ -120,9 +135,7 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     HPX_TEST_EQ(hpx::init(argc, argv, cfg), 0);

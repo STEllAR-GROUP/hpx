@@ -7,9 +7,9 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/threadmanager.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>
@@ -38,7 +38,7 @@ void p3(hpx::future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
-    (void)i;
+    (void) i;
     hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
     return;
 }
@@ -55,13 +55,16 @@ void test_return_int()
     HPX_TEST(f1.valid());
     hpx::future<int> f2 = f1.then(&p2);
     HPX_TEST(f2.valid());
-    try {
+    try
+    {
         HPX_TEST_EQ(f2.get(), 2);
     }
-    catch (hpx::exception const& /*ex*/) {
+    catch (hpx::exception const& /*ex*/)
+    {
         HPX_TEST(false);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -72,13 +75,16 @@ void test_return_int_launch()
     HPX_TEST(f1.valid());
     hpx::future<int> f2 = f1.then(hpx::launch::async, &p2);
     HPX_TEST(f2.valid());
-    try {
+    try
+    {
         HPX_TEST_EQ(f2.get(), 2);
     }
-    catch (hpx::exception const& /*ex*/) {
+    catch (hpx::exception const& /*ex*/)
+    {
         HPX_TEST(false);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -90,13 +96,16 @@ void test_return_void()
     HPX_TEST(f1.valid());
     hpx::future<void> f2 = f1.then(&p3);
     HPX_TEST(f2.valid());
-    try {
+    try
+    {
         f2.wait();
     }
-    catch (hpx::exception const& /*ex*/) {
+    catch (hpx::exception const& /*ex*/)
+    {
         HPX_TEST(false);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -107,13 +116,16 @@ void test_return_void_launch()
     HPX_TEST(f1.valid());
     hpx::future<void> f2 = f1.then(hpx::launch::sync, &p3);
     HPX_TEST(f2.valid());
-    try {
+    try
+    {
         f2.wait();
     }
-    catch (hpx::exception const& /*ex*/) {
+    catch (hpx::exception const& /*ex*/)
+    {
         HPX_TEST(false);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -125,13 +137,16 @@ void test_implicit_unwrapping()
     HPX_TEST(f1.valid());
     hpx::future<int> f2 = f1.then(&p4);
     HPX_TEST(f2.valid());
-    try {
-        HPX_TEST(f2.get()==2);
+    try
+    {
+        HPX_TEST(f2.get() == 2);
     }
-    catch (hpx::exception const& /*ex*/) {
+    catch (hpx::exception const& /*ex*/)
+    {
         HPX_TEST(false);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -140,13 +155,13 @@ void test_implicit_unwrapping()
 void test_simple_then()
 {
     hpx::future<int> f2 = hpx::async(p1).then(&p2);
-    HPX_TEST(f2.get()==2);
+    HPX_TEST(f2.get() == 2);
 }
 
 void test_simple_deferred_then()
 {
     hpx::future<int> f2 = hpx::async(hpx::launch::deferred, p1).then(&p2);
-    HPX_TEST(f2.get()==2);
+    HPX_TEST(f2.get() == 2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,21 +169,17 @@ void test_complex_then()
 {
     hpx::future<int> f1 = hpx::async(p1);
     hpx::future<int> f21 = f1.then(&p2);
-    hpx::future<int> f2= f21.then(&p2);
+    hpx::future<int> f2 = f21.then(&p2);
     HPX_TEST_EQ(f2.get(), 4);
 }
 
 void test_complex_then_launch()
 {
-    auto policy =
-        hpx::launch::select([]()
-        {
-            return hpx::launch::async;
-        });
+    auto policy = hpx::launch::select([]() { return hpx::launch::async; });
 
     hpx::future<int> f1 = hpx::async(p1);
     hpx::future<int> f21 = f1.then(policy, &p2);
-    hpx::future<int> f2= f21.then(policy, &p2);
+    hpx::future<int> f2 = f21.then(policy, &p2);
     HPX_TEST_EQ(f2.get(), 4);
 }
 
@@ -177,31 +188,28 @@ void test_complex_then_chain_one()
 {
     hpx::future<int> f1 = hpx::async(p1);
     hpx::future<int> f2 = f1.then(&p2).then(&p2);
-    HPX_TEST(f2.get()==4);
+    HPX_TEST(f2.get() == 4);
 }
 
 void test_complex_then_chain_one_launch()
 {
     std::atomic<int> count(0);
-    auto policy =
-        hpx::launch::select(
-            [&count]() -> hpx::launch
-            {
-                if (count++ == 0)
-                    return hpx::launch::async;
-                return hpx::launch::sync;
-            });
+    auto policy = hpx::launch::select([&count]() -> hpx::launch {
+        if (count++ == 0)
+            return hpx::launch::async;
+        return hpx::launch::sync;
+    });
 
     hpx::future<int> f1 = hpx::async(p1);
     hpx::future<int> f2 = f1.then(policy, &p2).then(policy, &p2);
-    HPX_TEST(f2.get()==4);
+    HPX_TEST(f2.get() == 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_complex_then_chain_two()
 {
     hpx::future<int> f2 = hpx::async(p1).then(&p2).then(&p2);
-    HPX_TEST(f2.get()==4);
+    HPX_TEST(f2.get() == 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -230,11 +238,8 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(argc, argv, cfg);
 }
-

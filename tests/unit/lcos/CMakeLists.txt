@@ -6,16 +6,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    future
-    future_ref
-    future_then
     future_then_executor
     local_promise_allocator
-    make_future
-    make_ready_future
-    shared_future
     use_allocator
 )
+
+set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests
@@ -34,9 +30,6 @@ if(HPX_WITH_AWAIT OR HPX_WITH_CXX20_COROUTINES)
   set(await_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()
 
-set(future_PARAMETERS THREADS_PER_LOCALITY 4)
-set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)
-set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)

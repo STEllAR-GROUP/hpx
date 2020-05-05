@@ -7,9 +7,9 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/threadmanager.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 
 #include <chrono>
@@ -27,12 +27,13 @@ struct X
 
     X()
       : i(42)
-    {}
+    {
+    }
 
-    X(X && other)
+    X(X&& other)
       : i(other.i)
     {
-        other.i=0;
+        other.i = 0;
     }
 
     ~X() {}
@@ -66,7 +67,7 @@ void set_promise_exception_thread(hpx::lcos::local::promise<int>* p)
 void test_store_value_from_thread()
 {
     hpx::lcos::local::promise<int> pi2;
-    hpx::lcos::future<int> fi2 (pi2.get_future());
+    hpx::lcos::future<int> fi2(pi2.get_future());
     hpx::thread t(&set_promise_thread, &pi2);
     fi2.wait();
     HPX_TEST(fi2.is_ready());
@@ -88,11 +89,13 @@ void test_store_exception()
     HPX_TEST(fi3.is_ready());
     HPX_TEST(!fi3.has_value());
     HPX_TEST(fi3.has_exception());
-    try {
+    try
+    {
         fi3.get();
         HPX_TEST(false);
     }
-    catch (my_exception) {
+    catch (my_exception)
+    {
         HPX_TEST(true);
     }
     t.join();
@@ -105,14 +108,17 @@ void test_initial_state()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    try {
+    try
+    {
         fi.get();
         HPX_TEST(false);
     }
-    catch (hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         HPX_TEST_EQ(e.get_error(), hpx::no_state);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -138,14 +144,17 @@ void test_cannot_get_future_twice()
     hpx::lcos::local::promise<int> pi;
     pi.get_future();
 
-    try {
+    try
+    {
         pi.get_future();
         HPX_TEST(false);
     }
-    catch (hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         HPX_TEST_EQ(e.get_error(), hpx::future_already_retrieved);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -194,7 +203,7 @@ void test_set_value_can_be_moved()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    int i=0;
+    int i = 0;
     HPX_TEST(i = fi.get());
     HPX_TEST_EQ(i, 42);
 }
@@ -232,14 +241,17 @@ void test_invoking_a_packaged_task_twice_throws()
     hpx::lcos::local::packaged_task<int()> pt(make_int);
 
     pt();
-    try {
+    try
+    {
         pt();
         HPX_TEST(false);
     }
-    catch (hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         HPX_TEST_EQ(e.get_error(), hpx::promise_already_satisfied);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
     // retrieve the future so the destructor of packaged_task is happy.
@@ -254,14 +266,17 @@ void test_cannot_get_future_twice_from_task()
 {
     hpx::lcos::local::packaged_task<int()> pt(make_int);
     pt.get_future();
-    try {
+    try
+    {
         pt.get_future();
         HPX_TEST(false);
     }
-    catch (hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         HPX_TEST_EQ(e.get_error(), hpx::future_already_retrieved);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -276,14 +291,17 @@ void test_task_stores_exception_if_function_throws()
     HPX_TEST(fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(fi.has_exception());
-    try {
+    try
+    {
         fi.get();
         HPX_TEST(false);
     }
-    catch (std::exception&) {
+    catch (std::exception&)
+    {
         HPX_TEST(true);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(!"Unknown exception thrown");
     }
 }
@@ -311,9 +329,7 @@ void test_reference_promise()
     HPX_TEST_EQ(&f.get(), &i);
 }
 
-void do_nothing()
-{
-}
+void do_nothing() {}
 
 void test_task_returning_void()
 {
@@ -397,10 +413,12 @@ void wait_callback(hpx::lcos::future<int>)
 
 void promise_set_value(hpx::lcos::local::promise<int>& pi)
 {
-    try {
+    try
+    {
         pi.set_value(42);
     }
-    catch (...) {
+    catch (...)
+    {
     }
 }
 
@@ -457,7 +475,6 @@ void test_wait_callback_with_timed_wait()
     HPX_TEST_EQ(callback_called, 1U);
 }
 
-
 void test_packaged_task_can_be_moved()
 {
     hpx::lcos::local::packaged_task<int()> pt(make_int);
@@ -467,14 +484,17 @@ void test_packaged_task_can_be_moved()
     hpx::lcos::local::packaged_task<int()> pt2(std::move(pt));
     HPX_TEST(!fi.is_ready());
 
-    try {
-        pt(); // NOLINT
+    try
+    {
+        pt();    // NOLINT
         HPX_TEST(!"Can invoke moved task!");
     }
-    catch (hpx::exception const& e) {
-      HPX_TEST_EQ(e.get_error(), hpx::no_state);
+    catch (hpx::exception const& e)
+    {
+        HPX_TEST_EQ(e.get_error(), hpx::no_state);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 
@@ -496,14 +516,17 @@ void test_destroying_a_promise_stores_broken_promise()
 
     HPX_TEST(f.is_ready());
     HPX_TEST(f.has_exception());
-    try {
+    try
+    {
         f.get();
         HPX_TEST(false);    // shouldn't get here
     }
-    catch (hpx::exception const& e) {
+    catch (hpx::exception const& e)
+    {
         HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -519,14 +542,17 @@ void test_destroying_a_packaged_task_stores_broken_task()
 
     HPX_TEST(f.is_ready());
     HPX_TEST(f.has_exception());
-    try {
+    try
+    {
         f.get();
         HPX_TEST(false);    // shouldn't get here
     }
-    catch (hpx::exception const& e) {
-      HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
+    catch (hpx::exception const& e)
+    {
+        HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -536,13 +562,14 @@ void test_assign_to_void()
     hpx::lcos::future<void> f1 = hpx::lcos::make_ready_future(42);
     f1.get();
 
-    hpx::lcos::shared_future<void> f2 = hpx::lcos::make_ready_future(42).share();
+    hpx::lcos::shared_future<void> f2 =
+        hpx::lcos::make_ready_future(42).share();
     f2.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 int hpx_main(variables_map&)
 {
@@ -585,11 +612,8 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
 }
-
