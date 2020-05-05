@@ -6,12 +6,9 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    future_then_executor
     local_promise_allocator
     use_allocator
 )
-
-set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests

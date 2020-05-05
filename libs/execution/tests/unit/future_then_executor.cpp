@@ -8,10 +8,10 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/parallel_execution.hpp>
+#include <hpx/include/threadmanager.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 
 #include <chrono>
@@ -39,7 +39,7 @@ void p3(hpx::future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
-    (void)i;
+    (void) i;
     hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
     return;
 }
@@ -57,13 +57,16 @@ void test_return_int(Executor& exec)
     HPX_TEST(f1.valid());
     hpx::future<int> f2 = f1.then(exec, &p2);
     HPX_TEST(f2.valid());
-    try {
+    try
+    {
         HPX_TEST_EQ(f2.get(), 2);
     }
-    catch (hpx::exception const& /*ex*/) {
+    catch (hpx::exception const& /*ex*/)
+    {
         HPX_TEST(false);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -76,13 +79,16 @@ void test_return_void(Executor& exec)
     HPX_TEST(f1.valid());
     hpx::future<void> f2 = f1.then(exec, &p3);
     HPX_TEST(f2.valid());
-    try {
+    try
+    {
         f2.wait();
     }
-    catch (hpx::exception const& /*ex*/) {
+    catch (hpx::exception const& /*ex*/)
+    {
         HPX_TEST(false);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -95,13 +101,16 @@ void test_implicit_unwrapping(Executor& exec)
     HPX_TEST(f1.valid());
     hpx::future<int> f2 = f1.then(exec, &p4);
     HPX_TEST(f2.valid());
-    try {
+    try
+    {
         HPX_TEST_EQ(f2.get(), 2);
     }
-    catch (hpx::exception const& /*ex*/) {
+    catch (hpx::exception const& /*ex*/)
+    {
         HPX_TEST(false);
     }
-    catch (...) {
+    catch (...)
+    {
         HPX_TEST(false);
     }
 }
@@ -144,9 +153,8 @@ void test_complex_then_chain_one(Executor& exec)
 template <typename Executor>
 void test_complex_then_chain_two(Executor& exec)
 {
-    hpx::future<int> f2 =
-        hpx::async(exec, p1).then(exec, &p2).then(exec, &p2);
-    HPX_TEST(f2.get()==4);
+    hpx::future<int> f2 = hpx::async(exec, p1).then(exec, &p2).then(exec, &p2);
+    HPX_TEST(f2.get() == 4);
 }
 
 template <typename Executor>
@@ -163,8 +171,8 @@ void test_then(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
+using hpx::program_options::variables_map;
 
 int hpx_main(variables_map&)
 {
@@ -189,11 +197,8 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
 }
-
