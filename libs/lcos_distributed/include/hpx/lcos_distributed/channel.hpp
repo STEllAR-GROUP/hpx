@@ -11,7 +11,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async/apply.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/server/channel.hpp>
+#include <hpx/lcos_distributed/server/channel.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/launch_policy.hpp>

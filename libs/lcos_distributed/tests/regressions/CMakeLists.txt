@@ -25,8 +25,8 @@ foreach(test ${tests})
     ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/LCOs")
+    FOLDER "Tests/Regressions/Modules/LCOsDistributed")
 
   target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})
-  add_hpx_regression_test("modules.lcos" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test("modules.lcos_distributed" ${test} ${${test}_PARAMETERS})
 endforeach()

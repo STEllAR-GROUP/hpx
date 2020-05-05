@@ -81,7 +81,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     checkpoint
     collectives
     distributed_executors
-    lcos
+    lcos_distributed
     performance_counters
     segmented_algorithms
     CACHE INTERNAL "list of HPX modules" FORCE

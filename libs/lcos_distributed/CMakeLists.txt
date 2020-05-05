@@ -8,18 +8,25 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(lcos_headers
+set(lcos_distributed_headers
+  hpx/lcos_distributed/channel.hpp
+  hpx/lcos_distributed/server/channel.hpp)
+
+set(lcos_distributed_compat_headers
   hpx/lcos/channel.hpp
   hpx/lcos/server/channel.hpp)
 
-set(lcos_sources)
+set(lcos_distributed_sources)
 
 include(HPX_AddModule)
-add_hpx_module(lcos
+add_hpx_module(lcos_distributed
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
   FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
-  SOURCES ${lcos_sources}
-  HEADERS ${lcos_headers}
+  SOURCES ${lcos_distributed_sources}
+  HEADERS ${lcos_distributed_headers}
+  COMPAT_HEADERS ${lcos_distributed_compat_headers}
   DEPENDENCIES
     hpx_assertion
     hpx_async

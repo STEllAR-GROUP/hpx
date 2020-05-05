@@ -5,14 +5,14 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-.. _libs_lcos:
+.. _libs_lcos_distributed:
 
-====
-lcos
-====
+================
+lcos_distributed
+================
 
 This module contains distributed :term:`LCO`\ s. Currently the only LCO provided
 is :cpp:class::`hpx::lcos::channel`, a construct for sending values from one
 :term:`locality` to another. See :ref:`libs_local_lcos` for local LCOs.
 
-See the :ref:`API reference <libs_lcos_api>` of this module for more details.
+See the :ref:`API reference <libs_lcos_distributed_api>` of this module for more details.

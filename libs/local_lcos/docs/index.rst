@@ -27,8 +27,8 @@ This module provides the following local :term:`LCO`\ s:
 * :cpp:class:`hpx::lcos::local::receive_buffer`
 * :cpp:class:`hpx::lcos::local::trigger`
 
-See :ref:`libs_lcos` for distributed LCOs. Basic synchronization primitives for
-use in |hpx| threads can be found in :ref:`libs_synchronization`.
+See :ref:`libs_lcos_distributed` for distributed LCOs. Basic synchronization
+primitives for use in |hpx| threads can be found in :ref:`libs_synchronization`.
 :ref:`async_combinators` contains useful utility functions for combining
 futures.
 
