@@ -17,6 +17,7 @@ foreach(component ${components})
 
   add_hpx_component(${component}
     INTERNAL_FLAGS
+    NOEXPORT
     AUTOGLOB
     HEADER_GLOB "${component}.h*"
     SOURCE_GLOB "${component}.c*"

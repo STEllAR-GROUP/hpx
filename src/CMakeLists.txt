@@ -470,15 +470,15 @@ endif()
 
 ################################################################################
 # libhpx
-add_library(hpx ${hpx_library_link_mode_core}
+add_library(hpx_core ${hpx_library_link_mode_core}
   ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
   ${hpx_external_OBJECTS} ${hpx_HEADERS})
 
-target_link_libraries(hpx PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
-target_link_libraries(hpx PUBLIC hpx_dependencies_boost)
+target_link_libraries(hpx_core PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
+target_link_libraries(hpx_core PUBLIC hpx_dependencies_boost)
 
 # Set the basic search paths for the HPX headers
-target_include_directories(hpx PUBLIC
+target_include_directories(hpx_core PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
   $<INSTALL_INTERFACE:include>
@@ -489,24 +489,24 @@ target_include_directories(hpx PUBLIC
 # should be removed when we make the modules object libraries that we publicly
 # link to hpx
 if(HPX_PROGRAM_OPTIONS_WITH_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-  target_link_libraries(hpx PUBLIC Boost::program_options)
+  target_link_libraries(hpx_core PUBLIC Boost::program_options)
 endif()
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
-  target_link_libraries(hpx PUBLIC Boost::filesystem)
+  target_link_libraries(hpx_core PUBLIC Boost::filesystem)
 endif()
 
-target_link_libraries(hpx PUBLIC hpx_dependencies_allocator)
+target_link_libraries(hpx_core PUBLIC hpx_dependencies_allocator)
 
 # Hwloc PUBLIC because used by exported target hpx_topology
-target_link_libraries(hpx PUBLIC Hwloc::hwloc)
+target_link_libraries(hpx_core PUBLIC Hwloc::hwloc)
 
 # Enable SIMD via VC if it is available
 if (TARGET Vc::vc)
-  target_link_libraries(hpx PUBLIC Vc::vc)
+  target_link_libraries(hpx_core PUBLIC Vc::vc)
 endif()
 
 if (TARGET Amplifier::amplifier)
-  target_link_libraries(hpx PRIVATE Amplifier::amplifier)
+  target_link_libraries(hpx_core PRIVATE Amplifier::amplifier)
 endif()
 
 if (TARGET APEX::apex)
@@ -515,24 +515,24 @@ if (TARGET APEX::apex)
   # we use the "INTERFACE" option for target_link_libraries.
   # Because libhpx_apex is a shared object library, we don't need to specify
   # the whole archive.
-  target_link_libraries(hpx INTERFACE APEX::apex)
+  target_link_libraries(hpx_core INTERFACE APEX::apex)
 endif()
 
 if (TARGET Gperftools::gperftools)
-  target_link_libraries(hpx PRIVATE Gperftools::gperftools)
+  target_link_libraries(hpx_core PRIVATE Gperftools::gperftools)
 endif()
 
 if (TARGET Valgrind::valgrind)
-  target_link_libraries(hpx PRIVATE Valgrind::valgrind)
+  target_link_libraries(hpx_core PRIVATE Valgrind::valgrind)
 endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-  set_target_properties(hpx PROPERTIES
+  set_target_properties(hpx_core PROPERTIES
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME hpx
     FOLDER "Core")
 else()
-  set_target_properties(hpx PROPERTIES
+  set_target_properties(hpx_core PROPERTIES
     VERSION ${HPX_VERSION}
     SOVERSION ${HPX_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1
@@ -540,11 +540,11 @@ else()
     FOLDER "Core")
 endif()
 
-target_link_libraries(hpx PUBLIC hpx_base_libraries)
+target_link_libraries(hpx_core PUBLIC hpx_base_libraries)
 
 # Link to each parcelport plugin
 foreach(_parcelport_plugin ${HPX_STATIC_PARCELPORT_PLUGINS})
-  target_link_libraries(hpx PRIVATE ${_parcelport_plugin})
+  target_link_libraries(hpx_core PRIVATE ${_parcelport_plugin})
 endforeach()
 
 # integrate the hpx modules with the main library
@@ -563,44 +563,59 @@ foreach(_module ${HPX_LIBS})
 
   # add module binaries as PRIVATE dependencies to the core hpx library to avoid
   # dependent applications have to link against those
-  target_link_libraries(hpx PRIVATE ${_module_target})
+  target_link_libraries(hpx_core PRIVATE ${_module_target})
 
   # add module include directories as PUBLIC to core hpx library to enable
   # compilation against indirectly included headers
   get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
-  target_include_directories(hpx PUBLIC ${_module_includes})
+  target_include_directories(hpx_core PUBLIC ${_module_includes})
 
 endforeach()
 
 if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
-  set_target_properties(hpx PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  set_target_properties(hpx_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
-target_compile_definitions(hpx PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
+target_compile_definitions(hpx_core PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
 ################################################################################
 # Emulation of SwapContext on Windows
 ################################################################################
 if(MSVC AND HPX_WITH_SWAP_CONTEXT_EMULATION)
-  target_link_options(hpx PRIVATE "/EXPORT:switch_to_fiber")
+  target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
 endif()
 
-set(hpx_targets hpx)
-
+################################################################################
+# Exported targets
+################################################################################
 set(_library_types "STATIC_LIBRARY;MODULE_LIBRARY;SHARED_LIBRARY;OBJECT_LIBRARY;INTERFACE_LIBRARY")
 set(_is_executable "$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>")
 set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 
-# hpx_interface contains additional interface options to be passed to dependent
-# targets. We create this as a separate target to easily filter out the
-# generator expressions that can't be handled by the pkgconfig file generation.
+add_library(hpx_no_wrap_main INTERFACE)
+add_library(hpx INTERFACE)
+
+target_link_libraries(hpx_no_wrap_main INTERFACE hpx_core)
+target_link_libraries(hpx INTERFACE hpx_core)
+
+# hpx_interface and hpx_interface_no_wrap_main contain additional interface
+# options to be passed to dependent targets. We create these as separate
+# targets to easily filter out the generator expressions that can't be handled
+# by the pkgconfig file generation.
+add_library(hpx_interface_no_wrap_main INTERFACE)
+target_link_libraries(hpx_interface_no_wrap_main INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>)
+target_link_libraries(hpx_interface_no_wrap_main INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>)
+target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>")
+target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">")
+target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>")
+target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>")
+
 add_library(hpx_interface INTERFACE)
-target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>)
-target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPX::hpx_init>>)
-target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>")
-target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">")
-target_compile_definitions(hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>")
-target_compile_definitions(hpx_interface INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>")
+target_link_libraries(hpx_interface INTERFACE hpx_interface_no_wrap_main)
+target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_wrap>>)
+target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_wrap>>)
+
+target_link_libraries(hpx_no_wrap_main INTERFACE hpx_interface_no_wrap_main)
 target_link_libraries(hpx INTERFACE hpx_interface)
 
 # HPX::component is to be linked privately to all HPX components
@@ -618,7 +633,8 @@ target_compile_definitions(component INTERFACE "$<${_is_library}:HPX_COMPONENT_E
 add_library(plugin INTERFACE)
 target_compile_definitions(plugin INTERFACE "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>")
 
-set(hpx_targets ${hpx_targets} hpx_interface plugin component)
+set(hpx_targets hpx hpx_no_wrap_main plugin component)
+set(hpx_internal_targets hpx_core hpx_interface hpx_interface_no_wrap_main)
 
 install(
   TARGETS ${hpx_targets}
@@ -630,10 +646,20 @@ install(
   ${_optional}
 )
 
+install(
+  TARGETS ${hpx_internal_targets}
+  EXPORT HPXInternalTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  COMPONENT runtime
+  ${_optional}
+)
+
 # install PDB if needed
 if(MSVC)
   install(
-    FILES $<TARGET_PDB_FILE:hpx>
+    FILES $<TARGET_PDB_FILE:hpx_core>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     CONFIGURATIONS Debug RelWithDebInfo
     OPTIONAL
@@ -641,6 +667,7 @@ if(MSVC)
 endif()
 
 hpx_export_targets(${hpx_targets})
+hpx_export_internal_targets(${hpx_internal_targets})
 
 foreach(target ${hpx_targets})
   add_hpx_pseudo_dependencies(core ${target})

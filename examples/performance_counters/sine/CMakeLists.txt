@@ -10,6 +10,7 @@ set(root "${PROJECT_SOURCE_DIR}/examples/performance_counters/sine")
 # add component
 add_hpx_component(sine
   INTERNAL_FLAGS
+  NOEXPORT
   FOLDER "Examples/PerformanceCounters/Sine"
   HEADER_GLOB "${root}/*.h*"
   SOURCE_GLOB "${root}/sine.c*"
