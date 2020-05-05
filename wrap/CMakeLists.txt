@@ -31,10 +31,9 @@ list(APPEND hpx_wrap_HEADERS
   hpx/hpx_main_impl.hpp)
 
 set(hpx_wrap_SOURCES "" CACHE INTERNAL "Sources for libhpx_wrap." FORCE)
+list(APPEND hpx_wrap_SOURCES main.cpp)
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
-  list(APPEND hpx_wrap_SOURCES
-    hpx_wrap.cpp
-    main.cpp)
+  list(APPEND hpx_wrap_SOURCES hpx_wrap.cpp)
 endif()
 
 # make source groups
@@ -55,33 +54,39 @@ add_hpx_source_group(
   TARGETS ${hpx_wrap_HEADERS})
 add_hpx_source_group(
   NAME hpx_wrap
-  CLASS "Header Files"
+  CLASS "Generated Files"
   ROOT "${CMAKE_CURRENT_BINARY_DIR}/include/hpx"
   TARGETS ${config_header})
 
+add_library(
+  hpx_wrap STATIC ${hpx_wrap_SOURCES} ${hpx_wrap_HEADERS} ${config_header}
+)
+set_target_properties(hpx_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_link_libraries(hpx_wrap PRIVATE hpx_core)
+target_link_libraries(hpx_wrap PRIVATE hpx_private_flags)
+target_compile_definitions(hpx_wrap PRIVATE HPX_APPLICATION_EXPORTS)
+target_include_directories(
+  hpx_wrap
+  PUBLIC $<BUILD_INTERFACE:${hpx_wrap_HEADER_ROOT}>
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+         $<INSTALL_INTERFACE:include>
+)
+
+set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
+
+if(MSVC)
+  set_target_properties(
+    hpx_wrap
+    PROPERTIES COMPILE_PDB_NAME_DEBUG hpx_wrapd
+               COMPILE_PDB_NAME_RELWITHDEBINFO hpx_wrap
+               COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG
+               ${CMAKE_CURRENT_BINARY_DIR}/Debug
+               COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO
+               ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo
+  )
+endif()
+
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
-  add_library(hpx_wrap STATIC ${hpx_wrap_SOURCES} ${hpx_wrap_HEADERS})
-  set_target_properties(hpx_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(hpx_wrap PRIVATE hpx_core)
-  target_link_libraries(hpx_wrap PRIVATE hpx_private_flags)
-  target_compile_definitions(hpx_wrap PRIVATE HPX_APPLICATION_EXPORTS)
-  target_include_directories(hpx_wrap
-    PUBLIC $<BUILD_INTERFACE:${hpx_wrap_HEADER_ROOT}>
-           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-           $<INSTALL_INTERFACE:include>)
-
-  set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
-
-  if(MSVC)
-    set_target_properties(hpx_wrap PROPERTIES
-      COMPILE_PDB_NAME_DEBUG hpx_wrapd
-      COMPILE_PDB_NAME_RELWITHDEBINFO hpx_wrap
-      COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG
-        ${CMAKE_CURRENT_BINARY_DIR}/Debug
-      COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO
-        ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo)
-  endif()
-
   if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     target_link_libraries(hpx_wrap INTERFACE "-Wl,-wrap=main")
   elseif(APPLE)
@@ -89,12 +94,6 @@ if(HPX_WITH_DYNAMIC_HPX_MAIN)
   else()
     hpx_error("Dynamic hpx_main is not supported on ${CMAKE_SYSTEM_NAME}.")
   endif()
-else()
-  add_library(hpx_wrap INTERFACE)
-  target_include_directories(hpx_wrap
-    INTERFACE $<BUILD_INTERFACE:${hpx_wrap_HEADER_ROOT}>
-           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-           $<INSTALL_INTERFACE:include>)
 endif()
 
 install(
