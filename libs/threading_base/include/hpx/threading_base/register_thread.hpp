@@ -93,6 +93,20 @@ namespace hpx { namespace threads {
         };
     }    // namespace detail
 
+    template <typename F>
+    thread_function_type make_thread_function(F&& f)
+    {
+        return {detail::thread_function<typename std::decay<F>::type>{
+            std::forward<F>(f)}};
+    }
+
+    template <typename F>
+    thread_function_type make_thread_function_nullary(F&& f)
+    {
+        return {detail::thread_function_nullary<typename std::decay<F>::type>{
+            std::forward<F>(f)}};
+    }
+
     namespace detail {
         using get_default_pool_type = std::function<thread_pool_base*()>;
         HPX_EXPORT void set_get_default_pool(get_default_pool_type f);
@@ -105,6 +119,108 @@ namespace hpx { namespace threads {
         HPX_EXPORT boost::asio::io_service* get_default_timer_service();
     }    // namespace detail
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create a new \a thread using the given data.
+    ///
+    /// \param data       [in] The data to use for creating the thread.
+    /// \param pool       [in] The thread pool to use for launching the work.
+    /// \param ec         [in,out] This represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \returns This function will return the internal id of the newly created
+    ///          HPX-thread.
+    ///
+    /// \throws invalid_status if the runtime system has not been started yet.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to
+    ///                   \a hpx#throws this function doesn't
+    ///                   throw but returns the result code using the
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    inline threads::thread_id_type register_thread(
+        threads::thread_init_data& data, threads::thread_pool_base* pool,
+        error_code& ec = throws)
+    {
+        HPX_ASSERT(pool);
+        data.run_now = true;
+        threads::thread_id_type id = threads::invalid_thread_id;
+        pool->create_thread(data, id, ec);
+        return id;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create a new \a thread using the given data on the same thread
+    ///        pool as the calling thread, or on the default thread pool if
+    ///        not on an HPX thread.
+    ///
+    /// \param data       [in] The data to use for creating the thread.
+    /// \param ec         [in,out] This represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \returns This function will return the internal id of the newly created
+    ///          HPX-thread.
+    ///
+    /// \throws invalid_status if the runtime system has not been started yet.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to
+    ///                   \a hpx#throws this function doesn't
+    ///                   throw but returns the result code using the
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    inline threads::thread_id_type register_thread(
+        threads::thread_init_data& data, error_code& ec = throws)
+    {
+        return register_thread(data, detail::get_self_or_default_pool(), ec);
+    }
+
+    /// \brief Create a new work item using the given data.
+    ///
+    /// \param data       [in] The data to use for creating the thread.
+    /// \param pool       [in] The thread pool to use for launching the work.
+    /// \param ec         [in,out] This represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \throws invalid_status if the runtime system has not been started yet.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to
+    ///                   \a hpx#throws this function doesn't
+    ///                   throw but returns the result code using the
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    inline void register_work(threads::thread_init_data& data,
+        threads::thread_pool_base* pool, error_code& ec = throws)
+    {
+        HPX_ASSERT(pool);
+        data.run_now = false;
+        pool->create_work(data, ec);
+    }
+
+    /// \brief Create a new work item using the given data on the same thread
+    ///        pool as the calling thread, or on the default thread pool if
+    ///        not on an HPX thread.
+    ///
+    /// \param data       [in] The data to use for creating the thread.
+    /// \param ec         [in,out] This represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    ///
+    /// \throws invalid_status if the runtime system has not been started yet.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to
+    ///                   \a hpx#throws this function doesn't
+    ///                   throw but returns the result code using the
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    inline void register_work(
+        threads::thread_init_data& data, error_code& ec = throws)
+    {
+        register_work(data, detail::get_self_or_default_pool(), ec);
+    }
+
+#if defined(HPX_HAVE_REGISTER_THREAD_OVERLOADS_COMPATIBILITY)
     inline threads::thread_id_type register_thread_plain(
         threads::thread_pool_base* pool, threads::thread_init_data& data,
         threads::thread_state_enum initial_state = threads::pending,
@@ -112,7 +228,9 @@ namespace hpx { namespace threads {
     {
         HPX_ASSERT(pool);
         threads::thread_id_type id = threads::invalid_thread_id;
-        pool->create_thread(data, id, initial_state, run_now, ec);
+        data.initial_state = initial_state;
+        data.run_now = initial_state;
+        pool->create_thread(data, id, ec);
         return id;
     }
 
@@ -122,8 +240,7 @@ namespace hpx { namespace threads {
         bool run_now = true, error_code& ec = throws)
     {
         HPX_ASSERT(pool);
-        data.stacksize = pool->get_scheduler()->get_stack_size(
-            threads::thread_stacksize_nostack);
+        data.stacksize = threads::thread_stacksize_nostack;
         return register_thread_plain(pool, data, initial_state, run_now, ec);
     }
 
@@ -144,8 +261,8 @@ namespace hpx { namespace threads {
             util::thread_description(func, "register_thread_plain");
 
         HPX_ASSERT(pool);
-        threads::thread_init_data data(std::move(func), d, priority,
-            schedulehint, pool->get_scheduler()->get_stack_size(stacksize));
+        threads::thread_init_data data(
+            std::move(func), d, priority, schedulehint, stacksize);
 
         return register_thread_plain(pool, data, initial_state, run_now, ec);
     }
@@ -416,7 +533,8 @@ namespace hpx { namespace threads {
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
-        pool->create_work(data, initial_state, ec);
+        data.initial_state = initial_state;
+        pool->create_work(data, ec);
     }
 
     inline void register_non_suspendable_work_plain(
@@ -425,8 +543,7 @@ namespace hpx { namespace threads {
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
-        data.stacksize = pool->get_scheduler()->get_stack_size(
-            threads::thread_stacksize_nostack);
+        data.stacksize = threads::thread_stacksize_nostack;
         register_work_plain(pool, data, initial_state, ec);
     }
 
@@ -446,8 +563,8 @@ namespace hpx { namespace threads {
             util::thread_description(func, "register_work_plain");
 
         HPX_ASSERT(pool);
-        threads::thread_init_data data(std::move(func), d, priority,
-            schedulehint, pool->get_scheduler()->get_stack_size(stacksize));
+        threads::thread_init_data data(
+            std::move(func), d, priority, schedulehint, stacksize);
 
         register_work_plain(pool, data, initial_state, ec);
     }
@@ -702,10 +819,12 @@ namespace hpx { namespace threads {
         register_non_suspendable_work_plain(pool, std::move(thread_func),
             description, initial_state, priority, os_thread, ec);
     }
+#endif
 }}    // namespace hpx::threads
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_REGISTER_THREAD_COMPATIBILITY)
+#if defined(HPX_HAVE_REGISTER_THREAD_COMPATIBILITY) &&                         \
+    defined(HPX_HAVE_REGISTER_THREAD_OVERLOADS_COMPATIBILITY)
 namespace hpx { namespace applier {
     using threads::register_thread;
     using threads::register_thread_nullary;

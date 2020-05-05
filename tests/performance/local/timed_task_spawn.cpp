@@ -45,7 +45,9 @@ using hpx::finalize;
 using hpx::get_os_thread_count;
 using hpx::init;
 
-using hpx::applier::register_work;
+using hpx::threads::register_work;
+using hpx::threads::thread_init_data;
+using hpx::threads::make_thread_function_nullary;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -166,10 +168,13 @@ void wait_for_tasks(
 
         if (all_count != suspended_tasks + 1)
         {
-            register_work(hpx::util::bind(&wait_for_tasks, std::ref(finished),
-                              suspended_tasks),
-                "wait_for_tasks", hpx::threads::pending,
+            thread_init_data data(
+                make_thread_function_nullary(
+                    hpx::util::bind(&wait_for_tasks, std::ref(finished),
+                        suspended_tasks)),
+                "wait_for_tasks",
                 hpx::threads::thread_priority_low);
+            register_work(data);
             return;
         }
     }
@@ -206,19 +211,23 @@ void stage_worker_static_balanced_stackbased(
 {
     if (suspend)
     {
-        hpx::threads::register_thread_plain(&invoke_worker_timed_suspension,
-            "invoke_worker_timed_suspension", hpx::threads::pending, false,
+        hpx::threads::thread_init_data data(
+            &invoke_worker_timed_suspension,
+            "invoke_worker_timed_suspension",
             hpx::threads::thread_priority_normal,
             hpx::threads::thread_schedule_hint(
                 static_cast<std::int16_t>(target_thread)));
+        hpx::threads::register_work(data);
     }
     else
     {
-        hpx::threads::register_thread_plain(&invoke_worker_timed_no_suspension,
-            "invoke_worker_timed_no_suspension", hpx::threads::pending, false,
+        hpx::threads::thread_init_data data(
+            &invoke_worker_timed_no_suspension,
+            "invoke_worker_timed_no_suspension",
             hpx::threads::thread_priority_normal,
             hpx::threads::thread_schedule_hint(
                 static_cast<std::int16_t>(target_thread)));
+        hpx::threads::register_work(data);
     }
 }
 
@@ -227,20 +236,22 @@ void stage_worker_static_balanced_stackless(
 {
     if (suspend)
     {
-        hpx::threads::register_non_suspendable_thread_plain(
+        hpx::threads::register_work(
             &invoke_worker_timed_suspension, "invoke_worker_timed_suspension",
-            hpx::threads::pending, false, hpx::threads::thread_priority_normal,
+            hpx::threads::thread_priority_normal,
             hpx::threads::thread_schedule_hint(
-                static_cast<std::int16_t>(target_thread)));
+                static_cast<std::int16_t>(target_thread)),
+            hpx::threads::thread_stacksize_nostack);
     }
     else
     {
-        hpx::threads::register_non_suspendable_thread_plain(
+        hpx::threads::register_work(
             &invoke_worker_timed_no_suspension,
-            "invoke_worker_timed_no_suspension", hpx::threads::pending, false,
+            "invoke_worker_timed_no_suspension",
             hpx::threads::thread_priority_normal,
             hpx::threads::thread_schedule_hint(
-                static_cast<std::int16_t>(target_thread)));
+                static_cast<std::int16_t>(target_thread)),
+            hpx::threads::thread_stacksize_nostack);
     }
 }
 
@@ -248,17 +259,21 @@ void stage_worker_static_imbalanced(std::uint64_t target_thread, bool suspend)
 {
     if (suspend)
     {
-        hpx::threads::register_thread_plain(&invoke_worker_timed_suspension,
-            "invoke_worker_timed_suspension", hpx::threads::pending, false,
+        hpx::threads::thread_init_data data(
+            &invoke_worker_timed_suspension,
+            "invoke_worker_timed_suspension",
             hpx::threads::thread_priority_normal,
             hpx::threads::thread_schedule_hint(0));
+        hpx::threads::register_work(data);
     }
     else
     {
-        hpx::threads::register_thread_plain(&invoke_worker_timed_no_suspension,
-            "invoke_worker_timed_no_suspension", hpx::threads::pending, false,
+        hpx::threads::thread_init_data data(
+            &invoke_worker_timed_no_suspension,
+            "invoke_worker_timed_no_suspension",
             hpx::threads::thread_priority_normal,
             hpx::threads::thread_schedule_hint(0));
+        hpx::threads::register_work(data);
     }
 }
 
@@ -266,13 +281,15 @@ void stage_worker_round_robin(std::uint64_t target_thread, bool suspend)
 {
     if (suspend)
     {
-        hpx::threads::register_thread_plain(&invoke_worker_timed_suspension,
-            "invoke_worker_timed_suspension", hpx::threads::pending, false);
+        hpx::threads::thread_init_data data(&invoke_worker_timed_suspension,
+            "invoke_worker_timed_suspension");
+        hpx::threads::register_work(data);
     }
     else
     {
-        hpx::threads::register_thread_plain(&invoke_worker_timed_no_suspension,
-            "invoke_worker_timed_no_suspension", hpx::threads::pending, false);
+        hpx::threads::thread_init_data data(&invoke_worker_timed_no_suspension,
+            "invoke_worker_timed_no_suspension");
+        hpx::threads::register_work(data);
     }
 }
 
@@ -283,12 +300,14 @@ void stage_workers(std::uint64_t target_thread, std::uint64_t local_tasks,
 
     if (num_thread != target_thread)
     {
-        register_work(hpx::util::bind(&stage_workers, target_thread,
-                          local_tasks, stage_worker),
-            "stage_workers", hpx::threads::pending,
+        thread_init_data data(make_thread_function_nullary(
+                hpx::util::bind(&stage_workers, target_thread,
+                    local_tasks, stage_worker)),
+            "stage_workers",
             hpx::threads::thread_priority_normal,
             hpx::threads::thread_schedule_hint(
                 static_cast<std::int16_t>(target_thread)));
+        register_work(data);
         return;
     }
 
@@ -449,12 +468,13 @@ int hpx_main(variables_map& vm)
             if (num_thread == i)
                 continue;
 
-            register_work(hpx::util::bind(&stage_workers, i, tasks_per_feeder,
-                              stage_worker),
-                "stage_workers", hpx::threads::pending,
+            thread_init_data data(make_thread_function_nullary(
+                hpx::util::bind(&stage_workers, i, tasks_per_feeder, stage_worker)),
+                "stage_workers",
                 hpx::threads::thread_priority_normal,
                 hpx::threads::thread_schedule_hint(
                     static_cast<std::int16_t>(i)));
+            register_work(data);
         }
 
         stage_workers(num_thread, tasks_per_feeder, stage_worker);
@@ -466,10 +486,11 @@ int hpx_main(variables_map& vm)
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
-        register_work(hpx::util::bind(&wait_for_tasks, std::ref(finished),
-                          total_suspended_tasks),
+        thread_init_data data(make_thread_function_nullary(
+            hpx::util::bind(&wait_for_tasks, std::ref(finished), total_suspended_tasks)),
             "wait_for_tasks", hpx::threads::pending,
             hpx::threads::thread_priority_low);
+        register_work(data);
 
         finished.wait();
 

@@ -93,21 +93,20 @@ namespace hpx { namespace threads {
             return coroutine_.set_thread_data(data);
         }
 
-        void rebind(
-            thread_init_data& init_data, thread_state_enum newstate) override
+        void rebind(thread_init_data& init_data) override
         {
-            this->thread_data::rebind_base(init_data, newstate);
+            this->thread_data::rebind_base(init_data);
 
             coroutine_.rebind(std::move(init_data.func), thread_id_type(this));
 
             HPX_ASSERT(coroutine_.is_ready());
         }
 
-        thread_data_stackful(thread_init_data& init_data, void* queue,
-            thread_state_enum newstate)
-          : thread_data(init_data, queue, newstate)
-          , coroutine_(std::move(init_data.func), thread_id_type(this_()),
-                init_data.stacksize)
+        thread_data_stackful(
+            thread_init_data& init_data, void* queue, std::ptrdiff_t stacksize)
+          : thread_data(init_data, queue, stacksize)
+          , coroutine_(
+                std::move(init_data.func), thread_id_type(this_()), stacksize)
           , agent_(coroutine_.impl())
         {
             HPX_ASSERT(coroutine_.is_ready());
@@ -115,8 +114,8 @@ namespace hpx { namespace threads {
 
         ~thread_data_stackful();
 
-        static inline thread_data* create(thread_init_data& init_data,
-            void* queue, thread_state_enum newstate);
+        static inline thread_data* create(
+            thread_init_data& init_data, void* queue, std::ptrdiff_t stacksize);
 
         void destroy() override
         {
@@ -131,10 +130,10 @@ namespace hpx { namespace threads {
 
     ////////////////////////////////////////////////////////////////////////////
     inline thread_data* thread_data_stackful::create(
-        thread_init_data& data, void* queue, thread_state_enum state)
+        thread_init_data& data, void* queue, std::ptrdiff_t stacksize)
     {
         thread_data* p = thread_alloc_.allocate(1);
-        new (p) thread_data_stackful(data, queue, state);
+        new (p) thread_data_stackful(data, queue, stacksize);
         return p;
     }
 }}    // namespace hpx::threads

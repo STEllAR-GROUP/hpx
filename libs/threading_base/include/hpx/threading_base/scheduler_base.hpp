@@ -203,8 +203,8 @@ namespace hpx { namespace threads { namespace policies {
         virtual bool cleanup_terminated(
             std::size_t num_thread, bool delete_all) = 0;
 
-        virtual void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now, error_code& ec) = 0;
+        virtual void create_thread(
+            thread_init_data& data, thread_id_type* id, error_code& ec) = 0;
 
         virtual bool get_next_thread(std::size_t num_thread, bool running,
             threads::thread_data*& thrd, bool enable_stealing) = 0;
@@ -241,6 +241,11 @@ namespace hpx { namespace threads { namespace policies {
 
         std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize) const
         {
+            if (stacksize == thread_stacksize_current)
+            {
+                stacksize = get_self_stacksize_enum();
+            }
+
             switch (stacksize)
             {
             case thread_stacksize_small:
@@ -258,10 +263,6 @@ namespace hpx { namespace threads { namespace policies {
 
             case thread_stacksize_nostack:
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
-
-            case thread_stacksize_current:
-                return get_self_stacksize();
-                break;
 
             default:
                 HPX_ASSERT_MSG(

@@ -15,7 +15,13 @@ void stackless_thread()
 
 int main(int argc, char* argv[])
 {
-    hpx::threads::register_non_suspendable_work_nullary(stackless_thread);
+    hpx::threads::thread_init_data data(
+        hpx::threads::make_thread_function_nullary(
+            stackless_thread), "stackless_thread",
+            hpx::threads::thread_priority_default,
+            hpx::threads::thread_schedule_hint(),
+            hpx::threads::thread_stacksize_nostack);
+    hpx::threads::register_work(data);
     return hpx::util::report_errors();
 }
 

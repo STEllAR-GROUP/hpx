@@ -77,9 +77,7 @@ namespace hpx { namespace applier { namespace detail {
 #endif
 #endif
         data.priority = fix_priority<Action>(priority);
-        data.stacksize =
-            threads::get_stack_size(static_cast<threads::thread_stacksize>(
-                traits::action_stacksize<Action>::value));
+        data.stacksize = traits::action_stacksize<Action>::value;
 
         while (!threads::threadmanager_is_at_least(state_running))
         {
@@ -87,8 +85,7 @@ namespace hpx { namespace applier { namespace detail {
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
-        traits::action_schedule_thread<Action>::call(
-            lva, comptype, data, threads::pending);
+        traits::action_schedule_thread<Action>::call(lva, comptype, data);
     }
 
     template <typename Action, typename Continuation, typename... Ts>
@@ -115,9 +112,8 @@ namespace hpx { namespace applier { namespace detail {
 #endif
 #endif
         data.priority = fix_priority<Action>(priority);
-        data.stacksize =
-            threads::get_stack_size(static_cast<threads::thread_stacksize>(
-                traits::action_stacksize<Action>::value));
+        data.stacksize = static_cast<threads::thread_stacksize>(
+            traits::action_stacksize<Action>::value);
 
         while (!threads::threadmanager_is_at_least(state_running))
         {
@@ -125,8 +121,7 @@ namespace hpx { namespace applier { namespace detail {
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
-        traits::action_schedule_thread<Action>::call(
-            lva, comptype, data, threads::pending);
+        traits::action_schedule_thread<Action>::call(lva, comptype, data);
     }
 
     template <typename Action, typename... Ts>

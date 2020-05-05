@@ -61,7 +61,10 @@ void do_async_io(char const* string_to_write,
 
     // Create an HPX thread to guarantee that the promise::set_value
     // function can be invoked safely.
-    hpx::threads::register_thread(hpx::util::bind(&set_value, p, 0));
+    hpx::threads::thread_init_data data(
+        hpx::threads::make_thread_function_nullary(
+            hpx::util::bind(&set_value, p, 0)), "set_value");
+    hpx::threads::register_thread(data);
 }
 
 // This function will be executed by an HPX thread

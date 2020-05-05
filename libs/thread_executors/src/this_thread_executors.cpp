@@ -154,17 +154,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(
                 util::bind(&this_thread_executor::thread_function_nullary, this,
                     std::move(f))),
-            desc);
-        data.stacksize =
-            this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
+            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            initial_state, run_now);
 
         // update statistics
         ++tasks_scheduled_;
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        threads::detail::create_thread(&scheduler_, data, id,
-            initial_state,    //-V601
-            run_now, ec);
+        threads::detail::create_thread(&scheduler_, data, id, ec);
         if (ec)
         {
             --tasks_scheduled_;
@@ -199,13 +196,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(
                 util::bind(&this_thread_executor::thread_function_nullary, this,
                     std::move(f))),
-            desc);
-        data.stacksize =
-            this_thread::get_pool()->get_scheduler()->get_stack_size(stacksize);
+            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(    //-V601
-            &scheduler_, data, id, suspended, true, ec);
+            &scheduler_, data, id, ec);
         if (ec)
             return;
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise

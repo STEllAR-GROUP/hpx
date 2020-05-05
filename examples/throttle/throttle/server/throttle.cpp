@@ -113,12 +113,13 @@ namespace throttle { namespace server
         std::string description("throttle controller for shepherd thread (" +
             std::to_string(shepherd) + ")");
 
-        hpx::threads::register_thread(
-            hpx::util::bind(&throttle::throttle_controller, this, shepherd),
+        hpx::threads::thread_init_data data(
+            hpx::threads::make_thread_function_nullary(
+                hpx::util::bind(&throttle::throttle_controller, this, shepherd)),
             description.c_str(),
-            hpx::threads::pending, true,
             hpx::threads::thread_priority_high,
             hpx::threads::thread_schedule_hint(shepherd));
+        hpx::threads::register_thread(data);
     }
 
     // schedule a high priority task on the given shepherd thread to suspend
@@ -127,12 +128,13 @@ namespace throttle { namespace server
         std::string description("suspend shepherd thread (" +
             std::to_string(shepherd) + ")");
 
-        hpx::threads::register_thread(
-            hpx::util::bind(&throttle::suspend, this, shepherd),
+        hpx::threads::thread_init_data data(
+            hpx::threads::make_thread_function_nullary(
+                hpx::util::bind(&throttle::suspend, this, shepherd)),
             description.c_str(),
-            hpx::threads::pending, true,
             hpx::threads::thread_priority_high,
             hpx::threads::thread_schedule_hint(shepherd));
+        hpx::threads::register_thread(data);
     }
 }}
 

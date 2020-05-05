@@ -52,8 +52,8 @@ namespace hpx { namespace threads
             std::exception_ptr exception;
 
             // Create the HPX thread
-            hpx::threads::register_thread_nullary(
-                [&, cond]() {
+            hpx::threads::thread_init_data data(
+                hpx::threads::make_thread_function_nullary([&, cond]() {
                     try
                     {
                         // Execute the given function, forward all parameters,
@@ -73,7 +73,8 @@ namespace hpx { namespace threads
                         stopping = true;
                     }
                     cond->notify_all();
-                });
+                }), "run_as_hpx_thread (non-void)");
+            hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);
@@ -100,8 +101,8 @@ namespace hpx { namespace threads
             std::exception_ptr exception;
 
             // Create an HPX thread
-            hpx::threads::register_thread_nullary(
-                [&, cond]()
+            hpx::threads::thread_init_data data(
+                hpx::threads::make_thread_function_nullary([&, cond]()
                 {
                     try
                     {
@@ -121,7 +122,8 @@ namespace hpx { namespace threads
                         stopping = true;
                     }
                     cond->notify_all();
-                });
+                }), "run_as_hpx_thread (void)");
+            hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
             std::unique_lock<hpx::lcos::local::spinlock> lk(mtx);

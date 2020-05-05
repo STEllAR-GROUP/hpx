@@ -516,6 +516,11 @@ namespace hpx { namespace threads {
             return stacksize_;
         }
 
+        thread_stacksize get_stack_size_enum() const noexcept
+        {
+            return stacksize_enum_;
+        }
+
         template <typename ThreadQueue>
         ThreadQueue& get_queue() noexcept
         {
@@ -548,8 +553,7 @@ namespace hpx { namespace threads {
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 
-        virtual void rebind(
-            thread_init_data& init_data, thread_state_enum newstate) = 0;
+        virtual void rebind(thread_init_data& init_data) = 0;
 
 #if defined(HPX_HAVE_APEX)
         std::shared_ptr<util::external_timer::task_wrapper> get_timer_data()
@@ -566,14 +570,13 @@ namespace hpx { namespace threads {
 
         // Construct a new \a thread
         thread_data(thread_init_data& init_data, void* queue,
-            thread_state_enum newstate, bool is_stackless = false);
+            std::ptrdiff_t stacksize, bool is_stackless = false);
 
         virtual ~thread_data();
         virtual void destroy() = 0;
 
     protected:
-        void rebind_base(
-            thread_init_data& init_data, thread_state_enum newstate);
+        void rebind_base(thread_init_data& init_data);
 
     private:
         mutable std::atomic<thread_state> current_state_;
@@ -617,6 +620,7 @@ namespace hpx { namespace threads {
         std::size_t last_worker_thread_num_;
 
         std::ptrdiff_t stacksize_;
+        thread_stacksize stacksize_enum_;
 
         void* queue_;
 
@@ -678,7 +682,12 @@ namespace hpx { namespace threads {
 
     /// The function \a get_self_stacksize returns the stack size of the
     /// current thread (or zero if the current thread is not a HPX thread).
-    HPX_API_EXPORT std::size_t get_self_stacksize();
+    HPX_API_EXPORT std::ptrdiff_t get_self_stacksize();
+
+    /// The function \a get_self_stacksize_enum returns the stack size of the /
+    //current thread (or thread_stacksize_default if the current thread is not
+    //a HPX thread).
+    HPX_API_EXPORT thread_stacksize get_self_stacksize_enum();
 
     /// The function \a get_parent_locality_id returns the id of the locality of
     /// the current thread's parent (or zero if the current thread is not a

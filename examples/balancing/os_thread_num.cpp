@@ -29,6 +29,8 @@ using hpx::threads::pending;
 using hpx::threads::thread_priority_normal;
 
 using hpx::threads::register_work;
+using hpx::threads::thread_init_data;
+using hpx::threads::make_thread_function_nullary;
 
 using hpx::init;
 using hpx::finalize;
@@ -86,13 +88,14 @@ int hpx_main(variables_map& vm)
 
             for (std::size_t j = 0; j < pxthreads; ++j)
             {
-                register_work(hpx::util::bind(&get_os_thread_num
+                thread_init_data data(make_thread_function_nullary(
+                    hpx::util::bind(&get_os_thread_num
                                         , std::ref(barr)
-                                        , std::ref(os_threads))
+                                        , std::ref(os_threads)))
                   , "get_os_thread_num"
-                  , pending
                   , thread_priority_normal
                   , hpx::threads::thread_schedule_hint(0));
+                register_work(data);
             }
 
             barr.wait(); // wait for all PX threads to enter the barrier

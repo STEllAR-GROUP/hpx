@@ -16,7 +16,8 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_stacksize
     {
-        enum { value = threads::thread_stacksize_default };
+        HPX_STATIC_CONSTEXPR threads::thread_stacksize value =
+            threads::thread_stacksize_default;
     };
 }}
 

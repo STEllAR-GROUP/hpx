@@ -21,6 +21,7 @@
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
@@ -96,16 +97,20 @@ namespace hpx { namespace threads { namespace policies {
         using thread_heap_type =
             std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
 
+        struct task_description
+        {
+            thread_init_data data;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        using task_description =
-            util::tuple<thread_init_data, thread_state_enum, std::uint64_t>;
-#else
-        using task_description =
-            util::tuple<thread_init_data, thread_state_enum>;
+            std::uint64_t waittime;
 #endif
+        };
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-        using thread_description = util::tuple<thread_data*, std::uint64_t>;
+        struct thread_description
+        {
+            thread_data* data;
+            std::uint64_t waittime;
+        };
 #else
         using thread_description = thread_data;
 #endif
@@ -122,12 +127,12 @@ namespace hpx { namespace threads { namespace policies {
     protected:
         template <typename Lock>
         void create_thread_object(threads::thread_id_type& thrd,
-            threads::thread_init_data& data, thread_state_enum state, Lock& lk)
+            threads::thread_init_data& data, Lock& lk)
         {
             HPX_ASSERT(lk.owns_lock());
-            HPX_ASSERT(data.stacksize > 0);
 
-            std::ptrdiff_t stacksize = data.stacksize;
+            std::ptrdiff_t const stacksize =
+                data.scheduler_base->get_stack_size(data.stacksize);
 
             thread_heap_type* heap = nullptr;
 
@@ -153,9 +158,10 @@ namespace hpx { namespace threads { namespace policies {
             }
             HPX_ASSERT(heap);
 
-            if (state == pending_do_not_schedule || state == pending_boost)
+            if (data.initial_state == pending_do_not_schedule ||
+                data.initial_state == pending_boost)
             {
-                state = pending;
+                data.initial_state = pending;
             }
 
             // Check for an unused thread object.
@@ -164,7 +170,7 @@ namespace hpx { namespace threads { namespace policies {
                 // Take ownership of the thread object and rebind it.
                 thrd = heap->front();
                 heap->pop_front();
-                get_thread_id_data(thrd)->rebind(data, state);
+                get_thread_id_data(thrd)->rebind(data);
             }
             else
             {
@@ -175,12 +181,12 @@ namespace hpx { namespace threads { namespace policies {
                 if (stacksize == parameters_.nostack_stacksize_)
                 {
                     p = threads::thread_data_stackless::create(
-                        data, this, state);
+                        data, this, stacksize);
                 }
                 else
                 {
                     p = threads::thread_data_stackful::create(
-                        data, this, state);
+                        data, this, stacksize);
                 }
                 thrd = thread_id_type(p);
             }
@@ -207,17 +213,17 @@ namespace hpx { namespace threads { namespace policies {
                 if (get_maintain_queue_wait_times_enabled())
                 {
                     addfrom->new_tasks_wait_ +=
-                        util::high_resolution_clock::now() -
-                        util::get<2>(*task);
+                        util::high_resolution_clock::now() - task->waittime;
                     ++addfrom->new_tasks_wait_count_;
                 }
 #endif
                 // create the new thread
-                threads::thread_init_data& data = util::get<0>(*task);
-                thread_state_enum state = util::get<1>(*task);
+                threads::thread_init_data& data = task->data;
                 threads::thread_id_type thrd;
 
-                create_thread_object(thrd, data, state, lk);
+                bool schedule_now = data.initial_state == pending;
+
+                create_thread_object(thrd, data, lk);
 
                 task->~task_description();
                 task_description_alloc_.deallocate(task, 1);
@@ -243,7 +249,7 @@ namespace hpx { namespace threads { namespace policies {
 
                 // only insert the thread into the work-items queue if it is in
                 // pending state
-                if (state == pending)
+                if (schedule_now)
                 {
                     // pushing the new thread into the pending queue of the
                     // specified thread_queue
@@ -631,14 +637,14 @@ namespace hpx { namespace threads { namespace policies {
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
-        void create_thread(thread_init_data& data, thread_id_type* id,
-            thread_state_enum initial_state, bool run_now, error_code& ec)
+        void create_thread(
+            thread_init_data& data, thread_id_type* id, error_code& ec)
         {
             // thread has not been created yet
             if (id)
                 *id = invalid_thread_id;
 
-            if (run_now)
+            if (data.run_now)
             {
                 threads::thread_id_type thrd;
 
@@ -648,7 +654,9 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     std::unique_lock<mutex_type> lk(mtx_);
 
-                    create_thread_object(thrd, data, initial_state, lk);
+                    bool schedule_now = data.initial_state == pending;
+
+                    create_thread_object(thrd, data, lk);
 
                     // add a new entry in the map for this thread
                     std::pair<thread_map_type::iterator, bool> p =
@@ -671,7 +679,7 @@ namespace hpx { namespace threads { namespace policies {
                         this);
 
                     // push the new thread in the pending thread queue
-                    if (initial_state == pending)
+                    if (schedule_now)
                     {
                         schedule_thread(get_thread_id_data(thrd));
                     }
@@ -692,11 +700,10 @@ namespace hpx { namespace threads { namespace policies {
 
             task_description* td = task_description_alloc_.allocate(1);
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            new (td) task_description(std::move(data), initial_state,
-                util::high_resolution_clock::now());
+            new (td) task_description{
+                std::move(data), util::high_resolution_clock::now()};
 #else
-            new (td)
-                task_description(std::move(data), initial_state);    //-V106
+            new (td) task_description{std::move(data)};    //-V106
 #endif
             new_tasks_.push(td);
             if (&ec != &throws)
@@ -714,9 +721,9 @@ namespace hpx { namespace threads { namespace policies {
                 if (get_maintain_queue_wait_times_enabled())
                 {
                     std::uint64_t now = util::high_resolution_clock::now();
-                    src->work_items_wait_ += now - util::get<1>(*trd);
+                    src->work_items_wait_ += now - trd->waittime;
                     ++src->work_items_wait_count_;
-                    util::get<1>(*trd) = now;
+                    trd->waittime = now;
                 }
 #endif
 
@@ -736,9 +743,9 @@ namespace hpx { namespace threads { namespace policies {
                 if (get_maintain_queue_wait_times_enabled())
                 {
                     std::int64_t now = util::high_resolution_clock::now();
-                    src->new_tasks_wait_ += now - util::get<2>(*task);
+                    src->new_tasks_wait_ += now - task->waittime;
                     ++src->new_tasks_wait_count_;
-                    util::get<2>(*task) = now;
+                    task->waittime = now;
                 }
 #endif
 
@@ -782,12 +789,12 @@ namespace hpx { namespace threads { namespace policies {
 
                 if (get_maintain_queue_wait_times_enabled())
                 {
-                    work_items_wait_ += util::high_resolution_clock::now() -
-                        util::get<1>(*tdesc);
+                    work_items_wait_ +=
+                        util::high_resolution_clock::now() - tdesc->waittime;
                     ++work_items_wait_count_;
                 }
 
-                thrd = util::get<0>(*tdesc);
+                thrd = tdesc->data;
                 delete tdesc;
 
                 return true;
@@ -807,8 +814,8 @@ namespace hpx { namespace threads { namespace policies {
         {
             ++work_items_count_.data_;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            work_items_.push(new thread_description(
-                                 thrd, util::high_resolution_clock::now()),
+            work_items_.push(new thread_description{thrd,
+                                 util::high_resolution_clock::now()},
                 other_end);
 #else
             work_items_.push(thrd, other_end);

@@ -752,9 +752,8 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void threadmanager::register_thread(thread_init_data& data,
-        thread_id_type& id, thread_state_enum initial_state, bool run_now,
-        error_code& ec)
+    void threadmanager::register_thread(
+        thread_init_data& data, thread_id_type& id, error_code& ec)
     {
         thread_pool_base* pool = nullptr;
         auto thrd_data = get_self_id_data();
@@ -766,12 +765,11 @@ namespace hpx { namespace threads {
         {
             pool = &default_pool();
         }
-        pool->create_thread(data, id, initial_state, run_now, ec);
+        pool->create_thread(data, id, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void threadmanager::register_work(
-        thread_init_data& data, thread_state_enum initial_state, error_code& ec)
+    void threadmanager::register_work(thread_init_data& data, error_code& ec)
     {
         thread_pool_base* pool = nullptr;
         auto thrd_data = get_self_id_data();
@@ -783,7 +781,7 @@ namespace hpx { namespace threads {
         {
             pool = &default_pool();
         }
-        pool->create_work(data, initial_state, ec);
+        pool->create_work(data, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -441,12 +441,13 @@ namespace hpx { namespace threads { namespace detail {
             },
             hpx::util::thread_description("background_work"),
             thread_priority_high_recursive, schedulehint,
-            scheduler.get_stack_size(thread_stacksize_large), &scheduler);
+            thread_stacksize_large,
+            // Create in suspended to prevent the thread from being scheduled
+            // directly...
+            suspended, true, &scheduler);
 
-        // Create in suspended to prevent the thread from being scheduled
-        // directly...
         scheduler.SchedulingPolicy::create_thread(
-            background_init, &background_thread, suspended, true, hpx::throws);
+            background_init, &background_thread, hpx::throws);
         HPX_ASSERT(background_thread);
         scheduler.SchedulingPolicy::increment_background_thread_count();
         // We can now set the state to pending

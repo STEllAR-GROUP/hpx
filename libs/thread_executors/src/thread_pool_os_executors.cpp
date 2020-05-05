@@ -178,11 +178,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(
                 util::bind(&thread_pool_os_executor::thread_function_nullary,
                     std::move(f))),
-            desc);
-        data.stacksize = scheduler_->get_stack_size(stacksize);
+            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            initial_state, run_now);
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        pool_->create_thread(data, id, initial_state, run_now, ec);
+        pool_->create_thread(data, id, ec);
         if (ec)
             return;
 
@@ -206,11 +206,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(
                 util::bind(&thread_pool_os_executor::thread_function_nullary,
                     std::move(f))),
-            desc);
-        data.stacksize = scheduler_->get_stack_size(stacksize);
+            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        pool_->create_thread(data, id, suspended, true, ec);
+        pool_->create_thread(data, id, ec);
         if (ec)
             return;
 

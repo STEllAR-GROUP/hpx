@@ -459,13 +459,16 @@ namespace hpx { namespace parcelset
                         parcel p, write_handler_type f
                     ) = &parcelhandler::put_parcel;
 
-                threads::register_thread_nullary(
-                    util::deferred_call(put_parcel_ptr, this,
-                        std::move(p), std::move(f)),
-                    "parcelhandler::put_parcel", threads::pending, true,
+                threads::thread_init_data data(
+                    threads::make_thread_function_nullary(
+                        util::deferred_call(put_parcel_ptr, this,
+                            std::move(p), std::move(f))),
+                    "parcelhandler::put_parcel",
                     threads::thread_priority_boost,
                     threads::thread_schedule_hint(),
-                    threads::thread_stacksize_medium);
+                    threads::thread_stacksize_medium,
+                    threads::pending, true);
+                threads::register_thread(data);
                 return;
             }
         }
@@ -555,13 +558,16 @@ namespace hpx { namespace parcelset
                         std::vector<parcel>, std::vector<write_handler_type>
                     ) = &parcelhandler::put_parcels;
 
-                threads::register_thread_nullary(
-                    util::deferred_call(put_parcels_ptr, this,
-                        std::move(parcels), std::move(handlers)),
-                    "parcelhandler::put_parcels", threads::pending, true,
+                threads::thread_init_data data(
+                    threads::make_thread_function_nullary(
+                        util::deferred_call(put_parcels_ptr, this,
+                            std::move(parcels), std::move(handlers))),
+                    "parcelhandler::put_parcels",
                     threads::thread_priority_boost,
                     threads::thread_schedule_hint(),
-                    threads::thread_stacksize_medium);
+                    threads::thread_stacksize_medium,
+                    threads::pending, true);
+                threads::register_thread(data);
                 return;
             }
         }

@@ -178,16 +178,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(util::bind(
                 &embedded_thread_pool_executor::thread_function_nullary, this,
                 std::move(f))),
-            desc);
-        data.stacksize = scheduler_.get_stack_size(stacksize);
+            desc, thread_priority_default, thread_schedule_hint(), stacksize,
+            initial_state, run_now);
 
         // update statistics
         ++tasks_scheduled_;
 
         threads::thread_id_type id = threads::invalid_thread_id;
-        threads::detail::create_thread(&scheduler_, data, id,
-            initial_state,    //-V601
-            run_now, ec);
+        threads::detail::create_thread(&scheduler_, data, id, ec);
         if (ec)
         {
             --tasks_scheduled_;
@@ -212,12 +210,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
             util::one_shot(util::bind(
                 &embedded_thread_pool_executor::thread_function_nullary, this,
                 std::move(f))),
-            desc);
-        data.stacksize = scheduler_.get_stack_size(stacksize);
+            desc, thread_priority_default, thread_schedule_hint(),
+            thread_stacksize_default, suspended, true);
 
         threads::thread_id_type id = threads::invalid_thread_id;
         threads::detail::create_thread(    //-V601
-            &scheduler_, data, id, suspended, true, ec);
+            &scheduler_, data, id, ec);
         if (ec)
             return;
         HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
@@ -449,14 +447,16 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         if (state.compare_exchange_strong(expected, state_starting))
         {
             ++curr_punits_;
-            register_thread_nullary(
-                util::deferred_call(&embedded_thread_pool_executor::run, this,
-                    virt_core, thread_num),
-                "embedded_thread_pool_executor thread", threads::pending, true,
+            thread_init_data data(
+                make_thread_function_nullary(
+                    util::deferred_call(&embedded_thread_pool_executor::run,
+                        this, virt_core, thread_num)),
+                "embedded_thread_pool_executor thread",
                 threads::thread_priority_normal,
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(thread_num)),
-                threads::thread_stacksize_default, ec);
+                threads::thread_stacksize_default, threads::pending, true);
+            register_thread(data, ec);
         }
     }
 

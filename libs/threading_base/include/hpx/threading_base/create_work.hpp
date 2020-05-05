@@ -18,12 +18,10 @@
 
 namespace hpx { namespace threads { namespace detail {
     inline void create_work(policies::scheduler_base* scheduler,
-        thread_init_data& data,
-        thread_state_enum initial_state = threads::pending,
-        error_code& ec = throws)
+        thread_init_data& data, error_code& ec = throws)
     {
         // verify parameters
-        switch (initial_state)
+        switch (data.initial_state)
         {
         case pending:
         case pending_do_not_schedule:
@@ -35,7 +33,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             std::ostringstream strm;
             strm << "invalid initial state: "
-                 << get_thread_state_name(initial_state);
+                 << get_thread_state_name(data.initial_state);
             HPX_THROWS_IF(
                 ec, bad_parameter, "thread::detail::create_work", strm.str());
             return;
@@ -52,7 +50,7 @@ namespace hpx { namespace threads { namespace detail {
 #endif
 
         LTM_(info) << "create_work: initial_state("
-                   << get_thread_state_name(initial_state)
+                   << get_thread_state_name(data.initial_state)
                    << "), thread_priority("
                    << get_thread_priority_name(data.priority)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
@@ -93,18 +91,11 @@ namespace hpx { namespace threads { namespace detail {
         if (data.priority == thread_priority_default)
             data.priority = thread_priority_normal;
 
-        if (thread_priority_high == data.priority ||
+        data.run_now = (thread_priority_high == data.priority ||
             thread_priority_high_recursive == data.priority ||
-            thread_priority_boost == data.priority)
-        {
-            // For critical priority threads, create the thread immediately.
-            scheduler->create_thread(data, nullptr, initial_state, true, ec);
-        }
-        else
-        {
-            // Create a task description for the new thread.
-            scheduler->create_thread(data, nullptr, initial_state, false, ec);
-        }
+            thread_priority_boost == data.priority);
+
+        scheduler->create_thread(data, nullptr, ec);
 
         // NOTE: Don't care if the hint is a NUMA hint, just want to wake up a
         // thread.

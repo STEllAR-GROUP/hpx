@@ -571,9 +571,8 @@ namespace hpx { namespace threads { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::create_thread(thread_init_data& data,
-        thread_id_type& id, thread_state_enum initial_state, bool run_now,
-        error_code& ec)
+    void scheduled_thread_pool<Scheduler>::create_thread(
+        thread_init_data& data, thread_id_type& id, error_code& ec)
     {
         // verify state
         if (thread_count_ == 0 && !sched_->Scheduler::is_state(state_running))
@@ -585,8 +584,7 @@ namespace hpx { namespace threads { namespace detail {
             return;
         }
 
-        detail::create_thread(
-            sched_.get(), data, id, initial_state, run_now, ec);    //-V601
+        detail::create_thread(sched_.get(), data, id, ec);    //-V601
 
         // update statistics
         ++tasks_scheduled_;
@@ -594,7 +592,7 @@ namespace hpx { namespace threads { namespace detail {
 
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::create_work(
-        thread_init_data& data, thread_state_enum initial_state, error_code& ec)
+        thread_init_data& data, error_code& ec)
     {
         // verify state
         if (thread_count_ == 0 && !sched_->Scheduler::is_state(state_running))
@@ -606,7 +604,7 @@ namespace hpx { namespace threads { namespace detail {
             return;
         }
 
-        detail::create_work(sched_.get(), data, initial_state, ec);    //-V601
+        detail::create_work(sched_.get(), data, ec);    //-V601
 
         // update statistics
         ++tasks_scheduled_;
