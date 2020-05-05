@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/execution_fwd.hpp>
+#include <hpx/basic_execution/execution.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/futures_factory.hpp>

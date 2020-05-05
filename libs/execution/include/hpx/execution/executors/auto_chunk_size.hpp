@@ -13,7 +13,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing.hpp>
 
-#include <hpx/execution/executors/execution_fwd.hpp>
+#include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 
 #include <algorithm>

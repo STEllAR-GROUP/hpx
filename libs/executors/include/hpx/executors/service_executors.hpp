@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/basic_execution/execution_fwd.hpp>
+#include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>

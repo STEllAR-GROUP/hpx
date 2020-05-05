@@ -12,7 +12,7 @@
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/assertion.hpp>
-#include <hpx/basic_execution/execution_fwd.hpp>
+#include <hpx/basic_execution/execution.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>

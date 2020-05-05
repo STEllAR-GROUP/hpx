@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/config/defines.hpp>
-#include <hpx/basic_execution/execution_fwd.hpp>
+#include <hpx/basic_execution/execution.hpp>
 
 #if defined(HPX_BASIC_EXECUTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

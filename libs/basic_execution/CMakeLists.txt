@@ -11,7 +11,7 @@ set(basic_execution_headers
   hpx/basic_execution/agent_ref.hpp
   hpx/basic_execution/context_base.hpp
   hpx/basic_execution/detail/spinlock_deadlock_detection.hpp
-  hpx/basic_execution/execution_fwd.hpp
+  hpx/basic_execution/execution.hpp
   hpx/basic_execution/register_locks.hpp
   hpx/basic_execution/resource_base.hpp
   hpx/basic_execution/this_thread.hpp
