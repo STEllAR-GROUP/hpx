@@ -25,12 +25,12 @@
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/traits/acquire_future.hpp>
+#include <hpx/futures/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <hpx/execution/executors/execution.hpp>

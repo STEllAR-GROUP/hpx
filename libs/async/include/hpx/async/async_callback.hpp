@@ -17,7 +17,7 @@
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 
 #include <type_traits>
 #include <utility>

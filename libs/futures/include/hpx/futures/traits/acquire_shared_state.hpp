@@ -11,10 +11,10 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <algorithm>

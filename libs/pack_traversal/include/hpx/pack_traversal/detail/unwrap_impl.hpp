@@ -12,8 +12,8 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/result_of.hpp>
 #include <hpx/pack_traversal/pack_traversal.hpp>
-#include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 
 #include <cstddef>
 #include <type_traits>

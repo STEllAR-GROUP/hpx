@@ -25,7 +25,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/traits/future_traits.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 
 #include <algorithm>
 #include <cstddef>

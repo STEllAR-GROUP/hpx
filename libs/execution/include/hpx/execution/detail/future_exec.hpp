@@ -23,9 +23,9 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_then_result_exec.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/execution/traits/future_then_result_exec.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <exception>

@@ -117,7 +117,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/when_each.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>

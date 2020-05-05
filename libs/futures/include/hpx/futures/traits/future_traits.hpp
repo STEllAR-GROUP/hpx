@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 
 #include <type_traits>
 

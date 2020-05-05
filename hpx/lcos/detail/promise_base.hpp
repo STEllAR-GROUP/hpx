@@ -20,7 +20,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/future_access.hpp>
+#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <exception>

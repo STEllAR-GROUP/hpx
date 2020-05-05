@@ -129,10 +129,10 @@ namespace hpx {
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/threading.hpp>
-#include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
+#include <hpx/futures/traits/acquire_future.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/reserve.hpp>
 

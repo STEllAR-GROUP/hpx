@@ -140,10 +140,10 @@ namespace hpx {
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
+#include <hpx/futures/traits/acquire_future.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future_range.hpp>
 
 #include <cstddef>
 #include <iterator>

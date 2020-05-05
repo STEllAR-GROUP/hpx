@@ -8,10 +8,10 @@
 #define HPX_LCOS_DETAIL_FUTURE_TRANSFORMS_HPP
 
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/detail/future_traits.hpp>
+#include <hpx/futures/traits/acquire_future.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <algorithm>

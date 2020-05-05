@@ -13,7 +13,7 @@
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 
 #include <utility>
 

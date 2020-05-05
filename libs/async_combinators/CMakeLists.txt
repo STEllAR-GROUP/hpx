@@ -43,6 +43,7 @@ add_hpx_module(
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
+    hpx_async_base
     hpx_basic_execution
     hpx_config
     hpx_datastructures

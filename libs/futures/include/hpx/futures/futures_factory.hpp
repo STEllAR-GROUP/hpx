@@ -20,7 +20,7 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/traits/future_access.hpp>
+#include <hpx/futures/traits/future_access.hpp>
 
 #include <cstddef>
 #include <cstdint>

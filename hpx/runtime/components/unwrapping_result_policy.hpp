@@ -19,7 +19,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 
 #include <type_traits>
 #include <utility>

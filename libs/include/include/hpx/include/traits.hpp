@@ -29,17 +29,17 @@
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/serialization/traits/serialization_access_data.hpp>
 #include <hpx/timed_execution/traits/is_timed_executor.hpp>
-#include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_traits.hpp>
+#include <hpx/futures/traits/acquire_future.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
-#include <hpx/traits/is_future_tuple.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future_range.hpp>
+#include <hpx/futures/traits/is_future_tuple.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/traits/pointer_category.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)

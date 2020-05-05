@@ -21,11 +21,11 @@
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_then_result.hpp>
-#include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/future_then_result.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/serialize_exception.hpp>
 

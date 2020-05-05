@@ -25,8 +25,8 @@
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <algorithm>

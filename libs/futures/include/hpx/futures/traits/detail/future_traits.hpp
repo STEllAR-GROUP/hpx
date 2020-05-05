@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/traits/future_traits.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <iterator>

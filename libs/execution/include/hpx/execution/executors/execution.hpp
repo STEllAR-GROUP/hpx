@@ -26,9 +26,9 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_then_result_exec.hpp>
-#include <hpx/traits/future_traits.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/execution/traits/future_then_result_exec.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/type_support/pack.hpp>
 

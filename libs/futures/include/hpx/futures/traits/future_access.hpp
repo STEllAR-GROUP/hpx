@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/traits/future_traits.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 
 #include <type_traits>
 #include <utility>

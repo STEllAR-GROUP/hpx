@@ -23,7 +23,7 @@
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/traits/future_traits.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 
 #include <algorithm>
 #include <cstddef>

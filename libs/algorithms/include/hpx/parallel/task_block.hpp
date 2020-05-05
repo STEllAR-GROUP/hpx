@@ -16,7 +16,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/local_async/dataflow.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/executors/execution.hpp>

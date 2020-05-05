@@ -19,7 +19,7 @@
 #include <hpx/async/applier/apply.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>

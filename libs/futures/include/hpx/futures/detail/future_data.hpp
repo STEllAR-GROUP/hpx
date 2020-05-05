@@ -21,7 +21,7 @@
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/traits/future_access.hpp>
+#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>

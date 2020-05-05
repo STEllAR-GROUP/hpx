@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <type_traits>

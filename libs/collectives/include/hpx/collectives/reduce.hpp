@@ -86,7 +86,7 @@ namespace hpx { namespace lcos {
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/calculate_fanout.hpp>

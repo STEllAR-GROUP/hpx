@@ -11,7 +11,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/traits/future_access.hpp>
+#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <exception>
