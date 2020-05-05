@@ -43,7 +43,7 @@ and synchronized with futures.
 
 It is important to note that multiple kernels may be launched
 without fetching a future, and multiple futures may be obtained
-from the helper. Please referr to the unit tests and examples
+from the helper. Please refer to the unit tests and examples
 for further examples.
 
 CMake variables

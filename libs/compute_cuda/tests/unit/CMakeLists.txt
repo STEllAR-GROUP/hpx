@@ -6,12 +6,9 @@
 
 set(tests)
 
-set(tests ${tests}
-    default_executor
-    for_each_compute
-    for_loop_compute
-    transform_compute
-   )
+set(tests ${tests} default_executor for_each_compute for_loop_compute
+          transform_compute
+)
 set(default_executor_CUDA On)
 set(for_each_compute_CUDA On)
 set(for_loop_compute_CUDA On)

@@ -6,39 +6,37 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-if (NOT HPX_WITH_CUDA_SUPPORT)
+if(NOT HPX_WITH_CUDA_SUPPORT)
   return()
 endif()
 
-if (NOT TARGET Cuda::cuda)
-    message(FATAL_ERROR "Cuda future support has been enabled, but the Cuda installation is not setup")
+if(NOT TARGET Cuda::cuda)
+  message(
+    FATAL_ERROR
+      "Cuda future support has been enabled, but the Cuda installation is not setup"
+  )
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/cuda_support/include
 set(cuda_support_headers
-  hpx/cuda_support/cuda_future_helper.hpp  
-  hpx/cuda_support/get_targets.hpp
-  hpx/cuda_support/target.hpp
+    hpx/cuda_support/cuda_future_helper.hpp hpx/cuda_support/get_targets.hpp
+    hpx/cuda_support/target.hpp
 )
 
 # Default location is $HPX_ROOT/libs/cuda_support/include_compatibility
-set(cuda_support_compat_headers
-  hpx/compute/cuda/get_targets.hpp
-  hpx/compute/cuda/target.hpp
+set(cuda_support_compat_headers hpx/compute/cuda/get_targets.hpp
+                                hpx/compute/cuda/target.hpp
 )
 
-set(cuda_support_sources
-  cuda_target.cpp
-  get_cuda_targets.cpp
-)
+set(cuda_support_sources cuda_target.cpp get_cuda_targets.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(cuda_support
+add_hpx_module(
+  cuda_support
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${cuda_support_sources}
   HEADERS ${cuda_support_headers}
