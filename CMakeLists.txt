@@ -1155,7 +1155,13 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if(((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+if((NOT HPX_WITH_CXX20_COROUTINES) AND
+   ((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64) OR
+    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+
+  # If C++20 coroutines are not supported by the compiler there is still a
+  # chance to enable them through command line options.
+
   hpx_option(HPX_WITH_AWAIT BOOL
       "Enable the use of experimental co_await functionality"
       OFF ADVANCED CATEGORY "LCOs")
@@ -1178,14 +1184,6 @@ if(((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64) OR ("${CMAKE_CXX_COMPILER
       endif()
     endif()
   endif()
-elseif(${HPX_CXX_STANDARD} GREATER_EQUAL 20)
-  # C++20 conforming compilers fully support co_await (should we turn this into
-  # a feature test?)
-  hpx_option(HPX_WITH_AWAIT BOOL
-      "Enable the use of C++20 co_await functionality"
-      ON ADVANCED CATEGORY "LCOs")
-  hpx_add_config_define(HPX_HAVE_AWAIT)
-  hpx_add_config_define(HPX_HAVE_CXX20_COROUTINES)
 endif()
 
 ################################################################################
@@ -1298,7 +1296,7 @@ if(WIN32)
     hpx_add_target_compile_option(-Ob1 PUBLIC CONFIGURATIONS Release)
 
     # /RTC1 is incompatible with /await
-    if(NOT HPX_WITH_AWAIT)
+    if((NOT HPX_WITH_AWAIT) AND (NOT HPX_WITH_CXX20_COROUTINES))
       hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
     else()
       hpx_remove_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)

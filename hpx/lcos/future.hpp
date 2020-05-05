@@ -16,6 +16,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/lcos/detail/future_await_traits.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -27,10 +28,6 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/serialize_exception.hpp>
-
-#if defined(HPX_HAVE_AWAIT)
-#include <hpx/lcos/detail/future_await_traits.hpp>
-#endif
 
 #include <exception>
 #include <iterator>
@@ -740,7 +737,7 @@ namespace hpx { namespace lcos { namespace detail
             return wait_until(rel_time.from_now(), ec);
         }
 
-#if defined(HPX_HAVE_AWAIT)
+#if defined(HPX_HAVE_AWAIT) || defined(HPX_HAVE_CXX20_COROUTINES)
         bool await_ready() const noexcept
         {
             return detail::await_ready(*static_cast<Derived const*>(this));

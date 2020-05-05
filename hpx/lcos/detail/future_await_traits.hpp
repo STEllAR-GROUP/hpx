@@ -7,9 +7,10 @@
 #if !defined(HPX_LCOS_ACBA3E3F_7B29_41D1_AE85_C73CB69D089C)
 #define HPX_LCOS_ACBA3E3F_7B29_41D1_AE85_C73CB69D089C
 
-#if defined(HPX_HAVE_AWAIT)
-
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_AWAIT) || defined(HPX_HAVE_CXX20_COROUTINES)
+
 #include <hpx/allocator_support.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
@@ -402,5 +403,5 @@ namespace std {
 #endif
 }    // namespace std
 
-#endif    // HPX_HAVE_AWAIT
+#endif    // HPX_HAVE_AWAIT || HPX_HAVE_CXX20_COROUTINES
 #endif    // HPX_LCOS_ACBA3E3F_7B29_41D1_AE85_C73CB69D089C

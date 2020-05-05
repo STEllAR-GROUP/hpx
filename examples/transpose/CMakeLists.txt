@@ -20,7 +20,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     transpose_serial_vector)
 endif()
 
-if(HPX_WITH_AWAIT)
+if(HPX_WITH_AWAIT OR HPX_WITH_CXX20_COROUTINES)
   set(example_programs
     ${example_programs}
     transpose_await)

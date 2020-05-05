@@ -6,8 +6,8 @@
 
 #include <hpx/hpx.hpp>
 
-#if !defined(HPX_HAVE_AWAIT)
-#error "This test requires compiler support for await"
+#if !defined(HPX_HAVE_AWAIT) && !defined(HPX_HAVE_CXX20_COROUTINES)
+#error "This test requires compiler support for C++20 coroutines"
 #endif
 
 #include <hpx/hpx_init.hpp>
