@@ -12,8 +12,8 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/local_async.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
 #include <hpx/synchronization/spinlock.hpp>

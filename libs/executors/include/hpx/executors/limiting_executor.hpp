@@ -10,7 +10,7 @@
 #include <hpx/basic_execution/execution_fwd.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/futures/futures_factory.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>
 
 #include <atomic>

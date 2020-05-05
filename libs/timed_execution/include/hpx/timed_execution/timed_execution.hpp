@@ -12,7 +12,7 @@
 
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 

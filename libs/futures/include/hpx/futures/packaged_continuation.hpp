@@ -11,7 +11,7 @@
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/futures/detail/future_data.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/threading_base/annotated_function.hpp>

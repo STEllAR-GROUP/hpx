@@ -23,8 +23,8 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_then_result_exec.hpp>

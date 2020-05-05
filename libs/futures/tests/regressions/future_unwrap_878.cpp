@@ -7,9 +7,9 @@
 // This test case demonstrates the issue described in #878: `future::unwrap`
 // triggers assertion
 
+#include <hpx/futures/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/testing.hpp>
 
 #include <exception>

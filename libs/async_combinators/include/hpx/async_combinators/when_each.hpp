@@ -129,8 +129,8 @@ namespace hpx {
 #include <hpx/async_combinators/when_some.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind_back.hpp>
+#include <hpx/futures/detail/future_data.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/acquire_future.hpp>

@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/agas/locality_namespace.hpp>

@@ -136,7 +136,7 @@ namespace hpx { namespace lcos {
 #include <hpx/basic_execution.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

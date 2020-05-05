@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/components_fwd.hpp>
 
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/basename_registration_fwd.hpp>
 #include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

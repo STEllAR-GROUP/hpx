@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/include/client.hpp>
 

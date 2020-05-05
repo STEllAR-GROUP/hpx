@@ -15,7 +15,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>
 #include <hpx/plugins/parcelport/tcp/receiver.hpp>
 #include <hpx/plugins/parcelport/tcp/sender.hpp>

@@ -18,8 +18,8 @@
 #include <hpx/executors/current_executor.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>

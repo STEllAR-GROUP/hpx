@@ -13,7 +13,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/state.hpp>
 #include <hpx/format.hpp>
 #include <hpx/timing.hpp>

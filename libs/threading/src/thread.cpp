@@ -10,8 +10,8 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading.hpp>

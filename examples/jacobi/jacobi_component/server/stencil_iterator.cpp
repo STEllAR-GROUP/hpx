@@ -7,7 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/async.hpp>
-#include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/futures/packaged_continuation.hpp>
 
 #include "stencil_iterator.hpp"
 

@@ -20,9 +20,9 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/futures_factory.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/future_access.hpp>

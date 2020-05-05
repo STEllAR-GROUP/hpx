@@ -7,9 +7,9 @@
 // This test case demonstrates the issue described in #790: wait_for() doesn't
 // compile
 
+#include <hpx/futures/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/future.hpp>
 
 #include <chrono>
 

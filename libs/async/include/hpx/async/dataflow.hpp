@@ -14,8 +14,8 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/detail/future_transforms.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/detail/future_transforms.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/local_async/dataflow.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>

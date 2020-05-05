@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/throttle.hpp"

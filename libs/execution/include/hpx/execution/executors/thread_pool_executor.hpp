@@ -24,8 +24,8 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/one_shot.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/serialize.hpp>

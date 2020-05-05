@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/traits/is_launch_policy.hpp>

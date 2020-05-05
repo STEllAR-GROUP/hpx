@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/launch_policy.hpp>

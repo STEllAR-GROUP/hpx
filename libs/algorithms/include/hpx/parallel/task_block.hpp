@@ -13,7 +13,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/local_async/dataflow.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/traits/is_future.hpp>

@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/future.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -14,7 +14,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/futures/futures_factory.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/threading_base/annotated_function.hpp>

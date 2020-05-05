@@ -12,7 +12,7 @@
 #include <hpx/async/detail/async_unwrap_result_implementations_fwd.hpp>
 #include <hpx/async/detail/sync_implementations.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>

@@ -13,7 +13,7 @@
 #include <hpx/basic_execution/execution_fwd.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/thread_support.hpp>
 
 #include <algorithm>

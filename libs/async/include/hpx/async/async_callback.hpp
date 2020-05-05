@@ -10,7 +10,7 @@
 #include <hpx/async/async_callback_fwd.hpp>
 #include <hpx/async/detail/async_implementations_fwd.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/extract_action.hpp>

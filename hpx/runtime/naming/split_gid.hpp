@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
 

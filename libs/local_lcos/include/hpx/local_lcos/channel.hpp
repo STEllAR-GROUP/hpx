@@ -10,8 +10,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
 #include <hpx/local_lcos/receive_buffer.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>

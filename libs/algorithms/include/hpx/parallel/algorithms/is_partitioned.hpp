@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/executors/execution_policy.hpp>

@@ -10,7 +10,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async/detail/async_implementations_fwd.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>

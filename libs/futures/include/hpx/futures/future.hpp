@@ -15,8 +15,8 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
-#include <hpx/lcos/detail/future_await_traits.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/traits/detail/future_await_traits.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
@@ -1539,7 +1539,7 @@ namespace hpx {
     using lcos::shared_future;
 }    // namespace hpx
 
-#include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/futures/packaged_continuation.hpp>
 
 #define HPX_MAKE_EXCEPTIONAL_FUTURE(T, errorcode, f, msg)                      \
     hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg)) /**/

@@ -9,7 +9,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>

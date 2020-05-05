@@ -8,7 +8,7 @@
 
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/spmd_block.hpp>
 
 #include <cstddef>

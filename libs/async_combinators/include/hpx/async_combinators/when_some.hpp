@@ -228,8 +228,8 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/futures_factory.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>

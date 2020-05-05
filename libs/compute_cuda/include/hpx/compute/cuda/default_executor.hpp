@@ -13,10 +13,10 @@
 #include <hpx/errors.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/executors/execution.hpp>

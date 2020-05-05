@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/unused.hpp>

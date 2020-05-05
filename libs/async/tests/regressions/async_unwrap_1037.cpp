@@ -8,9 +8,9 @@
 // implicit unwrapping of futures in async broken
 
 #include <hpx/async.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/testing.hpp>
 
 hpx::future<int> f(int i)

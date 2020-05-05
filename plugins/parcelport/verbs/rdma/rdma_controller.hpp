@@ -11,7 +11,7 @@
 //
 #include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/lcos/promise.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>

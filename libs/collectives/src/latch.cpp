@@ -8,7 +8,7 @@
 #include <hpx/async.hpp>
 #include <hpx/async/applier/apply.hpp>
 #include <hpx/collectives/latch.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>

@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async/async_continue_fwd.hpp>
 #include <hpx/async/async_fwd.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/traits/extract_action.hpp>

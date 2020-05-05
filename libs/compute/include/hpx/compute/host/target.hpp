@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/compute/host/get_targets.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/topology/topology.hpp>
 

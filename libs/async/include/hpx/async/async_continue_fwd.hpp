@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/action_remote_result.hpp>

@@ -78,7 +78,7 @@ namespace hpx { namespace lcos {
 #include <hpx/async/detail/async_colocated.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

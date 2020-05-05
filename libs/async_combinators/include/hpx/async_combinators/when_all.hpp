@@ -135,10 +135,10 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/detail/future_traits.hpp>
-#include <hpx/lcos/detail/future_transforms.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/detail/future_transforms.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_access.hpp>

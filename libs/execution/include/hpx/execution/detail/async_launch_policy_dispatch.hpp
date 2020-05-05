@@ -12,8 +12,8 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/futures_factory.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>

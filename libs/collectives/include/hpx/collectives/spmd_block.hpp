@@ -12,9 +12,9 @@
 #include <hpx/execution/execution.hpp>
 #include <hpx/functional/first_argument.hpp>
 #include <hpx/functional/traits/is_action.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/launch_policy.hpp>

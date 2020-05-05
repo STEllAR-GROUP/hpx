@@ -18,8 +18,8 @@
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/serialize.hpp>

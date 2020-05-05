@@ -16,9 +16,9 @@
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/result_of.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>

@@ -12,7 +12,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/futures/detail/future_data.hpp>
 #include <hpx/lcos/detail/promise_lco.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>

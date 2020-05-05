@@ -12,7 +12,7 @@
 #include <hpx/async/detail/async_colocated.hpp>
 #include <hpx/async/detail/async_colocated_callback.hpp>
 #include <hpx/async/detail/async_implementations.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/async/applier/detail/apply_colocated_callback_fwd.hpp>
 #include <hpx/async/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/async/applier/detail/apply_implementations.hpp>

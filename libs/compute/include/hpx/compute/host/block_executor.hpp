@@ -16,9 +16,9 @@
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/executors/thread_pool_attached_executors.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <algorithm>

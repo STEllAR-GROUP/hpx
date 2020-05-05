@@ -10,9 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/executors/execution_policy_fwd.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/hpx_finalize.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <exception>

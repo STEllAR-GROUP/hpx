@@ -13,8 +13,8 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/launch_policy.hpp>
