@@ -10,8 +10,7 @@
 
 #include <utility>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename Result, typename RemoteResult, typename Enable = void>
     struct get_remote_result
     {
@@ -20,7 +19,7 @@ namespace hpx { namespace traits
             return Result(rhs);
         }
 
-        static Result call(RemoteResult && rhs) //-V659
+        static Result call(RemoteResult&& rhs)    //-V659
         {
             return Result(std::move(rhs));
         }
@@ -34,7 +33,7 @@ namespace hpx { namespace traits
             return rhs;
         }
 
-        static Result && call(Result && rhs)
+        static Result&& call(Result&& rhs)
         {
             return std::move(rhs);
         }

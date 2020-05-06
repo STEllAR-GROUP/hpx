@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
@@ -15,7 +16,6 @@
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime_fwd.hpp>
 
 #include <algorithm>

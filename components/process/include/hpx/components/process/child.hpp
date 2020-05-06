@@ -10,7 +10,7 @@
 #include <hpx/async.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 
 #include <hpx/components/process/server/child.hpp>
 

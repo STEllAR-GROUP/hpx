@@ -32,11 +32,13 @@ if (HPX_FUTURES_WITH_TESTS)
     endif()
 
     if (HPX_WITH_TESTS_HEADERS)
+      # packaged_continuation.hpp has to be at the end of future.hpp.
+      set(excluded_headers hpx/futures/packaged_continuation.hpp)
       add_hpx_header_tests(
         modules.futures
         HEADERS ${futures_headers}
         HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-        NOLIBS
+        EXCLUDE ${excluded_headers}
         DEPENDENCIES hpx_futures)
     endif()
 endif()

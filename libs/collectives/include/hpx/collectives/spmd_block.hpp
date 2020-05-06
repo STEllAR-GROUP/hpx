@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/broadcast_direct.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/type_support/pack.hpp>
 

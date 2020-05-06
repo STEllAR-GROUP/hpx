@@ -11,7 +11,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/threading_base/thread_description.hpp>

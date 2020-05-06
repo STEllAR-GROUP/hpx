@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/async.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 
 #include <type_traits>
 #include <utility>

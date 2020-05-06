@@ -7,8 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detected.hpp>
 
 #include <cstddef>
@@ -282,3 +283,41 @@ namespace hpx { namespace traits {
     using executor_parameters_type_t =
         typename executor_parameters_type<Executor>::type;
 }}    // namespace hpx::traits
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+namespace hpx { namespace threads {
+    class executor;
+}}    // namespace hpx::threads
+
+namespace hpx { namespace traits {
+    namespace detail {
+        template <typename Executor>
+        struct is_threads_executor
+          : std::is_base_of<threads::executor, Executor>
+        {
+        };
+    }    // namespace detail
+
+    template <typename Executor>
+    struct is_threads_executor
+      : detail::is_threads_executor<typename hpx::util::decay<Executor>::type>
+    {
+    };
+
+    template <typename Policy>
+    struct is_launch_policy_or_executor
+      : std::integral_constant<bool,
+            is_launch_policy<Policy>::value ||
+                is_threads_executor<Policy>::value>
+    {
+    };
+
+    //////////////////////////////////////////////////////////////////////////
+    template <typename Executor>
+    struct executor_execution_category<Executor,
+        typename std::enable_if<is_threads_executor<Executor>::value>::type>
+    {
+        using type = parallel::execution::parallel_execution_tag;
+    };
+}}    // namespace hpx::traits
+#endif

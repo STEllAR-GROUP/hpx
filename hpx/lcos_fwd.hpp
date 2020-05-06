@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/futures/traits/promise_remote_result.hpp>
 
 #include <vector>
 

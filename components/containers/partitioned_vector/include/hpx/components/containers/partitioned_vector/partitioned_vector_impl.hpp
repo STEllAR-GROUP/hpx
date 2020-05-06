@@ -17,7 +17,7 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/distributed_metadata_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/functional/bind_back.hpp>

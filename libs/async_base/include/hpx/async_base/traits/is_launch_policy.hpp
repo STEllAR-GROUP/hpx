@@ -8,7 +8,7 @@
 #define HPX_TRAITS_IS_LAUNCH_POLICY_APR_8_2014_0436PM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <type_traits>

@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async/sync_fwd.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/extract_action.hpp>
 

@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/naming_base.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 namespace hpx { namespace traits

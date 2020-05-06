@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>

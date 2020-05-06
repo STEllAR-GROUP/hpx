@@ -126,20 +126,20 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_some.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/detail/future_data.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime/launch_policy.hpp>
-#include <hpx/futures/traits/detail/future_traits.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/futures/traits/detail/future_traits.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>

@@ -15,13 +15,13 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>

@@ -8,8 +8,7 @@
 
 #include <hpx/type_support/unused.hpp>
 
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename Result, typename Enable = void>
     struct promise_remote_result
     {

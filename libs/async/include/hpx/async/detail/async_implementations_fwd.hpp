@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async/async_fwd.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/traits/extract_action.hpp>
 

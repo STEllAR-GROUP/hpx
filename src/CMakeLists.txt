@@ -192,7 +192,6 @@ set(hpx_HEADERS
   hpx/state.hpp
   hpx/traits/managed_component_policies.hpp
   hpx/traits/pointer_category.hpp
-  hpx/traits/promise_remote_result.hpp
   hpx/traits/rma_memory_region_traits.hpp
   hpx/util/debugging.hpp
   hpx/util/debug/thread_stacktrace.hpp
@@ -396,7 +395,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/traits/component_type_database.hpp
     hpx/traits/component_type_is_compatible.hpp
     hpx/traits/extract_action.hpp
-    hpx/traits/get_remote_result.hpp
     hpx/traits/is_client.hpp
     hpx/traits/is_component.hpp
     hpx/traits/is_continuation.hpp

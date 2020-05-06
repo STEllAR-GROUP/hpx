@@ -16,9 +16,9 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/futures/traits/promise_remote_result.hpp>
 
 #include <cstddef>
 #include <exception>

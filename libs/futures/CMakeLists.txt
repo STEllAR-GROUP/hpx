@@ -17,10 +17,12 @@ set(futures_headers
     hpx/futures/traits/future_access.hpp
     hpx/futures/traits/future_then_result.hpp
     hpx/futures/traits/future_traits.hpp
+    hpx/futures/traits/get_remote_result.hpp
     hpx/futures/traits/is_future.hpp
     hpx/futures/traits/is_future_range.hpp
     hpx/futures/traits/is_future_tuple.hpp
     hpx/futures/traits/promise_local_result.hpp
+    hpx/futures/traits/promise_remote_result.hpp
 )
 
 set(futures_compat_headers
@@ -33,10 +35,12 @@ set(futures_compat_headers
     hpx/traits/future_access.hpp
     hpx/traits/future_then_result.hpp
     hpx/traits/future_traits.hpp
+    hpx/traits/get_remote_result.hpp
     hpx/traits/is_future.hpp
     hpx/traits/is_future_range.hpp
     hpx/traits/is_future_tuple.hpp
     hpx/traits/promise_local_result.hpp
+    hpx/traits/promise_remote_result.hpp
 )
 
 set(futures_sources future_data.cpp)

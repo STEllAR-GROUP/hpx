@@ -9,15 +9,15 @@
 #include <hpx/config.hpp>
 #include <hpx/async/async_callback_fwd.hpp>
 #include <hpx/async/detail/async_implementations_fwd.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -19,7 +19,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 

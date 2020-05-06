@@ -128,11 +128,12 @@ namespace hpx {
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
-#include <hpx/threading.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
+#include <hpx/futures/traits/detail/future_traits.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
+#include <hpx/threading.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/reserve.hpp>
 

@@ -9,13 +9,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <cstddef>

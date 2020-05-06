@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 
 #include <functional>
 #include <type_traits>
