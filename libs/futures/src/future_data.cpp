@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
@@ -26,6 +25,14 @@
 #include <utility>
 
 namespace hpx { namespace lcos { namespace detail {
+    static run_on_completed_error_handler_type run_on_completed_error_handler;
+
+    void set_run_on_completed_error_handler(
+        run_on_completed_error_handler_type f)
+    {
+        run_on_completed_error_handler = f;
+    }
+
     future_data_refcnt_base::~future_data_refcnt_base() = default;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -148,9 +155,14 @@ namespace hpx { namespace lcos { namespace detail {
         {
             // If the completion handler throws an exception, there's nothing
             // we can do, report the exception and terminate.
-            // TODO: This should not be here.
-            hpx::detail::report_exception_and_terminate(
-                std::current_exception());
+            if (run_on_completed_error_handler)
+            {
+                run_on_completed_error_handler(std::current_exception());
+            }
+            else
+            {
+                std::terminate();
+            }
         }
     }
 
@@ -201,8 +213,14 @@ namespace hpx { namespace lcos { namespace detail {
                 // If an exception while creating the new task or inside the
                 // completion handler is thrown, there is nothing we can do...
                 // ... but terminate and report the error
-                hpx::detail::report_exception_and_terminate(
-                    std::current_exception());
+                if (run_on_completed_error_handler)
+                {
+                    run_on_completed_error_handler(std::current_exception());
+                }
+                else
+                {
+                    std::rethrow_exception(std::current_exception());
+                }
             }
         }
     }

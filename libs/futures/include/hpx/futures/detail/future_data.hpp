@@ -53,6 +53,12 @@ namespace hpx { namespace lcos {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
+    using run_on_completed_error_handler_type =
+        std::function<void(std::exception_ptr const& e)>;
+    void set_run_on_completed_error_handler(
+        run_on_completed_error_handler_type f);
+
+    ///////////////////////////////////////////////////////////////////////
     template <typename Result>
     struct future_data;
 
