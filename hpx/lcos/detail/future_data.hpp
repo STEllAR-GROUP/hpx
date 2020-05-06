@@ -658,12 +658,16 @@ namespace hpx { namespace lcos { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename Allocator>
+    template <typename Result, typename Allocator, typename Derived = void>
     struct future_data_allocator : future_data<Result>
     {
         typedef typename future_data<Result>::init_no_addref init_no_addref;
+
+        typedef typename std::conditional<std::is_void<Derived>::value,
+            future_data_allocator, Derived>::type allocated_type;
+
         typedef typename std::allocator_traits<
-            Allocator>::template rebind_alloc<future_data_allocator>
+            Allocator>::template rebind_alloc<allocated_type>
             other_allocator;
 
         future_data_allocator(other_allocator const& alloc)
@@ -701,14 +705,14 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
 
-    private:
-        void destroy()
+    protected:
+        void destroy() override
         {
             typedef std::allocator_traits<other_allocator> traits;
 
             other_allocator alloc(alloc_);
-            traits::destroy(alloc, this);
-            traits::deallocate(alloc, this, 1);
+            traits::destroy(alloc, static_cast<allocated_type*>(this));
+            traits::deallocate(alloc, static_cast<allocated_type*>(this), 1);
         }
 
     private:
@@ -1014,6 +1018,7 @@ namespace hpx { namespace lcos { namespace detail {
 }}}    // namespace hpx::lcos::detail
 
 namespace hpx { namespace traits { namespace detail {
+
     template <typename R, typename Allocator>
     struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
     {

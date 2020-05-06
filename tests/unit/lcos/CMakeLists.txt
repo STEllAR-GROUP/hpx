@@ -28,7 +28,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       promise_emplace)
 endif()
 
-if(HPX_WITH_AWAIT)
+if(HPX_WITH_AWAIT OR HPX_WITH_CXX20_COROUTINES)
   set(tests ${tests} await)
   set(await_PARAMETERS THREADS_PER_LOCALITY 4)
 endif()
