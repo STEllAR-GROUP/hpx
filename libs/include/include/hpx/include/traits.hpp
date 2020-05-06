@@ -38,10 +38,6 @@
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/serialization/traits/serialization_access_data.hpp>
 #include <hpx/timed_execution/traits/is_timed_executor.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/pointer_category.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>

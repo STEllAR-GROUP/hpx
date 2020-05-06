@@ -196,6 +196,7 @@ namespace hpx { namespace lcos {
 #include <hpx/basic_execution.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -203,7 +204,6 @@ namespace hpx { namespace lcos {
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 

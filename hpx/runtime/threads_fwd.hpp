@@ -11,19 +11,3 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
-
-namespace hpx
-{
-    namespace parallel { namespace execution {
-        class thread_pool_executor;
-    }}
-
-    namespace threads
-    {
-        namespace executors
-        {
-            using current_executor = parallel::execution::thread_pool_executor;
-        }
-    }
-}
-

@@ -24,12 +24,6 @@ set(tests
 
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
-if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
-  set(tests ${tests}
-    thread_pool_attached_executors
-    )
-endif()
-
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

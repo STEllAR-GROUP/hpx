@@ -11,6 +11,7 @@
 
 #include <hpx/futures.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/thread_executors.hpp>
 
 int main()
 {

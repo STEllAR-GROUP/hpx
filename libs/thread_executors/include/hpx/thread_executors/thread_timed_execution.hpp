@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
 #include <hpx/timed_execution.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 
 #include <type_traits>
 #include <utility>

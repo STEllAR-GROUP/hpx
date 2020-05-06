@@ -752,8 +752,7 @@ namespace hpx { namespace lcos { namespace detail {
                 "timed_future_data<Result>::timed_future_data",
                 threads::thread_priority_boost, threads::thread_schedule_hint(),
                 threads::thread_stacksize_current, threads::suspended, true);
-            threads::thread_id_type id =
-                threads::register_thread(data, ec);
+            threads::thread_id_type id = threads::register_thread(data, ec);
             if (ec)
             {
                 // thread creation failed, report error to the new future

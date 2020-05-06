@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/local_async/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
