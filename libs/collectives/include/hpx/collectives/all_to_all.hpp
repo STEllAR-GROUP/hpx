@@ -132,141 +132,95 @@ namespace hpx { namespace lcos {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/assertion.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/async/dataflow.hpp>
+#include <hpx/basic_execution.hpp>
+#include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/local_lcos/and_gate.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/components/new.hpp>
-#include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/unmanaged.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace traits {
 
-    namespace detail {
+    namespace communication {
+        struct all_to_all_tag;
+    }
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        class all_to_all_server
-          : public hpx::components::component_base<all_to_all_server<T>>
+    ///////////////////////////////////////////////////////////////////////////
+    // support for all_to_all
+    template <typename Communicator>
+    struct communication_operation<Communicator, communication::all_to_all_tag>
+      : std::enable_shared_from_this<communication_operation<Communicator,
+            communication::all_to_all_tag>>
+    {
+        communication_operation(Communicator& comm)
+          : communicator_(comm)
         {
-            using mutex_type = lcos::local::spinlock;
-
-        public:
-            all_to_all_server()    //-V730
-            {
-                HPX_ASSERT(false);    // shouldn't ever be called
-            }
-
-            all_to_all_server(std::size_t num_sites, std::string const& name,
-                std::size_t site)
-              : num_sites_(num_sites)
-              , data_(num_sites)
-              , gate_(num_sites)
-              , name_(name)
-              , site_(site)
-            {
-            }
-
-            hpx::future<std::vector<T>> get_result(std::size_t which, T t)
-            {
-                std::unique_lock<mutex_type> l(mtx_);
-
-                auto on_ready = [this](
-                                    shared_future<void>&& f) -> std::vector<T> {
-                    f.get();    // propagate any exceptions
-
-                    std::vector<T> data;
-                    std::string name;
-
-                    {
-                        std::unique_lock<mutex_type> l(mtx_);
-                        util::ignore_while_checking<
-                            std::unique_lock<mutex_type>>
-                            il(&l);
-                        data = data_;
-                        std::swap(name, name_);
-                    }
-
-                    // this is a one-shot object (generations counters are not
-                    // supported), unregister ourselves (but only once)
-                    if (!name.empty())
-                    {
-                        hpx::unregister_with_basename(name, site_).get();
-                    }
-
-                    return data;
-                };
-
-                hpx::future<std::vector<T>> f = gate_.get_shared_future(l).then(
-                    hpx::launch::async, on_ready);
-
-                gate_.synchronize(1, l);
-                data_[which] = std::move(t);
-                gate_.set(which, l);
-
-                return f;
-            }
-
-            HPX_DEFINE_COMPONENT_ACTION(
-                all_to_all_server, get_result, get_result_action);
-
-        private:
-            mutex_type mtx_;
-            std::size_t num_sites_;
-            std::vector<T> data_;
-            lcos::local::and_gate gate_;
-            std::string name_;
-            std::size_t site_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        inline hpx::future<hpx::id_type> register_all_to_all_name(
-            hpx::future<hpx::id_type>&& f, std::string basename,
-            std::size_t site)
-        {
-            hpx::id_type target = f.get();
-
-            // Register unmanaged id to avoid cyclic dependencies, unregister
-            // is done after all data has been collected in the component above.
-            hpx::future<bool> result = hpx::register_with_basename(
-                basename, hpx::unmanaged(target), site);
-
-            return result.then(hpx::launch::sync,
-                [target = std::move(target), basename = std::move(basename)](
-                    hpx::future<bool>&& f) -> hpx::id_type {
-                    bool result = f.get();
-                    if (!result)
-                    {
-                        HPX_THROW_EXCEPTION(bad_parameter,
-                            "hpx::lcos::detail::register_all_to_all_name",
-                            "the given base name for the all_to_all operation "
-                            "was already registered: " +
-                                basename);
-                    }
-                    return target;
-                });
         }
-    }    // namespace detail
+
+        template <typename Result, typename T>
+        Result get(std::size_t which, T&& t)
+        {
+            using arg_type = typename std::decay<T>::type;
+            using mutex_type = typename Communicator::mutex_type;
+
+            auto this_ = this->shared_from_this();
+            auto on_ready =
+                [this_ = std::move(this_)](
+                    shared_future<void>&& f) -> std::vector<arg_type> {
+                f.get();    // propagate any exceptions
+
+                auto& communicator = this_->communicator_;
+
+                std::vector<arg_type> data;
+                {
+                    std::unique_lock<mutex_type> l(communicator.mtx_);
+                    data = communicator.data_;
+                }
+                return data;
+            };
+
+            std::unique_lock<mutex_type> l(communicator_.mtx_);
+            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+
+            hpx::future<std::vector<arg_type>> f =
+                communicator_.gate_.get_shared_future(l).then(
+                    hpx::launch::sync, on_ready);
+
+            communicator_.gate_.synchronize(1, l);
+            communicator_.data_[which] = std::forward<T>(t);
+            if (communicator_.gate_.set(which, l))
+            {
+                // this is a one-shot object (generations counters are not
+                // supported), unregister ourselves (but only once)
+                hpx::unregister_with_basename(
+                    std::move(communicator_.name_), communicator_.site_)
+                    .get();
+            }
+            return f;
+        }
+
+        Communicator& communicator_;
+    };
+}}    // namespace hpx::traits
+
+namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
@@ -275,34 +229,13 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
-        if (num_sites == std::size_t(-1))
-        {
-            num_sites = static_cast<std::size_t>(
-                hpx::get_num_localities(hpx::launch::sync));
-        }
-        if (this_site == std::size_t(-1))
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
-
-        std::string name(basename);
-        if (generation != std::size_t(-1))
-            name += std::to_string(generation) + "/";
-
-        // create a new all_to_all_server
-        using result_type = typename util::decay<T>::type;
-        hpx::future<hpx::id_type> id =
-            hpx::new_<detail::all_to_all_server<result_type>>(
-                hpx::find_here(), num_sites, name, this_site);
-
-        // register the all_to_all's id using the given basename
-        return id.then(hpx::launch::sync,
-            util::bind_back(
-                &detail::register_all_to_all_name, std::move(name), this_site));
+        return detail::create_communicator<T>(
+            basename, num_sites, generation, this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // destination site needs to be handled differently
     template <typename T>
-    hpx::future<std::vector<T>> all_to_all(hpx::future<hpx::id_type>&& f,
+    hpx::future<std::vector<T>> all_to_all(hpx::future<hpx::id_type>&& fid,
         hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -311,24 +244,24 @@ namespace hpx { namespace lcos {
         auto all_to_all_data =
             [this_site](hpx::future<hpx::id_type>&& f,
                 hpx::future<T>&& local_result) -> hpx::future<std::vector<T>> {
-            using action_type =
-                typename detail::all_to_all_server<T>::get_result_action;
+            using action_type = typename detail::communicator_server<T>::
+                template communication_get_action<
+                    traits::communication::all_to_all_tag,
+                    hpx::future<std::vector<T>>, T>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = f.get();
             auto result =
                 async(action_type(), id, this_site, local_result.get());
 
-            return result.then(hpx::launch::sync,
-                [id = std::move(id)](
-                    hpx::future<std::vector<T>>&& f) -> std::vector<T> {
-                    HPX_UNUSED(id);
-                    return f.get();
-                });
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [id = std::move(id)]() { HPX_UNUSED(id); });
+
+            return result;
         };
 
         return dataflow(hpx::launch::sync, std::move(all_to_all_data),
-            std::move(f), std::move(local_result));
+            std::move(fid), std::move(local_result));
     }
 
     template <typename T>
@@ -343,9 +276,11 @@ namespace hpx { namespace lcos {
                 hpx::get_num_localities(hpx::launch::sync));
         }
         if (this_site == std::size_t(-1))
+        {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
 
-        if (this_site == 0)
+        if (this_site == root_site)
         {
             return all_to_all(create_all_to_all<T>(
                                   basename, num_sites, generation, root_site),
@@ -364,11 +299,13 @@ namespace hpx { namespace lcos {
     // all_to_all plain values
     template <typename T>
     hpx::future<std::vector<typename util::decay<T>::type>> all_to_all(
-        hpx::future<hpx::id_type>&& f, T&& local_result,
+        hpx::future<hpx::id_type>&& fid, T&& local_result,
         std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
+        {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
 
         using arg_type = typename util::decay<T>::type;
 
@@ -376,24 +313,23 @@ namespace hpx { namespace lcos {
             [local_result = std::forward<T>(local_result), this_site](
                 hpx::future<hpx::id_type>&& f)
             -> hpx::future<std::vector<arg_type>> {
-            using action_type =
-                typename detail::all_to_all_server<arg_type>::get_result_action;
+            using action_type = typename detail::communicator_server<arg_type>::
+                template communication_get_action<
+                    traits::communication::all_to_all_tag,
+                    hpx::future<std::vector<arg_type>>, arg_type>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = f.get();
             auto result =
                 async(action_type(), id, this_site, std::move(local_result));
 
-            return result.then(hpx::launch::sync,
-                [id = std::move(id)](hpx::future<std::vector<arg_type>>&& f)
-                    -> std::vector<arg_type> {
-                    HPX_UNUSED(id);
-                    return f.get();
-                });
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [id = std::move(id)]() { HPX_UNUSED(id); });
+
+            return result;
         };
 
-        return dataflow(
-            hpx::launch::sync, std::move(all_to_all_data_direct), std::move(f));
+        return fid.then(hpx::launch::sync, std::move(all_to_all_data_direct));
     }
 
     template <typename T>
@@ -409,7 +345,9 @@ namespace hpx { namespace lcos {
                 hpx::get_num_localities(hpx::launch::sync));
         }
         if (this_site == std::size_t(-1))
+        {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
 
         if (this_site == root_site)
         {
@@ -434,24 +372,7 @@ namespace hpx {
 }    // namespace hpx
 
 ////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ALLTOALL_DECLARATION(...)                                 \
-    HPX_REGISTER_ALLTOALL_DECLARATION_(__VA_ARGS__)                            \
-    /**/
-
-#define HPX_REGISTER_ALLTOALL_DECLARATION_(...)                                \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_ALLTOALL_DECLARATION_,               \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
-
-#define HPX_REGISTER_ALLTOALL_DECLARATION_1(type)                              \
-    HPX_REGISTER_ALLTOALL_DECLARATION_2(type, HPX_PP_CAT(type, _all_to_all))   \
-    /**/
-
-#define HPX_REGISTER_ALLTOALL_DECLARATION_2(type, name)                        \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        hpx::lcos::detail::all_to_all_server<type>::get_result_action,         \
-        HPX_PP_CAT(gather_get_result_action_, name));                          \
-    /**/
+#define HPX_REGISTER_ALLTOALL_DECLARATION(...) /**/
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ALLTOALL(...)                                             \
@@ -468,11 +389,8 @@ namespace hpx {
     /**/
 
 #define HPX_REGISTER_ALLTOALL_2(type, name)                                    \
-    HPX_REGISTER_ACTION(                                                       \
-        hpx::lcos::detail::all_to_all_server<type>::get_result_action,         \
-        HPX_PP_CAT(gather_get_result_action_, name));                          \
     typedef hpx::components::component<                                        \
-        hpx::lcos::detail::all_to_all_server<type>>                            \
+        hpx::lcos::detail::communicator_server<type>>                          \
         HPX_PP_CAT(all_to_all_, name);                                         \
     HPX_REGISTER_COMPONENT(HPX_PP_CAT(all_to_all_, name))                      \
     /**/

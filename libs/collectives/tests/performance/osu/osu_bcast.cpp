@@ -19,7 +19,7 @@
 #include <numeric>
 #include <vector>
 
-#include <benchmarks/network/broadcast.hpp>
+#include <benchmarks/network/broadcast_direct.hpp>
 #include <benchmarks/network/osu_coll.hpp>
 
 HPX_PLAIN_ACTION(
