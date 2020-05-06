@@ -9,6 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/dataflow.hpp>
-#include <hpx/execution/dataflow.hpp>
+#include <hpx/executors/dataflow.hpp>
 
 #endif

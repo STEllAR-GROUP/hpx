@@ -32,6 +32,7 @@ set(HPX_CANDIDATE_LIBS
   debugging
   errors
   execution
+  executors
   filesystem
   format
   functional
@@ -68,6 +69,7 @@ set(HPX_CANDIDATE_LIBS
   threading
   threading_base
   threadmanager
+  timed_execution
   timing
   topology
   type_support

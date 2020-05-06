@@ -11,25 +11,14 @@ set(tests
     executor_parameters_timer_hooks
     minimal_async_executor
     minimal_sync_executor
-    minimal_timed_async_executor
-    minimal_timed_sync_executor
     parallel_executor
     parallel_fork_executor
     parallel_policy_executor
     persistent_executor_parameters
     polymorphic_executor
-    sequenced_executor
-    service_executors
     shared_parallel_executor
-    timed_parallel_executor
     standalone_thread_pool_executor
    )
-
-if(HPX_WITH_THREAD_EXECUTORS_COMPATIBILITY)
-  set(tests ${tests}
-    thread_pool_attached_executors
-    )
-endif()
 
 foreach(test ${tests})
   set(sources

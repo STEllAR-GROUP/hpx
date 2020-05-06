@@ -11,8 +11,8 @@
 
 #include <hpx/lcos/future.hpp>
 
-#include <hpx/execution/executors.hpp> // Workaround for a missing header file
-#include <hpx/execution/executors/pool_executor.hpp>
+#include <hpx/executors.hpp> // Workaround for a missing header file
+#include <hpx/executors/pool_executor.hpp>
 
 int main()
 {

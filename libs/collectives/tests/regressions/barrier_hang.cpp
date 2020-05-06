@@ -6,7 +6,7 @@
 
 #include <hpx/collectives.hpp>
 #include <hpx/execution/execution.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/testing.hpp>

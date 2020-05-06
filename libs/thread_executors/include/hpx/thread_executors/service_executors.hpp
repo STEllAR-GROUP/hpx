@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/execution/executors/service_executors.hpp>
+#include <hpx/executors/service_executors.hpp>
 
 namespace hpx { namespace threads { namespace executors {
     using parallel::execution::service_executor_type;

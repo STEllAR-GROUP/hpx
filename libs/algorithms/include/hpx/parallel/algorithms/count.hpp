@@ -17,8 +17,8 @@
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_count_bits.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

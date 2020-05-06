@@ -21,11 +21,11 @@
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/exception_list.hpp>
-#include <hpx/execution/execution_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/executors/exception_list.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

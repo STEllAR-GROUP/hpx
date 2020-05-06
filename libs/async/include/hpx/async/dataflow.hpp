@@ -35,7 +35,7 @@
 #include <hpx/type_support/always_void.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/parallel_executor.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 
 #include <atomic>
 #include <cstddef>

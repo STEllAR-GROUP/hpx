@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/execution/executors/thread_execution.hpp>
 #include <hpx/thread_executors/this_thread_executors.hpp>
+#include <hpx/thread_executors/thread_execution.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////

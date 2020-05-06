@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/execution_policy_fwd.hpp>
+#include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/type_support/unused.hpp>

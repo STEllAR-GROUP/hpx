@@ -39,6 +39,7 @@ All modules
    /libs/distributed_executors/docs/index.rst
    /libs/errors/docs/index.rst
    /libs/execution/docs/index.rst
+   /libs/executors/docs/index.rst
    /libs/filesystem/docs/index.rst
    /libs/format/docs/index.rst
    /libs/functional/docs/index.rst
@@ -77,6 +78,7 @@ All modules
    /libs/threading/docs/index.rst
    /libs/threading_base/docs/index.rst
    /libs/threadmanager/docs/index.rst
+   /libs/timed_execution/docs/index.rst
    /libs/timing/docs/index.rst
    /libs/topology/docs/index.rst
    /libs/type_support/docs/index.rst

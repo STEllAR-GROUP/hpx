@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/service_executors.hpp>
+#include <hpx/executors/service_executors.hpp>
 #include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/result_of.hpp>

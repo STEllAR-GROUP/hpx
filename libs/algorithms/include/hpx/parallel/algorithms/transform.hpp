@@ -25,7 +25,7 @@
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

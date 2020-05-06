@@ -8,6 +8,6 @@
 #define HPX_EXECUTION_POLICY_MAY_27_2014_0910PM
 
 #include <hpx/config.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 
 #endif

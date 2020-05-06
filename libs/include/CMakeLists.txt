@@ -105,6 +105,7 @@ add_hpx_module(include
     hpx_async_combinators
     hpx_config
     hpx_errors
+    hpx_executors
     hpx_format
     hpx_local_async
     hpx_local_lcos
@@ -117,6 +118,7 @@ add_hpx_module(include
     hpx_thread_pools
     hpx_threadmanager
     hpx_threading
+    hpx_timed_execution
     hpx_util
   CMAKE_SUBDIRS tests
 )

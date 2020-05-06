@@ -8,6 +8,6 @@
 #define HPX_PARALLEL_EXCEPTION_LIST_MAY_27_2014_0910PM
 
 #include <hpx/config.hpp>
-#include <hpx/execution/exception_list.hpp>
+#include <hpx/executors/exception_list.hpp>
 
 #endif
