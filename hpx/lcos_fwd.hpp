@@ -27,13 +27,6 @@ namespace hpx
             struct future_data_refcnt_base;
         }
 
-        //namespace local { namespace detail
-        //{
-            //template <typename R,
-                //typename SharedState = lcos::detail::future_data<R> >
-            //class promise_base;
-        //}}
-
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         class HPX_EXPORT base_lco;
 
