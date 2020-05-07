@@ -31,5 +31,5 @@ add_hpx_module(
     hpx_plugin
     hpx_string_util
     hpx_type_support
-  CMAKE_SUBDIRS
+  CMAKE_SUBDIRS tests
 )

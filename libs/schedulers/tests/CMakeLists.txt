@@ -47,6 +47,7 @@ if(HPX_SCHEDULERS_WITH_TESTS)
       HEADERS ${schedulers_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       DEPENDENCIES hpx_schedulers
+      NOLIBS
     )
   endif()
 endif()
