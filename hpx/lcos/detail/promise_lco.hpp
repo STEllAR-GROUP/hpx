@@ -17,7 +17,6 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/type_support/unused.hpp>

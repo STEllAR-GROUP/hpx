@@ -126,6 +126,7 @@ add_hpx_module(include
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   target_link_libraries(hpx_include PUBLIC
     hpx_async
+    hpx_lcos_distributed
     hpx_performance_counters
     hpx_segmented_algorithms)
 endif()

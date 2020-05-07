@@ -8,9 +8,6 @@
 set(tests
     after_588
     call_promise_get_gid_more_than_once
-    channel_2916
-    channel_not_empty_2890
-    channel_register_as_2722
     exception_from_continuation_1613
     future_2667
     future_790
@@ -38,8 +35,6 @@ set(tests
 
 set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
 set(after_588_PARAMETERS LOCALITIES 2)
-set(channel_2916_FLAGS DEPENDENCIES iostreams_component)
-set(channel_2916_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
 set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
