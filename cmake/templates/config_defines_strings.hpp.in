@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <hpx/config/config_defines_strings_modules.hpp>
-
 namespace hpx {
 
     char const* const config_strings[] =

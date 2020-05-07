@@ -639,6 +639,7 @@ jobs:
                   tests.unit.modules.concepts \
                   tests.unit.modules.concurrency \
                   tests.unit.modules.config \
+                  tests.unit.modules.config_registry \
                   tests.unit.modules.coroutines \
                   tests.unit.modules.datastructures \
                   tests.unit.modules.debugging \

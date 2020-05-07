@@ -80,24 +80,23 @@ function(create_configuration_summary message module_name)
     set(_base_dir_local "hpx/config")
     set(_base_dir "hpx/config")
     set(_template "config_defines_strings.hpp.in")
+
+    configure_file(
+      "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
+      "${HPX_BINARY_DIR}/${_base_dir_local}/config_strings.hpp" @ONLY
+    )
+    configure_file(
+      "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
+      "${HPX_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${_base_dir}/config_strings.hpp"
+      @ONLY
+    )
   else()
-    # NOTE: We generate the config_strings.hpp files for each module into the
-    # config module directory. This ensures that modules like version can access
-    # the config strings of all modules, instead of making the version module
-    # depend on all other modules.
-    set(_base_dir_local "libs/config/include/hpx/${module_name}/config/")
-    set(_base_dir "hpx/${module_name}/config/")
-    set(_template "config_defines_strings_for_modules.hpp.in")
+    set(_base_dir_local "libs/${module_name}/src/")
+    set(_template "config_defines_entries_for_modules.cpp.in")
+
+    configure_file(
+      "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
+      "${HPX_BINARY_DIR}/${_base_dir_local}/config_entries.cpp" @ONLY
+    )
   endif()
-
-  configure_file(
-    "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
-    "${HPX_BINARY_DIR}/${_base_dir_local}/config_strings.hpp" @ONLY
-  )
-  configure_file(
-    "${HPX_SOURCE_DIR}/cmake/templates/${_template}"
-    "${HPX_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${_base_dir}/config_strings.hpp"
-    @ONLY
-  )
-
 endfunction()
