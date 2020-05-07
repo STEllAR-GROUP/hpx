@@ -17,8 +17,8 @@
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/lcos/detail/future_transforms.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
@@ -44,11 +44,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // forward declare the type we will get function annotations from
-namespace hpx { namespace lcos { namespace detail
-{
+namespace hpx { namespace lcos { namespace detail {
     template <typename Frame>
     struct dataflow_finalization;
-}}}
+}}}    // namespace hpx::lcos::detail
 
 namespace hpx { namespace traits {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -62,19 +61,20 @@ namespace hpx { namespace traits {
         static char const* call(
             lcos::detail::dataflow_finalization<Frame> const& f) noexcept
         {
-            char const* annotation = hpx::traits::get_function_annotation<
-                typename hpx::util::decay<function_type>::type>::call(f.this_->func_);
+            char const* annotation =
+                hpx::traits::get_function_annotation<typename hpx::util::decay<
+                    function_type>::type>::call(f.this_->func_);
             return annotation;
         }
     };
 #endif
-}}
+}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail
-{
+namespace hpx { namespace lcos { namespace detail {
     template <typename Frame>
-    struct dataflow_finalization {
+    struct dataflow_finalization
+    {
         //
         explicit dataflow_finalization(Frame* df)
           : this_(df)
@@ -143,8 +143,8 @@ namespace hpx { namespace lcos { namespace detail
         typedef dataflow_frame<Policy, Func, Futures> dataflow_type;
 
         friend struct dataflow_finalization<dataflow_type>;
-        friend struct traits::get_function_annotation
-            <dataflow_finalization<dataflow_type>>;
+        friend struct traits::get_function_annotation<
+            dataflow_finalization<dataflow_type>>;
 
     private:
         // workaround gcc regression wrongly instantiating constructors
@@ -222,9 +222,7 @@ namespace hpx { namespace lcos { namespace detail
             parallel::execution::parallel_policy_executor<launch::async_policy>
                 exec{policy};
 
-            exec.post(
-                std::move(this_f_),
-                std::move(futures));
+            exec.post(std::move(this_f_), std::move(futures));
         }
 
         void finalize(hpx::detail::fork_policy policy, Futures&& futures)
@@ -234,9 +232,7 @@ namespace hpx { namespace lcos { namespace detail
             parallel::execution::parallel_policy_executor<launch::fork_policy>
                 exec{policy};
 
-            exec.post(
-                std::move(this_f_),
-                std::move(futures));
+            exec.post(std::move(this_f_), std::move(futures));
         }
 
         HPX_FORCEINLINE
@@ -307,10 +303,8 @@ namespace hpx { namespace lcos { namespace detail
         {
             detail::dataflow_finalization<dataflow_type> this_f_(this);
 
-            parallel::execution::post(
-                std::forward<Executor>(exec),
-                std::move(this_f_),
-                std::move(futures));
+            parallel::execution::post(std::forward<Executor>(exec),
+                std::move(this_f_), std::move(futures));
         }
 
     public:
