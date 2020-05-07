@@ -14,13 +14,13 @@ program_options
 The module program_options is a direct fork of the Boost.ProgramOptions library
 (Boost V1.70.0). For more information about this library please see `here
 <https://www.boost.org/doc/libs/1_70_0/doc/html/program_options.html>`__.
-In order to be included as an HPX module, the Boost.ProgramOptions library has
+In order to be included as an |hpx| module, the Boost.ProgramOptions library has
 been moved to the ``namespace hpx::program_options``. We have also replaced all
 Boost facilities the library depends on with either the equivalent facilities
-from the standard library or from HPX. As a result, the HPX program_options module
+from the standard library or from |hpx|. As a result, the |hpx| program_options module
 is fully interface compatible with Boost.ProgramOptions (sans the ``hpx``
 namespace and the ``#include <hpx/program_options.hpp>`` changes that need to be
-applied to all code relying on this library.
+applied to all code relying on this library).
 
 All credit goes to Vladimir Prus, the author of the excellent Boost.ProgramOptions
 library. All bugs have been introduced by us.
