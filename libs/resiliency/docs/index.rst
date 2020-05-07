@@ -12,13 +12,13 @@ resiliency
 ==========
 
 In |hpx|, a program failure is a manifestation of a failing task. This module
-exposes several APIs that allow to manage failing tasks in a convenient way by
+exposes several APIs that allow users to manage failing tasks in a convenient way by
 either replaying a failed task or by replicating a specific task to begin with.
 
 Task replay is analogous to the Checkpoint/Restart mechanism found in conventional
 execution models. The key difference being localized fault detection. When the
-runtime detects an error it replays the failing task as opposed to completely
-rolling back of the entire program to the previous checkpoint.
+runtime detects an error, it replays the failing task as opposed to completely
+rolling back the entire program to the previous checkpoint.
 
 Task replication is designed to provide reliability enhancements by replicating
 a set of tasks and evaluating their results to determine a consensus among them.
@@ -32,16 +32,16 @@ by repeating a task multiple times.
 The following API functions are exposed:
 
 - :cpp:func:`hpx::resiliency::async_replay`: This version of task replay will
-  catch user defined exceptions and automatically reschedule the task N times
+  catch user-defined exceptions and automatically reschedule the task N times
   before throwing an :cpp:func:`hpx::resiliency::abort_replay_exception` if no
   task is able to complete execution without an exception.
 
 - :cpp:func:`hpx::resiliency::async_replay_validate`: This version of replay
-  adds an argument to async replay which receives a user provided validation
+  adds an argument to async replay which receives a user-provided validation
   function to test the result of the task against. If the task's output is
   validated, the result is returned. If the output fails the check or an
   exception is thrown, the task is replayed until no errors are encountered or
-  the number of specified retries have been exceeded.
+  the number of specified retries has been exceeded.
 
 - :cpp:func:`hpx::resiliency::async_replicate`: This is the most basic
   implementation of the task replication. The API returns the first result that
@@ -56,7 +56,7 @@ The following API functions are exposed:
   are silent errors which do not interrupt program flow. In order to detect
   errors of this kind, it is necessary to run the task several times and compare
   the values returned by every version of the task. In order to determine which
-  return value is "correct", the API allow the user to provide a custom
+  return value is "correct", the API allows the user to provide a custom
   consensus function to properly form a consensus. This voting function then
   returns the "correct"" answer.
 
@@ -67,14 +67,14 @@ The following API functions are exposed:
   function" which returns the consensus formed by the voting logic.
 
 - :cpp:func:`hpx::resiliency::dataflow_replay`: This version of dataflow replay
-  will catch user defined exceptions and automatically reschedules the task N
+  will catch user-defined exceptions and automatically reschedules the task N
   times before throwing an :cpp:func:`hpx::resiliency::abort_replay_exception`
   if no task is able to complete execution without an exception. Any arguments
   for the executed task that are futures will cause the task invocation to be
   delayed until all of those futures have become ready.
 
 - :cpp:func:`hpx::resiliency::dataflow_replay_validate` : This version of replay
-  adds an argument to dataflow replay which receives a user provided validation
+  adds an argument to dataflow replay which receives a user-provided validation
   function to test the result of the task against. If the task's output is
   validated, the result is returned. If the output fails the check or an
   exception is thrown, the task is replayed until no errors are encountered or
