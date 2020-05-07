@@ -28,19 +28,14 @@ set(subdirs
     throttle
     tuplespace
     transpose
-   )
+)
 
 if(HPX_WITH_EXAMPLES_HDF5)
-  set(subdirs ${subdirs}
-    interpolate1d
-    sheneos
-    )
+  set(subdirs ${subdirs} interpolate1d sheneos)
 endif()
 
 if(HPX_WITH_APEX)
-  set(subdirs ${subdirs}
-      apex
-     )
+  set(subdirs ${subdirs} apex)
 endif()
 
 foreach(subdir ${subdirs})
@@ -53,4 +48,3 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(examples examples.${subdir})
 endforeach()
-

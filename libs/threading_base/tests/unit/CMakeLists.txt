@@ -17,14 +17,13 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
-    ${${test}_LIBRARIES}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS} ${${test}_LIBRARIES}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Modules/ThreadingBase")
+    FOLDER "Tests/Unit/Modules/ThreadingBase"
+  )
 
   add_hpx_unit_test("modules.threading_base" ${test} ${${test}_PARAMETERS})
 endforeach()

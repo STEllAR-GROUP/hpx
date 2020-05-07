@@ -16,7 +16,7 @@ set(benchmarks
     benchmark_remove_if
     benchmark_unique
     benchmark_unique_copy
-   )
+)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(benchmarks ${benchmarks} transform_reduce_scaling)
@@ -24,18 +24,19 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 foreach(benchmark ${benchmarks})
-  set(sources
-      ${benchmark}.cpp)
+  set(sources ${benchmark}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${benchmark}_test
-    INTERNAL_FLAGS
+  add_hpx_executable(
+    ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
-    EXCLUDE_FROM_ALL
-    ${${benchmark}_FLAGS}
-    FOLDER "Benchmarks/Modules/Algorithms")
+    EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
+    FOLDER "Benchmarks/Modules/Algorithms"
+  )
 
-  add_hpx_performance_test("modules.algorithms" ${benchmark} ${${benchmark}_PARAMETERS})
+  add_hpx_performance_test(
+    "modules.algorithms" ${benchmark} ${${benchmark}_PARAMETERS}
+  )
 endforeach()

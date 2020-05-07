@@ -5,20 +5,16 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # add subdirectories
-set(subdirs
-    algorithms
-    block
-    container_algorithms
-   )
+set(subdirs algorithms block container_algorithms)
 
 if(HPX_WITH_DATAPAR_VC)
-set(subdirs ${subdirs}
-    datapar_algorithms
-   )
+  set(subdirs ${subdirs} datapar_algorithms)
 endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.unit.modules.algorithms.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.modules.algorithms tests.unit.modules.algorithms.${subdir})
+  add_hpx_pseudo_dependencies(
+    tests.unit.modules.algorithms tests.unit.modules.algorithms.${subdir}
+  )
 endforeach()

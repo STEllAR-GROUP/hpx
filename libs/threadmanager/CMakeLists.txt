@@ -8,23 +8,17 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(threadmanager_headers
-  hpx/threadmanager.hpp
-  )
+set(threadmanager_headers hpx/threadmanager.hpp)
 
-set(threadmanager_compat_headers
-  hpx/runtime/threads/threadmanager.hpp
-  )
+set(threadmanager_compat_headers hpx/runtime/threads/threadmanager.hpp)
 
-set(threadmanager_sources
-  threadmanager.cpp
-  )
+set(threadmanager_sources threadmanager.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(threadmanager
+add_hpx_module(
+  threadmanager
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
   SOURCES ${threadmanager_sources}
   HEADERS ${threadmanager_headers}

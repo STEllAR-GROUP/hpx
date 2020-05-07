@@ -10,85 +10,79 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/collectives/include
 set(collectives_headers
-  hpx/collectives/all_reduce.hpp
-  hpx/collectives/all_to_all.hpp
-  hpx/collectives/barrier.hpp
-  hpx/collectives/broadcast.hpp
-  hpx/collectives/fold.hpp
-  hpx/collectives/gather.hpp
-  hpx/collectives/latch.hpp
-  hpx/collectives/reduce.hpp
-  hpx/collectives/spmd_block.hpp
-  hpx/collectives/detail/barrier_node.hpp
-  hpx/collectives/detail/latch.hpp
+    hpx/collectives/all_reduce.hpp
+    hpx/collectives/all_to_all.hpp
+    hpx/collectives/barrier.hpp
+    hpx/collectives/broadcast.hpp
+    hpx/collectives/fold.hpp
+    hpx/collectives/gather.hpp
+    hpx/collectives/latch.hpp
+    hpx/collectives/reduce.hpp
+    hpx/collectives/spmd_block.hpp
+    hpx/collectives/detail/barrier_node.hpp
+    hpx/collectives/detail/latch.hpp
 )
 
 # Default location is $HPX_ROOT/libs/collectives/include_compatibility
 set(collectives_compat_headers
-  hpx/lcos/barrier.hpp
-  hpx/lcos/broadcast.hpp
-  hpx/lcos/fold.hpp
-  hpx/lcos/gather.hpp
-  hpx/lcos/latch.hpp
-  hpx/lcos/reduce.hpp
-  hpx/lcos/spmd_block.hpp
+    hpx/lcos/barrier.hpp
+    hpx/lcos/broadcast.hpp
+    hpx/lcos/fold.hpp
+    hpx/lcos/gather.hpp
+    hpx/lcos/latch.hpp
+    hpx/lcos/reduce.hpp
+    hpx/lcos/spmd_block.hpp
 )
 
 # Default location is $HPX_ROOT/libs/collectives/src
-set(collectives_sources
-  barrier.cpp
-  latch.cpp
-  detail/barrier_node.cpp
-)
+set(collectives_sources barrier.cpp latch.cpp detail/barrier_node.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(collectives
-    COMPATIBILITY_HEADERS ON    # Added in 1.4.0
-    DEPRECATION_WARNINGS
-    FORCE_LINKING_GEN
-    SOURCES ${collectives_sources}
-    HEADERS ${collectives_headers}
-    COMPAT_HEADERS ${collectives_compat_headers}
-    DEPENDENCIES
-      hpx_affinity
-      hpx_allocator_support
-      hpx_assertion
-      hpx_async
-      hpx_cache
-      hpx_concurrency
-      hpx_config
-      hpx_coroutines
-      hpx_datastructures
-      hpx_errors
-      hpx_execution
-      hpx_executors
-      hpx_format
-      hpx_functional
-      hpx_hardware
-      hpx_hashing
-      hpx_iterator_support
-      hpx_local_lcos
-      hpx_logging
-      hpx_memory
-      hpx_pack_traversal
-      hpx_performance_counters
-      hpx_preprocessor
-      hpx_program_options
-      hpx_runtime_configuration
-      hpx_serialization
-      hpx_synchronization
-      hpx_timing
-      hpx_threading
-      hpx_thread_support
-      hpx_threading_base
-      hpx_threadmanager
-      hpx_topology
-      hpx_type_support
-      hpx_util
-    CMAKE_SUBDIRS examples tests
+add_hpx_module(
+  collectives
+  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  SOURCES ${collectives_sources}
+  HEADERS ${collectives_headers}
+  COMPAT_HEADERS ${collectives_compat_headers}
+  DEPENDENCIES
+    hpx_affinity
+    hpx_allocator_support
+    hpx_assertion
+    hpx_async
+    hpx_cache
+    hpx_concurrency
+    hpx_config
+    hpx_coroutines
+    hpx_datastructures
+    hpx_errors
+    hpx_execution
+    hpx_executors
+    hpx_format
+    hpx_functional
+    hpx_hardware
+    hpx_hashing
+    hpx_iterator_support
+    hpx_local_lcos
+    hpx_logging
+    hpx_memory
+    hpx_pack_traversal
+    hpx_performance_counters
+    hpx_preprocessor
+    hpx_program_options
+    hpx_runtime_configuration
+    hpx_serialization
+    hpx_synchronization
+    hpx_timing
+    hpx_threading
+    hpx_thread_support
+    hpx_threading_base
+    hpx_threadmanager
+    hpx_topology
+    hpx_type_support
+    hpx_util
+  CMAKE_SUBDIRS examples tests
 )
 
 # Temporary since the module still depends on some runtime files
-target_link_libraries(hpx_collectives PUBLIC
-  hpx_static_reinit
-  )
+target_link_libraries(hpx_collectives PUBLIC hpx_static_reinit)

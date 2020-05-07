@@ -15,19 +15,14 @@ set(tests
     thread_suspend_pending
     thread_suspend_duration
     threads_all_1422
-   )
+)
 
 if(HPX_WITH_LOCAL_SCHEDULER OR HPX_WITH_ALL_SCHEDULERS)
-  set(tests ${tests}
-    thread_pool_executor_1114
-    )
+  set(tests ${tests} thread_pool_executor_1114)
 endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests}
-    resume_priority
-    thread_rescheduling
-    )
+  set(tests ${tests} resume_priority thread_rescheduling)
 endif()
 
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -35,24 +30,22 @@ set(thread_pool_executor_1112_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_suspend_pending_PARAMETERS THREADS_PER_LOCALITY 1)
 set(thread_suspend_duration_PARAMETERS THREADS_PER_LOCALITY 1)
-set(threads_all_1422_PARAMETERS THREADS_PER_LOCALITY -1)        # -1 means 'all'
+set(threads_all_1422_PARAMETERS THREADS_PER_LOCALITY -1) # -1 means 'all'
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Threads")
+    FOLDER "Tests/Regressions/Threads"
+  )
 
   add_hpx_regression_test("threads" ${test} ${${test}_PARAMETERS})
 
 endforeach()
-

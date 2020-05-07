@@ -8,8 +8,8 @@
 if(HPX_WITH_PARCELPORT_TCP)
   hpx_debug("add_parcelport_tcp_module")
   include(HPX_AddParcelport)
-  add_parcelport(tcp
-    STATIC
+  add_parcelport(
+    tcp STATIC
     SOURCES
       "${PROJECT_SOURCE_DIR}/plugins/parcelport/tcp/connection_handler_tcp.cpp"
       "${PROJECT_SOURCE_DIR}/plugins/parcelport/tcp/parcelport_tcp.cpp"
@@ -40,9 +40,7 @@ if(HPX_WITH_PARCELPORT_TCP)
       hpx_timing
       hpx_topology
       hpx_util
-    INCLUDE_DIRS
-      "${PROJECT_SOURCE_DIR}"
-    FOLDER
-      "Core/Plugins/Parcelport/Tcp"
-    )
+    INCLUDE_DIRS "${PROJECT_SOURCE_DIR}"
+    FOLDER "Core/Plugins/Parcelport/Tcp"
+  )
 endif()

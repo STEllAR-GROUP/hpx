@@ -9,30 +9,32 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(pack_traversal_headers
-  hpx/pack_traversal/detail/container_category.hpp
-  hpx/pack_traversal/detail/pack_traversal_impl.hpp
-  hpx/pack_traversal/detail/pack_traversal_async_impl.hpp
-  hpx/pack_traversal/detail/unwrap_impl.hpp
-  hpx/pack_traversal/pack_traversal.hpp
-  hpx/pack_traversal/pack_traversal_async.hpp
-  hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp
-  hpx/pack_traversal/unwrap.hpp)
+    hpx/pack_traversal/detail/container_category.hpp
+    hpx/pack_traversal/detail/pack_traversal_impl.hpp
+    hpx/pack_traversal/detail/pack_traversal_async_impl.hpp
+    hpx/pack_traversal/detail/unwrap_impl.hpp
+    hpx/pack_traversal/pack_traversal.hpp
+    hpx/pack_traversal/pack_traversal_async.hpp
+    hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp
+    hpx/pack_traversal/unwrap.hpp
+)
 
 set(pack_traversal_compat_headers
-  hpx/traits/pack_traversal_rebind_container.hpp
-  hpx/util/detail/container_category.hpp
-  hpx/util/detail/pack_traversal_impl.hpp
-  hpx/util/detail/pack_traversal_async_impl.hpp
-  hpx/util/detail/unwrap_impl.hpp
-  hpx/util/pack_traversal.hpp
-  hpx/util/pack_traversal_async.hpp
-  hpx/util/unwrap.hpp)
+    hpx/traits/pack_traversal_rebind_container.hpp
+    hpx/util/detail/container_category.hpp
+    hpx/util/detail/pack_traversal_impl.hpp
+    hpx/util/detail/pack_traversal_async_impl.hpp
+    hpx/util/detail/unwrap_impl.hpp
+    hpx/util/pack_traversal.hpp
+    hpx/util/pack_traversal_async.hpp
+    hpx/util/unwrap.hpp
+)
 
 include(HPX_AddModule)
-add_hpx_module(pack_traversal
+add_hpx_module(
+  pack_traversal
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   HEADERS ${pack_traversal_headers}
   COMPAT_HEADERS ${pack_traversal_compat_headers}

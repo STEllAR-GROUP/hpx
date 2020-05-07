@@ -11,24 +11,23 @@ if(NOT TARGET Papi::papi)
   find_package(PkgConfig QUIET)
   pkg_check_modules(PC_PAPI QUIET papi)
 
-  find_path(PAPI_INCLUDE_DIR papi.h
-    HINTS
-      ${PAPI_ROOT} ENV PAPI_ROOT
-      ${HPX_PAPI_ROOT}
-      ${PC_PAPI_INCLUDEDIR}
-      ${PC_PAPI_INCLUDE_DIRS}
-    PATH_SUFFIXES include)
+  find_path(
+    PAPI_INCLUDE_DIR papi.h
+    HINTS ${PAPI_ROOT} ENV PAPI_ROOT ${HPX_PAPI_ROOT} ${PC_PAPI_INCLUDEDIR}
+          ${PC_PAPI_INCLUDE_DIRS}
+    PATH_SUFFIXES include
+  )
 
-  find_library(PAPI_LIBRARY NAMES papi libpapi
-    HINTS
-      ${PAPI_ROOT} ENV PAPI_ROOT
-      ${HPX_PAPI_ROOT}
-      ${PC_PAPI_LIBDIR}
-      ${PC_PAPI_LIBRARY_DIRS}
-    PATH_SUFFIXES lib lib64)
+  find_library(
+    PAPI_LIBRARY
+    NAMES papi libpapi
+    HINTS ${PAPI_ROOT} ENV PAPI_ROOT ${HPX_PAPI_ROOT} ${PC_PAPI_LIBDIR}
+          ${PC_PAPI_LIBRARY_DIRS}
+    PATH_SUFFIXES lib lib64
+  )
 
   # Set PAPI_ROOT in case the other hints are used
-  if (NOT PAPI_ROOT AND "$ENV{PAPI_ROOT}")
+  if(NOT PAPI_ROOT AND "$ENV{PAPI_ROOT}")
     set(PAPI_ROOT $ENV{PAPI_ROOT})
   elseif(NOT PAPI_ROOT)
     string(REPLACE "/include" "" PAPI_ROOT "${PAPI_INCLUDE_DIR}")
@@ -48,10 +47,15 @@ if(NOT TARGET Papi::papi)
   set(PAPI_LIBRARIES ${PAPI_LIBRARY})
   set(PAPI_INCLUDE_DIRS ${PAPI_INCLUDE_DIR})
 
-  find_package_handle_standard_args(PAPI DEFAULT_MSG
-    PAPI_LIBRARY PAPI_INCLUDE_DIR)
+  find_package_handle_standard_args(
+    PAPI DEFAULT_MSG PAPI_LIBRARY PAPI_INCLUDE_DIR
+  )
 
-  get_property(_type CACHE PAPI_ROOT PROPERTY TYPE)
+  get_property(
+    _type
+    CACHE PAPI_ROOT
+    PROPERTY TYPE
+  )
   if(_type)
     set_property(CACHE PAPI_ROOT PROPERTY ADVANCED 1)
     if("x${_type}" STREQUAL "xUNINITIALIZED")

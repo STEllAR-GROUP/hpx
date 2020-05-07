@@ -149,10 +149,26 @@ jobs:
           command: |
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
               clang-format -i **/*.{cpp,hpp}
-              git diff --exit-code > /tmp/modified_format_files.txt
+              git diff --exit-code > /tmp/modified_clang_format_files.txt
       - store_artifacts:
-          path: /tmp/modified_format_files.txt
-          destination: /hpx/artifacts/modified_format_files.txt
+          path: /tmp/modified_clang_format_files.txt
+          destination: /hpx/artifacts/modified_clang_format_files.txt
+
+  # Ensure that CMake files stay cmake-formatted
+  cmake_format:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check that CMake files are well cmake-formatted
+          command: |
+              cd /hpx/source && shopt -s globstar # to activate the ** globbing
+              cmake-format -i **/*.cmake **/CMakeLists.txt
+              git diff --exit-code > /tmp/modified_cmake_format_files.txt
+      - store_artifacts:
+          path: /tmp/modified_cmake_format_files.txt
+          destination: /hpx/artifacts/modified_cmake_format_files.txt
 
   configure:
     <<: *defaults
@@ -960,6 +976,10 @@ workflows:
             - checkout_code
           <<: *gh_pages_filter
       - clang_format:
+          requires:
+            - checkout_code
+          <<: *gh_pages_filter
+      - cmake_format:
           requires:
             - checkout_code
           <<: *gh_pages_filter

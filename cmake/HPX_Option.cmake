@@ -8,24 +8,29 @@
 include(CMakeParseArguments)
 
 set(HPX_OPTION_CATEGORIES
-  "Generic"
-  "Build Targets"
-  "Thread Manager"
-  "AGAS"
-  "Parcelport"
-  "Profiling"
-  "Debugging"
-  "Modules"
+    "Generic"
+    "Build Targets"
+    "Thread Manager"
+    "AGAS"
+    "Parcelport"
+    "Profiling"
+    "Debugging"
+    "Modules"
 )
 
 function(hpx_option option type description default)
   set(options ADVANCED)
   set(one_value_args CATEGORY)
   set(multi_value_args STRINGS)
-  cmake_parse_arguments(HPX_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
+  )
 
   if(NOT DEFINED ${option})
-    set(${option} ${default} CACHE ${type} "${description}" FORCE)
+    set(${option}
+        ${default}
+        CACHE ${type} "${description}" FORCE
+    )
     if(HPX_OPTION_ADVANCED)
       mark_as_advanced(${option})
     endif()
@@ -33,9 +38,17 @@ function(hpx_option option type description default)
     # make sure that dependent projects can overwrite any of the HPX options
     unset(${option} PARENT_SCOPE)
 
-    get_property(_option_is_cache_property CACHE "${option}" PROPERTY TYPE SET)
+    get_property(
+      _option_is_cache_property
+      CACHE "${option}"
+      PROPERTY TYPE
+      SET
+    )
     if(NOT _option_is_cache_property)
-      set(${option} ${default} CACHE ${type} "${description}" FORCE)
+      set(${option}
+          ${default}
+          CACHE ${type} "${description}" FORCE
+      )
       if(HPX_OPTION_ADVANCED)
         mark_as_advanced(${option})
       endif()
@@ -49,7 +62,9 @@ function(hpx_option option type description default)
     if("${type}" STREQUAL "STRING")
       set_property(CACHE "${option}" PROPERTY STRINGS "${HPX_OPTION_STRINGS}")
     else()
-      message(FATAL_ERROR "hpx_option(): STRINGS can only be used if type is STRING !")
+      message(
+        FATAL_ERROR "hpx_option(): STRINGS can only be used if type is STRING !"
+      )
     endif()
   endif()
 
@@ -57,7 +72,10 @@ function(hpx_option option type description default)
   if(HPX_OPTION_CATEGORY)
     set(_category "${HPX_OPTION_CATEGORY}")
   endif()
-  set(${option}Category ${_category} CACHE INTERNAL "")
+  set(${option}Category
+      ${_category}
+      CACHE INTERNAL ""
+  )
 endfunction()
 
 # simplify setting an option in cache
@@ -65,7 +83,10 @@ function(hpx_set_option option)
   set(options FORCE)
   set(one_value_args VALUE TYPE HELPSTRING)
   set(multi_value_args)
-  cmake_parse_arguments(HPX_SET_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_SET_OPTION "${options}" "${one_value_args}" "${multi_value_args}"
+    ${ARGN}
+  )
 
   if(NOT DEFINED ${option})
     hpx_error("attempting to set an undefined option: ${option}")
@@ -79,20 +100,35 @@ function(hpx_set_option option)
   if(HPX_SET_OPTION_HELPSTRING)
     set(${option}_description ${HPX_SET_OPTION_HELPSTRING})
   else()
-    get_property(${option}_description CACHE "${option}" PROPERTY HELPSTRING)
+    get_property(
+      ${option}_description
+      CACHE "${option}"
+      PROPERTY HELPSTRING
+    )
   endif()
 
   if(HPX_SET_OPTION_TYPE)
     set(${option}_type ${HPX_SET_OPTION_TYPE})
   else()
-    get_property(${option}_type CACHE "${option}" PROPERTY TYPE)
+    get_property(
+      ${option}_type
+      CACHE "${option}"
+      PROPERTY TYPE
+    )
   endif()
 
   if(DEFINED HPX_SET_OPTION_VALUE)
     set(${option}_value ${HPX_SET_OPTION_VALUE})
   else()
-    get_property(${option}_value CACHE "${option}" PROPERTY VALUE)
+    get_property(
+      ${option}_value
+      CACHE "${option}"
+      PROPERTY VALUE
+    )
   endif()
 
-  set(${option} ${${option}_value} CACHE ${${option}_type} "${${option}_description}" ${${option}_force})
+  set(${option}
+      ${${option}_value}
+      CACHE ${${option}_type} "${${option}_description}" ${${option}_force}
+  )
 endfunction()

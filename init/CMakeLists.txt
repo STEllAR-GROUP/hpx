@@ -6,15 +6,24 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(hpx_init_HEADERS "" CACHE INTERNAL "Headers for libhpx_init." FORCE)
-set(hpx_init_SOURCES "" CACHE INTERNAL "Sources for libhpx_init." FORCE)
-list(APPEND hpx_init_SOURCES
+set(hpx_init_HEADERS
+    ""
+    CACHE INTERNAL "Headers for libhpx_init." FORCE
+)
+set(hpx_init_SOURCES
+    ""
+    CACHE INTERNAL "Sources for libhpx_init." FORCE
+)
+list(
+  APPEND
+  hpx_init_SOURCES
   hpx_main.cpp
   hpx_main_argc_argv.cpp
   hpx_main_variables_map.cpp
   hpx_main_winsocket.cpp
   hpx_user_main.cpp
-  hpx_user_main_argc_argv.cpp)
+  hpx_user_main_argc_argv.cpp
+)
 
 # make source groups
 set(hpx_init_SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -23,7 +32,8 @@ add_hpx_source_group(
   NAME hpx_init
   CLASS "Source Files"
   ROOT "${hpx_init_SOURCE_ROOT}"
-  TARGETS ${hpx_init_SOURCES})
+  TARGETS ${hpx_init_SOURCES}
+)
 
 add_library(hpx_init STATIC ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 set_target_properties(hpx_init PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -34,20 +44,24 @@ target_compile_definitions(hpx_init PRIVATE HPX_APPLICATION_EXPORTS)
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
 if(MSVC)
-  set_target_properties(hpx_init PROPERTIES
-    COMPILE_PDB_NAME_DEBUG hpx_initd
-    COMPILE_PDB_NAME_RELWITHDEBINFO hpx_init
-    COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG
-      ${CMAKE_CURRENT_BINARY_DIR}/Debug
-    COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO
-      ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo)
+  set_target_properties(
+    hpx_init
+    PROPERTIES COMPILE_PDB_NAME_DEBUG hpx_initd
+               COMPILE_PDB_NAME_RELWITHDEBINFO hpx_init
+               COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG
+               ${CMAKE_CURRENT_BINARY_DIR}/Debug
+               COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO
+               ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo
+  )
 endif()
 
 if(HPX_WITH_STACKTRACES AND HPX_WITH_STACKTRACES_STATIC_SYMBOLS)
-  # Add -Wl,-E to linker for executables on Linux(Clang or gcc)
-  # this will add all symbols to the dynamic symbol table
-  if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") AND
-     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+  # Add -Wl,-E to linker for executables on Linux(Clang or gcc) this will add
+  # all symbols to the dynamic symbol table
+  if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+     AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+          OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  )
     target_link_libraries(hpx_init INTERFACE "-Wl,-E")
   endif()
 endif()
@@ -57,8 +71,7 @@ install(
   EXPORT HPXInternalTargets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT runtime
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
 )
 
 # install PDB if needed

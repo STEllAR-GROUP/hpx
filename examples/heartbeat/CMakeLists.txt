@@ -10,39 +10,37 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
 
-###############################################################################
+# ##############################################################################
 set(heartbeat_HEADERS)
 
-set(heartbeat_SOURCES
-    heartbeat.cpp)
+set(heartbeat_SOURCES heartbeat.cpp)
 
 if(MSVC)
-    set(heartbeat_HEADERS
-        ${heartbeat_HEADERS}
-        win_perf_counters.hpp
-        hpx_counters.hpp)
+  set(heartbeat_HEADERS ${heartbeat_HEADERS} win_perf_counters.hpp
+                        hpx_counters.hpp
+  )
 
-    set(heartbeat_SOURCES
-        ${heartbeat_SOURCES}
-        win_perf_counters.cpp)
+  set(heartbeat_SOURCES ${heartbeat_SOURCES} win_perf_counters.cpp)
 endif()
 
-add_hpx_executable(heartbeat
-                   INTERNAL_FLAGS
-                   SOURCES ${heartbeat_SOURCES}
-                   HEADERS ${heartbeat_HEADERS}
-                   FOLDER "Examples/HeartBeat"
-                   DEPENDENCIES iostreams_component)
+add_hpx_executable(
+  heartbeat INTERNAL_FLAGS
+  SOURCES ${heartbeat_SOURCES}
+  HEADERS ${heartbeat_HEADERS}
+  FOLDER "Examples/HeartBeat"
+  DEPENDENCIES iostreams_component
+)
 
 # add pseudo-target dependencies
 add_hpx_pseudo_dependencies(examples.heartbeat heartbeat)
 
-###############################################################################
-add_hpx_executable(heartbeat_console
-                   INTERNAL_FLAGS
-                   SOURCES heartbeat_console.cpp
-                   FOLDER "Examples/HeartBeat"
-                   DEPENDENCIES iostreams_component)
+# ##############################################################################
+add_hpx_executable(
+  heartbeat_console INTERNAL_FLAGS
+  SOURCES heartbeat_console.cpp
+  FOLDER "Examples/HeartBeat"
+  DEPENDENCIES iostreams_component
+)
 
 # add pseudo-target dependencies
 add_hpx_pseudo_dependencies(examples.heartbeat heartbeat_console)

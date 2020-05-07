@@ -8,21 +8,17 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(threading_headers
-  hpx/threading/jthread.hpp
-  hpx/threading/thread.hpp)
+set(threading_headers hpx/threading/jthread.hpp hpx/threading/thread.hpp)
 
-set(threading_compat_headers
-  hpx/runtime/threads/thread.hpp)
+set(threading_compat_headers hpx/runtime/threads/thread.hpp)
 
-set(threading_sources
-  thread.cpp)
+set(threading_sources thread.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(threading
+add_hpx_module(
+  threading
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${threading_sources}
   HEADERS ${threading_headers}

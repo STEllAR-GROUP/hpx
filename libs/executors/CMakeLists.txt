@@ -10,68 +10,66 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/executors/include
 set(executors_headers
-  hpx/executors/current_executor.hpp
-  hpx/executors/datapar/execution_policy_fwd.hpp
-  hpx/executors/datapar/execution_policy.hpp
-  hpx/executors/guided_pool_executor.hpp
-  hpx/executors.hpp
-  hpx/executors/apply.hpp
-  hpx/executors/async.hpp
-  hpx/executors/dataflow.hpp
-  hpx/executors/exception_list.hpp
-  hpx/executors/execution_policy_fwd.hpp
-  hpx/executors/execution_policy.hpp
-  hpx/executors/limiting_executor.hpp
-  hpx/executors/parallel_executor_aggregated.hpp
-  hpx/executors/parallel_executor.hpp
-  hpx/executors/pool_executor.hpp
-  hpx/executors/restricted_thread_pool_executor.hpp
-  hpx/executors/sequenced_executor.hpp
-  hpx/executors/service_executors.hpp
-  hpx/executors/sync.hpp
-  hpx/executors/thread_pool_attached_executors.hpp
-  )
+    hpx/executors/current_executor.hpp
+    hpx/executors/datapar/execution_policy_fwd.hpp
+    hpx/executors/datapar/execution_policy.hpp
+    hpx/executors/guided_pool_executor.hpp
+    hpx/executors.hpp
+    hpx/executors/apply.hpp
+    hpx/executors/async.hpp
+    hpx/executors/dataflow.hpp
+    hpx/executors/exception_list.hpp
+    hpx/executors/execution_policy_fwd.hpp
+    hpx/executors/execution_policy.hpp
+    hpx/executors/limiting_executor.hpp
+    hpx/executors/parallel_executor_aggregated.hpp
+    hpx/executors/parallel_executor.hpp
+    hpx/executors/pool_executor.hpp
+    hpx/executors/restricted_thread_pool_executor.hpp
+    hpx/executors/sequenced_executor.hpp
+    hpx/executors/service_executors.hpp
+    hpx/executors/sync.hpp
+    hpx/executors/thread_pool_attached_executors.hpp
+)
 
 # Default location is $HPX_ROOT/libs/executors/include_compatibility
 set(executors_compat_headers
-  hpx/execution/datapar/execution_policy_fwd.hpp
-  hpx/execution/datapar/execution_policy.hpp
-  hpx/execution/execution_policy_fwd.hpp
-  hpx/execution/execution_policy.hpp
-  hpx/execution/executors/current_executor.hpp
-  hpx/execution/executors/guided_pool_executor.hpp
-  hpx/execution/executors.hpp
-  hpx/execution/executors/limiting_executor.hpp
-  hpx/execution/executors/parallel_executor_aggregated.hpp
-  hpx/execution/executors/parallel_executor.hpp
-  hpx/execution/executors/pool_executor.hpp
-  hpx/execution/executors/restricted_thread_pool_executor.hpp
-  hpx/execution/executors/sequenced_executor.hpp
-  hpx/execution/executors/service_executors.hpp
-  hpx/execution/executors/thread_pool_attached_executors.hpp
-  hpx/parallel/datapar/execution_policy_fwd.hpp
-  hpx/parallel/datapar/execution_policy.hpp
-  hpx/parallel/exception_list.hpp
-  hpx/parallel/execution_policy_fwd.hpp
-  hpx/parallel/execution_policy.hpp
-  hpx/parallel/executors.hpp
-  hpx/parallel/executors/parallel_executor_aggregated.hpp
-  hpx/parallel/executors/parallel_executor.hpp
-  hpx/parallel/executors/pool_executor.hpp
-  hpx/parallel/executors/sequenced_executor.hpp
-  hpx/parallel/executors/service_executors.hpp
-  hpx/parallel/executors/thread_pool_attached_executors.hpp
-  )
+    hpx/execution/datapar/execution_policy_fwd.hpp
+    hpx/execution/datapar/execution_policy.hpp
+    hpx/execution/execution_policy_fwd.hpp
+    hpx/execution/execution_policy.hpp
+    hpx/execution/executors/current_executor.hpp
+    hpx/execution/executors/guided_pool_executor.hpp
+    hpx/execution/executors.hpp
+    hpx/execution/executors/limiting_executor.hpp
+    hpx/execution/executors/parallel_executor_aggregated.hpp
+    hpx/execution/executors/parallel_executor.hpp
+    hpx/execution/executors/pool_executor.hpp
+    hpx/execution/executors/restricted_thread_pool_executor.hpp
+    hpx/execution/executors/sequenced_executor.hpp
+    hpx/execution/executors/service_executors.hpp
+    hpx/execution/executors/thread_pool_attached_executors.hpp
+    hpx/parallel/datapar/execution_policy_fwd.hpp
+    hpx/parallel/datapar/execution_policy.hpp
+    hpx/parallel/exception_list.hpp
+    hpx/parallel/execution_policy_fwd.hpp
+    hpx/parallel/execution_policy.hpp
+    hpx/parallel/executors.hpp
+    hpx/parallel/executors/parallel_executor_aggregated.hpp
+    hpx/parallel/executors/parallel_executor.hpp
+    hpx/parallel/executors/pool_executor.hpp
+    hpx/parallel/executors/sequenced_executor.hpp
+    hpx/parallel/executors/service_executors.hpp
+    hpx/parallel/executors/thread_pool_attached_executors.hpp
+)
 
-set(executors_sources
-  current_executor.cpp
-  )
+set(executors_sources current_executor.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(executors
+add_hpx_module(
+  executors
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}

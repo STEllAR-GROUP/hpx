@@ -12,24 +12,21 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 foreach(benchmark ${benchmarks})
-  set(sources
-      ${benchmark}.cpp)
+  set(sources ${benchmark}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${benchmark}_test
-    INTERNAL_FLAGS
+  add_hpx_executable(
+    ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources}
-    EXCLUDE_FROM_ALL
-    ${${benchmark}_FLAGS}
-    DEPENDENCIES
-      iostreams_component
-      hpx_iterator_support
-      hpx_timing
-    FOLDER "Benchmarks/Modules/IteratorSupport")
+    EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
+    DEPENDENCIES iostreams_component hpx_iterator_support hpx_timing
+    FOLDER "Benchmarks/Modules/IteratorSupport"
+  )
 
-  add_hpx_performance_test("modules.iterator_support"
-    ${benchmark} ${${benchmark}_PARAMETERS})
+  add_hpx_performance_test(
+    "modules.iterator_support" ${benchmark} ${${benchmark}_PARAMETERS}
+  )
 
 endforeach()

@@ -17,11 +17,20 @@ set(CMAKE_CXX_COMPILER icpc)
 set(CMAKE_C_COMPILER icc)
 set(CMAKE_Fortran_COMPILER ifort)
 
-# Add the -mmic compile flag such that everything will be compiled for the correct
-# platform
-set(CMAKE_CXX_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Xeon Phi")
-set(CMAKE_C_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Xeon Phi")
-set(CMAKE_Fortran_FLAGS_INIT "-mmic" CACHE STRING "Initial compiler flags used to compile for the Xeon Phi")
+# Add the -mmic compile flag such that everything will be compiled for the
+# correct platform
+set(CMAKE_CXX_FLAGS_INIT
+    "-mmic"
+    CACHE STRING "Initial compiler flags used to compile for the Xeon Phi"
+)
+set(CMAKE_C_FLAGS_INIT
+    "-mmic"
+    CACHE STRING "Initial compiler flags used to compile for the Xeon Phi"
+)
+set(CMAKE_Fortran_FLAGS_INIT
+    "-mmic"
+    CACHE STRING "Initial compiler flags used to compile for the Xeon Phi"
+)
 
 # Disable searches in the default system paths. We are cross compiling after all
 # and cmake might pick up wrong libraries that way
@@ -37,24 +46,47 @@ set(CMAKE_CROSSCOMPILING ON)
 set(HPX_PLATFORM "XeonPhi")
 
 # Always disable the ibverbs parcelport as it is non-functional on the BGQ.
-set(HPX_WITH_PARCELPORT_VERBS OFF CACHE BOOL "Enable the ibverbs based parcelport. This is currently an experimental feature")
+set(HPX_WITH_PARCELPORT_VERBS
+    OFF
+    CACHE
+      BOOL
+      "Enable the ibverbs based parcelport. This is currently an experimental feature"
+)
 
-set(HPX_WITH_PARCELPORT_MPI ON CACHE BOOL "Enable the MPI based parcelport.")
+set(HPX_WITH_PARCELPORT_MPI
+    ON
+    CACHE BOOL "Enable the MPI based parcelport."
+)
 
 # We have a bunch of cores on the MIC ... increase the default
-set(HPX_WITH_MAX_CPU_COUNT "256" CACHE STRING "")
+set(HPX_WITH_MAX_CPU_COUNT
+    "256"
+    CACHE STRING ""
+)
 
 # We default to tbbmalloc as our allocator on the MIC
 if(NOT DEFINED HPX_WITH_MALLOC)
-  set(HPX_WITH_MALLOC "tbbmalloc" CACHE STRING "")
+  set(HPX_WITH_MALLOC
+      "tbbmalloc"
+      CACHE STRING ""
+  )
 endif()
 
 # Set the TBBMALLOC_PLATFORM correctly so that find_package(TBBMalloc) sets the
 # right hints
-set(TBBMALLOC_PLATFORM "mic" CACHE STRING "")
+set(TBBMALLOC_PLATFORM
+    "mic"
+    CACHE STRING ""
+)
 
-set(HPX_HIDDEN_VISIBILITY OFF CACHE BOOL "Use -fvisibility=hidden for builds on platforms which support it")
+set(HPX_HIDDEN_VISIBILITY
+    OFF
+    CACHE BOOL
+          "Use -fvisibility=hidden for builds on platforms which support it"
+)
 
 # RDTSC is available on Xeon/Phis
-set(HPX_WITH_RDTSC ON CACHE BOOL "")
-
+set(HPX_WITH_RDTSC
+    ON
+    CACHE BOOL ""
+)

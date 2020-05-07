@@ -10,7 +10,10 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 find_package(Git)
 
 if(NOT GIT_FOUND)
-  message(FATAL_ERROR "Could not find git. git is needed to download and update the GitHub pages.")
+  message(
+    FATAL_ERROR
+      "Could not find git. git is needed to download and update the GitHub pages."
+  )
 endif()
 
 if(NOT GIT_REPOSITORY)
@@ -21,7 +24,8 @@ if(EXISTS "${HPX_BINARY_DIR}/docs/gh-pages")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" pull --rebase
     WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
-    RESULT_VARIABLE git_pull_result)
+    RESULT_VARIABLE git_pull_result
+  )
   if(NOT "${git_pull_result}" EQUAL "0")
     message(FATAL_ERROR "Updating the GitHub pages branch failed.")
   endif()
@@ -29,9 +33,13 @@ else()
   message("${GIT_EXECUTABLE}")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" clone ${GIT_REPOSITORY} gh-pages
-    RESULT_VARIABLE git_clone_result)
+    RESULT_VARIABLE git_clone_result
+  )
   if(NOT "${git_clone_result}" EQUAL "0")
-    message(FATAL_ERROR "Cloning the GitHub pages branch failed. Trying to clone ${GIT_REPOSITORY}")
+    message(
+      FATAL_ERROR
+        "Cloning the GitHub pages branch failed. Trying to clone ${GIT_REPOSITORY}"
+    )
   endif()
 endif()
 
@@ -39,33 +47,38 @@ endif()
 set(DOCS_SOURCE "${HPX_BINARY_DIR}/share/hpx/docs")
 
 # Turn the string of output formats back into a list
-string(REGEX REPLACE " " ";"
-    HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS
-    "${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS}")
+string(REGEX REPLACE " " ";" HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS
+                     "${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS}"
+)
 
 # If a branch name has been set, we copy files to a corresponding directory
 message("HPX_WITH_GIT_BRANCH=\"${HPX_WITH_GIT_BRANCH}\"")
 if(HPX_WITH_GIT_BRANCH)
   message("Updating branch directory")
-  set(DOCS_BRANCH_DEST "${HPX_BINARY_DIR}/docs/gh-pages/branches/${HPX_WITH_GIT_BRANCH}")
+  set(DOCS_BRANCH_DEST
+      "${HPX_BINARY_DIR}/docs/gh-pages/branches/${HPX_WITH_GIT_BRANCH}"
+  )
   file(REMOVE_RECURSE "${DOCS_BRANCH_DEST}")
   if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     file(
-        COPY "${DOCS_SOURCE}/html"
-        DESTINATION "${DOCS_BRANCH_DEST}"
-        PATTERN "*.buildinfo" EXCLUDE)
+      COPY "${DOCS_SOURCE}/html"
+      DESTINATION "${DOCS_BRANCH_DEST}"
+      PATTERN "*.buildinfo" EXCLUDE
+    )
   endif()
   if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     file(
       COPY "${DOCS_SOURCE}/singlehtml"
       DESTINATION "${DOCS_BRANCH_DEST}"
-      PATTERN "*.buildinfo" EXCLUDE)
+      PATTERN "*.buildinfo" EXCLUDE
+    )
   endif()
   if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     file(
       COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
       DESTINATION "${DOCS_BRANCH_DEST}/pdf/"
-      PATTERN "*.buildinfo" EXCLUDE)
+      PATTERN "*.buildinfo" EXCLUDE
+    )
   endif()
 endif()
 
@@ -79,19 +92,22 @@ if(HPX_WITH_GIT_TAG)
     file(
       COPY "${DOCS_SOURCE}/html"
       DESTINATION "${DOCS_TAG_DEST}"
-      PATTERN "*.buildinfo" EXCLUDE)
+      PATTERN "*.buildinfo" EXCLUDE
+    )
   endif()
   if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     file(
       COPY "${DOCS_SOURCE}/singlehtml"
       DESTINATION "${DOCS_TAG_DEST}"
-      PATTERN "*.buildinfo" EXCLUDE)
+      PATTERN "*.buildinfo" EXCLUDE
+    )
   endif()
   if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
     file(
       COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
       DESTINATION "${DOCS_TAG_DEST}/pdf/"
-      PATTERN "*.buildinfo" EXCLUDE)
+      PATTERN "*.buildinfo" EXCLUDE
+    )
   endif()
 
   # If a tag name has been set and it is a suitable version number, we also copy
@@ -106,19 +122,22 @@ if(HPX_WITH_GIT_TAG)
       file(
         COPY "${DOCS_SOURCE}/html"
         DESTINATION "${DOCS_LATEST_DEST}"
-        PATTERN "*.buildinfo" EXCLUDE)
+        PATTERN "*.buildinfo" EXCLUDE
+      )
     endif()
     if("singlehtml" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
       file(
         COPY "${DOCS_SOURCE}/singlehtml"
         DESTINATION "${DOCS_LATEST_DEST}"
-        PATTERN "*.buildinfo" EXCLUDE)
+        PATTERN "*.buildinfo" EXCLUDE
+      )
     endif()
     if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
       file(
         COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
         DESTINATION "${DOCS_LATEST_DEST}/pdf/"
-        PATTERN "*.buildinfo" EXCLUDE)
+        PATTERN "*.buildinfo" EXCLUDE
+      )
     endif()
   endif()
 endif()
@@ -127,7 +146,8 @@ endif()
 execute_process(
   COMMAND "${GIT_EXECUTABLE}" add *
   WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
-  RESULT_VARIABLE git_add_result)
+  RESULT_VARIABLE git_add_result
+)
 if(NOT "${git_add_result}" EQUAL "0")
   message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
 endif()
@@ -136,13 +156,15 @@ endif()
 execute_process(
   COMMAND "${GIT_EXECUTABLE}" diff-index --quiet HEAD
   WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
-  RESULT_VARIABLE git_diff_index_result)
+  RESULT_VARIABLE git_diff_index_result
+)
 if(NOT "${git_diff_index_result}" EQUAL "0")
   # commit changes
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" commit -am "Updating Sphinx docs"
     WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
-    RESULT_VARIABLE git_commit_result)
+    RESULT_VARIABLE git_commit_result
+  )
   if(NOT "${git_commit_result}" EQUAL "0")
     message(FATAL_ERROR "Committing to the GitHub pages branch failed.")
   endif()
@@ -151,8 +173,9 @@ if(NOT "${git_diff_index_result}" EQUAL "0")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" push
     WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
-    RESULT_VARIABLE git_push_result)
+    RESULT_VARIABLE git_push_result
+  )
   if(NOT "${git_push_result}" EQUAL "0")
     message(FATAL_ERROR "Pushing to the GitHub pages branch failed.")
- endif()
+  endif()
 endif()

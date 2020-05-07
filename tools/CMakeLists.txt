@@ -11,4 +11,3 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(tools tools.${subdir})
 endforeach()
-

@@ -7,14 +7,13 @@
 set(binary_filter_plugins)
 
 if(HPX_WITH_NETWORKING)
-  set(binary_filter_plugins ${binary_filter_plugins}
-    bzip2
-    snappy
-    zlib)
+  set(binary_filter_plugins ${binary_filter_plugins} bzip2 snappy zlib)
 endif()
 
 foreach(type ${binary_filter_plugins})
   add_hpx_pseudo_target(plugins.binary_filter.${type})
   add_subdirectory(${type})
-  add_hpx_pseudo_dependencies(plugins.binary_filter plugins.binary_filter.${type})
+  add_hpx_pseudo_dependencies(
+    plugins.binary_filter plugins.binary_filter.${type}
+  )
 endforeach()

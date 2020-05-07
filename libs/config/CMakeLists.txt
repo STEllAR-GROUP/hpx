@@ -10,37 +10,34 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/config/include
 set(config_headers
-  hpx/config.hpp
-  hpx/config/asio.hpp
-  hpx/config/attributes.hpp
-  hpx/config/autolink.hpp
-  hpx/config/branch_hints.hpp
-  hpx/config/compiler_fence.hpp
-  hpx/config/compiler_native_tls.hpp
-  hpx/config/compiler_specific.hpp
-  hpx/config/constexpr.hpp
-  hpx/config/debug.hpp
-  hpx/config/emulate_deleted.hpp
-  hpx/config/export_definitions.hpp
-  hpx/config/force_linking.hpp
-  hpx/config/forceinline.hpp
-  hpx/config/lambda_capture.hpp
-  hpx/config/manual_profiling.hpp
-  hpx/config/threads_stack.hpp
-  hpx/config/warnings_prefix.hpp
-  hpx/config/warnings_suffix.hpp
-  hpx/config/weak_symbol.hpp
+    hpx/config.hpp
+    hpx/config/asio.hpp
+    hpx/config/attributes.hpp
+    hpx/config/autolink.hpp
+    hpx/config/branch_hints.hpp
+    hpx/config/compiler_fence.hpp
+    hpx/config/compiler_native_tls.hpp
+    hpx/config/compiler_specific.hpp
+    hpx/config/constexpr.hpp
+    hpx/config/debug.hpp
+    hpx/config/emulate_deleted.hpp
+    hpx/config/export_definitions.hpp
+    hpx/config/force_linking.hpp
+    hpx/config/forceinline.hpp
+    hpx/config/lambda_capture.hpp
+    hpx/config/manual_profiling.hpp
+    hpx/config/threads_stack.hpp
+    hpx/config/warnings_prefix.hpp
+    hpx/config/warnings_suffix.hpp
+    hpx/config/weak_symbol.hpp
 )
 
 # Default location is $HPX_ROOT/libs/config/src
-set(config_sources
-  force_linking.cpp
-  version.cpp
-)
+set(config_sources force_linking.cpp version.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(config
-  CONFIG_FILES
+add_hpx_module(
+  config CONFIG_FILES
   COMPATIBILITY_HEADERS OFF
   GLOBAL_HEADER_GEN OFF
   SOURCES ${config_sources}

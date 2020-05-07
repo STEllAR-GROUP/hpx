@@ -8,28 +8,28 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
 
-set(example_programs
-    rnd_future_reduce)
+set(example_programs rnd_future_reduce)
 
 set(rnd_future_reduce_FLAGS DEPENDENCIES iostreams_component)
 set(rnd_future_reduce_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(example_program ${example_programs})
-  set(sources
-      ${example_program}.cpp)
+  set(sources ${example_program}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${example_program}
-                     INTERNAL_FLAGS
-                     SOURCES ${sources}
-                     ${${example_program}_FLAGS}
-                     FOLDER "Examples/FutureReduce")
+  add_hpx_executable(
+    ${example_program} INTERNAL_FLAGS
+    SOURCES ${sources} ${${example_program}_FLAGS}
+    FOLDER "Examples/FutureReduce"
+  )
 
   add_hpx_example_target_dependencies("future_reduce" ${example_program})
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_example_test("future_reduce" ${example_program} ${${example_program}_PARAMETERS})
+    add_hpx_example_test(
+      "future_reduce" ${example_program} ${${example_program}_PARAMETERS}
+    )
   endif()
 endforeach()

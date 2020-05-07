@@ -10,7 +10,10 @@ macro(hpx_add_link_flag FLAG)
   set(options)
   set(one_value_args)
   set(multi_value_args TARGETS CONFIGURATIONS)
-  cmake_parse_arguments(HPX_ADD_LINK_FLAG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_ADD_LINK_FLAG "${options}" "${one_value_args}" "${multi_value_args}"
+    ${ARGN}
+  )
 
   set(_targets EXE SHARED STATIC)
   if(HPX_ADD_LINK_FLAG_TARGETS)
@@ -31,7 +34,8 @@ macro(hpx_add_link_flag FLAG)
 
     foreach(_target ${_targets})
       set(CMAKE_${_target}_LINKER_FLAGS${_conf}
-        "${CMAKE_${_target}_LINKER_FLAGS${_conf}} ${FLAG}")
+          "${CMAKE_${_target}_LINKER_FLAGS${_conf}} ${FLAG}"
+      )
     endforeach()
   endforeach()
 endmacro()
@@ -40,7 +44,10 @@ macro(hpx_remove_link_flag FLAG)
   set(options)
   set(one_value_args)
   set(multi_value_args TARGETS CONFIGURATIONS)
-  cmake_parse_arguments(HPX_REMOVE_LINK_FLAG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_REMOVE_LINK_FLAG "${options}" "${one_value_args}" "${multi_value_args}"
+    ${ARGN}
+  )
 
   set(_targets EXE SHARED STATIC)
   if(HPX_ADD_LINK_FLAG_TARGETS)
@@ -60,9 +67,9 @@ macro(hpx_remove_link_flag FLAG)
     endif()
 
     foreach(_target ${_targets})
-      STRING (REGEX REPLACE "${FLAG}" ""
-          CMAKE_${_target}_LINKER_FLAGS${_conf}
-          "${CMAKE_${_target}_LINKER_FLAGS${_conf}}")
+      string(REGEX REPLACE "${FLAG}" "" CMAKE_${_target}_LINKER_FLAGS${_conf}
+                           "${CMAKE_${_target}_LINKER_FLAGS${_conf}}"
+      )
     endforeach()
   endforeach()
 endmacro()
@@ -74,7 +81,10 @@ macro(hpx_add_link_flag_if_available FLAG)
   set(options)
   set(one_value_args NAME)
   set(multi_value_args TARGETS)
-  cmake_parse_arguments(HPX_ADD_LINK_FLAG_IA "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+  cmake_parse_arguments(
+    HPX_ADD_LINK_FLAG_IA "${options}" "${one_value_args}" "${multi_value_args}"
+    ${ARGN}
+  )
 
   if(HPX_ADD_LINK_FLAG_IA_NAME)
     string(TOUPPER ${HPX_ADD_LINK_FLAG_IA_NAME} _name)

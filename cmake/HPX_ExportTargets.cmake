@@ -8,7 +8,10 @@ function(hpx_export_targets)
   foreach(target ${ARGN})
     list(FIND HPX_EXPORT_TARGETS ${target} _found)
     if(_found EQUAL -1)
-      set(HPX_EXPORT_TARGETS ${HPX_EXPORT_TARGETS} ${target} CACHE INTERNAL "" FORCE)
+      set(HPX_EXPORT_TARGETS
+          ${HPX_EXPORT_TARGETS} ${target}
+          CACHE INTERNAL "" FORCE
+      )
     endif()
   endforeach()
 endfunction(hpx_export_targets)
@@ -17,7 +20,10 @@ function(hpx_export_internal_targets)
   foreach(target ${ARGN})
     list(FIND HPX_EXPORT_INTERNAL_TARGETS ${target} _found)
     if(_found EQUAL -1)
-      set(HPX_EXPORT_INTERNAL_TARGETS ${HPX_EXPORT_INTERNAL_TARGETS} ${target} CACHE INTERNAL "" FORCE)
+      set(HPX_EXPORT_INTERNAL_TARGETS
+          ${HPX_EXPORT_INTERNAL_TARGETS} ${target}
+          CACHE INTERNAL "" FORCE
+      )
     endif()
   endforeach()
 endfunction(hpx_export_internal_targets)

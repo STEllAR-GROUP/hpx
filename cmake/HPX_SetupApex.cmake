@@ -25,26 +25,26 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
 
     # If APEX_ROOT not specified, local clone into hpx source dir
-    if (NOT APEX_ROOT)
+    if(NOT APEX_ROOT)
       # handle APEX library
       include(GitExternal)
-      git_external(apex
-        https://github.com/khuck/xpress-apex.git
-        ${HPX_WITH_APEX_TAG}
-        ${_hpx_apex_no_update}
-        VERBOSE)
-      if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/apex)
+      git_external(
+        apex https://github.com/khuck/xpress-apex.git ${HPX_WITH_APEX_TAG}
+        ${_hpx_apex_no_update} VERBOSE
+      )
+      if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/apex)
         set(APEX_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/apex)
       else()
         hpx_error("APEX could not be found and HPX_WITH_APEX=On")
       endif()
     endif(NOT APEX_ROOT)
 
-    LIST(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")
+    list(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")
     add_subdirectory(${APEX_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
     if(AMPLIFIER_FOUND)
       hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the \
-      Intel Amplifier (WITH_AMPLIFIER=Off) in order to use APEX")
+      Intel Amplifier (WITH_AMPLIFIER=Off) in order to use APEX"
+      )
     endif()
   endif()
 
@@ -58,7 +58,8 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     target_link_options(APEX::apex INTERFACE "-Wl,-no-as-needed")
   endif()
 
-  # handle optional ITTNotify library (private dependency, skip when called in find_package(HPX))
+  # handle optional ITTNotify library (private dependency, skip when called in
+  # find_package(HPX))
   if(HPX_WITH_ITTNOTIFY AND NOT HPX_FIND_PACKAGE)
     add_subdirectory(${APEX_ROOT}/src/ITTNotify)
     if(NOT ITTNOTIFY_FOUND)
@@ -66,7 +67,9 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     endif()
 
     add_library(ITTNotify::ittnotify INTERFACE IMPORTED)
-    target_include_directories(ITTNotify::ittnotify SYSTEM INTERFACE ${ITTNOTIFY_SOURCE_DIR})
+    target_include_directories(
+      ITTNotify::ittnotify SYSTEM INTERFACE ${ITTNOTIFY_SOURCE_DIR}
+    )
     target_link_libraries(APEX::apex INTERFACE ITTNotify::ittnotify)
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
   endif()

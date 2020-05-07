@@ -10,7 +10,7 @@ set(exclude_from_all_headers)
 # These files are either known to expose incomplete types or are known to
 # require special handling to avoid circular #include dependencies.
 set(exclude_from_headers
-  "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
+    "${PROJECT_SOURCE_DIR}/hpx/lcos/local/futures_factory.hpp"
 )
 
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
@@ -24,4 +24,4 @@ add_hpx_header_tests(
   EXCLUDE ${exclude_from_headers}
   EXCLUDE_FROM_ALL ${exclude_from_all_headers}
   DEPENDENCIES ${test_deps}
-  )
+)

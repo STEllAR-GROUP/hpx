@@ -9,28 +9,32 @@ include(HPX_AddLibrary)
 if(HPX_WITH_COMPRESSION_SNAPPY)
   find_package(Snappy)
   if(NOT SNAPPY_FOUND)
-    hpx_error("Snappy could not be found and HPX_WITH_COMPRESSION_SNAPPY=ON, please specify SNAPPY_ROOT to point to the correct location or set HPX_WITH_COMPRESSION_SNAPPY to OFF")
+    hpx_error(
+      "Snappy could not be found and HPX_WITH_COMPRESSION_SNAPPY=ON, please specify SNAPPY_ROOT to point to the correct location or set HPX_WITH_COMPRESSION_SNAPPY to OFF"
+    )
   endif()
 
   set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
   set(HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
   hpx_debug("add_snappy_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
-  add_hpx_library(compression_snappy
-    INTERNAL_FLAGS
-    PLUGIN
-    SOURCES
-      "${SOURCE_ROOT}/snappy_serialization_filter.cpp"
+  add_hpx_library(
+    compression_snappy INTERNAL_FLAGS PLUGIN
+    SOURCES "${SOURCE_ROOT}/snappy_serialization_filter.cpp"
     HEADERS
       "${HEADER_ROOT}/hpx/include/compression_snappy.hpp"
       "${HEADER_ROOT}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp"
       "${HEADER_ROOT}/hpx/plugins/binary_filter/snappy_serialization_filter_registration.hpp"
     FOLDER "Core/Plugins/Compression"
-    DEPENDENCIES ${SNAPPY_LIBRARY})
+    DEPENDENCIES ${SNAPPY_LIBRARY}
+  )
 
-  target_include_directories(compression_snappy SYSTEM PRIVATE ${SNAPPY_INCLUDE_DIR})
-  target_include_directories(compression_snappy PUBLIC
-    $<BUILD_INTERFACE:${HEADER_ROOT}>)
+  target_include_directories(
+    compression_snappy SYSTEM PRIVATE ${SNAPPY_INCLUDE_DIR}
+  )
+  target_include_directories(
+    compression_snappy PUBLIC $<BUILD_INTERFACE:${HEADER_ROOT}>
+  )
 
   # FIXME: target_link_directories only exists for CMake >= 3.13
   if(MSVC)
@@ -42,4 +46,3 @@ if(HPX_WITH_COMPRESSION_SNAPPY)
   add_hpx_pseudo_dependencies(plugins.binary_filter.snappy compression_snappy)
   add_hpx_pseudo_dependencies(core plugins.binary_filter.snappy)
 endif()
-

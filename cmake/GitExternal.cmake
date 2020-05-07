@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
+#
 # configures an external git repository
 # Usage:
 #  * Automatically reads, parses and updates a .gitexternals file if it only
@@ -43,7 +43,7 @@ endfunction(GIT_EXTERNAL_MESSAGE)
 
 function(GIT_EXTERNAL DIR REPO TAG)
   cmake_parse_arguments(GIT_EXTERNAL "NO_UPDATE;VERBOSE" "" "RESET" ${ARGN})
-  get_filename_component(DIR  "${DIR}" ABSOLUTE)
+  get_filename_component(DIR "${DIR}" ABSOLUTE)
   get_filename_component(NAME "${DIR}" NAME)
   get_filename_component(GIT_EXTERNAL_DIR "${DIR}/.." ABSOLUTE)
 
@@ -51,77 +51,97 @@ function(GIT_EXTERNAL DIR REPO TAG)
     message(STATUS "git clone ${REPO} ${DIR}")
     execute_process(
       COMMAND "${GIT_EXECUTABLE}" clone "${REPO}" "${DIR}"
-      RESULT_VARIABLE nok ERROR_VARIABLE error
-      WORKING_DIRECTORY "${GIT_EXTERNAL_DIR}")
+      RESULT_VARIABLE nok
+      ERROR_VARIABLE error
+      WORKING_DIRECTORY "${GIT_EXTERNAL_DIR}"
+    )
     if(nok)
       message(FATAL_ERROR "${DIR} git clone failed: ${error}\n")
     endif()
 
     # checkout requested tag
-    GIT_EXTERNAL_MESSAGE("git checkout -q ${TAG}")
+    git_external_message("git checkout -q ${TAG}")
     execute_process(
       COMMAND "${GIT_EXECUTABLE}" checkout -q "${TAG}"
-      RESULT_VARIABLE nok ERROR_VARIABLE error
+      RESULT_VARIABLE nok
+      ERROR_VARIABLE error
       WORKING_DIRECTORY "${DIR}"
-      )
+    )
     if(nok)
       message(STATUS "${DIR} git checkout ${TAG} failed: ${error}\n")
     endif()
   elseif(IS_DIRECTORY "${DIR}/.git")
-    if (${GIT_EXTERNAL_NO_UPDATE})
-      GIT_EXTERNAL_MESSAGE("Update branch disabled by user")
+    if(${GIT_EXTERNAL_NO_UPDATE})
+      git_external_message("Update branch disabled by user")
     else()
       # reset generated files
       foreach(GIT_EXTERNAL_RESET_FILE ${GIT_EXTERNAL_RESET})
-        GIT_EXTERNAL_MESSAGE("git reset -q ${GIT_EXTERNAL_RESET_FILE}")
+        git_external_message("git reset -q ${GIT_EXTERNAL_RESET_FILE}")
         execute_process(
           COMMAND "${GIT_EXECUTABLE}" reset -q "${GIT_EXTERNAL_RESET_FILE}"
-          RESULT_VARIABLE nok ERROR_VARIABLE error
-          WORKING_DIRECTORY "${DIR}")
-        GIT_EXTERNAL_MESSAGE("git checkout -q -- ${GIT_EXTERNAL_RESET_FILE}")
+          RESULT_VARIABLE nok
+          ERROR_VARIABLE error
+          WORKING_DIRECTORY "${DIR}"
+        )
+        git_external_message("git checkout -q -- ${GIT_EXTERNAL_RESET_FILE}")
         execute_process(
-          COMMAND "${GIT_EXECUTABLE}" checkout -q -- "${GIT_EXTERNAL_RESET_FILE}"
-          RESULT_VARIABLE nok ERROR_VARIABLE error
-          WORKING_DIRECTORY "${DIR}")
+          COMMAND "${GIT_EXECUTABLE}" checkout -q --
+                  "${GIT_EXTERNAL_RESET_FILE}"
+          RESULT_VARIABLE nok
+          ERROR_VARIABLE error
+          WORKING_DIRECTORY "${DIR}"
+        )
       endforeach()
 
       # fetch latest update
-      GIT_EXTERNAL_MESSAGE("git fetch --all -q")
-      execute_process(COMMAND "${GIT_EXECUTABLE}" fetch --all -q
-        RESULT_VARIABLE nok ERROR_VARIABLE error
-        WORKING_DIRECTORY "${DIR}")
+      git_external_message("git fetch --all -q")
+      execute_process(
+        COMMAND "${GIT_EXECUTABLE}" fetch --all -q
+        RESULT_VARIABLE nok
+        ERROR_VARIABLE error
+        WORKING_DIRECTORY "${DIR}"
+      )
       if(nok)
         message(STATUS "Update of ${DIR} failed:\n   ${error}")
       endif()
 
       # checkout requested tag
-      GIT_EXTERNAL_MESSAGE("git checkout -q ${TAG}")
+      git_external_message("git checkout -q ${TAG}")
       execute_process(
         COMMAND "${GIT_EXECUTABLE}" checkout -q "${TAG}"
-        RESULT_VARIABLE nok ERROR_VARIABLE error
+        RESULT_VARIABLE nok
+        ERROR_VARIABLE error
         WORKING_DIRECTORY "${DIR}"
-        )
+      )
       if(nok)
         message(STATUS "${DIR} git checkout ${TAG} failed: ${error}\n")
       endif()
 
       # check if this is a branch
-      GIT_EXTERNAL_MESSAGE("git symbolic-ref -q HEAD")
-      execute_process(COMMAND "${GIT_EXECUTABLE}" symbolic-ref -q HEAD
-        RESULT_VARIABLE nok ERROR_VARIABLE error
-        WORKING_DIRECTORY "${DIR}")
+      git_external_message("git symbolic-ref -q HEAD")
+      execute_process(
+        COMMAND "${GIT_EXECUTABLE}" symbolic-ref -q HEAD
+        RESULT_VARIABLE nok
+        ERROR_VARIABLE error
+        WORKING_DIRECTORY "${DIR}"
+      )
       if(nok)
         message(STATUS "${TAG} is not a branch")
       else()
         # update tag
-        GIT_EXTERNAL_MESSAGE("git rebase FETCH_HEAD")
-        execute_process(COMMAND ${GIT_EXECUTABLE} rebase FETCH_HEAD
-          RESULT_VARIABLE RESULT OUTPUT_VARIABLE OUTPUT ERROR_VARIABLE OUTPUT
-          WORKING_DIRECTORY "${DIR}")
+        git_external_message("git rebase FETCH_HEAD")
+        execute_process(
+          COMMAND ${GIT_EXECUTABLE} rebase FETCH_HEAD
+          RESULT_VARIABLE RESULT
+          OUTPUT_VARIABLE OUTPUT
+          ERROR_VARIABLE OUTPUT
+          WORKING_DIRECTORY "${DIR}"
+        )
         if(RESULT)
           message(STATUS "git rebase failed, aborting ${DIR} merge")
-          execute_process(COMMAND ${GIT_EXECUTABLE} rebase --abort
-            WORKING_DIRECTORY "${DIR}")
+          execute_process(
+            COMMAND ${GIT_EXECUTABLE} rebase --abort WORKING_DIRECTORY "${DIR}"
+          )
         endif()
       endif()
     endif()
@@ -170,24 +190,32 @@ if(EXISTS ${GIT_EXTERNALS})
 
           # Create a unique, flat name
           file(RELATIVE_PATH GIT_EXTERNALS_BASE ${CMAKE_CURRENT_SOURCE_DIR}
-            ${GIT_EXTERNALS})
+               ${GIT_EXTERNALS}
+          )
           string(REPLACE "/" "_" GIT_EXTERNAL_TARGET ${GIT_EXTERNALS_BASE})
 
           set(GIT_EXTERNAL_TARGET update_git_external_${GIT_EXTERNAL_TARGET})
           if(NOT TARGET ${GIT_EXTERNAL_TARGET})
             set(GIT_EXTERNAL_SCRIPT
-              "${CMAKE_CURRENT_BINARY_DIR}/${GIT_EXTERNAL_TARGET}.cmake")
+                "${CMAKE_CURRENT_BINARY_DIR}/${GIT_EXTERNAL_TARGET}.cmake"
+            )
             file(WRITE "${GIT_EXTERNAL_SCRIPT}"
-              "file(WRITE ${GIT_EXTERNALS} \"# -*- mode: cmake -*-\n\")\n")
-            add_custom_target(${GIT_EXTERNAL_TARGET}
+                 "file(WRITE ${GIT_EXTERNALS} \"# -*- mode: cmake -*-\n\")\n"
+            )
+            add_custom_target(
+              ${GIT_EXTERNAL_TARGET}
               COMMAND ${CMAKE_COMMAND} -P ${GIT_EXTERNAL_SCRIPT}
               COMMENT "Recreate ${GIT_EXTERNALS_BASE}"
-              WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+              WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            )
           endif()
 
           set(GIT_EXTERNAL_SCRIPT
-            "${CMAKE_CURRENT_BINARY_DIR}/gitupdate${GIT_EXTERNAL_NAME}.cmake")
-          file(WRITE "${GIT_EXTERNAL_SCRIPT}" "
+              "${CMAKE_CURRENT_BINARY_DIR}/gitupdate${GIT_EXTERNAL_NAME}.cmake"
+          )
+          file(
+            WRITE "${GIT_EXTERNAL_SCRIPT}"
+            "
 execute_process(COMMAND ${GIT_EXECUTABLE} fetch --all -q
   WORKING_DIRECTORY ${DIR})
 execute_process(
@@ -197,32 +225,45 @@ if(newref)
   file(APPEND ${GIT_EXTERNALS} \"# ${DIR} ${REPO} \${newref}\")
 else()
   file(APPEND ${GIT_EXTERNALS} \"# ${DIR} ${REPO} ${TAG}\n\")
-endif()")
-          add_custom_target(update_git_external_${GIT_EXTERNAL_NAME}
+endif()"
+          )
+          add_custom_target(
+            update_git_external_${GIT_EXTERNAL_NAME}
             COMMAND ${CMAKE_COMMAND} -P ${GIT_EXTERNAL_SCRIPT}
             COMMENT "Update ${REPO} in ${GIT_EXTERNALS_BASE}"
             DEPENDS ${GIT_EXTERNAL_TARGET}
-            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-          add_dependencies(update_git_external
-            update_git_external_${GIT_EXTERNAL_NAME})
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+          )
+          add_dependencies(
+            update_git_external update_git_external_${GIT_EXTERNAL_NAME}
+          )
 
+          # cmake-format: off
           # Flattens a git external repository into its parent repo:
           # * Clean any changes from external
           # * Unlink external from git: Remove external/.git and .gitexternals
           # * Add external directory to parent
           # * Commit with flattened repo and tag info
           # - Depend on release branch checked out
-          add_custom_target(flatten_git_external_${GIT_EXTERNAL_NAME}
+          # cmake-format: on
+          add_custom_target(
+            flatten_git_external_${GIT_EXTERNAL_NAME}
             COMMAND ${GIT_EXECUTABLE} clean -dfx
             COMMAND ${CMAKE_COMMAND} -E remove_directory .git
-            COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_CURRENT_SOURCE_DIR}/.gitexternals
+            COMMAND ${CMAKE_COMMAND} -E remove -f
+                    ${CMAKE_CURRENT_SOURCE_DIR}/.gitexternals
             COMMAND ${GIT_EXECUTABLE} add -f .
-            COMMAND ${GIT_EXECUTABLE} commit -m "Flatten ${REPO} into ${DIR} at ${TAG}" . ${CMAKE_CURRENT_SOURCE_DIR}/.gitexternals
+            COMMAND
+              ${GIT_EXECUTABLE} commit -m
+              "Flatten ${REPO} into ${DIR} at ${TAG}" .
+              ${CMAKE_CURRENT_SOURCE_DIR}/.gitexternals
             COMMENT "Flatten ${REPO} into ${DIR}"
             DEPENDS make-branch
-            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${DIR}")
-          add_dependencies(flatten_git_external
-            flatten_git_external_${GIT_EXTERNAL_NAME})
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${DIR}"
+          )
+          add_dependencies(
+            flatten_git_external flatten_git_external_${GIT_EXTERNAL_NAME}
+          )
         endif()
       endif()
     endif()

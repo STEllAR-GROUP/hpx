@@ -8,14 +8,18 @@ if(HPX_WITH_COMPRESSION_ZLIB)
 
   if(MSVC)
     set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams zlib)
-    set(ZLIB_FOUND ON CACHE INTERNAL "ZLIB_FOUND")
+    set(ZLIB_FOUND
+        ON
+        CACHE INTERNAL "ZLIB_FOUND"
+    )
 
   else()
     find_package(ZLIB)
     if(NOT ZLIB_FOUND)
       hpx_error("zlib could not be found and HPX_WITH_COMPRESSION_ZLIB=ON, \
         please point cmake to the correct location or set \
-        HPX_WITH_COMPRESSION_BZIP2 to OFF")
+        HPX_WITH_COMPRESSION_BZIP2 to OFF"
+      )
     endif()
 
   endif()
@@ -25,23 +29,25 @@ if(HPX_WITH_COMPRESSION_ZLIB)
   set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
   include(HPX_AddLibrary)
-  add_hpx_library(compression_zlib
-    INTERNAL_FLAGS
-    PLUGIN
-    SOURCES
-      "${SOURCE_ROOT}/zlib_serialization_filter.cpp"
+  add_hpx_library(
+    compression_zlib INTERNAL_FLAGS PLUGIN
+    SOURCES "${SOURCE_ROOT}/zlib_serialization_filter.cpp"
     HEADERS
       "${HEADER_ROOT}/hpx/include/compression_zlib.hpp"
       "${HEADER_ROOT}/hpx/plugins/binary_filter/zlib_serialization_filter.hpp"
       "${HEADER_ROOT}/hpx/plugins/binary_filter/zlib_serialization_filter_registration.hpp"
     FOLDER "Core/Plugins/Compression"
-    DEPENDENCIES ${ZLIB_LIBRARIES})
+    DEPENDENCIES ${ZLIB_LIBRARIES}
+  )
 
   if(NOT MSVC)
-    target_include_directories(compression_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS})
+    target_include_directories(
+      compression_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS}
+    )
   endif()
-  target_include_directories(compression_zlib PUBLIC
-    $<BUILD_INTERFACE:${HEADER_ROOT}>)
+  target_include_directories(
+    compression_zlib PUBLIC $<BUILD_INTERFACE:${HEADER_ROOT}>
+  )
 
   target_link_libraries(compression_zlib PUBLIC Boost::iostreams)
 

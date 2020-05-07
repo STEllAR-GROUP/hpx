@@ -11,9 +11,7 @@ endif()
 
 add_subdirectory(central_tuplespace)
 
-set(example_programs
-    simple_central_tuplespace
-   )
+set(example_programs simple_central_tuplespace)
 
 set(simple_central_tuplespace_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -24,16 +22,18 @@ foreach(example_program ${example_programs})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${example_program}_client
-    INTERNAL_FLAGS
+  add_hpx_executable(
+    ${example_program}_client INTERNAL_FLAGS
     SOURCES ${sources}
     COMPONENT_DEPENDENCIES ${example_program} iostreams
-    FOLDER "Examples/TupleSpace/${example_program}")
+    FOLDER "Examples/TupleSpace/${example_program}"
+  )
 
   add_hpx_example_target_dependencies("tuplespace" ${example_program}_client)
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_example_test("tuplespace" ${example_program}_client
-      ${${example_program}_PARAMETERS})
+    add_hpx_example_test(
+      "tuplespace" ${example_program}_client ${${example_program}_PARAMETERS}
+    )
   endif()
 endforeach()

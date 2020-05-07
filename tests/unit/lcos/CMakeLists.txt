@@ -15,16 +15,18 @@ set(tests
     make_ready_future
     shared_future
     use_allocator
-   )
+)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests}
+  set(tests
+      ${tests}
       client_then
       future_wait
       packaged_action
       promise
       promise_allocator
-      promise_emplace)
+      promise_emplace
+  )
 endif()
 
 if(HPX_WITH_AWAIT OR HPX_WITH_CXX20_COROUTINES)
@@ -42,21 +44,20 @@ set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
 set(promise_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   set(folder_name "Tests/Unit/LCOs")
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER ${folder_name})
+    FOLDER ${folder_name}
+  )
 
   add_hpx_unit_test("lcos" ${test} ${${test}_PARAMETERS})
 

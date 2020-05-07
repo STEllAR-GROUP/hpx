@@ -7,46 +7,41 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(iterator_support_headers
-  hpx/iterator_support/traits/is_iterator.hpp
-  hpx/iterator_support/traits/is_range.hpp
-  hpx/iterator_support/counting_iterator.hpp
-  hpx/iterator_support/iterator_adaptor.hpp
-  hpx/iterator_support/iterator_facade.hpp
-  hpx/iterator_support/iterator_range.hpp
-  hpx/iterator_support/range.hpp
-  hpx/iterator_support/transform_iterator.hpp
-  hpx/iterator_support/zip_iterator.hpp
+    hpx/iterator_support/traits/is_iterator.hpp
+    hpx/iterator_support/traits/is_range.hpp
+    hpx/iterator_support/counting_iterator.hpp
+    hpx/iterator_support/iterator_adaptor.hpp
+    hpx/iterator_support/iterator_facade.hpp
+    hpx/iterator_support/iterator_range.hpp
+    hpx/iterator_support/range.hpp
+    hpx/iterator_support/transform_iterator.hpp
+    hpx/iterator_support/zip_iterator.hpp
 )
 
 set(iterator_support_compat_headers
-  hpx/traits/is_iterator.hpp
-  hpx/traits/is_range.hpp
-  hpx/util/iterator_adaptor.hpp
-  hpx/util/iterator_facade.hpp
-  hpx/util/iterator_range.hpp
-  hpx/util/range.hpp
-  hpx/util/transform_iterator.hpp
+    hpx/traits/is_iterator.hpp
+    hpx/traits/is_range.hpp
+    hpx/util/iterator_adaptor.hpp
+    hpx/util/iterator_facade.hpp
+    hpx/util/iterator_range.hpp
+    hpx/util/range.hpp
+    hpx/util/transform_iterator.hpp
 )
 
 set(iterator_support_sources)
 
 include(HPX_AddModule)
-add_hpx_module(iterator_support
+add_hpx_module(
+  iterator_support
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/iterator_support/traits/is_iterator.hpp"
-    "hpx/iterator_support/traits/is_range.hpp"
+  EXCLUDE_FROM_GLOBAL_HEADER "hpx/iterator_support/traits/is_iterator.hpp"
+                             "hpx/iterator_support/traits/is_range.hpp"
   SOURCES ${iterator_support_sources}
   HEADERS ${iterator_support_headers}
   COMPAT_HEADERS ${iterator_support_compat_headers}
-  DEPENDENCIES
-    hpx_config
-    hpx_datastructures
-    hpx_functional
-    hpx_serialization
-    hpx_type_support
+  DEPENDENCIES hpx_config hpx_datastructures hpx_functional hpx_serialization
+               hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

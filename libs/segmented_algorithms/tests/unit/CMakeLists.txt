@@ -41,16 +41,17 @@ set(tests
     partitioned_vector_transform_scan
     partitioned_vector_transform_scan2
     partitioned_vector_reduce
-   )
+)
 
 # add dependencies to partitioned_vector_target when Cuda is enabled
 if(HPX_WITH_CUDA)
-  set(partitioned_vector_target_LIBRARIES ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES})
+  set(partitioned_vector_target_LIBRARIES ${CUDA_LIBRARIES}
+                                          ${CUDA_CUBLAS_LIBRARIES}
+  )
 endif()
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   set(${test}_FLAGS DEPENDENCIES partitioned_vector_component)
   set(${test}_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
@@ -60,19 +61,21 @@ foreach(test ${tests})
   set(folder_name "Tests/Unit/Modules/SegmentedAlgorithms")
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER ${folder_name})
+    FOLDER ${folder_name}
+  )
 
   if(HPX_WITH_CUDA)
     target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
     target_link_libraries(${test}_test PRIVATE ${${${test}}_LIBRARIES})
   endif()
 
-  add_hpx_unit_test("modules.segmented_algorithms" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.segmented_algorithms" ${test} ${${test}_PARAMETERS}
+  )
 
 endforeach()

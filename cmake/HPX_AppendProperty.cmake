@@ -12,4 +12,3 @@ function(hpx_append_property target property)
     set_property(TARGET ${target} PROPERTY ${property} "${ARGN}")
   endif()
 endfunction()
-

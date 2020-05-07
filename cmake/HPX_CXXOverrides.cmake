@@ -6,4 +6,3 @@
 
 # allow the use of assembly files
 set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS C;M;c++;cc;cpp;cxx;m;mm;S)
-

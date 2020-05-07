@@ -1,4 +1,3 @@
-
 # Copyright (c)      2014 Thomas Heller
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
@@ -11,19 +10,22 @@
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_VALGRIND QUIET valgrind)
 
-find_path(VALGRIND_INCLUDE_DIR valgrind/valgrind.h
-  HINTS
-    ${VALGRIND_ROOT} ENV VALGRIND_ROOT
-    ${PC_VALGRIND_INCLUDEDIR}
-    ${PC_VALGRIND_INCLUDE_DIRS}
-  PATH_SUFFIXES include)
+find_path(
+  VALGRIND_INCLUDE_DIR valgrind/valgrind.h
+  HINTS ${VALGRIND_ROOT} ENV VALGRIND_ROOT ${PC_VALGRIND_INCLUDEDIR}
+        ${PC_VALGRIND_INCLUDE_DIRS}
+  PATH_SUFFIXES include
+)
 
 set(VALGRIND_INCLUDE_DIRS ${VALGRIND_INCLUDE_DIR})
 
-find_package_handle_standard_args(Valgrind DEFAULT_MSG
-  VALGRIND_INCLUDE_DIR)
+find_package_handle_standard_args(Valgrind DEFAULT_MSG VALGRIND_INCLUDE_DIR)
 
-get_property(_type CACHE VALGRIND_ROOT PROPERTY TYPE)
+get_property(
+  _type
+  CACHE VALGRIND_ROOT
+  PROPERTY TYPE
+)
 if(_type)
   set_property(CACHE VALGRIND_ROOT PROPERTY ADVANCED 1)
   if("x${_type}" STREQUAL "xUNINITIALIZED")

@@ -4,25 +4,22 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-  buffer_overrun_2839
-)
+set(tests buffer_overrun_2839)
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   set(folder_name "Tests/Regressions/Modules/Serialization")
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER ${folder_name})
+    FOLDER ${folder_name}
+  )
 
   add_hpx_regression_test("modules.serialization" ${test} ${${test}_PARAMETERS})
 
@@ -34,9 +31,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests)
 
   if(HPX_WITH_CXX17_STD_VARIANT)
-    set(compile_tests ${compile_tests}
-        std_variant_4448
-    )
+    set(compile_tests ${compile_tests} std_variant_4448)
   endif()
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
@@ -49,17 +44,15 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   endif()
 
   foreach(compile_test ${compile_tests})
-    set(sources
-        ${compile_test}.cpp)
+    set(sources ${compile_test}.cpp)
 
     source_group("Source Files" FILES ${sources})
 
     add_hpx_regression_compile_test(
-      "modules.serialization"
-      ${compile_test}
-      SOURCES ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER "Tests/Regressions/Modules/Serialization/CompileOnly")
+      "modules.serialization" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Regressions/Modules/Serialization/CompileOnly"
+    )
 
   endforeach()
 

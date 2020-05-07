@@ -7,16 +7,15 @@
 
 include(HPX_AddLibrary)
 
-################################################################################
+# ##############################################################################
 # Decide whether to use the MPI based parcelport
-################################################################################
+# ##############################################################################
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
   hpx_debug("add_parcelport_mpi_module")
   include(HPX_AddParcelport)
-  add_parcelport(mpi
-    STATIC
-    SOURCES
-      "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
+  add_parcelport(
+    mpi STATIC
+    SOURCES "${PROJECT_SOURCE_DIR}/plugins/parcelport/mpi/parcelport_mpi.cpp"
     HEADERS
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/header.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/locality.hpp"
@@ -50,8 +49,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
       hpx_util
       hpx_dependencies_boost
       Mpi::mpi
-    INCLUDE_DIRS
-      ${PROJECT_SOURCE_DIR}
-    FOLDER
-      "Core/Plugins/Parcelport/MPI")
+    INCLUDE_DIRS ${PROJECT_SOURCE_DIR}
+    FOLDER "Core/Plugins/Parcelport/MPI"
+  )
 endif()

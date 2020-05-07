@@ -16,35 +16,25 @@ if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_MPI_WITH_FUTURES)
 endif()
 
 # Default location is $HPX_ROOT/libs/mpi_base/include
-set(mpi_base_headers
-  hpx/mpi_base/mpi.hpp
-  hpx/mpi_base/mpi_environment.hpp
-)
+set(mpi_base_headers hpx/mpi_base/mpi.hpp hpx/mpi_base/mpi_environment.hpp)
 
 # Default location is $HPX_ROOT/libs/mpi_base/include_compatibility
-set(mpi_base_compat_headers
-  hpx/plugins/parcelport/mpi/mpi.hpp
-  hpx/plugins/parcelport/mpi/mpi_environment.hpp
+set(mpi_base_compat_headers hpx/plugins/parcelport/mpi/mpi.hpp
+                            hpx/plugins/parcelport/mpi/mpi_environment.hpp
 )
 
-set(mpi_base_sources
-  mpi_environment.cpp
-)
+set(mpi_base_sources mpi_environment.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(mpi_base
+add_hpx_module(
+  mpi_base
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_base_sources}
   HEADERS ${mpi_base_headers}
   COMPAT_HEADERS ${mpi_base_compat_headers}
-  DEPENDENCIES
-    hpx_config
-    hpx_runtime_configuration
-    hpx_synchronization
-    hpx_util
-    ${additional_dependencies}
+  DEPENDENCIES hpx_config hpx_runtime_configuration hpx_synchronization hpx_util
+               ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

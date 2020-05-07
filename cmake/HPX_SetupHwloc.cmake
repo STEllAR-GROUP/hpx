@@ -15,5 +15,7 @@
 
 find_package(Hwloc)
 if(NOT HWLOC_FOUND)
-  hpx_error("Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location")
+  hpx_error(
+    "Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location"
+  )
 endif()

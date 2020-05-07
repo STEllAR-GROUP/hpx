@@ -31,7 +31,7 @@ set(tests
     sliding_semaphore_2338
     wait_for_1751
     wait_for_action_2796
-   )
+)
 
 set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
 set(after_588_PARAMETERS LOCALITIES 2)
@@ -47,19 +47,18 @@ set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 
 # Create test cases
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/LCOs")
+    FOLDER "Tests/Regressions/LCOs"
+  )
 
   target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})
   add_hpx_regression_test("lcos" ${test} ${${test}_PARAMETERS})
@@ -68,23 +67,25 @@ endforeach()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   add_hpx_regression_test(
-    "lcos" after_588_4
-    EXECUTABLE after_588
-    PSEUDO_DEPS_NAME after_588
-    LOCALITIES 2
-    THREADS_PER_LOCALITY 4)
+    "lcos"
+    after_588_4
+    EXECUTABLE
+    after_588
+    PSEUDO_DEPS_NAME
+    after_588
+    LOCALITIES
+    2
+    THREADS_PER_LOCALITY
+    4
+  )
 endif()
 
 # compile only tests
 if(HPX_WITH_COMPILE_ONLY_TESTS)
-  set(compile_tests
-      future_range_ambiguity_2032
-     )
+  set(compile_tests future_range_ambiguity_2032)
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
-    set(fail_compile_tests
-        fail_future_2667
-       )
+    set(fail_compile_tests fail_future_2667)
     foreach(fail_compile_test ${fail_compile_tests})
       set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
     endforeach()
@@ -93,17 +94,15 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   endif()
 
   foreach(compile_test ${compile_tests})
-    set(sources
-        ${compile_test}.cpp)
+    set(sources ${compile_test}.cpp)
 
     source_group("Source Files" FILES ${sources})
 
     add_hpx_regression_compile_test(
-      "lcos"
-      ${compile_test}
-      SOURCES ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER "Tests/Regressions/LCOs/CompileOnly")
+      "lcos" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Regressions/LCOs/CompileOnly"
+    )
 
   endforeach()
 

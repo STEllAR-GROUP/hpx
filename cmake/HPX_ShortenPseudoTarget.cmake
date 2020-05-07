@@ -17,10 +17,17 @@ function(shorten_hpx_pseudo_target target shortened_target)
       list(GET elements -1 arg)
       set(args ${args} ${arg})
     endforeach()
-    set(${shortened_target} ${args} PARENT_SCOPE)
-    hpx_debug("shorten_hpx_pseudo_target" "shortened pseudo target: ${${shortened_target}}")
+    set(${shortened_target}
+        ${args}
+        PARENT_SCOPE
+    )
+    hpx_debug("shorten_hpx_pseudo_target"
+              "shortened pseudo target: ${${shortened_target}}"
+    )
   else()
-    set(${shortened_target} ${target} PARENT_SCOPE)
+    set(${shortened_target}
+        ${target}
+        PARENT_SCOPE
+    )
   endif()
 endfunction()
-

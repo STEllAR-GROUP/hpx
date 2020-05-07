@@ -13,12 +13,13 @@ project(HPXFetchContent LANGUAGES CXX)
 
 include(FetchContent)
 
-FetchContent_Declare(hpx
+fetchcontent_declare(
+  hpx
   GIT_REPOSITORY ${HPX_REPOSITORY}
   GIT_TAG ${HPX_TAG}
-  )
-FetchContent_GetProperties(hpx)
+)
+fetchcontent_getproperties(hpx)
 if(NOT hpx_POPULATED)
-  FetchContent_Populate(hpx)
+  fetchcontent_populate(hpx)
   add_subdirectory(${hpx_SOURCE_DIR} ${hpx_BINARY_DIR})
 endif()

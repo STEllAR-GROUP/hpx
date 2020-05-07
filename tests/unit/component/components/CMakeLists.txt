@@ -5,9 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_component(
-  launch_process_test_server
-  INTERNAL_FLAGS
+  launch_process_test_server INTERNAL_FLAGS
   FOLDER "Tests/Unit/Components"
-  EXCLUDE_FROM_ALL
-  AUTOGLOB)
-
+  EXCLUDE_FROM_ALL AUTOGLOB
+)

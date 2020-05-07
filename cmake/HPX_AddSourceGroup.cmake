@@ -10,14 +10,16 @@ function(add_hpx_source_group)
     set(options)
     set(one_value_args NAME CLASS ROOT)
     set(multi_value_args TARGETS)
-    cmake_parse_arguments(GROUP "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+    cmake_parse_arguments(
+      GROUP "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
+    )
 
     set(name "")
     if(GROUP_NAME)
       set(name ${GROUP_NAME})
     endif()
 
-    if (NOT GROUP_ROOT)
+    if(NOT GROUP_ROOT)
       set(GROUP_ROOT ".")
     endif()
     get_filename_component(root "${GROUP_ROOT}" ABSOLUTE)
@@ -33,16 +35,18 @@ function(add_hpx_source_group)
 
       if(GROUP_CLASS)
         if(NOT ("${relpath}" STREQUAL ""))
-          hpx_debug("add_source_group.${name}"
-                    "Adding '${target}' to source group '${GROUP_CLASS}', sub-group '${relpath}'")
+          hpx_debug(
+            "add_source_group.${name}"
+            "Adding '${target}' to source group '${GROUP_CLASS}', sub-group '${relpath}'"
+          )
           source_group("${GROUP_CLASS}\\${relpath}" FILES ${target})
         endif()
       else()
         hpx_debug("add_source_group.${name}"
-                  "Adding ${target} to source group ${relpath}")
+                  "Adding ${target} to source group ${relpath}"
+        )
         source_group("${relpath}" FILES ${target})
       endif()
     endforeach()
   endif()
 endfunction()
-

@@ -6,32 +6,34 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-################################################################################
+# ##############################################################################
 # gather sources
 
 set(hpx_SOURCES
-  custom_exception_info.cpp
-  lcos/detail/future_data.cpp
-  lcos/future.cpp
-  hpx_init.cpp
-  runtime.cpp
-  runtime_handlers.cpp
-  runtime/launch_policy.cpp
-  runtime/thread_pool_helpers.cpp
-  runtime/threads/thread_pool_suspension_helpers.cpp
-  state.cpp
-  util/debugging.cpp
-  util/debug/thread_stacktrace.cpp
-  util/interval_timer.cpp
-  util/pool_timer.cpp
-  util/register_locks_globally.cpp
-  util/serialize_exception.cpp
-  util/thread_aware_timer.cpp
-  util/thread_mapper.cpp
+    custom_exception_info.cpp
+    lcos/detail/future_data.cpp
+    lcos/future.cpp
+    hpx_init.cpp
+    runtime.cpp
+    runtime_handlers.cpp
+    runtime/launch_policy.cpp
+    runtime/thread_pool_helpers.cpp
+    runtime/threads/thread_pool_suspension_helpers.cpp
+    state.cpp
+    util/debugging.cpp
+    util/debug/thread_stacktrace.cpp
+    util/interval_timer.cpp
+    util/pool_timer.cpp
+    util/register_locks_globally.cpp
+    util/serialize_exception.cpp
+    util/thread_aware_timer.cpp
+    util/thread_mapper.cpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  list(APPEND hpx_SOURCES
+  list(
+    APPEND
+    hpx_SOURCES
     lcos/base_lco.cpp
     lcos/base_lco_with_value_1.cpp
     lcos/base_lco_with_value_2.cpp
@@ -104,32 +106,39 @@ endif()
 
 list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
 
-set(hpx_generated_SOURCES
-  ${PROJECT_BINARY_DIR}/libs/modules.cpp
-)
+set(hpx_generated_SOURCES ${PROJECT_BINARY_DIR}/libs/modules.cpp)
 
 set(hpx_external_objects_SOURCES)
 if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
     enable_language(ASM)
     set(switch_to_fiber_source
-      "${PROJECT_SOURCE_DIR}/libs/coroutines/src/switch_to_fiber.asm")
+        "${PROJECT_SOURCE_DIR}/libs/coroutines/src/switch_to_fiber.asm"
+    )
     list(APPEND hpx_external_objects_SOURCES "${switch_to_fiber_source}")
-    add_hpx_library_sources(hpx_external_objects
-      GLOB GLOBS "${switch_to_fiber_source}")
+    add_hpx_library_sources(
+      hpx_external_objects GLOB GLOBS "${switch_to_fiber_source}"
+    )
     add_custom_command(
       OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj"
-      COMMAND "${CMAKE_ASM_MASM_COMPILER}" /Fo "${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj" /nologo /c "${switch_to_fiber_source}"
+      COMMAND
+        "${CMAKE_ASM_MASM_COMPILER}" /Fo
+        "${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj" /nologo /c
+        "${switch_to_fiber_source}"
       DEPENDS "${switch_to_fiber_source}"
-      VERBATIM)
-    set(hpx_external_OBJECTS "${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj"
-      CACHE INTERNAL "External object files for HPX." FORCE)
+      VERBATIM
+    )
+    set(hpx_external_OBJECTS
+        "${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj"
+        CACHE INTERNAL "External object files for HPX." FORCE
+    )
   endif()
 
   # add natvis files to solution (supported starting VS2015)
   if(MSVC14)
-    add_hpx_library_sources(hpx_natvis_files
-      GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis")
+    add_hpx_library_sources(
+      hpx_natvis_files GLOB GLOBS "${PROJECT_SOURCE_DIR}/tools/VS/*.natvis"
+    )
     list(APPEND hpx_external_OBJECTS ${hpx_natvis_files_SOURCES})
     source_group("Natvis Files" FILES ${hpx_natvis_files_SOURCES})
   endif()
@@ -139,78 +148,81 @@ endif()
 set(hpx_external_SOURCES)
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   list(APPEND hpx_external_SOURCES ${hpx_external_objects_SOURCES}
-    "${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c")
+       "${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c"
+  )
 endif()
 
-################################################################################
+# ##############################################################################
 # gather headers
 
 # List all headers (local and distributed)
 set(hpx_HEADERS
-  hpx/custom_exception_info.hpp
-  hpx/hpx_finalize.hpp
-  hpx/hpx_init.hpp
-  hpx/hpx_init_impl.hpp
-  hpx/hpx_init_params.hpp
-  hpx/hpx_start.hpp
-  hpx/hpx_start_impl.hpp
-  hpx/hpx_suspend.hpp
-  hpx/hpx_user_main_config.hpp
-  hpx/lcos/future.hpp
-  hpx/lcos/future_wait.hpp
-  hpx/lcos_fwd.hpp
-  hpx/lcos/local/futures_factory.hpp
-  hpx/lcos/local/packaged_continuation.hpp
-  hpx/runtime/config_entry.hpp
-  hpx/runtime_fwd.hpp
-  hpx/runtime/get_num_localities.hpp
-  hpx/runtime/get_os_thread_count.hpp
-  hpx/runtime/get_thread_name.hpp
-  hpx/runtime/get_worker_thread_num.hpp
-  hpx/runtime_handlers.hpp
-  hpx/runtime.hpp
-  hpx/runtime/launch_policy.hpp
-  hpx/runtime/report_error.hpp
-  hpx/runtime/runtime_fwd.hpp
-  hpx/runtime/serialization/detail/preprocess_container.hpp
-  hpx/runtime/serialization/detail/preprocess_futures.hpp
-  hpx/runtime/serialization/detail/preprocess_gid_types.hpp
-  hpx/runtime/shutdown_function.hpp
-  hpx/runtime/startup_function.hpp
-  hpx/runtime/thread_hooks.hpp
-  hpx/runtime/thread_pool_helpers.hpp
-  hpx/runtime/threads_fwd.hpp
-  hpx/runtime/threads/run_as_hpx_thread.hpp
-  hpx/runtime/threads/run_as_os_thread.hpp
-  hpx/runtime/threads/thread_pool_suspension_helpers.hpp
-  hpx/state.hpp
-  hpx/traits/acquire_future.hpp
-  hpx/traits/acquire_shared_state.hpp
-  hpx/traits/future_access.hpp
-  hpx/traits/future_then_result.hpp
-  hpx/traits/future_traits.hpp
-  hpx/traits/is_future.hpp
-  hpx/traits/is_future_range.hpp
-  hpx/traits/is_future_tuple.hpp
-  hpx/traits/is_launch_policy.hpp
-  hpx/traits/managed_component_policies.hpp
-  hpx/traits/pointer_category.hpp
-  hpx/traits/promise_local_result.hpp
-  hpx/traits/promise_remote_result.hpp
-  hpx/traits/rma_memory_region_traits.hpp
-  hpx/util/debugging.hpp
-  hpx/util/debug/thread_stacktrace.hpp
-  hpx/util_fwd.hpp
-  hpx/util/interval_timer.hpp
-  hpx/util/pool_timer.hpp
-  hpx/util/register_locks_globally.hpp
-  hpx/util/serialize_exception.hpp
-  hpx/util/thread_aware_timer.hpp
-  hpx/util/thread_mapper.hpp
+    hpx/custom_exception_info.hpp
+    hpx/hpx_finalize.hpp
+    hpx/hpx_init.hpp
+    hpx/hpx_init_impl.hpp
+    hpx/hpx_init_params.hpp
+    hpx/hpx_start.hpp
+    hpx/hpx_start_impl.hpp
+    hpx/hpx_suspend.hpp
+    hpx/hpx_user_main_config.hpp
+    hpx/lcos/future.hpp
+    hpx/lcos/future_wait.hpp
+    hpx/lcos_fwd.hpp
+    hpx/lcos/local/futures_factory.hpp
+    hpx/lcos/local/packaged_continuation.hpp
+    hpx/runtime/config_entry.hpp
+    hpx/runtime_fwd.hpp
+    hpx/runtime/get_num_localities.hpp
+    hpx/runtime/get_os_thread_count.hpp
+    hpx/runtime/get_thread_name.hpp
+    hpx/runtime/get_worker_thread_num.hpp
+    hpx/runtime_handlers.hpp
+    hpx/runtime.hpp
+    hpx/runtime/launch_policy.hpp
+    hpx/runtime/report_error.hpp
+    hpx/runtime/runtime_fwd.hpp
+    hpx/runtime/serialization/detail/preprocess_container.hpp
+    hpx/runtime/serialization/detail/preprocess_futures.hpp
+    hpx/runtime/serialization/detail/preprocess_gid_types.hpp
+    hpx/runtime/shutdown_function.hpp
+    hpx/runtime/startup_function.hpp
+    hpx/runtime/thread_hooks.hpp
+    hpx/runtime/thread_pool_helpers.hpp
+    hpx/runtime/threads_fwd.hpp
+    hpx/runtime/threads/run_as_hpx_thread.hpp
+    hpx/runtime/threads/run_as_os_thread.hpp
+    hpx/runtime/threads/thread_pool_suspension_helpers.hpp
+    hpx/state.hpp
+    hpx/traits/acquire_future.hpp
+    hpx/traits/acquire_shared_state.hpp
+    hpx/traits/future_access.hpp
+    hpx/traits/future_then_result.hpp
+    hpx/traits/future_traits.hpp
+    hpx/traits/is_future.hpp
+    hpx/traits/is_future_range.hpp
+    hpx/traits/is_future_tuple.hpp
+    hpx/traits/is_launch_policy.hpp
+    hpx/traits/managed_component_policies.hpp
+    hpx/traits/pointer_category.hpp
+    hpx/traits/promise_local_result.hpp
+    hpx/traits/promise_remote_result.hpp
+    hpx/traits/rma_memory_region_traits.hpp
+    hpx/util/debugging.hpp
+    hpx/util/debug/thread_stacktrace.hpp
+    hpx/util_fwd.hpp
+    hpx/util/interval_timer.hpp
+    hpx/util/pool_timer.hpp
+    hpx/util/register_locks_globally.hpp
+    hpx/util/serialize_exception.hpp
+    hpx/util/thread_aware_timer.hpp
+    hpx/util/thread_mapper.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  list(APPEND hpx_HEADERS
+  list(
+    APPEND
+    hpx_HEADERS
     hpx/components/containers/container_distribution_policy.hpp
     hpx/components_fwd.hpp
     hpx/lcos/base_lco.hpp
@@ -423,38 +435,52 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/query_counters.hpp
     hpx/util/remove_local_destinations.hpp
     hpx/util/storage/tuple.hpp
-    hpx/util/wrapper_heap_base.hpp)
+    hpx/util/wrapper_heap_base.hpp
+  )
 endif()
 
 list(TRANSFORM hpx_HEADERS PREPEND ${PROJECT_SOURCE_DIR}/)
 
 foreach(lib "hpx" "hpx_external" "hpx_generated")
-  set(${lib}_SOURCES ${${lib}_SOURCES} CACHE INTERNAL "Sources for lib${lib}." FORCE)
-  set(${lib}_HEADERS ${${lib}_HEADERS} CACHE INTERNAL "Headers for lib${lib}." FORCE)
+  set(${lib}_SOURCES
+      ${${lib}_SOURCES}
+      CACHE INTERNAL "Sources for lib${lib}." FORCE
+  )
+  set(${lib}_HEADERS
+      ${${lib}_HEADERS}
+      CACHE INTERNAL "Headers for lib${lib}." FORCE
+  )
 endforeach()
 
-################################################################################
+# ##############################################################################
 # make source groups
 add_hpx_source_group(
-  NAME hpx CLASS "Source Files"
+  NAME hpx
+  CLASS "Source Files"
   ROOT "${PROJECT_SOURCE_DIR}/src"
-  TARGETS ${hpx_SOURCES})
+  TARGETS ${hpx_SOURCES}
+)
 
 add_hpx_source_group(
-  NAME hpx_generated CLASS "Source Files"
+  NAME hpx_generated
+  CLASS "Source Files"
   ROOT "${PROJECT_BINARY_DIR}/libs"
-  TARGETS ${hpx_generated_SOURCES})
+  TARGETS ${hpx_generated_SOURCES}
+)
 
 add_hpx_source_group(
-  NAME hpx CLASS "External Source Files"
+  NAME hpx
+  CLASS "External Source Files"
   ROOT "${PROJECT_SOURCE_DIR}"
-  TARGETS ${hpx_external_SOURCES})
+  TARGETS ${hpx_external_SOURCES}
+)
 
 add_hpx_source_group(
   NAME hpx
   CLASS "Header Files"
   ROOT "${PROJECT_SOURCE_DIR}/hpx"
-  TARGETS ${hpx_HEADERS})
+  TARGETS ${hpx_HEADERS}
+)
 
 if(NOT HPX_WITH_STATIC_LINKING)
   if(MSVC)
@@ -466,21 +492,26 @@ if(NOT HPX_WITH_STATIC_LINKING)
   endif()
 endif()
 
-################################################################################
+# ##############################################################################
 # libhpx
-add_library(hpx_core ${hpx_library_link_mode_core}
-  ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_generated_SOURCES}
-  ${hpx_external_OBJECTS} ${hpx_HEADERS})
+add_library(
+  hpx_core ${hpx_library_link_mode_core} ${hpx_SOURCES} ${hpx_external_SOURCES}
+           ${hpx_generated_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS}
+)
 
-target_link_libraries(hpx_core PUBLIC hpx_public_flags PRIVATE hpx_private_flags)
+target_link_libraries(
+  hpx_core
+  PUBLIC hpx_public_flags
+  PRIVATE hpx_private_flags
+)
 target_link_libraries(hpx_core PUBLIC hpx_dependencies_boost)
 
 # Set the basic search paths for the HPX headers
-target_include_directories(hpx_core PUBLIC
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
-  $<INSTALL_INTERFACE:include>
-  )
+target_include_directories(
+  hpx_core
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> $<INSTALL_INTERFACE:include>
+)
 
 # FIXME : temporary add public dependencies to the boost libraries which are
 # only linked in the modules (which are themselves privately linked to hpx), it
@@ -499,43 +530,39 @@ target_link_libraries(hpx_core PUBLIC hpx_dependencies_allocator)
 target_link_libraries(hpx_core PUBLIC Hwloc::hwloc)
 
 # Enable SIMD via VC if it is available
-if (TARGET Vc::vc)
+if(TARGET Vc::vc)
   target_link_libraries(hpx_core PUBLIC Vc::vc)
 endif()
 
-if (TARGET Amplifier::amplifier)
+if(TARGET Amplifier::amplifier)
   target_link_libraries(hpx_core PRIVATE Amplifier::amplifier)
 endif()
 
-if (TARGET APEX::apex)
-  # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER,
-  # we do want to add the APEX link commands to all executables, so
-  # we use the "INTERFACE" option for target_link_libraries.
-  # Because libhpx_apex is a shared object library, we don't need to specify
-  # the whole archive.
+if(TARGET APEX::apex)
+  # APEX won't get explicitly pulled into libhpx.so any more.  HOWEVER, we do
+  # want to add the APEX link commands to all executables, so we use the
+  # "INTERFACE" option for target_link_libraries. Because libhpx_apex is a
+  # shared object library, we don't need to specify the whole archive.
   target_link_libraries(hpx_core INTERFACE APEX::apex)
 endif()
 
-if (TARGET Gperftools::gperftools)
+if(TARGET Gperftools::gperftools)
   target_link_libraries(hpx_core PRIVATE Gperftools::gperftools)
 endif()
 
-if (TARGET Valgrind::valgrind)
+if(TARGET Valgrind::valgrind)
   target_link_libraries(hpx_core PRIVATE Valgrind::valgrind)
 endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-  set_target_properties(hpx_core PROPERTIES
-    CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME hpx
-    FOLDER "Core")
+  set_target_properties(
+    hpx_core PROPERTIES CLEAN_DIRECT_OUTPUT 1 OUTPUT_NAME hpx FOLDER "Core"
+  )
 else()
-  set_target_properties(hpx_core PROPERTIES
-    VERSION ${HPX_VERSION}
-    SOVERSION ${HPX_SOVERSION}
-    CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME hpx
-    FOLDER "Core")
+  set_target_properties(
+    hpx_core PROPERTIES VERSION ${HPX_VERSION} SOVERSION ${HPX_SOVERSION}
+                        CLEAN_DIRECT_OUTPUT 1 OUTPUT_NAME hpx FOLDER "Core"
+  )
 endif()
 
 target_link_libraries(hpx_core PUBLIC hpx_base_libraries)
@@ -555,7 +582,9 @@ foreach(_module ${HPX_LIBS})
     if(APPLE)
       set(_module_target "-Wl,-all_load" "${_module_target}")
     else(APPLE) # not apple, regular linux
-      set(_module_target "-Wl,--whole-archive" "${_module_target}" "-Wl,--no-whole-archive")
+      set(_module_target "-Wl,--whole-archive" "${_module_target}"
+                         "-Wl,--no-whole-archive"
+      )
     endif(APPLE)
   endif(UNIX)
 
@@ -565,28 +594,34 @@ foreach(_module ${HPX_LIBS})
 
   # add module include directories as PUBLIC to core hpx library to enable
   # compilation against indirectly included headers
-  get_target_property(_module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES)
+  get_target_property(
+    _module_includes hpx_${_module} INTERFACE_INCLUDE_DIRECTORIES
+  )
   target_include_directories(hpx_core PUBLIC ${_module_includes})
 
 endforeach()
 
-if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (APPLE)))
+if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+                                      OR (APPLE))
+)
   set_target_properties(hpx_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
 target_compile_definitions(hpx_core PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
-################################################################################
+# ##############################################################################
 # Emulation of SwapContext on Windows
-################################################################################
+# ##############################################################################
 if(MSVC AND HPX_WITH_SWAP_CONTEXT_EMULATION)
   target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
 endif()
 
-################################################################################
+# ##############################################################################
 # Exported targets
-################################################################################
-set(_library_types "STATIC_LIBRARY;MODULE_LIBRARY;SHARED_LIBRARY;OBJECT_LIBRARY;INTERFACE_LIBRARY")
+# ##############################################################################
+set(_library_types
+    "STATIC_LIBRARY;MODULE_LIBRARY;SHARED_LIBRARY;OBJECT_LIBRARY;INTERFACE_LIBRARY"
+)
 set(_is_executable "$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>")
 set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 
@@ -597,39 +632,72 @@ target_link_libraries(hpx_no_wrap_main INTERFACE hpx_core)
 target_link_libraries(hpx INTERFACE hpx_core)
 
 # hpx_interface and hpx_interface_no_wrap_main contain additional interface
-# options to be passed to dependent targets. We create these as separate
-# targets to easily filter out the generator expressions that can't be handled
-# by the pkgconfig file generation.
+# options to be passed to dependent targets. We create these as separate targets
+# to easily filter out the generator expressions that can't be handled by the
+# pkgconfig file generation.
 add_library(hpx_interface_no_wrap_main INTERFACE)
-target_link_libraries(hpx_interface_no_wrap_main INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>)
-target_link_libraries(hpx_interface_no_wrap_main INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>)
-target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>")
-target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">")
-target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>")
-target_compile_definitions(hpx_interface_no_wrap_main INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>")
+target_link_libraries(
+  hpx_interface_no_wrap_main
+  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>
+)
+target_link_libraries(
+  hpx_interface_no_wrap_main
+  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>
+)
+target_compile_definitions(
+  hpx_interface_no_wrap_main
+  INTERFACE
+    "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>"
+)
+target_compile_definitions(
+  hpx_interface_no_wrap_main
+  INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">"
+)
+target_compile_definitions(
+  hpx_interface_no_wrap_main
+  INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>"
+)
+target_compile_definitions(
+  hpx_interface_no_wrap_main INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>"
+)
 
 add_library(hpx_interface INTERFACE)
 target_link_libraries(hpx_interface INTERFACE hpx_interface_no_wrap_main)
-target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_wrap>>)
-target_link_libraries(hpx_interface INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_wrap>>)
+target_link_libraries(
+  hpx_interface
+  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_wrap>>
+)
+target_link_libraries(
+  hpx_interface
+  INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_wrap>>
+)
 
 target_link_libraries(hpx_no_wrap_main INTERFACE hpx_interface_no_wrap_main)
 target_link_libraries(hpx INTERFACE hpx_interface)
 
-# HPX::component is to be linked privately to all HPX components
-# NOTE: The _is_library guard only prevents simple mistakes of linking
-# HPX::component to executables. It does not prevent linking it to libraries
-# that are not components.
+# HPX::component is to be linked privately to all HPX components NOTE: The
+# _is_library guard only prevents simple mistakes of linking HPX::component to
+# executables. It does not prevent linking it to libraries that are not
+# components.
 add_library(component INTERFACE)
-target_compile_definitions(component INTERFACE "$<${_is_library}:HPX_COMPONENT_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>")
-target_compile_definitions(component INTERFACE "$<${_is_library}:HPX_COMPONENT_EXPORTS>")
+target_compile_definitions(
+  component
+  INTERFACE
+    "$<${_is_library}:HPX_COMPONENT_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>"
+)
+target_compile_definitions(
+  component INTERFACE "$<${_is_library}:HPX_COMPONENT_EXPORTS>"
+)
 
-# HPX::plugin is to be linked privately to all HPX plugins
-# NOTE: The _is_library guard only prevents simple mistakes of linking
-# HPX::component to executables. It does not prevent linking it to libraries
-# that are not components.
+# HPX::plugin is to be linked privately to all HPX plugins NOTE: The _is_library
+# guard only prevents simple mistakes of linking HPX::component to executables.
+# It does not prevent linking it to libraries that are not components.
 add_library(plugin INTERFACE)
-target_compile_definitions(plugin INTERFACE "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>")
+target_compile_definitions(
+  plugin
+  INTERFACE
+    "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>"
+)
 
 set(hpx_targets hpx hpx_no_wrap_main plugin component)
 set(hpx_internal_targets hpx_core hpx_interface hpx_interface_no_wrap_main)
@@ -640,8 +708,8 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT runtime
-  ${_optional}
+          COMPONENT runtime
+          ${_optional}
 )
 
 install(
@@ -650,8 +718,8 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT runtime
-  ${_optional}
+          COMPONENT runtime
+          ${_optional}
 )
 
 # install PDB if needed

@@ -12,4 +12,3 @@ if(CMAKE_Fortran_COMPILER_ID)
 else()
   hpx_info("Fortran support is disabled")
 endif()
-

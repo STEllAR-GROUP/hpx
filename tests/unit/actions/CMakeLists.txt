@@ -8,25 +8,22 @@
 set(tests)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests
-      return_future
-     )
+  set(tests return_future)
 endif()
 
 foreach(test ${tests})
-  set(sources
-      ${test}.cpp)
+  set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Actions")
+    FOLDER "Tests/Unit/Actions"
+  )
 
   add_hpx_unit_test("actions" ${test} ${${test}_PARAMETERS})
 
@@ -34,18 +31,14 @@ endforeach()
 
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
-  set(compile_tests
-      succeed_compile_const_ref_argument
-     )
+  set(compile_tests succeed_compile_const_ref_argument)
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
     set(fail_compile_tests
-        fail_compile_non_const_array_argument
-        fail_compile_const_array_argument
+        fail_compile_non_const_array_argument fail_compile_const_array_argument
         fail_compile_non_const_pointer_argument
-        fail_compile_const_pointer_argument
-        fail_compile_non_const_ref_argument
-       )
+        fail_compile_const_pointer_argument fail_compile_non_const_ref_argument
+    )
     foreach(fail_compile_test ${fail_compile_tests})
       set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
     endforeach()
@@ -54,18 +47,15 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   endif()
 
   foreach(compile_test ${compile_tests})
-    set(sources
-        ${compile_test}.cpp)
+    set(sources ${compile_test}.cpp)
 
     source_group("Source Files" FILES ${sources})
 
     add_hpx_unit_compile_test(
-      "actions"
-      ${compile_test}
-      SOURCES ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER "Tests/Unit/Actions/CompileOnly")
+      "actions" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Unit/Actions/CompileOnly"
+    )
 
   endforeach()
 endif()
-
