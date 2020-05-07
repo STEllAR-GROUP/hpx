@@ -21,7 +21,7 @@
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT pool_executor : public thread_pool_executor
+    class pool_executor : public thread_pool_executor
     {
     public:
         explicit pool_executor(std::string const& pool_name = "default",

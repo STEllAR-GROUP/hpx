@@ -35,7 +35,7 @@
 
 namespace hpx { namespace parallel { namespace execution {
     namespace detail {
-        class HPX_EXPORT service_executor
+        class service_executor
         {
         public:
             /// Associate the parallel_execution_tag executor tag type as a default
