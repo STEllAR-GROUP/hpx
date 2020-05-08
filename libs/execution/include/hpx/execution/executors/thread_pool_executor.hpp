@@ -90,8 +90,9 @@ namespace hpx { namespace parallel { namespace execution {
             threads::thread_schedule_hint schedulehint, launch policy, F&& f,
             Ts&&... ts)
         {
-            hpx::util::thread_description desc(
-                f, "hpx::parallel::execution::parallel_executor::post");
+            char const* annotation =
+                hpx::traits::get_function_annotation<F>::call(f);
+            hpx::util::thread_description desc(f, annotation);
 
             detail::post_policy_dispatch<decltype(policy)>::call(policy, desc,
                 pool, priority, stacksize, schedulehint, std::forward<F>(f),

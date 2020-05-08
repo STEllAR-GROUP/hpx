@@ -92,8 +92,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     get_thread_id_data(tid_self)->get_scheduler_base())
             {
                 // yield_to(tid)
-                hpx::this_thread::suspend(threads::pending, tid,
-                    "hpx::parallel::execution::parallel_executor::post");
+                hpx::this_thread::suspend(
+                    threads::pending, tid, "post_policy_dispatch(suspend)");
             }
         }
 

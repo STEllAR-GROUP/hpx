@@ -206,8 +206,9 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts) const
         {
-            hpx::util::thread_description desc(
-                f, "hpx::parallel::execution::parallel_executor::post");
+            char const* annotation =
+                hpx::traits::get_function_annotation<F>::call(f);
+            hpx::util::thread_description desc(f, annotation);
 
             detail::post_policy_dispatch<Policy>::call(policy_, desc, priority_,
                 stacksize_, schedulehint_, std::forward<F>(f),
