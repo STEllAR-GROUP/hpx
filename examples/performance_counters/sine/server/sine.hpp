@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
-#include <hpx/util/interval_timer.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 

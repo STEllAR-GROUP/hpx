@@ -11,7 +11,7 @@
 #include <hpx/command_line_handling.hpp>
 #include <hpx/concurrency/thread_name.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/custom_exception_info.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional.hpp>

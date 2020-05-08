@@ -13,7 +13,7 @@
 
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
-#include <hpx/util/interval_timer.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 
 #include <cstdint>
 #include <map>

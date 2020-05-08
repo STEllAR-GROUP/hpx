@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/custom_exception_info.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>

@@ -19,7 +19,7 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util_fwd.hpp>

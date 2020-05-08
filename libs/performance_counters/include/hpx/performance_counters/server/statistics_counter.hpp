@@ -11,7 +11,7 @@
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/util/interval_timer.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 
 #include <cstddef>
 #include <cstdint>

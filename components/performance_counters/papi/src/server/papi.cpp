@@ -17,7 +17,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/util/thread_mapper.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 
 #include <boost/version.hpp>
 

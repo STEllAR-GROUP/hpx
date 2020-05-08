@@ -13,7 +13,7 @@
 #include <hpx/logging/manipulator.hpp>
 #include <hpx/naming_base.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>

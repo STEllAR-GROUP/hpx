@@ -32,7 +32,7 @@
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
-#include <hpx/util/debug/thread_stacktrace.hpp>
+#include <hpx/runtime_local/thread_stacktrace.hpp>
 //
 #include <boost/asio/ip/host_name.hpp>
 //

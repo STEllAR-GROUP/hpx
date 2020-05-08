@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/custom_exception_info.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/components/component_type.hpp>

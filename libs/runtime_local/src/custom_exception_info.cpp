@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/custom_exception_info.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/futures/futures_factory.hpp>
@@ -16,7 +16,7 @@
 #include <hpx/naming_base.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threadmanager.hpp>

@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/runtime/threads/run_as_hpx_thread.hpp>
-#include <hpx/runtime/threads/run_as_os_thread.hpp>
+#include <hpx/runtime_local/run_as_hpx_thread.hpp>
+#include <hpx/runtime_local/run_as_os_thread.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/thread_executors.hpp>
 #include <hpx/thread_pools.hpp>

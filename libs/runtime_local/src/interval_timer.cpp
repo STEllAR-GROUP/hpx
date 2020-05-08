@@ -11,7 +11,7 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/util/interval_timer.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <chrono>

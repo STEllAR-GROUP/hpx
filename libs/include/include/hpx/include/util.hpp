@@ -32,7 +32,7 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/interval_timer.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
 

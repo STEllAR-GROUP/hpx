@@ -13,7 +13,7 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
-#include <hpx/runtime/threads/run_as_hpx_thread.hpp>
+#include <hpx/runtime_local/run_as_hpx_thread.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/state.hpp>
 #include <hpx/type_support/unused.hpp>
