@@ -14,6 +14,7 @@ set(hpx_SOURCES
     lcos/detail/future_data.cpp
     lcos/future.cpp
     hpx_init.cpp
+    hpx_main_winsocket.cpp
     runtime.cpp
     runtime_handlers.cpp
     runtime/launch_policy.cpp
@@ -162,6 +163,7 @@ set(hpx_HEADERS
     hpx/hpx_init.hpp
     hpx/hpx_init_impl.hpp
     hpx/hpx_init_params.hpp
+    hpx/hpx_main_winsocket.hpp
     hpx/hpx_start.hpp
     hpx/hpx_start_impl.hpp
     hpx/hpx_suspend.hpp
