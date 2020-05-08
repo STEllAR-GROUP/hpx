@@ -729,8 +729,13 @@ namespace hpx
                 &detail::get_default_pool);
             hpx::threads::detail::set_get_default_timer_service(
                 &hpx::detail::get_default_timer_service);
-            hpx::threads::detail::set_get_locality_id(
-                &get_locality_id);
+            hpx::threads::detail::set_get_locality_id(&get_locality_id);
+            hpx::parallel::execution::detail::set_get_pu_mask(
+                &hpx::detail::get_pu_mask);
+            hpx::parallel::execution::detail::set_get_os_thread_count(
+                []() { return hpx::get_os_thread_count(); });
+            hpx::parallel::v1::detail::set_exception_list_termination_handler(
+                &hpx::terminate);
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");

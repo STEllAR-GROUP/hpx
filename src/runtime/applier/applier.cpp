@@ -24,6 +24,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
