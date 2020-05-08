@@ -13,7 +13,6 @@ set(hpx_SOURCES
     hpx_init.cpp
     hpx_main_winsocket.cpp
     runtime/threads/thread_pool_suspension_helpers.cpp
-    util/pool_timer.cpp
     util/serialize_exception.cpp
 )
 
@@ -88,6 +87,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     util/integer/int128.cpp
     util/integer/uint128.cpp
     util/one_size_heap_list.cpp
+    util/pool_timer.cpp
     util/query_counters.cpp
     util/register_locks_globally.cpp
   )
@@ -165,7 +165,6 @@ set(hpx_HEADERS
   hpx/traits/pointer_category.hpp
   hpx/traits/rma_memory_region_traits.hpp
   hpx/util_fwd.hpp
-  hpx/util/pool_timer.hpp
   hpx/util/serialize_exception.hpp
 )
 
@@ -379,6 +378,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/integer/int128.hpp
     hpx/util/integer/uint128.hpp
     hpx/util/one_size_heap_list.hpp
+    hpx/util/pool_timer.hpp
     hpx/util/query_counters.hpp
     hpx/util/register_locks_globally.hpp
     hpx/util/remove_local_destinations.hpp
