@@ -31,6 +31,7 @@ set(runtime_local_headers
     hpx/runtime_local/thread_mapper.hpp
     hpx/runtime_local/thread_pool_helpers.hpp
     hpx/runtime_local/thread_stacktrace.hpp
+    hpx/util/thread_aware_timer.hpp
 )
 
 set(runtime_local_compat_headers
@@ -62,6 +63,7 @@ set(runtime_local_sources
     runtime_handlers.cpp
     runtime_local.cpp
     state.cpp
+    thread_aware_timer.cpp
     thread_mapper.cpp
     thread_pool_helpers.cpp
     thread_stacktrace.cpp

@@ -15,7 +15,6 @@ set(hpx_SOURCES
     runtime/threads/thread_pool_suspension_helpers.cpp
     util/pool_timer.cpp
     util/serialize_exception.cpp
-    util/thread_aware_timer.cpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -168,7 +167,6 @@ set(hpx_HEADERS
   hpx/util_fwd.hpp
   hpx/util/pool_timer.hpp
   hpx/util/serialize_exception.hpp
-  hpx/util/thread_aware_timer.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
