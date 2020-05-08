@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/async/apply.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_distributed/server/channel.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
 #include <cstddef>
