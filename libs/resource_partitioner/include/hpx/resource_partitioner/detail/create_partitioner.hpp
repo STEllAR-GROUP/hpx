@@ -16,6 +16,7 @@
 #include <hpx/program_options.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -38,6 +39,8 @@ namespace hpx { namespace resource { namespace detail {
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv, std::vector<std::string> ini_config,
         resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries,
         int* result);
 
 }}}    // namespace hpx::resource::detail

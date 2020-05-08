@@ -542,6 +542,8 @@ namespace hpx { namespace util {
     void runtime_configuration::load_component_path(
         std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
             plugin_registries,
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries,
         std::string const& path, std::set<std::string>& component_paths,
         std::map<std::string, filesystem::path>& basenames)
     {
@@ -568,8 +570,9 @@ namespace hpx { namespace util {
                 fs::path this_path(*p.first);
                 if (fs::exists(this_path, fsec) && !fsec)
                 {
-                    plugin_list_type tmp_regs = util::init_ini_data_default(
-                        this_path.string(), *this, basenames, modules_);
+                    plugin_list_type tmp_regs =
+                        util::init_ini_data_default(this_path.string(), *this,
+                            basenames, modules_, component_registries);
 
                     std::copy(tmp_regs.begin(), tmp_regs.end(),
                         std::back_inserter(plugin_registries));
@@ -581,6 +584,8 @@ namespace hpx { namespace util {
     void runtime_configuration::load_component_paths(
         std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
             plugin_registries,
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries,
         std::string const& component_base_paths,
         std::string const& component_path_suffixes,
         std::set<std::string>& component_paths,
@@ -611,21 +616,23 @@ namespace hpx { namespace util {
                 {
                     std::string p = path;
                     p += *jt;
-                    load_component_path(
-                        plugin_registries, p, component_paths, basenames);
+                    load_component_path(plugin_registries, component_registries,
+                        p, component_paths, basenames);
                 }
             }
             else
             {
-                load_component_path(
-                    plugin_registries, path, component_paths, basenames);
+                load_component_path(plugin_registries, component_registries,
+                    path, component_paths, basenames);
             }
         }
     }
 
     // load information about dynamically discovered plugins
     std::vector<std::shared_ptr<plugins::plugin_registry_base>>
-    runtime_configuration::load_modules()
+    runtime_configuration::load_modules(
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries)
     {
         typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
             plugin_list_type;
@@ -645,13 +652,13 @@ namespace hpx { namespace util {
         std::string component_path_suffixes(
             get_entry("hpx.component_path_suffixes", "/lib/hpx"));
 
-        load_component_paths(plugin_registries, component_base_paths,
+        load_component_paths(plugin_registries, component_registries, component_base_paths,
             component_path_suffixes, component_paths, basenames);
 
         // load additional explicit plugin paths from plugin_paths key
         std::string plugin_paths(get_entry("hpx.component_paths", ""));
-        load_component_paths(
-            plugin_registries, plugin_paths, "", component_paths, basenames);
+        load_component_paths(plugin_registries, component_registries,
+            plugin_paths, "", component_paths, basenames);
 
         // read system and user ini files _again_, to allow the user to
         // overwrite the settings from the default component ini's.

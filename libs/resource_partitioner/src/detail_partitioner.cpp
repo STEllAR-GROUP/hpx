@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <iosfwd>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -881,6 +882,8 @@ namespace hpx { namespace resource { namespace detail {
         hpx::program_options::options_description desc_cmdline, int argc,
         char** argv, std::vector<std::string> ini_config,    // -V813
         resource::partitioner_mode rpmode, runtime_mode mode,
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries,
         bool fill_internal_topology)
     {
         mode_ = rpmode;
@@ -904,7 +907,8 @@ namespace hpx { namespace resource { namespace detail {
 #endif
         // parse command line and set options
         // terminate set if program options contain --hpx:help or --hpx:version ...
-        cfg_.parse_result_ = cfg_.call(desc_cmdline, argc, argv);
+        cfg_.parse_result_ =
+            cfg_.call(desc_cmdline, argc, argv, component_registries);
 
         // set all parameters related to affinity data
         std::string affinity_description;
