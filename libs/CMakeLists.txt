@@ -85,6 +85,7 @@ set(HPX_CANDIDATE_LIBS
     type_support
     util
     version
+)
 # cmake-format: on
 
 # add example pseudo targets needed for modules
