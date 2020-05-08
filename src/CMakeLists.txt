@@ -10,11 +10,9 @@
 # gather sources
 
 set(hpx_SOURCES
-    lcos/future.cpp
     hpx_init.cpp
     hpx_main_winsocket.cpp
     runtime/threads/thread_pool_suspension_helpers.cpp
-    util/interval_timer.cpp
     util/pool_timer.cpp
     util/serialize_exception.cpp
     util/thread_aware_timer.cpp
@@ -168,7 +166,6 @@ set(hpx_HEADERS
   hpx/traits/pointer_category.hpp
   hpx/traits/rma_memory_region_traits.hpp
   hpx/util_fwd.hpp
-  hpx/util/interval_timer.hpp
   hpx/util/pool_timer.hpp
   hpx/util/serialize_exception.hpp
   hpx/util/thread_aware_timer.hpp

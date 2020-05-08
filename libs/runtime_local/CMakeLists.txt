@@ -17,6 +17,7 @@ set(runtime_local_headers
     hpx/runtime_local/get_os_thread_count.hpp
     hpx/runtime_local/get_thread_name.hpp
     hpx/runtime_local/get_worker_thread_num.hpp
+    hpx/runtime_local/interval_timer.hpp
     hpx/runtime_local/report_error.hpp
     hpx/runtime_local/run_as_hpx_thread.hpp
     hpx/runtime_local/run_as_os_thread.hpp
@@ -50,12 +51,14 @@ set(runtime_local_compat_headers
     hpx/runtime_handlers.hpp
     hpx/util/debug/thread_stacktrace.hpp
     hpx/util/debugging.hpp
+    hpx/util/interval_timer.hpp
     hpx/util/thread_mapper.hpp
 )
 
 set(runtime_local_sources
     custom_exception_info.cpp
     debugging.cpp
+    interval_timer.cpp
     runtime_handlers.cpp
     runtime_local.cpp
     state.cpp
