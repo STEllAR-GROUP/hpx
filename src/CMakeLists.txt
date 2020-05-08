@@ -10,8 +10,6 @@
 # gather sources
 
 set(hpx_SOURCES
-    hpx_init.cpp
-    hpx_main_winsocket.cpp
     runtime/threads/thread_pool_suspension_helpers.cpp
     util/serialize_exception.cpp
 )
@@ -146,15 +144,7 @@ endif()
 
 # List all headers (local and distributed)
 set(hpx_HEADERS
-  hpx/hpx_finalize.hpp
-  hpx/hpx_init.hpp
-  hpx/hpx_init_impl.hpp
-  hpx/hpx_init_params.hpp
-  hpx/hpx_start.hpp
-  hpx/hpx_start_impl.hpp
-  hpx/hpx_suspend.hpp
   hpx/hpx_user_main_config.hpp
-  hpx/hpx_main_winsocket.hpp
   hpx/lcos/future.hpp
   hpx/lcos_fwd.hpp
   hpx/runtime/serialization/detail/preprocess_container.hpp
