@@ -227,7 +227,7 @@ namespace hpx { namespace parallel { namespace execution {
     ///
     /// This executor conforms to the concepts of a TwoWayExecutor,
     /// and a BulkTwoWayExecutor
-    class HPX_EXPORT thread_pool_executor
+    class thread_pool_executor
     {
     public:
         /// Associate the parallel_execution_tag executor tag type as a default

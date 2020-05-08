@@ -16,7 +16,7 @@
 namespace hpx
 {
     namespace parallel { namespace execution {
-        class HPX_EXPORT thread_pool_executor;
+        class thread_pool_executor;
     }}
 
     namespace threads
