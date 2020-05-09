@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_ACTION_SERIALIZATION_FILTER_FEB_14_2013_0903PM)
-#define HPX_TRAITS_ACTION_SERIALIZATION_FILTER_FEB_14_2013_0903PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -28,6 +27,5 @@ namespace hpx { namespace traits
     };
 }}
 
-#endif
 #endif
 

@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_THREAD_INIT_DATA_HPP
-#define HPX_RUNTIME_THREADS_THREAD_INIT_DATA_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -157,5 +156,3 @@ namespace hpx { namespace threads {
         policies::scheduler_base* scheduler_base;
     };
 }}    // namespace hpx::threads
-
-#endif /*HPX_RUNTIME_THREADS_THREAD_INIT_DATA_HPP*/

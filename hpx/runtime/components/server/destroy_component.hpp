@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_DESTROY_COMPONENT_JUN_02_2008_0146PM)
-#define HPX_COMPONENTS_SERVER_DESTROY_COMPONENT_JUN_02_2008_0146PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -80,5 +79,4 @@ namespace hpx { namespace components { namespace server
     }
 }}}
 
-#endif
 

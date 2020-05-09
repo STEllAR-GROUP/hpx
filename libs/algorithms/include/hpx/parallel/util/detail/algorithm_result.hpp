@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_DETAIL_ALGORITHM_RESULT_MAY_28_2014_1020PM)
-#define HPX_PARALLEL_DETAIL_ALGORITHM_RESULT_MAY_28_2014_1020PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -274,5 +273,3 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             std::move(f), std::forward<Conv>(conv));
     }
 }}}}    // namespace hpx::parallel::util::detail
-
-#endif

@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/uninitialized_move.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_UNINITIALIZED_MOVE_MAY_30_2017_0843AM)
-#define HPX_PARALLEL_DETAIL_UNINITIALIZED_MOVE_MAY_30_2017_0843AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -383,5 +382,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::size_t(count), dest));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

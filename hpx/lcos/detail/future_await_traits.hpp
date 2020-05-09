@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_ACBA3E3F_7B29_41D1_AE85_C73CB69D089C)
-#define HPX_LCOS_ACBA3E3F_7B29_41D1_AE85_C73CB69D089C
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -404,4 +403,3 @@ namespace std {
 }    // namespace std
 
 #endif    // HPX_HAVE_AWAIT || HPX_HAVE_CXX20_COROUTINES
-#endif    // HPX_LCOS_ACBA3E3F_7B29_41D1_AE85_C73CB69D089C

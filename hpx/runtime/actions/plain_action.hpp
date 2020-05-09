@@ -7,8 +7,7 @@
 
 /// \file plain_action.hpp
 
-#if !defined(HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM)
-#define HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -394,5 +393,4 @@ namespace hpx { namespace traits
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 

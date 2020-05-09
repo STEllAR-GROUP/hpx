@@ -7,8 +7,7 @@
 
 // hpxinspect:nounnamed
 
-#if !defined(HPX_PARALLEL_EXECUTORS_EXECUTION_FWD_DEC_23_0712PM)
-#define HPX_PARALLEL_EXECUTORS_EXECUTION_FWD_DEC_23_0712PM
+#pragma once
 
 #include <type_traits>
 #include <utility>
@@ -593,5 +592,3 @@ namespace hpx { namespace parallel { namespace execution {
                 detail::bulk_then_execute_tag>>::value;
     }    // namespace
 }}}      // namespace hpx::parallel::execution
-
-#endif

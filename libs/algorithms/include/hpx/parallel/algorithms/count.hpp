@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/count.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM)
-#define HPX_PARALLEL_DETAIL_COUNT_JUNE_17_2014_1154AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -433,5 +432,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

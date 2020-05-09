@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM)
-#define HPX_THREADMANAGER_THREAD_QUEUE_AUG_25_2009_0132PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
@@ -1032,7 +1031,7 @@ namespace hpx { namespace threads { namespace policies {
         bool dump_suspended_threads(
             std::size_t num_thread, std::int64_t& idle_loop_count, bool running)
         {
-#ifndef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+#if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
             return false;
 #else
             if (get_minimal_deadlock_detection_enabled())
@@ -1125,5 +1124,3 @@ namespace hpx { namespace threads { namespace policies {
         thread_queue<Mutex, PendingQueuing, StagedQueuing,
             TerminatedQueuing>::task_description_alloc_;
 }}}    // namespace hpx::threads::policies
-
-#endif

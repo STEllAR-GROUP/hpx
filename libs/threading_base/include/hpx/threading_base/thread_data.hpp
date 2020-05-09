@@ -6,8 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_THREAD_DATA_HPP
-#define HPX_RUNTIME_THREADS_THREAD_DATA_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -254,7 +253,7 @@ namespace hpx { namespace threads {
             return 0;
         }
 
-#ifndef HPX_HAVE_THREAD_DESCRIPTION
+#if !defined(HPX_HAVE_THREAD_DESCRIPTION)
         util::thread_description get_description() const
         {
             return util::thread_description("<unknown>");
@@ -301,7 +300,7 @@ namespace hpx { namespace threads {
         }
 #endif
 
-#ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
+#if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         /// Return the locality of the parent thread
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
         constexpr
@@ -362,7 +361,7 @@ namespace hpx { namespace threads {
         }
 #endif
 
-#ifndef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
+#if !defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION)
 
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
@@ -723,5 +722,4 @@ namespace hpx { namespace threads {
         }
         return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
-}}     // namespace hpx::threads
-#endif /*HPX_RUNTIME_THREADS_THREAD_DATA_HPP*/
+}}    // namespace hpx::threads

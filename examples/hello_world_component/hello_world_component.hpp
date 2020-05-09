@@ -5,8 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //[hello_world_hpp_getting_started
-#if !defined(HELLO_WORLD_COMPONENT_HPP)
-#define HELLO_WORLD_COMPONENT_HPP
+#pragma once
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
@@ -52,6 +51,5 @@ namespace examples
     };
 }
 
-#endif // HELLO_WORLD_COMPONENT_HPP
 //]
 

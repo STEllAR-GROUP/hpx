@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_TRAITS_ACQUIRE_SHARED_STATE_HPP
-#define HPX_TRAITS_ACQUIRE_SHARED_STATE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
@@ -151,4 +150,3 @@ namespace hpx { namespace traits
     }
 }}
 
-#endif /*HPX_TRAITS_ACQUIRE_SHARED_STATE_HPP*/

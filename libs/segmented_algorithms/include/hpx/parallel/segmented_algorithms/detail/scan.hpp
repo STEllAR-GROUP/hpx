@@ -6,8 +6,7 @@
 
 /// \file parallel/segmented_algorithms/detail/scan.hpp
 
-#if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHMS_SCAN)
-#define HPX_PARALLEL_SEGMENTED_ALGORITHMS_SCAN
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -799,5 +798,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
-
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_COMPONENTS_SERVER_EXECUTOR_COMPONENT_FEB_09_2017_0839PM)
-#define HPX_RUNTIME_COMPONENTS_SERVER_EXECUTOR_COMPONENT_FEB_09_2017_0839PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_lva.hpp>
@@ -98,5 +97,4 @@ namespace hpx { namespace components
     };
 }}
 
-#endif
 

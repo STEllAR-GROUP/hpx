@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_PACK_TRAVERSAL_HPP
-#define HPX_UTIL_PACK_TRAVERSAL_HPP
+#pragma once
 
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/pack_traversal/detail/pack_traversal_impl.hpp>
@@ -87,4 +86,3 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 #endif    // DOXYGEN
-#endif    // HPX_UTIL_PACK_TRAVERSAL_HPP

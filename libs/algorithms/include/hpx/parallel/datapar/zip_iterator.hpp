@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_DATAPAR_ZIP_ITERATOR_SEP_30_2016_1251PM)
-#define HPX_PARALLEL_DATAPAR_ZIP_ITERATOR_SEP_30_2016_1251PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -166,5 +165,4 @@ namespace hpx { namespace parallel { namespace traits {
     };
 }}}    // namespace hpx::parallel::traits
 
-#endif
 #endif

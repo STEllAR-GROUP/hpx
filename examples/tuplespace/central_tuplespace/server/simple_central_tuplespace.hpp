@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SERVER_SIMPLE_CENTRAL_TUPLESPACE_MAR_29_2013_0237PM)
-#define HPX_SERVER_SIMPLE_CENTRAL_TUPLESPACE_MAR_29_2013_0237PM
+#pragma once
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
@@ -203,5 +202,4 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 #undef TS_DEBUG
 
-#endif
 

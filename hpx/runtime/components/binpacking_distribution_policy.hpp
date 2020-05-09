@@ -6,8 +6,7 @@
 
 /// \file binpacking_distribution_policy.hpp
 
-#if !defined(HPX_COMPONENTS_BINPACKING_DISTRIBUTION_POLICY_APR_10_2015_0344PM)
-#define HPX_COMPONENTS_BINPACKING_DISTRIBUTION_POLICY_APR_10_2015_0344PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -380,4 +379,3 @@ namespace hpx
 }
 /// \endcond
 
-#endif

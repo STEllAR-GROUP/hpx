@@ -8,8 +8,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM)
-#define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -193,5 +192,4 @@ HPX_IS_BITWISE_SERIALIZABLE(hpx::parcelset::detail::parcel_data)
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

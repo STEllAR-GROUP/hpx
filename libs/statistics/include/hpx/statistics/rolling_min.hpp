@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ROLLING_MIN_HPP
-#define ROLLING_MIN_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -102,5 +101,3 @@ namespace hpx { namespace util {
 
     using boost::accumulators::extract::rolling_min;
 }}    // namespace hpx::util
-
-#endif

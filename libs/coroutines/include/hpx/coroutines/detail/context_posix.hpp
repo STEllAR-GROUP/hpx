@@ -27,8 +27,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_POSIX_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_POSIX_HPP
+#pragma once
 
 // NOTE (per http://lists.apple.com/archives/darwin-dev/2008/Jan/msg00232.html):
 // > Why the bus error? What am I doing wrong?
@@ -118,7 +117,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #include <stdlib.h>
 #include <strings.h>
 
-#ifndef SEGV_STACK_SIZE
+#if !defined(SEGV_STACK_SIZE)
 #define SEGV_STACK_SIZE MINSIGSTKSZ + 4096
 #endif
 
@@ -443,5 +442,3 @@ namespace hpx { namespace threads { namespace coroutines {
 #error No context implementation for this POSIX system.
 
 #endif
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_POSIX_HPP*/

@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_PACK_TRAVERSAL_REBIND_CONTAINER_JUN_10_2019_1020AM)
-#define HPX_TRAITS_PACK_TRAVERSAL_REBIND_CONTAINER_JUN_10_2019_1020AM
+#pragma once
 
 #include <array>
 #include <cstddef>
@@ -116,5 +115,3 @@ namespace hpx { namespace traits {
         }
     };
 }}    // namespace hpx::traits
-
-#endif

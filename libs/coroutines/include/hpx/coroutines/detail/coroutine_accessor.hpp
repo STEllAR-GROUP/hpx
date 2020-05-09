@@ -27,8 +27,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP
+#pragma once
 
 namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
@@ -41,5 +40,3 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
     };
 }}}}    // namespace hpx::threads::coroutines::detail
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_ACCESSOR_HPP*/

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_JAN_18_2013_0939AM)
-#define HPX_PERFORMANCE_COUNTERS_PERFORMANCE_COUNTER_JAN_18_2013_0939AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -132,5 +131,3 @@ namespace hpx { namespace performance_counters {
     HPX_API_EXPORT std::vector<performance_counter> discover_counters(
         std::string const& name, error_code& ec = throws);
 }}    // namespace hpx::performance_counters
-
-#endif

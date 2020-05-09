@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_STUBS_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0459PM)
-#define HPX_STUBS_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0459PM
+#pragma once
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/async/applier/apply.hpp>
@@ -106,5 +105,4 @@ namespace examples { namespace stubs
     };
 }}
 
-#endif
 

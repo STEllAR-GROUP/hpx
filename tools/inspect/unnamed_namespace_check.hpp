@@ -7,8 +7,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_UNNAMED_NAMESPACE_CHECK_HPP_GP_20060718
-#define BOOST_UNNAMED_NAMESPACE_CHECK_HPP_GP_20060718
+#pragma once
 
 #include "inspector.hpp"
 
@@ -41,4 +40,3 @@ namespace boost
 }
 
 
-#endif // include guard

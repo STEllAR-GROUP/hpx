@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_874FFB61_BEF5_4D46_B024_6DAAF81BACF1)
-#define HPX_874FFB61_BEF5_4D46_B024_6DAAF81BACF1
+#pragma once
 
 #include <hpx/config.hpp>
 #if defined(HPX_WINDOWS)
@@ -27,5 +26,3 @@ namespace hpx { namespace util { namespace hardware {
 }}}    // namespace hpx::util::hardware
 
 #endif
-
-#endif    // HPX_874FFB61_BEF5_4D46_B024_6DAAF81BACF1

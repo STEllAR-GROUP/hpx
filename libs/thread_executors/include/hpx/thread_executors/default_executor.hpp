@@ -6,8 +6,7 @@
 
 /// \file runtime/threads/executors/default_executor.hpp
 
-#if !defined(HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR_HPP)
-#define HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -18,5 +17,3 @@ namespace hpx { namespace threads { namespace executors {
     using default_executor = parallel::execution::default_executor;
 }}}    // namespace hpx::threads::executors
 #endif
-
-#endif /*HPX_RUNTIME_THREADS_EXECUTORS_DEFAULT_EXECUTOR_HPP*/

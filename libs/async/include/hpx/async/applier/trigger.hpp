@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_6B2240CE_5CE8_43EA_BAFF_5C8F17D21AAE)
-#define HPX_6B2240CE_5CE8_43EA_BAFF_5C8F17D21AAE
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
@@ -40,5 +39,3 @@ namespace hpx { namespace applier {
     }
 
 }}    // namespace hpx::applier
-
-#endif    // HPX_6B2240CE_5CE8_43EA_BAFF_5C8F17D21AAE

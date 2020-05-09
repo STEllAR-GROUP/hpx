@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_RUNTIME_CONFIGURATION_HPP
-#define HPX_UTIL_RUNTIME_CONFIGURATION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -191,5 +190,3 @@ namespace hpx { namespace util {
         std::map<std::string, hpx::util::plugin::dll> modules_;
     };
 }}    // namespace hpx::util
-
-#endif /*HPX_UTIL_RUNTIME_CONFIGURATION_HPP*/

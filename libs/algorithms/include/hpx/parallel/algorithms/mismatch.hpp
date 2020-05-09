@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/mismatch.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM)
-#define HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -400,5 +399,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Pred>(op));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

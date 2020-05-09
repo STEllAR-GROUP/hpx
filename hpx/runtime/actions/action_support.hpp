@@ -8,8 +8,7 @@
 
 /// \file action_support.hpp
 
-#if !defined(HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM)
-#define HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -63,7 +62,7 @@ namespace hpx { namespace actions
 #if defined(HPX_HAVE_NETWORKING)
         template <typename Action>
         char const* get_action_name()
-#ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
+#if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
         ;
 #else
         {
@@ -96,7 +95,7 @@ namespace hpx { namespace actions
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         template <typename Action>
         util::itt::string_handle const& get_action_name_itt()
-#ifndef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
+#if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
         ;
 #else
         {
@@ -178,4 +177,3 @@ namespace hpx { namespace actions
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif

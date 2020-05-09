@@ -9,8 +9,7 @@
 
 /// \file hpx_init.hpp
 
-#ifndef HPX_HPX_INIT_HPP
-#define HPX_HPX_INIT_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
@@ -851,7 +850,7 @@ namespace hpx
 
 }
 
-#ifndef DOXYGEN
+#if !defined(DOXYGEN)
 ///////////////////////////////////////////////////////////////////////////////
 // Pull in the implementation of the inlined hpx::init functions if we're not
 // compiling the core HPX library.
@@ -860,4 +859,3 @@ namespace hpx
 #endif
 #endif
 
-#endif /*HPX_HPX_INIT_HPP*/

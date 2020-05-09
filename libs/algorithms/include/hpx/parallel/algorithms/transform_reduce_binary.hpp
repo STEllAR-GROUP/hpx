@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/transform_reduce_binary.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM)
-#define HPX_PARALLEL_ALGORITHM_TRANFORM_REDUCE_BINARY_JUL_15_2015_0730AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -413,5 +412,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Convert>(conv_op), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

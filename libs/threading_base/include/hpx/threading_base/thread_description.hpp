@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_THREADS_DETAIL_THREAD_DESCRIPTION_FEB_19_2016_0200PM)
-#define HPX_RUNTIME_THREADS_DETAIL_THREAD_DESCRIPTION_FEB_19_2016_0200PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -318,5 +317,3 @@ namespace hpx { namespace threads {
         util::thread_description const& desc = util::thread_description(),
         error_code& ec = throws);
 }}    // namespace hpx::threads
-
-#endif

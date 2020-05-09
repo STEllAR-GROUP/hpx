@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_RUNTIME_SUPPORT_JUN_03_2008_0438PM)
-#define HPX_COMPONENTS_RUNTIME_SUPPORT_JUN_03_2008_0438PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/applier/applier.hpp>
@@ -163,4 +162,3 @@ namespace hpx { namespace components
     };
 }}
 
-#endif

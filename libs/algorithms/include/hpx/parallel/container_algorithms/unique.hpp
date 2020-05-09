@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/unique.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_UNIQUE_JUL_11_2017_1018PM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_UNIQUE_JUL_11_2017_1018PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -200,5 +199,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Pred>(pred), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

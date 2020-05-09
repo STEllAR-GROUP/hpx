@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/destroy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_destroy_JUN_01_2017_1049AM)
-#define HPX_PARALLEL_DETAIL_destroy_JUN_01_2017_1049AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -268,5 +267,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             is_seq(), first, std::size_t(count));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

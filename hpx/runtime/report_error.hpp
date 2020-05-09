@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime/report_error.hpp
 
-#if !defined(HPX_RUNTIME_REPORT_ERROR_HPP)
-#define HPX_RUNTIME_REPORT_ERROR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -24,5 +23,4 @@ namespace hpx
     HPX_API_EXPORT void report_error(std::exception_ptr const& e);
 }
 
-#endif
 

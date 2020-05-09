@@ -8,8 +8,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PROCESS_POSIX_INITIALIZERS_ON_FORK_SETUP_HPP
-#define HPX_PROCESS_POSIX_INITIALIZERS_ON_FORK_SETUP_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -61,5 +60,4 @@ on_fork_setup_<Handler> on_fork_setup(Handler && handler)
 
 }}}}
 
-#endif
 #endif

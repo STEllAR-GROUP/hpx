@@ -8,8 +8,7 @@
 
 /// \file applier_fwd.hpp
 
-#ifndef HPX_RUNTIME_APPLIER_FWD_HPP
-#define HPX_RUNTIME_APPLIER_FWD_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -33,5 +32,3 @@ namespace hpx {
         HPX_API_EXPORT applier* get_applier_ptr();
     }    // namespace applier
 }    // namespace hpx
-
-#endif

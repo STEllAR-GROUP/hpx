@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_ABSTRACT_MIGRATION_SUPPORT_APR_04_2019_1203PM)
-#define HPX_COMPONENTS_SERVER_ABSTRACT_MIGRATION_SUPPORT_APR_04_2019_1203PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
@@ -138,4 +137,3 @@ namespace hpx { namespace components
     };
 }}
 
-#endif

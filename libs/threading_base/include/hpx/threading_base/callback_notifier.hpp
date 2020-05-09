@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_POLICIES_CALLBACK_NOTIFIER_JUN_18_2009_1132AM)
-#define HPX_THREADMANAGER_POLICIES_CALLBACK_NOTIFIER_JUN_18_2009_1132AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
@@ -99,5 +98,3 @@ namespace hpx { namespace threads { namespace policies {
 }}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

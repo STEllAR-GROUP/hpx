@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_MEMORY_JUN_25_2008_0122PM)
-#define HPX_COMPONENTS_MEMORY_JUN_25_2008_0122PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
@@ -174,5 +173,4 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::components::server::memory::uint128_t, hpx_components_memory_uint128_t)
 
-#endif
 

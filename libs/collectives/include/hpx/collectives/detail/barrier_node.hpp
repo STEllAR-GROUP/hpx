@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LCOS_DETAIL_BARRIER_NODE_HPP
-#define HPX_LCOS_DETAIL_BARRIER_NODE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -105,5 +104,3 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action);
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

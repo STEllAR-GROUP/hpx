@@ -7,9 +7,7 @@
 
 /// \file parallel/executors/restricted_thread_pool_executors.hpp
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_RESTRICTED_THREAD_POOL_EXECUTORS_AUG_28_2015_0511PM)
-#define HPX_PARALLEL_EXECUTORS_RESTRICTED_THREAD_POOL_EXECUTORS_AUG_28_2015_0511PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -185,5 +183,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

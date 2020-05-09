@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_JAN_31_2015_0130PM)
-#define HPX_TRAITS_JAN_31_2015_0130PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -71,6 +70,4 @@
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
-#endif
-
 #endif

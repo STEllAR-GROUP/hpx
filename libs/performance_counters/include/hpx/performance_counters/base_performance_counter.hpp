@@ -4,9 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(                                                                  \
-    HPX_PERFORMANCE_COUNTERS_BASE_PERFORMANCE_COUNTER_JAN_18_2013_1036AM)
-#define HPX_PERFORMANCE_COUNTERS_BASE_PERFORMANCE_COUNTER_JAN_18_2013_1036AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -54,5 +52,3 @@ namespace hpx { namespace performance_counters {
         }
     };
 }}    // namespace hpx::performance_counters
-
-#endif

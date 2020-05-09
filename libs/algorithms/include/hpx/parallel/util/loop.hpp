@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_UTIL_LOOP_MAY_27_2014_1040PM)
-#define HPX_PARALLEL_UTIL_LOOP_MAY_27_2014_1040PM
+#pragma once
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_DATAPAR)
@@ -582,5 +581,3 @@ namespace hpx { namespace parallel { namespace util {
         return val;
     }
 }}}    // namespace hpx::parallel::util
-
-#endif

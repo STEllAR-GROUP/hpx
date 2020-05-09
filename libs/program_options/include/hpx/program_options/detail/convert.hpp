@@ -4,8 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef PROGRAM_OPTIONS_CONVERT_HPP_VP_2004_04_28
-#define PROGRAM_OPTIONS_CONVERT_HPP_VP_2004_04_28
+#pragma once
 
 #include <hpx/program_options/config.hpp>
 
@@ -81,5 +80,4 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#endif
 #endif

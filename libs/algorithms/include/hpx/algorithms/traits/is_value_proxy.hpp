@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_TRAITS_IS_VALUE_PROXY_HPP
-#define HPX_TRAITS_IS_VALUE_PROXY_HPP
+#pragma once
 
 #include <type_traits>
 
@@ -17,5 +16,3 @@ namespace hpx { namespace traits {
     {
     };
 }}    // namespace hpx::traits
-
-#endif

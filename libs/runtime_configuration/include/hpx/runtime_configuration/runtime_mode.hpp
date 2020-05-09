@@ -7,8 +7,7 @@
 
 /// \file runtime_mode.hpp
 
-#ifndef HPX_RUNTIME_RUNTIME_MODE_HPP
-#define HPX_RUNTIME_RUNTIME_MODE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -44,5 +43,3 @@ namespace hpx {
     HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(
         std::string const& mode);
 }    // namespace hpx
-
-#endif /*HPX_RUNTIME_RUNTIME_MODE_HPP*/

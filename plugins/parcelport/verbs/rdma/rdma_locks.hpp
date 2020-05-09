@@ -4,8 +4,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_RDMA_LOCKS_HPP
-#define HPX_PARCELSET_POLICIES_VERBS_RDMA_LOCKS_HPP
+#pragma once
 
 #include <hpx/config/parcelport_defines.hpp>
 //
@@ -59,5 +58,4 @@ namespace verbs
 #endif
 }}}}
 
-#endif
 

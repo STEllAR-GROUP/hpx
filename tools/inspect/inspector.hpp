@@ -9,8 +9,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_INSPECTOR_HPP
-#define BOOST_INSPECTOR_HPP
+#pragma once
 
 #include <hpx/filesystem.hpp>
 
@@ -82,8 +81,16 @@ namespace boost
       string_set m_skip_signatures;
     };
 
+    // for inspection of header files
+    class header_inspector : public inspector
+    {
+    public:
+      // registers the basic set of known source signatures
+      header_inspector();
+    };
+
     // for inspection of source code of one form or other
-    class source_inspector : public inspector
+    class source_inspector : public header_inspector
     {
     public:
       // registers the basic set of known source signatures
@@ -118,5 +125,4 @@ namespace boost
   }
 }
 
-#endif // BOOST_INSPECTOR_HPP
 

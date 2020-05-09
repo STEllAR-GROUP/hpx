@@ -8,8 +8,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM)
-#define HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -128,5 +127,3 @@ namespace hpx { namespace lcos { namespace local {
 
     using recursive_mutex = detail::recursive_mutex_impl<>;
 }}}    // namespace hpx::lcos::local
-
-#endif

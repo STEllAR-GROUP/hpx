@@ -9,7 +9,7 @@
 //                               hpxinspect:noinclude:HPX_ASSERT_MSG
 //                               hpxinspect:noassert_macro
 
-//  Note: There are no include guards. This is intentional.
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion/current_function.hpp>

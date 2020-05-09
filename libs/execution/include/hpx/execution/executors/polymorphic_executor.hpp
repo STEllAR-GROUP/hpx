@@ -6,8 +6,7 @@
 
 /// \file parallel/executors/polymorphic_executor.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTION_POLYMORPHIC_EXECUTOR_2020_APR_11_0117PM)
-#define HPX_PARALLEL_EXECUTION_POLYMORPHIC_EXECUTOR_2020_APR_11_0117PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -915,5 +914,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

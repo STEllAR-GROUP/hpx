@@ -6,8 +6,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM)
-#define HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/async_continue_fwd.hpp>
@@ -109,5 +108,3 @@ namespace hpx {
             std::forward<Cont>(cont), policy, std::forward<Ts>(vs)...);
     }
 }    // namespace hpx
-
-#endif

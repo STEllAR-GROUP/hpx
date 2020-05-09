@@ -7,8 +7,7 @@
 //
 // This was modeled after the code available in the Range v3 library
 
-#if !defined(HPX_DATASTRUCTURES_TAGGED_DEC_23_2015_1014AM)
-#define HPX_DATASTRUCTURES_TAGGED_DEC_23_2015_1014AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -278,6 +277,4 @@ namespace std {
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
-#endif
-
 #endif

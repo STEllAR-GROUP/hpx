@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_CACHE_LRU_ENTRY_NOV_17_2008_0231PM)
-#define HPX_UTIL_CACHE_LRU_ENTRY_NOV_17_2008_0231PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/cache/entries/entry.hpp>
@@ -85,5 +84,3 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         std::chrono::steady_clock::time_point access_time_;
     };
 }}}}    // namespace hpx::util::cache::entries
-
-#endif

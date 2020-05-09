@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FWD_APR_15_2015_0830AM)
-#define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FWD_APR_15_2015_0830AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -43,6 +42,4 @@ namespace hpx { namespace detail {
 namespace hpx {
     using hpx::detail::apply_colocated;
 }
-#endif
-
 #endif

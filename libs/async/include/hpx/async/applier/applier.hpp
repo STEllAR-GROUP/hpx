@@ -6,8 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_APPLIER_APPLIER_JUN_03_2008_0438PM)
-#define HPX_APPLIER_APPLIER_JUN_03_2008_0438PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -182,5 +181,4 @@ namespace hpx { namespace applier {
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

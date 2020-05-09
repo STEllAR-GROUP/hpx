@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARALLEL_EXECUTORS_CURRENT_EXECUTOR_HPP
-#define HPX_PARALLEL_EXECUTORS_CURRENT_EXECUTOR_HPP
+#pragma once
 
 #include <hpx/execution/executors/thread_pool_executor.hpp>
 
@@ -48,5 +47,3 @@ namespace hpx { namespace this_thread {
     HPX_EXPORT parallel::execution::current_executor get_executor(
         error_code& ec = throws);
 }}    // namespace hpx::this_thread
-
-#endif

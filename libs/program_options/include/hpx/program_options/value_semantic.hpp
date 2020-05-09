@@ -4,8 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef PROGRAM_OPTIONS_VALUE_SEMANTIC_HPP_VP_2004_02_24
-#define PROGRAM_OPTIONS_VALUE_SEMANTIC_HPP_VP_2004_02_24
+#pragma once
 
 #include <hpx/program_options/config.hpp>
 
@@ -477,5 +476,4 @@ namespace hpx { namespace program_options {
 
 #include <hpx/program_options/detail/value_semantic.hpp>
 
-#endif
 #endif

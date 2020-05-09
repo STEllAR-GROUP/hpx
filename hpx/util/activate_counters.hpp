@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_7B5783D6_FCA3_4E3D_BBCE_FBB0A6CF644B)
-#define HPX_7B5783D6_FCA3_4E3D_BBCE_FBB0A6CF644B
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
@@ -74,5 +73,4 @@ namespace hpx { namespace util
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif // 7B5783D6_FCA3_4E3D_BBCE_FBB0A6CF644B
 

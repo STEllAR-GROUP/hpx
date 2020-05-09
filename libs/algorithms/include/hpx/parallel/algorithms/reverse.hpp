@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/reverse.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REVERSE_JUL_29_2014_0432PM)
-#define HPX_PARALLEL_DETAIL_REVERSE_JUL_29_2014_0432PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -263,5 +262,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 dest_first));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

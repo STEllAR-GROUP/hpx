@@ -27,8 +27,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -146,5 +145,3 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #error No default_context_impl available for this system
 
 #endif    // HPX_HAVE_GENERIC_CONTEXT_COROUTINES
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_CONTEXT_IMPL_HPP*/

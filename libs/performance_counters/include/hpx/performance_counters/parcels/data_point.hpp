@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_76311D67_43DA_4B3A_8A2A_14B8A1A266D9)
-#define HPX_76311D67_43DA_4B3A_8A2A_14B8A1A266D9
+#pragma once
 
 #include <hpx/runtime/naming/name.hpp>
 
@@ -46,5 +45,3 @@ namespace hpx { namespace performance_counters { namespace parcels {
             buffer_allocate_time_;    ///< The time spent for allocating buffers
     };
 }}}    // namespace hpx::performance_counters::parcels
-
-#endif    // HPX_76311D67_43DA_4B3A_8A2A_14B8A1A266D9

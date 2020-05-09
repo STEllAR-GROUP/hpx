@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_ACTION_SNAPPY_SERIALIZATION_FILTER_FEB_21_2013_0203PM)
-#define HPX_ACTION_SNAPPY_SERIALIZATION_FILTER_FEB_21_2013_0203PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/plugins/binary_filter/snappy_serialization_filter_registration.hpp>
@@ -58,5 +57,4 @@ namespace hpx { namespace plugins { namespace compression
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

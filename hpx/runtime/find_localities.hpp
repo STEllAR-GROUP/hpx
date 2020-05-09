@@ -7,8 +7,7 @@
 
 /// \file find_localities.hpp
 
-#if !defined(HPX_RUNTIME_FIND_LOCALITIES_HPP)
-#define HPX_RUNTIME_FIND_LOCALITIES_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -220,4 +219,3 @@ namespace hpx
         error_code& ec = throws);
 }
 
-#endif

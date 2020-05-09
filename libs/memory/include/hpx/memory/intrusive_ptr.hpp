@@ -9,8 +9,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef HPX_SMART_PTR_INTRUSIVE_PTR_HPP_INCLUDED
-#define HPX_SMART_PTR_INTRUSIVE_PTR_HPP_INCLUDED
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/memory/config/defines.hpp>
@@ -351,5 +350,3 @@ namespace std {
         }
     };
 }    // namespace std
-
-#endif

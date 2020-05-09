@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_DETAIL_CREATE_PARTITIONER_AUG_10_2017_1116AM)
-#define HPX_DETAIL_CREATE_PARTITIONER_AUG_10_2017_1116AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/bind_back.hpp>
@@ -188,5 +187,3 @@ namespace hpx { namespace resource { namespace detail {
     }
 #endif
 }}}    // namespace hpx::resource::detail
-
-#endif

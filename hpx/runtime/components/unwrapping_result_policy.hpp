@@ -6,8 +6,7 @@
 
 /// \file colocating_distribution_policy.hpp
 
-#if !defined(HPX_COMPONENTS_UNWRAPPING_RESULT_POLICY_JUL_22_2018_1240PM)
-#define HPX_COMPONENTS_UNWRAPPING_RESULT_POLICY_JUL_22_2018_1240PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/detail/async_implementations.hpp>
@@ -142,4 +141,3 @@ namespace hpx
 }
 /// \endcond
 
-#endif

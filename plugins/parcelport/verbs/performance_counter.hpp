@@ -4,8 +4,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 
-#ifndef HPT_PARCELSET_POLICIES_VERBS_PERFORMANCE_COUNTER_HPP
-#define HPT_PARCELSET_POLICIES_VERBS_PERFORMANCE_COUNTER_HPP
+#pragma once
 
 #include <hpx/config/parcelport_defines.hpp>
 #include <plugins/parcelport/parcelport_logging.hpp>
@@ -113,5 +112,4 @@ namespace verbs
     };
 }}}}
 
-#endif
 

@@ -6,8 +6,7 @@
 
 /// \file exception_list.hpp
 
-#if !defined(HPX_EXCEPTION_LIST_OCT_06_2008_0942AM)
-#define HPX_EXCEPTION_LIST_OCT_06_2008_0942AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
@@ -100,5 +99,3 @@ namespace hpx {
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

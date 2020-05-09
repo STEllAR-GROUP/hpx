@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_CONSOLE_DEC_16_2008_0427PM)
-#define HPX_COMPONENTS_CONSOLE_DEC_16_2008_0427PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -86,5 +85,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::console_logging_action<>,
     console_logging_action)
 
-#endif
 

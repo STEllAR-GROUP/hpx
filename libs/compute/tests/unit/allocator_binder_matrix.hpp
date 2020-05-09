@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ALLOCATOR_BINDER_MATRIX_HPP
-#define ALLOCATOR_BINDER_MATRIX_HPP
+#pragma once
 
 #include <hpx/compute/host/numa_binding_allocator.hpp>
 //
@@ -117,5 +116,3 @@ struct matrix_numa_binder : hpx::compute::host::numa_binding_helper<T>
     std::size_t rowprocs_;
     std::size_t rows_page_;
 };
-
-#endif    // ALLOCATOR_BINDER_MATRIX_HPP

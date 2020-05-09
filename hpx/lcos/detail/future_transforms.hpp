@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LCOS_DETAIL_FUTURE_TRANSFORMS_HPP
-#define HPX_LCOS_DETAIL_FUTURE_TRANSFORMS_HPP
+#pragma once
 
 #include <hpx/lcos/detail/future_traits.hpp>
 #include <hpx/lcos_fwd.hpp>
@@ -107,4 +106,3 @@ namespace lcos {
 }    // end namespace lcos
 }    // end namespace hpx
 
-#endif    // HPX_LCOS_DETAIL_FUTURE_TRANSFORMS_HPP

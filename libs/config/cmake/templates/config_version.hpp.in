@@ -8,8 +8,7 @@
 
 // Make HPX inspect tool happy: hpxinspect:nounnamed
 
-#ifndef HPX_CONFIG_VERSION_HPP
-#define HPX_CONFIG_VERSION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
@@ -92,4 +91,3 @@ namespace hpx
     }
 #endif
 
-#endif

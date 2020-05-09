@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_STATIC_REINIT_OCT_25_2012_0921AM)
-#define HPX_UTIL_STATIC_REINIT_OCT_25_2012_0921AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
@@ -26,5 +25,3 @@ namespace hpx { namespace util {
     // Invoke all globally registered destruction functions
     HPX_API_EXPORT void reinit_destruct();
 }}    // namespace hpx::util
-
-#endif

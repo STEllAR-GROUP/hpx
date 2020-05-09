@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime/threads/thread_data_fwd.hpp
 
-#if !defined(HPX_THREADING_BASE_THREADING_BASE_FWD)
-#define HPX_THREADING_BASE_THREADING_BASE_FWD
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/coroutine_fwd.hpp>
@@ -83,5 +82,3 @@ namespace std {
         }
     };
 }    // namespace std
-
-#endif

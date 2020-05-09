@@ -5,9 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(                                                                  \
-    HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIORITY_QUEUE_MAR_15_2011_0926AM)
-#define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIORITY_QUEUE_MAR_15_2011_0926AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
@@ -1294,5 +1292,3 @@ namespace hpx { namespace threads { namespace policies {
 }}}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

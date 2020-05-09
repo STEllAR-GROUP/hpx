@@ -9,8 +9,7 @@
 // (C) Copyright Jeremy Siek    2002.
 // (C) Copyright Thomas Witt    2002.
 
-#if !defined(HPX_UTIL_ITERATOR_ADAPTOR_HPP)
-#define HPX_UTIL_ITERATOR_ADAPTOR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
@@ -223,5 +222,3 @@ namespace hpx { namespace util {
         Base iterator_;
     };
 }}    // namespace hpx::util
-
-#endif

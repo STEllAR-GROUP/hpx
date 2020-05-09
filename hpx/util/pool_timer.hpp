@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_POOL_TIMER)
-#define HPX_UTIL_POOL_TIMER
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
@@ -49,4 +48,3 @@ namespace hpx { namespace util
 }}
 
 
-#endif

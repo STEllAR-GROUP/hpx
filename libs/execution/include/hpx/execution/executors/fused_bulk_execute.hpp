@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_EXECUTORS_FUSED_BULK_EXECUTE_FEB_18_2019_0905AM)
-#define HPX_PARALLEL_EXECUTORS_FUSED_BULK_EXECUTE_FEB_18_2019_0905AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -165,5 +164,3 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             std::forward<Shape>(shape), std::forward<Args>(args)};
     }
 }}}}    // namespace hpx::parallel::execution::detail
-
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COMPUTE_HOST_NUMA_BINDING_ALLOCATOR_HPP
-#define HPX_COMPUTE_HOST_NUMA_BINDING_ALLOCATOR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -36,7 +35,7 @@
 // Can be used to enable debugging of the allocator page mapping
 //#define NUMA_BINDING_ALLOCATOR_INIT_MEMORY
 
-#ifndef NDEBUG
+#if !defined(NDEBUG)
 #define NUMA_BINDING_ALLOCATOR_DEBUG true
 #else
 #if !defined(NUMA_BINDING_ALLOCATOR_DEBUG)
@@ -657,5 +656,3 @@ namespace hpx { namespace compute { namespace host {
         mutable std::mutex init_mutex;
     };
 }}}    // namespace hpx::compute::host
-
-#endif

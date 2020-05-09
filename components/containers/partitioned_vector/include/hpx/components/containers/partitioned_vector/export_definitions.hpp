@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARTITIONED_VECTOR_EXPORT_DEFINITIONS_AUG_02_2017_0658PM)
-#define HPX_PARTITIONED_VECTOR_EXPORT_DEFINITIONS_AUG_02_2017_0658PM
+#pragma once
 
 #include <hpx/config/export_definitions.hpp>
 
@@ -21,6 +20,5 @@
 #define HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
 #endif
 
-#endif
 
 

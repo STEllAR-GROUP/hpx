@@ -6,8 +6,7 @@
 
 /// \file hpx/components/partitioned_vector/partitioned_vector_view.hpp
 
-#ifndef HPX_PARTITIONED_VECTOR_LOCAL_VIEW_HPP
-#define HPX_PARTITIONED_VECTOR_LOCAL_VIEW_HPP
+#pragma once
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
@@ -87,4 +86,3 @@ namespace hpx
     }
 }
 
-#endif    // PARTITIONED_VECTOR_LOCAL_VIEW_HPP

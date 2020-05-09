@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/for_loop.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_FOR_LOOP_MAR_02_2016_1256PM)
-#define HPX_PARALLEL_ALGORITHM_FOR_LOOP_MAR_02_2016_1256PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -1145,6 +1144,4 @@ namespace hpx { namespace traits {
     };
 #endif
 }}    // namespace hpx::traits
-#endif
-
 #endif

@@ -6,8 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_TRAITS_DETAIL_RESERVE_HPP
-#define HPX_TRAITS_DETAIL_RESERVE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
@@ -82,5 +81,3 @@ namespace hpx { namespace traits { namespace detail {
         // do nothing if it's not a vector
     }
 }}}    // namespace hpx::traits::detail
-
-#endif /*HPX_TRAITS_DETAIL_RESERVE_HPP*/

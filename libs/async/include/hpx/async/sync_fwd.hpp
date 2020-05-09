@@ -6,8 +6,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_LCOS_SYNC_FWD_JUL_21_2018_0919PM)
-#define HPX_LCOS_SYNC_FWD_JUL_21_2018_0919PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/local_async/sync.hpp>
@@ -31,5 +30,3 @@ namespace hpx {
             typename util::decay<F>::type>::call(std::forward<F>(f),
             std::forward<Ts>(ts)...));
 }    // namespace hpx
-
-#endif

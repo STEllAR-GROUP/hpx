@@ -7,8 +7,7 @@
 
 /// \file base_object.hpp
 
-#ifndef HPX_SERIALIZATION_BASE_OBJECT_HPP
-#define HPX_SERIALIZATION_BASE_OBJECT_HPP
+#pragma once
 
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -109,5 +108,3 @@ namespace hpx { namespace serialization {
         return ar;
     }
 }}    // namespace hpx::serialization
-
-#endif

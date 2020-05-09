@@ -8,8 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_RUNTIME_THREADS_TOPOLOGY_HPP
-#define HPX_RUNTIME_THREADS_TOPOLOGY_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
@@ -429,5 +428,3 @@ namespace hpx { namespace threads {
         return hpx::threads::topology::memory_page_size_;
     }
 }}    // namespace hpx::threads
-
-#endif /*HPX_RUNTIME_THREADS_TOPOLOGY_HPP*/

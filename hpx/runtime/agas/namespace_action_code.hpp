@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_60B7914E_21A5_4977_AA9C_8E66C44EE0FB)
-#define HPX_60B7914E_21A5_4977_AA9C_8E66C44EE0FB
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -445,5 +444,4 @@ namespace detail
 
 }}
 
-#endif // HPX_60B7914E_21A5_4977_AA9C_8E66C44EE0FB
 

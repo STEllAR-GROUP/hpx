@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_MEM_FN_HPP
-#define HPX_UTIL_MEM_FN_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -59,5 +58,3 @@ namespace hpx { namespace util {
         return detail::mem_fn<R (C::*)(Ps...) const>(pm);
     }
 }}    // namespace hpx::util
-
-#endif

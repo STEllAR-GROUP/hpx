@@ -78,8 +78,7 @@
 //      else:
 //        delete t
 
-#ifndef HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP
-#define HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -207,5 +206,3 @@ namespace hpx { namespace lcos { namespace local {
                 std::forward<F>(f), std::forward<Args>(args)...)));
     }
 }}}    // namespace hpx::lcos::local
-
-#endif /*HPX_LCOS_LOCAL_COMPOSABLE_GUARD_HPP*/

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_STRING_UTIL_CLASSIFICATION_HPP
-#define HPX_STRING_UTIL_CLASSIFICATION_HPP
+#pragma once
 
 #include <cctype>
 #include <string>
@@ -45,5 +44,3 @@ namespace hpx { namespace string_util {
         }
     };
 }}    // namespace hpx::string_util
-
-#endif

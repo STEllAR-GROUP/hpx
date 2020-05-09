@@ -6,8 +6,7 @@
 
 /// \file colocating_distribution_policy.hpp
 
-#if !defined(HPX_COMPONENTS_COLOCATING_DISTRIBUTION_POLICY_APR_10_2015_0227PM)
-#define HPX_COMPONENTS_COLOCATING_DISTRIBUTION_POLICY_APR_10_2015_0227PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/detail/async_colocated.hpp>
@@ -309,4 +308,3 @@ namespace hpx
 }
 /// \endcond
 
-#endif

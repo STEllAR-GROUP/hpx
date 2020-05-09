@@ -7,8 +7,7 @@
 
 // Make HPX inspect tool happy: hpxinspect:nounnamed
 
-#ifndef HPX_EXPORT_PLUGIN_VP_2004_08_25
-#define HPX_EXPORT_PLUGIN_VP_2004_08_25
+#pragma once
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
@@ -151,5 +150,3 @@
     HPX_PLUGIN_EXPORT_LIST_(                                                   \
         HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC, name, classname)                    \
     /**/
-
-#endif

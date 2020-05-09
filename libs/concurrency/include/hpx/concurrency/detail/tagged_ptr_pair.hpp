@@ -11,8 +11,7 @@
 
 //  Disclaimer: Not a Boost library.
 
-#ifndef BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB
-#define BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -485,5 +484,3 @@ namespace boost { namespace lockfree {
 #endif
 
 }}    // namespace boost::lockfree
-
-#endif    // BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB

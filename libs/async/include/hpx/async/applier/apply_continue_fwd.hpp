@@ -5,8 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_RUNTIME_APPLIER_APPLY_CONTINUE_FWD_HPP)
-#define HPX_RUNTIME_APPLIER_APPLY_CONTINUE_FWD_HPP
+#pragma once
 
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
@@ -32,5 +31,3 @@ namespace hpx {
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         naming::id_type const& cont, naming::id_type const& gid, Ts&&... vs);
 }    // namespace hpx
-
-#endif

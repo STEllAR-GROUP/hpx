@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_REBIND_EXECUTOR_SEP_07_2016_0658AM)
-#define HPX_PARALLEL_REBIND_EXECUTOR_SEP_07_2016_0658AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
@@ -71,5 +70,3 @@ namespace hpx { namespace parallel { namespace execution {
             parameters_type>::type type;
     };
 }}}    // namespace hpx::parallel::execution
-
-#endif

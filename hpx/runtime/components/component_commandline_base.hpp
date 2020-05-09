@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENT_COMMANDLINE_BASE_JAN_09_2012_1132AM)
-#define HPX_COMPONENT_COMMANDLINE_BASE_JAN_09_2012_1132AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/plugin.hpp>
@@ -64,4 +63,3 @@ namespace hpx { namespace components
         commandline_options)                                                  \
 /**/
 
-#endif

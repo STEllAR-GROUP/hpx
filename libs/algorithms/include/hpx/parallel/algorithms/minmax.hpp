@@ -8,8 +8,7 @@
 
 /// \file parallel/algorithms/minmax.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_MINMAX_AUG_20_2014_1005AM)
-#define HPX_PARALLEL_DETAIL_MINMAX_AUG_20_2014_1005AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -729,5 +728,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma pop_macro("max")
 #endif
 }}}    // namespace hpx::parallel::v1
-
-#endif

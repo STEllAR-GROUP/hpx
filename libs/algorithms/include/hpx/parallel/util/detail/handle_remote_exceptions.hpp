@@ -4,9 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_UTIL_DETAIL_HANDLE_REMOTE_EXCEPTIONS_DEC_28_2014_0316PM)
-#define HPX_PARALLEL_UTIL_DETAIL_HANDLE_REMOTE_EXCEPTIONS_DEC_28_2014_0316PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -109,5 +107,3 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
     };
 }}}}    // namespace hpx::parallel::util::detail
-
-#endif

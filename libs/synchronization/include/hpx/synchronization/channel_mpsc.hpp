@@ -6,8 +6,7 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#if !defined(HPX_LCOS_LOCAL_CHANNEL_MPSC_NOV_27_2019_1021AM)
-#define HPX_LCOS_LOCAL_CHANNEL_MPSC_NOV_27_2019_1021AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -219,5 +218,3 @@ namespace hpx { namespace lcos { namespace local {
     using channel_mpsc = base_channel_mpsc<T, hpx::lcos::local::spinlock>;
 
 }}}    // namespace hpx::lcos::local
-
-#endif

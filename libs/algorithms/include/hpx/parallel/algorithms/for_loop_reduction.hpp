@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/for_loop_reduction.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM)
-#define HPX_PARALLEL_ALGORITHM_FOR_LOOP_REDUCTION_MAR_05_2016_0837PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -232,5 +231,3 @@ namespace hpx { namespace parallel { inline namespace v2 {
     }
     /// \endcond
 }}}    // namespace hpx::parallel::v2
-
-#endif

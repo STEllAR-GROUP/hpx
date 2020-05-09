@@ -7,8 +7,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_DEPRECATED_MACRO_CHECK_HPP
-#define BOOST_DEPRECATED_MACRO_CHECK_HPP
+#pragma once
 
 #include "inspector.hpp"
 
@@ -40,4 +39,3 @@ namespace boost
   }
 }
 
-#endif // BOOST_DEPRECATED_MACRO_CHECK_HPP

@@ -7,8 +7,7 @@
 
 /// \file exception.hpp
 
-#if !defined(HPX_EXCEPTION_MAR_24_2008_0929AM)
-#define HPX_EXCEPTION_MAR_24_2008_0929AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors/error.hpp>
@@ -532,5 +531,3 @@ namespace hpx {
 #include <hpx/errors/throw_exception.hpp>
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

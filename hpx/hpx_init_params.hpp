@@ -6,8 +6,7 @@
 
 /// \file hpx_init_params.hpp
 
-#ifndef HPX_HPX_INIT_PARAMS_HPP
-#define HPX_HPX_INIT_PARAMS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
@@ -22,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#ifndef DOXYGEN
+#if !defined(DOXYGEN)
 ///////////////////////////////////////////////////////////////////////////////
 // One of these functions must be implemented by the application for the
 // console locality.
@@ -68,7 +67,7 @@ namespace hpx
                     "Usage: " HPX_APPLICATION_STRING " [options]");
     }
 
-#ifndef DOXYGEN
+#if !defined(DOXYGEN)
     typedef int (*hpx_main_type)(hpx::program_options::variables_map&);
     typedef int (*hpx_user_main_type)(int argc, char** argv);
 #endif
@@ -123,4 +122,3 @@ namespace hpx
     };
 }
 
-#endif

@@ -6,9 +6,7 @@
 
 /// \file parallel/algorithms/uninitialized_default_construct.hpp
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_DETAIL_UNINITIALIZED_DEFAULT_CONSTRUCT_MAY_31_2017_0928AM)
-#define HPX_PARALLEL_DETAIL_UNINITIALIZED_DEFAULT_CONSTRUCT_MAY_31_2017_0928AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -343,5 +341,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::size_t(count));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

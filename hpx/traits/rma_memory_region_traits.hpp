@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_TRAITS_rma_memory_region_traits_HPP
-#define HPX_TRAITS_rma_memory_region_traits_HPP
+#pragma once
 
 #include <memory>
 //
@@ -36,4 +35,3 @@ namespace hpx { namespace traits
     };
 }}
 
-#endif

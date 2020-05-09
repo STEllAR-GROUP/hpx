@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef RM_EXPERIMENT_SYSTEM_CHARACTERISTICS_H_H
-#define RM_EXPERIMENT_SYSTEM_CHARACTERISTICS_H_H
+#pragma once
 
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -52,5 +51,3 @@ void print_system_characteristics()
     //! -------------------------------------- topology
     topo.print_hwloc(std::cout);
 }
-
-#endif    //RM_EXPERIMENT_SYSTEM_CHARACTERISTICS_H_H

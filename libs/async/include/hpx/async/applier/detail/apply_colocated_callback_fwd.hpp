@@ -5,9 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(                                                                  \
-    HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_FWD_APR_15_2015_0831AM)
-#define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_CALLBACK_FWD_APR_15_2015_0831AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -42,6 +40,4 @@ namespace hpx { namespace detail {
 namespace hpx {
     using hpx::detail::apply_colocated_cb;
 }
-#endif
-
 #endif

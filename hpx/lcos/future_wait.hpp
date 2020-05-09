@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM)
-#define HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -294,4 +293,3 @@ namespace hpx { namespace lcos
     }
 }}
 
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM)
-#define HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/recursive_mutex.hpp>
@@ -129,4 +128,3 @@ namespace hpx { namespace iostreams { namespace detail
     };
 }}}
 
-#endif

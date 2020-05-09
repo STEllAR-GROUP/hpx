@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F)
-#define HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
@@ -237,5 +236,3 @@ namespace hpx { namespace lcos { namespace local {
 
     typedef detail::shared_mutex<> shared_mutex;
 }}}    // namespace hpx::lcos::local
-
-#endif    // HPX_F0757EAC_E2A3_4F80_A1EC_8CC7EB55186F

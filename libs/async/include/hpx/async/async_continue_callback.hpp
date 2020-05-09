@@ -6,8 +6,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_LCOS_ASYNC_CONTINUE_CALLBACK_MAR_30_2015_1132AM)
-#define HPX_LCOS_ASYNC_CONTINUE_CALLBACK_MAR_30_2015_1132AM
+#pragma once
 
 #include <hpx/async/applier/apply_callback.hpp>
 #include <hpx/async/async_callback_fwd.hpp>
@@ -111,5 +110,3 @@ namespace hpx {
             std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 }    // namespace hpx
-
-#endif

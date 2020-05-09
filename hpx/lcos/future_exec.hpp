@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_FUTURE_EXEC_MAR_06_2012_1059AM)
-#define HPX_LCOS_FUTURE_EXEC_MAR_06_2012_1059AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
@@ -155,5 +154,3 @@ namespace hpx { namespace lcos { namespace detail
     };
 
 }}} // namespace hpx::lcos::detail
-
-#endif

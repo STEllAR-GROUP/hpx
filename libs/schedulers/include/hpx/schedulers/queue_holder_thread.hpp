@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_SCHEDULING_QUEUE_HOLDER_THREAD)
-#define HPX_THREADMANAGER_SCHEDULING_QUEUE_HOLDER_THREAD
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -38,7 +37,7 @@
 #include <utility>
 
 #if !defined(QUEUE_HOLDER_THREAD_DEBUG)
-#ifndef NDEBUG
+#if !defined(NDEBUG)
 #define QUEUE_HOLDER_THREAD_DEBUG false
 #else
 #if !defined(QUEUE_HOLDER_THREAD_DEBUG)
@@ -1030,5 +1029,3 @@ namespace hpx { namespace threads { namespace policies {
     util::internal_allocator<threads::thread_data>
         queue_holder_thread<QueueType>::thread_alloc_;
 }}}    // namespace hpx::threads::policies
-
-#endif

@@ -8,8 +8,7 @@
 // hpxinspect:nodeprecatedinclude:boost/intrusive_ptr.hpp
 // hpxinspect:nodeprecatedname:boost::intrusive_ptr
 
-#ifndef HPX_SERIALIZATION_INTRUSIVE_PTR_HPP
-#define HPX_SERIALIZATION_INTRUSIVE_PTR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -37,5 +36,4 @@ namespace hpx { namespace serialization {
         (template <typename T>), (boost::intrusive_ptr<T>) );
 }}    // namespace hpx::serialization
 
-#endif
 #endif

@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/uninitialized_fill.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM)
-#define HPX_PARALLEL_DETAIL_UNINITIALIZED_FILL_OCT_06_2014_1019AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -328,5 +327,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             value);
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

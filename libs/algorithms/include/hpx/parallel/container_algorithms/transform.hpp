@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/transform.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_TRANSFORM_JUL_18_2015_0804PM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_TRANSFORM_JUL_18_2015_0804PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -341,5 +340,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj2>(proj2));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

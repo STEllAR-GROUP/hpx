@@ -19,8 +19,7 @@
 
 // hpxinspect:noinclude:HPX_PP_STRINGIZE
 
-#ifndef HPX_PREPROCESSOR_STRINGIZE_HPP
-#define HPX_PREPROCESSOR_STRINGIZE_HPP
+#pragma once
 
 #if defined(DOXYGEN)
 /// The \a HPX_PP_STRINGIZE macro stringizes its argument after it has been expanded.
@@ -47,5 +46,4 @@
 
 #define HPX_PP_STRINGIZE_I(text) #text
 
-#endif
 #endif

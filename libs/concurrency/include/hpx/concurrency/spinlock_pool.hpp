@@ -10,8 +10,7 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_SPINLOCK_POOL_HPP_INCLUDED
-#define HPX_UTIL_SPINLOCK_POOL_HPP_INCLUDED
+#pragma once
 
 // MS compatible compilers support #pragma once
 
@@ -129,5 +128,3 @@ namespace hpx { namespace util {
 #endif
 
 }}    // namespace hpx::util
-
-#endif

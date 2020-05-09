@@ -7,8 +7,7 @@
 //
 //  The algorithm was taken from http://locklessinc.com/articles/barriers/
 
-#if !defined(HPX_LCOS_BARRIER_JUN_23_2008_0530PM)
-#define HPX_LCOS_BARRIER_JUN_23_2008_0530PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
@@ -74,5 +73,3 @@ namespace hpx { namespace lcos { namespace local {
 }}}    // namespace hpx::lcos::local
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

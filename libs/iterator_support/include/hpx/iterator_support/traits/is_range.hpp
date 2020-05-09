@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_TRAITS_IS_RANGE_HPP
-#define HPX_TRAITS_IS_RANGE_HPP
+#pragma once
 
 #include <hpx/iterator_support/range.hpp>
 
@@ -54,5 +53,3 @@ namespace hpx { namespace traits {
         typedef typename util::detail::sentinel<R>::type sentinel_type;
     };
 }}    // namespace hpx::traits
-
-#endif /*HPX_TRAITS_IS_RANGE_HPP*/

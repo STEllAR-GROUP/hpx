@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/search.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_SEARCH_FEB_28_2018_0007AM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_SEARCH_FEB_28_2018_0007AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
@@ -220,5 +219,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj2>(proj2));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

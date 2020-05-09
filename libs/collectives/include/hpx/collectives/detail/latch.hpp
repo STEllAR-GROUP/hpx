@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_SERVER_LATCH_APR_19_2015_0956AM)
-#define HPX_LCOS_SERVER_LATCH_APR_19_2015_0956AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/custom_exception_info.hpp>
@@ -142,5 +141,3 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     bool, std::ptrdiff_t, bool_std_ptrdiff)
-
-#endif

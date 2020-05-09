@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_TRANSFORM_SEP_08_2014_0927AM)
-#define HPX_PARALLEL_TEST_TRANSFORM_SEP_08_2014_0927AM
+#pragma once
 
 #include <hpx/include/parallel_transform.hpp>
 #include <hpx/testing.hpp>
@@ -276,5 +275,3 @@ void test_transform_binary_bad_alloc_async(ExPolicy p, IteratorTag)
     HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
 }
-
-#endif

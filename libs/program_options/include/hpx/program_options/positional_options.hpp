@@ -4,8 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef PROGRAM_OPTIONS_POSITIONAL_OPTIONS_VP_2004_03_02
-#define PROGRAM_OPTIONS_POSITIONAL_OPTIONS_VP_2004_03_02
+#pragma once
 
 #include <hpx/program_options/config.hpp>
 
@@ -79,5 +78,4 @@ namespace hpx { namespace program_options {
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

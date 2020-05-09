@@ -7,8 +7,7 @@
 
 /// \file get_locality_id.hpp
 
-#ifndef HPX_RUNTIME_GET_LOCALITY_ID_HPP
-#define HPX_RUNTIME_GET_LOCALITY_ID_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -43,4 +42,3 @@ namespace hpx
     HPX_API_EXPORT std::uint32_t get_locality_id(error_code& ec = throws);
 }
 
-#endif

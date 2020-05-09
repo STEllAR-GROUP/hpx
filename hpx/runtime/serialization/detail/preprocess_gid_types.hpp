@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SERIALIZATION_DETAIL_PREPROCESS_GID_TYPES_HPP)
-#define HPX_SERIALIZATION_DETAIL_PREPROCESS_GID_TYPES_HPP
+#pragma once
 
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures.hpp>
@@ -101,4 +100,3 @@ namespace hpx { namespace serialization {
     }    // namespace detail
 }}    // namespace hpx::serialization
 
-#endif

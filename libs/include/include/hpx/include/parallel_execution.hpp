@@ -4,12 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_EXECUTION)
-#define HPX_EXECUTION
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/execution.hpp>
 #include <hpx/executors.hpp>
 #include <hpx/thread_executors/executors.hpp>
-
-#endif

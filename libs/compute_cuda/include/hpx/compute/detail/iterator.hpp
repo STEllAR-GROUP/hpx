@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_DETAIL_ITERATOR_HPP
-#define HPX_COMPUTE_DETAIL_ITERATOR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -90,5 +89,3 @@ namespace hpx { namespace compute { namespace detail {
     {
     };
 }}}    // namespace hpx::compute::detail
-
-#endif

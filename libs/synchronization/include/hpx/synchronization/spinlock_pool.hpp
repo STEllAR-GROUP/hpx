@@ -11,8 +11,7 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
-#define HPX_LCOS_LOCAL_SPINLOCK_POOL_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
@@ -119,5 +118,3 @@ namespace hpx { namespace lcos { namespace local {
     util::detail::itt_spinlock_init<Tag, N> spinlock_pool<Tag, N>::init_;
 #endif
 }}}    // namespace hpx::lcos::local
-
-#endif

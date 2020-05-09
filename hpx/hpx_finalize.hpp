@@ -6,8 +6,7 @@
 
 /// \file hpx_finalize.hpp
 
-#ifndef HPX_HPX_FINALIZE_HPP
-#define HPX_HPX_FINALIZE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -207,4 +206,3 @@ namespace hpx
     HPX_EXPORT int stop(error_code& ec = throws);
 }
 
-#endif /*HPX_HPX_FINALIZE_HPP*/

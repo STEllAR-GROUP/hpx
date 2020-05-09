@@ -6,8 +6,7 @@
 
 /// \file default_distribution_policy.hpp
 
-#if !defined(HPX_COMPONENTS_DISTRIBUTION_POLICY_APR_07_2015_1246PM)
-#define HPX_COMPONENTS_DISTRIBUTION_POLICY_APR_07_2015_1246PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -388,4 +387,3 @@ namespace hpx
 }
 /// \endcond
 
-#endif

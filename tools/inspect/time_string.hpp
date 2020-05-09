@@ -11,8 +11,7 @@
 //
 // $Id$
 
-#ifndef BOOST_TIME_STRING_HPP_GP_20060731
-#define BOOST_TIME_STRING_HPP_GP_20060731
+#pragma once
 
 #include <string>
 #include <ctime>
@@ -53,4 +52,3 @@ bool time_string(std::string & result
 
 }
 
-#endif // include guard

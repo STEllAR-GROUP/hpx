@@ -6,8 +6,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_LCOS_ASYNC_CONTINUE_FWD_JAN_25_2013_0828AM)
-#define HPX_LCOS_ASYNC_CONTINUE_FWD_JAN_25_2013_0828AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/result_of.hpp>
@@ -79,5 +78,3 @@ namespace hpx {
         Cont&& cont, DistPolicy const& policy, Ts&&... vs);
 #endif
 }    // namespace hpx
-
-#endif

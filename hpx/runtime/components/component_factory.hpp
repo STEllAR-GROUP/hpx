@@ -7,8 +7,7 @@
 
 /// \file hpx/runtime/components/component_factory.hpp
 
-#ifndef HPX_RUNTIME_COMPONENTS_COMPONENT_FACTORY_HPP
-#define HPX_RUNTIME_COMPONENTS_COMPONENT_FACTORY_HPP
+#pragma once
 
 #ifdef DOXYGEN
 /// \def HPX_REGISTER_COMPONENT(type, name, mode)
@@ -150,5 +149,3 @@
 /**/
 
 #endif
-
-#endif /*HPX_RUNTIME_COMPONENTS_COMPONENT_FACTORY_HPP*/

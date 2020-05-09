@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/transform_reduce.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM)
-#define HPX_PARALLEL_DETAIL_TRANSFORM_REDUCE_JUL_11_2014_0428PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
@@ -250,5 +249,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Convert>(conv_op), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

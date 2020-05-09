@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_PARTITION_JUL_20_2017_0954PM)
-#define HPX_PARALLEL_TEST_PARTITION_JUL_20_2017_0954PM
+#pragma once
 
 #include <hpx/include/parallel_partition.hpp>
 #include <hpx/testing.hpp>
@@ -475,5 +474,3 @@ void test_partition_bad_alloc()
     test_partition_bad_alloc_async(
         execution::par(execution::task), IteratorTag());
 }
-
-#endif

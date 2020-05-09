@@ -5,8 +5,7 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_TRAITS_HAS_XXX_HPP
-#define HPX_TRAITS_HAS_XXX_HPP
+#pragma once
 
 #include <hpx/type_support/always_void.hpp>
 
@@ -32,5 +31,3 @@
       : std::true_type                                                         \
     {                                                                          \
     } /**/
-
-#endif

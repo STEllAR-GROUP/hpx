@@ -6,8 +6,7 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
-#if !defined(HPX_UNUSED_FEB_01_2009_1217PM)
-#define HPX_UNUSED_FEB_01_2009_1217PM
+#pragma once
 
 // clang-format off
 #include <hpx/config.hpp>
@@ -107,6 +106,4 @@ namespace hpx { namespace util {
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)
-#endif
-
 #endif

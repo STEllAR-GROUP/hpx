@@ -8,8 +8,7 @@
 
 /// \file parallel/algorithms/copy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM)
-#define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -569,5 +568,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<F>(f), std::forward<Proj>(proj)));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

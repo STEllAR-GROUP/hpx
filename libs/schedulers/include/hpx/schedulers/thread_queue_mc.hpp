@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_THREAD_QUEUE_MC)
-#define HPX_THREADMANAGER_THREAD_QUEUE_MC
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
@@ -45,7 +44,7 @@
 #include <vector>
 
 #if !defined(THREAD_QUEUE_MC_DEBUG)
-#ifndef NDEBUG
+#if !defined(NDEBUG)
 #define THREAD_QUEUE_MC_DEBUG false
 #else
 #if !defined(THREAD_QUEUE_MC_DEBUG)
@@ -332,5 +331,3 @@ namespace hpx { namespace threads { namespace policies {
     };
 
 }}}    // namespace hpx::threads::policies
-
-#endif

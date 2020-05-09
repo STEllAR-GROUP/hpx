@@ -6,8 +6,7 @@
 
 // hpxinspect:nodeprecatedname:boost::barrier
 
-#ifndef HPX_COMPAT_BARRIER_HPP
-#define HPX_COMPAT_BARRIER_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -43,5 +42,3 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_SERIALIZATION_FORCE_LINKING_HPP
-#define HPX_SERIALIZATION_FORCE_LINKING_HPP
+#pragma once
 
 namespace hpx { namespace serialization {
     struct force_linking_helper
@@ -15,5 +14,3 @@ namespace hpx { namespace serialization {
 
     force_linking_helper& force_linking();
 }}    // namespace hpx::serialization
-
-#endif

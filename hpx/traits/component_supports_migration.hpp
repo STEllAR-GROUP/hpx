@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_ACTION_SUPPORTS_MIGRATION_FEB_10_2016_1252PM)
-#define HPX_TRAITS_ACTION_SUPPORTS_MIGRATION_FEB_10_2016_1252PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
@@ -56,5 +55,4 @@ namespace hpx { namespace traits
     };
 }}
 
-#endif
 

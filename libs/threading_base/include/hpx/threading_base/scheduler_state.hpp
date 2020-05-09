@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_THREAD_DATA_SCHEDULER_STATE)
-#define HPX_THREAD_DATA_SCHEDULER_STATE
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -33,5 +32,3 @@ namespace hpx {
         last_valid_runtime_state = state_stopped
     };
 }
-
-#endif    // HPX_703646B3_0567_484E_AD34_A752B8163B30

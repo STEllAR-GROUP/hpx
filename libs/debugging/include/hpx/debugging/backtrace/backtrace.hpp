@@ -8,8 +8,7 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-#ifndef HPX_BACKTRACE_HPP
-#define HPX_BACKTRACE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -128,5 +127,3 @@ namespace hpx { namespace util {
         return backtrace(frames_no).trace();
     }
 }}    // namespace hpx::util
-
-#endif

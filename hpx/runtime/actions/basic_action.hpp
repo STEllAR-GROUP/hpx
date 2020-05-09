@@ -8,8 +8,7 @@
 
 /// \file hpx/runtime/actions/basic_action.hpp
 
-#ifndef HPX_RUNTIME_ACTIONS_BASIC_ACTION_HPP
-#define HPX_RUNTIME_ACTIONS_BASIC_ACTION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -999,4 +998,3 @@ namespace hpx { namespace serialization
 /**/
 #endif
 
-#endif /*HPX_RUNTIME_ACTIONS_BASIC_ACTION_HPP*/

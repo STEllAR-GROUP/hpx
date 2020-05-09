@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENT_STARTUP_SHUTDOWN_SEP_20_2011_0217PM)
-#define HPX_COMPONENT_STARTUP_SHUTDOWN_SEP_20_2011_0217PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -146,5 +145,4 @@ namespace hpx { namespace components
         HPX_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _provider), startup_shutdown) \
     /**/
 
-#endif // HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
 

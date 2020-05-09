@@ -4,8 +4,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PROCESS_SERVER_CHILD_MAR_11_2016_0646PM)
-#define HPX_PROCESS_SERVER_CHILD_MAR_11_2016_0646PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
@@ -49,5 +48,4 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::process::server::child::wait_for_exit_action,
     hpx_components_process_server_child_wait_for_exit);
 
-#endif
 

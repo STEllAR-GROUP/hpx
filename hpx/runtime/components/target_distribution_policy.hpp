@@ -6,8 +6,7 @@
 
 /// \file target_distribution_policy.hpp
 
-#if !defined(HPX_COMPONENTS_TARGET_DISTRIBUTION_POLICY_APR_12_2015_1245PM)
-#define HPX_COMPONENTS_TARGET_DISTRIBUTION_POLICY_APR_12_2015_1245PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/dataflow.hpp>
@@ -246,4 +245,3 @@ namespace hpx
 }
 /// \endcond
 
-#endif

@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/remove.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_REMOVE_DEC_24_2017_0644PM)
-#define HPX_PARALLEL_ALGORITHM_REMOVE_DEC_24_2017_0644PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -350,5 +349,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

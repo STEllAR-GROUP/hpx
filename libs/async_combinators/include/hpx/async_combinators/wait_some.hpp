@@ -7,8 +7,7 @@
 
 /// \file lcos/wait_some.hpp
 
-#if !defined(HPX_LCOS_WAIT_SOME_APR_19_2012_0203PM)
-#define HPX_LCOS_WAIT_SOME_APR_19_2012_0203PM
+#pragma once
 
 #if defined(DOXYGEN)
 namespace hpx {
@@ -605,4 +604,3 @@ namespace hpx {
 }    // namespace hpx
 
 #endif    // DOXYGEN
-#endif

@@ -7,8 +7,7 @@
 // Partial implementation of the coroutine support library
 // (<experimental/coroutines>).
 
-#if !defined(HPX_UTIL_933DADE6_D0AB_46EB_98F3_9ECDAE31A4DA)
-#define HPX_UTIL_933DADE6_D0AB_46EB_98F3_9ECDAE31A4DA
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -137,4 +136,3 @@ namespace std { namespace experimental {
 }}    // namespace std::experimental
 
 #endif    // defined(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-#endif    // HPX_UTIL_933DADE6_D0AB_46EB_98F3_9ECDAE31A4DA

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_ACTION_SELECT_DIRECT_EXECUTION_MAR_22_21018_0124PM)
-#define HPX_TRAITS_ACTION_SELECT_DIRECT_EXECUTION_MAR_22_21018_0124PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/naming_base.hpp>
@@ -62,5 +61,4 @@ namespace hpx { namespace traits
     };
 }}
 
-#endif
 

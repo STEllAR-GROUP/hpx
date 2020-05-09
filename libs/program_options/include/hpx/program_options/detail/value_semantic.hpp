@@ -4,8 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef PROGRAM_OPTIONS_DETAIL_VALUE_SEMANTIC
-#define PROGRAM_OPTIONS_DETAIL_VALUE_SEMANTIC
+#pragma once
 
 // This file defines template functions that are declared in
 // ../value_semantic.hpp.
@@ -246,5 +245,4 @@ namespace hpx { namespace program_options {
 
 }}    // namespace hpx::program_options
 
-#endif
 #endif

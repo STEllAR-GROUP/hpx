@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_SERIALIZE_EXCEPTION_JAN_23_2009_0108PM)
-#define HPX_UTIL_SERIALIZE_EXCEPTION_JAN_23_2009_0108PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -59,4 +58,3 @@ namespace hpx { namespace serialization
     HPX_SERIALIZATION_SPLIT_FREE(std::exception_ptr)
 }}
 
-#endif

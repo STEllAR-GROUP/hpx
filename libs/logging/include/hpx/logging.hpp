@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LOGGING_HPP
-#define HPX_LOGGING_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -247,5 +246,3 @@ bootstrap_logging const& operator<<(bootstrap_logging const& l, T&&)
 }
 
 #endif
-
-#endif /*HPX_LOGGING_HPP*/

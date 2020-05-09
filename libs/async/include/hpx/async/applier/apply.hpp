@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_APPLIER_APPLY_NOV_27_2008_0957AM)
-#define HPX_APPLIER_APPLY_NOV_27_2008_0957AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -649,5 +648,3 @@ namespace hpx {
             gid, actions::action_priority<Derived>(), std::forward<Ts>(vs)...);
     }
 }    // namespace hpx
-
-#endif

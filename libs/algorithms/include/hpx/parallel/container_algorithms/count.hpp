@@ -6,8 +6,7 @@
 
 /// \file parallel/container_algorithms/count.hpp
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_COUNT_FEB_09_2018_2057PM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_COUNT_FEB_09_2018_2057PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -164,5 +163,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<F>(f), std::forward<Proj>(proj));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

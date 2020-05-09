@@ -13,8 +13,7 @@
 
 /// \file hpx/util/checkpoint.hpp
 
-#if !defined(CHECKPOINT_HPP_07262017)
-#define CHECKPOINT_HPP_07262017
+#pragma once
 
 #include <hpx/async/dataflow.hpp>
 #include <hpx/lcos/future.hpp>
@@ -606,5 +605,3 @@ namespace hpx { namespace util {
     }
 
 }}    // namespace hpx::util
-
-#endif

@@ -28,8 +28,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP
-#define HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP
+#pragma once
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
@@ -140,5 +139,3 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
-
-#endif /*HPX_RUNTIME_THREADS_COROUTINES_DETAIL_COROUTINE_IMPL_HPP*/

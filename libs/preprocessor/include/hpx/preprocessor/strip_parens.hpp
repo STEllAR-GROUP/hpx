@@ -11,8 +11,7 @@
 
 // hpxinspect:noinclude:HPX_PP_STRIP_PARENS
 
-#ifndef HPX_PREPROCESSOR_STRIP_PARENS_HPP
-#define HPX_PREPROCESSOR_STRIP_PARENS_HPP
+#pragma once
 
 #include <hpx/preprocessor/cat.hpp>
 
@@ -64,5 +63,3 @@
 #define HPX_PP_STRIP_PARENS(X)                                                 \
     HPX_PP_DETAILS_EVAL((HPX_PP_DETAILS_STRIP_PARENS_I X), X)                  \
     /**/
-
-#endif

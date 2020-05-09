@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RUNTIME_PARCELSET_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM)
-#define HPX_RUNTIME_PARCELSET_COALESCING_MESSAGE_HANDLER_FEB_24_2013_0302PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -116,5 +115,4 @@ namespace hpx { namespace plugins { namespace parcel
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
 #endif

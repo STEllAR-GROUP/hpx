@@ -88,33 +88,33 @@
 #include <thread>    // partly for __WINPTHREADS_VERSION if on MinGW-w64 w/ POSIX threading
 
 // Platform-specific definitions of a numeric thread ID type and an invalid value
-namespace moodycamel { namespace details {
+namespace hpx { namespace concurrency { namespace details {
     template<typename thread_id_t> struct thread_id_converter {
         typedef thread_id_t thread_id_numeric_size_t;
         typedef thread_id_t thread_id_hash_t;
         static thread_id_hash_t prehash(thread_id_t const& x) { return x; }
     };
-} }
+} } }
 #if defined(MCDBGQ_USE_RELACY)
-namespace moodycamel { namespace details {
+namespace hpx { namespace concurrency { namespace details {
     typedef std::uint32_t thread_id_t;
     static const thread_id_t invalid_thread_id  = 0xFFFFFFFFU;
     static const thread_id_t invalid_thread_id2 = 0xFFFFFFFEU;
     static inline thread_id_t thread_id() { return rl::thread_index(); }
-} }
+} } }
 #elif defined(_WIN32) || defined(__WINDOWS__) || defined(__WIN32__)
 // No sense pulling in windows.h in a header, we'll manually declare the function
 // we use and rely on backwards-compatibility for this not to break
 extern "C" __declspec(dllimport) unsigned long __stdcall GetCurrentThreadId(void);
-namespace moodycamel { namespace details {
+namespace hpx { namespace concurrency { namespace details {
     static_assert(sizeof(unsigned long) == sizeof(std::uint32_t), "Expected size of unsigned long to be 32 bits on Windows");
     typedef std::uint32_t thread_id_t;
     static const thread_id_t invalid_thread_id  = 0;      // See http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
     static const thread_id_t invalid_thread_id2 = 0xFFFFFFFFU;  // Not technically guaranteed to be invalid, but is never used in practice. Note that all Win32 thread IDs are presently multiples of 4.
     static inline thread_id_t thread_id() { return static_cast<thread_id_t>(::GetCurrentThreadId()); }
-} }
+} } }
 #elif defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || (defined(__APPLE__) && TARGET_OS_IPHONE)
-namespace moodycamel { namespace details {
+namespace hpx { namespace concurrency { namespace details {
     static_assert(sizeof(std::thread::id) == 4 || sizeof(std::thread::id) == 8, "std::thread::id is expected to be either 4 or 8 bytes");
 
     typedef std::thread::id thread_id_t;
@@ -131,7 +131,7 @@ namespace moodycamel { namespace details {
 
     template<> struct thread_id_converter<thread_id_t> {
         typedef thread_id_size<sizeof(thread_id_t)>::numeric_t thread_id_numeric_size_t;
-#ifndef __APPLE__
+#if !defined(__APPLE__)
         typedef std::size_t thread_id_hash_t;
 #else
         typedef thread_id_numeric_size_t thread_id_hash_t;
@@ -139,14 +139,14 @@ namespace moodycamel { namespace details {
 
         static thread_id_hash_t prehash(thread_id_t const& x)
         {
-#ifndef __APPLE__
+#if !defined(__APPLE__)
             return std::hash<std::thread::id>()(x);
 #else
             return *reinterpret_cast<thread_id_hash_t const*>(&x);
 #endif
         }
     };
-} }
+} } }
 #else
 // Use a nice trick from this answer: http://stackoverflow.com/a/8438730/21475
 // In order to get a numeric thread ID in a platform-independent way, we use a thread-local
@@ -159,16 +159,16 @@ namespace moodycamel { namespace details {
 // Assume C++11 compliant compiler
 #define MOODYCAMEL_THREADLOCAL thread_local
 #endif
-namespace moodycamel { namespace details {
+namespace hpx { namespace concurrency { namespace details {
     typedef std::uintptr_t thread_id_t;
     static const thread_id_t invalid_thread_id  = 0;    // Address can't be nullptr
     static const thread_id_t invalid_thread_id2 = 1;    // Member accesses off a null pointer are also generally invalid. Plus it's not aligned.
     static inline thread_id_t thread_id() { static MOODYCAMEL_THREADLOCAL int x; return reinterpret_cast<thread_id_t>(&x); }
-} }
+} } }
 #endif
 
 // Exceptions
-#ifndef MOODYCAMEL_EXCEPTIONS_ENABLED
+#if !defined(MOODYCAMEL_EXCEPTIONS_ENABLED)
 #if (defined(_MSC_VER) && defined(_CPPUNWIND)) || (defined(__GNUC__) && defined(__EXCEPTIONS)) || (!defined(_MSC_VER) && !defined(__GNUC__))
 #define MOODYCAMEL_EXCEPTIONS_ENABLED
 #endif
@@ -185,7 +185,7 @@ namespace moodycamel { namespace details {
 #define MOODYCAMEL_THROW(expr)
 #endif
 
-#ifndef MOODYCAMEL_NOEXCEPT
+#if !defined(MOODYCAMEL_NOEXCEPT)
 #if !defined(MOODYCAMEL_EXCEPTIONS_ENABLED)
 #define MOODYCAMEL_NOEXCEPT
 #define MOODYCAMEL_NOEXCEPT_CTOR(type, valueType, expr) true
@@ -207,7 +207,7 @@ namespace moodycamel { namespace details {
 #endif
 #endif
 
-#ifndef MOODYCAMEL_CPP11_THREAD_LOCAL_SUPPORTED
+#if !defined(MOODYCAMEL_CPP11_THREAD_LOCAL_SUPPORTED)
 #ifdef MCDBGQ_USE_RELACY
 #define MOODYCAMEL_CPP11_THREAD_LOCAL_SUPPORTED
 #else
@@ -223,7 +223,7 @@ namespace moodycamel { namespace details {
 
 // VS2012 doesn't support deleted functions.
 // In this case, we declare the function normally but don't define it. A link error will be generated if the function is called.
-#ifndef MOODYCAMEL_DELETE_FUNCTION
+#if !defined(MOODYCAMEL_DELETE_FUNCTION)
 #if defined(_MSC_VER) && _MSC_VER < 1800
 #define MOODYCAMEL_DELETE_FUNCTION
 #else
@@ -232,7 +232,7 @@ namespace moodycamel { namespace details {
 #endif
 
 // Compiler-specific likely/unlikely hints
-namespace moodycamel { namespace details {
+namespace hpx { namespace concurrency { namespace details {
 #if defined(__GNUC__)
     static inline bool (likely)(bool x) { return __builtin_expect((x), true); }
     static inline bool (unlikely)(bool x) { return __builtin_expect((x), false); }
@@ -240,13 +240,13 @@ namespace moodycamel { namespace details {
     static inline bool (likely)(bool x) { return x; }
     static inline bool (unlikely)(bool x) { return x; }
 #endif
-} }
+} } }
 
 #ifdef MOODYCAMEL_QUEUE_INTERNAL_DEBUG
 #include "internal/concurrentqueue_internal_debug.h"
 #endif
 
-namespace moodycamel {
+namespace hpx { namespace concurrency {
 namespace details {
     template<typename T>
     struct const_numeric_max {
@@ -334,7 +334,7 @@ struct ConcurrentQueueDefaultTraits
     static const size_t MAX_SUBQUEUE_SIZE = details::const_numeric_max<size_t>::value;
 
 
-#ifndef MCDBGQ_USE_RELACY
+#if !defined(MCDBGQ_USE_RELACY)
     // Memory allocation can be customized if needed.
     // malloc should return nullptr on failure, and handle alignment like std::malloc.
 #if defined(malloc) || defined(free)
@@ -700,8 +700,8 @@ template<typename T, typename Traits = ConcurrentQueueDefaultTraits>
 class ConcurrentQueue
 {
 public:
-    typedef ::moodycamel::ProducerToken producer_token_t;
-    typedef ::moodycamel::ConsumerToken consumer_token_t;
+    typedef ::hpx::concurrency::ProducerToken producer_token_t;
+    typedef ::hpx::concurrency::ConsumerToken consumer_token_t;
 
     typedef typename Traits::index_t index_t;
     typedef typename Traits::size_t size_t;
@@ -3251,7 +3251,7 @@ private:
     };
 
     template<typename XT, typename XTraits>
-    friend void moodycamel::swap(typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&, typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&) MOODYCAMEL_NOEXCEPT;
+    friend void hpx::concurrency::swap(typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&, typename ConcurrentQueue<XT, XTraits>::ImplicitProducerKVP&) MOODYCAMEL_NOEXCEPT;
 
     struct ImplicitProducerHash
     {
@@ -3647,7 +3647,7 @@ inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, ty
     a.swap(b);
 }
 
-}
+} }
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop

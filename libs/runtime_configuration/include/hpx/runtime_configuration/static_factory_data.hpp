@@ -6,8 +6,7 @@
 
 // Make HPX inspect tool happy: hpxinspect:nounnamed
 
-#if !defined(HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP)
-#define HPX_COMPONENTS_STATIC_FACTORY_DATA_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/any.hpp>
@@ -109,5 +108,3 @@ namespace hpx { namespace components {
         } HPX_PP_CAT(module_startup_shutdown_data_, __LINE__);                 \
     }                                                                          \
     /**/
-
-#endif

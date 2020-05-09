@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/transform_inclusive_scan.hpp
 
-#if !defined(HPX_PARALLEL_ALGORITHM_TRANSFORM_INCLUSIVE_SCAN_JAN_04_2015_0556PM)
-#define HPX_PARALLEL_ALGORITHM_TRANSFORM_INCLUSIVE_SCAN_JAN_04_2015_0556PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -440,5 +439,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Op>(op), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

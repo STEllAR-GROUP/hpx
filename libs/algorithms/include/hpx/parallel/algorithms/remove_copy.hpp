@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/remove_copy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM)
-#define HPX_PARALLEL_DETAIL_REMOVE_COPY_FEB_25_2015_0137PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -344,5 +343,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<F>(f), std::forward<Proj>(proj)));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

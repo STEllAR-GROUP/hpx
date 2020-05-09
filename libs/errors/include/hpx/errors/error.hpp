@@ -8,8 +8,7 @@
 
 /// \file error.hpp
 
-#if !defined(HPX_ERROR_SEP_08_2013_1109AM)
-#define HPX_ERROR_SEP_08_2013_1109AM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -231,5 +230,3 @@ namespace boost { namespace system {
     };
 }}    // namespace boost::system
 /// \endcond
-
-#endif

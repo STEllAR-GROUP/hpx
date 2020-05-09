@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0555PM)
-#define HPX_SIMPLE_CENTRAL_TUPLESPACE_MAR_31_2013_0555PM
+#pragma once
 
 #include <hpx/assertion.hpp>
 #include <hpx/include/components.hpp>
@@ -187,5 +186,4 @@ namespace examples
     };
 } // examples
 
-#endif
 

@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4)
-#define HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -170,5 +169,4 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 
 }}
 
-#endif // HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4
 

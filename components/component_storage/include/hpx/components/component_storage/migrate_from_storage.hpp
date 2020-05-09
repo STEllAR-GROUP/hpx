@@ -6,8 +6,7 @@
 
 /// \file migrate_from_storage.hpp
 
-#if !defined(HPX_MIGRATE_FROM_STORAGE_FEB_09_2015_0329PM)
-#define HPX_MIGRATE_FROM_STORAGE_FEB_09_2015_0329PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
@@ -58,6 +57,5 @@ namespace hpx { namespace components
     }
 }}
 
-#endif
 
 

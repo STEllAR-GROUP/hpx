@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_CACHE_LFU_ENTRY_NOV_19_2008_0121PM)
-#define HPX_UTIL_CACHE_LFU_ENTRY_NOV_19_2008_0121PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/cache/entries/entry.hpp>
@@ -83,5 +82,3 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         unsigned long ref_count_;
     };
 }}}}    // namespace hpx::util::cache::entries
-
-#endif

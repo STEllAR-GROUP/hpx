@@ -7,6 +7,8 @@
 
 /// \file lcos/reduce.hpp
 
+#pragma once
+
 #if defined(DOXYGEN)
 namespace hpx { namespace lcos {
 
@@ -70,9 +72,6 @@ namespace hpx { namespace lcos {
         ReduceOp&& reduce_op, ArgN argN, ...);
 }}    // namespace hpx::lcos
 #else
-
-#if !defined(HPX_LCOS_REDUCE_SEP_28_2013_1105AM)
-#define HPX_LCOS_REDUCE_SEP_28_2013_1105AM
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -429,7 +428,5 @@ namespace hpx { namespace lcos {
                             reduce_invoker_helper<ReduceOp>::type,             \
         HPX_PP_CAT(reduce_, Name))                                             \
     /**/
-
-#endif
 
 #endif    // DOXYGEN

@@ -7,8 +7,7 @@
 
 /// \file find_here.hpp
 
-#ifndef HPX_RUNTIME_FIND_HERE_HPP
-#define HPX_RUNTIME_FIND_HERE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -46,4 +45,3 @@ namespace hpx
     HPX_API_EXPORT naming::id_type find_here(error_code& ec = throws);
 }
 
-#endif

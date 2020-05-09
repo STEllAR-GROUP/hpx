@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(TEST_TRANSFORM_BINARY2_HPP)
-#define TEST_TRANSFORM_BINARY2_HPP
+#pragma once
 
 #include <hpx/include/parallel_count.hpp>
 #include <hpx/include/parallel_transform.hpp>
@@ -174,5 +173,3 @@ void transform_binary2_tests(std::vector<hpx::id_type>& localities)
             x, V(1));
     }
 }
-
-#endif

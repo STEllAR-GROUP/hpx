@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_MAR_24_2008_1118AM)
-#define HPX_MAR_24_2008_1118AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -17,6 +16,4 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async.hpp>
 #include <hpx/include/performance_counters.hpp>
-#endif
-
 #endif

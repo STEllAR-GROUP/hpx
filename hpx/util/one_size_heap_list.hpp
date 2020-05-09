@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_ONE_SIZE_HEAP_LIST_HPP
-#define HPX_UTIL_ONE_SIZE_HEAP_LIST_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -130,4 +129,3 @@ namespace hpx { namespace util
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif /*HPX_UTIL_ONE_SIZE_HEAP_LIST_HPP*/

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_TRIGGER_SEP_09_2012_1229PM)
-#define HPX_LCOS_LOCAL_TRIGGER_SEP_09_2012_1229PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -249,5 +248,3 @@ namespace hpx { namespace lcos { namespace local {
         }
     };
 }}}    // namespace hpx::lcos::local
-
-#endif

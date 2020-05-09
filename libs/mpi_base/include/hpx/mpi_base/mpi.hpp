@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PLUGINS_PARCELPORT_MPI_MPI_HPP
-#define HPX_PLUGINS_PARCELPORT_MPI_MPI_HPP
+#pragma once
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_LIB_MPI)
@@ -24,8 +23,6 @@
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
 #pragma GCC diagnostic pop
-#endif
-
 #endif
 
 #endif

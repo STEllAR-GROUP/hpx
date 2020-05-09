@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HISTOGRAM_HPP
-#define HISTOGRAM_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
@@ -198,5 +197,3 @@ namespace hpx { namespace util {
 
     using boost::accumulators::extract::histogram;
 }}    // namespace hpx::util
-
-#endif

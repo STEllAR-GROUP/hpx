@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime/basename_registration_fwd.hpp
 
-#if !defined(HPX_RUNTIME_BASENAME_REGISTRATION_FWD_AUG_17_2015_0432PM)
-#define HPX_RUNTIME_BASENAME_REGISTRATION_FWD_AUG_17_2015_0432PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/components_fwd.hpp>
@@ -291,4 +290,3 @@ namespace hpx
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 }
 
-#endif

@@ -6,8 +6,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef FUNCTION_HYPER_HPP
-#define FUNCTION_HYPER_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/filesystem.hpp>
@@ -61,4 +60,3 @@ inline std::string loclink(path const& full_path, std::string const& word)
     return total;
 }
 
-#endif

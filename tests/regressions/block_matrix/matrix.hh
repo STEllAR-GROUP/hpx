@@ -3,8 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef MATRIX_HH
-#define MATRIX_HH
+#pragma once
 
 #include "defs.hh"
 
@@ -92,5 +91,3 @@ struct matrix_t {
 };
 
 std::ostream& operator<<(std::ostream& os, const matrix_t& a);
-
-#endif // #ifndef MATRIX_HH

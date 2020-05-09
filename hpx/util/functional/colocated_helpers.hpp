@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM)
-#define HPX_UTIL_DETAIL_COLOCATED_HELPERS_FEB_04_2014_0828PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -323,4 +322,3 @@ namespace hpx { namespace util { namespace functional
     }
 }}}
 
-#endif

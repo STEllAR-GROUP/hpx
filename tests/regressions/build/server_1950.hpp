@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_TESTS_UNIT_BUILD_TEST_COMPONENT_HPP
-#define HPX_TESTS_UNIT_BUILD_TEST_COMPONENT_HPP
+#pragma once
 
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
@@ -24,4 +23,3 @@ struct HPX_COMPONENT_EXPORT test_server
 typedef test_server::call_action call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action);
 
-#endif

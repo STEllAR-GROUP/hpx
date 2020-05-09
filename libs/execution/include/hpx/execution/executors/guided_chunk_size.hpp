@@ -6,8 +6,7 @@
 
 /// \file parallel/executors/guided_chunk_size.hpp
 
-#if !defined(HPX_PARALLEL_GUIDED_CHUNK_SIZE_AUG_01_2015_0238PM)
-#define HPX_PARALLEL_GUIDED_CHUNK_SIZE_AUG_01_2015_0238PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
@@ -94,5 +93,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_SHARED_RECEIVE_QUEUE
-#define HPX_PARCELSET_POLICIES_VERBS_SHARED_RECEIVE_QUEUE
+#pragma once
 
 #include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
 //
@@ -95,5 +94,4 @@ namespace verbs
 
 }}}}
 
-#endif
 

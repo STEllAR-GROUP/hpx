@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/reduce.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM)
-#define HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
@@ -337,5 +336,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             value_type(), std::plus<value_type>(), is_segmented());
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_COMMAND_LINE_HANDLING_HPP
-#define HPX_UTIL_COMMAND_LINE_HANDLING_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional.hpp>
@@ -105,5 +104,3 @@ namespace hpx { namespace util {
             int argc, char** argv);
     };
 }}    // namespace hpx::util
-
-#endif /*HPX_UTIL_COMMAND_LINE_HANDLING_HPP*/

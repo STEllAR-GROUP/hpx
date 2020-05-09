@@ -6,8 +6,7 @@
 
 /// \file new.hpp
 
-#if !defined(HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM)
-#define HPX_RUNTIME_COMPONENTS_NEW_OCT_10_2012_1256PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
@@ -624,4 +623,3 @@ namespace hpx
 
 #endif
 
-#endif // HPX_NEW_OCT_10_2012_1256PM

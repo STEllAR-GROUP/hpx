@@ -4,13 +4,12 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_PLUGIN_DLL_HPP
-#define HPX_UTIL_PLUGIN_DLL_HPP
+#pragma once
 
 #include <hpx/plugin/config.hpp>
 
-#ifndef HPX_MSVC
-#ifndef HPX_HAS_DLOPEN
+#if !defined(HPX_MSVC)
+#if !defined(HPX_HAS_DLOPEN)
 #define HPX_HAS_DLOPEN 1
 #endif
 #endif
@@ -22,5 +21,3 @@
 #else
 #error "Hpx.Plugin: your platform is not supported by this library."
 #endif
-
-#endif /*HPX_UTIL_PLUGIN_DLL_HPP*/

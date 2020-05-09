@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0226PM)
-#define HPX_COMPONENTS_CONSOLE_ERROR_SINK_JAN_23_2009_0226PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -30,4 +29,3 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::console_error_sink_action,
     console_error_sink_action)
 
-#endif

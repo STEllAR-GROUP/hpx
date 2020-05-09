@@ -8,8 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_F0153C92_99B1_4F31_8FA9_4208DB2F26CE)
-#define HPX_F0153C92_99B1_4F31_8FA9_4208DB2F26CE
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/logging.hpp>
@@ -40,7 +39,7 @@ namespace hpx { namespace threads { namespace policies {
         bool dump_suspended_threads(std::size_t num_thread, Map& tm,
             std::int64_t& idle_loop_count, bool running)
         {
-#ifndef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+#if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
             HPX_UNUSED(tm);
             HPX_UNUSED(idle_loop_count);
             HPX_UNUSED(running);    //-V601
@@ -155,5 +154,3 @@ namespace hpx { namespace threads { namespace policies {
     }    // namespace detail
 
 }}}    // namespace hpx::threads::policies
-
-#endif    // HPX_F0153C92_99B1_4F31_8FA9_4208DB2F26CE

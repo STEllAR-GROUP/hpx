@@ -7,8 +7,7 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt
 
-#ifndef HPX_MEMORY_DETAIL_SP_CONVERTIBLE_HPP
-#define HPX_MEMORY_DETAIL_SP_CONVERTIBLE_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -47,5 +46,3 @@ namespace hpx { namespace memory { namespace detail {
         HPX_STATIC_CONSTEXPR bool value = sp_convertible<Y[1], T[1]>::value;
     };
 }}}    // namespace hpx::memory::detail
-
-#endif

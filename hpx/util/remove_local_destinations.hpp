@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_REMOVE_LOCAL_DESTINATIONS_JUL_16_2012_1119AM)
-#define HPX_UTIL_REMOVE_LOCAL_DESTINATIONS_JUL_16_2012_1119AM
+#pragma once
 
 #include <hpx/assertion.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -61,4 +60,3 @@ namespace hpx { namespace util
     }
 }}
 
-#endif

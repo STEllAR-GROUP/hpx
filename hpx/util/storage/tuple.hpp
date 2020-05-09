@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_STORAGE_TUPLE_HPP_APR_11_2013_1010AM)
-#define HPX_UTIL_STORAGE_TUPLE_HPP_APR_11_2013_1010AM
+#pragma once
 
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
@@ -128,4 +127,3 @@ namespace hpx { namespace util { namespace storage {
     };
 }}}    // namespace hpx::util::storage
 
-#endif

@@ -8,8 +8,7 @@
 
 /// \file hpx/runtime/actions/preassigned_action_id.hpp
 
-#ifndef HPX_RUNTIME_ACTIONS_PREASSIGNED_ACTION_ID_HPP
-#define HPX_RUNTIME_ACTIONS_PREASSIGNED_ACTION_ID_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -189,4 +188,3 @@ namespace hpx { namespace actions
     /// \endcond
 }}
 
-#endif

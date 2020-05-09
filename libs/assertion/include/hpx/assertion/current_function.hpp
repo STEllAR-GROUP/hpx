@@ -1,5 +1,4 @@
-#ifndef HPX_CURRENT_FUNCTION_HPP
-#define HPX_CURRENT_FUNCTION_HPP
+#pragma once
 
 //
 //  Copyright 2002-2018 Peter Dimov
@@ -58,5 +57,3 @@ namespace hpx { namespace assertion { namespace detail {
     }
 
 }}}    // namespace hpx::assertion::detail
-
-#endif

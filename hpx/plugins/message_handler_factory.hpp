@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_MESSAGE_HANDLER_FACTORY_MAR_24_2013_0347PM)
-#define HPX_MESSAGE_HANDLER_FACTORY_MAR_24_2013_0347PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/plugins/message_handler_factory_base.hpp>
@@ -99,5 +98,4 @@ namespace hpx { namespace plugins
     HPX_REGISTER_PLUGIN_REGISTRY_2(MessageHandler, pluginname)                \
 /**/
 
-#endif
 

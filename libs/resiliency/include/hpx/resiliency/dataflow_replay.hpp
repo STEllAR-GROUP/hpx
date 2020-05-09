@@ -7,8 +7,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_RESILIENCY_DATAFLOW_REPLAY_HPP_2019_FEB_04_0449PM)
-#define HPX_RESILIENCY_DATAFLOW_REPLAY_HPP_2019_FEB_04_0449PM
+#pragma once
 
 #include <hpx/resiliency/config.hpp>
 #include <hpx/resiliency/async_replay.hpp>
@@ -52,5 +51,3 @@ namespace hpx { namespace resiliency {
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }}    // namespace hpx::resiliency
-
-#endif

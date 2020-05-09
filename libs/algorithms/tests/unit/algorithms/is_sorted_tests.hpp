@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_IS_SORTED_MAY28_15_1320)
-#define HPX_PARALLEL_TEST_IS_SORTED_MAY28_15_1320
+#pragma once
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -312,5 +311,3 @@ void test_sorted_bad_alloc_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(caught_bad_alloc);
 }
-
-#endif

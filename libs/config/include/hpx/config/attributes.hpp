@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_CONFIG_ATTRIBUTES_HPP
-#define HPX_CONFIG_ATTRIBUTES_HPP
+#pragma once
 
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/defines.hpp>
@@ -111,5 +110,4 @@
 
 // clang-format on
 
-#endif
 #endif

@@ -6,8 +6,7 @@
 
 // hpxinspect:nodeprecated_macros
 
-#ifndef HPX_CONFIG_LAMBDA_CAPTURE_HPP
-#define HPX_CONFIG_LAMBDA_CAPTURE_HPP
+#pragma once
 
 #include <hpx/config/defines.hpp>
 
@@ -26,5 +25,3 @@
 /// This macro is deprecated. Prefer using ``var = std::move(var)`` directly
 /// instead.
 #define HPX_CAPTURE_MOVE(var) var = std::move(var)
-
-#endif

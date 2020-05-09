@@ -4,10 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_EXECUTION_DEC_25_2106_0102PM)
-#define HPX_PARALLEL_EXECUTION_DEC_25_2106_0102PM
+#pragma once
 
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-
-#endif

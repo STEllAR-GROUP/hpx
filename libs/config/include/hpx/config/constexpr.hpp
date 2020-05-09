@@ -7,8 +7,7 @@
 
 // hpxinspect:nodeprecated_macros
 
-#ifndef HPX_CONFIG_CONSTEXPR_HPP
-#define HPX_CONFIG_CONSTEXPR_HPP
+#pragma once
 
 #include <hpx/config/defines.hpp>
 
@@ -42,5 +41,3 @@
 /// This macro is deprecated. It is always replaced with the ``static
 /// constexpr`` keyword. Prefer using ``static constexpr`` directly instead.
 #define HPX_STATIC_CONSTEXPR static constexpr
-
-#endif

@@ -6,8 +6,7 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#if !defined(HPX_LCOS_LOCAL_CHANNEL_SPSC_NOV_24_2019_1141AM)
-#define HPX_LCOS_LOCAL_CHANNEL_SPSC_NOV_24_2019_1141AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -196,5 +195,3 @@ namespace hpx { namespace lcos { namespace local {
         std::atomic<bool> closed_;
     };
 }}}    // namespace hpx::lcos::local
-
-#endif

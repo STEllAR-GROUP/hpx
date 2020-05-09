@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_VERBS_RDMA_LOGGING
-#define HPX_PARCELSET_POLICIES_VERBS_RDMA_LOGGING
+#pragma once
 
 #include <chrono>
 #include <iomanip>
@@ -93,7 +92,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs {
 //
 // Logging disabled, #define all macros (except for error), to be empty
 //
-#ifndef HPX_PARCELPORT_VERBS_HAVE_LOGGING
+#if !defined(HPX_PARCELPORT_VERBS_HAVE_LOGGING)
 #undef LOG_DEBUG_MSG
 #define LOG_DEBUG_MSG(x)
 #define LOG_TRACE_MSG(x)
@@ -201,4 +200,3 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs {
 // example of usage
 // DEFINE_ENUM_WITH_STRING_CONVERSIONS(test_type, (test1)(test2)(test3))
 
-#endif

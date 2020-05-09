@@ -7,8 +7,7 @@
 
 /// \file get_thread_name.hpp
 
-#if !defined(HPX_RUNTIME_GET_THREAD_NAME_HPP)
-#define HPX_RUNTIME_GET_THREAD_NAME_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -25,4 +24,3 @@ namespace hpx
     HPX_API_EXPORT std::string get_thread_name();
 }
 
-#endif

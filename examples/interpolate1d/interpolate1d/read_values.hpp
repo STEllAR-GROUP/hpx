@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_INTERPOLATE1D_READ_VALUES_AUG_05_2011_1056AM)
-#define HPX_INTERPOLATE1D_READ_VALUES_AUG_05_2011_1056AM
+#pragma once
 
 #include <H5Cpp.h>
 
@@ -13,7 +12,7 @@
 #include <cstdint>
 #include <string>
 
-#ifndef H5_HAVE_THREADSAFE
+#if !defined(H5_HAVE_THREADSAFE)
 #error    "This example requires that the HDF5 API is thread-safe. Please provide a suitable version of HDF5."
 #endif
 
@@ -31,5 +30,4 @@ namespace interpolate1d
       std::size_t offset, std::size_t count);
 }
 
-#endif
 

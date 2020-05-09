@@ -7,6 +7,8 @@
 
 /// \file broadcast.hpp
 
+#pragma once
+
 #if defined(DOXYGEN)
 namespace hpx { namespace lcos {
 
@@ -123,9 +125,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, ArgN argN, ...);
 }}    // namespace hpx::lcos
 #else
-
-#ifndef HPX_LCOS_BROADCAST_HPP
-#define HPX_LCOS_BROADCAST_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -833,7 +832,5 @@ namespace hpx { namespace lcos {
             ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
         HPX_PP_CAT(async_colocated_broadcast_with_index_, Name))               \
     /**/
-
-#endif
 
 #endif    // DOXYGEN

@@ -6,8 +6,7 @@
 
 /// \file unmanaged.hpp
 
-#if !defined(HPX_NAMING_UNMANAGED_NOV_12_2013_0210PM)
-#define HPX_NAMING_UNMANAGED_NOV_12_2013_0210PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -43,5 +42,3 @@ namespace hpx
 {
     using naming::unmanaged;
 }
-
-#endif

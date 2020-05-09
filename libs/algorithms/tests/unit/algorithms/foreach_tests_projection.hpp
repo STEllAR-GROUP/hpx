@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_TEST_FOREACH_PROJECTION_JUL_29_2015_1100AM)
-#define HPX_PARALLEL_TEST_FOREACH_PROJECTION_JUL_29_2015_1100AM
+#pragma once
 
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/testing.hpp>
@@ -211,5 +210,3 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag, Proj&& proj)
     HPX_TEST(caught_exception);
     HPX_TEST(returned_from_algorithm);
 }
-
-#endif

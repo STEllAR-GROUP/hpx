@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_UTIL_PACK_TRAVERSAL_ASYNC_HPP
-#define HPX_UTIL_PACK_TRAVERSAL_ASYNC_HPP
+#pragma once
 
 #include <hpx/pack_traversal/detail/pack_traversal_async_impl.hpp>
 
@@ -161,5 +160,3 @@ namespace hpx { namespace util {
             alloc, std::forward<Visitor>(visitor), std::forward<T>(pack)...);
     }
 }}    // namespace hpx::util
-
-#endif    // HPX_UTIL_PACK_TRAVERSAL_ASYNC_HPP

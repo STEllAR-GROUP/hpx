@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef HPX_COMPUTE_CUDA_HPP
-#define HPX_COMPUTE_CUDA_HPP
+#pragma once
 
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/cuda/concurrent_executor.hpp>
@@ -20,5 +19,3 @@
 #include <hpx/compute/cuda/traits/access_target.hpp>
 #include <hpx/compute/cuda/transfer.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
-
-#endif

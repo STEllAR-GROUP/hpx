@@ -7,8 +7,7 @@
 
 // make inspect happy: hpxinspect:nominmax
 
-#if !defined(HPX_PARALLEL_CONTAINER_ALGORITHM_TAGSPEC_DEC_23_2015_1156AM)
-#define HPX_PARALLEL_CONTAINER_ALGORITHM_TAGSPEC_DEC_23_2015_1156AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tagged.hpp>
@@ -38,5 +37,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma pop_macro("max")
 #endif
 }}}    // namespace hpx::parallel::v1
-
-#endif

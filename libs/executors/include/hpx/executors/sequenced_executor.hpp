@@ -6,8 +6,7 @@
 
 /// \file parallel/executors/sequenced_executor.hpp
 
-#if !defined(HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM)
-#define HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors/exception_list.hpp>
@@ -162,5 +161,3 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
-
-#endif

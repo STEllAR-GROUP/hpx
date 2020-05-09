@@ -7,8 +7,7 @@
 
 /// \file get_num_localities.hpp
 
-#if !defined(HPX_RUNTIME_GET_NUM_LOCALITIES_HPP)
-#define HPX_RUNTIME_GET_NUM_LOCALITIES_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
@@ -110,4 +109,3 @@ namespace hpx
         components::component_type t, error_code& ec = throws);
 }
 
-#endif

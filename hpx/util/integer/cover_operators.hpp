@@ -8,8 +8,7 @@
 
 //----------------------------------------------------------------------------//
 
-#ifndef HPX_UTIL_INTEGER_ENDIAN_COVER_OPERATORS_HPP
-#define HPX_UTIL_INTEGER_ENDIAN_COVER_OPERATORS_HPP
+#pragma once
 
 #include <boost/operators.hpp>
 #include <iosfwd>
@@ -75,4 +74,3 @@ namespace hpx { namespace util
   } // namespace integer
 }} // namespace hpx::util
 
-#endif // HPX_UTIL_INTEGER_ENDIAN_COVER_OPERATORS_HPP

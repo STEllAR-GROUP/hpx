@@ -7,8 +7,7 @@
 
 /// \file throw_exception.hpp
 
-#ifndef HPX_THROW_EXCEPTION_HPP
-#define HPX_THROW_EXCEPTION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion/current_function.hpp>
@@ -178,5 +177,3 @@ namespace hpx {
     hpx::detail::throws_if(ec, errcode, msg, f, __FILE__, __LINE__) /**/
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif

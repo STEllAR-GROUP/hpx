@@ -6,8 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP)
-#define HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP
+#pragma once
 
 #if defined(__unix__)
 
@@ -27,5 +26,3 @@ namespace hpx { namespace util { namespace hardware {
 }}}    // namespace hpx::util::hardware
 
 #endif
-
-#endif    // HPX_UTIL_HARDWARE_TIMESTAMP_LINUX_GENERIC_HPP

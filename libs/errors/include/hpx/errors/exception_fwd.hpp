@@ -7,8 +7,7 @@
 
 /// \file exception_fwd.hpp
 
-#ifndef HPX_EXCEPTION_FWD_HPP
-#define HPX_EXCEPTION_FWD_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/errors/error.hpp>
@@ -67,5 +66,3 @@ namespace hpx {
 }    // namespace hpx
 
 #include <hpx/errors/throw_exception.hpp>
-
-#endif

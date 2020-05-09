@@ -6,8 +6,7 @@
 
 /// \file parallel/algorithms/swap_ranges.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM)
-#define HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -135,5 +134,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<ExPolicy>(policy), is_seq(), first1, last1, first2);
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

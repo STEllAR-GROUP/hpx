@@ -7,8 +7,7 @@
 
 /// \file parallel/algorithms/lexicographical_compare.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_LEXI_COMPARE_DEC_30_2014_0312PM)
-#define HPX_PARALLEL_DETAIL_LEXI_COMPARE_DEC_30_2014_0312PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -217,5 +216,3 @@ namespace hpx { namespace parallel { inline namespace v1 {
             last2, std::forward<Pred>(pred));
     }
 }}}    // namespace hpx::parallel::v1
-
-#endif

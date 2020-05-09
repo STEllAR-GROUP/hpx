@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_POLICIES_LIBFABRIC_CONTROLLER_HPP
-#define HPX_PARCELSET_POLICIES_LIBFABRIC_CONTROLLER_HPP
+#pragma once
 
 // config
 #include <hpx/config/defines.hpp>
@@ -167,7 +166,7 @@ namespace libfabric
 
             // setup a passive listener, or an active RDM endpoint
             here_ = create_local_endpoint();
-#ifndef HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM
+#if !defined(HPX_PARCELPORT_LIBFABRIC_ENDPOINT_RDM)
             create_event_queue();
 #endif
 
@@ -607,7 +606,7 @@ namespace libfabric
         void initialize_localities(hpx::agas::addressing_service &as)
         {
             FUNC_START_DEBUG_MSG;
-#ifndef HPX_PARCELPORT_LIBFABRIC_HAVE_PMI
+#if !defined(HPX_PARCELPORT_LIBFABRIC_HAVE_PMI)
             std::uint32_t N = hpx::get_config().get_num_localities();
             LOG_DEBUG_MSG("Parcelport initialize_localities with " << N << " localities");
 
@@ -1185,4 +1184,3 @@ namespace libfabric
 
 }}}}
 
-#endif

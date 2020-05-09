@@ -6,8 +6,7 @@
 
 // hpxinspect:nodeprecatedname:util::result_of
 
-#ifndef HPX_UTIL_INVOKE_FUSED_HPP
-#define HPX_UTIL_INVOKE_FUSED_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -148,5 +147,3 @@ namespace hpx { namespace util {
     }    // namespace functional
     /// \endcond
 }}    // namespace hpx::util
-
-#endif

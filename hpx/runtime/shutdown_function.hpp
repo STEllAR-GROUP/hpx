@@ -7,8 +7,7 @@
 
 /// \file startup_function.hpp
 
-#ifndef HPX_RUNTIME_SHUTDOWN_FUNCTION_HPP
-#define HPX_RUNTIME_SHUTDOWN_FUNCTION_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/functional/unique_function.hpp>
@@ -58,4 +57,3 @@ namespace hpx
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type f);
 }
 
-#endif

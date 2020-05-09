@@ -7,8 +7,7 @@
 
 // hpxinspect:nounnamed
 
-#if !defined(HPX_PARALLEL_EXECUTORS_TIMED_EXECUTION_FWD_JAN_07_2017_0720AM)
-#define HPX_PARALLEL_EXECUTORS_TIMED_EXECUTION_FWD_JAN_07_2017_0720AM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
@@ -439,5 +438,3 @@ namespace hpx { namespace parallel { namespace execution {
                 detail::sync_execute_after_tag>>::value;
     }    // namespace
 }}}      // namespace hpx::parallel::execution
-
-#endif

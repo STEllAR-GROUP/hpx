@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM)
-#define HPX_LCOS_ASYNC_COLOCATED_FWD_FEB_01_2014_0107PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/async_fwd.hpp>
@@ -62,6 +61,4 @@ namespace hpx { namespace detail {
 namespace hpx {
     using hpx::detail::async_colocated;
 }
-#endif
-
 #endif

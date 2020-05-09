@@ -5,8 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_RUNTIME_APPLIER_APPLY_CONTINUE_CALLBACK_MAR_09_2014_1207PM)
-#define HPX_RUNTIME_APPLIER_APPLY_CONTINUE_CALLBACK_MAR_09_2014_1207PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/async/applier/apply.hpp>
@@ -69,5 +68,3 @@ namespace hpx {
             cont, gid, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
     }
 }    // namespace hpx
-
-#endif

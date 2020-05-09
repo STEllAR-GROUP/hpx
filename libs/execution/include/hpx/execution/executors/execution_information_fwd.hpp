@@ -7,9 +7,7 @@
 
 // hpxinspect:nounnamed
 
-#if !defined(                                                                  \
-    HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_FWD_JAN_16_2017_0350PM)
-#define HPX_PARALLEL_EXECUTORS_EXECUTION_INFORMATION_FWD_JAN_16_2017_0350PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_fwd.hpp>
@@ -232,5 +230,3 @@ namespace hpx { namespace parallel { namespace execution {
                 detail::set_scheduler_mode_tag>>::value;
     }    // namespace
 }}}      // namespace hpx::parallel::execution
-
-#endif

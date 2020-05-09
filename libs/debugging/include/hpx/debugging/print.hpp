@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_DEBUGGING_PRINT_HPP)
-#define HPX_DEBUGGING_PRINT_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -316,7 +315,7 @@ namespace hpx { namespace debug {
     };
 
     // if fold expressions are not available, all output is disabled
-#ifndef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
+#if !defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
     template <bool>
     struct enable_print;
 
@@ -385,7 +384,7 @@ namespace hpx { namespace debug {
         }
     };
 
-#ifndef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
+#if !defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
 
     template <>
     struct enable_print<false> : public disable_print
@@ -496,5 +495,3 @@ namespace hpx { namespace debug {
 #endif
 }}    // namespace hpx::debug
 /// \endcond
-
-#endif

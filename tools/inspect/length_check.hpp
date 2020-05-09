@@ -7,8 +7,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_EIGHTY_CHECK_HPP
-#define BOOST_EIGHTY_CHECK_HPP
+#pragma once
 
 #include "inspector.hpp"
 #include <cstddef>
@@ -47,4 +46,3 @@ namespace boost
     }
 }
 
-#endif // BOOST_EXTRA_WHITESPACE_CHECK_HPP

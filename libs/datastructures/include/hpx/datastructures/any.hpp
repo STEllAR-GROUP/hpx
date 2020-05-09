@@ -13,8 +13,7 @@
     It adds support for HPX serialization, move assignment, == operator.
 ==============================================================================*/
 
-#ifndef HPX_UTIL_ANY_HPP
-#define HPX_UTIL_ANY_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
@@ -1644,6 +1643,4 @@ namespace hpx { namespace util {
 ////////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_MSVC) && HPX_MSVC >= 1400
 #pragma warning(pop)
-#endif
-
 #endif

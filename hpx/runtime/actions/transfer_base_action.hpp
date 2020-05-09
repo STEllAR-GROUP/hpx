@@ -8,8 +8,7 @@
 
 /// \file transfer_action.hpp
 
-#ifndef HPX_RUNTIME_ACTIONS_TRANSFER_BASE_ACTION_HPP
-#define HPX_RUNTIME_ACTIONS_TRANSFER_BASE_ACTION_HPP
+#pragma once
 
 #include <hpx/config/defines.hpp>
 
@@ -362,5 +361,4 @@ namespace hpx { namespace parcelset { namespace detail
 }}}
 #endif
 
-#endif
 #endif

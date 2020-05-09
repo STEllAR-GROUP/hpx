@@ -5,8 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_DETAIL_FUTURE_TRAITS_DEC_05_2017_0214PM)
-#define HPX_LCOS_DETAIL_FUTURE_TRAITS_DEC_05_2017_0214PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/always_void.hpp>
@@ -35,4 +34,3 @@ namespace hpx { namespace lcos { namespace detail
     };
 }}}
 
-#endif

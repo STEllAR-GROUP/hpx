@@ -6,8 +6,7 @@
 
 /// \file hpx/synchronization/latch.hpp
 
-#if !defined(HPX_LCOS_LATCH_APR_18_2015_0925PM)
-#define HPX_LCOS_LATCH_APR_18_2015_0925PM
+#pragma once
 
 #include <hpx/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
@@ -197,5 +196,3 @@ namespace hpx { namespace lcos { namespace local {
         bool notified_;
     };
 }}}    // namespace hpx::lcos::local
-
-#endif

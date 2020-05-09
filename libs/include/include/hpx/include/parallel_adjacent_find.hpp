@@ -5,14 +5,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARALLEL_ADJACENT_FIND_SEP_20_2014_0732PM)
-#define HPX_PARALLEL_ADJACENT_FIND_SEP_20_2014_0732PM
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/adjacent_find.hpp>
-#endif
-
 #endif

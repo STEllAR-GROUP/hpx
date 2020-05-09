@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADING_BASE_DETAIL_RESET_LCO_DESCRIPTION_APR_26_2020_0132PM)
-#define HPX_THREADING_BASE_DETAIL_RESET_LCO_DESCRIPTION_APR_26_2020_0132PM
+#pragma once
 
 #include <hpx/config.hpp>
 
@@ -41,5 +40,3 @@ namespace hpx { namespace threads { namespace detail {
 }}}    // namespace hpx::threads::detail
 
 #endif    // HPX_HAVE_THREAD_DESCRIPTION
-
-#endif
