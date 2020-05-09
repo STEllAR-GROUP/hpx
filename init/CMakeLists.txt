@@ -20,7 +20,6 @@ list(
   hpx_main.cpp
   hpx_main_argc_argv.cpp
   hpx_main_variables_map.cpp
-  hpx_main_winsocket.cpp
   hpx_user_main.cpp
   hpx_user_main_argc_argv.cpp
 )

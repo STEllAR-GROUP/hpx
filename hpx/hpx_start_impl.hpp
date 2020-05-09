@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/assertion.hpp>
+#include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/program_options.hpp>
@@ -42,14 +43,9 @@ namespace hpx
             > const& f, int argc, char** argv,
             init_params const& params, bool blocking);
 
-#if defined(HPX_WINDOWS)
-        void init_winsocket();
-#endif
-
         HPX_EXPORT int init_helper(
             hpx::program_options::variables_map&,
             util::function_nonser<int(int, char**)> const&);
-
     }
     /// \endcond
 
