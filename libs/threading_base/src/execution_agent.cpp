@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
+#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/throw_exception.hpp>
 #include <hpx/format.hpp>
@@ -25,8 +26,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <sstream>
 #include <string>
+#include <utility>
 
 namespace hpx { namespace threads {
 
@@ -110,6 +113,27 @@ namespace hpx { namespace threads {
         }
     }
 
+#if defined(HPX_HAVE_VERIFY_LOCKS)
+    struct on_exit_reset_held_lock_data
+    {
+        on_exit_reset_held_lock_data()
+          : data_(hpx::util::get_held_locks_data())
+        {
+        }
+
+        ~on_exit_reset_held_lock_data()
+        {
+            hpx::util::set_held_locks_data(std::move(data_));
+        }
+
+        std::unique_ptr<hpx::util::held_locks_data> data_;
+    };
+#else
+    struct on_exit_reset_held_lock_data
+    {
+    };
+#endif
+
     hpx::threads::thread_state_ex_enum execution_agent::do_yield(
         const char* desc, threads::thread_state_enum state)
     {
@@ -139,6 +163,8 @@ namespace hpx { namespace threads {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id);
 #endif
+            on_exit_reset_held_lock_data held_locks;
+
             HPX_ASSERT(thrd_data->get_state().state() == active);
             HPX_ASSERT(state != active);
             statex = self_.yield(

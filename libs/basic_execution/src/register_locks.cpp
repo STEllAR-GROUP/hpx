@@ -11,7 +11,7 @@
 #include <hpx/errors.hpp>
 
 #include <cstddef>
-#include <map>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -19,90 +19,102 @@
 namespace hpx { namespace util {
 
 #ifdef HPX_HAVE_VERIFY_LOCKS
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        struct lock_data
+        lock_data::lock_data(std::size_t trace_depth)
+          : ignore_(false)
+          , user_data_(nullptr)
+#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+          , backtrace_(hpx::util::trace(trace_depth))
+#endif
         {
-            lock_data(std::size_t trace_depth)
-              : ignore_(false)
-              , user_data_(nullptr)
+        }
+
+        lock_data::lock_data(register_lock_data* data, std::size_t trace_depth)
+          : ignore_(false)
+          , user_data_(data)
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-              , backtrace_(hpx::util::trace(trace_depth))
+          , backtrace_(hpx::detail::trace(trace_depth))
 #endif
+        {
+        }
+
+        lock_data::~lock_data()
+        {
+            delete user_data_;
+        }
+
+        struct held_locks_data_ptr
+        {
+            held_locks_data_ptr()
+              : data_(new held_locks_data)
             {
             }
 
-            lock_data(register_lock_data* data, std::size_t trace_depth)
-              : ignore_(false)
-              , user_data_(data)
-#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-              , backtrace_(hpx::detail::trace(trace_depth))
-#endif
+            void reinitialize()
             {
+                data_.reset(new held_locks_data);
             }
 
-            ~lock_data()
+            // note: this invalidates the stored pointer - this is intentional
+            std::unique_ptr<held_locks_data> release()
             {
-                delete user_data_;
+                HPX_ASSERT(!!data_);
+                return std::move(data_);
             }
 
-            bool ignore_;
-            register_lock_data* user_data_;
-#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-            std::string backtrace_;
-#endif
+            void set(std::unique_ptr<held_locks_data>&& data)
+            {
+                data_ = std::move(data);
+            }
+
+            std::unique_ptr<held_locks_data> data_;
         };
 
         struct register_locks
         {
-            using held_locks_map = std::map<void const*, lock_data>;
+            using held_locks_map = held_locks_data::held_locks_map;
 
-            struct held_locks_data
+            static held_locks_data_ptr& get_held_locks()
             {
-                held_locks_data()
-                  : enabled_(true)
-                  , ignore_all_locks_(false)
+                static thread_local held_locks_data_ptr held_locks;
+                if (!held_locks.data_)
                 {
+                    held_locks.reinitialize();
                 }
-
-                held_locks_map data_;
-                bool enabled_;
-                bool ignore_all_locks_;
-            };
-
-            static thread_local held_locks_data held_locks_;
+                return held_locks;
+            }
 
             static bool lock_detection_enabled_;
             static std::size_t lock_detection_trace_depth_;
 
             static held_locks_map& get_lock_map()
             {
-                return held_locks_.data_;
+                return get_held_locks().data_->map_;
             }
 
             static bool get_lock_enabled()
             {
-                return held_locks_.enabled_;
+                return get_held_locks().data_->enabled_;
             }
 
             static void set_lock_enabled(bool enable)
             {
-                held_locks_.enabled_ = enable;
+                get_held_locks().data_->enabled_ = enable;
             }
 
             static bool get_ignore_all_locks()
             {
-                return !held_locks_.ignore_all_locks_;
+                return !get_held_locks().data_->ignore_all_locks_;
             }
 
             static void set_ignore_all_locks(bool enable)
             {
-                held_locks_.ignore_all_locks_ = enable;
+                get_held_locks().data_->ignore_all_locks_ = enable;
             }
         };
 
-        thread_local register_locks::held_locks_data
-            register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
         std::size_t register_locks::lock_detection_trace_depth_ =
             HPX_HAVE_THREAD_BACKTRACE_DEPTH;
@@ -122,6 +134,18 @@ namespace hpx { namespace util {
             bool old_value_;
         };
     }    // namespace detail
+
+    // retrieve the current thread_local data about held locks
+    std::unique_ptr<held_locks_data> get_held_locks_data()
+    {
+        return detail::register_locks::get_held_locks().release();
+    }
+
+    // set the current thread_local data about held locks
+    void set_held_locks_data(std::unique_ptr<held_locks_data>&& data)
+    {
+        detail::register_locks::get_held_locks().set(std::move(data));
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     void enable_lock_detection()
@@ -349,6 +373,12 @@ namespace hpx { namespace util {
 
     void force_error_on_lock() {}
 
+    void enable_lock_detection() {}
+
+    void disable_lock_detection() {}
+
+    void trace_depth_lock_detection(std::size_t) {}
+
     void ignore_lock(void const* lock) {}
 
     void reset_ignored(void const* lock) {}
@@ -356,5 +386,12 @@ namespace hpx { namespace util {
     void ignore_all_locks() {}
 
     void reset_ignored_all() {}
+
+    std::unique_ptr<held_locks_data> get_held_locks_data()
+    {
+        return std::unique_ptr<held_locks_data>();
+    }
+
+    void set_held_locks_data(std::unique_ptr<held_locks_data>&& data) {}
 #endif
 }}    // namespace hpx::util

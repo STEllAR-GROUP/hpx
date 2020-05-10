@@ -94,6 +94,7 @@ add_hpx_module(
     hpx_affinity
     hpx_allocator_support
     hpx_assertion
+    hpx_basic_execution
     hpx_config
     hpx_coroutines
     hpx_errors
