@@ -186,6 +186,9 @@ namespace hpx { namespace threads { namespace policies {
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
 
+        // Queries whether a given core is idle
+        virtual bool is_core_idle(std::size_t num_thread) const = 0;
+
         // count active background threads
         std::int64_t get_background_thread_count();
         void increment_background_thread_count();

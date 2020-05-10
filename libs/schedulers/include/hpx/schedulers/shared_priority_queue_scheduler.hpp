@@ -968,6 +968,16 @@ namespace hpx { namespace threads { namespace policies {
                     }
                 }
 
+                // Queries whether a given core is idle
+                bool is_core_idle(std::size_t num_thread) const override
+                {
+                    std::size_t domain_num = d_lookup_[num_thread];
+                    std::size_t q_index = q_lookup_[num_thread];
+                    return numa_holder_[domain_num]
+                               .thread_queue(q_index)
+                               ->get_thread_count(unknown) == 0;
+                }
+
                 //---------------------------------------------------------------------
                 // Enumerate matching threads from all queues
                 bool enumerate_threads(
