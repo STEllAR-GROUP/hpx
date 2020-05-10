@@ -9,6 +9,7 @@ set(tests
     all_to_all
     barrier
     broadcast
+    broadcast_direct
     broadcast_apply
     broadcast_component
     fold
@@ -20,6 +21,7 @@ set(tests
 set(all_reduce_PARAMETERS LOCALITIES 2)
 set(all_to_all_PARAMETERS LOCALITIES 2)
 set(broadcast_PARAMETERS LOCALITIES 2)
+set(broadcast_direct_PARAMETERS LOCALITIES 2)
 set(broadcast_apply_PARAMETERS LOCALITIES 2)
 set(broadcast_component_PARAMETERS LOCALITIES 2)
 set(remote_latch_PARAMETERS LOCALITIES 2)

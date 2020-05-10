@@ -14,6 +14,8 @@ set(collectives_headers
     hpx/collectives/all_to_all.hpp
     hpx/collectives/barrier.hpp
     hpx/collectives/broadcast.hpp
+    hpx/collectives/broadcast_direct.hpp
+    hpx/collectives/detail/communicator.hpp
     hpx/collectives/fold.hpp
     hpx/collectives/gather.hpp
     hpx/collectives/latch.hpp

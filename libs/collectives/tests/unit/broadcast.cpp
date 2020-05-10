@@ -1,143 +1,75 @@
-//  Copyright (c) 2013 Thomas Heller
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/collectives.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
+#include <string>
+#include <utility>
 #include <vector>
 
-std::uint32_t f1()
+char const* broadcast_basename = "/test/broadcast/";
+char const* broadcast_direct_basename = "/test/broadcast_direct/";
+
+HPX_REGISTER_BROADCAST(std::uint32_t, test_broadcast);
+
+int hpx_main(int argc, char* argv[])
 {
-    return hpx::get_locality_id();
-}
-HPX_PLAIN_ACTION(f1);
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST(num_localities >= 2);
 
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f1_action)
-HPX_REGISTER_BROADCAST_ACTION(f1_action)
-
-void f2() {}
-HPX_PLAIN_ACTION(f2);
-
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f2_action)
-HPX_REGISTER_BROADCAST_ACTION(f2_action)
-
-std::uint32_t f3(std::uint32_t i)
-{
-    return hpx::get_locality_id() + i;
-}
-HPX_PLAIN_ACTION(f3);
-
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f3_action)
-HPX_REGISTER_BROADCAST_ACTION(f3_action)
-
-void f4(std::uint32_t i) {}
-HPX_PLAIN_ACTION(f4);
-
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f4_action)
-HPX_REGISTER_BROADCAST_ACTION(f4_action)
-
-std::uint32_t f1_idx(std::size_t)
-{
-    return hpx::get_locality_id();
-}
-HPX_PLAIN_ACTION(f1_idx);
-
-HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f1_idx_action)
-HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f1_idx_action)
-
-void f2_idx(std::size_t) {}
-HPX_PLAIN_ACTION(f2_idx);
-
-HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f2_idx_action)
-HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f2_idx_action)
-
-std::uint32_t f3_idx(std::uint32_t i, std::size_t)
-{
-    return hpx::get_locality_id() + i;
-}
-HPX_PLAIN_ACTION(f3_idx);
-
-HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f3_idx_action)
-HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f3_idx_action)
-
-void f4_idx(std::uint32_t i, std::size_t) {}
-HPX_PLAIN_ACTION(f4_idx);
-
-HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f4_idx_action)
-HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f4_idx_action)
-
-int hpx_main()
-{
-    hpx::id_type here = hpx::find_here();
-    hpx::id_type there = here;
-    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    // test functionality based on future<> of local result
+    for (std::uint32_t i = 0; i != 10; ++i)
     {
-        std::vector<std::uint32_t> f1_res;
-        f1_res = hpx::lcos::broadcast<f1_action>(localities).get();
-
-        HPX_TEST_EQ(f1_res.size(), localities.size());
-        for (std::size_t i = 0; i < f1_res.size(); ++i)
+        if (hpx::get_locality_id() == 0)
         {
-            HPX_TEST_EQ(
-                f1_res[i], hpx::naming::get_locality_id_from_id(localities[i]));
+            hpx::future<void> f = broadcast_to(broadcast_basename,
+                hpx::make_ready_future(i + 42), num_localities, i);
+            f.get();
         }
-
-        hpx::lcos::broadcast<f2_action>(localities).get();
-
-        std::vector<std::uint32_t> f3_res;
-        f3_res = hpx::lcos::broadcast<f3_action>(localities, 1).get();
-
-        HPX_TEST_EQ(f3_res.size(), localities.size());
-        for (std::size_t i = 0; i < f3_res.size(); ++i)
+        else
         {
-            HPX_TEST_EQ(f3_res[i],
-                hpx::naming::get_locality_id_from_id(localities[i]) + 1);
-        }
+            hpx::future<std::uint32_t> result =
+                hpx::broadcast_from<std::uint32_t>(broadcast_basename, i);
 
-        hpx::lcos::broadcast<f4_action>(localities, 0).get();
+            HPX_TEST_EQ(i + 42, result.get());
+        }
     }
+
+    // test functionality based on immediate local result value
+    for (std::uint32_t i = 0; i != 10; ++i)
     {
-        std::vector<std::uint32_t> f1_res;
-        f1_res =
-            hpx::lcos::broadcast_with_index<f1_idx_action>(localities).get();
-
-        HPX_TEST_EQ(f1_res.size(), localities.size());
-        for (std::size_t i = 0; i < f1_res.size(); ++i)
+        if (hpx::get_locality_id() == 0)
         {
-            HPX_TEST_EQ(
-                f1_res[i], hpx::naming::get_locality_id_from_id(localities[i]));
+            hpx::future<void> f = hpx::broadcast_to(
+                broadcast_direct_basename, i + 42, num_localities, i);
+            f.get();
         }
-
-        hpx::lcos::broadcast_with_index<f2_idx_action>(localities).get();
-
-        std::vector<std::uint32_t> f3_res;
-        f3_res =
-            hpx::lcos::broadcast_with_index<f3_idx_action>(localities, 1).get();
-
-        HPX_TEST_EQ(f3_res.size(), localities.size());
-        for (std::size_t i = 0; i < f3_res.size(); ++i)
+        else
         {
-            HPX_TEST_EQ(f3_res[i],
-                hpx::naming::get_locality_id_from_id(localities[i]) + 1);
-        }
+            hpx::future<std::uint32_t> result =
+                hpx::broadcast_from<std::uint32_t>(
+                    broadcast_direct_basename, i);
 
-        hpx::lcos::broadcast_with_index<f4_idx_action>(localities, 0).get();
+            HPX_TEST_EQ(i + 42, result.get());
+        }
     }
+
     return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
 {
-    // Initialize and run HPX
-    HPX_TEST_EQ_MSG(
-        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
+    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
+    HPX_TEST_EQ(hpx::init(argc, argv, cfg), 0);
     return hpx::util::report_errors();
 }

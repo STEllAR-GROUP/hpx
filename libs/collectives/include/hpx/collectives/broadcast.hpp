@@ -1,5 +1,4 @@
-//  Copyright (c) 2013-2014 Thomas Heller
-//  Copyright (c) 2013-2017 Hartmut Kaiser
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,827 +9,476 @@
 #pragma once
 
 #if defined(DOXYGEN)
+// clang-format off
 namespace hpx { namespace lcos {
 
-    /// \brief Perform a distributed broadcast operation
+    /// Broadcast a value to different call sites
     ///
-    /// The function hpx::lcos::broadcast performs a distributed broadcast
-    /// operation resulting in action invocations on a given set
-    /// of global identifiers. The action can be either a plain action (in
-    /// which case the global identifiers have to refer to localities) or a
-    /// component action (in which case the global identifiers have to refer
-    /// to instances of a component type which exposes the action.
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
     ///
-    /// The given action is invoked asynchronously on all given identifiers,
-    /// and the arguments ArgN are passed along to those invocations.
+    /// \param  basename    The base name identifying the broadcast operation
+    /// \param  local_result A future referring to the value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     broadcast support object. This value is optional
+    ///                     and defaults to '0' (zero).
     ///
-    /// \param ids       [in] A list of global identifiers identifying the
-    ///                  target objects for which the given action will be
-    ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed
-    ///                  by const reference) which will be forwarded to the
-    ///                  action invocation.
+    /// \note       Each broadcast operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_BROADCAST macro to define the
+    ///             necessary internal facilities used by \a broadcast.
     ///
-    /// \returns         This function returns a future representing the result
-    ///                  of the overall reduction operation.
+    /// \returns    This function returns a future that will become
+    ///             ready once the broadcast operation has been completed.
     ///
-    /// \note            If decltype(Action(...)) is void, then the result of
-    ///                  this function is future<void>.
-    ///
-    template <typename Action, typename ArgN, ...>
-    hpx::future<std::vector<decltype(Action(hpx::id_type, ArgN, ...))>>
-    broadcast(std::vector<hpx::id_type> const& ids, ArgN argN, ...);
+    template <typename T>
+    hpx::future<void> broadcast_to(char const* basename,
+        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
 
-    /// \brief Perform an asynchronous (fire&forget) distributed broadcast operation
+    /// Broadcast a value to different call sites
     ///
-    /// The function hpx::lcos::broadcast_apply performs an asynchronous
-    /// (fire&forget) distributed broadcast operation resulting in action
-    /// invocations on a given set of global identifiers. The action can be
-    /// either a plain action (in which case the global identifiers have to
-    /// refer to localities) or a component action (in which case the global
-    /// identifiers have to refer to instances of a component type which
-    /// exposes the action.
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
     ///
-    /// The given action is invoked asynchronously on all given identifiers,
-    /// and the arguments ArgN are passed along to those invocations.
+    /// \param  basename    The base name identifying the broadcast operation
+    /// \param  local_result A value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     broadcast support object. This value is optional
+    ///                     and defaults to '0' (zero).
     ///
-    /// \param ids       [in] A list of global identifiers identifying the
-    ///                  target objects for which the given action will be
-    ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed
-    ///                  by const reference) which will be forwarded to the
-    ///                  action invocation.
+    /// \note       Each broadcast operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_BROADCAST macro to define the
+    ///             necessary internal facilities used by \a broadcast.
     ///
-    template <typename Action, typename ArgN, ...>
-    void broadcast_apply(std::vector<hpx::id_type> const& ids, ArgN argN, ...);
+    /// \returns    This function returns a future that will become
+    ///             ready once the broadcast operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<void> broadcast_to(char const* basename,
+        T&& local_result, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
 
-    /// \brief Perform a distributed broadcast operation
+    /// Receive a value that was broadcast to different call sites
     ///
-    /// The function hpx::lcos::broadcast_with_index performs a distributed broadcast
-    /// operation resulting in action invocations on a given set
-    /// of global identifiers. The action can be either a plain action (in
-    /// which case the global identifiers have to refer to localities) or a
-    /// component action (in which case the global identifiers have to refer
-    /// to instances of a component type which exposes the action.
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
     ///
-    /// The given action is invoked asynchronously on all given identifiers,
-    /// and the arguments ArgN are passed along to those invocations.
+    /// \param  basename    The base name identifying the broadcast operation
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \params root_site   The site that is responsible for creating the
+    ///                     broadcast support object. This value is optional
+    ///                     and defaults to '0' (zero).
     ///
-    /// The function passes the index of the global identifier in the given
-    /// list of identifiers as the last argument to the action.
+    /// \note       Each broadcast operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_BROADCAST macro to define the
+    ///             necessary internal facilities used by \a broadcast.
     ///
-    /// \param ids       [in] A list of global identifiers identifying the
-    ///                  target objects for which the given action will be
-    ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed
-    ///                  by const reference) which will be forwarded to the
-    ///                  action invocation.
+    /// \returns    This function returns a future holding the value that was
+    ///             sent to all participating sites. It will become
+    ///             ready once the broadcast operation has been completed.
     ///
-    /// \returns         This function returns a future representing the result
-    ///                  of the overall reduction operation.
-    ///
-    /// \note            If decltype(Action(...)) is void, then the result of
-    ///                  this function is future<void>.
-    ///
-    template <typename Action, typename ArgN, ...>
-    hpx::future<
-        std::vector<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>>
-    broadcast_with_index(std::vector<hpx::id_type> const& ids, ArgN argN, ...);
+    template <typename T>
+    hpx::future<T> broadcast_from(char const* basename,
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
 
-    /// \brief Perform an asynchronous (fire&forget) distributed broadcast operation
-    ///
-    /// The function hpx::lcos::broadcast_apply_with_index performs an asynchronous
-    /// (fire&forget) distributed broadcast operation resulting in action
-    /// invocations on a given set of global identifiers. The action can be
-    /// either a plain action (in which case the global identifiers have to
-    /// refer to localities) or a component action (in which case the global
-    /// identifiers have to refer to instances of a component type which
-    /// exposes the action.
-    ///
-    /// The given action is invoked asynchronously on all given identifiers,
-    /// and the arguments ArgN are passed along to those invocations.
-    ///
-    /// The function passes the index of the global identifier in the given
-    /// list of identifiers as the last argument to the action.
-    ///
-    /// \param ids       [in] A list of global identifiers identifying the
-    ///                  target objects for which the given action will be
-    ///                  invoked.
-    /// \param argN      [in] Any number of arbitrary arguments (passed
-    ///                  by const reference) which will be forwarded to the
-    ///                  action invocation.
-    ///
-    template <typename Action, typename ArgN, ...>
-    void broadcast_apply_with_index(
-        std::vector<hpx::id_type> const& ids, ArgN argN, ...);
+/// \def HPX_REGISTER_BROADCAST_DECLARATION(type, name)
+///
+/// \brief Declare a broadcast object named \a name for a given data type \a type.
+///
+/// The macro \a HPX_REGISTER_BROADCAST_DECLARATION can be used to declare
+/// all facilities necessary for a (possibly remote) broadcast operation.
+///
+/// The parameter \a type specifies for which data type the broadcast
+/// operations should be enabled.
+///
+/// The (optional) parameter \a name should be a unique C-style identifier
+/// that will be internally used to identify a particular broadcast operation.
+/// If this defaults to \a \<type\>_broadcast if not specified.
+///
+/// \note The macro \a HPX_REGISTER_BROADCAST_DECLARATION can be used with 1
+///       or 2 arguments. The second argument is optional and defaults to
+///       \a \<type\>_broadcast.
+///
+#define HPX_REGISTER_BROADCAST_DECLARATION(type, name)
+
+/// \def HPX_REGISTER_BROADCAST(type, name)
+///
+/// \brief Define a broadcast object named \a name for a given data type \a type.
+///
+/// The macro \a HPX_REGISTER_BROADCAST can be used to define
+/// all facilities necessary for a (possibly remote) broadcast operation.
+///
+/// The parameter \a type specifies for which data type the broadcast
+/// operations should be enabled.
+///
+/// The (optional) parameter \a name should be a unique C-style identifier
+/// that will be internally used to identify a particular broadcast operation.
+/// If this defaults to \a \<type\>_broadcast if not specified.
+///
+/// \note The macro \a HPX_REGISTER_BROADCAST can be used with 1
+///       or 2 arguments. The second argument is optional and defaults to
+///       \a \<type\>_broadcast.
+///
+#define HPX_REGISTER_BROADCAST(type, name)
 }}    // namespace hpx::lcos
+// clang-format on
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/async/applier/detail/apply_colocated.hpp>
-#include <hpx/async/apply.hpp>
-#include <hpx/async/detail/async_colocated.hpp>
-#include <hpx/async_combinators/when_all.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
+#include <hpx/async/dataflow.hpp>
+#include <hpx/basic_execution.hpp>
+#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/functional/bind_back.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/promise_local_result.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/util/calculate_fanout.hpp>
+#include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
+#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
+#include <memory>
+#include <mutex>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#if !defined(HPX_BROADCAST_FANOUT)
-#define HPX_BROADCAST_FANOUT 16
-#endif
+namespace hpx { namespace traits {
+
+    ///////////////////////////////////////////////////////////////////////////
+    // support for broadcast
+    namespace communication {
+        struct broadcast_tag;
+    }
+
+    template <typename Communicator>
+    struct communication_operation<Communicator, communication::broadcast_tag>
+      : std::enable_shared_from_this<
+            communication_operation<Communicator, communication::broadcast_tag>>
+    {
+        communication_operation(Communicator& comm)
+          : communicator_(comm)
+        {
+        }
+
+        template <typename Result>
+        Result get(std::size_t which)
+        {
+            using arg_type = typename Communicator::arg_type;
+            using mutex_type = typename Communicator::mutex_type;
+
+            auto this_ = this->shared_from_this();
+            auto on_ready = [this_ = std::move(this_)](
+                                shared_future<void>&& f) -> arg_type {
+                f.get();    // propagate any exceptions
+
+                auto& communicator = this_->communicator_;
+
+                arg_type data;
+                {
+                    std::unique_lock<mutex_type> l(communicator.mtx_);
+                    data = communicator.data_[0];
+                }
+                return data;
+            };
+
+            std::unique_lock<mutex_type> l(communicator_.mtx_);
+            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+
+            hpx::future<arg_type> f =
+                communicator_.gate_.get_shared_future(l).then(
+                    hpx::launch::sync, std::move(on_ready));
+
+            communicator_.gate_.synchronize(1, l);
+            if (communicator_.gate_.set(which, l))
+            {
+                // this is a one-shot object (generations counters are not
+                // supported), unregister ourselves (but only once)
+                hpx::unregister_with_basename(
+                    std::move(communicator_.name_), communicator_.site_)
+                    .get();
+            }
+            return f;
+        }
+
+        template <typename T>
+        void set(std::size_t which, T&& t)
+        {
+            using mutex_type = typename Communicator::mutex_type;
+
+            std::unique_lock<mutex_type> l(communicator_.mtx_);
+            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+
+            communicator_.gate_.synchronize(1, l);
+            communicator_.data_[0] = std::forward<T>(t);
+            if (communicator_.gate_.set(which, l))
+            {
+                // this is a one-shot object (generations counters are not
+                // supported), unregister ourselves (but only once)
+                hpx::unregister_with_basename(
+                    std::move(communicator_.name_), communicator_.site_)
+                    .get();
+            }
+        }
+
+        Communicator& communicator_;
+    };
+}}    // namespace hpx::traits
 
 namespace hpx { namespace lcos {
-    namespace detail {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action>
-        struct broadcast_with_index
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    hpx::future<hpx::id_type> create_broadcast(char const* basename,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1))
+    {
+        // everybody waits for exactly one value
+        return detail::create_communicator<T>(
+            basename, num_sites, generation, this_site, 1);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // destination site needs to be handled differently
+    template <typename T>
+    hpx::future<void> broadcast_to(hpx::future<hpx::id_type>&& fid,
+        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
+    {
+        if (this_site == std::size_t(-1))
         {
-            typedef typename Action::arguments_type arguments_type;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action>
-        struct broadcast_result
-        {
-            typedef typename traits::promise_local_result<
-                typename hpx::traits::extract_action<
-                    Action>::remote_result_type>::type action_result;
-            typedef typename std::conditional<
-                std::is_same<void, action_result>::value, void,
-                std::vector<action_result>>::type type;
-        };
-
-        template <typename Action>
-        struct broadcast_result<broadcast_with_index<Action>>
-          : broadcast_result<Action>
-        {
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename... Ts>
-        //hpx::future<typename broadcast_result<Action>::type>
-        typename broadcast_result<Action>::type broadcast_impl(
-            Action const& act, std::vector<hpx::id_type> const& ids,
-            std::size_t global_idx, std::false_type, Ts const&... vs);
-
-        template <typename Action, typename... Ts>
-        //hpx::future<void>
-        void broadcast_impl(Action const& act,
-            std::vector<hpx::id_type> const& ids, std::size_t global_idx,
-            std::true_type, Ts const&... vs);
-
-        template <typename Action, typename... Ts>
-        void broadcast_apply_impl(Action const& act,
-            std::vector<hpx::id_type> const& ids, std::size_t global_idx,
-            Ts const&... vs);
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Futures, typename... Ts>
-        void broadcast_invoke(Action act, Futures& futures,
-            hpx::id_type const& id, std::size_t, Ts const&... vs)
-        {
-            futures.push_back(hpx::async(act, id, vs...));
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
         }
 
-        template <typename Action, typename Futures, typename... Ts>
-        void broadcast_invoke(broadcast_with_index<Action>, Futures& futures,
-            hpx::id_type const& id, std::size_t global_idx, Ts const&... vs)
-        {
-            futures.push_back(hpx::async(Action(), id, vs..., global_idx));
-        }
+        auto broadcast_data =
+            [this_site](hpx::future<hpx::id_type>&& f,
+                hpx::future<T>&& local_result) -> hpx::future<void> {
+            using action_type = typename detail::communicator_server<T>::
+                template communication_set_action<
+                    traits::communication::broadcast_tag, T>;
 
-        template <typename Action, typename Futures, typename Cont,
-            typename... Ts>
-        void broadcast_invoke(Action act, Futures& futures, Cont&& cont,
-            hpx::id_type const& id, std::size_t, Ts const&... vs)
-        {
-            futures.push_back(
-                hpx::async(act, id, vs...).then(std::forward<Cont>(cont)));
-        }
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            auto result =
+                async(action_type(), id, this_site, local_result.get());
 
-        template <typename Action, typename Futures, typename Cont,
-            typename... Ts>
-        void broadcast_invoke(broadcast_with_index<Action>, Futures& futures,
-            Cont&& cont, hpx::id_type const& id, std::size_t global_idx,
-            Ts const&... vs)
-        {
-            futures.push_back(hpx::async(Action(), id, vs..., global_idx)
-                                  .then(std::forward<Cont>(cont)));
-        }
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [id = std::move(id)]() { HPX_UNUSED(id); });
 
-        template <typename Action, typename... Ts>
-        void broadcast_invoke_apply(
-            Action act, hpx::id_type const& id, std::size_t, Ts const&... vs)
-        {
-            hpx::apply(act, id, vs...);
-        }
-
-        template <typename Action, typename... Ts>
-        void broadcast_invoke_apply(broadcast_with_index<Action>,
-            hpx::id_type const& id, std::size_t global_idx, Ts const&... vs)
-        {
-            hpx::apply(Action(), id, vs..., global_idx);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename IsVoid, typename... Ts>
-        struct broadcast_invoker
-        {
-            //static hpx::future<typename broadcast_result<Action>::type>
-            static typename broadcast_result<Action>::type call(
-                Action const& act, std::vector<hpx::id_type> const& ids,
-                std::size_t global_idx, IsVoid, Ts const&... vs)
-            {
-                return broadcast_impl(act, ids, global_idx, IsVoid(), vs...);
-            }
-        };
-
-        template <typename Action, typename... Ts>
-        struct broadcast_apply_invoker
-        {
-            static void call(Action const& act,
-                std::vector<hpx::id_type> const& ids, std::size_t global_idx,
-                Ts const&... vs)
-            {
-                return broadcast_apply_impl(act, ids, global_idx, vs...);
-            }
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename Is>
-        struct make_broadcast_action_impl;
-
-        template <typename Action, std::size_t... Is>
-        struct make_broadcast_action_impl<Action, util::index_pack<Is...>>
-        {
-            typedef
-                typename broadcast_result<Action>::action_result action_result;
-
-            typedef detail::broadcast_invoker<Action,
-                typename std::is_void<action_result>::type,
-                typename util::tuple_element<Is,
-                    typename Action::arguments_type>::type...>
-                broadcast_invoker_type;
-
-            typedef typename HPX_MAKE_ACTION(
-                broadcast_invoker_type::call)::type type;
-        };
-
-        template <typename Action>
-        struct make_broadcast_action
-          : make_broadcast_action_impl<Action,
-                typename util::make_index_pack<Action::arity>::type>
-        {
-        };
-
-        template <typename Action>
-        struct make_broadcast_action<broadcast_with_index<Action>>
-          : make_broadcast_action_impl<broadcast_with_index<Action>,
-                typename util::make_index_pack<Action::arity - 1>::type>
-        {
-        };
-
-        template <typename Action, typename Is>
-        struct make_broadcast_apply_action_impl;
-
-        template <typename Action, std::size_t... Is>
-        struct make_broadcast_apply_action_impl<Action, util::index_pack<Is...>>
-        {
-            typedef
-                typename broadcast_result<Action>::action_result action_result;
-
-            typedef detail::broadcast_apply_invoker<Action,
-                typename util::tuple_element<Is,
-                    typename Action::arguments_type>::type...>
-                broadcast_invoker_type;
-
-            typedef typename HPX_MAKE_ACTION(
-                broadcast_invoker_type::call)::type type;
-        };
-
-        template <typename Action>
-        struct make_broadcast_apply_action
-          : make_broadcast_apply_action_impl<Action,
-                typename util::make_index_pack<Action::arity>::type>
-        {
-        };
-
-        template <typename Action>
-        struct make_broadcast_apply_action<broadcast_with_index<Action>>
-          : make_broadcast_apply_action_impl<broadcast_with_index<Action>,
-                typename util::make_index_pack<Action::arity - 1>::type>
-        {
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        inline void return_void(hpx::future<std::vector<hpx::future<void>>>)
-        {
-            // todo: verify validity of all futures in the vector
-        }
-
-        template <typename Result>
-        std::vector<Result> wrap_into_vector(hpx::future<Result> r)
-        {
-            std::vector<Result> result;
-            result.push_back(r.get());
             return result;
-        }
+        };
 
-        template <typename Result>
-        std::vector<Result> return_result_type(
-            hpx::future<std::vector<hpx::future<std::vector<Result>>>> r)
-        {
-            std::vector<Result> res;
-            std::vector<hpx::future<std::vector<Result>>> fres =
-                std::move(r.get());
-
-            for (hpx::future<std::vector<Result>>& f : fres)
-            {
-                std::vector<Result> t = std::move(f.get());
-                res.reserve(res.capacity() + t.size());
-                std::move(t.begin(), t.end(), std::back_inserter(res));
-            }
-
-            return res;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename... Ts>
-        //hpx::future<void>
-        void broadcast_impl(Action const& act,
-            std::vector<hpx::id_type> const& ids, std::size_t global_idx,
-            std::true_type, Ts const&... vs)
-        {
-            if (ids.empty())
-                return;    // hpx::lcos::make_ready_future();
-
-            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout =
-                util::calculate_fanout(ids.size(), local_fanout);
-
-            std::vector<hpx::future<void>> broadcast_futures;
-            broadcast_futures.reserve(local_size + (ids.size() / fanout) + 1);
-            for (std::size_t i = 0; i != local_size; ++i)
-            {
-                broadcast_invoke(
-                    act, broadcast_futures, ids[i], global_idx + i, vs...);
-            }
-
-            if (ids.size() > local_fanout)
-            {
-                std::size_t applied = local_fanout;
-                std::vector<hpx::id_type>::const_iterator it =
-                    ids.begin() + local_fanout;
-
-                typedef typename detail::make_broadcast_action<Action>::type
-                    broadcast_impl_action;
-
-                while (it != ids.end())
-                {
-                    HPX_ASSERT(ids.size() >= applied);
-
-                    std::size_t next_fan =
-                        (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
-
-                    hpx::id_type id(ids_next[0]);
-                    broadcast_futures.push_back(
-                        hpx::detail::async_colocated<broadcast_impl_action>(id,
-                            act, std::move(ids_next), global_idx + applied,
-                            std::true_type(), vs...));
-
-                    applied += next_fan;
-                    it += next_fan;
-                }
-            }
-
-            //return hpx::when_all(broadcast_futures).then(&return_void);
-            hpx::when_all(broadcast_futures).then(&return_void).get();
-        }
-
-        template <typename Action, typename... Ts>
-        //hpx::future<typename broadcast_result<Action>::type>
-        typename broadcast_result<Action>::type broadcast_impl(
-            Action const& act, std::vector<hpx::id_type> const& ids,
-            std::size_t global_idx, std::false_type, Ts const&... vs)
-        {
-            typedef
-                typename broadcast_result<Action>::action_result action_result;
-            typedef typename broadcast_result<Action>::type result_type;
-
-            //if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
-            if (ids.empty())
-                return result_type();
-
-            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
-            std::size_t fanout =
-                util::calculate_fanout(ids.size(), local_fanout);
-
-            std::vector<hpx::future<result_type>> broadcast_futures;
-            broadcast_futures.reserve(local_size + (ids.size() / fanout) + 1);
-            for (std::size_t i = 0; i != local_size; ++i)
-            {
-                broadcast_invoke(act, broadcast_futures,
-                    &wrap_into_vector<action_result>, ids[i], global_idx + i,
-                    vs...);
-            }
-
-            if (ids.size() > local_fanout)
-            {
-                std::size_t applied = local_fanout;
-                std::vector<hpx::id_type>::const_iterator it =
-                    ids.begin() + local_fanout;
-
-                typedef typename detail::make_broadcast_action<Action>::type
-                    broadcast_impl_action;
-
-                while (it != ids.end())
-                {
-                    HPX_ASSERT(ids.size() >= applied);
-
-                    std::size_t next_fan =
-                        (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
-
-                    hpx::id_type id(ids_next[0]);
-                    broadcast_futures.push_back(
-                        hpx::detail::async_colocated<broadcast_impl_action>(id,
-                            act, std::move(ids_next), global_idx + applied,
-                            std::false_type(), vs...));
-
-                    applied += next_fan;
-                    it += next_fan;
-                }
-            }
-
-            return hpx::when_all(broadcast_futures)
-                .then(&return_result_type<action_result>)
-                .get();
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Action, typename... Ts>
-        void broadcast_apply_impl(Action const& act,
-            std::vector<hpx::id_type> const& ids, std::size_t global_idx,
-            Ts const&... vs)
-        {
-            if (ids.empty())
-                return;
-
-            std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
-
-            for (std::size_t i = 0; i != local_size; ++i)
-            {
-                broadcast_invoke_apply(act, ids[i], global_idx + i, vs...);
-            }
-
-            if (ids.size() > local_fanout)
-            {
-                std::size_t applied = local_fanout;
-                std::vector<hpx::id_type>::const_iterator it =
-                    ids.begin() + local_fanout;
-
-                typedef
-                    typename detail::make_broadcast_apply_action<Action>::type
-                        broadcast_impl_action;
-
-                std::size_t fanout =
-                    util::calculate_fanout(ids.size(), local_fanout);
-                while (it != ids.end())
-                {
-                    HPX_ASSERT(ids.size() >= applied);
-
-                    std::size_t next_fan =
-                        (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
-
-                    hpx::id_type id(ids_next[0]);
-                    hpx::detail::apply_colocated<broadcast_impl_action>(id, act,
-                        std::move(ids_next), global_idx + applied, vs...);
-
-                    applied += next_fan;
-                    it += next_fan;
-                }
-            }
-        }
-    }    // namespace detail
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename... Ts>
-    hpx::future<typename detail::broadcast_result<Action>::type> broadcast(
-        std::vector<hpx::id_type> const& ids, Ts const&... vs)
-    {
-        typedef typename detail::make_broadcast_action<Action>::type
-            broadcast_impl_action;
-        typedef typename detail::broadcast_result<Action>::action_result
-            action_result;
-
-        if (ids.empty())
-        {
-            typedef typename detail::broadcast_result<Action>::type result_type;
-
-            return hpx::make_exceptional_future<result_type>(
-                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::broadcast",
-                    "empty list of targets for broadcast operation"));
-        }
-
-        return hpx::detail::async_colocated<broadcast_impl_action>(ids[0],
-            Action(), ids, std::size_t(0), std::is_void<action_result>(),
-            vs...);
+        return dataflow(hpx::launch::sync, std::move(broadcast_data),
+            std::move(fid), std::move(local_result));
     }
 
-    template <typename Component, typename Signature, typename Derived,
-        typename... Ts>
-    hpx::future<typename detail::broadcast_result<Derived>::type> broadcast(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-        ,
-        std::vector<hpx::id_type> const& ids, Ts const&... vs)
+    template <typename T>
+    hpx::future<void> broadcast_to(hpx::future<hpx::id_type>&& fid,
+        T&& local_result, std::size_t this_site = std::size_t(-1))
     {
-        return broadcast<Derived>(ids, vs...);
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
+
+        using arg_type = typename std::decay<T>::type;
+
+        auto broadcast_data =
+            [this_site](hpx::future<hpx::id_type>&& f,
+                arg_type&& local_result) -> hpx::future<void> {
+            using action_type = typename detail::communicator_server<T>::
+                template communication_set_action<
+                    traits::communication::broadcast_tag, arg_type>;
+
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = f.get();
+            auto result =
+                async(action_type(), id, this_site, std::move(local_result));
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [id = std::move(id)]() { HPX_UNUSED(id); });
+
+            return result;
+        };
+
+        return dataflow(hpx::launch::sync, std::move(broadcast_data),
+            std::move(fid), std::forward<T>(local_result));
+    }
+
+    template <typename T>
+    hpx::future<void> broadcast_to(char const* basename,
+        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+    {
+        if (num_sites == std::size_t(-1))
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
+
+        if (this_site == root_site)
+        {
+            return broadcast_to(create_broadcast<typename std::decay<T>::type>(
+                                    basename, num_sites, generation, root_site),
+                std::move(local_result), this_site);
+        }
+
+        std::string name(basename);
+        if (generation != std::size_t(-1))
+            name += std::to_string(generation) + "/";
+
+        return broadcast_to(hpx::find_from_basename(std::move(name), root_site),
+            std::move(local_result), this_site);
+    }
+
+    template <typename T>
+    hpx::future<void> broadcast_to(char const* basename, T&& local_result,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+    {
+        if (num_sites == std::size_t(-1))
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
+
+        return broadcast_to(create_broadcast<typename std::decay<T>::type>(
+                                basename, num_sites, generation, root_site),
+            std::forward<T>(local_result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename... Ts>
-    void broadcast_apply(std::vector<hpx::id_type> const& ids, Ts const&... vs)
+    template <typename T>
+    hpx::future<T> broadcast_from(hpx::future<hpx::id_type>&& fid,
+        std::size_t this_site = std::size_t(-1))
     {
-        typedef typename detail::make_broadcast_apply_action<Action>::type
-            broadcast_impl_action;
-
-        if (ids.empty())
+        if (this_site == std::size_t(-1))
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "hpx::lcos::broadcast_apply",
-                "empty list of targets for broadcast operation");
-            return;
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
         }
 
-        hpx::detail::apply_colocated<broadcast_impl_action>(
-            ids[0], Action(), ids, 0, vs...);
+        using arg_type = typename util::decay<T>::type;
+
+        auto broadcast_data_direct =
+            [this_site](hpx::future<hpx::id_type>&& fid) -> hpx::future<T> {
+            using action_type = typename detail::communicator_server<T>::
+                template communication_get_action<
+                    traits::communication::broadcast_tag, hpx::future<T>>;
+
+            // make sure id is kept alive as long as the returned future
+            hpx::id_type id = fid.get();
+            auto result = async(action_type(), id, this_site);
+
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [id = std::move(id)]() { HPX_UNUSED(id); });
+
+            return result;
+        };
+
+        return dataflow(hpx::launch::sync, std::move(broadcast_data_direct),
+            std::move(fid));
     }
 
-    template <typename Component, typename Signature, typename Derived,
-        typename... Ts>
-    void broadcast_apply(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-        ,
-        std::vector<hpx::id_type> const& ids, Ts const&... vs)
+    template <typename T>
+    hpx::future<T> broadcast_from(char const* basename,
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
-        broadcast_apply<Derived>(ids, vs...);
-    }
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename... Ts>
-    hpx::future<typename detail::broadcast_result<Action>::type>
-    broadcast_with_index(std::vector<hpx::id_type> const& ids, Ts const&... vs)
-    {
-        return broadcast<detail::broadcast_with_index<Action>>(ids, vs...);
-    }
+        std::string name(basename);
+        if (generation != std::size_t(-1))
+            name += std::to_string(generation) + "/";
 
-    template <typename Component, typename Signature, typename Derived,
-        typename... Ts>
-    hpx::future<typename detail::broadcast_result<Derived>::type>
-    broadcast_with_index(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-        ,
-        std::vector<hpx::id_type> const& ids, Ts const&... vs)
-    {
-        return broadcast<detail::broadcast_with_index<Derived>>(ids, vs...);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename... Ts>
-    void broadcast_apply_with_index(
-        std::vector<hpx::id_type> const& ids, Ts const&... vs)
-    {
-        broadcast_apply<detail::broadcast_with_index<Action>>(ids, vs...);
-    }
-
-    template <typename Component, typename Signature, typename Derived,
-        typename... Ts>
-    void broadcast_apply_with_index(
-        hpx::actions::basic_action<Component, Signature, Derived> /* act */
-        ,
-        std::vector<hpx::id_type> const& ids, Ts const&... vs)
-    {
-        broadcast_apply<detail::broadcast_with_index<Derived>>(ids, vs...);
+        return broadcast_from<T>(
+            hpx::find_from_basename(std::move(name), root_site), this_site);
     }
 }}    // namespace hpx::lcos
 
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION(...)                   \
-    HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_(__VA_ARGS__)              \
-/**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_(...)                  \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_, \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+////////////////////////////////////////////////////////////////////////////////
+namespace hpx {
+    using lcos::broadcast_from;
+    using lcos::broadcast_to;
+    using lcos::create_broadcast;
+}    // namespace hpx
+
+////////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST_DECLARATION(...) /**/
+
+////////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST(...)                                            \
+    HPX_REGISTER_BROADCAST_(__VA_ARGS__)                                       \
     /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_1(Action)              \
-    HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_2(Action, Action)          \
-/**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_2(Action, Name)        \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type,        \
-        HPX_PP_CAT(broadcast_apply_, Name))                                    \
-    HPX_REGISTER_APPLY_COLOCATED_DECLARATION(                                  \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type,        \
-        HPX_PP_CAT(apply_colocated_broadcast_, Name))                          \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION(...)                               \
-    HPX_REGISTER_BROADCAST_APPLY_ACTION_(__VA_ARGS__)                          \
-/**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_(...)                              \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_APPLY_ACTION_,             \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
-
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_1(Action)                          \
-    HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Action)                      \
-/**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Name)                    \
-    HPX_REGISTER_ACTION(                                                       \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type,        \
-        HPX_PP_CAT(broadcast_apply_, Name))                                    \
-    HPX_REGISTER_APPLY_COLOCATED(                                              \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type,        \
-        HPX_PP_CAT(apply_colocated_broadcast_, Name))                          \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION(...)        \
-    HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)   \
-/**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_(...)       \
+#define HPX_REGISTER_BROADCAST_(...)                                           \
     HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_,           \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+        HPX_REGISTER_BROADCAST_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))      \
     /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_1(Action)   \
-    HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_2(              \
-        Action, Action)                                                        \
-/**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_2(          \
-    Action, Name)                                                              \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_broadcast_apply_action<                      \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(broadcast_apply_with_index_, Name))                         \
-    HPX_REGISTER_APPLY_COLOCATED_DECLARATION(                                  \
-        ::hpx::lcos::detail::make_broadcast_apply_action<                      \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(apply_colocated_broadcast_with_index_, Name))               \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION(...)                    \
-    HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_(__VA_ARGS__)               \
-/**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_(...)                   \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_,  \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+#define HPX_REGISTER_BROADCAST_1(type)                                         \
+    HPX_REGISTER_BROADCAST_2(type, HPX_PP_CAT(type, _broadcast))               \
     /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_1(Action)               \
-    HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_2(Action, Action)           \
-/**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_2(Action, Name)         \
-    HPX_REGISTER_ACTION(                                                       \
-        ::hpx::lcos::detail::make_broadcast_apply_action<                      \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(broadcast_apply_with_index_, Name))                         \
-    HPX_REGISTER_APPLY_COLOCATED(                                              \
-        ::hpx::lcos::detail::make_broadcast_apply_action<                      \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(apply_colocated_broadcast_with_index_, Name))               \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION(...)                         \
-    HPX_REGISTER_BROADCAST_ACTION_DECLARATION_(__VA_ARGS__)                    \
-/**/
-#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_(...)                        \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_ACTION_DECLARATION_,       \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+#define HPX_REGISTER_BROADCAST_2(type, name)                                   \
+    typedef hpx::components::component<                                        \
+        hpx::lcos::detail::communicator_server<type>>                          \
+        HPX_PP_CAT(broadcast_, name);                                          \
+    HPX_REGISTER_COMPONENT(HPX_PP_CAT(broadcast_, name))                       \
     /**/
 
-#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_1(Action)                    \
-    HPX_REGISTER_BROADCAST_ACTION_DECLARATION_2(Action, Action)                \
-/**/
-#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_2(Action, Name)              \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type,              \
-        HPX_PP_CAT(broadcast_, Name))                                          \
-    HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(                                  \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type,              \
-        HPX_PP_CAT(async_colocated_broadcast_, Name))                          \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_ACTION(...)                                     \
-    HPX_REGISTER_BROADCAST_ACTION_(__VA_ARGS__)                                \
-/**/
-#define HPX_REGISTER_BROADCAST_ACTION_(...)                                    \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_ACTION_,                   \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
-
-#define HPX_REGISTER_BROADCAST_ACTION_1(Action)                                \
-    HPX_REGISTER_BROADCAST_ACTION_2(Action, Action)                            \
-/**/
-#define HPX_REGISTER_BROADCAST_ACTION_2(Action, Name)                          \
-    HPX_REGISTER_ACTION(                                                       \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type,              \
-        HPX_PP_CAT(broadcast_, Name))                                          \
-    HPX_REGISTER_ASYNC_COLOCATED(                                              \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type,              \
-        HPX_PP_CAT(async_colocated_broadcast_, Name))                          \
-/**/
-#define HPX_REGISTER_BROADCAST_ACTION_ID(Action, Name, Id)                     \
-    HPX_REGISTER_ACTION_ID(                                                    \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type,              \
-        HPX_PP_CAT(broadcast_, Name), Id)                                      \
-    HPX_REGISTER_ASYNC_COLOCATED(                                              \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type,              \
-        HPX_PP_CAT(async_colocated_broadcast_, Name))                          \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(...)              \
-    HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)         \
-/**/
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_(...)             \
-    HPX_PP_EXPAND(                                                             \
-        HPX_PP_CAT(HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_,      \
-            HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                           \
-    /**/
-
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_1(Action)         \
-    HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_2(Action, Action)     \
-/**/
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_2(Action, Name)   \
-    HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_broadcast_action<                            \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(broadcast_with_index_, Name))                               \
-    HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(                                  \
-        ::hpx::lcos::detail::make_broadcast_action<                            \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(async_colocated_broadcast_with_index_, Name))               \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(...)                          \
-    HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_(__VA_ARGS__)                     \
-/**/
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_(...)                         \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_,        \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
-    /**/
-
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_1(Action)                     \
-    HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_2(Action, Action)                 \
-/**/
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_2(Action, Name)               \
-    HPX_REGISTER_ACTION(                                                       \
-        ::hpx::lcos::detail::make_broadcast_action<                            \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(broadcast_with_index_, Name))                               \
-    HPX_REGISTER_ASYNC_COLOCATED(                                              \
-        ::hpx::lcos::detail::make_broadcast_action<                            \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(async_colocated_broadcast_with_index_, Name))               \
-/**/
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_ID(Action, Name, Id)          \
-    HPX_REGISTER_ACTION_ID(                                                    \
-        ::hpx::lcos::detail::make_broadcast_action<                            \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(broadcast_with_index_, Name), Id)                           \
-    HPX_REGISTER_ASYNC_COLOCATED(                                              \
-        ::hpx::lcos::detail::make_broadcast_action<                            \
-            ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(async_colocated_broadcast_with_index_, Name))               \
-    /**/
-
+#endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN
