@@ -156,7 +156,7 @@ namespace hpx { namespace util {
         template <std::size_t I, typename... Ts>
         struct at_index_impl<I, pack<Ts...>, true>
         {
-            using type = struct
+            using type = struct unspecified
             {
                 using type = __type_pack_element<I, Ts...>;
             };
