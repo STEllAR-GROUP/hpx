@@ -34,7 +34,7 @@ namespace hpx { namespace basic_execution {
 #ifdef HPX_HAVE_VERIFY_LOCKS
         util::verify_no_locks();
 #endif
-        impl_->yield(desc);
+        impl_->yield_k(k, desc);
     }
 
     void agent_ref::suspend(const char* desc)
