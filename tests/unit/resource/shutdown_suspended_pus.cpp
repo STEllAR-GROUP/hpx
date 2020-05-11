@@ -10,9 +10,9 @@
 #include <hpx/include/apply.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/schedulers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -40,29 +40,27 @@ int hpx_main(int argc, char* argv[])
     // Schedule some dummy work
     for (std::size_t i = 0; i < 10000; ++i)
     {
-        hpx::apply([](){});
+        hpx::apply([]() {});
     }
 
     // Start shutdown
     return hpx::finalize();
 }
 
-void test_scheduler(int argc, char* argv[],
-    hpx::resource::scheduling_policy scheduler)
+void test_scheduler(
+    int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> cfg =
-    {
-        "hpx.os_threads=4"
+    hpx::init_params init_args;
+
+    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.rp_callback = [scheduler](auto& rp) {
+        rp.create_thread_pool("default", scheduler,
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::default_mode |
+                hpx::threads::policies::enable_elasticity));
     };
 
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
-
-    rp.create_thread_pool("default", scheduler,
-        hpx::threads::policies::scheduler_mode(
-            hpx::threads::policies::default_mode |
-            hpx::threads::policies::enable_elasticity));
-
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])
@@ -94,8 +92,7 @@ int main(int argc, char* argv[])
 
     {
         // These schedulers should fail
-        std::vector<hpx::resource::scheduling_policy> schedulers =
-        {
+        std::vector<hpx::resource::scheduling_policy> schedulers = {
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
             hpx::resource::scheduling_policy::static_,
 #endif

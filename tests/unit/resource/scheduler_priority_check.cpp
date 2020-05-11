@@ -11,11 +11,10 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/local_async.hpp>
-#include <hpx/include/parallel_execution.hpp>
-#include <hpx/include/resource_partitioner.hpp>
-#include <hpx/include/threads.hpp>
 #include <hpx/async_combinators/when_all.hpp>
+#include <hpx/include/parallel_execution.hpp>
+#include <hpx/include/threads.hpp>
+#include <hpx/local_async.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -80,10 +79,10 @@ int hpx_main(variables_map& vm)
 
     // setup executors for different task priorities on the pools
     hpx::parallel::execution::pool_executor HP_executor(
-            "default", hpx::threads::thread_priority_high);
+        "default", hpx::threads::thread_priority_high);
 
     hpx::parallel::execution::pool_executor NP_executor(
-            "default", hpx::threads::thread_priority_default);
+        "default", hpx::threads::thread_priority_default);
 
     // randomly create normal priority tasks
     // and then a set of HP tasks in periodic bursts

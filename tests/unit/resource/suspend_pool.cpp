@@ -13,10 +13,10 @@
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/schedulers.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing.hpp>
 
 #include <atomic>
@@ -107,8 +107,7 @@ int hpx_main(int argc, char* argv[])
         while (t.elapsed() < 2)
         {
             for (std::size_t thread_num = 0;
-                 thread_num < worker_pool_threads - 1;
-                 ++thread_num)
+                 thread_num < worker_pool_threads - 1; ++thread_num)
             {
                 hpx::threads::suspend_processing_unit(worker_pool, thread_num);
             }
@@ -116,8 +115,7 @@ int hpx_main(int argc, char* argv[])
             std::vector<hpx::future<void>> fs;
 
             for (std::size_t i = 0;
-                 i < hpx::resource::get_num_threads("default") * 10000;
-                 ++i)
+                 i < hpx::resource::get_num_threads("default") * 10000; ++i)
             {
                 fs.push_back(hpx::async(worker_exec, []() {}));
             }
@@ -134,35 +132,35 @@ int hpx_main(int argc, char* argv[])
     return hpx::finalize();
 }
 
-void test_scheduler(int argc,
-    char* argv[],
-    hpx::resource::scheduling_policy scheduler)
+void test_scheduler(
+    int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> cfg = {"hpx.os_threads=4"};
+    hpx::init_params init_args;
 
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.rp_callback = [scheduler](auto& rp) {
+        rp.create_thread_pool("worker", scheduler);
 
-    rp.create_thread_pool("worker", scheduler);
+        int const worker_pool_threads = 3;
+        int worker_pool_threads_added = 0;
 
-    int const worker_pool_threads = 3;
-    int worker_pool_threads_added = 0;
-
-    for (const hpx::resource::numa_domain& d : rp.numa_domains())
-    {
-        for (const hpx::resource::core& c : d.cores())
+        for (const hpx::resource::numa_domain& d : rp.numa_domains())
         {
-            for (const hpx::resource::pu& p : c.pus())
+            for (const hpx::resource::core& c : d.cores())
             {
-                if (worker_pool_threads_added < worker_pool_threads)
+                for (const hpx::resource::pu& p : c.pus())
                 {
-                    rp.add_resource(p, "worker");
-                    ++worker_pool_threads_added;
+                    if (worker_pool_threads_added < worker_pool_threads)
+                    {
+                        rp.add_resource(p, "worker");
+                        ++worker_pool_threads_added;
+                    }
                 }
             }
         }
-    }
+    };
 
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])

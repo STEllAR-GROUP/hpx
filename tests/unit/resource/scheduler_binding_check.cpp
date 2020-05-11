@@ -8,14 +8,14 @@
 // tasks bound to that core incrementally.
 // Tasks should always report the right core number when they run.
 
-#include <hpx/local_async.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/thread_executors/default_executor.hpp>
+#include <hpx/local_async.hpp>
 #include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/thread_executors/default_executor.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -94,18 +94,15 @@ int hpx_main(boost::program_options::variables_map&)
 
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    hpx::program_options::options_description desc_cmdline(
-        "Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::init_params init_args;
 
-    // Create the resource partitioner
-    hpx::resource::partitioner rp(desc_cmdline, argc, argv);
+    init_args.rp_callback = [](auto& rp) {
+        // setup the default pool with a numa/binding aware scheduler
+        rp.create_thread_pool("default",
+            hpx::resource::scheduling_policy::shared_priority,
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::default_mode));
+    };
 
-    // setup the default pool with a numa/binding aware scheduler
-    rp.create_thread_pool("default",
-        hpx::resource::scheduling_policy::shared_priority,
-        hpx::threads::policies::scheduler_mode(
-            hpx::threads::policies::default_mode));
-
-    return hpx::init(desc_cmdline, argc, argv);
+    return hpx::init(argc, argv, init_args);
 }

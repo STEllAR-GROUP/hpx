@@ -6,6 +6,7 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
+#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/include/apply.hpp>
@@ -14,26 +15,23 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/timing.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 
 #include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>
 
-void test_scheduler(int argc, char* argv[],
-    hpx::resource::scheduling_policy scheduler)
+void test_scheduler(
+    int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> cfg =
-    {
-        "hpx.os_threads=4"
+    hpx::init_params init_args;
+
+    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.rp_callback = [scheduler](auto& rp) {
+        rp.create_thread_pool("default", scheduler);
     };
 
-    hpx::resource::partitioner rp(nullptr, argc, argv, std::move(cfg));
-
-    rp.create_thread_pool("default", scheduler);
-
-    hpx::start(nullptr, argc, argv);
+    hpx::start(nullptr, argc, argv, init_args);
     hpx::suspend();
 
     hpx::util::high_resolution_timer t;
@@ -42,13 +40,12 @@ void test_scheduler(int argc, char* argv[],
     {
         hpx::resume();
 
-        hpx::apply([]()
+        hpx::apply([]() {
+            for (std::size_t i = 0; i < 10000; ++i)
             {
-                for (std::size_t i = 0; i < 10000; ++i)
-                {
-                    hpx::apply([](){});
-                }
-            });
+                hpx::apply([]() {});
+            }
+        });
 
         hpx::suspend();
     }
