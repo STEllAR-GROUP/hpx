@@ -27,13 +27,13 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_hpx_executable(${test}_test
-    INTERNAL_FLAGS
-    SOURCES ${sources}
-    ${${test}_FLAGS}
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Modules/Futures")
+    FOLDER "Tests/Regressions/Modules/Futures"
+  )
 
   add_hpx_regression_test("modules.futures" ${test} ${${test}_PARAMETERS})
 endforeach()
@@ -57,10 +57,9 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     source_group("Source Files" FILES ${sources})
 
     add_hpx_regression_compile_test(
-      "modules.futures"
-      ${compile_test}
-      SOURCES ${sources}
-      ${${compile_test}_FLAGS}
-      FOLDER "Tests/Regressions/Modules/Futures/CompileOnly")
+      "modules.futures" ${compile_test}
+      SOURCES ${sources} ${${compile_test}_FLAGS}
+      FOLDER "Tests/Regressions/Modules/Futures/CompileOnly"
+    )
   endforeach()
 endif()

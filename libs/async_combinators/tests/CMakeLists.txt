@@ -41,16 +41,17 @@ if(HPX_ASYNC_COMBINATORS_WITH_TESTS)
     add_subdirectory(performance)
   endif()
 
-    if (HPX_WITH_TESTS_HEADERS)
-      # This header is excluded as it's not complete on it's own. It requires
-      # the future_then_dispatch specializations from the execution module,
-      # which depends on async_combinators.
-      set(excluded_headers hpx/async_combinators/split_future.hpp)
-      add_hpx_header_tests(
-        modules.async_combinators
-        HEADERS ${async_combinators_headers}
-        EXCLUDE ${excluded_headers}
-        HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-        DEPENDENCIES hpx_async_combinators)
-    endif()
+  if(HPX_WITH_TESTS_HEADERS)
+    # This header is excluded as it's not complete on it's own. It requires the
+    # future_then_dispatch specializations from the execution module, which
+    # depends on async_combinators.
+    set(excluded_headers hpx/async_combinators/split_future.hpp)
+    add_hpx_header_tests(
+      modules.async_combinators
+      HEADERS ${async_combinators_headers}
+      EXCLUDE ${excluded_headers}
+      HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      DEPENDENCIES hpx_async_combinators
+    )
+  endif()
 endif()

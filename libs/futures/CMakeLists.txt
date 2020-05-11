@@ -46,10 +46,10 @@ set(futures_compat_headers
 set(futures_sources future_data.cpp)
 
 include(HPX_AddModule)
-add_hpx_module(futures
+add_hpx_module(
+  futures
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${futures_sources}
   HEADERS ${futures_headers}

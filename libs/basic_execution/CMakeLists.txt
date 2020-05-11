@@ -7,21 +7,20 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(basic_execution_headers
-  hpx/basic_execution/agent_base.hpp
-  hpx/basic_execution/agent_ref.hpp
-  hpx/basic_execution/context_base.hpp
-  hpx/basic_execution/detail/spinlock_deadlock_detection.hpp
-  hpx/basic_execution/execution.hpp
-  hpx/basic_execution/register_locks.hpp
-  hpx/basic_execution/resource_base.hpp
-  hpx/basic_execution/this_thread.hpp
+    hpx/basic_execution/agent_base.hpp
+    hpx/basic_execution/agent_ref.hpp
+    hpx/basic_execution/context_base.hpp
+    hpx/basic_execution/detail/spinlock_deadlock_detection.hpp
+    hpx/basic_execution/execution.hpp
+    hpx/basic_execution/register_locks.hpp
+    hpx/basic_execution/resource_base.hpp
+    hpx/basic_execution/this_thread.hpp
 )
 
 set(basic_execution_compat_headers
-  hpx/parallel/executors/execution_fwd.hpp
-  hpx/synchronization/detail/yield_k.hpp
-  hpx/util/register_locks.hpp
-  hpx/util/yield_while.hpp
+    hpx/parallel/executors/execution_fwd.hpp
+    hpx/synchronization/detail/yield_k.hpp hpx/util/register_locks.hpp
+    hpx/util/yield_while.hpp
 )
 
 set(basic_execution_sources agent_ref.cpp register_locks.cpp
