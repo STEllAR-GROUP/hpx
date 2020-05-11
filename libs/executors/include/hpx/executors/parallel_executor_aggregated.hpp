@@ -86,6 +86,15 @@ namespace hpx { namespace parallel { namespace execution {
 
         /// \cond NOINTERNAL
 
+        // OneWayExecutor interface
+        template <typename F, typename... Ts>
+        static void sync_execute(F&& f, Ts&&... ts)
+        {
+            return hpx::detail::sync_launch_policy_dispatch<
+                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
+        }
+
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
         static hpx::future<void> async_execute(F&& f, Ts&&... ts)
@@ -288,6 +297,15 @@ namespace hpx { namespace parallel { namespace execution {
         /// \endcond
 
         /// \cond NOINTERNAL
+
+        // OneWayExecutor interface
+        template <typename F, typename... Ts>
+        static void sync_execute(F&& f, Ts&&... ts)
+        {
+            return hpx::detail::sync_launch_policy_dispatch<
+                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
+        }
 
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
