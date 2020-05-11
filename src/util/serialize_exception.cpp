@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/custom_exception_info.hpp>
+#include <hpx/errors.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
@@ -23,12 +23,11 @@
 #include <typeinfo>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace runtime_local { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
-    template <typename Archive>
-    void save(Archive& ar, std::exception_ptr const& ep, unsigned int)
+    void save_custom_exception(hpx::serialization::output_archive& ar,
+        std::exception_ptr const& ep, unsigned int version)
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
@@ -51,22 +50,21 @@ namespace hpx { namespace serialization
         std::string throw_auxinfo_;
 
         // retrieve information related to exception_info
-        try {
+        try
+        {
             std::rethrow_exception(ep);
         }
-        catch (exception_info const& xi) {
-            std::string const* function =
-                xi.get<hpx::detail::throw_function>();
+        catch (exception_info const& xi)
+        {
+            std::string const* function = xi.get<hpx::detail::throw_function>();
             if (function)
                 throw_function_ = *function;
 
-            std::string const* file =
-                xi.get<hpx::detail::throw_file>();
+            std::string const* file = xi.get<hpx::detail::throw_file>();
             if (file)
                 throw_file_ = *file;
 
-            long const* line =
-                xi.get<hpx::detail::throw_line>();
+            long const* line = xi.get<hpx::detail::throw_line>();
             if (line)
                 throw_line_ = *line;
 
@@ -80,13 +78,11 @@ namespace hpx { namespace serialization
             if (hostname_)
                 throw_hostname_ = *hostname_;
 
-            std::int64_t const* pid_ =
-                xi.get<hpx::detail::throw_pid>();
+            std::int64_t const* pid_ = xi.get<hpx::detail::throw_pid>();
             if (pid_)
                 throw_pid_ = *pid_;
 
-            std::size_t const* shepherd =
-                xi.get<hpx::detail::throw_shepherd>();
+            std::size_t const* shepherd = xi.get<hpx::detail::throw_shepherd>();
             if (shepherd)
                 throw_shepherd_ = *shepherd;
 
@@ -105,111 +101,130 @@ namespace hpx { namespace serialization
             if (back_trace)
                 throw_back_trace_ = *back_trace;
 
-            std::string const* env_ =
-                xi.get<hpx::detail::throw_env>();
+            std::string const* env_ = xi.get<hpx::detail::throw_env>();
             if (env_)
                 throw_env_ = *env_;
 
-            std::string const* config_ =
-                xi.get<hpx::detail::throw_config>();
+            std::string const* config_ = xi.get<hpx::detail::throw_config>();
             if (config_)
                 throw_config_ = *config_;
 
-            std::string const* state_ =
-                xi.get<hpx::detail::throw_state>();
+            std::string const* state_ = xi.get<hpx::detail::throw_state>();
             if (state_)
                 throw_state_ = *state_;
 
-            std::string const* auxinfo_ =
-                xi.get<hpx::detail::throw_auxinfo>();
+            std::string const* auxinfo_ = xi.get<hpx::detail::throw_auxinfo>();
             if (auxinfo_)
                 throw_auxinfo_ = *auxinfo_;
         }
 
         // figure out concrete underlying exception type
-        try {
+        try
+        {
             std::rethrow_exception(ep);
         }
-        catch (hpx::thread_interrupted const&) {
+        catch (hpx::thread_interrupted const&)
+        {
             type = hpx::util::hpx_thread_interrupted_exception;
             what = "hpx::thread_interrupted";
             err_value = hpx::thread_cancelled;
         }
-        catch (hpx::exception const& e) {
+        catch (hpx::exception const& e)
+        {
             type = hpx::util::hpx_exception;
             what = e.what();
             err_value = e.get_error();
         }
-        catch (boost::system::system_error const& e) {
+        catch (boost::system::system_error const& e)
+        {
             type = hpx::util::boost_system_error;
             what = e.what();
             err_value = e.code().value();
             err_message = e.code().message();
         }
-        catch (std::runtime_error const& e) {
+        catch (std::runtime_error const& e)
+        {
             type = hpx::util::std_runtime_error;
             what = e.what();
         }
-        catch (std::invalid_argument const& e) {
+        catch (std::invalid_argument const& e)
+        {
             type = hpx::util::std_invalid_argument;
             what = e.what();
         }
-        catch (std::out_of_range const& e) {
+        catch (std::out_of_range const& e)
+        {
             type = hpx::util::std_out_of_range;
             what = e.what();
         }
-        catch (std::logic_error const& e) {
+        catch (std::logic_error const& e)
+        {
             type = hpx::util::std_logic_error;
             what = e.what();
         }
-        catch (std::bad_alloc const& e) {
+        catch (std::bad_alloc const& e)
+        {
             type = hpx::util::std_bad_alloc;
             what = e.what();
         }
-        catch (std::bad_cast const& e) {
+        catch (std::bad_cast const& e)
+        {
             type = hpx::util::std_bad_cast;
             what = e.what();
         }
-        catch (std::bad_typeid const& e) {
+        catch (std::bad_typeid const& e)
+        {
             type = hpx::util::std_bad_typeid;
             what = e.what();
         }
-        catch (std::bad_exception const& e) {
+        catch (std::bad_exception const& e)
+        {
             type = hpx::util::std_bad_exception;
             what = e.what();
         }
-        catch (std::exception const& e) {
+        catch (std::exception const& e)
+        {
             type = hpx::util::std_exception;
             what = e.what();
         }
 #if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
-        catch (boost::exception const& e) {
+        catch (boost::exception const& e)
+        {
             type = hpx::util::boost_exception;
             what = boost::diagnostic_information(e);
         }
 #endif
-        catch (...) {
+        catch (...)
+        {
             type = hpx::util::unknown_exception;
             what = "unknown exception";
         }
 
-        ar & type & what & throw_function_ & throw_file_ & throw_line_
-           & throw_locality_ & throw_hostname_ & throw_pid_ & throw_shepherd_
-           & throw_thread_id_ & throw_thread_name_ & throw_back_trace_
-           & throw_env_ & throw_config_ & throw_state_ & throw_auxinfo_;
+        // clang-format off
+        ar & type & what & throw_function_ & throw_file_ & throw_line_ &
+            throw_locality_ & throw_hostname_ & throw_pid_ & throw_shepherd_ &
+            throw_thread_id_ & throw_thread_name_ & throw_back_trace_ &
+            throw_env_ & throw_config_ & throw_state_ & throw_auxinfo_;
+        // clang-format on
 
-        if (hpx::util::hpx_exception == type) {
+        if (hpx::util::hpx_exception == type)
+        {
+            // clang-format off
             ar & err_value;
+            // clang-format on
         }
-        else if (hpx::util::boost_system_error == type) {
-            ar & err_value & err_message;
+        else if (hpx::util::boost_system_error == type)
+        {
+            // clang-format off
+            ar & err_value& err_message;
+            // clang-format on
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
-    template <typename Archive>
-    void load(Archive& ar, std::exception_ptr& e, unsigned int)
+    void load_custom_exception(hpx::serialization::input_archive& ar,
+        std::exception_ptr& e, unsigned int)
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
@@ -231,16 +246,24 @@ namespace hpx { namespace serialization
         std::string throw_state_;
         std::string throw_auxinfo_;
 
-        ar & type & what & throw_function_ & throw_file_ & throw_line_
-           & throw_locality_ & throw_hostname_ & throw_pid_ & throw_shepherd_
-           & throw_thread_id_ & throw_thread_name_ & throw_back_trace_
-           & throw_env_ & throw_config_ & throw_state_ & throw_auxinfo_;
+        // clang-format off
+        ar & type & what & throw_function_ & throw_file_ & throw_line_ &
+            throw_locality_ & throw_hostname_ & throw_pid_ & throw_shepherd_ &
+            throw_thread_id_ & throw_thread_name_ & throw_back_trace_ &
+            throw_env_ & throw_config_ & throw_state_ & throw_auxinfo_;
+        // clang-format on
 
-        if (hpx::util::hpx_exception == type) {
+        if (hpx::util::hpx_exception == type)
+        {
+            // clang-format off
             ar & err_value;
+            // clang-format on
         }
-        else if (hpx::util::boost_system_error == type) {
-            ar & err_value & err_message;
+        else if (hpx::util::boost_system_error == type)
+        {
+            // clang-format off
+            ar & err_value& err_message;
+            // clang-format on
         }
 
         switch (type)
@@ -374,15 +397,4 @@ namespace hpx { namespace serialization
             break;
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // explicit instantiation for the correct archive types
-    template HPX_EXPORT void
-    save(hpx::serialization::output_archive&, std::exception_ptr const&,
-        unsigned int);
-
-    template HPX_EXPORT void
-    load(hpx::serialization::input_archive&, std::exception_ptr&,
-        unsigned int);
-}}
-
+}}}    // namespace hpx::runtime_local::detail

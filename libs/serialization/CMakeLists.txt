@@ -39,6 +39,7 @@ set(serialization_headers
     hpx/serialization/datapar.hpp
     hpx/serialization/deque.hpp
     hpx/serialization/dynamic_bitset.hpp
+    hpx/serialization/exception_ptr.hpp
     hpx/serialization/force_linking.hpp
     hpx/serialization/list.hpp
     hpx/serialization/map.hpp
@@ -144,6 +145,7 @@ set(serialization_sources
     detail/polymorphic_id_factory.cpp
     detail/polymorphic_intrusive_factory.cpp
     detail/polymorphic_nonintrusive_factory.cpp
+    exception_ptr.cpp
     force_linking.cpp
     serializable_any.cpp
 )
@@ -173,7 +175,3 @@ add_hpx_module(
 if(TARGET Vc::vc)
   target_link_libraries(hpx_serialization PUBLIC Vc::vc)
 endif()
-
-# Temporary needs hpx_util cause still depending on custom_exception_info which
-# is itself depending on hpx/naming_base.hpp
-target_link_libraries(hpx_serialization PUBLIC hpx_naming_base)
