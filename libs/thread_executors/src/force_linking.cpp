@@ -13,7 +13,8 @@ namespace hpx { namespace thread_executors {
     force_linking_helper& force_linking()
     {
         static force_linking_helper helper{
-            &hpx::threads::executors::local_priority_queue_executor::dummy};
+            &hpx::threads::executors::local_priority_queue_executor::dummy,
+            &hpx::threads::executors::local_priority_queue_os_executor::dummy};
         return helper;
     }
 }}    // namespace hpx::thread_executors
