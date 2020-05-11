@@ -174,9 +174,8 @@ namespace hpx { namespace parallel { namespace execution {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
             sync_execute(F&& f, Ts&&... ts)
         {
-            return hpx::detail::sync_launch_policy_dispatch<
-                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            return hpx::detail::sync_launch_policy_dispatch<Policy>::call(
+                launch::sync, std::forward<F>(f), std::forward<Ts>(ts)...);
         }
 
         // TwoWayExecutor interface

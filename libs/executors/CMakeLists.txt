@@ -64,10 +64,7 @@ set(executors_compat_headers
     hpx/parallel/executors/thread_pool_attached_executors.hpp
 )
 
-set(executors_sources
-    current_executor.cpp
-    force_linking.cpp
-)
+set(executors_sources current_executor.cpp force_linking.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
