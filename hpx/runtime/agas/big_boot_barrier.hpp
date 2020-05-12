@@ -13,6 +13,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -54,7 +55,9 @@ private:
     std::mutex mtx;
     std::size_t connected;
 
-    boost::lockfree::queue<util::unique_function_nonser<void()>* > thunks;
+    using thunk_type = util::unique_function_nonser<void()>*;
+
+    boost::lockfree::queue<thunk_type, hpx::util::internal_allocator<thunk_type>> thunks;
 
     std::vector<parcelset::endpoints_type> localities;
 
