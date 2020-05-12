@@ -33,117 +33,114 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace agas
-{
+namespace hpx { namespace agas {
 
-struct notification_header;
+    struct notification_header;
 
-struct HPX_EXPORT big_boot_barrier
-{
-public:
-    HPX_NON_COPYABLE(big_boot_barrier);
-
-private:
-    parcelset::parcelport* pp;
-    parcelset::endpoints_type const& endpoints;
-
-    service_mode const service_type;
-    parcelset::locality const bootstrap_agas;
-
-    std::condition_variable cond;
-    std::mutex mtx;
-    std::size_t connected;
-
-    boost::lockfree::queue<util::unique_function_nonser<void()>* > thunks;
-
-    std::vector<parcelset::endpoints_type> localities;
-
-    void spin();
-
-    void notify();
-
-public:
-    struct scoped_lock
+    struct HPX_EXPORT big_boot_barrier
     {
+    public:
+        HPX_NON_COPYABLE(big_boot_barrier);
+
     private:
-        big_boot_barrier& bbb;
+        parcelset::parcelport* pp;
+        parcelset::endpoints_type const& endpoints;
+
+        service_mode const service_type;
+        parcelset::locality const bootstrap_agas;
+
+        std::condition_variable cond;
+        std::mutex mtx;
+        std::size_t connected;
+
+        using thunk_type = util::unique_function_nonser<void()>*;
+
+        boost::lockfree::queue<thunk_type,
+            hpx::util::internal_allocator<thunk_type>>
+            thunks;
+
+        std::vector<parcelset::endpoints_type> localities;
+
+        void spin();
+
+        void notify();
 
     public:
-        explicit scoped_lock(big_boot_barrier& bbb_)
-          : bbb(bbb_)
+        struct scoped_lock
         {
-            bbb.mtx.lock();
+        private:
+            big_boot_barrier& bbb;
+
+        public:
+            explicit scoped_lock(big_boot_barrier& bbb_)
+              : bbb(bbb_)
+            {
+                bbb.mtx.lock();
+            }
+
+            ~scoped_lock()
+            {
+                bbb.notify();
+            }
+        };
+
+        big_boot_barrier(parcelset::parcelport* pp_,
+            parcelset::endpoints_type const& endpoints_,
+            util::runtime_configuration const& ini_);
+
+        ~big_boot_barrier()
+        {
+            util::unique_function_nonser<void()>* f;
+            while (thunks.pop(f))
+                delete f;
         }
 
-        ~scoped_lock()
+        parcelset::locality here()
         {
-            bbb.notify();
+            return bootstrap_agas;
         }
+        parcelset::endpoints_type const& get_endpoints()
+        {
+            return endpoints;
+        }
+
+        template <typename Action, typename... Args>
+        void apply(std::uint32_t source_locality_id,
+            std::uint32_t target_locality_id, parcelset::locality dest,
+            Action act, Args&&... args);
+
+        template <typename Action, typename... Args>
+        void apply_late(std::uint32_t source_locality_id,
+            std::uint32_t target_locality_id, parcelset::locality const& dest,
+            Action act, Args&&... args);
+
+        void apply_notification(std::uint32_t source_locality_id,
+            std::uint32_t target_locality_id, parcelset::locality const& dest,
+            notification_header&& hdr);
+
+        void wait_bootstrap();
+        void wait_hosted(std::string const& locality_name,
+            naming::address::address_type primary_ns_ptr,
+            naming::address::address_type symbol_ns_ptr);
+
+        // no-op on non-bootstrap localities
+        void trigger();
+
+        void add_thunk(util::unique_function_nonser<void()>* f);
+
+        void add_locality_endpoints(std::uint32_t locality_id,
+            parcelset::endpoints_type const& endpoints);
     };
 
-    big_boot_barrier(
-        parcelset::parcelport* pp_
-      , parcelset::endpoints_type const& endpoints_
-      , util::runtime_configuration const& ini_
-        );
+    HPX_EXPORT void create_big_boot_barrier(parcelset::parcelport* pp_,
+        parcelset::endpoints_type const& endpoints_,
+        util::runtime_configuration const& ini_);
 
-    ~big_boot_barrier()
-    {
-        util::unique_function_nonser<void()>* f;
-        while (thunks.pop(f))
-            delete f;
-    }
+    HPX_EXPORT void destroy_big_boot_barrier();
 
-    parcelset::locality here() { return bootstrap_agas; }
-    parcelset::endpoints_type const &get_endpoints() { return endpoints; }
+    HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
 
-    template <typename Action, typename... Args>
-    void apply(
-        std::uint32_t source_locality_id
-      , std::uint32_t target_locality_id
-      , parcelset::locality dest
-      , Action act
-      , Args &&... args);
-
-    template <typename Action, typename... Args>
-    void apply_late(
-        std::uint32_t source_locality_id
-      , std::uint32_t target_locality_id
-      , parcelset::locality const & dest
-      , Action act
-      , Args &&... args);
-
-    void apply_notification(
-        std::uint32_t source_locality_id
-      , std::uint32_t target_locality_id
-      , parcelset::locality const& dest
-      , notification_header&& hdr);
-
-    void wait_bootstrap();
-    void wait_hosted(std::string const& locality_name,
-        naming::address::address_type primary_ns_ptr,
-        naming::address::address_type symbol_ns_ptr);
-
-    // no-op on non-bootstrap localities
-    void trigger();
-
-    void add_thunk(util::unique_function_nonser<void()>* f);
-
-    void add_locality_endpoints(std::uint32_t locality_id,
-        parcelset::endpoints_type const& endpoints);
-};
-
-HPX_EXPORT void create_big_boot_barrier(
-    parcelset::parcelport* pp_
-  , parcelset::endpoints_type const& endpoints_
-  , util::runtime_configuration const& ini_
-    );
-
-HPX_EXPORT void destroy_big_boot_barrier();
-
-HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
-
-}}
+}}    // namespace hpx::agas
 
 #include <hpx/config/warnings_suffix.hpp>
 
