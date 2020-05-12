@@ -182,6 +182,7 @@ namespace hpx { namespace threads { namespace policies {
                   , debug_init_(false)
                   , thread_init_counter_(0)
                 {
+                    set_scheduler_mode(scheduler_mode::default_mode);
                     HPX_ASSERT(num_workers_ != 0);
                 }
 
@@ -444,8 +445,8 @@ namespace hpx { namespace threads { namespace policies {
                             , "D", debug::dec<2>(domain_num)
                             , "Q", debug::dec<3>(q_index)
                             , "this"
-                            , "D", debug::dec<2>(d_lookup_[local_num])
-                            , "Q", debug::dec<3>(local_num)
+                            , "D", debug::dec<2>(d_lookup_[thread_num])
+                            , "Q", debug::dec<3>(thread_num)
                             , "run_now OVERRIDE ", data.run_now
                             , debug::threadinfo<thread_init_data>(data));
                         // clang-format on
@@ -460,8 +461,8 @@ namespace hpx { namespace threads { namespace policies {
                             , "D", debug::dec<2>(domain_num)
                             , "Q", debug::dec<3>(q_index)
                             , "this"
-                            , "D", debug::dec<2>(d_lookup_[local_num])
-                            , "Q", debug::dec<3>(local_num)
+                            , "D", debug::dec<2>(d_lookup_[thread_num])
+                            , "Q", debug::dec<3>(thread_num)
                             , "run_now", data.run_now
                             , debug::threadinfo<thread_init_data>(data));
                         // clang-format on
