@@ -25,15 +25,13 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         // This is the overload for running functions which return a value.
         template <typename F, typename... Ts>
-        typename util::invoke_result<F, Ts...>::type
-        run_as_hpx_thread(std::false_type, F const& f, Ts &&... ts)
+        typename util::invoke_result<F, Ts...>::type run_as_hpx_thread(
+            std::false_type, F const& f, Ts&&... ts)
         {
             // NOTE: The condition variable needs be able to live past the scope
             // of this function. The mutex and boolean are guaranteed to live
@@ -57,7 +55,8 @@ namespace hpx { namespace threads
                     {
                         // Execute the given function, forward all parameters,
                         // store result.
-                        result.emplace(util::invoke(f, std::forward<Ts>(ts)...));
+                        result.emplace(
+                            util::invoke(f, std::forward<Ts>(ts)...));
                     }
                     catch (...)
                     {
@@ -72,7 +71,8 @@ namespace hpx { namespace threads
                         stopping = true;
                     }
                     cond->notify_all();
-                }), "run_as_hpx_thread (non-void)");
+                }),
+                "run_as_hpx_thread (non-void)");
             hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
@@ -88,7 +88,7 @@ namespace hpx { namespace threads
 
         // This is the overload for running functions which return void.
         template <typename F, typename... Ts>
-        void run_as_hpx_thread(std::true_type, F const& f, Ts &&... ts)
+        void run_as_hpx_thread(std::true_type, F const& f, Ts&&... ts)
         {
             // NOTE: The condition variable needs be able to live past the scope
             // of this function. The mutex and boolean are guaranteed to live
@@ -101,8 +101,7 @@ namespace hpx { namespace threads
 
             // Create an HPX thread
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary([&, cond]()
-                {
+                hpx::threads::make_thread_function_nullary([&, cond]() {
                     try
                     {
                         // Execute the given function, forward all parameters.
@@ -121,7 +120,8 @@ namespace hpx { namespace threads
                         stopping = true;
                     }
                     cond->notify_all();
-                }), "run_as_hpx_thread (void)");
+                }),
+                "run_as_hpx_thread (void)");
             hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
@@ -132,22 +132,20 @@ namespace hpx { namespace threads
             if (exception)
                 std::rethrow_exception(exception);
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    typename util::invoke_result<F, Ts...>::type
-    run_as_hpx_thread(F const& f, Ts &&... vs)
+    typename util::invoke_result<F, Ts...>::type run_as_hpx_thread(
+        F const& f, Ts&&... vs)
     {
         // This shouldn't be used on a HPX-thread
         HPX_ASSERT(hpx::threads::get_self_ptr() == nullptr);
 
         typedef typename std::is_void<
-                typename util::invoke_result<F, Ts...>::type
-            >::type result_is_void;
+            typename util::invoke_result<F, Ts...>::type>::type result_is_void;
 
-        return detail::run_as_hpx_thread(result_is_void(),
-            f, std::forward<Ts>(vs)...);
+        return detail::run_as_hpx_thread(
+            result_is_void(), f, std::forward<Ts>(vs)...);
     }
-}}
-
+}}    // namespace hpx::threads

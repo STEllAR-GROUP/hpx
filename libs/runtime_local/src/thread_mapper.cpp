@@ -17,17 +17,20 @@
 #include <sys/syscall.h>
 #endif
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // static members
-    std::uint32_t const thread_mapper::invalid_index = static_cast<std::uint32_t>(-1);
+    std::uint32_t const thread_mapper::invalid_index =
+        static_cast<std::uint32_t>(-1);
     long const thread_mapper::invalid_tid = -1;
     std::string const thread_mapper::invalid_label;
 
     ///////////////////////////////////////////////////////////////////////////
     // methods
-    bool thread_mapper::null_cb(std::uint32_t) {return true;}
+    bool thread_mapper::null_cb(std::uint32_t)
+    {
+        return true;
+    }
 
     long int thread_mapper::get_system_thread_id()
     {
@@ -43,20 +46,21 @@ namespace hpx { namespace util
     {
         std::uint32_t tix = it->second;
         thread_map_.erase(it);
-        if (tix >= thread_info_.size()) return false; //-V104
-        thread_info_[tix].cleanup_ = &thread_mapper::null_cb; //-V108
-        return thread_info_[tix].cleanup_(tix); //-V108
+        if (tix >= thread_info_.size())
+            return false;                                        //-V104
+        thread_info_[tix].cleanup_ = &thread_mapper::null_cb;    //-V108
+        return thread_info_[tix].cleanup_(tix);                  //-V108
     }
 
     thread_mapper::~thread_mapper()
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        for (std::uint32_t i = 0; i < thread_info_.size(); i++) //-V104
-            thread_info_[i].cleanup_(i); //-V108
+        for (std::uint32_t i = 0; i < thread_info_.size(); i++)    //-V104
+            thread_info_[i].cleanup_(i);                           //-V108
     }
 
-    std::uint32_t thread_mapper::register_thread(char const *l, error_code& ec)
+    std::uint32_t thread_mapper::register_thread(char const* l, error_code& ec)
     {
         std::lock_guard<mutex_type> m(mtx_);
 
@@ -99,8 +103,8 @@ namespace hpx { namespace util
         return (it == thread_map_.end()) ? false : unmap_thread(it);
     }
 
-    bool thread_mapper::register_callback(std::uint32_t tix,
-        callback_type const& cb)
+    bool thread_mapper::register_callback(
+        std::uint32_t tix, callback_type const& cb)
     {
         std::lock_guard<mutex_type> m(mtx_);
 
@@ -134,16 +138,19 @@ namespace hpx { namespace util
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        label_map_type::right_map::const_iterator it = label_map_.right.find(tix);
-        return (it == label_map_.right.end())? invalid_label: it->second;
+        label_map_type::right_map::const_iterator it =
+            label_map_.right.find(tix);
+        return (it == label_map_.right.end()) ? invalid_label : it->second;
     }
 
-    std::uint32_t thread_mapper::get_thread_index(std::string const& label) const
+    std::uint32_t thread_mapper::get_thread_index(
+        std::string const& label) const
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        label_map_type::left_map::const_iterator it = label_map_.left.find(label);
-        return (it == label_map_.left.end())? invalid_index: it->second;
+        label_map_type::left_map::const_iterator it =
+            label_map_.left.find(label);
+        return (it == label_map_.left.end()) ? invalid_index : it->second;
     }
 
     std::uint32_t thread_mapper::get_thread_count() const
@@ -152,4 +159,4 @@ namespace hpx { namespace util
 
         return static_cast<std::uint32_t>(thread_info_.size());
     }
-}}
+}}    // namespace hpx::util

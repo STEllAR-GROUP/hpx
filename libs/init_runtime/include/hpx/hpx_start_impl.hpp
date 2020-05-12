@@ -8,17 +8,17 @@
 #pragma once
 
 #include <hpx/assertion.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/function.hpp>
 #include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/prefix/find_prefix.hpp>
-#include <hpx/functional/function.hpp>
 
 #include <csignal>
 #include <cstddef>
@@ -37,24 +37,20 @@ namespace apex {
 
     // force linking of the application with APEX
     HPX_SYMBOL_IMPORT std::string& version();
-}
+}    // namespace apex
 #endif
 
-namespace hpx
-{
+namespace hpx {
     /// \cond NOINTERNAL
-    namespace detail
-    {
+    namespace detail {
         HPX_EXPORT int run_or_start(
-            util::function_nonser<
-                int(hpx::program_options::variables_map& vm)
-            > const& f, int argc, char** argv,
-            init_params const& params, bool blocking);
+            util::function_nonser<int(
+                hpx::program_options::variables_map& vm)> const& f,
+            int argc, char** argv, init_params const& params, bool blocking);
 
-        HPX_EXPORT int init_helper(
-            hpx::program_options::variables_map&,
+        HPX_EXPORT int init_helper(hpx::program_options::variables_map&,
             util::function_nonser<int(int, char**)> const&);
-    }
+    }    // namespace detail
     /// \endcond
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -65,8 +61,9 @@ namespace hpx
     /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
-    inline bool start(util::function_nonser<
-        int(hpx::program_options::variables_map&)> const& f,
+    inline bool start(
+        util::function_nonser<int(hpx::program_options::variables_map&)> const&
+            f,
         int argc, char** argv, init_params const& params)
     {
 #if defined(HPX_WINDOWS)
@@ -98,14 +95,15 @@ namespace hpx
     /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
-    inline bool start(util::function_nonser<int(int, char**)> const& f, int argc,
-        char** argv, init_params const& params)
+    inline bool start(util::function_nonser<int(int, char**)> const& f,
+        int argc, char** argv, init_params const& params)
     {
-        util::function_nonser<int(hpx::program_options::variables_map&)> main_f
-            = util::bind_back(detail::init_helper, f);
+        util::function_nonser<int(hpx::program_options::variables_map&)>
+            main_f = util::bind_back(detail::init_helper, f);
         if (argc == 0 || argv == nullptr)
         {
-            return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
+            return start(
+                main_f, detail::dummy_argc, detail::dummy_argv, params);
         }
         return start(main_f, argc, argv, params);
     }
@@ -120,11 +118,12 @@ namespace hpx
     /// with the runtime system's execution.
     inline bool start(int argc, char** argv, init_params const& params)
     {
-        util::function_nonser<int(hpx::program_options::variables_map&)> main_f
-            = static_cast<hpx_main_type>(::hpx_main);
+        util::function_nonser<int(hpx::program_options::variables_map&)>
+            main_f = static_cast<hpx_main_type>(::hpx_main);
         if (argc == 0 || argv == nullptr)
         {
-            return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
+            return start(
+                main_f, detail::dummy_argc, detail::dummy_argv, params);
         }
         return start(main_f, argc, argv, params);
     }
@@ -137,13 +136,14 @@ namespace hpx
     /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
-    inline bool start(std::nullptr_t f, int argc, char** argv,
-        init_params const& params)
+    inline bool start(
+        std::nullptr_t f, int argc, char** argv, init_params const& params)
     {
         util::function_nonser<int(hpx::program_options::variables_map&)> main_f;
         if (argc == 0 || argv == nullptr)
         {
-            return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
+            return start(
+                main_f, detail::dummy_argc, detail::dummy_argv, params);
         }
         return start(main_f, argc, argv, params);
     }
@@ -158,8 +158,8 @@ namespace hpx
     /// with the runtime system's execution.
     inline bool start(init_params const& params)
     {
-        util::function_nonser<int(hpx::program_options::variables_map&)> main_f
-            = static_cast<hpx_main_type>(::hpx_main);
+        util::function_nonser<int(hpx::program_options::variables_map&)>
+            main_f = static_cast<hpx_main_type>(::hpx_main);
         return start(main_f, detail::dummy_argc, detail::dummy_argv, params);
     }
 
@@ -172,12 +172,10 @@ namespace hpx
     /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
-    inline bool start(
-        util::function_nonser<
-            int(hpx::program_options::variables_map& vm)
-        > const& f,
-        hpx::program_options::options_description const& desc_cmdline,
-        int argc, char** argv, std::vector<std::string> const& cfg,
+    inline bool start(util::function_nonser<int(
+                          hpx::program_options::variables_map& vm)> const& f,
+        hpx::program_options::options_description const& desc_cmdline, int argc,
+        char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup, shutdown_function_type shutdown,
         hpx::runtime_mode mode)
     {
@@ -199,10 +197,9 @@ namespace hpx
     /// schedule the function given by \p f as an HPX thread. It will return
     /// immediately after that. Use `hpx::wait` and `hpx::stop` to synchronize
     /// with the runtime system's execution.
-    inline bool
-    start(int (*f)(hpx::program_options::variables_map& vm),
-        hpx::program_options::options_description const& desc_cmdline,
-        int argc, char** argv, startup_function_type startup,
+    inline bool start(int (*f)(hpx::program_options::variables_map& vm),
+        hpx::program_options::options_description const& desc_cmdline, int argc,
+        char** argv, startup_function_type startup,
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
         std::vector<std::string> cfg;
@@ -224,9 +221,9 @@ namespace hpx
     /// set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
-    inline bool
-    start(hpx::program_options::options_description const& desc_cmdline,
-        int argc, char** argv, startup_function_type startup,
+    inline bool start(
+        hpx::program_options::options_description const& desc_cmdline, int argc,
+        char** argv, startup_function_type startup,
         shutdown_function_type shutdown, hpx::runtime_mode mode)
     {
         using hpx::program_options::options_description;
@@ -246,9 +243,9 @@ namespace hpx
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
-    inline bool
-    start(hpx::program_options::options_description const& desc_cmdline,
-        int argc, char** argv, std::vector<std::string> const& cfg,
+    inline bool start(
+        hpx::program_options::options_description const& desc_cmdline, int argc,
+        char** argv, std::vector<std::string> const& cfg,
         startup_function_type startup, shutdown_function_type shutdown,
         hpx::runtime_mode mode)
     {
@@ -270,9 +267,8 @@ namespace hpx
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
-    inline bool
-    start(int argc, char** argv, std::vector<std::string> const& cfg,
-        hpx::runtime_mode mode)
+    inline bool start(int argc, char** argv,
+        std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
         iparams.cfg = cfg;
@@ -287,9 +283,9 @@ namespace hpx
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
-    inline bool
-    start(hpx::program_options::options_description const& desc_cmdline,
-        int argc, char** argv, hpx::runtime_mode mode)
+    inline bool start(
+        hpx::program_options::options_description const& desc_cmdline, int argc,
+        char** argv, hpx::runtime_mode mode)
     {
         using hpx::program_options::options_description;
 
@@ -306,9 +302,9 @@ namespace hpx
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
-    inline bool
-    start(hpx::program_options::options_description const& desc_cmdline,
-        int argc, char** argv, std::vector<std::string> const& cfg,
+    inline bool start(
+        hpx::program_options::options_description const& desc_cmdline, int argc,
+        char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
         using hpx::program_options::options_description;
@@ -327,13 +323,12 @@ namespace hpx
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
-    inline bool
-    start(std::string const& app_name, int argc, char** argv,
+    inline bool start(std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
         using hpx::program_options::options_description;
-        options_description desc = options_description("Usage: " + app_name +
-                " [options]");
+        options_description desc =
+            options_description("Usage: " + app_name + " [options]");
         hpx::init_params iparams;
         iparams.desc_cmdline = desc;
         iparams.mode = mode;
@@ -361,8 +356,8 @@ namespace hpx
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediately after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
-    inline bool start(std::vector<std::string> const& cfg,
-        hpx::runtime_mode mode)
+    inline bool start(
+        std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
         iparams.cfg = cfg;
@@ -384,7 +379,7 @@ namespace hpx
         using hpx::program_options::options_description;
 
         options_description desc_commandline(
-            "Usage: " + app_name +  " [options]");
+            "Usage: " + app_name + " [options]");
 
         hpx::init_params iparams;
         iparams.desc_cmdline = desc_commandline;
@@ -405,7 +400,7 @@ namespace hpx
     {
         using hpx::program_options::options_description;
         options_description desc_commandline(
-            "Usage: " + app_name +  " [options]");
+            "Usage: " + app_name + " [options]");
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
@@ -428,8 +423,7 @@ namespace hpx
     }
 
     inline bool start(util::function_nonser<int(int, char**)> const& f,
-        std::vector<std::string> const& cfg,
-        hpx::runtime_mode mode)
+        std::vector<std::string> const& cfg, hpx::runtime_mode mode)
     {
         hpx::init_params iparams;
         iparams.cfg = cfg;
@@ -442,7 +436,7 @@ namespace hpx
     {
         using hpx::program_options::options_description;
         options_description desc_commandline(
-            "Usage: " + app_name +  " [options]");
+            "Usage: " + app_name + " [options]");
 
         HPX_ASSERT(argc != 0 && argv != nullptr);
 
@@ -472,5 +466,4 @@ namespace hpx
         return start(f, detail::dummy_argc, detail::dummy_argv, iparams);
     }
 #endif
-}
-
+}    // namespace hpx

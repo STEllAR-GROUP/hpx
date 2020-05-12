@@ -10,8 +10,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx
-{
+namespace hpx {
     class HPX_EXPORT runtime;
 
     /// The function \a get_runtime returns a reference to the (thread
@@ -26,4 +25,4 @@ namespace hpx
     ///       command line option `--hpx:expect-connecting-localities` was
     ///       specified
     HPX_EXPORT bool is_networking_enabled();
-}
+}    // namespace hpx

@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
@@ -22,16 +22,14 @@
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(push)
-#pragma warning(disable: 4251)
+#pragma warning(disable : 4251)
 #endif
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     class interval_timer;
-}}
+}}    // namespace hpx::util
 
-namespace hpx { namespace util { namespace detail
-{
+namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT interval_timer
       : public std::enable_shared_from_this<interval_timer>
@@ -58,8 +56,14 @@ namespace hpx { namespace util { namespace detail
 
         bool restart(bool evaluate);
 
-        bool is_started() const { return is_started_; }
-        bool is_terminated() const { return is_terminated_; }
+        bool is_started() const
+        {
+            return is_started_;
+        }
+        bool is_terminated() const
+        {
+            return is_terminated_;
+        }
 
         std::int64_t get_interval() const;
 
@@ -67,35 +71,35 @@ namespace hpx { namespace util { namespace detail
 
     protected:
         // schedule a high priority task after a given time interval
-        void schedule_thread(std::unique_lock<mutex_type> & l);
+        void schedule_thread(std::unique_lock<mutex_type>& l);
 
-        threads::thread_result_type
-            evaluate(threads::thread_state_ex_enum statex);
+        threads::thread_result_type evaluate(
+            threads::thread_state_ex_enum statex);
 
-        void terminate();             // handle system shutdown
+        void terminate();    // handle system shutdown
         bool stop_locked();
 
     private:
         mutable mutex_type mtx_;
-        util::function_nonser<bool()> f_; ///< function to call
-        util::function_nonser<void()> on_term_; ///< function to call on termination
-        std::int64_t microsecs_;    ///< time interval
-        threads::thread_id_type id_;  ///< id of currently scheduled thread
-        threads::thread_id_type timerid_;  ///< id of the timer thread for the
-                                           ///< currently scheduled thread
-        std::string description_;     ///< description of this interval timer
+        util::function_nonser<bool()> f_;    ///< function to call
+        util::function_nonser<void()>
+            on_term_;                   ///< function to call on termination
+        std::int64_t microsecs_;        ///< time interval
+        threads::thread_id_type id_;    ///< id of currently scheduled thread
+        threads::thread_id_type timerid_;    ///< id of the timer thread for the
+                                             ///< currently scheduled thread
+        std::string description_;    ///< description of this interval timer
 
-        bool pre_shutdown_;           ///< execute termination during pre-shutdown
-        bool is_started_;             ///< timer has been started (is running)
+        bool pre_shutdown_;    ///< execute termination during pre-shutdown
+        bool is_started_;      ///< timer has been started (is running)
         bool first_start_;
         ///^ flag to distinguish first invocation of start()
-        bool is_terminated_;          ///< The timer has been terminated
+        bool is_terminated_;    ///< The timer has been terminated
         bool is_stopped_;
     };
-}}}
+}}}    // namespace hpx::util::detail
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     class HPX_EXPORT interval_timer
     {
     public:
@@ -112,12 +116,12 @@ namespace hpx { namespace util
             bool pre_shutdown = false);
 
         interval_timer(util::function_nonser<bool()> const& f,
-            util::steady_duration const& rel_time,
-            char const*  description = "", bool pre_shutdown = false);
+            util::steady_duration const& rel_time, char const* description = "",
+            bool pre_shutdown = false);
         interval_timer(util::function_nonser<bool()> const& f,
             util::function_nonser<void()> const& on_term,
-            util::steady_duration const& rel_time,
-            char const*  description = "", bool pre_shutdown = false);
+            util::steady_duration const& rel_time, char const* description = "",
+            bool pre_shutdown = false);
 
         ~interval_timer();
 
@@ -153,9 +157,8 @@ namespace hpx { namespace util
     private:
         std::shared_ptr<detail::interval_timer> timer_;
     };
-}}
+}}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)
 #endif
-

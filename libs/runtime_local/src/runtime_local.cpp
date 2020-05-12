@@ -11,16 +11,18 @@
 #include <hpx/command_line_handling.hpp>
 #include <hpx/concurrency/thread_name.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/runtime_local/debugging.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/state.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>
@@ -30,9 +32,7 @@
 #include <hpx/threadmanager.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/runtime_local/debugging.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -1069,8 +1069,7 @@ namespace hpx { namespace threads {
             to_add_mode, to_remove_mode);
     }
 
-    HPX_EXPORT void remove_scheduler_mode(
-        threads::policies::scheduler_mode m)
+    HPX_EXPORT void remove_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().remove_scheduler_mode(m);
     }
@@ -1341,8 +1340,7 @@ namespace hpx {
         threads::thread_init_data data(util::bind(&runtime::run_helper, this,
                                            func, std::ref(result_), true),
             "run_helper", threads::thread_priority_normal,
-            threads::thread_schedule_hint(0),
-            threads::thread_stacksize_large);
+            threads::thread_schedule_hint(0), threads::thread_stacksize_large);
 
         this->runtime::starting();
         threads::thread_id_type id = threads::invalid_thread_id;

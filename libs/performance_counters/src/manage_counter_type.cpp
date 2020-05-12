@@ -15,8 +15,8 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime_local.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime_local.hpp>
 #include <hpx/version.hpp>
 
 #include <cstddef>

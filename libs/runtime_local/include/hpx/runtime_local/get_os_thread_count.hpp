@@ -6,15 +6,13 @@
 
 /// \file hpx/runtime_local/get_os_thread_count.hpp
 
-#ifndef HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP
-#define HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
 #include <cstddef>
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
@@ -35,6 +33,4 @@ namespace hpx
     ///
     /// \param exec [in] The executor to be used.
     HPX_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
-}
-
-#endif /*HPX_RUNTIME_GET_OS_THREAD_COUNT_HPP*/
+}    // namespace hpx

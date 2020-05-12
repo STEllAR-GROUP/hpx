@@ -10,11 +10,11 @@
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_local/run_as_hpx_thread.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/state.hpp>
 #include <hpx/type_support/unused.hpp>
 

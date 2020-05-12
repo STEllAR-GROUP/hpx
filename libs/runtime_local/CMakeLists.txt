@@ -70,10 +70,10 @@ set(runtime_local_sources
 )
 
 include(HPX_AddModule)
-add_hpx_module(runtime_local
+add_hpx_module(
+  runtime_local
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${runtime_local_sources}
   HEADERS ${runtime_local_headers}

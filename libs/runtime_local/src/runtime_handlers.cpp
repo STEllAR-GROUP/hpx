@@ -9,17 +9,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/logging.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/runtime_local/debugging.hpp>
+#include <hpx/runtime_local/runtime_handlers.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/runtime_local/runtime_handlers.hpp>
 #include <hpx/threadmanager.hpp>
-#include <hpx/debugging/backtrace.hpp>
-#include <hpx/runtime_local/debugging.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -110,8 +110,7 @@ namespace hpx { namespace detail {
         hpx::runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::detail::get_default_pool",
+            HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::get_default_pool",
                 "The runtime system is not active");
         }
 

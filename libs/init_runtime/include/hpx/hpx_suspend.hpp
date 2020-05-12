@@ -11,8 +11,7 @@
 #include <hpx/errors.hpp>
 
 /// \namespace hpx
-namespace hpx
-{
+namespace hpx {
     /// \brief Suspend the runtime system.
     ///
     /// The function \a hpx::suspend is used to suspend the HPX runtime system.
@@ -52,5 +51,4 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     HPX_EXPORT int resume(error_code& ec = throws);
-}
-
+}    // namespace hpx

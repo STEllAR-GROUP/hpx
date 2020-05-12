@@ -10,12 +10,10 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/threading_base.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace hpx {
-namespace util {
-namespace debug {
+namespace hpx { namespace util { namespace debug {
 
     // ------------------------------------------------------------------------
     // return a vector of suspended/other task Ids
@@ -31,6 +29,4 @@ namespace debug {
     // return string containing the stack backtrace for suspended tasks
     HPX_EXPORT std::string suspended_task_backtraces();
 
-}}}
-
-
+}}}    // namespace hpx::util::debug

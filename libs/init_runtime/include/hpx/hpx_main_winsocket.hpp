@@ -10,9 +10,8 @@
 
 #if defined(HPX_WINDOWS)
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     HPX_EXPORT void init_winsocket();
-}}
+}}    // namespace hpx::detail
 
 #endif

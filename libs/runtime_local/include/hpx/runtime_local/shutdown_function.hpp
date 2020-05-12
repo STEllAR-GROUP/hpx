@@ -12,8 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/unique_function.hpp>
 
-namespace hpx
-{
+namespace hpx {
     /// The type of a function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
     typedef util::unique_function_nonser<void()> shutdown_function_type;
@@ -55,5 +54,4 @@ namespace hpx
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
     HPX_EXPORT void register_shutdown_function(shutdown_function_type f);
-}
-
+}    // namespace hpx

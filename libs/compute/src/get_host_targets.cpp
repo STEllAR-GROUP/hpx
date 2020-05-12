@@ -8,8 +8,8 @@
 #include <hpx/compute/host/target.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/topology/topology.hpp>

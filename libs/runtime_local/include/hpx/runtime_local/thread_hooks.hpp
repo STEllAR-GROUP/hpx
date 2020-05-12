@@ -9,8 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
-namespace hpx
-{
+namespace hpx {
     /// Retrieve the currently installed start handler function. This is a
     /// function that will be called by HPX for each newly created thread that
     /// is made known to the runtime. HPX stores exactly one such function
@@ -23,7 +22,7 @@ namespace hpx
     /// \note This function can be called before the HPX runtime is initialized.
     ///
     HPX_EXPORT threads::policies::callback_notifier::on_startstop_type
-        get_thread_on_start_func();
+    get_thread_on_start_func();
 
     /// Retrieve the currently installed stop handler function. This is a
     /// function that will be called by HPX for each newly created thread that
@@ -37,7 +36,7 @@ namespace hpx
     /// \note This function can be called before the HPX runtime is initialized.
     ///
     HPX_EXPORT threads::policies::callback_notifier::on_startstop_type
-        get_thread_on_stop_func();
+    get_thread_on_stop_func();
 
     /// Retrieve the currently installed error handler function. This is a
     /// function that will be called by HPX for each newly created thread that
@@ -51,7 +50,7 @@ namespace hpx
     /// \note This function can be called before the HPX runtime is initialized.
     ///
     HPX_EXPORT threads::policies::callback_notifier::on_error_type
-        get_thread_on_error_func();
+    get_thread_on_error_func();
 
     /// Set the currently installed start handler function. This is a
     /// function that will be called by HPX for each newly created thread that
@@ -109,5 +108,4 @@ namespace hpx
     HPX_EXPORT threads::policies::callback_notifier::on_error_type
     register_thread_on_error_func(
         threads::policies::callback_notifier::on_error_type&& f);
-}
-
+}    // namespace hpx

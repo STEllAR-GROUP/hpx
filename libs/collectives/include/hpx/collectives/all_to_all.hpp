@@ -142,7 +142,6 @@ namespace hpx { namespace lcos {
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/type_support/decay.hpp>

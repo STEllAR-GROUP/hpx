@@ -7,33 +7,31 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/runtime_local/state.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_local/state.hpp>
 #include <hpx/threadmanager.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    namespace threads
+namespace hpx { namespace threads {
+    // return whether thread manager is in the state described by st
+    bool threadmanager_is(state st)
     {
-        // return whether thread manager is in the state described by st
-        bool threadmanager_is(state st)
+        hpx::runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
         {
-            hpx::runtime* rt = get_runtime_ptr();
-            if (nullptr == rt) {
-                // we're probably either starting or stopping
-                return st <= state_starting || st >= state_stopping;
-            }
-            return (rt->get_thread_manager().status() == st);
+            // we're probably either starting or stopping
+            return st <= state_starting || st >= state_stopping;
         }
-        bool threadmanager_is_at_least(state st)
-        {
-            hpx::runtime* rt = get_runtime_ptr();
-            if (nullptr == rt) {
-                // we're probably either starting or stopping
-                return false;
-            }
-            return (rt->get_thread_manager().status() >= st);
-        }
+        return (rt->get_thread_manager().status() == st);
     }
-}
+    bool threadmanager_is_at_least(state st)
+    {
+        hpx::runtime* rt = get_runtime_ptr();
+        if (nullptr == rt)
+        {
+            // we're probably either starting or stopping
+            return false;
+        }
+        return (rt->get_thread_manager().status() >= st);
+    }
+}}    // namespace hpx::threads

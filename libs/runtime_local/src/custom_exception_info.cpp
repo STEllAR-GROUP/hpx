@@ -8,29 +8,29 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/naming_base.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/runtime_local/debugging.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/state.hpp>
 #include <hpx/threading.hpp>
-#include <hpx/debugging/backtrace.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/runtime_local/debugging.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/version.hpp>
 
 #if defined(HPX_WINDOWS)
-#  include <process.h>
+#include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)
-#  include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include <algorithm>
@@ -52,11 +52,10 @@
 #elif defined(__FreeBSD__)
 HPX_EXPORT char** freebsd_environ = nullptr;
 #elif !defined(HPX_WINDOWS)
-extern char **environ;
+extern char** environ;
 #endif
 
-namespace hpx
-{
+namespace hpx {
     char const* get_runtime_state_name(state st);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -172,7 +171,7 @@ namespace hpx
 
         return strm.str();
     }
-}
+}    // namespace hpx
 
 namespace hpx { namespace util {
     // This is a local helper used to get the backtrace on a new new stack if
@@ -181,7 +180,7 @@ namespace hpx { namespace util {
         std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
     {
 #if defined(HPX_HAVE_STACKTRACES)
-        if(frames_no == 0)
+        if (frames_no == 0)
         {
             return std::string();
         }
@@ -195,7 +194,8 @@ namespace hpx { namespace util {
             return bt.trace();
         }
 
-        lcos::local::futures_factory<std::string()> p([&bt]() { return bt.trace(); });
+        lcos::local::futures_factory<std::string()> p(
+            [&bt]() { return bt.trace(); });
 
         error_code ec(lightweight);
         threads::thread_id_type tid = p.apply("hpx::util::trace_on_new_stack",
@@ -213,10 +213,9 @@ namespace hpx { namespace util {
         return "";
 #endif
     }
-}}
+}}    // namespace hpx::util
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     void pre_exception_handler()
     {
         if (!expect_exception_flag.load(std::memory_order_relaxed))
@@ -253,13 +252,13 @@ namespace hpx { namespace detail
         std::abort();
     }
 
-    hpx::exception_info construct_exception_info(
-        std::string const& func, std::string const& file, long line,
-        std::string const& back_trace, std::uint32_t node,
-        std::string const& hostname, std::int64_t pid, std::size_t shepherd,
-        std::size_t thread_id, std::string const& thread_name,
-        std::string const& env, std::string const& config,
-        std::string const& state_name, std::string const& auxinfo)
+    hpx::exception_info construct_exception_info(std::string const& func,
+        std::string const& file, long line, std::string const& back_trace,
+        std::uint32_t node, std::string const& hostname, std::int64_t pid,
+        std::size_t shepherd, std::size_t thread_id,
+        std::string const& thread_name, std::string const& env,
+        std::string const& config, std::string const& state_name,
+        std::string const& auxinfo)
     {
         return hpx::exception_info().set(
             hpx::detail::throw_stacktrace(back_trace),
@@ -291,7 +290,7 @@ namespace hpx { namespace detail
         }
 
         // need this return to silence a warning with icc
-        HPX_ASSERT(false);  // -V779
+        HPX_ASSERT(false);    // -V779
         return std::exception_ptr();
     }
 
@@ -333,9 +332,10 @@ namespace hpx { namespace detail
     inline std::size_t get_arraylen(char** array)
     {
         std::size_t count = 0;
-        if (nullptr != array) {
-            while(nullptr != array[count])
-                ++count;   // simply count the environment strings
+        if (nullptr != array)
+        {
+            while (nullptr != array[count])
+                ++count;    // simply count the environment strings
         }
         return count;
     }
@@ -348,7 +348,8 @@ namespace hpx { namespace detail
         std::size_t len = get_arraylen(_environ);
         env.reserve(len);
         std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
-#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__AIX__)
+#elif defined(linux) || defined(__linux) || defined(__linux__) ||              \
+    defined(__AIX__)
         std::size_t len = get_arraylen(environ);
         env.reserve(len);
         std::copy(&environ[0], &environ[len], std::back_inserter(env));
@@ -378,8 +379,7 @@ namespace hpx { namespace detail
         return retval;
     }
 
-    hpx::exception_info custom_exception_info(
-        std::string const& func,
+    hpx::exception_info custom_exception_info(std::string const& func,
         std::string const& file, long line, std::string const& auxinfo)
     {
         std::int64_t pid = ::getpid();
@@ -398,8 +398,7 @@ namespace hpx { namespace detail
             state rts_state = rt->get_state();
             state_name = get_runtime_state_name(rts_state);
 
-            if (rts_state >= state_initialized &&
-                rts_state < state_stopped)
+            if (rts_state >= state_initialized && rts_state < state_stopped)
             {
                 std::ostringstream strm;
                 strm << get_runtime().here();
@@ -432,29 +431,25 @@ namespace hpx { namespace detail
         return hpx::exception_info().set(
             hpx::detail::throw_stacktrace(back_trace),
             hpx::detail::throw_locality(node),
-            hpx::detail::throw_hostname(hostname),
-            hpx::detail::throw_pid(pid),
+            hpx::detail::throw_hostname(hostname), hpx::detail::throw_pid(pid),
             hpx::detail::throw_shepherd(shepherd),
-            hpx::detail::throw_thread_id(reinterpret_cast<std::size_t>(thread_id.get())),
+            hpx::detail::throw_thread_id(
+                reinterpret_cast<std::size_t>(thread_id.get())),
             hpx::detail::throw_thread_name(util::as_string(thread_name)),
-            hpx::detail::throw_function(func),
-            hpx::detail::throw_file(file),
-            hpx::detail::throw_line(line),
-            hpx::detail::throw_env(env),
+            hpx::detail::throw_function(func), hpx::detail::throw_file(file),
+            hpx::detail::throw_line(line), hpx::detail::throw_env(env),
             hpx::detail::throw_config(config),
             hpx::detail::throw_state(state_name),
             hpx::detail::throw_auxinfo(auxinfo));
     }
-}}
+}}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     /// Return the host-name of the locality where the exception was thrown.
     std::string get_error_host_name(hpx::exception_info const& xi)
     {
-        std::string const* hostname_ =
-            xi.get<hpx::detail::throw_hostname>();
+        std::string const* hostname_ = xi.get<hpx::detail::throw_hostname>();
         if (hostname_ && !hostname_->empty())
             return *hostname_;
         return std::string();
@@ -463,8 +458,7 @@ namespace hpx
     /// Return the locality where the exception was thrown.
     std::uint32_t get_error_locality_id(hpx::exception_info const& xi)
     {
-        std::uint32_t const* locality =
-            xi.get<hpx::detail::throw_locality>();
+        std::uint32_t const* locality = xi.get<hpx::detail::throw_locality>();
         if (locality)
             return *locality;
         return naming::invalid_locality_id;
@@ -474,8 +468,7 @@ namespace hpx
     /// exception was thrown.
     std::int64_t get_error_process_id(hpx::exception_info const& xi)
     {
-        std::int64_t const* pid_ =
-            xi.get<hpx::detail::throw_pid>();
+        std::int64_t const* pid_ = xi.get<hpx::detail::throw_pid>();
         if (pid_)
             return *pid_;
         return -1;
@@ -485,8 +478,7 @@ namespace hpx
     /// was thrown.
     std::string get_error_env(hpx::exception_info const& xi)
     {
-        std::string const* env =
-            xi.get<hpx::detail::throw_env>();
+        std::string const* env = xi.get<hpx::detail::throw_env>();
         if (env && !env->empty())
             return *env;
 
@@ -496,8 +488,7 @@ namespace hpx
     /// Return the stack backtrace at the point the exception was thrown.
     std::string get_error_backtrace(hpx::exception_info const& xi)
     {
-        std::string const* back_trace =
-            xi.get<hpx::detail::throw_stacktrace>();
+        std::string const* back_trace = xi.get<hpx::detail::throw_stacktrace>();
         if (back_trace && !back_trace->empty())
             return *back_trace;
 
@@ -508,8 +499,7 @@ namespace hpx
     /// from which the exception was thrown.
     std::size_t get_error_os_thread(hpx::exception_info const& xi)
     {
-        std::size_t const* shepherd =
-            xi.get<hpx::detail::throw_shepherd>();
+        std::size_t const* shepherd = xi.get<hpx::detail::throw_shepherd>();
         if (shepherd && std::size_t(-1) != *shepherd)
             return *shepherd;
         return std::size_t(-1);
@@ -519,8 +509,7 @@ namespace hpx
     /// was thrown.
     std::size_t get_error_thread_id(hpx::exception_info const& xi)
     {
-        std::size_t const* thread_id =
-            xi.get<hpx::detail::throw_thread_id>();
+        std::size_t const* thread_id = xi.get<hpx::detail::throw_thread_id>();
         if (thread_id && *thread_id)
             return *thread_id;
         return std::size_t(-1);
@@ -541,8 +530,7 @@ namespace hpx
     /// exception was thrown.
     std::string get_error_config(hpx::exception_info const& xi)
     {
-        std::string const* config_info =
-            xi.get<hpx::detail::throw_config>();
+        std::string const* config_info = xi.get<hpx::detail::throw_config>();
         if (config_info && !config_info->empty())
             return *config_info;
         return std::string();
@@ -552,11 +540,9 @@ namespace hpx
     /// thrown.
     std::string get_error_state(hpx::exception_info const& xi)
     {
-        std::string const* state_info =
-            xi.get<hpx::detail::throw_state>();
+        std::string const* state_info = xi.get<hpx::detail::throw_state>();
         if (state_info && !state_info->empty())
             return *state_info;
         return std::string();
     }
-}
-
+}    // namespace hpx

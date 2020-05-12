@@ -32,40 +32,37 @@ int hpx_main(hpx::program_options::variables_map& vm);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NOINTERNAL
-namespace hpx_startup
-{
+namespace hpx_startup {
     // As an alternative, the user can provide a function hpx_startup::user_main,
     // which is semantically equivalent to the plain old C-main.
     int user_main();
     int user_main(int argc, char** argv);
-}
+}    // namespace hpx_startup
 /// \endcond
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \namespace hpx
-namespace hpx
-{
+namespace hpx {
     /// \cond NOINTERNAL
     namespace resource {
         // Utilities to init the thread_pools of the resource partitioner
-        using rp_callback_type = hpx::util::function_nonser<void(
-                hpx::resource::partitioner&)>;
-    }
+        using rp_callback_type =
+            hpx::util::function_nonser<void(hpx::resource::partitioner&)>;
+    }    // namespace resource
     /// \endcond
 
-    namespace detail
-    {
+    namespace detail {
         // Default params to initialize the init_params struct
         HPX_MAYBE_UNUSED static int dummy_argc = 1;
         HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;
-        static char *default_argv[2] = { app_name, nullptr };
-        HPX_MAYBE_UNUSED static char **dummy_argv = default_argv;
+        static char* default_argv[2] = {app_name, nullptr};
+        HPX_MAYBE_UNUSED static char** dummy_argv = default_argv;
         // HPX_APPLICATION_STRING is specific to an application and therefore
         // cannot be in the source file
         HPX_MAYBE_UNUSED static const hpx::program_options::options_description
             default_desc = hpx::program_options::options_description(
-                    "Usage: " HPX_APPLICATION_STRING " [options]");
-    }
+                "Usage: " HPX_APPLICATION_STRING " [options]");
+    }    // namespace detail
 
 #if !defined(DOXYGEN)
     typedef int (*hpx_main_type)(hpx::program_options::variables_map&);
@@ -109,7 +106,8 @@ namespace hpx
     ///                     partitioner creation, it may be used to
     ///                     initialize thread pools. If none is specified no
     ///                     function will be executed.
-    struct init_params {
+    struct init_params
+    {
         // Parameters
         std::reference_wrapper<hpx::program_options::options_description const>
             desc_cmdline = detail::default_desc;
@@ -120,5 +118,4 @@ namespace hpx
         hpx::resource::partitioner_mode rp_mode = ::hpx::resource::mode_default;
         hpx::resource::rp_callback_type rp_callback;
     };
-}
-
+}    // namespace hpx

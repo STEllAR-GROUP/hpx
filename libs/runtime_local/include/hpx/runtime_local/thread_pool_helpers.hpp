@@ -6,8 +6,7 @@
 
 /// \file hpx/runtime_local/thread_pool_helpers.hpp
 
-#ifndef HPX_RUNTIME_THREAD_POOL_HELPERS_HPP
-#define HPX_RUNTIME_THREAD_POOL_HELPERS_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -16,8 +15,7 @@
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace resource
-{
+namespace hpx { namespace resource {
     ///////////////////////////////////////////////////////////////////////////
     /// Return the number of thread pools currently managed by the
     /// \a resource_partitioner
@@ -54,7 +52,7 @@ namespace hpx { namespace resource
 
     /// Return true if the pool with the given index exists
     HPX_EXPORT bool pool_exists(std::size_t pool_index);
-}}
+}}    // namespace hpx::resource
 
 namespace hpx { namespace threads {
     ///    The function \a get_thread_count returns the number of currently
@@ -67,8 +65,7 @@ namespace hpx { namespace threads {
     ///       number of currently existing threads, but will add the number
     ///       of registered task descriptions (which have not been
     ///       converted into threads yet).
-    HPX_EXPORT std::int64_t get_thread_count(
-        thread_state_enum state = unknown);
+    HPX_EXPORT std::int64_t get_thread_count(thread_state_enum state = unknown);
 
     /// The function \a get_thread_count returns the number of currently
     /// known threads.
@@ -96,6 +93,4 @@ namespace hpx { namespace threads {
     HPX_EXPORT bool enumerate_threads(
         util::function_nonser<bool(thread_id_type)> const& f,
         thread_state_enum state = unknown);
-}}
-
-#endif
+}}    // namespace hpx::threads

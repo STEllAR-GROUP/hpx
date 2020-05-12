@@ -10,14 +10,15 @@
 #if defined(HPX_WINDOWS)
 
 #if !defined(WIN32)
-#  define WIN32
+#define WIN32
 #endif
+// clang-format off
 #include <winsock2.h>
 #include <windows.h>
 #include <boost/asio/detail/winsock_init.hpp>
+// clang-format on
 
-namespace hpx { namespace detail
-{
+namespace hpx { namespace detail {
     // Make sure the Winsocket library is explicitly initialized before main
     // is executed.
     struct winsocket_init_helper
@@ -35,6 +36,6 @@ namespace hpx { namespace detail
     {
         winsocket_init_helper::init();
     }
-}}
+}}    // namespace hpx::detail
 
 #endif

@@ -8,21 +8,20 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <boost/bimap.hpp>
 
-#include <thread>
 #include <cstdint>
 #include <map>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // enumerates active OS threads and maintains their metadata
     class HPX_EXPORT thread_mapper
@@ -54,8 +53,11 @@ namespace hpx { namespace util
             // callback function invoked when unregistering a thread
             callback_type cleanup_;
 
-            thread_data(long int tid = invalid_tid):
-                tid_(tid), cleanup_(&thread_mapper::null_cb) { }
+            thread_data(long int tid = invalid_tid)
+              : tid_(tid)
+              , cleanup_(&thread_mapper::null_cb)
+            {
+            }
         };
 
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -79,12 +81,12 @@ namespace hpx { namespace util
         bool unmap_thread(thread_map_type::iterator&);
 
     public:
-        thread_mapper() { }
+        thread_mapper() {}
         ~thread_mapper();
 
         // registers invoking OS thread with a unique label
-        std::uint32_t register_thread(char const *label,
-            error_code& ec = throws);
+        std::uint32_t register_thread(
+            char const* label, error_code& ec = throws);
 
         // unregisters the calling OS thread
         bool unregister_thread();
@@ -108,7 +110,6 @@ namespace hpx { namespace util
         // returns the number of threads registered so far
         std::uint32_t get_thread_count() const;
     };
-}}
+}}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
-

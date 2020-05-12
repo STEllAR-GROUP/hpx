@@ -12,8 +12,7 @@
 
 #include <string>
 
-namespace hpx {
-namespace util {
+namespace hpx { namespace util {
     void may_attach_debugger(std::string const& category)
     {
         if (get_config_entry("hpx.attach_debugger", "") == category)
@@ -21,5 +20,4 @@ namespace util {
             attach_debugger();
         }
     }
-}    // end namespace util
-}    // end namespace hpx
+}}    // namespace hpx::util

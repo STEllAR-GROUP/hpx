@@ -10,26 +10,24 @@
 #include <hpx/assertion.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/service_executors.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/result_of.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace threads
-{
+namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename ... Ts>
-    hpx::future<typename util::invoke_result<F, Ts...>::type>
-    run_as_os_thread(F && f, Ts &&... vs)
+    template <typename F, typename... Ts>
+    hpx::future<typename util::invoke_result<F, Ts...>::type> run_as_os_thread(
+        F&& f, Ts&&... vs)
     {
         HPX_ASSERT(get_self_ptr() != nullptr);
 
         parallel::execution::io_pool_executor executor;
-        auto result = parallel::execution::async_execute(executor,
-            std::forward<F>(f), std::forward<Ts>(vs)...);
+        auto result = parallel::execution::async_execute(
+            executor, std::forward<F>(f), std::forward<Ts>(vs)...);
         return result;
     }
-}}
-
+}}    // namespace hpx::threads

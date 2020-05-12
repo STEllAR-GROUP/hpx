@@ -25,6 +25,7 @@
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
@@ -32,7 +33,6 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
 

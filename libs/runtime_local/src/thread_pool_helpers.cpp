@@ -19,8 +19,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resource
-{
+namespace hpx { namespace resource {
     std::size_t get_num_thread_pools()
     {
         return get_partitioner().get_num_pools();
@@ -51,8 +50,7 @@ namespace hpx { namespace resource
         return get_partitioner().get_pool_name(pool_index);
     }
 
-    threads::thread_pool_base& get_thread_pool(
-        std::string const& pool_name)
+    threads::thread_pool_base& get_thread_pool(std::string const& pool_name)
     {
         return get_runtime().get_thread_manager().get_pool(pool_name);
     }
@@ -62,8 +60,7 @@ namespace hpx { namespace resource
         return get_thread_pool(get_pool_name(pool_index));
     }
 
-    bool pool_exists(
-        std::string const& pool_name)
+    bool pool_exists(std::string const& pool_name)
     {
         return get_runtime().get_thread_manager().pool_exists(pool_name);
     }

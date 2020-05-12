@@ -13,8 +13,7 @@
 
 #include <string>
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the name of the calling thread.
     ///
@@ -22,5 +21,4 @@ namespace hpx
     /// identifies the thread in the context of HPX. If the function is called
     /// while no HPX runtime system is active, the result will be "<unknown>".
     HPX_EXPORT std::string get_thread_name();
-}
-
+}    // namespace hpx

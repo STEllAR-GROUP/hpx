@@ -14,13 +14,13 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/detail/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_num_localities.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/get_thread_name.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/runtime_local/report_error.hpp>
-#include <hpx/runtime_local/detail/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
@@ -169,10 +169,10 @@ namespace hpx {
         /// Get the global topology instance
         HPX_EXPORT topology const& get_topology();
         /// \endcond
-    }
+    }    // namespace threads
 
     namespace detail {
         HPX_EXPORT void on_exit() noexcept;
         HPX_EXPORT void on_abort(int signal) noexcept;
-    }
+    }    // namespace detail
 }    // namespace hpx

@@ -15,8 +15,7 @@
 
 #include <cstdint>
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called
     ///        from.
@@ -40,5 +39,4 @@ namespace hpx
     /// \note     This function needs to be executed on a HPX-thread. It will
     ///           fail otherwise (it will return -1).
     HPX_EXPORT std::uint32_t get_locality_id(error_code& ec = throws);
-}
-
+}    // namespace hpx

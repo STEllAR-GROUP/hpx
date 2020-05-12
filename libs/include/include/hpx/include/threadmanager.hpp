@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/threadmanager.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)

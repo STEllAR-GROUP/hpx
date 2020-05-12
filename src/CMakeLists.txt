@@ -9,9 +9,8 @@
 # ##############################################################################
 # gather sources
 
-set(hpx_SOURCES
-    runtime/threads/thread_pool_suspension_helpers.cpp
-    util/serialize_exception.cpp
+set(hpx_SOURCES runtime/threads/thread_pool_suspension_helpers.cpp
+                util/serialize_exception.cpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -144,18 +143,17 @@ endif()
 
 # List all headers (local and distributed)
 set(hpx_HEADERS
-  hpx/hpx_user_main_config.hpp
-  hpx/lcos/future.hpp
-  hpx/lcos_fwd.hpp
-  hpx/runtime/serialization/detail/preprocess_container.hpp
-  hpx/runtime/serialization/detail/preprocess_futures.hpp
-  hpx/runtime/serialization/detail/preprocess_gid_types.hpp
-  hpx/runtime/threads_fwd.hpp
-  hpx/traits/managed_component_policies.hpp
-  hpx/traits/pointer_category.hpp
-  hpx/traits/rma_memory_region_traits.hpp
-  hpx/util_fwd.hpp
-  hpx/util/serialize_exception.hpp
+    hpx/hpx_user_main_config.hpp
+    hpx/lcos_fwd.hpp
+    hpx/runtime/serialization/detail/preprocess_container.hpp
+    hpx/runtime/serialization/detail/preprocess_futures.hpp
+    hpx/runtime/serialization/detail/preprocess_gid_types.hpp
+    hpx/runtime/threads_fwd.hpp
+    hpx/traits/managed_component_policies.hpp
+    hpx/traits/pointer_category.hpp
+    hpx/traits/rma_memory_region_traits.hpp
+    hpx/util_fwd.hpp
+    hpx/util/serialize_exception.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)

@@ -652,8 +652,9 @@ namespace hpx { namespace util {
         std::string component_path_suffixes(
             get_entry("hpx.component_path_suffixes", "/lib/hpx"));
 
-        load_component_paths(plugin_registries, component_registries, component_base_paths,
-            component_path_suffixes, component_paths, basenames);
+        load_component_paths(plugin_registries, component_registries,
+            component_base_paths, component_path_suffixes, component_paths,
+            basenames);
 
         // load additional explicit plugin paths from plugin_paths key
         std::string plugin_paths(get_entry("hpx.component_paths", ""));

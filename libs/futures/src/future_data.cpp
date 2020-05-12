@@ -11,7 +11,6 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>

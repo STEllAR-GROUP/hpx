@@ -6,23 +6,18 @@
 
 /// \file hpx/runtime_local/report_error.hpp
 
-#if !defined(HPX_RUNTIME_REPORT_ERROR_HPP)
-#define HPX_RUNTIME_REPORT_ERROR_HPP
+#pragma once
 
 #include <hpx/config.hpp>
 
 #include <cstddef>
 #include <exception>
 
-namespace hpx
-{
+namespace hpx {
     /// The function report_error reports the given exception to the console
-    HPX_EXPORT void report_error(std::size_t num_thread,
-        std::exception_ptr const& e);
+    HPX_EXPORT void report_error(
+        std::size_t num_thread, std::exception_ptr const& e);
 
     /// The function report_error reports the given exception to the console
     HPX_EXPORT void report_error(std::exception_ptr const& e);
-}
-
-#endif
-
+}    // namespace hpx

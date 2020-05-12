@@ -12,8 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/unique_function.hpp>
 
-namespace hpx
-{
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// The type of a function which is registered to be executed as a
     /// startup or pre-startup function.
@@ -67,5 +66,4 @@ namespace hpx
     ///
     /// \see    \a hpx::register_pre_startup_function()
     HPX_EXPORT void register_startup_function(startup_function_type f);
-}
-
+}    // namespace hpx

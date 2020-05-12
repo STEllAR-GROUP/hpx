@@ -7,17 +7,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
-#include <hpx/runtime_fwd.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 
 #include <cstdint>
 
 #include <functional>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     std::uint64_t thread_aware_timer::take_time_stamp()
     {
         hpx::lcos::local::promise<std::uint64_t> p;
@@ -26,9 +25,10 @@ namespace hpx { namespace util
         hpx::util::io_service_pool* pool = hpx::get_thread_pool("timer_pool");
 
         // ... and schedule the handler to run on the first of its OS-threads.
-        pool->get_io_service(0).post(hpx::util::bind_front(&sample_time, std::ref(p)));
+        pool->get_io_service(0).post(
+            hpx::util::bind_front(&sample_time, std::ref(p)));
         return p.get_future().get();
     }
-}}
+}}    // namespace hpx::util
 
 #endif

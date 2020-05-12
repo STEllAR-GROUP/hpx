@@ -5,18 +5,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/runtime_local/thread_stacktrace.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
 
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
 
-namespace hpx {
-namespace util {
-namespace debug {
+namespace hpx { namespace util { namespace debug {
 
     // ------------------------------------------------------------------------
     // return a vector of suspended/other task Ids
@@ -26,13 +24,11 @@ namespace debug {
         std::vector<hpx::threads::thread_id_type> thread_ids_vector;
         //
         hpx::threads::enumerate_threads(
-            [&thread_ids_vector](hpx::threads::thread_id_type id) -> bool
-            {
+            [&thread_ids_vector](hpx::threads::thread_id_type id) -> bool {
                 thread_ids_vector.push_back(id);
-                return true; // always continue enumeration
+                return true;    // always continue enumeration
             },
-            state
-        );
+            state);
         return thread_ids_vector;
     }
 
@@ -44,14 +40,12 @@ namespace debug {
         std::vector<hpx::threads::thread_data*> thread_data_vector;
         //
         hpx::threads::enumerate_threads(
-            [&thread_data_vector](hpx::threads::thread_id_type id) -> bool
-            {
-                hpx::threads::thread_data *data = get_thread_id_data(id);
+            [&thread_data_vector](hpx::threads::thread_id_type id) -> bool {
+                hpx::threads::thread_data* data = get_thread_id_data(id);
                 thread_data_vector.push_back(data);
-                return true; // always continue enumeration
+                return true;    // always continue enumeration
             },
-            state
-        );
+            state);
         return thread_data_vector;
     }
 
@@ -65,7 +59,8 @@ namespace debug {
         std::stringstream tmp;
         //
         int count = 0;
-        for (const auto & data : tlist) {
+        for (const auto& data : tlist)
+        {
             tmp << "Stack trace "
                 << "" << std::dec << count << " : "
                 << "0x" << std::setfill('0') << std::setw(12) << std::noshowbase
@@ -79,4 +74,4 @@ namespace debug {
         }
         return tmp.str();
     }
-}}}
+}}}    // namespace hpx::util::debug

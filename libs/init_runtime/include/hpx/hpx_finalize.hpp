@@ -12,8 +12,7 @@
 #include <hpx/errors.hpp>
 
 /// \namespace hpx
-namespace hpx
-{
+namespace hpx {
     /// \brief Main function to gracefully terminate the HPX runtime system.
     ///
     /// The function \a hpx::finalize is the main way to (gracefully) exit any
@@ -66,8 +65,8 @@ namespace hpx
     ///
     /// Using this function is an alternative to \a hpx::disconnect, these
     /// functions do not need to be called both.
-    HPX_EXPORT int finalize(double shutdown_timeout,
-        double localwait = -1.0, error_code& ec = throws);
+    HPX_EXPORT int finalize(double shutdown_timeout, double localwait = -1.0,
+        error_code& ec = throws);
 
     /// \brief Main function to gracefully terminate the HPX runtime system.
     ///
@@ -161,8 +160,8 @@ namespace hpx
     /// before returning to the caller. It should be the last HPX-function
     /// called by any locality being disconnected.
     ///
-    HPX_EXPORT int disconnect(double shutdown_timeout,
-        double localwait = -1.0, error_code& ec = throws);
+    HPX_EXPORT int disconnect(double shutdown_timeout, double localwait = -1.0,
+        error_code& ec = throws);
 
     /// \brief Disconnect this locality from the application.
     ///
@@ -204,5 +203,4 @@ namespace hpx
     /// runtime system was started using `hpx::start`.
     ///
     HPX_EXPORT int stop(error_code& ec = throws);
-}
-
+}    // namespace hpx
