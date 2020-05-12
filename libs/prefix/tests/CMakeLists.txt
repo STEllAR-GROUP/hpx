@@ -9,45 +9,43 @@ include(HPX_Option)
 
 if(NOT HPX_WITH_TESTS AND HPX_TOP_LEVEL)
   hpx_set_option(
-    HPX_SCHEDULERS_WITH_TESTS
+    HPX_PREFIX_WITH_TESTS
     VALUE OFF
     FORCE
   )
   return()
 endif()
 
-if(HPX_SCHEDULERS_WITH_TESTS)
+if(HPX_PREFIX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
-    add_hpx_pseudo_target(tests.unit.modules.schedulers)
-    add_hpx_pseudo_dependencies(
-      tests.unit.modules tests.unit.modules.schedulers
-    )
+    add_hpx_pseudo_target(tests.unit.modules.prefix)
+    add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.prefix)
     add_subdirectory(unit)
   endif()
 
   if(HPX_WITH_TESTS_REGRESSIONS)
-    add_hpx_pseudo_target(tests.regressions.modules.schedulers)
+    add_hpx_pseudo_target(tests.regressions.modules.prefix)
     add_hpx_pseudo_dependencies(
-      tests.regressions.modules tests.regressions.modules.schedulers
+      tests.regressions.modules tests.regressions.modules.prefix
     )
     add_subdirectory(regressions)
   endif()
 
   if(HPX_WITH_TESTS_BENCHMARKS)
-    add_hpx_pseudo_target(tests.performance.modules.schedulers)
+    add_hpx_pseudo_target(tests.performance.modules.prefix)
     add_hpx_pseudo_dependencies(
-      tests.performance.modules tests.performance.modules.schedulers
+      tests.performance.modules tests.performance.modules.prefix
     )
     add_subdirectory(performance)
   endif()
 
   if(HPX_WITH_TESTS_HEADERS)
     add_hpx_header_tests(
-      modules.schedulers
-      HEADERS ${schedulers_headers}
+      modules.prefix
+      HEADERS ${prefix_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
-      DEPENDENCIES hpx_schedulers
       NOLIBS
+      DEPENDENCIES hpx_prefix
     )
   endif()
 endif()

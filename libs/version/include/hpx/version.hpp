@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <cstdint>
 #include <string>

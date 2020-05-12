@@ -50,4 +50,5 @@ add_hpx_module(
   COMPAT_HEADERS ${plugin_compat_headers}
   DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_datastructures
                hpx_filesystem hpx_functional
+  CMAKE_SUBDIRS tests
 )

@@ -115,13 +115,6 @@ namespace hpx { namespace threads { namespace policies {
         thread_heap_type thread_heap_huge_;
         thread_heap_type thread_heap_nostack_;
 
-        // number of terminated threads to discard
-        int const min_delete_count_;
-        int const max_delete_count_;
-
-        // number of terminated threads to collect before cleaning them up
-        int const max_terminated_threads_;
-
         // these ought to be atomic, but if we get a race and assign a thread
         // to queue N instead of N+1 it doesn't really matter
 
@@ -154,6 +147,8 @@ namespace hpx { namespace threads { namespace policies {
         terminated_items_type terminated_items_;
         mutable util::cache_line_data<std::atomic<std::int32_t>>
             terminated_items_count_;
+
+        thread_queue_init_parameters parameters_;
 
         // ------------------------------------------------------------
         struct queue_mc_print
@@ -212,11 +207,8 @@ namespace hpx { namespace threads { namespace policies {
           , queue_index_(queue)
           , thread_num_(thread_num)
           , owner_mask_(owner)
-          , min_delete_count_(static_cast<int>(init.min_delete_count_))
-          , max_delete_count_(static_cast<int>(init.max_delete_count_))
-          , max_terminated_threads_(
-                static_cast<int>(init.max_terminated_threads_))
           , terminated_items_(max_thread_count)
+          , parameters_(init)
         {
             rollover_counters_.data_ =
                 std::make_tuple(queue_index_, round_robin_rollover);
@@ -479,23 +471,23 @@ namespace hpx { namespace threads { namespace policies {
                 data.scheduler_base->get_stack_size(data.stacksize);
 
             thread_heap_type* heap = nullptr;
-            if (stacksize == get_stack_size(thread_stacksize_small))
+            if (stacksize == parameters_.small_stacksize_)
             {
                 heap = &thread_heap_small_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_medium))
+            else if (stacksize == parameters_.medium_stacksize_)
             {
                 heap = &thread_heap_medium_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_large))
+            else if (stacksize == parameters_.large_stacksize_)
             {
                 heap = &thread_heap_large_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_huge))
+            else if (stacksize == parameters_.huge_stacksize_)
             {
                 heap = &thread_heap_huge_;
             }
-            else if (stacksize == get_stack_size(thread_stacksize_nostack))
+            else if (stacksize == parameters_.nostack_stacksize_)
             {
                 heap = &thread_heap_nostack_;
             }
@@ -522,7 +514,7 @@ namespace hpx { namespace threads { namespace policies {
             {
                 // Allocate a new thread object.
                 threads::thread_data* p = nullptr;
-                if (stacksize == get_stack_size(thread_stacksize_nostack))
+                if (stacksize == parameters_.nostack_stacksize_)
                 {
                     p = threads::thread_data_stackless::create(
                         data, this, stacksize);
@@ -545,23 +537,23 @@ namespace hpx { namespace threads { namespace policies {
             std::ptrdiff_t stacksize =
                 get_thread_id_data(tid)->get_stack_size();
 
-            if (stacksize == get_stack_size(thread_stacksize_small))
+            if (stacksize == parameters_.small_stacksize_)
             {
                 thread_heap_small_.push_front(tid);
             }
-            else if (stacksize == get_stack_size(thread_stacksize_medium))
+            else if (stacksize == parameters_.medium_stacksize_)
             {
                 thread_heap_medium_.push_front(tid);
             }
-            else if (stacksize == get_stack_size(thread_stacksize_large))
+            else if (stacksize == parameters_.large_stacksize_)
             {
                 thread_heap_large_.push_front(tid);
             }
-            else if (stacksize == get_stack_size(thread_stacksize_huge))
+            else if (stacksize == parameters_.huge_stacksize_)
             {
                 thread_heap_huge_.push_front(tid);
             }
-            else if (stacksize == get_stack_size(thread_stacksize_nostack))
+            else if (stacksize == parameters_.nostack_stacksize_)
             {
                 thread_heap_nostack_.push_front(tid);
             }
@@ -913,7 +905,7 @@ namespace hpx { namespace threads { namespace policies {
             terminated_items_.push(thrd);
             std::int64_t count = ++terminated_items_count_.data_;
 
-            if (!xthread && (count > max_terminated_threads_))
+            if (!xthread && (count > parameters_.max_terminated_threads_))
             {
                 cleanup_terminated(
                     thread_num, false);    // clean up all terminated threads
