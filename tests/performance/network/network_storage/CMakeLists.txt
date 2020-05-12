@@ -86,7 +86,7 @@ else()
   set(SCRIPTS "slurm-network-storage" "ll-network-storage")
   foreach(script ${SCRIPTS})
     add_custom_command(
-      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${script}.sh.in"
+      OUTPUT "${HPX_WITH_BENCHMARK_SCRIPTS_PATH}/${script}.sh"
       COMMAND
         "${CMAKE_COMMAND}" ARGS -DEXE_PATH="$<TARGET_FILE:network_storage>"
         -DMPIEXEC="${MPIEXEC}" -DSCRIPT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
@@ -94,7 +94,7 @@ else()
         -DSCRIPT_DEST_DIR="${HPX_WITH_BENCHMARK_SCRIPTS_PATH}"
         -DLIB_PATH="${LD_LIBRARY_PATH}" -DJOB_OPTIONS1="${SLURM_JOB_OPTIONS1}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/copy_script.cmake"
-      OUTPUT "${HPX_WITH_BENCHMARK_SCRIPTS_PATH}/${script}.sh"
+      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${script}.sh.in"
       VERBATIM
     )
 
