@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config/defines.hpp>
+
 #if defined(DOXYGEN)
 /// Returns the GCC version HPX is compiled with. Only set if compiled with GCC.
 #define HPX_GCC_VERSION
