@@ -135,3 +135,19 @@ install(
 hpx_export_internal_targets(hpx_wrap)
 
 add_hpx_pseudo_dependencies(core hpx_wrap)
+
+# Add public target for unconditionally linking to hpx_wrap
+add_library(wrap_main INTERFACE)
+
+target_link_libraries(wrap_main INTERFACE hpx_wrap)
+
+install(
+  TARGETS wrap_main
+  EXPORT HPXTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+          COMPONENT runtime
+)
+
+hpx_export_targets(wrap_main)
