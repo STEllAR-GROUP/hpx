@@ -714,6 +714,16 @@ if(HPX_WITH_STACKTRACES OR HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION)
       HPX_HAVE_STACKTRACES_STATIC_SYMBOLS
       ${HPX_WITH_STACKTRACES_STATIC_SYMBOLS}
     )
+
+    # Demangling can segfault in certain configurations.
+    hpx_option(
+      HPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS BOOL
+      "Thread stack back trace symbols will be demangled (default: ON)" ON
+      CATEGORY "Thread Manager" ADVANCED
+    )
+    if(HPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS)
+      hpx_add_config_define(HPX_HAVE_STACKTRACES_DEMANGLE_SYMBOLS)
+    endif()
   endif()
 endif()
 

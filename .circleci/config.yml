@@ -204,6 +204,7 @@ jobs:
                 -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
+                -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
                 -DHPX_WITH_TESTS_DEBUG_LOG=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
                 -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
