@@ -28,6 +28,7 @@ set(HPX_CANDIDATE_LIBS
     concepts
     concurrency
     config
+    config_registry
     coroutines
     datastructures
     debugging
@@ -186,14 +187,4 @@ configure_file(
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
   "${PROJECT_BINARY_DIR}/libs/modules.cpp" @ONLY
-)
-
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp" @ONLY
-)
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
-  @ONLY
 )

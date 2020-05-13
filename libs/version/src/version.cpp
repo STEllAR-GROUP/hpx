@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/config_strings.hpp>
 #include <hpx/config/version.hpp>
+#include <hpx/config_registry.hpp>
 #include <hpx/format.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -199,15 +200,17 @@ namespace hpx {
         strm << "\n";
 
         // print module configurations
-        module_config_strings const* ms = hpx::config_strings_modules;
-        while (ms->name)
+        auto const& configs = hpx::config_registry::get_module_configs();
+        for (auto const& c : configs)
         {
-            strm << "Module " << ms->name << ":\n";
-            char const* const* p = ms->config_strings;
-            while (*p)
-                strm << "  " << *p++ << "\n";
+            strm << "Module " << c.module_name << ":\n";
+
+            for (auto const& e : c.config_entries)
+            {
+                strm << "  " << e << std::endl;
+            }
+
             strm << "\n";
-            ++ms;
         }
 
         return strm.str();

@@ -154,6 +154,10 @@ function(add_hpx_module name)
     )
   endif()
 
+  set(config_entries_source
+      "${CMAKE_CURRENT_BINARY_DIR}/src/config_entries.cpp"
+  )
+
   # generate configuration header for this module
   set(config_header
       "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/config/defines.hpp"
@@ -194,7 +198,7 @@ function(add_hpx_module name)
     # cmake-format: off
     cuda_add_library(
       hpx_${name} STATIC
-      ${sources} ${force_linking_source}
+      ${sources} ${force_linking_source} ${config_entries_source}
       ${headers} ${force_linking_header} ${generated_headers} ${compat_headers}
     )
     # cmake-format: on
@@ -202,7 +206,7 @@ function(add_hpx_module name)
     # cmake-format: off
     add_library(
       hpx_${name} STATIC
-      ${sources} ${force_linking_source}
+      ${sources} ${force_linking_source} ${config_entries_source}
       ${headers} ${force_linking_header} ${generated_headers} ${compat_headers}
     )
     # cmake-format: on
@@ -221,6 +225,11 @@ function(add_hpx_module name)
     PUBLIC hpx_public_flags
     PRIVATE hpx_private_flags
   )
+
+  # All modules depend on the config registry
+  if(NOT "${name}" STREQUAL "config_registry")
+    target_link_libraries(hpx_${name} PUBLIC hpx_config_registry)
+  endif()
 
   if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
     target_include_directories(
