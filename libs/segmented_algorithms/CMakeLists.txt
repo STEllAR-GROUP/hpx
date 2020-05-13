@@ -6,6 +6,10 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  return()
+endif()
+
 set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithm.hpp
     hpx/parallel/segmented_algorithms/adjacent_difference.hpp
