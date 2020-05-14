@@ -102,8 +102,6 @@ namespace hpx { namespace functional {
 
 namespace hpx { namespace functional {
     namespace tag_invoke_t_ns {
-        void tag_invoke() = delete;
-
         struct tag_invoke_t
         {
 #define HPX_FUNCTIONAL_TAG_INVOKE_EXPRESSION                                   \
