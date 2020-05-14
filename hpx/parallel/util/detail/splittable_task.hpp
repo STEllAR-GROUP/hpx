@@ -33,29 +33,29 @@ struct splittable_task
 
     void operator()()
     {
-        std::vector<hpx::future<void>> futures;
+        hpx::future<void> result;
 	std::size_t remainder = (stop_ - start_) * float(num_free_ - 1) / float(num_free_);
-        //std::cout<<"remainder:"<<remainder<<std::endl;
+//        std::cout<<"remainder:"<<remainder<<std::endl;
         if ((num_free_ > 1) &
             (remainder > 1))    //split the current task among the idle cores
         {
             num_free_ -= 1;
-            futures.push_back(hpx::async(splittable_task(f_,
+            result = hpx::async(splittable_task(f_,
                 hpx::util::make_tuple(
                     start_, start_ + remainder, index_ + 1),
-                num_free_)));
+                num_free_));
             start_ = start_ + remainder;
         }
 
-        //std::cout << "task " << num_free_ << " from: " << start_
-        //          << " to: " << stop_ << std::endl;
+//        std::cout << "task " << num_free_ << " from: " << start_
+//                  << " to: " << stop_ << std::endl;
 
-        f_(hpx::util::make_tuple(start_, stop_, 0));
+        f_(hpx::util::make_tuple(start_, stop_ - start_, index_));
         //num_free_ -= 1;
 
-        if (!futures.empty())
+        if (!result.valid())
         {
-            wait_all(futures);
+            result.get() ;
         }
     }
 };
