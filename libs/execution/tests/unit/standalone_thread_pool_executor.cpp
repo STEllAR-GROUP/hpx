@@ -177,10 +177,10 @@ int main(int argc, char* argv[])
             thread_queue_init{};
         sched_type::init_parameter_type scheduler_init(
             num_threads, ad, num_threads, thread_queue_init, "my_scheduler");
+        hpx::threads::detail::network_background_callback_type network_callback{};
         hpx::threads::thread_pool_init_parameters thread_pool_init("my_pool", 0,
             hpx::threads::policies::scheduler_mode::default_mode, num_threads,
-            0, notifier, ad,
-            hpx::threads::detail::network_background_callback_type{}, 0,
+            0, notifier, ad, network_callback, 0,
             (std::numeric_limits<std::int64_t>::max)(),
             (std::numeric_limits<std::int64_t>::max)());
 
