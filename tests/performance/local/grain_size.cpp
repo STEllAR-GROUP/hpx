@@ -1,4 +1,4 @@
-//  Copyright (c) 2018=2019 Mikael Simberg
+//  Copyright (c) 2018-2019 Mikael Simberg
 //  Copyright (c) 2018-2019 John Biddiscombe
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
@@ -6,41 +6,27 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/format.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/apply.hpp>
-#include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/include/parallel_for_loop.hpp>
-#include <hpx/include/threads.hpp>
-#include <hpx/lcos/wait_each.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-//#include <hpx/testing.hpp>
-//#include <hpx/timing.hpp>
-#include <hpx/util/annotated_function.hpp>
-#include <hpx/util/yield_while.hpp>
-
-#include <hpx/include/parallel_executor_parameters.hpp>
+#include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/runtime/threads/executors/limiting_executor.hpp>
-#include <hpx/runtime/threads/executors/pool_executor.hpp>
-//#include <hpx/synchronization.hpp>
+#include <hpx/include/parallel_executor_parameters.hpp>
+//#include <hpx/timing.hpp>
+
+//#include <hpx/execution/executors/parallel_executor_aggregated.hpp>
+
 #include "worker_timed.hpp"
 
-#include <array>
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
-#include <sstream>
+#include <iterator>
+#include <memory>
+#include <numeric>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
 #include <vector>
-#include <cmath>
+
 using boost::program_options::options_description;
 using boost::program_options::value;
 using boost::program_options::variables_map;
@@ -86,8 +72,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
         hpx::util::format_to(temp,
             "num_iterations {:1}, {:27} {:15} {:18} in {:8} microseconds "
             ", queue {:20}, numa {:4}, threads {:4}\n",
-            count, title, wait, exec, us, queuing, numa_sensitive,
-            num_threads);
+            count, title, wait, exec, us, queuing, numa_sensitive, num_threads);
     }
     std::cout << temp.str() << std::endl;
     // CDash graph plotting
@@ -98,10 +83,6 @@ const char* ExecName(const hpx::parallel::execution::parallel_executor& exec)
 {
     return "parallel_executor";
 }
-const char* ExecName(const hpx::parallel::execution::default_executor& exec)
-{
-    return "default_executor";
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
@@ -109,28 +90,32 @@ double global_scratch = 0;
 std::uint64_t num_num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
-void measure_function_futures_for_loop(std::uint64_t count, bool csv, std::uint64_t chunk_size, std::uint64_t iter_length)
+void measure_function_futures_for_loop(std::uint64_t count, bool csv,
+    std::uint64_t chunk_size, std::uint64_t iter_length)
 {
     // start the clock
     high_resolution_timer walltime;
-    hpx::parallel::for_loop(hpx::parallel::execution::par.with(
-                                hpx::parallel::execution::dynamic_chunk_size( chunk_size )),
-        0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
+    hpx::parallel::for_loop(
+        hpx::parallel::execution::par.with(
+            hpx::parallel::execution::dynamic_chunk_size(chunk_size)),
+        0, count, [&](std::uint64_t) { worker_timed(iter_length * 1000); });
 
     // stop the clock
     const double duration = walltime.elapsed();
     print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
 }
 
-void measure_function_futures_for_loopctr(std::uint64_t count, bool csv, std::uint64_t chunk_size, std::uint64_t iter_length)
+void measure_function_futures_for_loopctr(std::uint64_t count, bool csv,
+    std::uint64_t chunk_size, std::uint64_t iter_length)
 {
     // start the clock
     high_resolution_timer walltime;
     hpx::evaluate_active_counters(true, "Initialization");
 
-    hpx::parallel::for_loop(hpx::parallel::execution::par.with(
-                                hpx::parallel::execution::dynamic_chunk_size( chunk_size )),
-        0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
+    hpx::parallel::for_loop(
+        hpx::parallel::execution::par.with(
+            hpx::parallel::execution::dynamic_chunk_size(chunk_size)),
+        0, count, [&](std::uint64_t) { worker_timed(iter_length * 1000); });
     hpx::evaluate_active_counters(false, "Done");
 
     // stop the clock
@@ -138,51 +123,43 @@ void measure_function_futures_for_loopctr(std::uint64_t count, bool csv, std::ui
     print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
 }
 
-void measure_function_futures_for_loop_sptctr(std::uint64_t count, bool csv, std::uint64_t iter_length)
+void measure_function_futures_for_loop_sptctr(
+    std::uint64_t count, bool csv, std::uint64_t iter_length)
 {
     // start the clock
     high_resolution_timer walltime;
     hpx::evaluate_active_counters(true, "Initialization");
 
-    hpx::parallel::for_loop(hpx::parallel::execution::par.on(
-                                 hpx::parallel::execution::splittable_executor()), 0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
-    
+    hpx::parallel::for_loop(
+        hpx::parallel::execution::par.on(
+            hpx::parallel::execution::splittable_executor()),
+        0, count, [&](std::uint64_t) { worker_timed(iter_length * 1000); });
+
     hpx::evaluate_active_counters(false, "Done");
     // stop the clock
     const double duration = walltime.elapsed();
     print_stats("for_loop", "par", "splittable_executor", count, duration, csv);
 }
-    
 
-void measure_function_futures_for_loop_spt(std::uint64_t count, bool csv, std::uint64_t iter_length)
+void measure_function_futures_for_loop_spt(
+    std::uint64_t count, bool csv, std::uint64_t iter_length)
 {
     // start the clock
     high_resolution_timer walltime;
-    hpx::parallel::for_loop(hpx::parallel::execution::par.on(
-                                 hpx::parallel::execution::splittable_executor()), 0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
+    hpx::parallel::for_loop(
+        hpx::parallel::execution::par.on(
+            hpx::parallel::execution::splittable_executor()),
+        0, count, [&](std::uint64_t) { worker_timed(iter_length * 1000); });
 
     // stop the clock
     const double duration = walltime.elapsed();
     print_stats("for_loop", "par", "splittable_executor", count, duration, csv);
 }
-
-void measure_function_futures_for_loop_seq(std::uint64_t count, bool csv, std::uint64_t iter_length)
-{
-    // start the clock
-    high_resolution_timer walltime;
-    hpx::parallel::for_loop(hpx::parallel::execution::seq,
-        0, count, [&](std::uint64_t) { worker_timed(iter_length*1000); });
-
-    // stop the clock
-    const double duration = walltime.elapsed();
-    print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    
+    {
         if (vm.count("hpx:queuing"))
             queuing = vm["hpx:queuing"].as<std::string>();
 
@@ -195,52 +172,56 @@ int hpx_main(variables_map& vm)
 
         num_threads = hpx::get_num_worker_threads();
 
-        const std::uint64_t chunk_size = vm["chunk_size"].as<std::uint64_t>();
+        const std::uint64_t chunk_size =  vm["chunk_size"].as<std::uint64_t>();
         const std::uint64_t iter_length = vm["iter_length"].as<std::uint64_t>();
 
         const std::uint64_t count = vm["num_iterations"].as<std::uint64_t>();
         bool csv = vm.count("csv") != 0;
-        bool seq = vm.count("seq") != 0;
         bool spt = vm.count("spt") != 0;
         bool ctr = vm.count("counter") != 0;
 
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-	if (seq) 
-	{		
-	        for (int i = 0; i < repetitions; i++)
-	        {
-	            measure_function_futures_for_loop_seq(count, csv, iter_length);
-	        }
-	}
-	else
-	{
-      	  	if (spt)        	
-		{
-			if (ctr)
-			{
-                                for (int i = 0; i < repetitions; i++)
-                                {
-                                        measure_function_futures_for_loop_sptctr(count, csv, iter_length);
-                                }
-			}
-			else
-			{	
-                		for (int i = 0; i < repetitions; i++)
-                		{
-                    			measure_function_futures_for_loop_spt(count, csv, iter_length);
-                		}
-			}
-       	 	}	
-		else 
-		{
-			for (int i = 0; i < repetitions; i++)
-               		{
-                   		 measure_function_futures_for_loop(count, csv, chunk_size, iter_length);
-               		}
-		}	
-		
+        if (spt)
+        {
+            if (ctr)
+            {
+                for (int i = 0; i < repetitions; i++)
+                {
+                    measure_function_futures_for_loop_sptctr(
+                        count, csv, iter_length);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < repetitions; i++)
+                {
+                    measure_function_futures_for_loop_spt(
+                        count, csv, iter_length);
+                }
+            }
+        }
+
+        else
+        {
+            if (ctr)
+            {
+                for (int i = 0; i < repetitions; i++)
+                {
+                    measure_function_futures_for_loopctr(
+                        count, csv, chunk_size, iter_length);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < repetitions; i++)
+                {
+                    measure_function_futures_for_loop(
+                        count, csv, chunk_size, iter_length);
+                }
+            }
+        }
     }
 
     return hpx::finalize();
@@ -254,16 +235,15 @@ int main(int argc, char* argv[])
 
     // clang-format off
     cmdline.add_options()("num_iterations",
-        value<std::uint64_t>()->default_value(500000),
-        "number of iterations to invoke")
+                          value<std::uint64_t>()->default_value(500000),
+                          "number of iterations to invoke")
 
         ("csv", "output results as csv (format: count,duration)")
         ("repetitions", value<int>()->default_value(1),
          "number of repetitions of the full benchmark")
-        ("seq","run sequqntially or in parallel")
         ("spt","run using splittable executor")
         ("iter_length",value<std::uint64_t>()->default_value(1), "length of each iteration")
-    	("chunk_size",value<std::uint64_t>()->default_value(1), "chunk size")
+        ("chunk_size",value<std::uint64_t>()->default_value(1), "chunk size")
         ("counter","print data collected from performance counters");
 
     // clang-format on

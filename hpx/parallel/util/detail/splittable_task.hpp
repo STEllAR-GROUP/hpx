@@ -36,7 +36,7 @@ struct splittable_task
         hpx::future<void> result;
 	std::size_t remainder = (stop_ - start_) * float(num_free_ - 1) / float(num_free_);
 //        std::cout<<"remainder:"<<remainder<<std::endl;
-        if ((num_free_ > 1) &
+        if ((num_free_ > 1) &&
             (remainder > 1))    //split the current task among the idle cores
         {
             num_free_ -= 1;
@@ -53,7 +53,7 @@ struct splittable_task
         f_(hpx::util::make_tuple(start_, stop_ - start_, index_));
         //num_free_ -= 1;
 
-        if (!result.valid())
+        if (result.valid())
         {
             result.get() ;
         }
