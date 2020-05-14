@@ -12,6 +12,11 @@
 
 #include <cstddef>
 #include <functional>
+#include <map>
+#include <memory>
+#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+#include <string>
+#endif
 #include <type_traits>
 #include <utility>
 
@@ -30,6 +35,38 @@ namespace hpx { namespace util {
 
 #if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS) ||                  \
     defined(HPX_MODULE_EXPORTS)
+
+    namespace detail {
+
+        struct HPX_EXPORT lock_data
+        {
+            lock_data(std::size_t trace_depth);
+            lock_data(register_lock_data* data, std::size_t trace_depth);
+
+            ~lock_data();
+
+            bool ignore_;
+            register_lock_data* user_data_;
+#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+            std::string backtrace_;
+#endif
+        };
+    }    // namespace detail
+
+    struct held_locks_data
+    {
+        using held_locks_map = std::map<void const*, detail::lock_data>;
+
+        held_locks_data()
+          : enabled_(true)
+          , ignore_all_locks_(false)
+        {
+        }
+
+        held_locks_map map_;
+        bool enabled_;
+        bool ignore_all_locks_;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT bool register_lock(
@@ -101,6 +138,18 @@ namespace hpx { namespace util {
         void const* mtx_;
     };
 
+    // The following functions are used to store the held locks information
+    // during thread suspension. The data is stored on a thread_local basis,
+    // so we must make sure that locks the are being ignored are restored
+    // after suspension even if the thread is being resumed on a different core.
+
+    // retrieve the current thread_local data about held locks
+    HPX_API_EXPORT std::unique_ptr<held_locks_data> get_held_locks_data();
+
+    // set the current thread_local data about held locks
+    HPX_API_EXPORT void set_held_locks_data(
+        std::unique_ptr<held_locks_data>&& data);
+
 #else
 
     template <typename Lock, typename Enable>
@@ -133,5 +182,20 @@ namespace hpx { namespace util {
 
     constexpr inline void ignore_all_locks() {}
     constexpr inline void reset_ignored_all() {}
+
+    struct held_locks_data
+    {
+    };
+
+    inline std::unique_ptr<held_locks_data> get_held_locks_data()
+    {
+        return std::unique_ptr<held_locks_data>();
+    }
+
+    constexpr inline void set_held_locks_data(
+        std::unique_ptr<held_locks_data>&& data)
+    {
+    }
+
 #endif
 }}    // namespace hpx::util
