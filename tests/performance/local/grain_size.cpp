@@ -138,7 +138,7 @@ void measure_function_futures_for_loopctr(std::uint64_t count, bool csv, std::ui
     print_stats("for_loop", "par", "parallel_executor", count, duration, csv);
 }
 
-void measure_function_futures_for_loop_spt(std::uint64_t count, bool csv, std::uint64_t iter_length)
+void measure_function_futures_for_loop_sptctr(std::uint64_t count, bool csv, std::uint64_t iter_length)
 {
     // start the clock
     high_resolution_timer walltime;
@@ -154,7 +154,7 @@ void measure_function_futures_for_loop_spt(std::uint64_t count, bool csv, std::u
 }
     
 
-void measure_function_futures_for_loop_sptctr(std::uint64_t count, bool csv, std::uint64_t iter_length)
+void measure_function_futures_for_loop_spt(std::uint64_t count, bool csv, std::uint64_t iter_length)
 {
     // start the clock
     high_resolution_timer walltime;
@@ -182,7 +182,7 @@ void measure_function_futures_for_loop_seq(std::uint64_t count, bool csv, std::u
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    {
+    
         if (vm.count("hpx:queuing"))
             queuing = vm["hpx:queuing"].as<std::string>();
 
@@ -233,22 +233,14 @@ int hpx_main(variables_map& vm)
                 		}
 			}
        	 	}	
-		if (ctr)
-		{
-                        for (int i = 0; i < repetitions; i++)
-                        {
-                                 measure_function_futures_for_loopctr(count, csv, chunk_size, iter_length);
-                        }
-
-		}
-		else
+		else 
 		{
 			for (int i = 0; i < repetitions; i++)
                		{
                    		 measure_function_futures_for_loop(count, csv, chunk_size, iter_length);
                		}
 		}	
-	}
+		
     }
 
     return hpx::finalize();
