@@ -20,12 +20,14 @@
 // this is currently used only for jemalloc and if a special API prefix is
 // used for its APIs
 #include <jemalloc/jemalloc.h>
+#else
+#include <malloc.h>
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
-#if defined(HPX_HAVE_INTERNAL_ALLOCATOR)
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T = int>
     struct internal_allocator
@@ -66,13 +68,22 @@ namespace hpx { namespace util {
 
         pointer allocate(size_type n, void const* hint = nullptr)
         {
+#if !defined(HPX_HAVE_INTERNAL_ALLOCATOR)
+            return reinterpret_cast<pointer>(
+                memalign(alignof(T), n * sizeof(T)));
+#else
             return reinterpret_cast<pointer>(
                 HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, malloc)(n * sizeof(T)));
+#endif
         }
 
         void deallocate(pointer p, size_type n)
         {
+#if !defined(HPX_HAVE_INTERNAL_ALLOCATOR)
+            free(p);
+#else
             HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
+#endif
         }
 
         size_type max_size() const noexcept
@@ -106,11 +117,6 @@ namespace hpx { namespace util {
     {
         return false;
     }
-#else
-    // fall back to system allocator if no special internal allocator is needed
-    template <typename T = int>
-    using internal_allocator = std::allocator<T>;
-#endif
 }}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
