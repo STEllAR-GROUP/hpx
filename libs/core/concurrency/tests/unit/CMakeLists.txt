@@ -42,3 +42,4 @@ target_compile_definitions(
   lockfree_fifo_test PRIVATE HPX_MODULE_STATIC_LINKING HPX_NO_VERSION_CHECK
 )
 target_include_directories(lockfree_fifo_test PRIVATE ${HPX_SOURCE_DIR})
+target_link_libraries(lockfree_fifo_test PRIVATE hpx_allocator_support)
