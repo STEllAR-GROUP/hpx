@@ -1,0 +1,45 @@
+# Copyright (c) 2020 EXASOL
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: Linux CI - Using Address and Undefined behavior sanitizer
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: stellargroup/build_env:ubuntu
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      shell: bash
+      run: |
+          cmake \
+              . \
+              -Bbuild \
+              -GNinja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_EXAMPLES=ON \
+              -DHPX_WITH_TESTS=ON \
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
+              -DHPX_WITH_SANITIZERS=On \
+              -DCMAKE_CXX_FLAGS="-fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer" \
+              -DHPX_WITH_STACKOVERFLOW_DETECTION=Off
+    - name: Build
+      shell: bash
+      run: |
+          cmake --build build --target all
+          cmake --build build --target examples
+    - name: Test
+      shell: bash
+      run: |
+          cd build
+          ctest \
+            --output-on-failure \
+            --tests-regex tests.examples \
+            --exclude-regex tests.examples.transpose.transpose_block_numa
