@@ -635,6 +635,10 @@ namespace hpx { namespace threads {
         return static_cast<thread_data*>(tid.get());
     }
 
+    namespace detail {
+        HPX_EXPORT void set_self_ptr(thread_self*);
+    }
+
     ///////////////////////////////////////////////////////////////////////
     /// The function \a get_self returns a reference to the (OS thread
     /// specific) self reference to the current HPX thread.
