@@ -103,6 +103,7 @@ What's so special about |hpx|?
    :maxdepth: 2
 
    releases
+   heps
    about_hpx
 
 
