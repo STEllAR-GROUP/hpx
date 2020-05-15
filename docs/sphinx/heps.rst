@@ -20,3 +20,7 @@ implemented.
    modifications even after being accepted if deemed necessary. As the process
    is formalized we may consider HEPs immutable, but they may be modified or
    superceded by newer HEPs.
+
+.. toctree::
+
+   /heps/hep2.rst
