@@ -140,15 +140,14 @@ namespace hpx {
 
     static custom_exception_info_handler_type custom_exception_info_handler;
 
-    HPX_EXPORT void set_custom_exception_info_handler(
-        custom_exception_info_handler_type f)
+    void set_custom_exception_info_handler(custom_exception_info_handler_type f)
     {
         custom_exception_info_handler = f;
     }
 
     static pre_exception_handler_type pre_exception_handler;
 
-    HPX_EXPORT void set_pre_exception_handler(pre_exception_handler_type f)
+    void set_pre_exception_handler(pre_exception_handler_type f)
     {
         pre_exception_handler = f;
     }

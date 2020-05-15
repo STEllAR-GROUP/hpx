@@ -28,7 +28,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
-    HPX_API_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
+    HPX_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
         hpx::program_options::options_description const& app_options,
         std::string const& cmdline, hpx::program_options::variables_map& vm,
         std::size_t node, int error_mode = return_on_error,
@@ -36,7 +36,7 @@ namespace hpx { namespace util {
         hpx::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
 
-    HPX_API_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
+    HPX_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
         hpx::program_options::options_description const& app_options,
         std::string const& arg0, std::vector<std::string> const& args,
         hpx::program_options::variables_map& vm, std::size_t node,
@@ -46,7 +46,7 @@ namespace hpx { namespace util {
         std::vector<std::string>* unregistered_options = nullptr);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT std::string reconstruct_command_line(
+    HPX_EXPORT std::string reconstruct_command_line(
         hpx::program_options::variables_map const& vm);
 
     ///////////////////////////////////////////////////////////////////////////

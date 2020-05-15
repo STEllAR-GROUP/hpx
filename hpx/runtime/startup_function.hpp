@@ -41,7 +41,7 @@ namespace hpx
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_startup_function()
-    HPX_API_EXPORT void register_pre_startup_function(startup_function_type f);
+    HPX_EXPORT void register_pre_startup_function(startup_function_type f);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add a function to be executed by a HPX thread before hpx_main
@@ -66,6 +66,6 @@ namespace hpx
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_pre_startup_function()
-    HPX_API_EXPORT void register_startup_function(startup_function_type f);
+    HPX_EXPORT void register_startup_function(startup_function_type f);
 }
 

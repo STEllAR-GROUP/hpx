@@ -31,7 +31,7 @@ namespace hpx
     ///           hpx::exception.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT std::uint32_t get_initial_num_localities();
+    HPX_EXPORT std::uint32_t get_initial_num_localities();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Asynchronously return the number of localities which are
@@ -45,7 +45,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT lcos::future<std::uint32_t> get_num_localities();
+    HPX_EXPORT lcos::future<std::uint32_t> get_num_localities();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of localities which are currently registered
@@ -67,7 +67,7 @@ namespace hpx
     ///           hpx::exception.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT std::uint32_t get_num_localities(launch::sync_policy,
+    HPX_EXPORT std::uint32_t get_num_localities(launch::sync_policy,
         error_code& ec = throws);
 
     /// \brief Asynchronously return the number of localities which are
@@ -85,7 +85,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT lcos::future<std::uint32_t> get_num_localities(
+    HPX_EXPORT lcos::future<std::uint32_t> get_num_localities(
         components::component_type t);
 
     /// \brief Synchronously return the number of localities which are
@@ -105,7 +105,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT std::uint32_t get_num_localities(launch::sync_policy,
+    HPX_EXPORT std::uint32_t get_num_localities(launch::sync_policy,
         components::component_type t, error_code& ec = throws);
 }
 

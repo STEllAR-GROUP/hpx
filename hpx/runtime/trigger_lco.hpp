@@ -36,7 +36,7 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id,
+    HPX_EXPORT void trigger_lco_event(naming::id_type const& id,
         naming::address && addr, bool move_credits = true);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id,
+    HPX_EXPORT void trigger_lco_event(naming::id_type const& id,
         naming::address && addr, naming::id_type const& cont,
         bool move_credits = true);
 
@@ -203,7 +203,7 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
+    HPX_EXPORT void set_lco_error(naming::id_type const& id,
         naming::address && addr, std::exception_ptr const& e,
         bool move_credits = true);
 
@@ -218,7 +218,7 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
+    HPX_EXPORT void set_lco_error(naming::id_type const& id,
         naming::address && addr, std::exception_ptr && e,
         bool move_credits = true);
 
@@ -264,7 +264,7 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
+    HPX_EXPORT void set_lco_error(naming::id_type const& id,
         naming::address && addr, std::exception_ptr const& e,
         naming::id_type const& cont, bool move_credits = true);
 
@@ -280,7 +280,7 @@ namespace hpx
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
+    HPX_EXPORT void set_lco_error(naming::id_type const& id,
         naming::address && addr, std::exception_ptr && e,
         naming::id_type const& cont, bool move_credits = true);
 

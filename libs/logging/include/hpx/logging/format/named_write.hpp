@@ -143,7 +143,7 @@ You could have an output like this:
         // recomputes the write steps - note that this takes place after
         // each operation for instance, the user might have first set the
         // string and later added the formatters
-        void compute_write_steps();
+        HPX_EXPORT void compute_write_steps();
 
     private:
         struct write_step
@@ -259,7 +259,7 @@ In the above example, I know that the available destinations are @c out_file,
         // recomputes the write steps - note that this takes place after
         // each operation for instance, the user might have first set the
         // string and later added the formatters
-        void compute_write_steps();
+        HPX_EXPORT void compute_write_steps();
 
     private:
         std::vector<named<ptr_type>> destinations;

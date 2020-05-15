@@ -12,18 +12,18 @@
 
 namespace hpx
 {
-    class HPX_API_EXPORT runtime;
+    class HPX_EXPORT runtime;
 
     /// The function \a get_runtime returns a reference to the (thread
     /// specific) runtime instance.
-    HPX_API_EXPORT runtime& get_runtime();
-    HPX_API_EXPORT runtime*& get_runtime_ptr();
+    HPX_EXPORT runtime& get_runtime();
+    HPX_EXPORT runtime*& get_runtime_ptr();
 
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-    class HPX_API_EXPORT runtime_distributed;
-    HPX_API_EXPORT runtime_distributed& get_runtime_distributed();
-    HPX_API_EXPORT runtime_distributed*& get_runtime_distributed_ptr();
+    class HPX_EXPORT runtime_distributed;
+    HPX_EXPORT runtime_distributed& get_runtime_distributed();
+    HPX_EXPORT runtime_distributed*& get_runtime_distributed_ptr();
 #endif
 
     /// Return true if networking is enabled.
@@ -32,6 +32,6 @@ namespace hpx
     ///       configuration time and more than one locality is used or the
     ///       command line option `--hpx:expect-connecting-localities` was
     ///       specified
-    HPX_API_EXPORT bool is_networking_enabled();
+    HPX_EXPORT bool is_networking_enabled();
 }
 

@@ -24,7 +24,7 @@ namespace hpx { namespace threads { namespace detail {
         get_default_pool = f;
     }
 
-    HPX_EXPORT thread_pool_base* get_self_or_default_pool()
+    thread_pool_base* get_self_or_default_pool()
     {
         thread_pool_base* pool = nullptr;
         auto thrd_data = get_self_id_data();
@@ -56,7 +56,7 @@ namespace hpx { namespace threads { namespace detail {
         get_default_timer_service_f = f;
     }
 
-    HPX_EXPORT boost::asio::io_service* get_default_timer_service()
+    boost::asio::io_service* get_default_timer_service()
     {
         boost::asio::io_service* timer_service = nullptr;
         if (detail::get_default_timer_service_f)

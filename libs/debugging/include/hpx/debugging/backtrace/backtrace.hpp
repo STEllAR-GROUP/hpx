@@ -20,11 +20,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
     namespace stack_trace {
-        HPX_API_EXPORT std::size_t trace(void** addresses, std::size_t size);
-        HPX_API_EXPORT void write_symbols(
+        HPX_EXPORT std::size_t trace(void** addresses, std::size_t size);
+        HPX_EXPORT void write_symbols(
             void* const* addresses, std::size_t size, std::ostream&);
-        HPX_API_EXPORT std::string get_symbol(void* address);
-        HPX_API_EXPORT std::string get_symbols(
+        HPX_EXPORT std::string get_symbol(void* address);
+        HPX_EXPORT std::string get_symbols(
             void* const* address, std::size_t size);
     }    // namespace stack_trace
 

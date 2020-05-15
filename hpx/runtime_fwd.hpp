@@ -43,24 +43,24 @@ namespace hpx {
     /// Register the current kernel thread with HPX, this should be done once
     /// for each external OS-thread intended to invoke HPX functionality.
     /// Calling this function more than once will silently fail.
-    HPX_API_EXPORT bool register_thread(
+    HPX_EXPORT bool register_thread(
         runtime* rt, char const* name, error_code& ec = throws);
 
     /// Unregister the thread from HPX, this should be done once in
     /// the end before the external thread exists.
-    HPX_API_EXPORT void unregister_thread(runtime* rt);
+    HPX_EXPORT void unregister_thread(runtime* rt);
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     /// The function \a get_locality returns a reference to the locality prefix
-    HPX_API_EXPORT naming::gid_type const& get_locality();
+    HPX_EXPORT naming::gid_type const& get_locality();
 #endif
 
     /// The function \a get_runtime_instance_number returns a unique number
     /// associated with the runtime instance the current thread is running in.
-    HPX_API_EXPORT std::size_t get_runtime_instance_number();
+    HPX_EXPORT std::size_t get_runtime_instance_number();
 
     /// Register a function to be called during system shutdown
-    HPX_API_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
+    HPX_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
 
     /// \cond NOINTERNAL
     namespace util {
@@ -69,20 +69,20 @@ namespace hpx {
 #endif
 
         /// \brief Expand INI variables in a string
-        HPX_API_EXPORT std::string expand(std::string const& expand);
+        HPX_EXPORT std::string expand(std::string const& expand);
 
         /// \brief Expand INI variables in a string
-        HPX_API_EXPORT void expand(std::string& expand);
+        HPX_EXPORT void expand(std::string& expand);
     }    // namespace util
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT bool is_scheduler_numa_sensitive();
+    HPX_EXPORT bool is_scheduler_numa_sensitive();
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT util::runtime_configuration const& get_config();
+    HPX_EXPORT util::runtime_configuration const& get_config();
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT hpx::util::io_service_pool* get_thread_pool(
+    HPX_EXPORT hpx::util::io_service_pool* get_thread_pool(
         char const* name, char const* pool_name_suffix = "");
 
     /// \endcond
@@ -96,14 +96,14 @@ namespace hpx {
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
-    HPX_API_EXPORT bool is_starting();
+    HPX_EXPORT bool is_starting();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Test if HPX runs in fault-tolerant mode
     ///
     /// This function returns whether the runtime system is running
     /// in fault-tolerant mode
-    HPX_API_EXPORT bool tolerate_node_faults();
+    HPX_EXPORT bool tolerate_node_faults();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently running.
@@ -114,7 +114,7 @@ namespace hpx {
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
-    HPX_API_EXPORT bool is_running();
+    HPX_EXPORT bool is_running();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently stopped.
@@ -125,7 +125,7 @@ namespace hpx {
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
-    HPX_API_EXPORT bool is_stopped();
+    HPX_EXPORT bool is_stopped();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Test whether the runtime system is currently being shut down.
@@ -136,7 +136,7 @@ namespace hpx {
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
-    HPX_API_EXPORT bool is_stopped_or_shutting_down();
+    HPX_EXPORT bool is_stopped_or_shutting_down();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of worker OS- threads used to execute HPX
@@ -145,7 +145,7 @@ namespace hpx {
     /// This function returns the number of OS-threads used to execute HPX
     /// threads. If the function is called while no HPX runtime system is active,
     /// it will return zero.
-    HPX_API_EXPORT std::size_t get_num_worker_threads();
+    HPX_EXPORT std::size_t get_num_worker_threads();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the system uptime measure on the thread executing this call.
@@ -153,7 +153,7 @@ namespace hpx {
     /// This function returns the system uptime measured in nanoseconds for the
     /// thread executing this call. If the function is called while no HPX
     /// runtime system is active, it will return zero.
-    HPX_API_EXPORT std::uint64_t get_system_uptime();
+    HPX_EXPORT std::uint64_t get_system_uptime();
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     ///////////////////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_API_EXPORT void start_active_counters(error_code& ec = throws);
+    HPX_EXPORT void start_active_counters(error_code& ec = throws);
 
     /// \brief Resets all active performance counters.
     ///
@@ -188,7 +188,7 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_API_EXPORT void reset_active_counters(error_code& ec = throws);
+    HPX_EXPORT void reset_active_counters(error_code& ec = throws);
 
     /// \brief Re-initialize all active performance counters.
     ///
@@ -206,7 +206,7 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_API_EXPORT void reinit_active_counters(
+    HPX_EXPORT void reinit_active_counters(
         bool reset = true, error_code& ec = throws);
 
     /// \brief Stop all active performance counters.
@@ -223,7 +223,7 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_API_EXPORT void stop_active_counters(error_code& ec = throws);
+    HPX_EXPORT void stop_active_counters(error_code& ec = throws);
 
     /// \brief Evaluate and output all active performance counters, optionally
     ///        naming the point in code marked by this function.
@@ -248,7 +248,7 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_API_EXPORT void evaluate_active_counters(bool reset = false,
+    HPX_EXPORT void evaluate_active_counters(bool reset = false,
         char const* description = nullptr, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ namespace hpx {
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
-    HPX_API_EXPORT serialization::binary_filter* create_binary_filter(
+    HPX_EXPORT serialization::binary_filter* create_binary_filter(
         char const* binary_filter_type, bool compress,
         serialization::binary_filter* next_filter = nullptr,
         error_code& ec = throws);
@@ -278,32 +278,32 @@ namespace hpx {
         /// \cond NOINTERNAL
         // The function get_thread_manager returns a reference to the
         // current thread manager.
-        HPX_API_EXPORT threadmanager& get_thread_manager();
+        HPX_EXPORT threadmanager& get_thread_manager();
         /// \endcond
 
         /// \cond NOINTERNAL
         /// Reset internal (round robin) thread distribution scheme
-        HPX_API_EXPORT void reset_thread_distribution();
+        HPX_EXPORT void reset_thread_distribution();
 
         /// Set the new scheduler mode
-        HPX_API_EXPORT void set_scheduler_mode(
+        HPX_EXPORT void set_scheduler_mode(
             threads::policies::scheduler_mode new_mode);
 
         /// Add the given flags to the scheduler mode
-        HPX_API_EXPORT void add_scheduler_mode(
+        HPX_EXPORT void add_scheduler_mode(
             threads::policies::scheduler_mode to_add);
 
         /// Add/remove the given flags to the scheduler mode
-        HPX_API_EXPORT void add_remove_scheduler_mode(
+        HPX_EXPORT void add_remove_scheduler_mode(
             threads::policies::scheduler_mode to_add,
             threads::policies::scheduler_mode to_remove);
 
         /// Remove the given flags from the scheduler mode
-        HPX_API_EXPORT void remove_scheduler_mode(
+        HPX_EXPORT void remove_scheduler_mode(
             threads::policies::scheduler_mode to_remove);
 
         /// Get the global topology instance
-        HPX_API_EXPORT topology const& get_topology();
+        HPX_EXPORT topology const& get_topology();
         /// \endcond
     }
 

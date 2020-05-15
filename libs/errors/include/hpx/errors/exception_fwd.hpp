@@ -17,9 +17,9 @@ namespace hpx {
     // forward declaration
     class error_code;
 
-    class HPX_EXCEPTION_EXPORT exception;
+    class HPX_EXPORT exception;
 
-    struct HPX_EXCEPTION_EXPORT thread_interrupted;
+    struct HPX_EXPORT thread_interrupted;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ namespace hpx {
     // the compiler.
     extern HPX_DEVICE error_code throws;
 #else
-    HPX_EXCEPTION_EXPORT extern error_code throws;
+    HPX_EXPORT extern error_code throws;
 #endif
 }    // namespace hpx
 

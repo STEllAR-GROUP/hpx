@@ -68,7 +68,7 @@ namespace hpx
         template <typename Component, typename Derived = detail::this_type>
         class managed_component;
 
-        struct HPX_API_EXPORT component_factory_base;
+        struct HPX_EXPORT component_factory_base;
 
         template <typename Component>
         struct component_factory;
@@ -86,8 +86,8 @@ namespace hpx
 
         namespace server
         {
-            class HPX_API_EXPORT runtime_support;
-            class HPX_API_EXPORT memory;
+            class HPX_EXPORT runtime_support;
+            class HPX_EXPORT memory;
         }
 
         HPX_EXPORT void console_logging(logging_destination dest,

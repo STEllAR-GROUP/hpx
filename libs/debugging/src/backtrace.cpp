@@ -116,7 +116,7 @@ namespace hpx { namespace util { namespace stack_trace {
         return _URC_NO_REASON;
     }
 
-    HPX_API_EXPORT std::size_t trace(void** array, std::size_t n)
+    std::size_t trace(void** array, std::size_t n)
     {
         trace_data d(array, n);
 
@@ -131,14 +131,14 @@ namespace hpx { namespace util { namespace stack_trace {
 
 #elif defined(HPX_HAVE_EXECINFO)
 
-    HPX_API_EXPORT std::size_t trace(void** array, std::size_t n)
+    std::size_t trace(void** array, std::size_t n)
     {
         return ::backtrace(array, n);
     }
 
 #elif defined(HPX_MSVC)
 
-    HPX_API_EXPORT std::size_t trace(void** array, std::size_t n)
+    std::size_t trace(void** array, std::size_t n)
     {
 #if _WIN32_WINNT < 0x0600
         // for Windows XP/Windows Server 2003
@@ -150,7 +150,7 @@ namespace hpx { namespace util { namespace stack_trace {
 
 #else
 
-    HPX_API_EXPORT std::size_t trace(void** /*array*/, std::size_t /*n*/)
+    std::size_t trace(void** /*array*/, std::size_t /*n*/)
     {
         return 0;
     }
@@ -179,7 +179,7 @@ namespace hpx { namespace util { namespace stack_trace {
 #endif
 
 #if defined(HPX_HAVE_DLFCN) && defined(HPX_HAVE_ABI_CXA_DEMANGLE)
-    HPX_API_EXPORT std::string get_symbol(void* ptr)
+    std::string get_symbol(void* ptr)
     {
         if (!ptr)
             return std::string();
@@ -245,8 +245,7 @@ namespace hpx { namespace util { namespace stack_trace {
         return res.str();
     }
 
-    HPX_API_EXPORT std::string get_symbols(
-        void* const* addresses, std::size_t size)
+    std::string get_symbols(void* const* addresses, std::size_t size)
     {
         // the first two stack frames are from the back tracing facility itself
         if (size > 2)
@@ -268,7 +267,7 @@ namespace hpx { namespace util { namespace stack_trace {
         }
         return res;
     }
-    HPX_API_EXPORT void write_symbols(
+    void write_symbols(
         void* const* addresses, std::size_t size, std::ostream& out)
     {
         out << size << ((1 == size) ? " frame:" : " frames:");
@@ -285,13 +284,12 @@ namespace hpx { namespace util { namespace stack_trace {
 
 #elif defined(HPX_HAVE_EXECINFO)
 
-    HPX_API_EXPORT std::string get_symbol(void* address)
+    std::string get_symbol(void* address)
     {
         return get_symbol_exec_info(address);
     }
 
-    HPX_API_EXPORT std::string get_symbols(
-        void* const* address, std::size_t size)
+    std::string get_symbols(void* const* address, std::size_t size)
     {
         // the first two stack frames are from the back tracing facility itself
         if (size > 2)
@@ -323,7 +321,7 @@ namespace hpx { namespace util { namespace stack_trace {
         }
     }
 
-    HPX_API_EXPORT void write_symbols(
+    void write_symbols(
         void* const* addresses, std::size_t size, std::ostream& out)
     {
         char** ptr = backtrace_symbols(addresses, size);
@@ -366,7 +364,7 @@ namespace hpx { namespace util { namespace stack_trace {
         }
     }    // namespace
 
-    HPX_API_EXPORT std::string get_symbol(void* ptr)
+    std::string get_symbol(void* ptr)
     {
         if (ptr == nullptr)
             return std::string();
@@ -398,8 +396,7 @@ namespace hpx { namespace util { namespace stack_trace {
         return ss.str();
     }
 
-    HPX_API_EXPORT std::string get_symbols(
-        void* const* addresses, std::size_t size)
+    std::string get_symbols(void* const* addresses, std::size_t size)
     {
         // the first two stack frames are from the back tracing facility itself
         if (size > 2)
@@ -422,7 +419,7 @@ namespace hpx { namespace util { namespace stack_trace {
         return res;
     }
 
-    HPX_API_EXPORT void write_symbols(
+    void write_symbols(
         void* const* addresses, std::size_t size, std::ostream& out)
     {
         out << size << ((1 == size) ? " frame:" : " frames:");    //-V128
@@ -439,7 +436,7 @@ namespace hpx { namespace util { namespace stack_trace {
 
 #else
 
-    HPX_API_EXPORT std::string get_symbol(void* ptr)
+    std::string get_symbol(void* ptr)
     {
         if (!ptr)
             return std::string();
@@ -450,7 +447,7 @@ namespace hpx { namespace util { namespace stack_trace {
         return res.str();
     }
 
-    HPX_API_EXPORT std::string get_symbols(void* const* ptrs, std::size_t size)
+    std::string get_symbols(void* const* ptrs, std::size_t size)
     {
         if (!ptrs)
             return std::string();
@@ -468,7 +465,7 @@ namespace hpx { namespace util { namespace stack_trace {
         return res.str();
     }
 
-    HPX_API_EXPORT void write_symbols(
+    void write_symbols(
         void* const* addresses, std::size_t size, std::ostream& out)
     {
         out << size << ((1 == size) ? " frame:" : " frames:");    //-V128

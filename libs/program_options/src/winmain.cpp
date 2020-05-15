@@ -105,8 +105,7 @@ namespace hpx { namespace program_options {
         return result;
     }
 
-    HPX_EXPORT std::vector<std::wstring> split_winmain(
-        const std::wstring& cmdline)
+    std::vector<std::wstring> split_winmain(const std::wstring& cmdline)
     {
         std::vector<std::wstring> result;
         std::vector<std::string> aux = split_winmain(to_internal(cmdline));

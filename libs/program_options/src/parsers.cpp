@@ -158,7 +158,7 @@ namespace hpx { namespace program_options {
         const char* filename, const options_description& desc,
         bool allow_unregistered);
 
-    HPX_EXPORT parsed_options parse_environment(const options_description& desc,
+    parsed_options parse_environment(const options_description& desc,
         const std::function<std::string(std::string)>& name_mapper)
     {
         parsed_options result(&desc);
@@ -209,13 +209,13 @@ namespace hpx { namespace program_options {
         };
     }    // namespace detail
 
-    HPX_EXPORT parsed_options parse_environment(
+    parsed_options parse_environment(
         const options_description& desc, const std::string& prefix)
     {
         return parse_environment(desc, detail::prefix_name_mapper(prefix));
     }
 
-    HPX_EXPORT parsed_options parse_environment(
+    parsed_options parse_environment(
         const options_description& desc, const char* prefix)
     {
         return parse_environment(desc, string(prefix));

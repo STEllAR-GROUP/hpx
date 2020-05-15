@@ -36,6 +36,6 @@ namespace hpx { namespace agas
         struct HPX_EXPORT primary_namespace;
         struct HPX_EXPORT symbol_namespace;
     }
-    struct HPX_API_EXPORT addressing_service;
+    struct HPX_EXPORT addressing_service;
 }}
 

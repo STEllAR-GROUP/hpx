@@ -147,12 +147,12 @@ namespace hpx { namespace program_options {
         }
     }
 
-    HPX_EXPORT void store(const wparsed_options& options, variables_map& m)
+    void store(const wparsed_options& options, variables_map& m)
     {
         store(options.utf8_encoded_options, m, true);
     }
 
-    HPX_EXPORT void notify(variables_map& vm)
+    void notify(variables_map& vm)
     {
         vm.notify();
     }

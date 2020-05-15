@@ -42,6 +42,6 @@ namespace hpx
     ///           otherwise.
     ///
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
-    HPX_API_EXPORT naming::id_type find_here(error_code& ec = throws);
+    HPX_EXPORT naming::id_type find_here(error_code& ec = throws);
 }
 

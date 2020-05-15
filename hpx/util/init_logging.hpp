@@ -18,6 +18,6 @@ namespace hpx { namespace util { namespace detail
 {
     /// The init_logging type will be used for initialization purposes only as
     /// well.
-    HPX_API_EXPORT void init_logging(runtime_configuration& ini, bool isconsole);
+    HPX_EXPORT void init_logging(runtime_configuration& ini, bool isconsole);
 }}}
 

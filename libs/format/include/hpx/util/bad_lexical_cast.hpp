@@ -14,7 +14,7 @@
 
 namespace hpx { namespace util {
 
-    class HPX_EXCEPTION_EXPORT bad_lexical_cast : public std::bad_cast
+    class HPX_EXPORT bad_lexical_cast : public std::bad_cast
     {
     public:
         bad_lexical_cast() noexcept

@@ -62,7 +62,7 @@ function(add_parcelport name)
     hpx_export_targets(${_link_libraries})
   endif()
 
-  target_compile_definitions(${parcelport_name} PRIVATE HPX_MODULE_EXPORTS)
+  target_compile_definitions(${parcelport_name} PRIVATE HPX_EXPORTS)
 
   add_hpx_pseudo_dependencies(plugins.parcelport.${name} ${parcelport_name})
   add_hpx_pseudo_dependencies(core plugins.parcelport.${name})

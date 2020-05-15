@@ -32,7 +32,7 @@
 namespace hpx { namespace util {
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
-        HPX_API_EXPORT hpx::util::logging::level get_log_level(
+        HPX_EXPORT hpx::util::logging::level get_log_level(
             std::string const& env, bool allow_always = false);
     }
 

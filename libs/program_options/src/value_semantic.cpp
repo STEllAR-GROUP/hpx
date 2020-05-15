@@ -84,7 +84,7 @@ namespace hpx { namespace program_options {
         xparse(value_store, tokens);
     }
 
-    HPX_EXPORT std::string arg("arg");
+    std::string arg("arg");
 
     std::string untyped_value::name() const
     {
@@ -117,12 +117,12 @@ namespace hpx { namespace program_options {
         value_store = new_tokens.empty() ? std::string("") : new_tokens.front();
     }
 
-    HPX_EXPORT typed_value<bool>* bool_switch()
+    typed_value<bool>* bool_switch()
     {
         return bool_switch(nullptr);
     }
 
-    HPX_EXPORT typed_value<bool>* bool_switch(bool* v)
+    typed_value<bool>* bool_switch(bool* v)
     {
         typed_value<bool>* r = new typed_value<bool>(v);
         r->default_value(false);
@@ -137,7 +137,7 @@ namespace hpx { namespace program_options {
         Case is ignored. The 'xs' vector can either be empty, in which
         case the value is 'true', or can contain explicit value.
     */
-    HPX_EXPORT void validate(
+    void validate(
         hpx::util::any_nonser& v, const vector<string>& xs, bool*, int)
     {
         check_first_occurrence(v);

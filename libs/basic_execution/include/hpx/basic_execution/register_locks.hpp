@@ -33,8 +33,7 @@ namespace hpx { namespace util {
     template <typename Lock, typename Enable = void>
     struct ignore_while_checking;
 
-#if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS) ||                  \
-    defined(HPX_MODULE_EXPORTS)
+#if defined(HPX_HAVE_VERIFY_LOCKS) || defined(HPX_EXPORTS)
 
     namespace detail {
 
@@ -69,25 +68,25 @@ namespace hpx { namespace util {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT bool register_lock(
+    HPX_EXPORT bool register_lock(
         void const* lock, register_lock_data* data = nullptr);
-    HPX_API_EXPORT bool unregister_lock(void const* lock);
-    HPX_API_EXPORT void verify_no_locks();
-    HPX_API_EXPORT void force_error_on_lock();
-    HPX_API_EXPORT void enable_lock_detection();
-    HPX_API_EXPORT void disable_lock_detection();
-    HPX_API_EXPORT void trace_depth_lock_detection(std::size_t value);
-    HPX_API_EXPORT void ignore_lock(void const* lock);
-    HPX_API_EXPORT void reset_ignored(void const* lock);
-    HPX_API_EXPORT void ignore_all_locks();
-    HPX_API_EXPORT void reset_ignored_all();
+    HPX_EXPORT bool unregister_lock(void const* lock);
+    HPX_EXPORT void verify_no_locks();
+    HPX_EXPORT void force_error_on_lock();
+    HPX_EXPORT void enable_lock_detection();
+    HPX_EXPORT void disable_lock_detection();
+    HPX_EXPORT void trace_depth_lock_detection(std::size_t value);
+    HPX_EXPORT void ignore_lock(void const* lock);
+    HPX_EXPORT void reset_ignored(void const* lock);
+    HPX_EXPORT void ignore_all_locks();
+    HPX_EXPORT void reset_ignored_all();
 
     using registered_locks_error_handler_type = std::function<void()>;
 
     /// Sets a handler which gets called when verifying that no locks are held
     /// fails. Can be used to print information at the point of failure such as
     /// a backtrace.
-    HPX_API_EXPORT void set_registered_locks_error_handler(
+    HPX_EXPORT void set_registered_locks_error_handler(
         registered_locks_error_handler_type);
 
     using register_locks_predicate_type = std::function<bool()>;
@@ -99,8 +98,7 @@ namespace hpx { namespace util {
     /// register, unregister, or verify locks, depending on other factors (such
     /// as if lock detection is enabled globally). The predicate may return
     /// different values depending on context.
-    HPX_API_EXPORT void set_register_locks_predicate(
-        register_locks_predicate_type);
+    HPX_EXPORT void set_register_locks_predicate(register_locks_predicate_type);
 
     ///////////////////////////////////////////////////////////////////////////
     struct ignore_all_while_checking
@@ -144,10 +142,10 @@ namespace hpx { namespace util {
     // after suspension even if the thread is being resumed on a different core.
 
     // retrieve the current thread_local data about held locks
-    HPX_API_EXPORT std::unique_ptr<held_locks_data> get_held_locks_data();
+    HPX_EXPORT std::unique_ptr<held_locks_data> get_held_locks_data();
 
     // set the current thread_local data about held locks
-    HPX_API_EXPORT void set_held_locks_data(
+    HPX_EXPORT void set_held_locks_data(
         std::unique_ptr<held_locks_data>&& data);
 
 #else

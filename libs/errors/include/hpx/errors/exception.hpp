@@ -37,7 +37,7 @@ namespace hpx {
     /// are either of this type or of a type derived from it. This implies that
     /// it is always safe to use this type only in catch statements guarding
     /// HPX library calls.
-    class HPX_EXCEPTION_EXPORT exception : public boost::system::system_error
+    class HPX_EXPORT exception : public boost::system::system_error
     {
     public:
         /// Construct a hpx::exception from a \a hpx::error.
@@ -182,7 +182,7 @@ namespace hpx {
     ///
     /// At any point, the interruption state for the current thread can be
     /// queried by calling \a hpx::this_thread::interruption_enabled().
-    struct HPX_EXCEPTION_EXPORT thread_interrupted : std::exception
+    struct HPX_EXPORT thread_interrupted : std::exception
     {
     };
 
@@ -203,7 +203,7 @@ namespace hpx {
         // under the [line] tag.
         HPX_DEFINE_ERROR_INFO(throw_line, long);
 
-        struct HPX_EXCEPTION_EXPORT std_exception : std::exception
+        struct HPX_EXPORT std_exception : std::exception
         {
         private:
             std::string what_;
@@ -222,7 +222,7 @@ namespace hpx {
             }
         };
 
-        struct HPX_EXCEPTION_EXPORT bad_alloc : std::bad_alloc
+        struct HPX_EXPORT bad_alloc : std::bad_alloc
         {
         private:
             std::string what_;
@@ -241,7 +241,7 @@ namespace hpx {
             }
         };
 
-        struct HPX_EXCEPTION_EXPORT bad_exception : std::bad_exception
+        struct HPX_EXPORT bad_exception : std::bad_exception
         {
         private:
             std::string what_;
@@ -260,7 +260,7 @@ namespace hpx {
             }
         };
 
-        struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast
+        struct HPX_EXPORT bad_cast : std::bad_cast
         {
         private:
             std::string what_;
@@ -279,7 +279,7 @@ namespace hpx {
             }
         };
 
-        struct HPX_EXCEPTION_EXPORT bad_typeid : std::bad_typeid
+        struct HPX_EXPORT bad_typeid : std::bad_typeid
         {
         private:
             std::string what_;

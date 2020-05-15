@@ -47,7 +47,7 @@ namespace hpx { namespace threads {
                 core,
                 pu
             };
-            HPX_API_EXPORT static char const* type_name(type t);
+            HPX_EXPORT static char const* type_name(type t);
 
             static std::int64_t all_entities()
             {
@@ -101,14 +101,14 @@ namespace hpx { namespace threads {
         typedef boost::variant<distribution_type, mappings_spec_type>
             mappings_type;
 
-        HPX_API_EXPORT bounds_type extract_bounds(
+        HPX_EXPORT bounds_type extract_bounds(
             spec_type const& m, std::size_t default_last, error_code& ec);
 
-        HPX_API_EXPORT void parse_mappings(std::string const& spec,
+        HPX_EXPORT void parse_mappings(std::string const& spec,
             mappings_type& mappings, error_code& ec = throws);
     }    // namespace detail
 
-    HPX_API_EXPORT void parse_affinity_options(std::string const& spec,
+    HPX_EXPORT void parse_affinity_options(std::string const& spec,
         std::vector<mask_type>& affinities, std::size_t used_cores,
         std::size_t max_cores, std::size_t num_threads,
         std::vector<std::size_t>& num_pus, bool use_process_mask,

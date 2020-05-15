@@ -26,25 +26,25 @@
 
 namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT bool get_endpoint(std::string const& addr,
-        std::uint16_t port, boost::asio::ip::tcp::endpoint& ep);
+    HPX_EXPORT bool get_endpoint(std::string const& addr, std::uint16_t port,
+        boost::asio::ip::tcp::endpoint& ep);
 
-    HPX_API_EXPORT std::string get_endpoint_name(
+    HPX_EXPORT std::string get_endpoint_name(
         boost::asio::ip::tcp::endpoint const& ep);
 
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
-    HPX_API_EXPORT boost::asio::ip::tcp::endpoint resolve_hostname(
+    HPX_EXPORT boost::asio::ip::tcp::endpoint resolve_hostname(
         std::string const& hostname, std::uint16_t port,
         boost::asio::io_service& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
     // return the public IP address of the local node
-    HPX_API_EXPORT std::string resolve_public_ip_address();
+    HPX_EXPORT std::string resolve_public_ip_address();
 
     ///////////////////////////////////////////////////////////////////////
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
-    HPX_API_EXPORT std::string cleanup_ip_address(const std::string& addr);
+    HPX_EXPORT std::string cleanup_ip_address(const std::string& addr);
 
     typedef boost::asio::ip::tcp::resolver::iterator endpoint_iterator_type;
 
@@ -91,6 +91,6 @@ namespace hpx { namespace util {
 namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
-    HPX_API_EXPORT bool split_ip_address(
+    HPX_EXPORT bool split_ip_address(
         std::string const& v, std::string& host, std::uint16_t& port);
 }}    // namespace hpx::util

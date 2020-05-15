@@ -418,7 +418,7 @@ namespace hpx { namespace threads {
         return topo.get();
     }
 
-    HPX_API_EXPORT HPX_NODISCARD unsigned int hardware_concurrency();
+    HPX_EXPORT HPX_NODISCARD unsigned int hardware_concurrency();
 
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are

@@ -79,7 +79,7 @@ namespace hpx { namespace program_options { namespace detail {
 
 namespace hpx { namespace program_options {
 
-    HPX_EXPORT std::wstring from_8_bit(const std::string& s,
+    std::wstring from_8_bit(const std::string& s,
         const std::codecvt<wchar_t, char, std::mbstate_t>& cvt)
     {
         using namespace std::placeholders;
@@ -88,7 +88,7 @@ namespace hpx { namespace program_options {
                 _1, _2, _3, _4, _5, _6, _7));
     }
 
-    HPX_EXPORT std::string to_8_bit(const std::wstring& s,
+    std::string to_8_bit(const std::wstring& s,
         const std::codecvt<wchar_t, char, std::mbstate_t>& cvt)
     {
         using namespace std::placeholders;
@@ -101,34 +101,34 @@ namespace hpx { namespace program_options {
         hpx::program_options::detail::utf8_codecvt_facet utf8_facet;
     }
 
-    HPX_EXPORT std::wstring from_utf8(const std::string& s)
+    std::wstring from_utf8(const std::string& s)
     {
         return from_8_bit(s, utf8_facet);
     }
 
-    HPX_EXPORT std::string to_utf8(const std::wstring& s)
+    std::string to_utf8(const std::wstring& s)
     {
         return to_8_bit(s, utf8_facet);
     }
 
-    HPX_EXPORT std::wstring from_local_8_bit(const std::string& s)
+    std::wstring from_local_8_bit(const std::string& s)
     {
         using facet_type = std::codecvt<wchar_t, char, std::mbstate_t>;
         return from_8_bit(s, std::use_facet<facet_type>(std::locale()));
     }
 
-    HPX_EXPORT std::string to_local_8_bit(const std::wstring& s)
+    std::string to_local_8_bit(const std::wstring& s)
     {
         using facet_type = std::codecvt<wchar_t, char, std::mbstate_t>;
         return to_8_bit(s, std::use_facet<facet_type>(std::locale()));
     }
 
-    HPX_EXPORT std::string to_internal(const std::string& s)
+    std::string to_internal(const std::string& s)
     {
         return s;
     }
 
-    HPX_EXPORT std::string to_internal(const std::wstring& s)
+    std::string to_internal(const std::wstring& s)
     {
         return to_utf8(s);
     }

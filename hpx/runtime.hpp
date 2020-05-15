@@ -478,13 +478,13 @@ namespace hpx {
     namespace util {
         ///////////////////////////////////////////////////////////////////////////
         // retrieve the command line arguments for the current locality
-        HPX_API_EXPORT bool retrieve_commandline_arguments(
+        HPX_EXPORT bool retrieve_commandline_arguments(
             hpx::program_options::options_description const& app_options,
             hpx::program_options::variables_map& vm);
 
         ///////////////////////////////////////////////////////////////////////////
         // retrieve the command line arguments for the current locality
-        HPX_API_EXPORT bool retrieve_commandline_arguments(
+        HPX_EXPORT bool retrieve_commandline_arguments(
             std::string const& appname,
             hpx::program_options::variables_map& vm);
     }    // namespace util
@@ -495,7 +495,7 @@ namespace hpx {
         /// Get the readable string representing the given stack size constant.
         ///
         /// \param size this represents the stack size
-        HPX_API_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
+        HPX_EXPORT char const* get_stack_size_name(std::ptrdiff_t size);
     }    // namespace threads
 }    // namespace hpx
 

@@ -28,7 +28,7 @@
 
 namespace hpx { namespace detail
 {
-    HPX_API_EXPORT naming::gid_type get_next_id(std::size_t count = 1);
+    HPX_EXPORT naming::gid_type get_next_id(std::size_t count = 1);
 }}
 
 namespace hpx { namespace components

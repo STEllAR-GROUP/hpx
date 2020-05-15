@@ -128,6 +128,6 @@ namespace hpx { namespace performance_counters {
     };
 
     // Return all counters matching the given name (with optional wild cards).
-    HPX_API_EXPORT std::vector<performance_counter> discover_counters(
+    HPX_EXPORT std::vector<performance_counter> discover_counters(
         std::string const& name, error_code& ec = throws);
 }}    // namespace hpx::performance_counters
