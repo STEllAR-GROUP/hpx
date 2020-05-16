@@ -296,6 +296,9 @@ namespace hpx { namespace threads { namespace executors {
     {
     }
 
+    // this is defined to force linking only
+    void local_priority_queue_os_executor::dummy() {}
+
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     static_priority_queue_os_executor::static_priority_queue_os_executor(

@@ -28,7 +28,7 @@ void test_sync()
     typedef hpx::parallel::execution::parallel_executor executor;
 
     executor exec(hpx::launch::fork);
-    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) !=
+    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
         hpx::this_thread::get_id());
 }
 
@@ -151,8 +151,8 @@ void static_check_executor()
     using namespace hpx::traits;
     using executor = hpx::parallel::execution::parallel_executor;
 
-    static_assert(!has_sync_execute_member<executor>::value,
-        "!has_sync_execute_member<executor>::value");
+    static_assert(has_sync_execute_member<executor>::value,
+        "has_sync_execute_member<executor>::value");
     static_assert(has_async_execute_member<executor>::value,
         "has_async_execute_member<executor>::value");
     static_assert(has_then_execute_member<executor>::value,

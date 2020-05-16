@@ -6,17 +6,13 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/thread_executors/embedded_thread_pool_executors.hpp>
-#include <hpx/thread_executors/thread_pool_os_executors.hpp>
+#include <hpx/executors/current_executor.hpp>
 
-namespace hpx { namespace thread_executors {
-
+namespace hpx { namespace executors {
     struct force_linking_helper
     {
-        void (*dummy1_ptr)();
-        void (*dummy2_ptr)();
+        parallel::execution::current_executor (*get_executor)(error_code&);
     };
 
     force_linking_helper& force_linking();
-}}    // namespace hpx::thread_executors
+}}    // namespace hpx::executors

@@ -14,6 +14,7 @@
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
+#include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -85,6 +86,15 @@ namespace hpx { namespace parallel { namespace execution {
         /// \endcond
 
         /// \cond NOINTERNAL
+
+        // OneWayExecutor interface
+        template <typename F, typename... Ts>
+        static void sync_execute(F&& f, Ts&&... ts)
+        {
+            return hpx::detail::sync_launch_policy_dispatch<
+                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
+        }
 
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
@@ -288,6 +298,15 @@ namespace hpx { namespace parallel { namespace execution {
         /// \endcond
 
         /// \cond NOINTERNAL
+
+        // OneWayExecutor interface
+        template <typename F, typename... Ts>
+        static void sync_execute(F&& f, Ts&&... ts)
+        {
+            return hpx::detail::sync_launch_policy_dispatch<
+                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
+                std::forward<Ts>(ts)...);
+        }
 
         // TwoWayExecutor interface
         template <typename F, typename... Ts>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,12 +13,14 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing.hpp>
 
+#include <hpx/execution/executors/execution_fwd.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
@@ -75,7 +77,10 @@ namespace hpx { namespace parallel { namespace execution {
                 using hpx::util::high_resolution_clock;
                 std::uint64_t t = high_resolution_clock::now();
 
-                std::size_t test_chunk_size = f(num_iters_for_timing_);
+                // use executor to launch given function for measurements
+                std::size_t test_chunk_size = sync_execute(
+                    std::forward<Executor>(exec), f, num_iters_for_timing_);
+
                 if (test_chunk_size != 0)
                 {
                     t = (high_resolution_clock::now() - t) / test_chunk_size;

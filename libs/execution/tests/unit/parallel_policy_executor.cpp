@@ -24,15 +24,13 @@ hpx::thread::id test(int passed_through)
 }
 
 template <typename Policy>
-void test_sync(bool sync)
+void test_sync()
 {
     typedef hpx::parallel::execution::parallel_policy_executor<Policy> executor;
 
     executor exec;
-    bool result = hpx::parallel::execution::sync_execute(exec, &test, 42) ==
-        hpx::this_thread::get_id();
-
-    HPX_TEST_EQ(sync, result);
+    HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) ==
+        hpx::this_thread::get_id());
 }
 
 template <typename Policy>
@@ -189,8 +187,8 @@ void static_check_executor()
     using namespace hpx::traits;
     using executor = hpx::parallel::execution::parallel_policy_executor<Policy>;
 
-    static_assert(!has_sync_execute_member<executor>::value,
-        "!has_sync_execute_member<executor>::value");
+    static_assert(has_sync_execute_member<executor>::value,
+        "has_sync_execute_member<executor>::value");
     static_assert(has_async_execute_member<executor>::value,
         "has_async_execute_member<executor>::value");
     static_assert(has_then_execute_member<executor>::value,
@@ -211,7 +209,7 @@ void policy_test(bool sync = false)
 {
     static_check_executor<Policy>();
 
-    test_sync<Policy>(sync);
+    test_sync<Policy>();
     test_async<Policy>(sync);
     test_then<Policy>(sync);
 
