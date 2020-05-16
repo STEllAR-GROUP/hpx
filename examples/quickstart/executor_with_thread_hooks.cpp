@@ -126,6 +126,16 @@ namespace executor_example {
                 std::forward<Ts>(ts)...);
         }
 
+        // BulkOneWayExecutor interface
+        template <typename F, typename S, typename... Ts>
+        decltype(auto) bulk_sync_execute(
+            F&& f, S const& shape, Ts&&... ts) const
+        {
+            return hpx::parallel::execution::bulk_sync_execute(exec_,
+                hook_wrapper<F>{*this, std::forward<F>(f)}, shape,
+                std::forward<Ts>(ts)...);
+        }
+
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
         decltype(auto) bulk_async_execute(
