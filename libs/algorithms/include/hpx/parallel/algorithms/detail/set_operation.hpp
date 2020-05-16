@@ -96,7 +96,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             new buffer_type[combiner(len1, len2)]);
 
         std::size_t cores = execution::processing_units_count(
-            policy.executor(), policy.parameters());
+            policy.parameters(), policy.executor());
 
         std::size_t step = (len1 + cores - 1) / cores;
         boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);

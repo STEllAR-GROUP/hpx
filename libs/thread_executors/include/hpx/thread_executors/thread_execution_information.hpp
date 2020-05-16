@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +23,7 @@ namespace hpx { namespace threads {
     template <typename Executor, typename Parameters>
     typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
         std::size_t>::type
-    processing_units_count(Executor&& exec, Parameters&)
+    processing_units_count(Parameters&&, Executor&& exec)
     {
         return hpx::get_os_thread_count(exec);
     }

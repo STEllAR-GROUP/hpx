@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -75,7 +75,7 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
         for (Executor& exec : execs)
         {
             HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
-                            exec, test::dummy),
+                            test::dummy, exec),
                 num_pus);
         }
 
@@ -93,7 +93,7 @@ void test_executors(std::size_t processing_units, std::size_t num_pus)
         for (Executor& exec : execs)
         {
             HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
-                            exec, test::dummy),
+                            test::dummy, exec),
                 num_pus);
         }
     }
@@ -134,7 +134,7 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
     hpx::this_thread::yield();
 
     HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
-                    shrink_exec, test::dummy),
+                    test::dummy, shrink_exec),
         processing_units);
 
     std::size_t num_execs = (processing_units - 1) / num_pus;
@@ -152,13 +152,13 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
         for (Executor& exec : execs)
         {
             HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
-                            exec, test::dummy),
+                            test::dummy, exec),
                 num_pus);
         }
 
         // the main executor should run on a reduced amount of cores
         HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
-                        shrink_exec, test::dummy),
+                        test::dummy, shrink_exec),
             processing_units - num_execs * num_pus);
 
         // schedule a couple of tasks on each of the executors
@@ -175,13 +175,13 @@ void test_executors_shrink(std::size_t processing_units, std::size_t num_pus)
         for (Executor& exec : execs)
         {
             HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
-                            exec, test::dummy),
+                            test::dummy, exec),
                 num_pus);
         }
 
         // the main executor should run on a reduced amount of cores
         HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
-                        shrink_exec, test::dummy),
+                        test::dummy, shrink_exec),
             processing_units - num_execs * num_pus);
     }
 
@@ -193,7 +193,9 @@ void test_executors_shrink(std::size_t num_pus)
     using namespace hpx::parallel::execution;
     std::size_t processing_units = hpx::get_os_thread_count();
 
-    processing_units = (processing_units / num_pus) * num_pus;
+    // we should have at least one processing unit
+    processing_units =
+        (std::max)((processing_units / num_pus) * num_pus, std::size_t(1));
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
     test_executors_shrink<local_queue_executor>(processing_units, num_pus);

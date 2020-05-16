@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2020 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -58,21 +58,27 @@ namespace hpx { namespace parallel { namespace execution {
         struct post_tag
         {
         };
+
         struct sync_execute_tag
         {
         };
+
         struct async_execute_tag
         {
         };
+
         struct then_execute_tag
         {
         };
+
         struct bulk_sync_execute_tag
         {
         };
+
         struct bulk_async_execute_tag
         {
         };
+
         struct bulk_then_execute_tag
         {
         };
