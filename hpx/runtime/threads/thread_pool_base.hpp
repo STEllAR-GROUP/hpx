@@ -280,6 +280,8 @@ namespace hpx { namespace threads
             thread_priority /*priority*/, std::size_t /*num_thread*/,
             bool /*reset*/) { return 0; }
 
+	virtual std::int64_t get_idle_thread_count() { return 0; }
+
         virtual std::int64_t get_background_thread_count() { return 0; }
 
         std::int64_t get_thread_count_unknown(

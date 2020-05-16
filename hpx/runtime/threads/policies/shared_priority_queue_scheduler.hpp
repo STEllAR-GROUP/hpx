@@ -1055,6 +1055,20 @@ namespace policies {
             return count;
         }
 
+	// Queries the current number of idle threads (cores)
+        std::int64_t get_idle_thread_count() const override
+        {
+            // Return thread count of one specific queue.
+            std::int64_t count = 0;
+
+            // Return the cumulative count for all queues.
+            for (std::size_t d = 0; d < num_domains_; ++d)
+            {
+                count += hp_queues_[d].get_thread_count(unknown) == 0;
+            }
+
+            return count;
+        }
         ///////////////////////////////////////////////////////////////////////
         // Enumerate matching threads from all queues
         bool enumerate_threads(

@@ -715,6 +715,19 @@ namespace hpx { namespace threads
         return total_count;
     }
 
+    std::int64_t threadmanager::get_idle_thread_count()
+    {
+        std::int64_t total_count = 0;
+        std::lock_guard<mutex_type> lk(mtx_);
+
+        for (auto& pool_iter : pools_)
+        {
+            total_count += pool_iter->get_idle_thread_count();
+        }
+
+        return total_count;
+    }
+
     std::int64_t threadmanager::get_background_thread_count()
     {
         std::int64_t total_count = 0;
@@ -1881,6 +1894,11 @@ namespace hpx { namespace threads
         thread_state_enum state)
     {
         return get_thread_manager().get_thread_count(state, priority);
+    }
+
+    std::int64_t get_idle_thread_count()
+    {
+        return get_thread_manager().get_idle_thread_count();
     }
 
     ///////////////////////////////////////////////////////////////////////////

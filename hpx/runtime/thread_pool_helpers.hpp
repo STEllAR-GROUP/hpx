@@ -37,6 +37,10 @@ namespace hpx { namespace resource
     /// managed by the \a resource_partitioner
     HPX_API_EXPORT std::size_t get_num_threads(std::size_t pool_index);
 
+    /// Returns the number of currently idling threads (cores).
+    /// managed by the \a resource_partitioner
+    HPX_API_EXPORT std::int64_t get_idle_thread_count();
+    
     /// Return the internal index of the pool given its name.
     HPX_API_EXPORT std::size_t get_pool_index(std::string const& pool_name);
 
