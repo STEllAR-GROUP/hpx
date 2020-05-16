@@ -11,9 +11,8 @@
 segmented_algorithms
 ====================
 
-Segmented algorithms extend the usual parallel algorithms
-(:ref:`libs_algorithms`) by providing overloads that work with distributed
-containers, such as partitioned vectors.
+Segmented algorithms extend the usual parallel :ref:`libs_algorithms` by
+providing overloads that work with distributed containers, such as partitioned vectors.
 
 See the :ref:`API reference <libs_segmented_algorithms_api>` of the module for
 more details.
