@@ -8,7 +8,9 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(threading_headers hpx/threading/jthread.hpp hpx/threading/thread.hpp)
+set(threading_headers hpx/thread.hpp hpx/threading/jthread.hpp
+                      hpx/threading/thread.hpp
+)
 
 set(threading_compat_headers hpx/runtime/threads/thread.hpp)
 
