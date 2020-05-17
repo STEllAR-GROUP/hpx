@@ -18,6 +18,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/static.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -48,8 +49,8 @@ namespace hpx { namespace actions { namespace detail
     struct action_decorate_function_semaphore
     {
         typedef lcos::local::counting_semaphore_var<
-                hpx::lcos::local::spinlock, N
-            > semaphore_type;
+                hpx::lcos::local::spinlock, N>
+            semaphore_type;
 
         struct tag {};
 

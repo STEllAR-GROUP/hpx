@@ -14,6 +14,7 @@
 #include <hpx/thread_support/assert_owns_lock.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <utility>
@@ -31,13 +32,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         typedef lcos::local::spinlock mutex_type;
 
     public:
-        counting_semaphore(std::int64_t value = 0)
+        counting_semaphore(std::ptrdiff_t value = 0)
           : value_(value)
           , cond_()
         {
         }
 
-        void wait(std::unique_lock<mutex_type>& l, std::int64_t count)
+        void wait(std::unique_lock<mutex_type>& l, std::ptrdiff_t count)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -48,7 +49,25 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             value_ -= count;
         }
 
-        bool try_wait(std::unique_lock<mutex_type>& l, std::int64_t count = 1)
+        bool wait_until(std::unique_lock<mutex_type>& l,
+            util::steady_time_point const& abs_time, std::ptrdiff_t count)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            while (value_ < count)
+            {
+                // return false if unblocked by timeout expiring
+                if (cond_.wait_until(
+                        l, abs_time, "counting_semaphore::wait_until"))
+                {
+                    return false;
+                }
+            }
+            value_ -= count;
+            return true;
+        }
+
+        bool try_wait(std::unique_lock<mutex_type>& l, std::ptrdiff_t count = 1)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -62,7 +81,19 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             return false;
         }
 
-        void signal(std::unique_lock<mutex_type> l, std::int64_t count)
+        bool try_acquire(std::unique_lock<mutex_type>& l)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            if (value_ >= 1)
+            {
+                --value_;
+                return true;
+            }
+            return false;
+        }
+
+        void signal(std::unique_lock<mutex_type> l, std::ptrdiff_t count)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -81,17 +112,17 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             }
         }
 
-        std::int64_t signal_all(std::unique_lock<mutex_type> l)
+        std::ptrdiff_t signal_all(std::unique_lock<mutex_type> l)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
-            std::int64_t count = static_cast<std::int64_t>(cond_.size(l));
+            std::ptrdiff_t count = static_cast<std::ptrdiff_t>(cond_.size(l));
             signal(std::move(l), count);
             return count;
         }
 
     private:
-        std::int64_t value_;
+        std::ptrdiff_t value_;
         local::detail::condition_variable cond_;
     };
 }}}}    // namespace hpx::lcos::local::detail
