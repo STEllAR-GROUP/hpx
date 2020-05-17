@@ -888,7 +888,7 @@ namespace hpx { namespace threads { namespace policies
             return count;
         }
 
-	std::int64_t get_idle_thread_count() const override
+	std::int64_t get_idle_core_count() const override
         {
             // Return thread count of one specific queue.
             std::int64_t count = 0;

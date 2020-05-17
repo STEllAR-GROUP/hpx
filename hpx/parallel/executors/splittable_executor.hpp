@@ -9,8 +9,9 @@
 #define HPX_SPLITTABLE_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/error.hpp>
 #include <hpx/parallel/util/detail/splittable_task.hpp>
+#include <hpx/traits/is_executor.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -35,8 +36,16 @@ namespace hpx { namespace parallel { namespace execution {
         ///       types will use 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
-        splittable_executor()
+        splittable_executor() {}
+
+        splittable_executor(std::string exec_type)
         {
+            if (exec_type != "all" && exec_type != "idle")
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter, "throw_hpx_exception",
+                    "unknwn type, type should be either all or idle");
+            }
+            split_type_ = exec_type;
         }
 
         /// Construct an \a splittable_executor executor parameters object
@@ -68,7 +77,7 @@ namespace hpx { namespace parallel { namespace execution {
             for (auto const& elem : shape)
             {
                 results.push_back(hpx::async(make_splittable_task(
-			std::forward<F>(f), elem, hpx::get_os_thread_count())));
+                    std::forward<F>(f), elem, split_type_)));
             }
 
             return results;
@@ -76,9 +85,11 @@ namespace hpx { namespace parallel { namespace execution {
 
     private:
         friend class hpx::serialization::access;
-
+        static std::string split_type_;
         /// \cond NOINTERNAL
     };
+
+    std::string splittable_executor::split_type_ = "all";
 
     template <>
     struct is_bulk_two_way_executor<splittable_executor> : std::true_type
