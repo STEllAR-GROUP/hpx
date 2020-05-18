@@ -13,7 +13,7 @@ resiliency
 
 In |hpx|, a program failure is a manifestation of a failing task. This module
 exposes several APIs that allow users to manage failing tasks in a convenient way by
-either replaying a failed task or by replicating a specific task to begin with.
+either replaying a failed task or by replicating a specific task.
 
 Task replay is analogous to the Checkpoint/Restart mechanism found in conventional
 execution models. The key difference being localized fault detection. When the
