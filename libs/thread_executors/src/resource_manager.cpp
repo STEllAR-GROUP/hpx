@@ -10,6 +10,7 @@
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/thread_executors/resource_manager.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>
@@ -35,7 +36,7 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     resource_manager::resource_manager()
       : next_cookie_(0)
-      , punits_(get_os_thread_count())
+      , punits_(parallel::execution::detail::get_os_thread_count())
       , topology_(create_topology())
     {
     }
@@ -61,7 +62,7 @@ namespace hpx { namespace threads {
         std::size_t max_punits =
             proxy->get_policy_element(detail::max_concurrency, ec1);
         if (ec1)
-            max_punits = get_os_thread_count();
+            max_punits = parallel::execution::detail::get_os_thread_count();
 
         // lock the resource manager from this point on
         std::lock_guard<mutex_type> l(mtx_);
@@ -679,7 +680,8 @@ namespace hpx { namespace threads {
             st.max_proxy_cores_ =
                 p.proxy_->get_policy_element(detail::max_concurrency, ec1);
             if (ec1)
-                st.max_proxy_cores_ = get_os_thread_count();
+                st.max_proxy_cores_ =
+                    parallel::execution::detail::get_os_thread_count();
 
             st.num_borrowed_cores_ = 0;
             st.num_owned_cores_ = 0;

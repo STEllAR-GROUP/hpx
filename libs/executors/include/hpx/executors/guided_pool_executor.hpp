@@ -4,12 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// TODO: This executor should be in the executors module together with other
-// executors. However, it depends on dataflow (in the async module, which itself
-// depends on the executors module). We need to either find a way to remove
-// dataflow from this executor, or introduce a higher-level executors module for
-// executors that need to use things like dataflow.
-
 #pragma once
 
 #include <hpx/debugging/demangle_helper.hpp>
@@ -19,7 +13,6 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/traits/is_future_tuple.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <cstddef>
@@ -231,29 +224,30 @@ namespace hpx { namespace parallel { namespace execution {
         friend struct guided_pool_executor_shim;
 
     public:
-        guided_pool_executor(const std::string& pool_name, bool hp_sync = false)
-          : pool_(&resource::get_thread_pool(pool_name))
+        guided_pool_executor(
+            threads::thread_pool_base* pool, bool hp_sync = false)
+          : pool_(pool)
           , priority_(threads::thread_priority_default)
           , stacksize_(threads::thread_stacksize_default)
           , hp_sync_(hp_sync)
         {
         }
 
-        guided_pool_executor(const std::string& pool_name,
+        guided_pool_executor(threads::thread_pool_base* pool,
             threads::thread_stacksize stacksize, bool hp_sync = false)
-          : pool_(&resource::get_thread_pool(pool_name))
+          : pool_(pool)
           , priority_(threads::thread_priority_default)
           , stacksize_(stacksize)
           , hp_sync_(hp_sync)
         {
         }
 
-        guided_pool_executor(const std::string& pool_name,
+        guided_pool_executor(threads::thread_pool_base* pool,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
             bool hp_sync = false)
-          : pool_(&resource::get_thread_pool(pool_name))
+          : pool_(pool)
           , priority_(priority)
           , stacksize_(stacksize)
           , hp_sync_(hp_sync)
@@ -500,26 +494,26 @@ namespace hpx { namespace parallel { namespace execution {
     {
     public:
         guided_pool_executor_shim(
-            bool guided, const std::string& pool_name, bool hp_sync = false)
+            bool guided, threads::thread_pool_base* pool, bool hp_sync = false)
           : guided_(guided)
-          , guided_exec_(pool_name, hp_sync)
+          , guided_exec_(pool, hp_sync)
         {
         }
 
-        guided_pool_executor_shim(bool guided, const std::string& pool_name,
+        guided_pool_executor_shim(bool guided, threads::thread_pool_base* pool,
             threads::thread_stacksize stacksize, bool hp_sync = false)
           : guided_(guided)
-          , guided_exec_(pool_name, hp_sync, stacksize)
+          , guided_exec_(pool, hp_sync, stacksize)
         {
         }
 
-        guided_pool_executor_shim(bool guided, const std::string& pool_name,
+        guided_pool_executor_shim(bool guided, threads::thread_pool_base* pool,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
             bool hp_sync = false)
           : guided_(guided)
-          , guided_exec_(pool_name, priority, stacksize, hp_sync)
+          , guided_exec_(pool, priority, stacksize, hp_sync)
         {
         }
 

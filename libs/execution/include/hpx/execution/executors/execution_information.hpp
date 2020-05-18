@@ -8,33 +8,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_information_fwd.hpp>
 
-// TODO: Remove this dependency.
-#include <hpx/resource_partitioner.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
-    // TODO: Specialize this for executors.
-    HPX_EXPORT inline threads::mask_cref_type get_pu_mask(
-        threads::topology& topo, std::size_t thread_num)
-    {
-        auto& rp = hpx::resource::get_partitioner();
-        return rp.get_pu_mask(thread_num);
-    }
-}}    // namespace hpx::threads
 
 namespace hpx { namespace parallel { inline namespace v3 { namespace detail {
     /// \cond NOINTERNAL
@@ -94,7 +79,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             hpx::traits::detail::wrap_int, AnyExecutor&& exec,
             threads::topology& topo, std::size_t thread_num)
         {
-            return hpx::threads::get_pu_mask(topo, thread_num);
+            return get_pu_mask(topo, thread_num);
         }
 
         template <typename AnyExecutor>

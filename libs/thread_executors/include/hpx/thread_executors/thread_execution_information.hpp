@@ -7,8 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -25,7 +23,7 @@ namespace hpx { namespace threads {
         std::size_t>::type
     processing_units_count(Parameters&&, Executor&& exec)
     {
-        return hpx::get_os_thread_count(exec);
+        return parallel::execution::detail::get_os_thread_count(exec);
     }
 
     template <typename Executor>

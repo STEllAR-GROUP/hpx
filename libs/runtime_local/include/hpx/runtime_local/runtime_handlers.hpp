@@ -16,6 +16,7 @@
 
 #include <boost/asio/io_service.hpp>
 
+#include <cstddef>
 #include <string>
 
 namespace hpx { namespace detail {
@@ -31,5 +32,7 @@ namespace hpx { namespace detail {
     bool register_locks_predicate();
 #endif
     threads::thread_pool_base* get_default_pool();
+    threads::mask_cref_type get_pu_mask(
+        threads::topology& topo, std::size_t thread_num);
     boost::asio::io_service* get_default_timer_service();
 }}    // namespace hpx::detail

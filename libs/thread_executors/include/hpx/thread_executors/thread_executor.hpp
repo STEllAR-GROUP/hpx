@@ -12,7 +12,6 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_description.hpp>
@@ -29,6 +28,17 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <iosfwd>
+
+// NOTE: Thread executors are deprecated and will be removed. Until then this
+// forward declaration serves to make sure the thread_executors module does not
+// depend on the runtime_local module (although it really does).
+namespace hpx {
+    namespace threads {
+        class executor;
+    }
+
+    HPX_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {

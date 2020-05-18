@@ -12,7 +12,6 @@
 #include <hpx/errors.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/hpx_finalize.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <exception>
@@ -178,6 +177,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 #endif
 
+        using exception_list_termination_handler_type = std::function<void()>;
+        HPX_EXPORT void set_exception_list_termination_handler(
+            exception_list_termination_handler_type f);
+        HPX_NORETURN HPX_EXPORT void exception_list_termination_handler();
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct handle_exception_impl<execution::parallel_unsequenced_policy,
@@ -189,19 +193,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 // any exceptions thrown by algorithms executed with the
                 // parallel_unsequenced_policy are to call terminate.
-                hpx::terminate();
+                exception_list_termination_handler();
             }
 
             HPX_NORETURN
             static hpx::future<Result> call(hpx::future<Result>&&)
             {
-                hpx::terminate();
+                exception_list_termination_handler();
             }
 
             HPX_NORETURN
             static hpx::future<Result> call(std::exception_ptr const&)
             {
-                hpx::terminate();
+                exception_list_termination_handler();
             }
         };
 

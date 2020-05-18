@@ -10,11 +10,11 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
@@ -281,7 +281,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::detail::wrap_int, AnyParameters&& params,
                 Executor&& exec)
             {
-                return hpx::get_os_thread_count();
+                return get_os_thread_count();
             }
 
             template <typename AnyParameters, typename Executor>

@@ -129,4 +129,11 @@ namespace hpx { namespace detail {
 
         return &get_thread_pool("timer-pool")->get_io_service();
     }
+
+    threads::mask_cref_type get_pu_mask(
+        threads::topology& topo, std::size_t thread_num)
+    {
+        auto& rp = hpx::resource::get_partitioner();
+        return rp.get_pu_mask(thread_num);
+    }
 }}    // namespace hpx::detail

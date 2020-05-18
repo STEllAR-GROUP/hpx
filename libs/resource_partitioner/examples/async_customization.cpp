@@ -6,6 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/include/threadmanager.hpp>
 #include <hpx/thread_executors/default_executor.hpp>
 #include <hpx/thread_executors/pool_executor.hpp>
 #define GUIDED_EXECUTOR_DEBUG 1
@@ -508,7 +509,7 @@ int hpx_main()
     try
     {
         hpx::parallel::execution::guided_pool_executor<dummy_hint> exec2(
-            "default");
+            &hpx::resource::get_thread_pool("default"));
         test("Testing guided_pool_executor<dummy_hint>", exec2);
     }
     catch (std::exception& e)
@@ -520,7 +521,7 @@ int hpx_main()
     try
     {
         hpx::parallel::execution::guided_pool_executor_shim<dummy_hint> exec3(
-            true, "default");
+            true, &hpx::resource::get_thread_pool("default"));
         test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
     }
     catch (std::exception& e)

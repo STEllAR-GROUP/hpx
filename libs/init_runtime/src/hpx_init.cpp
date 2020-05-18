@@ -14,6 +14,8 @@
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
+#include <hpx/executors/exception_list.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind_front.hpp>
