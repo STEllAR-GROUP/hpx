@@ -203,6 +203,7 @@ namespace hpx { namespace util { namespace stack_trace {
         {
             if (info.dli_sname)
             {
+#if defined(HPX_HAVE_STACKTRACES_DEMANGLE_SYMBOLS)
                 int status = 0;
                 char* demangled = abi::__cxa_demangle(
                     info.dli_sname, nullptr, nullptr, &status);
@@ -215,6 +216,9 @@ namespace hpx { namespace util { namespace stack_trace {
                 {
                     res << info.dli_sname;
                 }
+#else
+                res << info.dli_sname;
+#endif
             }
             else
             {
