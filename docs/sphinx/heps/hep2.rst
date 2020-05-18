@@ -62,9 +62,9 @@ Utilities
   - other utilities that go with ``format``
 
 - ``hpx/chrono.hpp``
-  - ``hpx::high_resolution_clock``?
-  - ``hpx::high_resolution_timer``?
-  - ``hpx::scoped_timer``?
+  - ``hpx::high_resolution_clock``
+  - ``hpx::high_resolution_timer``
+  - ``hpx::scoped_timer``
 
 - ``hpx/exception.hpp``
   - ``hpx::exception``
@@ -97,8 +97,6 @@ Local concurrency and parallelism
   - ``hpx::dataflow``
   - ``hpx::launch_policy`` (or ``hpx::execution::launch_policy``?)
   - ``hpx::is_future`` and friends
-
-- ``hpx/future.hpp``?
   - ``hpx::when_all``
   - ``hpx::wait_all``
   - ``hpx::when_any``
@@ -119,7 +117,7 @@ Local concurrency and parallelism
 - ``hpx/algorithm.hpp``
   - ``hpx::for_loop`` and all the other parallel algorithms
 
-- ``hpx/algorithm/for_loop.hpp``
+- ``hpx/algorithm/for_loop.hpp``: this is a bonus (i.e. the standard library does not have headers for each individual algorithm)
   - ``hpx::for_loop`` and the same for all other individual algorithms (no need to separate range-based and iterator-based, I believe)
 
 - ``hpx/execution.hpp``
@@ -134,8 +132,6 @@ Local concurrency and parallelism
   - ``hpx::execution::par``
   - ``hpx::execution::par_unseq``
   - ``hpx::execution::task``
-
-- ``hpx/execution.hpp``? these should probably be public, despite upcoming changes to executors?
   - ``hpx::execution::post``?
   - ``hpx::execution::sync_execute``?
   - ``hpx::execution::async_execute``?
@@ -143,8 +139,6 @@ Local concurrency and parallelism
   - ``hpx::execution::bulk_sync_execute``?
   - ``hpx::execution::bulk_async_execute``?
   - ``hpx::execution::bulk_then_execute``?
-
-- ``hpx/execution.hpp``?
   - ``hpx::execution::sequenced_executor``
   - ``hpx::execution::parallel_executor``
   - all the other executors? or just a selected subset?
@@ -152,8 +146,6 @@ Local concurrency and parallelism
   - ``hpx::experimental::execution::thread_pool_executor``?
   - ``hpx::execution::current_executor`` (not sure we need this)
   - ``hpx::execution::is_executor`` and friends
-
-- ``hpx/execution.hpp``
   - ``hpx::execution::static_chunk_size`` and other executor parameters
 
 - ``hpx/mutex.hpp``
@@ -177,42 +169,47 @@ Local concurrency and parallelism
 - ``hpx/latch.hpp``
   - ``hpx::latch``
 
-- ``hpx/channel.hpp``?
-  - ``hpx::channel`` (``hpx::channel_*``?)
+- ``hpx/channel.hpp``
+  - ``hpx::channel``
 
-- ``hpx/spmd_block.hpp``?
+- ``hpx/spmd_block.hpp``
   - ``hpx::spmd_block``
 
-- ``hpx/task_block.hpp``?
+- ``hpx/task_block.hpp``
   - ``hpx::task_block``
 
 Distributed
 ...........
 
-- ``hpx/distributed/future.hpp``?
+- ``hpx/distributed/future.hpp``
   - distributed equivalents of ``hpx::promise``, ``hpx::async``, etc.
 
-- ``hpx/distributed/algorithm.hpp``?
+- ``hpx/distributed/algorithm.hpp``
+  - distributed equivalents of parallel algorithms
+
+- ``hpx/distributed/algorithm/for_loop.hpp``
   - distributed equivalents of parallel algorithms
 
 - ``hpx/distributed/latch.hpp``
   - ``hpx::distributed::latch``
+
 - ``hpx/distributed/barrier.hpp``
   - ``hpx::distributed::barrier``
+
+- ``hpx/distributed/channel.hpp``
+  - ``hpx::distributed::channel``
+
 - etc. to match local headers and namespaces
 
-- ``hpx/distributed/components.hpp``?
+- ``hpx/distributed/components.hpp``
   - ``HPX_REGISTER_COMPONENT``
   - any other classes, functions, and macros that might be required to write components?
 
-- ``hpx/distributed/actions.hpp``?
+- ``hpx/distributed/actions.hpp``
   - ``HPX_REGISTER_ACTION``
   - any other classes, functions, and macros that might be required to write actions?
 
-- ``hpx/distributed/channel.hpp``?
-  - ``hpx::distributed::channel``
-
-- ``???`` each in a separate header like channel, latch, etc.?
+- ``hpx/distributed/x.hpp`` each in a separate header like channel, latch, etc.?
   - ``hpx::distributed::all_to_all``
   - ``hpx::distributed::all_reduce``
   - ``hpx::distributed::broadcast``
@@ -306,5 +303,10 @@ TODO
 - ``HPX::hpx_local``
 - ``HPX::hpx`` (does not wrap main automatically)
 - ``HPX::wrap_main``
-- ``HPX::x_component``
-- ...
+
+- ``HPX::iostream``
+  - in header ``hpx/distributed/iostream.hpp``
+    - ``hpx::distributed::cout``
+    - ``hpx::distributed::cerr``
+- partitioned vector?
+- unordered map?
