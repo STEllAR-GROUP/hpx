@@ -89,9 +89,9 @@ if(NOT TARGET hpx_dependencies_boost)
 
   # target_arch should be set already by the parent CMakeLists file
   if("${__target_arch}" STREQUAL "ppc" OR "${__target_arch}" STREQUAL "ppc64")
-    if ("${Boost_VERSION_STRING}" VERSION_LESS "1.69.0")
+    if("${Boost_VERSION_STRING}" VERSION_LESS "1.69.0")
       hpx_error("Boost versions < 1.69.0 are unsupported on PPC architecture")
-    endif()     
+    endif()
   endif()
 
   # We are assuming that there is only one Boost Root
