@@ -21,6 +21,12 @@ function(add_hpx_module name)
   include(HPX_Message)
   include(HPX_Option)
 
+  if(NOT "${${name}_COMPATIBILITY_HEADERS}" STREQUAL "")
+    set(_have_compatibility_headers_option TRUE)
+  else()
+    set(_have_compatibility_headers_option FALSE)
+  endif()
+
   # Global headers should be always generated except if explicitly disabled
   if("${${name}_GLOBAL_HEADER_GEN}" STREQUAL "")
     set(${name}_GLOBAL_HEADER_GEN ON)
@@ -57,7 +63,7 @@ function(add_hpx_module name)
     )
   endif()
 
-  if(NOT "${${name}_COMPATIBILITY_HEADERS}" STREQUAL "")
+  if(${_have_compatibility_headers_option})
     set(_compatibility_headers_default OFF)
     if(${name}_COMPATIBILITY_HEADERS)
       set(_compatibility_headers_default ON)
@@ -85,7 +91,9 @@ function(add_hpx_module name)
   hpx_debug("Add module ${name}: SOURCE_ROOT: ${SOURCE_ROOT}")
   hpx_debug("Add module ${name}: HEADER_ROOT: ${HEADER_ROOT}")
 
-  if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
+  if(${_have_compatibility_headers_option}
+     AND HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
+  )
     set(COMPAT_HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include_compatibility")
     hpx_debug("Add module ${name}: COMPAT_HEADER_ROOT: ${COMPAT_HEADER_ROOT}")
   endif()
@@ -103,7 +111,9 @@ function(add_hpx_module name)
             OUTPUT_VARIABLE
             headers
   )
-  if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
+  if(${_have_compatibility_headers_option}
+     AND HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
+  )
     list(
       TRANSFORM ${name}_COMPAT_HEADERS
       PREPEND ${COMPAT_HEADER_ROOT}/
@@ -231,7 +241,9 @@ function(add_hpx_module name)
     target_link_libraries(hpx_${name} PUBLIC hpx_config_registry)
   endif()
 
-  if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
+  if(${_have_compatibility_headers_option}
+     AND HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
+  )
     target_include_directories(
       hpx_${name} PUBLIC $<BUILD_INTERFACE:${COMPAT_HEADER_ROOT}>
     )
@@ -260,7 +272,9 @@ function(add_hpx_module name)
     CLASS "Source Files"
     TARGETS ${sources}
   )
-  if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
+  if(${_have_compatibility_headers_option}
+     AND HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
+  )
     add_hpx_source_group(
       NAME hpx_${name}
       ROOT ${COMPAT_HEADER_ROOT}/hpx
@@ -332,7 +346,9 @@ function(add_hpx_module name)
   )
 
   # Install the compatibility headers from the source
-  if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
+  if(${_have_compatibility_headers_option}
+     AND HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS
+  )
     install(
       DIRECTORY include_compatibility/hpx
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
