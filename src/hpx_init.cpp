@@ -806,9 +806,11 @@ namespace hpx
                     // Construct resource partitioner if this has not been done
                     // yet and get a handle to it (if the command-line parsing
                     // has not yet been done, do it now)
-                    hpx::resource::partitioner rp(f, params.desc_cmdline, argc,
-                        argv, hpx_startup::user_main_config(params.cfg),
-                        params.rp_mode, params.mode, false, &result);
+                    hpx::resource::partitioner rp =
+                        hpx::resource::detail::make_partitioner(f,
+                            params.desc_cmdline, argc, argv,
+                            hpx_startup::user_main_config(params.cfg),
+                            params.rp_mode, params.mode, false, &result);
 
                     activate_global_options(rp.get_command_line_switches(),
                         argc, argv);

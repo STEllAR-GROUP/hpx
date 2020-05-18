@@ -29,7 +29,8 @@ int hpx_main(int argc, char* argv[])
 
         // Use .get() to throw exception
         hpx::threads::suspend_processing_unit(tp, 0).get();
-        HPX_TEST_MSG(false, "Suspending should not be allowed with "
+        HPX_TEST_MSG(false,
+            "Suspending should not be allowed with "
             "elasticity disabled");
     }
     catch (hpx::exception const&)
@@ -44,19 +45,17 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg =
-    {
-        "hpx.os_threads=4"
+    hpx::init_params init_args;
+
+    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.rp_callback = [](auto& rp) {
+        // Explicitly disable elasticity if it is in defaults
+        rp.create_thread_pool("default",
+            hpx::resource::scheduling_policy::local_priority_fifo,
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::default_mode &
+                ~hpx::threads::policies::enable_elasticity));
     };
 
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
-
-    // Explicitly disable elasticity if it is in defaults
-    rp.create_thread_pool("default",
-        hpx::resource::scheduling_policy::local_priority_fifo,
-        hpx::threads::policies::scheduler_mode(
-            hpx::threads::policies::default_mode &
-            ~hpx::threads::policies::enable_elasticity));
-
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 }

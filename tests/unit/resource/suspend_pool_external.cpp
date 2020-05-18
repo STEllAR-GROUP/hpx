@@ -11,10 +11,10 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/schedulers.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing.hpp>
 
 #include <atomic>
@@ -28,13 +28,14 @@
 void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> cfg = {"hpx.os_threads=4"};
+    hpx::init_params init_args;
 
-    hpx::resource::partitioner rp(nullptr, argc, argv, std::move(cfg));
+    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.rp_callback = [scheduler](auto& rp) {
+        rp.create_thread_pool("default", scheduler);
+    };
 
-    rp.create_thread_pool("default", scheduler);
-
-    hpx::start(nullptr, argc, argv);
+    hpx::start(nullptr, argc, argv, init_args);
 
     hpx::threads::thread_pool_base& default_pool =
         hpx::resource::get_thread_pool("default");

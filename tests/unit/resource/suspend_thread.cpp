@@ -11,9 +11,9 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/schedulers.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/timing.hpp>
 
 #include <cstddef>
@@ -74,8 +74,7 @@ int hpx_main(int argc, char* argv[])
         for (thread_num = 0; thread_num < num_threads; ++thread_num)
         {
             for (std::size_t thread_num_suspend = 0;
-                 thread_num_suspend < num_threads;
-                 ++thread_num_suspend)
+                 thread_num_suspend < num_threads; ++thread_num_suspend)
             {
                 if (thread_num != thread_num_suspend)
                 {
@@ -88,8 +87,7 @@ int hpx_main(int argc, char* argv[])
             hpx::async(test_function).wait();
 
             for (std::size_t thread_num_resume = 0;
-                 thread_num_resume < num_threads;
-                 ++thread_num_resume)
+                 thread_num_resume < num_threads; ++thread_num_resume)
             {
                 if (thread_num != thread_num_resume)
                 {
@@ -149,8 +147,7 @@ int hpx_main(int argc, char* argv[])
         while (t.elapsed() < 2)
         {
             for (std::size_t i = 0;
-                 i < hpx::resource::get_num_threads("default") * 10;
-                 ++i)
+                 i < hpx::resource::get_num_threads("default") * 10; ++i)
             {
                 fs.push_back(hpx::async([]() {}));
             }
@@ -199,16 +196,16 @@ int hpx_main(int argc, char* argv[])
 void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
-    std::vector<std::string> cfg = {"hpx.os_threads=4"};
+    hpx::init_params init_args;
+    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.rp_callback = [scheduler](auto& rp) {
+        rp.create_thread_pool("default", scheduler,
+            hpx::threads::policies::scheduler_mode(
+                hpx::threads::policies::default_mode |
+                hpx::threads::policies::enable_elasticity));
+    };
 
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
-
-    rp.create_thread_pool("default", scheduler,
-        hpx::threads::policies::scheduler_mode(
-            hpx::threads::policies::default_mode |
-            hpx::threads::policies::enable_elasticity));
-
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])

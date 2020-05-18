@@ -15,14 +15,14 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/local_async.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/thread_executors/pool_executor.hpp>
-#include <hpx/async_combinators/when_all.hpp>
+#include <hpx/local_async.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/thread_executors/pool_executor.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -89,8 +89,10 @@ int hpx_main(int argc, char* /*argv*/[])
     for (std::size_t i = 0; i < num_pools; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
-        HP_executors.emplace_back(pool_name, hpx::threads::thread_priority_high);
-        NP_executors.emplace_back(pool_name, hpx::threads::thread_priority_default);
+        HP_executors.emplace_back(
+            pool_name, hpx::threads::thread_priority_high);
+        NP_executors.emplace_back(
+            pool_name, hpx::threads::thread_priority_default);
     }
 
     // randomly create tasks that run on a random pool

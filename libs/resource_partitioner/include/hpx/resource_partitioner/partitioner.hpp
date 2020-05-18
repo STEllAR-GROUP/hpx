@@ -126,114 +126,39 @@ namespace hpx { namespace resource {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    class partitioner
-    {
-    public:
-        partitioner(util::function_nonser<int(
-                        hpx::program_options::variables_map& vm)> const& f,
+    namespace detail {
+        inline ::hpx::resource::partitioner make_partitioner(
+            util::function_nonser<int(
+                hpx::program_options::variables_map& vm)> const& f,
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            runtime_mode mode = runtime_mode_default)
-          : partitioner_(detail::create_partitioner(f, desc_cmdline, argc, argv,
-                std::move(ini_config), rpmode, mode))
-        {
-        }
+            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            int* result);
+    }
+
+    class partitioner
+    {
+    private:
+        friend ::hpx::resource::partitioner detail::make_partitioner(
+            util::function_nonser<int(
+                hpx::program_options::variables_map& vm)> const& f,
+            hpx::program_options::options_description const& desc_cmdline,
+            int argc, char** argv, std::vector<std::string> ini_config,
+            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            int* result);
 
         partitioner(util::function_nonser<int(
                         hpx::program_options::variables_map& vm)> const& f,
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            runtime_mode mode = runtime_mode_default, bool check = true,
-            int* result = nullptr)
+            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            int* result)
           : partitioner_(detail::create_partitioner(f, desc_cmdline, argc, argv,
                 std::move(ini_config), rpmode, mode, check, result))
         {
         }
 
-#if !defined(HPX_EXPORTS)
-        partitioner(util::function_nonser<int(int, char**)> const& f, int argc,
-            char** argv,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            hpx::runtime_mode mode = hpx::runtime_mode_default)
-          : partitioner_(
-                detail::create_partitioner(f, argc, argv, rpmode, mode))
-        {
-        }
-
-        partitioner(util::function_nonser<int(int, char**)> const& f, int argc,
-            char** argv, std::vector<std::string> const& cfg,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            hpx::runtime_mode mode = hpx::runtime_mode_default)
-          : partitioner_(
-                detail::create_partitioner(f, argc, argv, cfg, rpmode, mode))
-        {
-        }
-
-        partitioner(int argc, char** argv,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            runtime_mode mode = runtime_mode_default)
-          : partitioner_(detail::create_partitioner(argc, argv, rpmode, mode))
-        {
-        }
-
-        partitioner(int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            runtime_mode mode = runtime_mode_default)
-          : partitioner_(detail::create_partitioner(
-                argc, argv, std::move(ini_config), rpmode, mode))
-        {
-        }
-
-        partitioner(
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            runtime_mode mode = runtime_mode_default)
-          : partitioner_(detail::create_partitioner(
-                desc_cmdline, argc, argv, rpmode, mode))
-        {
-        }
-
-        partitioner(
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            runtime_mode mode = runtime_mode_default)
-          : partitioner_(detail::create_partitioner(
-                desc_cmdline, argc, argv, std::move(ini_config), rpmode, mode))
-        {
-        }
-
-        partitioner(std::nullptr_t f, int argc, char** argv,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            hpx::runtime_mode mode = hpx::runtime_mode_default)
-          : partitioner_(
-                detail::create_partitioner(f, argc, argv, rpmode, mode))
-        {
-        }
-
-        partitioner(std::nullptr_t f, int argc, char** argv,
-            std::vector<std::string> const& cfg,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            hpx::runtime_mode mode = hpx::runtime_mode_default)
-          : partitioner_(
-                detail::create_partitioner(f, argc, argv, cfg, rpmode, mode))
-        {
-        }
-
-        partitioner(std::nullptr_t f,
-            hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv, std::vector<std::string> ini_config,
-            resource::partitioner_mode rpmode = resource::mode_default,
-            runtime_mode mode = runtime_mode_default)
-          : partitioner_(detail::create_partitioner(f, desc_cmdline, argc, argv,
-                std::move(ini_config), rpmode, mode))
-        {
-        }
-#endif
-
+    public:
         ///////////////////////////////////////////////////////////////////////
         // Create one of the predefined thread pools
         HPX_EXPORT void create_thread_pool(std::string const& name,
@@ -297,4 +222,17 @@ namespace hpx { namespace resource {
         detail::partitioner& partitioner_;
     };
 
-}}    // namespace hpx::resource
+    namespace detail {
+        ::hpx::resource::partitioner make_partitioner(
+            util::function_nonser<int(
+                hpx::program_options::variables_map& vm)> const& f,
+            hpx::program_options::options_description const& desc_cmdline,
+            int argc, char** argv, std::vector<std::string> ini_config,
+            resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            int* result)
+        {
+            return ::hpx::resource::partitioner(f, desc_cmdline, argc, argv,
+                ini_config, rpmode, mode, check, result);
+        }
+    }    // namespace detail
+}}       // namespace hpx::resource

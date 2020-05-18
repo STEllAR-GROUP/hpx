@@ -39,33 +39,35 @@ int hpx_main(int argc, char* argv[])
 template <typename Scheduler>
 void test_scheduler(int argc, char* argv[])
 {
-    std::vector<std::string> cfg = {"hpx.os_threads=1"};
+    hpx::init_params init_args;
 
-    hpx::resource::partitioner rp(argc, argv, std::move(cfg));
+    init_args.cfg = {"hpx.os_threads=1"};
+    init_args.rp_callback = [](auto& rp) {
+        rp.create_thread_pool("default",
+            [](hpx::threads::thread_pool_init_parameters thread_pool_init,
+                hpx::threads::policies::thread_queue_init_parameters
+                    thread_queue_init)
+                -> std::unique_ptr<hpx::threads::thread_pool_base> {
+                typename Scheduler::init_parameter_type init(
+                    thread_pool_init.num_threads_,
+                    thread_pool_init.affinity_data_, std::size_t(-1),
+                    thread_queue_init);
+                std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
 
-    rp.create_thread_pool("default",
-        [](hpx::threads::thread_pool_init_parameters thread_pool_init,
-            hpx::threads::policies::thread_queue_init_parameters
-                thread_queue_init)
-            -> std::unique_ptr<hpx::threads::thread_pool_base> {
-            typename Scheduler::init_parameter_type init(
-                thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
-                std::size_t(-1), thread_queue_init);
-            std::unique_ptr<Scheduler> scheduler(new Scheduler(init));
+                thread_pool_init.mode_ = hpx::threads::policies::scheduler_mode(
+                    hpx::threads::policies::do_background_work |
+                    hpx::threads::policies::reduce_thread_priority |
+                    hpx::threads::policies::delay_exit);
 
-            thread_pool_init.mode_ = hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::do_background_work |
-                hpx::threads::policies::reduce_thread_priority |
-                hpx::threads::policies::delay_exit);
+                std::unique_ptr<hpx::threads::thread_pool_base> pool(
+                    new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
+                        std::move(scheduler), thread_pool_init));
 
-            std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<Scheduler>(
-                    std::move(scheduler), thread_pool_init));
+                return pool;
+            });
+    };
 
-            return pool;
-        });
-
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
 }
 
 int main(int argc, char* argv[])
