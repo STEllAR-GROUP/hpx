@@ -40,12 +40,6 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace threads { namespace detail {
-    // The function \a set_self_ptr sets a pointer to the (OS thread
-    // specific) self reference to the current HPX thread.
-    void set_self_ptr(threads::thread_self*);
-}}}    // namespace hpx::threads::detail
-
 namespace hpx { namespace threads { namespace executors { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
