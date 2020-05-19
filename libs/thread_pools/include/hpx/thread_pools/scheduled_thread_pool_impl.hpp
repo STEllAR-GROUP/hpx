@@ -1776,6 +1776,21 @@ namespace hpx { namespace threads { namespace detail {
             thread_count_.load();
     }
 
+    template <typename Scheduler>
+    std::int64_t scheduled_thread_pool<Scheduler>::get_idle_core_count() const
+    {
+        std::int64_t count = 0;
+        std::size_t i = 0;
+        for (auto const& data : counter_data_)
+        {
+            if (!data.tasks_active_ && sched_->Scheduler::is_core_idle(i++))
+            {
+                ++count;
+            }
+        }
+        return count;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::init_perf_counter_data(

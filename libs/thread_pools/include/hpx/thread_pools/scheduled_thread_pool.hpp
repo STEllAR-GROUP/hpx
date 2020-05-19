@@ -104,6 +104,8 @@ namespace hpx { namespace threads { namespace detail {
                 state, priority, num, reset);
         }
 
+        std::int64_t get_idle_core_count() const override;
+
         std::int64_t get_background_thread_count() override
         {
             return sched_->Scheduler::get_background_thread_count();
