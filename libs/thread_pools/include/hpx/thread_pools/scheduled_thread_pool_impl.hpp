@@ -1783,10 +1783,11 @@ namespace hpx { namespace threads { namespace detail {
         std::size_t i = 0;
         for (auto const& data : counter_data_)
         {
-            if (!data.tasks_active_ && sched_->Scheduler::is_core_idle(i++))
+            if (!data.tasks_active_ && sched_->Scheduler::is_core_idle(i))
             {
                 ++count;
             }
+            ++i;
         }
         return count;
     }
