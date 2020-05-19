@@ -8,6 +8,7 @@ set(tests
     bulk_async
     created_executor
     executor_parameters
+    executor_parameters_dispatching
     executor_parameters_timer_hooks
     minimal_async_executor
     minimal_sync_executor

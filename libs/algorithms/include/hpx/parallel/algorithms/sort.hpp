@@ -180,7 +180,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             // figure out the chunk size to use
             std::size_t const cores = execution::processing_units_count(
-                policy.executor(), policy.parameters());
+                policy.parameters(), policy.executor());
 
             std::size_t max_chunks = execution::maximal_number_of_chunks(
                 policy.parameters(), policy.executor(), cores, count);

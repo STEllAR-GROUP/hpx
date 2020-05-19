@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,21 +24,27 @@ namespace hpx { namespace parallel { namespace execution {
         struct get_chunk_size_tag
         {
         };
+
         struct maximal_number_of_chunks_tag
         {
         };
+
         struct reset_thread_distribution_tag
         {
         };
-        struct count_processing_units_tag
+
+        struct processing_units_count_tag
         {
         };
+
         struct mark_begin_execution_tag
         {
         };
+
         struct mark_end_of_scheduling_tag
         {
         };
+
         struct mark_end_execution_tag
         {
         };
@@ -63,7 +69,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Parameters, typename Executor,
             typename Enable = void>
-        struct count_processing_units_fn_helper;
+        struct processing_units_count_fn_helper;
 
         template <typename Parameters, typename Executor,
             typename Enable = void>
@@ -187,16 +193,16 @@ namespace hpx { namespace parallel { namespace execution {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        // count_processing_units dispatch point
+        // processing_units_count dispatch point
         template <typename Parameters, typename Executor>
-        HPX_FORCEINLINE auto count_processing_units(
+        HPX_FORCEINLINE auto processing_units_count(
             Parameters&& params, Executor&& exec) ->
-            typename count_processing_units_fn_helper<
+            typename processing_units_count_fn_helper<
                 typename hpx::util::decay_unwrap<Parameters>::type,
                 typename hpx::util::decay<Executor>::type>::
                 template result<Parameters, Executor>::type
         {
-            return count_processing_units_fn_helper<
+            return processing_units_count_fn_helper<
                 typename hpx::util::decay_unwrap<Parameters>::type,
                 typename hpx::util::decay<Executor>::type>::
                 call(std::forward<Parameters>(params),
@@ -204,17 +210,17 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         template <>
-        struct customization_point<count_processing_units_tag>
+        struct customization_point<processing_units_count_tag>
         {
         public:
             template <typename Parameters, typename Executor>
             HPX_FORCEINLINE auto operator()(
                 Parameters&& params, Executor&& exec) const
                 -> decltype(
-                    count_processing_units(std::forward<Parameters>(params),
+                    processing_units_count(std::forward<Parameters>(params),
                         std::forward<Executor>(exec)))
             {
-                return count_processing_units(std::forward<Parameters>(params),
+                return processing_units_count(std::forward<Parameters>(params),
                     std::forward<Executor>(exec));
             }
         };
@@ -392,9 +398,9 @@ namespace hpx { namespace parallel { namespace execution {
         ///       object.
         ///
         constexpr detail::customization_point<
-            detail::count_processing_units_tag> const& count_processing_units =
+            detail::processing_units_count_tag> const& processing_units_count =
             detail::static_const<detail::customization_point<
-                detail::count_processing_units_tag>>::value;
+                detail::processing_units_count_tag>>::value;
 
         /// Mark the begin of a parallel algorithm execution
         ///

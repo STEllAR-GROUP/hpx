@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2020 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -23,15 +23,14 @@ namespace hpx { namespace parallel { namespace execution {
     // Define infrastructure for customization points
     namespace detail {
         /// \cond NOINTERNAL
-        struct processing_units_count_tag
-        {
-        };
         struct has_pending_closures_tag
         {
         };
+
         struct get_pu_mask_tag
         {
         };
+
         struct set_scheduler_mode_tag
         {
         };
@@ -42,9 +41,6 @@ namespace hpx { namespace parallel { namespace execution {
     // Executor information customization points
     namespace detail {
         /// \cond NOINTERNAL
-        template <typename Executor, typename Enable = void>
-        struct processing_units_count_fn_helper;
-
         template <typename Executor, typename Enable = void>
         struct has_pending_closures_fn_helper;
 
@@ -58,34 +54,6 @@ namespace hpx { namespace parallel { namespace execution {
 
     namespace detail {
         /// \cond NOINTERNAL
-
-        ///////////////////////////////////////////////////////////////////////
-        // processing_units_count dispatch point
-        template <typename Executor, typename Parameters>
-        HPX_FORCEINLINE auto processing_units_count(
-            Executor&& exec, Parameters& params) ->
-            typename processing_units_count_fn_helper<typename std::decay<
-                Executor>::type>::template result<Executor, Parameters>::type
-        {
-            return processing_units_count_fn_helper<
-                typename std::decay<Executor>::type>::call(0,
-                std::forward<Executor>(exec), params);
-        }
-
-        template <>
-        struct customization_point<processing_units_count_tag>
-        {
-        public:
-            template <typename Executor, typename Parameters>
-            HPX_FORCEINLINE auto operator()(
-                Executor&& exec, Parameters& params) const
-                -> decltype(processing_units_count(
-                    std::forward<Executor>(exec), params))
-            {
-                return processing_units_count(
-                    std::forward<Executor>(exec), params);
-            }
-        };
 
         ///////////////////////////////////////////////////////////////////////
         // has_pending_closures dispatch point
@@ -169,20 +137,6 @@ namespace hpx { namespace parallel { namespace execution {
 
     // define customization points
     namespace {
-        /// Retrieve the number of (kernel-)threads used by the associated
-        /// executor.
-        ///
-        /// \param exec  [in] The executor object to use to extract the
-        ///              requested information for.
-        ///
-        /// \note This calls exec.os_thread_count() if it exists;
-        ///       otherwise it executes hpx::get_os_thread_count().
-        ///
-        constexpr detail::customization_point<
-            detail::processing_units_count_tag> const& processing_units_count =
-            detail::static_const<detail::customization_point<
-                detail::processing_units_count_tag>>::value;
-
         /// Retrieve whether this executor has operations pending or not.
         ///
         /// \param exec  [in] The executor object to use to extract the

@@ -117,7 +117,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         FwdIter& begin, std::size_t& count, Stride s)
     {
         std::size_t const cores = execution::processing_units_count(
-            policy.executor(), policy.parameters());
+            policy.parameters(), policy.executor());
 
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         using tuple_type = hpx::util::tuple<FwdIter, std::size_t>;
 
         std::size_t const cores = execution::processing_units_count(
-            policy.executor(), policy.parameters());
+            policy.parameters(), policy.executor());
 
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         FwdIter begin, std::size_t count, Stride s)
     {
         std::size_t const cores = execution::processing_units_count(
-            policy.executor(), policy.parameters());
+            policy.parameters(), policy.executor());
 
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -319,7 +319,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         using tuple_type = hpx::util::tuple<FwdIter, std::size_t, std::size_t>;
 
         std::size_t const cores = execution::processing_units_count(
-            policy.executor(), policy.parameters());
+            policy.parameters(), policy.executor());
 
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);

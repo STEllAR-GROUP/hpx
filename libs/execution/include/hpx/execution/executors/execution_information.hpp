@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2020 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -47,82 +47,6 @@ namespace hpx { namespace parallel { inline namespace v3 { namespace detail {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace execution { namespace detail {
     /// \cond NOINTERNAL
-
-    ///////////////////////////////////////////////////////////////////////
-    // customization point for interface processing_units_count()
-    template <typename Parameters_>
-    struct processing_units_count_parameter_helper
-    {
-        template <typename Parameters, typename Executor>
-        static std::size_t call(
-            hpx::traits::detail::wrap_int, Parameters&& params, Executor&& exec)
-        {
-            return hpx::get_os_thread_count();
-        }
-
-        template <typename Parameters, typename Executor>
-        static auto call(int, Parameters&& params, Executor&& exec) -> decltype(
-            params.processing_units_count(std::forward<Executor>(exec)))
-        {
-            return params.processing_units_count(std::forward<Executor>(exec));
-        }
-
-        template <typename Executor>
-        static std::size_t call(Parameters_& params, Executor&& exec)
-        {
-            return call(0, params, std::forward<Executor>(exec));
-        }
-
-        template <typename Parameters, typename Executor>
-        static std::size_t call(Parameters params, Executor&& exec)
-        {
-            return call(static_cast<Parameters_&>(params),
-                std::forward<Executor>(exec));
-        }
-    };
-
-    template <typename Parameters, typename Executor>
-    std::size_t call_processing_units_parameter_count(
-        Parameters&& params, Executor&& exec)
-    {
-        return processing_units_count_parameter_helper<
-            typename hpx::util::decay_unwrap<Parameters>::type>::
-            call(
-                std::forward<Parameters>(params), std::forward<Executor>(exec));
-    }
-
-    template <typename Executor>
-    struct processing_units_count_fn_helper<Executor,
-        typename std::enable_if<
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value ||
-            hpx::traits::is_never_blocking_one_way_executor<Executor>::value>::
-            type>
-    {
-        template <typename AnyExecutor, typename Parameters>
-        HPX_FORCEINLINE static auto call(hpx::traits::detail::wrap_int,
-            AnyExecutor&& exec, Parameters& params)
-            -> decltype(call_processing_units_parameter_count(
-                params, std::forward<AnyExecutor>(exec)))
-        {
-            return call_processing_units_parameter_count(
-                params, std::forward<AnyExecutor>(exec));
-        }
-
-        template <typename AnyExecutor, typename Parameters>
-        HPX_FORCEINLINE static auto call(int, AnyExecutor&& exec, Parameters&)
-            -> decltype(exec.processing_units_count())
-        {
-            return exec.processing_units_count();
-        }
-
-        template <typename AnyExecutor, typename Parameters>
-        struct result
-        {
-            using type = decltype(call(
-                0, std::declval<AnyExecutor>(), std::declval<Parameters&>()));
-        };
-    };
 
     ///////////////////////////////////////////////////////////////////////
     // customization point for interface has_pending_closures()

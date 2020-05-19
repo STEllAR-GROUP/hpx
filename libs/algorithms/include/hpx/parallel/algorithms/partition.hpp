@@ -171,7 +171,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                         std::size_t const cores =
                             execution::processing_units_count(
-                                policy.executor(), policy.parameters());
+                                policy.parameters(), policy.executor());
 
                         std::size_t chunk_size = execution::get_chunk_size(
                             policy.parameters(), policy.executor(),
@@ -857,7 +857,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return first;
 
                 std::size_t const cores = execution::processing_units_count(
-                    policy.executor(), policy.parameters());
+                    policy.parameters(), policy.executor());
 
                 // TODO: Find more better block size.
                 const std::size_t block_size = std::size_t(20000);
