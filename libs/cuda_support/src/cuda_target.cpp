@@ -6,8 +6,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
-
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/cuda_support/target.hpp>
@@ -253,5 +251,3 @@ namespace hpx { namespace cuda {
     }
 #endif
 }}    // namespace hpx::cuda
-
-#endif

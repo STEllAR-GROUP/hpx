@@ -9,7 +9,6 @@
 
 #pragma once
 
-// must be before HPX_HAVE_CUDA - it's defined in the config
 #include <hpx/config.hpp>
 
 #include <hpx/allocator_support/allocator_deleter.hpp>
