@@ -1,4 +1,4 @@
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2020 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,19 +16,13 @@
 
 #include <hpx/preprocessor/cat.hpp>
 
-#if defined(HPX_HAVE_INTERNAL_ALLOCATOR)
-// this is currently used only for jemalloc and if a special API prefix is
-// used for its APIs
-#include <jemalloc/jemalloc.h>
-#endif
-
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
-#if defined(HPX_HAVE_INTERNAL_ALLOCATOR)
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T = int>
-    struct internal_allocator
+    struct aligned_allocator
     {
         typedef T value_type;
         typedef T* pointer;
@@ -41,16 +35,16 @@ namespace hpx { namespace util {
         template <typename U>
         struct rebind
         {
-            typedef internal_allocator<U> other;
+            typedef aligned_allocator<U> other;
         };
 
         typedef std::true_type is_always_equal;
         typedef std::true_type propagate_on_container_move_assignment;
 
-        internal_allocator() = default;
+        aligned_allocator() = default;
 
         template <typename U>
-        explicit internal_allocator(internal_allocator<U> const&)
+        explicit aligned_allocator(aligned_allocator<U> const&)
         {
         }
 
@@ -67,12 +61,12 @@ namespace hpx { namespace util {
         pointer allocate(size_type n, void const* hint = nullptr)
         {
             return reinterpret_cast<pointer>(
-                HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, malloc)(n * sizeof(T)));
+                aligned_alloc(alignof(T), n * sizeof(T)));
         }
 
         void deallocate(pointer p, size_type n)
         {
-            HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
+            free(p);
         }
 
         size_type max_size() const noexcept
@@ -95,22 +89,17 @@ namespace hpx { namespace util {
 
     template <typename T>
     constexpr bool operator==(
-        internal_allocator<T> const&, internal_allocator<T> const&)
+        aligned_allocator<T> const&, aligned_allocator<T> const&)
     {
         return true;
     }
 
     template <typename T>
     constexpr bool operator!=(
-        internal_allocator<T> const&, internal_allocator<T> const&)
+        aligned_allocator<T> const&, aligned_allocator<T> const&)
     {
         return false;
     }
-#else
-    // fall back to system allocator if no special internal allocator is needed
-    template <typename T = int>
-    using internal_allocator = std::allocator<T>;
-#endif
 }}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

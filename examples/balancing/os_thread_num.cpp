@@ -19,7 +19,7 @@
 #include <map>
 
 template <typename T>
-using queue = boost::lockfree::queue<T, hpx::util::internal_allocator<std::size_t>>;
+using queue = boost::lockfree::queue<T, hpx::util::aligned_allocator<std::size_t>>;
 
 using hpx::program_options::variables_map;
 using hpx::program_options::options_description;

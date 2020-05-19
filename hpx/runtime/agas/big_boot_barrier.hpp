@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/naming_base/address.hpp>
@@ -54,9 +55,8 @@ namespace hpx { namespace agas {
         std::size_t connected;
 
         using thunk_type = util::unique_function_nonser<void()>*;
-
         boost::lockfree::queue<thunk_type,
-            hpx::util::internal_allocator<thunk_type>>
+            hpx::util::aligned_allocator<thunk_type>>
             thunks;
 
         std::vector<parcelset::endpoints_type> localities;

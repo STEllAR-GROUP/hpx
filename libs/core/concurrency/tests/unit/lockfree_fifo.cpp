@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -21,7 +21,7 @@
 #include <vector>
 
 using queue = boost::lockfree::queue<std::uint64_t,
-      hpx::util::internal_allocator<std::uint64_t>>; 
+      hpx::util::aligned_allocator<std::uint64_t>>; 
 
 std::vector<queue*> queues;
 std::vector<std::uint64_t> stolen;
