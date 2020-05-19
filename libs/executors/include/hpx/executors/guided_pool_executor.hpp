@@ -9,7 +9,6 @@
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/executors/dataflow.hpp>
-#include <hpx/executors/pool_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/traits/is_future_tuple.hpp>

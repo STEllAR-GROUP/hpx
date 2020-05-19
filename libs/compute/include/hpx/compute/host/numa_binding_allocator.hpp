@@ -11,8 +11,9 @@
 #include <hpx/assertion.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/guided_pool_executor.hpp>
-#include <hpx/executors/pool_executor.hpp>
 #include <hpx/local_async/async.hpp>
+#include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -441,7 +442,8 @@ namespace hpx { namespace compute { namespace host {
             // not steal across numa domains for those tasks, so they are sure
             // to remain on the right queue and be executed on the right domain.
             guided_pool_executor<allocator_hint_type> numa_executor(
-                binding_helper_->pool_name(), threads::thread_priority_bound);
+                &hpx::resource::get_thread_pool(binding_helper_->pool_name()),
+                threads::thread_priority_bound);
 
             nba_deb.debug("Launching First-Touch tasks");
             // for each numa domain, we must launch a task to 'touch' the memory

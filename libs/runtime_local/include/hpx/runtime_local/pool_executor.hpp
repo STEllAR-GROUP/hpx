@@ -9,10 +9,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/thread_pool_executor.hpp>
 
-// TODO: Move this file elsewhere or remove these dependencies
-#include <hpx/runtime_fwd.hpp>
+#if defined(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)
+#include <hpx/execution/executors/thread_pool_executor.hpp>
+#include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/threadmanager.hpp>
 
 #include <string>
@@ -60,3 +60,11 @@ namespace hpx { namespace parallel { namespace execution {
     };
     /// \endcond
 }}}    // namespace hpx::parallel::execution
+
+#if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+namespace hpx { namespace threads { namespace executors {
+    using pool_executor = parallel::execution::pool_executor;
+}}}    // namespace hpx::threads::executors
+
+#endif
+#endif

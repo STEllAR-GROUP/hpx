@@ -13,6 +13,7 @@
 
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/include/parallel_execution.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/local_async.hpp>
 #include <hpx/program_options.hpp>

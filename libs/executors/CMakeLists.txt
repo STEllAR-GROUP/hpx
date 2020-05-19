@@ -25,7 +25,6 @@ set(executors_headers
     hpx/executors/limiting_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
-    hpx/executors/pool_executor.hpp
     hpx/executors/restricted_thread_pool_executor.hpp
     hpx/executors/sequenced_executor.hpp
     hpx/executors/service_executors.hpp
@@ -45,7 +44,6 @@ set(executors_compat_headers
     hpx/execution/executors/limiting_executor.hpp
     hpx/execution/executors/parallel_executor_aggregated.hpp
     hpx/execution/executors/parallel_executor.hpp
-    hpx/execution/executors/pool_executor.hpp
     hpx/execution/executors/restricted_thread_pool_executor.hpp
     hpx/execution/executors/sequenced_executor.hpp
     hpx/execution/executors/service_executors.hpp
@@ -58,7 +56,6 @@ set(executors_compat_headers
     hpx/parallel/executors.hpp
     hpx/parallel/executors/parallel_executor_aggregated.hpp
     hpx/parallel/executors/parallel_executor.hpp
-    hpx/parallel/executors/pool_executor.hpp
     hpx/parallel/executors/sequenced_executor.hpp
     hpx/parallel/executors/service_executors.hpp
     hpx/parallel/executors/thread_pool_attached_executors.hpp

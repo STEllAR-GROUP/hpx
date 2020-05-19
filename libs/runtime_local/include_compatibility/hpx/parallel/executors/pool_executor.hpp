@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Ste||ar Group
+//  Copyright (c) 2020 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,16 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/executors/config/defines.hpp>
-#include <hpx/executors/pool_executor.hpp>
+#include <hpx/runtime_local/config/defines.hpp>
+#include <hpx/runtime_local/pool_executor.hpp>
 
-#if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if defined(HPX_RUNTIME_LOCAL_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/pool_executor.hpp is deprecated, \
-    please include hpx/executors/pool_executor.hpp instead")
+    please include hpx/runtime_local/pool_executor.hpp instead")
 #else
 #warning "The header hpx/parallel/executors/pool_executor.hpp is deprecated, \
-    please include hpx/executors/pool_executor.hpp instead"
+    please include hpx/runtime_local/pool_executor.hpp instead"
 #endif
 #endif

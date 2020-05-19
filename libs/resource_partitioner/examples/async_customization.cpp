@@ -7,8 +7,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threadmanager.hpp>
-#include <hpx/thread_executors/default_executor.hpp>
-#include <hpx/thread_executors/pool_executor.hpp>
 #define GUIDED_EXECUTOR_DEBUG 1
 #include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>

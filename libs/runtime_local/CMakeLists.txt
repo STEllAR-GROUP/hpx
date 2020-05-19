@@ -18,6 +18,7 @@ set(runtime_local_headers
     hpx/runtime_local/get_thread_name.hpp
     hpx/runtime_local/get_worker_thread_num.hpp
     hpx/runtime_local/interval_timer.hpp
+    hpx/runtime_local/pool_executor.hpp
     hpx/runtime_local/report_error.hpp
     hpx/runtime_local/run_as_hpx_thread.hpp
     hpx/runtime_local/run_as_os_thread.hpp
@@ -36,6 +37,8 @@ set(runtime_local_headers
 
 set(runtime_local_compat_headers
     hpx/custom_exception_info.hpp
+    hpx/parallel/executors/pool_executor.hpp
+    hpx/parallel/executors/service_executors.hpp
     hpx/runtime/config_entry.hpp
     hpx/runtime/get_locality_id.hpp
     hpx/runtime/get_num_localities.hpp
@@ -47,6 +50,8 @@ set(runtime_local_compat_headers
     hpx/runtime/startup_function.hpp
     hpx/runtime/thread_hooks.hpp
     hpx/runtime/thread_pool_helpers.hpp
+    hpx/runtime/threads/executors/pool_executor.hpp
+    hpx/runtime/threads/executors/service_executors.hpp
     hpx/runtime/threads/run_as_hpx_thread.hpp
     hpx/runtime/threads/run_as_os_thread.hpp
     hpx/runtime_handlers.hpp
