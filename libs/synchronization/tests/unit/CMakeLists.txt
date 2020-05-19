@@ -13,6 +13,7 @@ set(tests
     channel_spsc_shift
     condition_variable
     counting_semaphore
+    latch_cpp20
     local_latch
     local_barrier
     local_barrier_count_up
@@ -33,6 +34,7 @@ set(channel_spsc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 
+set(latch_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_event_PARAMETERS THREADS_PER_LOCALITY 4)

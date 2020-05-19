@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/synchronization/include
 set(synchronization_headers
+    hpx/latch.hpp
     hpx/synchronization/barrier.hpp
     hpx/synchronization/condition_variable.hpp
     hpx/synchronization/counting_semaphore.hpp
