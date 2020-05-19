@@ -977,15 +977,15 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-    HPX_EXPORT void serialize(serialization::output_archive& ar,
+    void serialize(serialization::output_archive& ar,
         section::entry_type const& data, unsigned int version)
     {
         ar << data.first;
         // do not handle callback function
     }
 
-    HPX_EXPORT void serialize(serialization::input_archive& ar,
-        section::entry_type& data, unsigned int version)
+    void serialize(serialization::input_archive& ar, section::entry_type& data,
+        unsigned int version)
     {
         ar >> data.first;
         // do not handle callback function

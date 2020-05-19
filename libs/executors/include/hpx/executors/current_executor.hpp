@@ -26,7 +26,7 @@ namespace hpx { namespace threads {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT parallel::execution::current_executor get_executor(
+    HPX_EXPORT parallel::execution::current_executor get_executor(
         thread_id_type const& id, error_code& ec = throws);
 }}    // namespace hpx::threads
 

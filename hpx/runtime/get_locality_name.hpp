@@ -28,7 +28,7 @@ namespace hpx
     ///           networking layer and may be different for different parcelports.
     ///
     /// \see      \a future<std::string> get_locality_name(naming::id_type const& id)
-    HPX_API_EXPORT std::string get_locality_name();
+    HPX_EXPORT std::string get_locality_name();
 
     /// \fn future<std::string> get_locality_name(naming::id_type const& id)
     ///
@@ -45,7 +45,7 @@ namespace hpx
     ///           and may be different for different parcel ports.
     ///
     /// \see      \a std::string get_locality_name()
-    HPX_API_EXPORT future<std::string> get_locality_name(
+    HPX_EXPORT future<std::string> get_locality_name(
         naming::id_type const& id);
 }
 

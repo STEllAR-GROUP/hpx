@@ -135,7 +135,7 @@ namespace hpx { namespace compute { namespace cuda {
             hpx::runtime* rt_;
         };
 
-        HPX_API_EXPORT hpx::future<void> get_future(cudaStream_t);
+        HPX_EXPORT hpx::future<void> get_future(cudaStream_t);
 
         template <typename Allocator>
         hpx::future<void> get_future(Allocator const& a, cudaStream_t stream)
@@ -341,7 +341,7 @@ namespace hpx { namespace compute { namespace cuda {
     };
 
     using detail::get_future;
-    HPX_API_EXPORT target& get_default_target();
+    HPX_EXPORT target& get_default_target();
 }}}    // namespace hpx::compute::cuda
 
 #include <hpx/config/warnings_suffix.hpp>

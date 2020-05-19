@@ -35,7 +35,7 @@ namespace hpx
     ///       exception.
     ///
     /// \see    \a hpx::register_shutdown_function()
-    HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type f);
+    HPX_EXPORT void register_pre_shutdown_function(shutdown_function_type f);
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed after any pre-shutdown function is
@@ -54,6 +54,6 @@ namespace hpx
     ///       exception.
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
-    HPX_API_EXPORT void register_shutdown_function(shutdown_function_type f);
+    HPX_EXPORT void register_shutdown_function(shutdown_function_type f);
 }
 

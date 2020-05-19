@@ -303,16 +303,16 @@ namespace hpx { namespace threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT util::thread_description get_thread_description(
+    HPX_EXPORT util::thread_description get_thread_description(
         thread_id_type const& id, error_code& ec = throws);
-    HPX_API_EXPORT util::thread_description set_thread_description(
+    HPX_EXPORT util::thread_description set_thread_description(
         thread_id_type const& id,
         util::thread_description const& desc = util::thread_description(),
         error_code& ec = throws);
 
-    HPX_API_EXPORT util::thread_description get_thread_lco_description(
+    HPX_EXPORT util::thread_description get_thread_lco_description(
         thread_id_type const& id, error_code& ec = throws);
-    HPX_API_EXPORT util::thread_description set_thread_lco_description(
+    HPX_EXPORT util::thread_description set_thread_lco_description(
         thread_id_type const& id,
         util::thread_description const& desc = util::thread_description(),
         error_code& ec = throws);

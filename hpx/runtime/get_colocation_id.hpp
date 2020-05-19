@@ -34,7 +34,7 @@ namespace hpx
     ///           hpx::exception.
     ///
     /// \see    \a hpx::get_colocation_id()
-    HPX_API_EXPORT naming::id_type get_colocation_id(launch::sync_policy,
+    HPX_EXPORT naming::id_type get_colocation_id(launch::sync_policy,
         naming::id_type const& id, error_code& ec = throws);
 
     /// \brief Asynchronously return the id of the locality where the object
@@ -43,7 +43,7 @@ namespace hpx
     /// \param id [in] The id of the object to locate.
     ///
     /// \see    \a hpx::get_colocation_id(launch::sync_policy)
-    HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
+    HPX_EXPORT lcos::future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
 }
 

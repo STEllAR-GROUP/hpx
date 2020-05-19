@@ -25,7 +25,7 @@
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_API_EXPORT manage_object_action_base
+    struct HPX_EXPORT manage_object_action_base
     {
         typedef void (*construct_function)(void*, std::size_t);
         typedef void (*clone_function)(void*, void const*, std::size_t);

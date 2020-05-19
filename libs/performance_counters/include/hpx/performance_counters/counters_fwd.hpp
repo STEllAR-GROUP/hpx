@@ -145,7 +145,7 @@ namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the readable name of a given counter type
-    HPX_API_EXPORT char const* get_counter_type_name(counter_type state);
+    HPX_EXPORT char const* get_counter_type_name(counter_type state);
 
     ///////////////////////////////////////////////////////////////////////////
     // Status and error codes used by the functions related to
@@ -177,49 +177,48 @@ namespace hpx { namespace performance_counters {
     /// \brief Create a full name of a counter type from the contents of the
     ///        given \a counter_type_path_elements instance.The generated
     ///        counter type name will not contain any parameters.
-    HPX_API_EXPORT counter_status get_counter_type_name(
+    HPX_EXPORT counter_status get_counter_type_name(
         counter_type_path_elements const& path, std::string& result,
         error_code& ec = throws);
 
     /// \brief Create a full name of a counter type from the contents of the
     ///        given \a counter_type_path_elements instance. The generated
     ///        counter type name will contain all parameters.
-    HPX_API_EXPORT counter_status get_full_counter_type_name(
+    HPX_EXPORT counter_status get_full_counter_type_name(
         counter_type_path_elements const& path, std::string& result,
         error_code& ec = throws);
 
     /// \brief Create a full name of a counter from the contents of the given
     ///        \a counter_path_elements instance.
-    HPX_API_EXPORT counter_status get_counter_name(
+    HPX_EXPORT counter_status get_counter_name(
         counter_path_elements const& path, std::string& result,
         error_code& ec = throws);
 
     /// \brief Create a name of a counter instance from the contents of the
     ///        given \a counter_path_elements instance.
-    HPX_API_EXPORT counter_status get_counter_instance_name(
+    HPX_EXPORT counter_status get_counter_instance_name(
         counter_path_elements const& path, std::string& result,
         error_code& ec = throws);
 
     /// \brief Fill the given \a counter_type_path_elements instance from the
     ///        given full name of a counter type
-    HPX_API_EXPORT counter_status get_counter_type_path_elements(
+    HPX_EXPORT counter_status get_counter_type_path_elements(
         std::string const& name, counter_type_path_elements& path,
         error_code& ec = throws);
 
     /// \brief Fill the given \a counter_path_elements instance from the given
     ///        full name of a counter
-    HPX_API_EXPORT counter_status get_counter_path_elements(
-        std::string const& name, counter_path_elements& path,
-        error_code& ec = throws);
+    HPX_EXPORT counter_status get_counter_path_elements(std::string const& name,
+        counter_path_elements& path, error_code& ec = throws);
 
     /// \brief Return the canonical counter instance name from a given full
     ///        instance name
-    HPX_API_EXPORT counter_status get_counter_name(std::string const& name,
+    HPX_EXPORT counter_status get_counter_name(std::string const& name,
         std::string& countername, error_code& ec = throws);
 
     /// \brief Return the canonical counter type name from a given (full)
     ///        instance name
-    HPX_API_EXPORT counter_status get_counter_type_name(std::string const& name,
+    HPX_EXPORT counter_status get_counter_type_name(std::string const& name,
         std::string& type_name, error_code& ec = throws);
 
 // default version of performance counter structures
@@ -259,11 +258,10 @@ namespace hpx { namespace performance_counters {
 
         ///////////////////////////////////////////////////////////////////////////
         /// \brief Complement the counter info if parent instance name is missing
-        HPX_API_EXPORT counter_status complement_counter_info(
-            counter_info& info, counter_info const& type_info,
-            error_code& ec = throws);
+        HPX_EXPORT counter_status complement_counter_info(counter_info& info,
+            counter_info const& type_info, error_code& ec = throws);
 
-        HPX_API_EXPORT counter_status complement_counter_info(
+        HPX_EXPORT counter_status complement_counter_info(
             counter_info& info, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////////
@@ -434,7 +432,7 @@ namespace hpx { namespace performance_counters {
 
         ///////////////////////////////////////////////////////////////////////
         // Add a new performance counter type to the (local) registry
-        HPX_API_EXPORT counter_status add_counter_type(counter_info const& info,
+        HPX_EXPORT counter_status add_counter_type(counter_info const& info,
             create_counter_func const& create_counter,
             discover_counters_func const& discover_counters,
             error_code& ec = throws);
@@ -444,25 +442,24 @@ namespace hpx { namespace performance_counters {
 
         ///////////////////////////////////////////////////////////////////////////
         /// \brief Call the supplied function for each registered counter type
-        HPX_API_EXPORT counter_status discover_counter_types(
+        HPX_EXPORT counter_status discover_counter_types(
             discover_counter_func const& discover_counter,
             discover_counters_mode mode = discover_counters_minimal,
             error_code& ec = throws);
 
         /// \brief Return a list of all available counter descriptions.
-        HPX_API_EXPORT counter_status discover_counter_types(
+        HPX_EXPORT counter_status discover_counter_types(
             std::vector<counter_info>& counters,
             discover_counters_mode mode = discover_counters_minimal,
             error_code& ec = throws);
 
         /// \brief Call the supplied function for the given registered counter type.
-        HPX_API_EXPORT counter_status discover_counter_type(
-            std::string const& name,
+        HPX_EXPORT counter_status discover_counter_type(std::string const& name,
             discover_counter_func const& discover_counter,
             discover_counters_mode mode = discover_counters_minimal,
             error_code& ec = throws);
 
-        HPX_API_EXPORT counter_status discover_counter_type(
+        HPX_EXPORT counter_status discover_counter_type(
             counter_info const& info,
             discover_counter_func const& discover_counter,
             discover_counters_mode mode = discover_counters_minimal,
@@ -470,12 +467,12 @@ namespace hpx { namespace performance_counters {
 
         /// \brief Return a list of matching counter descriptions for the given
         ///        registered counter type.
-        HPX_API_EXPORT counter_status discover_counter_type(
-            std::string const& name, std::vector<counter_info>& counters,
+        HPX_EXPORT counter_status discover_counter_type(std::string const& name,
+            std::vector<counter_info>& counters,
             discover_counters_mode mode = discover_counters_minimal,
             error_code& ec = throws);
 
-        HPX_API_EXPORT counter_status discover_counter_type(
+        HPX_EXPORT counter_status discover_counter_type(
             counter_info const& info, std::vector<counter_info>& counters,
             discover_counters_mode mode = discover_counters_minimal,
             error_code& ec = throws);
@@ -485,26 +482,26 @@ namespace hpx { namespace performance_counters {
         ///
         /// This function expands all locality#* and worker-thread#* wild
         /// cards only.
-        HPX_API_EXPORT bool expand_counter_info(
+        HPX_EXPORT bool expand_counter_info(
             counter_info const&, discover_counter_func const&, error_code&);
 
         /// \brief Remove an existing counter type from the (local) registry
         ///
         /// \note This doesn't remove existing counters of this type, it just
         ///       inhibits defining new counters using this type.
-        HPX_API_EXPORT counter_status remove_counter_type(
+        HPX_EXPORT counter_status remove_counter_type(
             counter_info const& info, error_code& ec = throws);
 
         /// \brief Retrieve the counter type for the given counter name from the
         ///        (local) registry
-        HPX_API_EXPORT counter_status get_counter_type(std::string const& name,
+        HPX_EXPORT counter_status get_counter_type(std::string const& name,
             counter_info& info, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////////
         /// \brief Get the global id of an existing performance counter, if the
         ///        counter does not exist yet, the function attempts to create the
         ///        counter based on the given counter name.
-        HPX_API_EXPORT lcos::future<naming::id_type> get_counter_async(
+        HPX_EXPORT lcos::future<naming::id_type> get_counter_async(
             std::string name, error_code& ec = throws);
 
         inline naming::id_type get_counter(
@@ -513,7 +510,7 @@ namespace hpx { namespace performance_counters {
         /// \brief Get the global id of an existing performance counter, if the
         ///        counter does not exist yet, the function attempts to create the
         ///        counter based on the given counter info.
-        HPX_API_EXPORT lcos::future<naming::id_type> get_counter_async(
+        HPX_EXPORT lcos::future<naming::id_type> get_counter_async(
             counter_info const& info, error_code& ec = throws);
 
         inline naming::id_type get_counter(
@@ -521,26 +518,25 @@ namespace hpx { namespace performance_counters {
 
         ///////////////////////////////////////////////////////////////////////////
         /// \brief Retrieve the meta data specific for the given counter instance
-        HPX_API_EXPORT void get_counter_infos(counter_info const& info,
+        HPX_EXPORT void get_counter_infos(counter_info const& info,
             counter_type& type, std::string& helptext, std::uint32_t& version,
             error_code& ec = throws);
 
         /// \brief Retrieve the meta data specific for the given counter instance
-        HPX_API_EXPORT void get_counter_infos(std::string name,
-            counter_type& type, std::string& helptext, std::uint32_t& version,
+        HPX_EXPORT void get_counter_infos(std::string name, counter_type& type,
+            std::string& helptext, std::uint32_t& version,
             error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////////
         namespace detail {
             /// \brief Add an existing performance counter instance to the registry
-            HPX_API_EXPORT counter_status add_counter(naming::id_type const& id,
+            HPX_EXPORT counter_status add_counter(naming::id_type const& id,
                 counter_info const& info, error_code& ec = throws);
 
             /// \brief Remove an existing performance counter instance with the
             ///        given id (as returned from \a create_counter)
-            HPX_API_EXPORT counter_status remove_counter(
-                counter_info const& info, naming::id_type const& id,
-                error_code& ec = throws);
+            HPX_EXPORT counter_status remove_counter(counter_info const& info,
+                naming::id_type const& id, error_code& ec = throws);
 
             ///////////////////////////////////////////////////////////////////////
             // Helper function for creating counters encapsulating a function

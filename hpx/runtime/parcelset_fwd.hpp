@@ -22,11 +22,11 @@ namespace hpx {
     /// \namespace parcelset
     namespace parcelset
     {
-        class HPX_API_EXPORT locality;
+        class HPX_EXPORT locality;
 
-        class HPX_API_EXPORT parcel;
-        class HPX_API_EXPORT parcelport;
-        class HPX_API_EXPORT parcelhandler;
+        class HPX_EXPORT parcel;
+        class HPX_EXPORT parcelport;
+        class HPX_EXPORT parcelhandler;
 
         namespace policies
         {
@@ -59,7 +59,7 @@ namespace hpx {
         ///
         /// \param ec[int, out] this represents the error code during exit.
 
-        HPX_API_EXPORT policies::message_handler* get_message_handler(
+        HPX_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type,
             std::size_t num, std::size_t interval, locality const& l,
             error_code& ec = throws);
@@ -84,7 +84,7 @@ namespace hpx {
             parcelport_background_mode_all = 0x07
         };
 
-        HPX_API_EXPORT bool do_background_work(std::size_t num_thread = 0,
+        HPX_EXPORT bool do_background_work(std::size_t num_thread = 0,
             parcelport_background_mode mode = parcelport_background_mode_all);
 
         typedef util::function_nonser<
@@ -93,11 +93,11 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         /// Hand a parcel to the underlying parcel layer for delivery.
-        HPX_API_EXPORT void put_parcel(parcel&& p, write_handler_type&& f);
+        HPX_EXPORT void put_parcel(parcel&& p, write_handler_type&& f);
 
         /// Hand a parcel to the underlying parcel layer for delivery.
         /// Wait for the operation to finish before returning to the user.
-        HPX_API_EXPORT void sync_put_parcel(parcelset::parcel&& p);
+        HPX_EXPORT void sync_put_parcel(parcelset::parcel&& p);
     }
 }
 

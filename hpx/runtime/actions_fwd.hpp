@@ -31,7 +31,7 @@ namespace hpx { namespace actions
 
     namespace detail
     {
-        HPX_API_EXPORT std::uint32_t get_action_id_from_name(
+        HPX_EXPORT std::uint32_t get_action_id_from_name(
             char const* action_name);
     }
 

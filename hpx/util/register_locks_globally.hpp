@@ -14,10 +14,10 @@ namespace hpx { namespace util
     // Debug and Release builds.
 
 #if defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY) || defined(HPX_EXPORTS)
-    HPX_API_EXPORT bool register_lock_globally(void const* lock);
-    HPX_API_EXPORT bool unregister_lock_globally(void const* lock);
-    HPX_API_EXPORT void enable_global_lock_detection();
-    HPX_API_EXPORT void disable_global_lock_detection();
+    HPX_EXPORT bool register_lock_globally(void const* lock);
+    HPX_EXPORT bool unregister_lock_globally(void const* lock);
+    HPX_EXPORT void enable_global_lock_detection();
+    HPX_EXPORT void disable_global_lock_detection();
 #else
     inline bool register_lock_globally(void const*)
     {

@@ -15,13 +15,13 @@ namespace hpx { namespace util {
     // the runtime system is about to start and after the runtime system has
     // been terminated. This is used to initialize/reinitialize all
     // singleton instances.
-    HPX_API_EXPORT void reinit_register(
+    HPX_EXPORT void reinit_register(
         util::function_nonser<void()> const& construct,
         util::function_nonser<void()> const& destruct);
 
     // Invoke all globally registered construction functions
-    HPX_API_EXPORT void reinit_construct();
+    HPX_EXPORT void reinit_construct();
 
     // Invoke all globally registered destruction functions
-    HPX_API_EXPORT void reinit_destruct();
+    HPX_EXPORT void reinit_destruct();
 }}    // namespace hpx::util

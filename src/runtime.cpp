@@ -92,7 +92,7 @@ namespace hpx {
         }
     }
 
-    HPX_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
+    BOOL WINAPI termination_handler(DWORD ctrl_type)
     {
         switch (ctrl_type)
         {
@@ -131,7 +131,7 @@ namespace hpx {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT HPX_NORETURN void termination_handler(int signum)
+    HPX_NORETURN void termination_handler(int signum)
     {
         if (signum != SIGINT &&
             get_config_entry("hpx.attach_debugger", "") == "exception")
@@ -174,7 +174,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT void HPX_CDECL new_handler()
+    void HPX_CDECL new_handler()
     {
         HPX_THROW_EXCEPTION(out_of_memory, "new_handler",
             "new allocator failed to allocate memory");
@@ -989,7 +989,7 @@ namespace hpx {
         return true;    // assume stopped
     }
 
-    bool HPX_EXPORT tolerate_node_faults()
+    bool tolerate_node_faults()
     {
 #ifdef HPX_HAVE_FAULT_TOLERANCE
         return true;
@@ -998,13 +998,13 @@ namespace hpx {
 #endif
     }
 
-    bool HPX_EXPORT is_starting()
+    bool is_starting()
     {
         runtime* rt = get_runtime_ptr();
         return nullptr != rt ? rt->get_state() <= state_startup : true;
     }
 
-    bool HPX_EXPORT is_pre_startup()
+    bool is_pre_startup()
     {
         runtime* rt = get_runtime_ptr();
         return nullptr != rt ? rt->get_state() < state_startup : true;
@@ -1046,22 +1046,22 @@ namespace hpx { namespace threads {
         return get_runtime().get_config().get_stack_size(stacksize);
     }
 
-    HPX_API_EXPORT void reset_thread_distribution()
+    void reset_thread_distribution()
     {
         get_runtime().get_thread_manager().reset_thread_distribution();
     }
 
-    HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode m)
+    void set_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().set_scheduler_mode(m);
     }
 
-    HPX_API_EXPORT void add_scheduler_mode(threads::policies::scheduler_mode m)
+    void add_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().add_scheduler_mode(m);
     }
 
-    HPX_API_EXPORT void add_remove_scheduler_mode(
+    void add_remove_scheduler_mode(
         threads::policies::scheduler_mode to_add_mode,
         threads::policies::scheduler_mode to_remove_mode)
     {
@@ -1069,13 +1069,13 @@ namespace hpx { namespace threads {
             to_add_mode, to_remove_mode);
     }
 
-    HPX_API_EXPORT void remove_scheduler_mode(
+    void remove_scheduler_mode(
         threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().remove_scheduler_mode(m);
     }
 
-    HPX_API_EXPORT topology const& get_topology()
+    topology const& get_topology()
     {
         hpx::runtime* rt = hpx::get_runtime_ptr();
         if (rt == nullptr)

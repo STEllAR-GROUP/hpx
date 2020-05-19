@@ -15,7 +15,7 @@
 
 namespace hpx
 {
-    HPX_API_EXPORT parcel_write_handler_type set_parcel_write_handler(
+    parcel_write_handler_type set_parcel_write_handler(
         parcel_write_handler_type const& f)
     {
         runtime_distributed* rt = get_runtime_distributed_ptr();

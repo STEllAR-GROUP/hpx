@@ -42,7 +42,7 @@ namespace hpx
     ///       terminate the application in case of any errors detected during
     ///       preparing or sending the parcel.
     ///
-    HPX_API_EXPORT parcel_write_handler_type set_parcel_write_handler(
+    HPX_EXPORT parcel_write_handler_type set_parcel_write_handler(
         parcel_write_handler_type const& f);
 }
 

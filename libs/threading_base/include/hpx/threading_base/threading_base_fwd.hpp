@@ -62,9 +62,9 @@ namespace hpx { namespace threads {
         util::unique_function_nonser<thread_function_sig>;
 
 #if defined(HPX_HAVE_APEX)
-    HPX_API_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>
+    HPX_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>
     get_self_timer_data(void);
-    HPX_API_EXPORT void set_self_timer_data(
+    HPX_EXPORT void set_self_timer_data(
         std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
 #endif
     /// \endcond

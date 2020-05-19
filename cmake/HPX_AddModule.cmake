@@ -251,7 +251,7 @@ function(add_hpx_module name)
 
   target_compile_definitions(
     hpx_${name} PRIVATE $<$<CONFIG:Debug>:DEBUG> $<$<CONFIG:Debug>:_DEBUG>
-                        HPX_MODULE_EXPORTS
+                        HPX_EXPORTS
   )
 
   # This is a temporary solution until all of HPX has been modularized as it

@@ -176,7 +176,7 @@ namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the readable name of a given counter type
-    HPX_API_EXPORT char const* get_counter_type_name(counter_type state);
+    HPX_EXPORT char const* get_counter_type_name(counter_type state);
 
 #if defined(DOXYGEN)
     ///////////////////////////////////////////////////////////////////////////

@@ -46,7 +46,7 @@ namespace hpx
     ///           otherwise.
     ///
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
-    HPX_API_EXPORT naming::id_type find_root_locality(error_code& ec = throws);
+    HPX_EXPORT naming::id_type find_root_locality(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the list of global ids representing all localities
@@ -75,7 +75,7 @@ namespace hpx
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
+    HPX_EXPORT std::vector<naming::id_type> find_all_localities(
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ namespace hpx
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
+    HPX_EXPORT std::vector<naming::id_type> find_all_localities(
         components::component_type type, error_code& ec = throws);
 
     /// \brief Return the list of locality ids of remote localities supporting
@@ -143,7 +143,7 @@ namespace hpx
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
+    HPX_EXPORT std::vector<naming::id_type> find_remote_localities(
         error_code& ec = throws);
 
     /// \brief Return the list of locality ids of remote localities supporting
@@ -177,7 +177,7 @@ namespace hpx
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
+    HPX_EXPORT std::vector<naming::id_type> find_remote_localities(
         components::component_type type, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@ namespace hpx
     ///           otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
-    HPX_API_EXPORT naming::id_type find_locality(components::component_type type,
+    HPX_EXPORT naming::id_type find_locality(components::component_type type,
         error_code& ec = throws);
 }
 

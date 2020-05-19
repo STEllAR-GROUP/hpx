@@ -22,7 +22,7 @@ namespace hpx
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_API_EXPORT threads::policies::callback_notifier::on_startstop_type
+    HPX_EXPORT threads::policies::callback_notifier::on_startstop_type
         get_thread_on_start_func();
 
     /// Retrieve the currently installed stop handler function. This is a
@@ -36,7 +36,7 @@ namespace hpx
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_API_EXPORT threads::policies::callback_notifier::on_startstop_type
+    HPX_EXPORT threads::policies::callback_notifier::on_startstop_type
         get_thread_on_stop_func();
 
     /// Retrieve the currently installed error handler function. This is a
@@ -50,7 +50,7 @@ namespace hpx
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_API_EXPORT threads::policies::callback_notifier::on_error_type
+    HPX_EXPORT threads::policies::callback_notifier::on_error_type
         get_thread_on_error_func();
 
     /// Set the currently installed start handler function. This is a
@@ -68,7 +68,7 @@ namespace hpx
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_API_EXPORT threads::policies::callback_notifier::on_startstop_type
+    HPX_EXPORT threads::policies::callback_notifier::on_startstop_type
     register_thread_on_start_func(
         threads::policies::callback_notifier::on_startstop_type&& f);
 
@@ -87,7 +87,7 @@ namespace hpx
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_API_EXPORT threads::policies::callback_notifier::on_startstop_type
+    HPX_EXPORT threads::policies::callback_notifier::on_startstop_type
     register_thread_on_stop_func(
         threads::policies::callback_notifier::on_startstop_type&& f);
 
@@ -106,7 +106,7 @@ namespace hpx
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_API_EXPORT threads::policies::callback_notifier::on_error_type
+    HPX_EXPORT threads::policies::callback_notifier::on_error_type
     register_thread_on_error_func(
         threads::policies::callback_notifier::on_error_type&& f);
 }

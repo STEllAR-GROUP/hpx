@@ -21,6 +21,6 @@ namespace hpx
     /// This function returns the name of the calling thread. This name uniquely
     /// identifies the thread in the context of HPX. If the function is called
     /// while no HPX runtime system is active, the result will be "<unknown>".
-    HPX_API_EXPORT std::string get_thread_name();
+    HPX_EXPORT std::string get_thread_name();
 }
 

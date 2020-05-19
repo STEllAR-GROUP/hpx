@@ -25,7 +25,7 @@ namespace hpx
     /// \cond NOINTERNAL
     namespace detail
     {
-        HPX_API_EXPORT std::string name_from_basename(
+        HPX_EXPORT std::string name_from_basename(
             std::string const& basename, std::size_t idx);
     }
     /// \endcond
@@ -49,7 +49,7 @@ namespace hpx
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type>>
+    HPX_EXPORT std::vector<hpx::future<hpx::id_type>>
     find_all_from_basename(std::string base_name, std::size_t num_ids);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ namespace hpx
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_API_EXPORT std::vector<hpx::future<hpx::id_type>> find_from_basename(
+    HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_from_basename(
         std::string base_name, std::vector<std::size_t> const& ids);
 
     /// Return registered clients from the given base name and sequence numbers.
@@ -142,7 +142,7 @@ namespace hpx
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_API_EXPORT hpx::future<hpx::id_type> find_from_basename(
+    HPX_EXPORT hpx::future<hpx::id_type> find_from_basename(
         std::string base_name,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
@@ -192,7 +192,7 @@ namespace hpx
     /// \note    The operation will fail if the given sequence number is not
     ///          unique.
     ///
-    HPX_API_EXPORT hpx::future<bool> register_with_basename(
+    HPX_EXPORT hpx::future<bool> register_with_basename(
         std::string base_name, hpx::id_type id,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
@@ -218,7 +218,7 @@ namespace hpx
     /// \note    The operation will fail if the given sequence number is not
     ///          unique.
     ///
-    HPX_API_EXPORT hpx::future<bool> register_with_basename(
+    HPX_EXPORT hpx::future<bool> register_with_basename(
         std::string base_name, hpx::future<hpx::id_type> f,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
@@ -265,7 +265,7 @@ namespace hpx
     /// \returns A future representing the result of the un-registration
     ///          operation itself.
     ///
-    HPX_API_EXPORT hpx::future<hpx::id_type> unregister_with_basename(
+    HPX_EXPORT hpx::future<hpx::id_type> unregister_with_basename(
         std::string base_name,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 

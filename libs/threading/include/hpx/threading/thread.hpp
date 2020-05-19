@@ -232,31 +232,30 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread {
-        HPX_API_EXPORT thread::id get_id() noexcept;
+        HPX_EXPORT thread::id get_id() noexcept;
 
-        HPX_API_EXPORT void yield() noexcept;
-        HPX_API_EXPORT void yield_to(thread::id) noexcept;
+        HPX_EXPORT void yield() noexcept;
+        HPX_EXPORT void yield_to(thread::id) noexcept;
 
         // extensions
-        HPX_API_EXPORT threads::thread_priority get_priority();
-        HPX_API_EXPORT std::ptrdiff_t get_stack_size();
+        HPX_EXPORT threads::thread_priority get_priority();
+        HPX_EXPORT std::ptrdiff_t get_stack_size();
 
-        HPX_API_EXPORT void interruption_point();
-        HPX_API_EXPORT bool interruption_enabled();
-        HPX_API_EXPORT bool interruption_requested();
+        HPX_EXPORT void interruption_point();
+        HPX_EXPORT bool interruption_enabled();
+        HPX_EXPORT bool interruption_requested();
 
-        HPX_API_EXPORT void interrupt();
+        HPX_EXPORT void interrupt();
 
-        HPX_API_EXPORT void sleep_until(
-            util::steady_time_point const& abs_time);
+        HPX_EXPORT void sleep_until(util::steady_time_point const& abs_time);
 
         inline void sleep_for(util::steady_duration const& rel_time)
         {
             sleep_until(rel_time.from_now());
         }
 
-        HPX_API_EXPORT std::size_t get_thread_data();
-        HPX_API_EXPORT std::size_t set_thread_data(std::size_t);
+        HPX_EXPORT std::size_t get_thread_data();
+        HPX_EXPORT std::size_t set_thread_data(std::size_t);
 
         class HPX_EXPORT disable_interruption
         {

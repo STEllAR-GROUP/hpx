@@ -468,7 +468,7 @@ namespace hpx { namespace naming
             return replenish_credits_locked(l, gid);
         }
 
-        HPX_EXPORT std::int64_t replenish_credits_locked(
+        std::int64_t replenish_credits_locked(
             std::unique_lock<gid_type::mutex_type>& l, gid_type& gid)
         {
             std::int64_t added_credit = 0;

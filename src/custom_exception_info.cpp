@@ -253,7 +253,7 @@ namespace hpx { namespace detail
         std::abort();
     }
 
-    HPX_EXPORT hpx::exception_info construct_exception_info(
+    hpx::exception_info construct_exception_info(
         std::string const& func, std::string const& file, long line,
         std::string const& back_trace, std::uint32_t node,
         std::string const& hostname, std::int64_t pid, std::size_t shepherd,
@@ -276,7 +276,7 @@ namespace hpx { namespace detail
     }
 
     template <typename Exception>
-    HPX_EXPORT std::exception_ptr construct_exception(
+    std::exception_ptr construct_exception(
         Exception const& e, hpx::exception_info info)
     {
         // create a std::exception_ptr object encapsulating the Exception to
