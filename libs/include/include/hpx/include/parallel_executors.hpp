@@ -9,5 +9,6 @@
 #include <hpx/execution.hpp>
 #include <hpx/executors.hpp>
 #include <hpx/runtime_local/pool_executor.hpp>
+#include <hpx/runtime_local/service_executors.hpp>
 #include <hpx/thread_executors.hpp>
 #include <hpx/timed_execution.hpp>

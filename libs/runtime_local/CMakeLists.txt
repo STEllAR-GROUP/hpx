@@ -25,6 +25,7 @@ set(runtime_local_headers
     hpx/runtime_local/runtime_handlers.hpp
     hpx/runtime_local/runtime_local.hpp
     hpx/runtime_local/runtime_local_fwd.hpp
+    hpx/runtime_local/service_executors.hpp
     hpx/runtime_local/state.hpp
     hpx/runtime_local/shutdown_function.hpp
     hpx/runtime_local/startup_function.hpp
