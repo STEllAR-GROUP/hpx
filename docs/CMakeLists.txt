@@ -57,7 +57,6 @@ set(doxygen_definition_list
     "BOOST_SYSTEM_NOEXCEPT="
     "HPX_EXCEPTION_EXPORT="
     "HPX_EXPORT="
-    "HPX_API_EXPORT="
     "HPX_ALWAYS_EXPORT="
     "extern="
     "HPX_FORCEINLINE="
