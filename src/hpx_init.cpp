@@ -19,7 +19,6 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/hpx_user_main_config.hpp>
-#include <hpx/mpi_base.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -397,19 +396,6 @@ namespace hpx
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             util::detail::init_logging(
                 cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
-#endif
-
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_LIB_MPI)
-            // getting localities from MPI environment (support mpirun)
-            if (util::mpi_environment::check_mpi_environment(cms.rtcfg_))
-            {
-                util::mpi_environment::init(&argc, &argv, cms.rtcfg_);
-                cms.num_localities_ =
-                    static_cast<std::size_t>(util::mpi_environment::size());
-                cms.node_ =
-                    static_cast<std::size_t>(util::mpi_environment::rank());
-            }
 #endif
 
 #if defined(HPX_HAVE_NETWORKING)

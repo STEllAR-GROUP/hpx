@@ -251,8 +251,9 @@ namespace hpx { namespace threads { namespace policies {
             switch (stacksize)
             {
             case thread_stacksize_small:
+                HPX_FALLTHROUGH;
+            case thread_stacksize_current:
                 return thread_queue_init_.small_stacksize_;
-                break;
 
             case thread_stacksize_medium:
                 return thread_queue_init_.medium_stacksize_;
