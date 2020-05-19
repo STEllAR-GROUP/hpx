@@ -17,7 +17,7 @@
 #include <boost/lockfree/queue.hpp>
 #endif
 
-#include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/aligned_allocator.hpp>
 
 // Does not rely on CXX11_STD_ATOMIC_128BIT
 #include <hpx/concurrency/concurrentqueue.hpp>
@@ -36,9 +36,9 @@ namespace hpx { namespace threads { namespace policies {
     struct lockfree_fifo_backend
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-        using container_type = boost::lockfree::deque<T, hpx::util::internal_allocator<T>>;
+        using container_type = boost::lockfree::deque<T, hpx::util::aligned_allocator<T>>;
 #else
-        using container_type = boost::lockfree::queue<T, hpx::util::internal_allocator<T>>;
+        using container_type = boost::lockfree::queue<T, hpx::util::aligned_allocator<T>>;
 #endif
 
         using value_type = T;
@@ -147,7 +147,7 @@ namespace hpx { namespace threads { namespace policies {
             template <typename T>
             struct lockfree_lifo_backend
             {
-                using container_type = boost::lockfree::deque<T, hpx::util::internal_allocator<T>>;
+                using container_type = boost::lockfree::deque<T, hpx::util::aligned_allocator<T>>;
 
                 using value_type = T;
                 using reference = T&;
@@ -199,7 +199,7 @@ namespace hpx { namespace threads { namespace policies {
             template <typename T>
             struct lockfree_abp_fifo_backend
             {
-                using container_type = boost::lockfree::deque<T, hpx::util::internal_allocator<T>>;
+                using container_type = boost::lockfree::deque<T, hpx::util::aligned_allocator<T>>;
 
                 using value_type = T;
                 using reference = T&;
@@ -249,7 +249,7 @@ namespace hpx { namespace threads { namespace policies {
             template <typename T>
             struct lockfree_abp_lifo_backend
             {
-                using container_type = boost::lockfree::deque<T, hpx::util::internal_allocator<T>>;
+                using container_type = boost::lockfree::deque<T, hpx::util::aligned_allocator<T>>;
 
                 using value_type = T;
                 using reference = T&;

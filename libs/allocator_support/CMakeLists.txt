@@ -6,7 +6,8 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-set(allocator_support_headers hpx/allocator_support/allocator_deleter.hpp
+set(allocator_support_headers hpx/allocator_support/aligned_allocator.hpp
+                              hpx/allocator_support/allocator_deleter.hpp
                               hpx/allocator_support/internal_allocator.hpp
 )
 
