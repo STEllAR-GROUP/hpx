@@ -1,10 +1,20 @@
 #!/bin/bash
 
+# Copyright (c) 2019 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# ----------------------------------------------------------------
 # simple pre commit hook script to check that *.cpp and *.hpp files 
 # are correctly clang-formatted and that CMakeLists.txt and *.cmake
 # files are cmake-formatted
 
-# to install this hook, copy this file to your git hooks as follows
+# To use this hook, you must have clang-format and cmake-format
+# installed on your system
+
+# To install this hook, copy this file to your git hooks as follows
 # cp tools/pre-commit .git/hooks/pre-commit
 # chmod +x .git/hooks/pre-commit
 
@@ -33,7 +43,7 @@ returncode=0
 if [ -n "${cxxfiles}" ]; then
     printf "# ${blue}clang-format ${red}error pre-commit${normal} : To fix run the following (use git commit ${yellow}--no-verify${normal} to bypass)\n"
     for f in "${cxxfiles[@]}" ; do
-        printf "clang-format -style=file -i %s\n" "$f"
+        printf "clang-format -i %s\n" "$f"
     done
     returncode=1
 fi
