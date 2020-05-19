@@ -36,9 +36,8 @@ set(function_tests
     protect_test
     stateless_test
     sum_avg
+    tag_invoke
 )
-
-add_hpx_pseudo_target(tests.unit.modules.functional.function)
 
 foreach(test ${function_tests})
   set(sources ${test}.cpp)
@@ -54,9 +53,6 @@ foreach(test ${function_tests})
     FOLDER "Tests/Unit/Modules/Functional"
   )
 
-  add_hpx_unit_test("modules.functional.function" ${test})
+  add_hpx_unit_test("modules.functional" ${test})
 
 endforeach()
-add_hpx_pseudo_dependencies(
-  tests.unit.modules.functional tests.unit.modules.functional.function
-)

@@ -31,6 +31,7 @@ set(functional_headers
     hpx/functional/one_shot.hpp
     hpx/functional/protect.hpp
     hpx/functional/result_of.hpp
+    hpx/functional/tag_invoke.hpp
     hpx/functional/unique_function.hpp
     hpx/functional/serialization/detail/serializable_basic_function.hpp
     hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp
