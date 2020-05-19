@@ -21,4 +21,3 @@ namespace hpx { namespace cuda {
     HPX_EXPORT hpx::future<std::vector<target>> get_targets(
         hpx::id_type const& locality);
 }}    // namespace hpx::cuda
-

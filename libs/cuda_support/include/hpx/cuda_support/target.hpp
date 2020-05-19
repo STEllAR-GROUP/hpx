@@ -344,4 +344,3 @@ namespace hpx { namespace cuda {
 }}    // namespace hpx::cuda
 
 #include <hpx/config/warnings_suffix.hpp>
-
