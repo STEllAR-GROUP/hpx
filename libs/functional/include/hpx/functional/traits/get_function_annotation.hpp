@@ -19,7 +19,7 @@ namespace hpx { namespace traits {
     {
         static char const* call(F const& /*f*/) noexcept
         {
-            return "<anonymous>";
+            return nullptr;
         }
     };
 
