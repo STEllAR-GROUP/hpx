@@ -60,6 +60,7 @@ namespace hpx { namespace basic_execution {
     void set_error(R&& r, E&& e);
 #endif
 
+    namespace traits {
     /// Receiving values from asynchronous computations is handled by the `receiver`
     /// concept. A `receiver` needs to be able to receive an error or be marked as
     /// being cancelled. As such, the Receiver concept is defined by having the
@@ -82,7 +83,7 @@ namespace hpx { namespace basic_execution {
     /// without throwing an exception, the receiver contract has been satisfied.
     /// In other words: The asynchronous operation has been completed.
     ///
-    /// \see hpx::basic_execution::is_receiver_of
+    /// \see hpx::basic_execution::traits::is_receiver_of
     template <typename T, typename E = std::exception_ptr>
     struct is_receiver;
 
@@ -96,9 +97,10 @@ namespace hpx { namespace basic_execution {
     ///       is still valid to call `hpx::basic_execution::set_error` or
     ///       `hpx::basic_execution::set_done`
     ///
-    /// \see hpx::basic_execution::is_receiver
+    /// \see hpx::basic_execution::traits::is_receiver
     template <typename T, typename... As>
     struct is_receiver_of;
+    }
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_value_t
     {
@@ -107,7 +109,7 @@ namespace hpx { namespace basic_execution {
         *this, std::forward<Receiver>(rcv), std::forward<Values>(values)...)
         template <typename Receiver, typename... Values>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, true> /* is tag invocable */,
+            std::true_type /* is tag invocable */,
             Receiver&& rcv, Values&&... values) const
             noexcept(
                 noexcept(HPX_BASIC_EXECUTION_RECEIVER_SET_VALUE_EXPRESSION))
@@ -121,7 +123,7 @@ namespace hpx { namespace basic_execution {
     std::forward<Receiver>(rcv).set_value(std::forward<Values>(values)...)
         template <typename Receiver, typename... Values>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, false> /* is not tag invocable */,
+            std::false_type /* is not tag invocable */,
             Receiver&& rcv, Values&&... values) const
             noexcept(
                 noexcept(HPX_BASIC_EXECUTION_RECEIVER_SET_VALUE_EXPRESSION))
@@ -155,7 +157,7 @@ namespace hpx { namespace basic_execution {
         *this, std::forward<Receiver>(rcv), std::forward<Error>(error))
         template <typename Receiver, typename Error>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, true> /* is tag invocable */,
+            std::true_type /* is tag invocable */,
             Receiver&& rcv, Error&& error) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_ERROR_EXPRESSION)
         {
@@ -171,7 +173,7 @@ namespace hpx { namespace basic_execution {
     std::forward<Receiver>(rcv).set_error(std::forward<Error>(error))
         template <typename Receiver, typename Error>
         constexpr HPX_FORCEINLINE auto tag_invoke_member_impl(
-            std::integral_constant<bool, true> /* is noexcept */,
+            std::true_type /* is noexcept */,
             Receiver&& rcv, Error&& error) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_ERROR_EXPRESSION)
         {
@@ -184,7 +186,7 @@ namespace hpx { namespace basic_execution {
         std::forward<Receiver>(rcv), std::forward<Error>(error))
         template <typename Receiver, typename Error>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, false> /* is not tag invocable */,
+            std::false_type /* is not tag invocable */,
             Receiver&& rcv, Error&& error) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_ERROR_IMPL_EXPRESSION)
         {
@@ -220,7 +222,7 @@ namespace hpx { namespace basic_execution {
     hpx::functional::tag_invoke(*this, std::forward<Receiver>(rcv))
         template <typename Receiver>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, true> /* is tag invocable */,
+            std::true_type /* is tag invocable */,
             Receiver&& rcv) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_DONE_EXPRESSION)
         {
@@ -236,7 +238,7 @@ namespace hpx { namespace basic_execution {
     std::forward<Receiver>(rcv).set_done()
         template <typename Receiver>
         constexpr HPX_FORCEINLINE auto tag_invoke_member_impl(
-            std::integral_constant<bool, true> /* is not tag invocable */,
+            std::true_type /* is not tag invocable */,
             Receiver&& rcv) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_DONE_EXPRESSION)
         {
@@ -250,7 +252,7 @@ namespace hpx { namespace basic_execution {
         std::forward<Receiver>(rcv))
         template <typename Receiver>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, false> /* is not tag invocable */,
+            std::false_type /* is not tag invocable */,
             Receiver&& rcv) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_DONE_IMPL_EXPRESSION)
         {
@@ -276,6 +278,7 @@ namespace hpx { namespace basic_execution {
 #undef HPX_BASIC_EXECUTION_RECEIVER_SET_DONE_EXPRESSION
     } set_done;
 
+    namespace traits {
     namespace detail {
         template <bool ConstructionRequirements, typename T, typename E>
         struct is_receiver_impl;
@@ -362,4 +365,5 @@ namespace hpx { namespace basic_execution {
     template <typename T, typename... As>
     constexpr bool is_nothrow_receiver_of_v =
         is_nothrow_receiver_of<T, As...>::value;
+}
 }}    // namespace hpx::basic_execution
