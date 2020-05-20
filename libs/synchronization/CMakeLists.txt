@@ -13,7 +13,9 @@ set(synchronization_headers
     hpx/barrier.hpp
     hpx/condition_variable.hpp
     hpx/latch.hpp
+    hpx/mutex.hpp
     hpx/semaphore.hpp
+    hpx/shared_mutex.hpp
     hpx/stop_token.hpp
     hpx/synchronization/barrier.hpp
     hpx/synchronization/condition_variable.hpp
