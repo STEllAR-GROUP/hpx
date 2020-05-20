@@ -180,85 +180,85 @@ namespace mylib {
 
 int main()
 {
-    static_assert(hpx::basic_execution::is_receiver<mylib::receiver_1>::value,
+    static_assert(hpx::basic_execution::traits::is_receiver<mylib::receiver_1>::value,
         "mylib::receiver_1 should be a receiver");
     static_assert(
-        hpx::basic_execution::is_receiver_of<mylib::receiver_1, int>::value,
+        hpx::basic_execution::traits::is_receiver_of<mylib::receiver_1, int>::value,
         "mylib::receiver_1 should be a receiver of an int");
     static_assert(
-        !hpx::basic_execution::is_nothrow_receiver_of<mylib::receiver_1,
+        !hpx::basic_execution::traits::is_nothrow_receiver_of<mylib::receiver_1,
             int>::value,
         "mylib::receiver_1 should not be a nothrow receiver of an int");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::receiver_1,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::receiver_1,
                       std::string>::value,
         "mylib::receiver_1 should not be a receiver of a std::string");
 
-    static_assert(!hpx::basic_execution::is_receiver<mylib::receiver_2>::value,
+    static_assert(!hpx::basic_execution::traits::is_receiver<mylib::receiver_2>::value,
         "mylib::receiver_2 should not be a receiver of std::exception_ptr");
     static_assert(
-        hpx::basic_execution::is_receiver<mylib::receiver_2, int>::value,
+        hpx::basic_execution::traits::is_receiver<mylib::receiver_2, int>::value,
         "mylib::receiver_2 should be a receiver");
     static_assert(
-        !hpx::basic_execution::is_receiver_of<mylib::receiver_2, int>::value,
+        !hpx::basic_execution::traits::is_receiver_of<mylib::receiver_2, int>::value,
         "mylib::receiver_2 should not be a receiver of int");
     static_assert(
-        !hpx::basic_execution::is_nothrow_receiver_of<mylib::receiver_2,
+        !hpx::basic_execution::traits::is_nothrow_receiver_of<mylib::receiver_2,
             int>::value,
         "mylib::receiver_2 should not be a nothrow receiver of int");
 
-    static_assert(hpx::basic_execution::is_receiver<mylib::receiver_1>::value,
+    static_assert(hpx::basic_execution::traits::is_receiver<mylib::receiver_1>::value,
         "mylib::receiver_1 should be a receiver");
     static_assert(
-        hpx::basic_execution::is_receiver_of<mylib::receiver_3, int>::value,
+        hpx::basic_execution::traits::is_receiver_of<mylib::receiver_3, int>::value,
         "mylib::receiver_3 should be a receiver of an int");
     static_assert(
-        hpx::basic_execution::is_nothrow_receiver_of<mylib::receiver_3,
+        hpx::basic_execution::traits::is_nothrow_receiver_of<mylib::receiver_3,
             int>::value,
         "mylib::receiver_3 should be a nothrow receiver of an int");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::receiver_3,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::receiver_3,
                       std::string>::value,
         "mylib::receiver_3 should not be a receiver of a std::string");
 
     static_assert(
-        !hpx::basic_execution::is_receiver<mylib::non_receiver_1>::value,
+        !hpx::basic_execution::traits::is_receiver<mylib::non_receiver_1>::value,
         "mylib::non_receiver_1 should not be a receiver");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::non_receiver_1,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::non_receiver_1,
                       int>::value,
         "mylib::non_receiver_1 should not be a receiver of int");
     static_assert(
-        !hpx::basic_execution::is_receiver<mylib::non_receiver_2>::value,
+        !hpx::basic_execution::traits::is_receiver<mylib::non_receiver_2>::value,
         "mylib::non_receiver_2 should not be a receiver");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::non_receiver_2,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::non_receiver_2,
                       int>::value,
         "mylib::non_receiver_2 should not be a receiver of int");
     static_assert(
-        !hpx::basic_execution::is_receiver<mylib::non_receiver_3>::value,
+        !hpx::basic_execution::traits::is_receiver<mylib::non_receiver_3>::value,
         "mylib::non_receiver_3 should not be a receiver");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::non_receiver_3,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::non_receiver_3,
                       int>::value,
         "mylib::non_receiver_3 should not be a receiver of int");
     static_assert(
-        hpx::basic_execution::is_receiver<mylib::non_receiver_4>::value,
+        hpx::basic_execution::traits::is_receiver<mylib::non_receiver_4>::value,
         "mylib::non_receiver_4 should be a receiver");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::non_receiver_4,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::non_receiver_4,
                       int>::value,
         "mylib::non_receiver_4 should not be a receiver of int");
     static_assert(
-        !hpx::basic_execution::is_receiver<mylib::non_receiver_5>::value,
+        !hpx::basic_execution::traits::is_receiver<mylib::non_receiver_5>::value,
         "mylib::non_receiver_5 should not be a receiver");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::non_receiver_5,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::non_receiver_5,
                       int>::value,
         "mylib::non_receiver_5 should not be a receiver of int");
     static_assert(
-        !hpx::basic_execution::is_receiver<mylib::non_receiver_6>::value,
+        !hpx::basic_execution::traits::is_receiver<mylib::non_receiver_6>::value,
         "mylib::non_receiver_6 should not be a receiver");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::non_receiver_6,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::non_receiver_6,
                       int>::value,
         "mylib::non_receiver_6 should not be a receiver of int");
     static_assert(
-        !hpx::basic_execution::is_receiver<mylib::non_receiver_7>::value,
+        !hpx::basic_execution::traits::is_receiver<mylib::non_receiver_7>::value,
         "mylib::non_receiver_7 should not be a receiver");
-    static_assert(!hpx::basic_execution::is_receiver_of<mylib::non_receiver_7,
+    static_assert(!hpx::basic_execution::traits::is_receiver_of<mylib::non_receiver_7,
                       int>::value,
         "mylib::non_receiver_7 should not be a receiver of int");
 
