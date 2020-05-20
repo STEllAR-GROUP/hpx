@@ -12,6 +12,7 @@ set(algorithms_headers
     hpx/algorithms/traits/projected.hpp
     hpx/algorithms/traits/projected_range.hpp
     hpx/algorithms/traits/segmented_iterator_traits.hpp
+    hpx/numeric.hpp
     hpx/parallel/algorithm.hpp
     hpx/parallel/algorithms/adjacent_difference.hpp
     hpx/parallel/algorithms/adjacent_find.hpp
