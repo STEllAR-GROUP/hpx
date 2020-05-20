@@ -1265,19 +1265,13 @@ namespace example {
             return count;
         }
 
-        // Queries the current number of idle threads (cores)
-        std::int64_t get_idle_core_count() const override
+	//Queries whether a given core is idle
+        bool is_core_idle(std::size_t num_thread) const override
         {
-            // Return thread count of one specific queue.
-            std::int64_t count = 0;
-
-            // Return the cumulative count for all queues.
-            for (std::size_t d = 0; d < num_domains_; ++d)
-            {
-                count += hp_queues_[d].get_thread_count(unknown) == 0;
-            }
-
-            return count;
+            std::size_t domain_num = d_lookup_[num_thread];
+            std::size_t q_index = q_lookup_[num_thread];
+            return hp_queues_[domain_num].queues_[q_index]
+                       ->get_thread_count(unknown) == 0;
         }
 
         ///////////////////////////////////////////////////////////////////////

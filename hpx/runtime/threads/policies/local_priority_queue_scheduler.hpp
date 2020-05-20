@@ -888,35 +888,18 @@ namespace hpx { namespace threads { namespace policies
             return count;
         }
 
-	std::int64_t get_idle_core_count() const override
-        {
-            // Return thread count of one specific queue.
-            std::int64_t count = 0;
-
-            for (std::size_t i = 0;
-                 i != (std::max)(num_queues_, num_high_priority_queues_); ++i)
+	 // Queries whether a given core is idle
+	bool is_core_idle(std::size_t num_thread) const override
+	{
+            if (num_thread < num_queues_ && queues_[num_thread].data_->get_thread_count(unknown) != 0)
             {
-                bool idle = true;
-
-                if (i < num_queues_)
-                {
-                    idle = idle &&
-                        (queues_[i].data_->get_thread_count(unknown) == 0);
-                }
-                if (i < num_high_priority_queues_)
-                {
-                    idle = idle &&
-                        (high_priority_queues_[i].data_->get_thread_count(
-                             unknown) == 0);
-                }
-
-                if (idle)
-                {
-                    ++count;
-                }
+                  return false;
             }
-
-            return count;
+            if (num_thread < num_high_priority_queues_ && high_priority_queues_[num_thread].data_->get_thread_count(unknown) != 0)
+            {
+                  return false;
+            }
+            return true;
         }
 
         ///////////////////////////////////////////////////////////////////////

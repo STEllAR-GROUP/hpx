@@ -624,20 +624,12 @@ namespace hpx { namespace threads { namespace policies
             return count;
         }
 
-	// Queries the current number of idle threads (cores)
-        std::int64_t get_idle_core_count() const override
+        // Queries whether a given core is idle
+        bool is_core_idle(std::size_t num_thread) const override
         {
-            // Return thread count of one specific queue.
-            std::int64_t count = 0;
-
-            // Return the cumulative count for all queues.
-            for (std::size_t i = 0; i != queues_.size(); ++i)
-            {
-                count += queues_[i]->get_thread_count(unknown) == 0;
-            }
-
-            return count;
+               return queues_[num_thread]->get_thread_count(unknown) == 0;
         }
+
         ///////////////////////////////////////////////////////////////////////
         // Enumerate matching threads from all queues
         bool enumerate_threads(
