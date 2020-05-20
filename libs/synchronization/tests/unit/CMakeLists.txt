@@ -6,6 +6,7 @@
 
 set(tests
     barrier_cpp20
+    binary_semaphore_cpp20
     channel_mpmc_fib
     channel_mpmc_shift
     channel_mpsc_fib
@@ -14,6 +15,7 @@ set(tests
     channel_spsc_shift
     condition_variable
     counting_semaphore
+    counting_semaphore_cpp20
     latch_cpp20
     local_latch
     local_barrier
@@ -27,6 +29,7 @@ set(tests
 )
 
 set(barrier_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
+set(binary_semaphore_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_mpmc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_mpmc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_mpsc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -35,6 +38,7 @@ set(channel_spsc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_spsc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
+set(counting_semaphore_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(latch_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
