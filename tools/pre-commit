@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Copyright (c) 2019 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# ----------------------------------------------------------------
+# simple pre commit hook script to check that *.cpp and *.hpp files 
+# are correctly clang-formatted and that CMakeLists.txt and *.cmake
+# files are cmake-formatted
+
+# To use this hook, you must have clang-format and cmake-format
+# installed on your system
+
+# To install this hook, copy this file to your git hooks as follows
+# cp tools/pre-commit .git/hooks/pre-commit
+# chmod +x .git/hooks/pre-commit
+
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+blue=$(tput setaf 4)
+normal=$(tput sgr0)
+
+cxxfiles=()
+for file in `git diff --cached --name-only --diff-filter=ACMRT | grep -E "\.(cpp|hpp)$"`; do
+    if ! cmp -s <(git show :${file}) <(git show :${file}|clang-format -style=file); then
+        cxxfiles+=("${file}")
+    fi
+done
+
+cmakefiles=()
+for file in `git diff --cached --name-only --diff-filter=ACMRT | grep -E "(CMakeLists\.txt|\.cmake)$"`; do
+    if ! cmp -s <(git show :${file}) <(git show :${file}|cmake-format); then
+        cmakefiles+=("${file}")
+    fi
+done
+
+returncode=0
+
+if [ -n "${cxxfiles}" ]; then
+    printf "# ${blue}clang-format ${red}error pre-commit${normal} : To fix run the following (use git commit ${yellow}--no-verify${normal} to bypass)\n"
+    for f in "${cxxfiles[@]}" ; do
+        printf "clang-format -i %s\n" "$f"
+    done
+    returncode=1
+fi
+
+if [ -n "${cmakefiles}" ]; then
+    printf "# ${green}cmake-format ${red}error pre-commit${normal} : To fix run the following (use git commit ${yellow}--no-verify${normal} to bypass)\n"
+    for f in "${cmakefiles[@]}" ; do
+        printf "cmake-format -i %s\n" "$f"
+    done
+    returncode=1
+fi
+
+exit $returncode
