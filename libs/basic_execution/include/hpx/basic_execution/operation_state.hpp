@@ -125,7 +125,7 @@ namespace hpx { namespace basic_execution {
             template <typename O>
             struct is_operation_state_impl<true, O>
               : std::integral_constant<bool,
-                    noexcept(hpx::basic_execution::start(std::declval<O&>()))>
+                    noexcept(hpx::basic_execution::start(std::declval<O>()))>
             {
             };
         }    // namespace detail
@@ -134,8 +134,12 @@ namespace hpx { namespace basic_execution {
         struct is_operation_state
           : detail::is_operation_state_impl<std::is_destructible<O>::value &&
                     std::is_object<O>::value &&
-                    hpx::traits::is_callable<hpx::basic_execution::start_t(
-                        O&)>::value,
+                    (hpx::traits::is_callable<hpx::basic_execution::start_t(
+                            O&)>::value ||
+                        hpx::traits::is_callable<hpx::basic_execution::start_t(
+                            O const&)>::value ||
+                        hpx::traits::is_callable<hpx::basic_execution::start_t(
+                            O&&)>::value),
                 O>
         {
         };

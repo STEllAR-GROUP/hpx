@@ -31,6 +31,14 @@ namespace mylib {
             start_called = true;
         }
     };
+
+    struct state_4
+    {
+        void start() && noexcept
+        {
+            start_called = true;
+        }
+    };
 }    // namespace mylib
 
 int main()
@@ -44,6 +52,9 @@ int main()
     static_assert(
         hpx::basic_execution::traits::is_operation_state<mylib::state_3>::value,
         "mylib::state_3 is an operation state");
+    static_assert(
+        hpx::basic_execution::traits::is_operation_state<mylib::state_4>::value,
+        "mylib::state_4 is an operation state");
 
     mylib::state_3 state;
 
