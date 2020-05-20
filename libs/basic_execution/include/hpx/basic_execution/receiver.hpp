@@ -60,45 +60,47 @@ namespace hpx { namespace basic_execution {
     void set_error(R&& r, E&& e);
 #endif
 
-    /// Receiving values from asynchronous computations is handled by the `receiver`
-    /// concept. A `receiver` needs to be able to receive an error or be marked as
-    /// being cancelled. As such, the Receiver concept is defined by having the
-    /// following two customization points defined, which form the completion-signal
-    /// operations:
-    ///     * `hpx::basic_execution::set_done`
-    ///     * `hpx::basic_execution::set_error`
-    ///
-    /// Those two functions denote the completion-signal operations. The receiver
-    /// contract is as follows:
-    ///     * None of a receiver's completion-signal operation shall be invoked
-    ///       before `hpx::basic_execution::start` has been called on the operation
-    ///       state object that was returned by connecting a receiver to a sender
-    ///       `hpx::basic_execution::connect`.
-    ///     * Once `hpx::basic_execution::start` has been called on the operation
-    ///       state object, exactly one of the receiver's completion-signal operation
-    ///       shall complete without an exception before the receiver is destroyed
-    ///
-    /// Once one of the receiver's completion-signal operation has been completed
-    /// without throwing an exception, the receiver contract has been satisfied.
-    /// In other words: The asynchronous operation has been completed.
-    ///
-    /// \see hpx::basic_execution::is_receiver_of
-    template <typename T, typename E = std::exception_ptr>
-    struct is_receiver;
+    namespace traits {
+        /// Receiving values from asynchronous computations is handled by the `receiver`
+        /// concept. A `receiver` needs to be able to receive an error or be marked as
+        /// being cancelled. As such, the Receiver concept is defined by having the
+        /// following two customization points defined, which form the completion-signal
+        /// operations:
+        ///     * `hpx::basic_execution::set_done`
+        ///     * `hpx::basic_execution::set_error`
+        ///
+        /// Those two functions denote the completion-signal operations. The receiver
+        /// contract is as follows:
+        ///     * None of a receiver's completion-signal operation shall be invoked
+        ///       before `hpx::basic_execution::start` has been called on the operation
+        ///       state object that was returned by connecting a receiver to a sender
+        ///       `hpx::basic_execution::connect`.
+        ///     * Once `hpx::basic_execution::start` has been called on the operation
+        ///       state object, exactly one of the receiver's completion-signal operation
+        ///       shall complete without an exception before the receiver is destroyed
+        ///
+        /// Once one of the receiver's completion-signal operation has been completed
+        /// without throwing an exception, the receiver contract has been satisfied.
+        /// In other words: The asynchronous operation has been completed.
+        ///
+        /// \see hpx::basic_execution::traits::is_receiver_of
+        template <typename T, typename E = std::exception_ptr>
+        struct is_receiver;
 
-    /// The `receiver_of` concept is a refinement of the `receiver` concept by
-    /// requiring one additional completion-signal operation:
-    ///     * `hpx::basic_execution::set_value`
-    ///
-    /// This completion-signal operation adds the following to the receiver's
-    /// contract:
-    ///     * If `hpx::basic_execution::set_value` exits with an exception, it
-    ///       is still valid to call `hpx::basic_execution::set_error` or
-    ///       `hpx::basic_execution::set_done`
-    ///
-    /// \see hpx::basic_execution::is_receiver
-    template <typename T, typename... As>
-    struct is_receiver_of;
+        /// The `receiver_of` concept is a refinement of the `receiver` concept by
+        /// requiring one additional completion-signal operation:
+        ///     * `hpx::basic_execution::set_value`
+        ///
+        /// This completion-signal operation adds the following to the receiver's
+        /// contract:
+        ///     * If `hpx::basic_execution::set_value` exits with an exception, it
+        ///       is still valid to call `hpx::basic_execution::set_error` or
+        ///       `hpx::basic_execution::set_done`
+        ///
+        /// \see hpx::basic_execution::traits::is_receiver
+        template <typename T, typename... As>
+        struct is_receiver_of;
+    }    // namespace traits
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_value_t
     {
@@ -107,8 +109,8 @@ namespace hpx { namespace basic_execution {
         *this, std::forward<Receiver>(rcv), std::forward<Values>(values)...)
         template <typename Receiver, typename... Values>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, true> /* is tag invocable */,
-            Receiver&& rcv, Values&&... values) const
+            std::true_type /* is tag invocable */, Receiver&& rcv,
+            Values&&... values) const
             noexcept(
                 noexcept(HPX_BASIC_EXECUTION_RECEIVER_SET_VALUE_EXPRESSION))
                 -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_VALUE_EXPRESSION)
@@ -121,8 +123,8 @@ namespace hpx { namespace basic_execution {
     std::forward<Receiver>(rcv).set_value(std::forward<Values>(values)...)
         template <typename Receiver, typename... Values>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, false> /* is not tag invocable */,
-            Receiver&& rcv, Values&&... values) const
+            std::false_type /* is not tag invocable */, Receiver&& rcv,
+            Values&&... values) const
             noexcept(
                 noexcept(HPX_BASIC_EXECUTION_RECEIVER_SET_VALUE_EXPRESSION))
                 -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_VALUE_EXPRESSION)
@@ -155,8 +157,8 @@ namespace hpx { namespace basic_execution {
         *this, std::forward<Receiver>(rcv), std::forward<Error>(error))
         template <typename Receiver, typename Error>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, true> /* is tag invocable */,
-            Receiver&& rcv, Error&& error) const noexcept
+            std::true_type /* is tag invocable */, Receiver&& rcv,
+            Error&& error) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_ERROR_EXPRESSION)
         {
             static_assert(
@@ -171,8 +173,8 @@ namespace hpx { namespace basic_execution {
     std::forward<Receiver>(rcv).set_error(std::forward<Error>(error))
         template <typename Receiver, typename Error>
         constexpr HPX_FORCEINLINE auto tag_invoke_member_impl(
-            std::integral_constant<bool, true> /* is noexcept */,
-            Receiver&& rcv, Error&& error) const noexcept
+            std::true_type /* is noexcept */, Receiver&& rcv,
+            Error&& error) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_ERROR_EXPRESSION)
         {
             return HPX_BASIC_EXECUTION_RECEIVER_SET_ERROR_EXPRESSION;
@@ -184,8 +186,8 @@ namespace hpx { namespace basic_execution {
         std::forward<Receiver>(rcv), std::forward<Error>(error))
         template <typename Receiver, typename Error>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, false> /* is not tag invocable */,
-            Receiver&& rcv, Error&& error) const noexcept
+            std::false_type /* is not tag invocable */, Receiver&& rcv,
+            Error&& error) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_ERROR_IMPL_EXPRESSION)
         {
             static_assert(
@@ -220,7 +222,7 @@ namespace hpx { namespace basic_execution {
     hpx::functional::tag_invoke(*this, std::forward<Receiver>(rcv))
         template <typename Receiver>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, true> /* is tag invocable */,
+            std::true_type /* is tag invocable */,
             Receiver&& rcv) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_DONE_EXPRESSION)
         {
@@ -236,7 +238,7 @@ namespace hpx { namespace basic_execution {
     std::forward<Receiver>(rcv).set_done()
         template <typename Receiver>
         constexpr HPX_FORCEINLINE auto tag_invoke_member_impl(
-            std::integral_constant<bool, true> /* is not tag invocable */,
+            std::true_type /* is not tag invocable */,
             Receiver&& rcv) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_DONE_EXPRESSION)
         {
@@ -250,7 +252,7 @@ namespace hpx { namespace basic_execution {
         std::forward<Receiver>(rcv))
         template <typename Receiver>
         constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::integral_constant<bool, false> /* is not tag invocable */,
+            std::false_type /* is not tag invocable */,
             Receiver&& rcv) const noexcept
             -> decltype(HPX_BASIC_EXECUTION_RECEIVER_SET_DONE_IMPL_EXPRESSION)
         {
@@ -276,90 +278,95 @@ namespace hpx { namespace basic_execution {
 #undef HPX_BASIC_EXECUTION_RECEIVER_SET_DONE_EXPRESSION
     } set_done;
 
-    namespace detail {
-        template <bool ConstructionRequirements, typename T, typename E>
-        struct is_receiver_impl;
+    namespace traits {
+        namespace detail {
+            template <bool ConstructionRequirements, typename T, typename E>
+            struct is_receiver_impl;
+
+            template <typename T, typename E>
+            struct is_receiver_impl<false, T, E> : std::false_type
+            {
+            };
+
+            template <typename T, typename E>
+            struct is_receiver_impl<true, T, E>
+              : std::integral_constant<bool,
+                    hpx::traits::is_callable<hpx::basic_execution::set_done_t(
+                        typename std::decay<T>::type&&)>::value &&
+                        hpx::traits::is_callable<
+                            hpx::basic_execution::set_error_t(
+                                typename std::decay<T>::type&&, E)>::value>
+            {
+            };
+        }    // namespace detail
 
         template <typename T, typename E>
-        struct is_receiver_impl<false, T, E> : std::false_type
+        struct is_receiver
+          : detail::is_receiver_impl<std::is_move_constructible<
+                                         typename std::decay<T>::type>::value &&
+                    std::is_constructible<typename std::decay<T>::type,
+                        T>::value,
+                T, E>
         {
         };
 
-        template <typename T, typename E>
-        struct is_receiver_impl<true, T, E>
-          : std::integral_constant<bool,
-                hpx::traits::is_callable<hpx::basic_execution::set_done_t(
-                    typename std::decay<T>::type&&)>::value &&
-                    hpx::traits::is_callable<hpx::basic_execution::set_error_t(
-                        typename std::decay<T>::type&&, E)>::value>
-        {
-        };
-    }    // namespace detail
+        template <typename T, typename E = std::exception_ptr>
+        constexpr bool is_receiver_v = is_receiver<T, E>::value;
 
-    template <typename T, typename E>
-    struct is_receiver
-      : detail::is_receiver_impl<
-            std::is_move_constructible<typename std::decay<T>::type>::value &&
-                std::is_constructible<typename std::decay<T>::type, T>::value,
-            T, E>
-    {
-    };
+        namespace detail {
+            template <bool IsReceiver, typename T, typename... As>
+            struct is_receiver_of_impl;
 
-    template <typename T, typename E = std::exception_ptr>
-    constexpr bool is_receiver_v = is_receiver<T, E>::value;
+            template <typename T, typename... As>
+            struct is_receiver_of_impl<false, T, As...> : std::false_type
+            {
+            };
 
-    namespace detail {
-        template <bool IsReceiver, typename T, typename... As>
-        struct is_receiver_of_impl;
+            template <typename T, typename... As>
+            struct is_receiver_of_impl<true, T, As...>
+              : std::integral_constant<bool,
+                    hpx::traits::is_callable<hpx::basic_execution::set_value_t(
+                        typename std::decay<T>::type&&, As...)>::value>
+            {
+            };
+        }    // namespace detail
 
         template <typename T, typename... As>
-        struct is_receiver_of_impl<false, T, As...> : std::false_type
-        {
-        };
-
-        template <typename T, typename... As>
-        struct is_receiver_of_impl<true, T, As...>
-          : std::integral_constant<bool,
-                hpx::traits::is_callable<hpx::basic_execution::set_value_t(
-                    typename std::decay<T>::type&&, As...)>::value>
-        {
-        };
-    }    // namespace detail
-
-    template <typename T, typename... As>
-    struct is_receiver_of
-      : detail::is_receiver_of_impl<is_receiver_v<T>, T, As...>
-    {
-    };
-
-    template <typename T, typename... As>
-    constexpr bool is_receiver_of_v = is_receiver_of<T, As...>::value;
-
-    namespace detail {
-        template <bool IsReceiverOf, typename T, typename... As>
-        struct is_nothrow_receiver_of_impl;
-
-        template <typename T, typename... As>
-        struct is_nothrow_receiver_of_impl<false, T, As...> : std::false_type
+        struct is_receiver_of
+          : detail::is_receiver_of_impl<is_receiver_v<T>, T, As...>
         {
         };
 
         template <typename T, typename... As>
-        struct is_nothrow_receiver_of_impl<true, T, As...>
-          : std::integral_constant<bool,
-                noexcept(hpx::basic_execution::set_value(
-                    std::declval<T>(), std::declval<As>()...))>
+        constexpr bool is_receiver_of_v = is_receiver_of<T, As...>::value;
+
+        namespace detail {
+            template <bool IsReceiverOf, typename T, typename... As>
+            struct is_nothrow_receiver_of_impl;
+
+            template <typename T, typename... As>
+            struct is_nothrow_receiver_of_impl<false, T, As...>
+              : std::false_type
+            {
+            };
+
+            template <typename T, typename... As>
+            struct is_nothrow_receiver_of_impl<true, T, As...>
+              : std::integral_constant<bool,
+                    noexcept(hpx::basic_execution::set_value(
+                        std::declval<T>(), std::declval<As>()...))>
+            {
+            };
+        }    // namespace detail
+
+        template <typename T, typename... As>
+        struct is_nothrow_receiver_of
+          : detail::is_nothrow_receiver_of_impl<is_receiver_v<T>, T, As...>
         {
         };
-    }    // namespace detail
 
-    template <typename T, typename... As>
-    struct is_nothrow_receiver_of
-      : detail::is_nothrow_receiver_of_impl<is_receiver_v<T>, T, As...>
-    {
-    };
-
-    template <typename T, typename... As>
-    constexpr bool is_nothrow_receiver_of_v =
-        is_nothrow_receiver_of<T, As...>::value;
+        template <typename T, typename... As>
+        constexpr bool is_nothrow_receiver_of_v =
+            is_nothrow_receiver_of<T, As...>::value;
+    }    // namespace traits
 }}    // namespace hpx::basic_execution
