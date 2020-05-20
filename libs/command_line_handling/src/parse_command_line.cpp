@@ -424,12 +424,19 @@ namespace hpx { namespace util {
                 // clang-format on
                 break;
 #endif
+            case runtime_mode_local:
+                break;
 
             case runtime_mode_invalid:
             default:
                 throw hpx::detail::command_line_error(
                     "Invalid runtime mode specified");
             }
+
+            // Always add the option to start the local runtime
+            hpx_options.add_options()("hpx:local",
+                "run this instance in local mode (experimental; certain "
+                "functionality not available at runt-time)");
 
             // general options definitions
             // clang-format off

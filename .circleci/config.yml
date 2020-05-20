@@ -654,6 +654,7 @@ jobs:
                   tests.unit.modules.futures \
                   tests.unit.modules.hardware \
                   tests.unit.modules.hashing \
+                  tests.unit.modules.init_runtime \
                   tests.unit.modules.iterator_support \
                   tests.unit.modules.lcos_distributed \
                   tests.unit.modules.async_local \

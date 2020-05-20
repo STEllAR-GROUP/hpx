@@ -107,7 +107,6 @@ extern "C" int initialize_main(int argc, char** argv)
         hpx::init_params iparams;
         iparams.desc_cmdline = desc;
         iparams.cfg = cfg;
-        iparams.mode = hpx::runtime_mode_console;
 
         // Initialize the HPX runtime system
         return hpx::init(start_function, argc, argv, iparams);
