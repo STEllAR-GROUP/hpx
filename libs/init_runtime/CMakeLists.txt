@@ -16,13 +16,15 @@ set(init_runtime_headers
     hpx/hpx_start_impl.hpp
     hpx/hpx_suspend.hpp
     hpx/hpx_main_winsocket.hpp
+    hpx/init_runtime/detail/run_or_start.hpp
+    hpx/init_runtime/force_linking.hpp
 )
 
-set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp)
+set(init_runtime_sources force_linking.cpp hpx_init.cpp hpx_main_winsocket.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
-  init_runtime FORCE_LINKING_GEN
+  init_runtime
   GLOBAL_HEADER_GEN OFF
   SOURCES ${init_runtime_sources}
   HEADERS ${init_runtime_headers}

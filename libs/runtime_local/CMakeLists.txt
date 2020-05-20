@@ -12,6 +12,7 @@ set(runtime_local_headers
     hpx/runtime_local/config_entry.hpp
     hpx/runtime_local/custom_exception_info.hpp
     hpx/runtime_local/debugging.hpp
+    hpx/runtime_local/force_linking.hpp
     hpx/runtime_local/get_locality_id.hpp
     hpx/runtime_local/get_num_localities.hpp
     hpx/runtime_local/get_os_thread_count.hpp
@@ -65,6 +66,7 @@ set(runtime_local_compat_headers
 set(runtime_local_sources
     custom_exception_info.cpp
     debugging.cpp
+    force_linking.cpp
     interval_timer.cpp
     runtime_handlers.cpp
     runtime_local.cpp
@@ -79,7 +81,7 @@ include(HPX_AddModule)
 add_hpx_module(
   runtime_local
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${runtime_local_sources}
   HEADERS ${runtime_local_headers}

@@ -77,6 +77,7 @@ namespace hpx { namespace util {
             p.set_value(util::high_resolution_clock::now());
         }
 
+    public:
         HPX_EXPORT static std::uint64_t take_time_stamp();
 
     private:

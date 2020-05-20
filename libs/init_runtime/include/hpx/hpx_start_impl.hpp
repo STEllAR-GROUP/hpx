@@ -13,6 +13,7 @@
 #include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
@@ -41,18 +42,6 @@ namespace apex {
 #endif
 
 namespace hpx {
-    /// \cond NOINTERNAL
-    namespace detail {
-        HPX_EXPORT int run_or_start(
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
-            int argc, char** argv, init_params const& params, bool blocking);
-
-        HPX_EXPORT int init_helper(hpx::program_options::variables_map&,
-            util::function_nonser<int(int, char**)> const&);
-    }    // namespace detail
-    /// \endcond
-
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is the main, non-blocking entry point for any HPX application.

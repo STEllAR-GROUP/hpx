@@ -21,7 +21,10 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
+#include <hpx/hpx_finalize.hpp>
+#include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/mpi_base.hpp>
 #include <hpx/program_options/options_description.hpp>
@@ -778,9 +781,8 @@ namespace hpx {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT int run_or_start(
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
+        int run_or_start(util::function_nonser<int(
+                             hpx::program_options::variables_map& vm)> const& f,
             int argc, char** argv, init_params const& params, bool blocking)
         {
             init_environment();
@@ -1103,7 +1105,7 @@ namespace hpx {
     }
 
     namespace detail {
-        HPX_EXPORT int init_helper(hpx::program_options::variables_map& /*vm*/,
+        int init_helper(hpx::program_options::variables_map& /*vm*/,
             util::function_nonser<int(int, char**)> const& f)
         {
             std::string cmdline(
