@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    barrier_cpp20
     channel_mpmc_fib
     channel_mpmc_shift
     channel_mpsc_fib
@@ -25,6 +26,7 @@ set(tests
     stop_token_cb2
 )
 
+set(barrier_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_mpmc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_mpmc_shift_PARAMETERS THREADS_PER_LOCALITY 4)
 set(channel_mpsc_fib_PARAMETERS THREADS_PER_LOCALITY 4)
