@@ -48,6 +48,7 @@ add_hpx_module(
     hpx_functional
     hpx_hardware
     hpx_memory
+    hpx_mpi_base
     hpx_pack_traversal
     hpx_plugin
     hpx_program_options
