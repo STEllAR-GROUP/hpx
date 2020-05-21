@@ -32,6 +32,14 @@ extern HPX_EXPORT char** freebsd_environ;
 extern char** environ;
 #endif
 
+#if defined(HPX_WINDOWS) && defined(HPX_HAVE_APEX)
+namespace apex {
+
+    // force linking of the application with APEX
+    HPX_SYMBOL_IMPORT std::string& version();
+}
+#endif
+
 namespace hpx
 {
     /// \cond NOINTERNAL
@@ -63,6 +71,11 @@ namespace hpx
     {
 #if defined(HPX_WINDOWS)
         detail::init_winsocket();
+#if defined(HPX_HAVE_APEX)
+        // artificially force the apex shared library to be loaded by the
+        // application
+        apex::version();
+#endif
 #endif
         util::set_hpx_prefix(HPX_PREFIX);
 #if defined(__FreeBSD__)
