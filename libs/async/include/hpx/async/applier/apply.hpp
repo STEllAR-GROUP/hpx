@@ -14,14 +14,17 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/local_async/apply.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/threading_base.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
@@ -179,6 +182,17 @@ namespace hpx {
                 typename action_type::component_type>::call(addr));
 
             threads::thread_init_data data;
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            data.description = actions::detail::get_action_name<Action>();
+#endif
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
+            data.parent_id = threads::get_self_id();
+            data.parent_locality_id = get_locality_id();
+#endif
+#if defined(HPX_HAVE_APEX)
+            data.timer_data = hpx::util::external_timer::new_task(
+                data.description, data.parent_locality_id, data.parent_id);
+#endif
             apply_helper<action_type>::call(std::move(data), target,
                 addr.address_, addr.type_, priority, std::forward<Ts>(vs)...);
             return true;    // no parcel has been sent (dest is local)
@@ -196,6 +210,17 @@ namespace hpx {
                 typename action_type::component_type>::call(addr));
 
             threads::thread_init_data data;
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            data.description = actions::detail::get_action_name<Action>();
+#endif
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
+            data.parent_id = threads::get_self_id();
+            data.parent_locality_id = get_locality_id();
+#endif
+#if defined(HPX_HAVE_APEX)
+            data.timer_data = hpx::util::external_timer::new_task(
+                data.description, data.parent_locality_id, data.parent_id);
+#endif
             apply_helper<action_type>::call(std::move(data), target,
                 addr.address_, addr.type_, priority, std::move(vs)...);
             return true;    // no parcel has been sent (dest is local)
@@ -398,7 +423,14 @@ namespace hpx {
                 typename action_type::component_type>::call(addr));
 
             threads::thread_init_data data;
-#ifdef HPX_HAVE_APEX
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            data.description = actions::detail::get_action_name<Action>();
+#endif
+#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
+            data.parent_id = threads::get_self_id();
+            data.parent_locality_id = get_locality_id();
+#endif
+#if defined(HPX_HAVE_APEX)
             data.timer_data = hpx::util::external_timer::new_task(
                 data.description, data.parent_locality_id, data.parent_id);
 #endif

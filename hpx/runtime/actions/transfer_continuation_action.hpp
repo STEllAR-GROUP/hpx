@@ -13,9 +13,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/async/applier/apply_helper.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/transfer_base_action.hpp>
-#include <hpx/async/applier/apply_helper.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
@@ -175,9 +176,16 @@ namespace hpx { namespace actions
         }
 
         threads::thread_init_data data;
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+        data.description = actions::detail::get_action_name<Action>();
+#endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         data.parent_id = this->parent_id_;
         data.parent_locality_id = this->parent_locality_;
+#endif
+#if defined(HPX_HAVE_APEX)
+        data.timer_data = hpx::util::external_timer::new_task(
+            data.description, data.parent_locality_id, data.parent_id);
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
             std::move(data), std::move(cont_), target, lva, comptype,

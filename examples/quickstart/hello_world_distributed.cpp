@@ -95,8 +95,6 @@ void hello_world_foreman()
             // thread, but no guarantees are given by the scheduler that the
             // task will actually run on that worker thread.
             hpx::parallel::execution::default_executor exec(
-                hpx::threads::thread_priority_default,
-                hpx::threads::thread_stacksize_default,
                 hpx::threads::thread_schedule_hint(
                     hpx::threads::thread_schedule_hint_mode_thread, worker));
             futures.push_back(hpx::async(exec, hello_world_worker, worker));
