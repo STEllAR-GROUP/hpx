@@ -39,6 +39,7 @@ namespace hpx { namespace util {
 
         struct HPX_EXPORT lock_data
         {
+#ifdef HPX_HAVE_VERIFY_LOCKS
             lock_data(std::size_t trace_depth);
             lock_data(register_lock_data* data, std::size_t trace_depth);
 
@@ -48,6 +49,7 @@ namespace hpx { namespace util {
             register_lock_data* user_data_;
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
             std::string backtrace_;
+#endif
 #endif
         };
     }    // namespace detail
