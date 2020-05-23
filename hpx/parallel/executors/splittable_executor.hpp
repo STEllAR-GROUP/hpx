@@ -38,14 +38,14 @@ namespace hpx { namespace parallel { namespace execution {
         ///
         splittable_executor() {}
 
-        splittable_executor(std::string exec_type)
+	splittable_executor(std::string split_type)
         {
-            if (exec_type != "all" && exec_type != "idle")
+            if (split_type != "all" && split_type != "idle")
             {
                 HPX_THROW_EXCEPTION(hpx::bad_parameter, "throw_hpx_exception",
-                    "unknwn type, type should be either all or idle");
+                            "unknwn type, type should be either all or idle");
             }
-            split_type_ = exec_type;
+            split_type_ = split_type;
         }
 
         /// Construct an \a splittable_executor executor parameters object
@@ -65,7 +65,7 @@ namespace hpx { namespace parallel { namespace execution {
         /// \endcond
 
         template <typename F, typename S, typename... Ts>
-        static std::vector<hpx::future<
+        std::vector<hpx::future<
             typename detail::bulk_function_result<F, S, Ts...>::type>>
         bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
@@ -85,11 +85,9 @@ namespace hpx { namespace parallel { namespace execution {
 
     private:
         friend class hpx::serialization::access;
-        static std::string split_type_;
+        std::string split_type_;
         /// \cond NOINTERNAL
     };
-
-    std::string splittable_executor::split_type_ = "all";
 
     template <>
     struct is_bulk_two_way_executor<splittable_executor> : std::true_type
