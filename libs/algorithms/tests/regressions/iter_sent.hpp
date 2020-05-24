@@ -11,16 +11,21 @@
 #include <cstddef>
 #include <iterator>
 
-template <typename Value>
+template <typename ValueType>
 struct Sentinel
 {
-    explicit Sentinel(Value stopValue)
+    explicit Sentinel(ValueType stopValue)
       : stop(stopValue)
     {
     }
 
-public:
-    Value stop;
+    ValueType get_stop() const
+    {
+        return this->stop;
+    }
+
+private:
+    ValueType stop;
 };
 
 template <typename Value>
@@ -106,11 +111,11 @@ struct Iterator
 
     friend bool operator==(Iterator i, Sentinel<Value> s)
     {
-        return i.state == s.stop;
+        return i.state == s.get_stop();
     }
     friend bool operator==(Sentinel<Value> s, Iterator i)
     {
-        return i.state == s.stop;
+        return i.state == s.get_stop();
     }
 
     bool operator!=(const Iterator& that) const
@@ -120,11 +125,11 @@ struct Iterator
 
     friend bool operator!=(Iterator i, Sentinel<Value> s)
     {
-        return i.state != s.stop;
+        return i.state != s.get_stop();
     }
     friend bool operator!=(Sentinel<Value> s, Iterator i)
     {
-        return i.state != s.stop;
+        return i.state != s.get_stop();
     }
 
     bool operator<(const Iterator& that) const
