@@ -94,7 +94,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 {
                     // send the incremented token to the next rank
                     ++tokens[i];
-                    hpx::future<void> f_send = hpx::async(
+                    hpx::future<int> f_send = hpx::async(
                         exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
                     // when the send completes
                     f_send.then([=, &tokens, &counter](auto&&) {
