@@ -30,6 +30,8 @@ set(datastructures_headers
     hpx/datastructures/traits/supports_streaming_with_any.hpp
     hpx/datastructures/traits/is_tuple_like.hpp
     hpx/datastructures/variant_helper.hpp
+    hpx/optional.hpp
+    hpx/tuple.hpp
 )
 
 set(datastructures_compat_headers
