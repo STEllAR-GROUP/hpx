@@ -9,8 +9,9 @@
 # ##############################################################################
 # gather sources
 
-set(hpx_SOURCES runtime/threads/thread_pool_suspension_helpers.cpp
-                util/serialize_exception.cpp
+set(hpx_SOURCES
+    lcos/future.cpp runtime/threads/thread_pool_suspension_helpers.cpp
+    util/serialize_exception.cpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
