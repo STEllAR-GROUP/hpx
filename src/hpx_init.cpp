@@ -705,7 +705,12 @@ namespace hpx
             hpx::util::set_enable_parent_task_handler(
                     &detail::enable_parent_task_handler);
 #endif
-            hpx::set_custom_exception_info_handler(&detail::custom_exception_info);
+            hpx::set_custom_exception_info_handler(
+                &detail::custom_exception_info);
+            hpx::serialization::detail::set_save_custom_exception_handler(
+                &runtime_local::detail::save_custom_exception);
+            hpx::serialization::detail::set_load_custom_exception_handler(
+                &runtime_local::detail::load_custom_exception);
             hpx::set_pre_exception_handler(&detail::pre_exception_handler);
             hpx::set_thread_termination_handler(
                 [](std::exception_ptr const& e) { report_error(e); });

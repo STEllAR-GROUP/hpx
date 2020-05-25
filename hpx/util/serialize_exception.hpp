@@ -8,53 +8,15 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/serialization/exception_ptr.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <exception>
 
-namespace hpx { namespace util
-{
-    enum exception_type
-    {
-        // unknown exception
-        unknown_exception = 0,
-
-        // standard exceptions
-        std_runtime_error = 1,
-        std_invalid_argument = 2,
-        std_out_of_range = 3,
-        std_logic_error = 4,
-        std_bad_alloc = 5,
-        std_bad_cast = 6,
-        std_bad_typeid = 7,
-        std_bad_exception = 8,
-        std_exception = 9,
-
-        // boost::system::system_error
-        boost_system_error = 10,
-
-        // hpx::exception
-        hpx_exception = 11,
-        hpx_thread_interrupted_exception = 12,
-
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
-        // boost exceptions
-        boost_exception = 13
-#endif
-    };
-}}  // namespace hpx::util
-
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive>
-    void save(Archive& ar, std::exception_ptr const& e, unsigned int);
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive>
-    void load(Archive& ar, std::exception_ptr& e, unsigned int);
-
-    HPX_SERIALIZATION_SPLIT_FREE(std::exception_ptr)
-}}
-
+namespace hpx { namespace runtime_local { namespace detail {
+    HPX_EXPORT void save_custom_exception(hpx::serialization::output_archive&,
+        std::exception_ptr const&, unsigned int);
+    HPX_EXPORT void load_custom_exception(
+        hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
+}}}    // namespace hpx::runtime_local::detail
