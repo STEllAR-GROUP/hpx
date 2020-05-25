@@ -20,12 +20,12 @@
 int main()
 {
     std::int64_t result = hpx::parallel::reduce(hpx::parallel::execution::seq,
-        Iterator<std::int64_t, 100>{0}, Sentinel<int64_t>{}, std::int64_t(0));
+        Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, std::int64_t(0));
 
     HPX_TEST_EQ(result, std::int64_t(4950));
 
     result = hpx::parallel::reduce(hpx::parallel::execution::par,
-        Iterator<std::int64_t, 100>{0}, Sentinel<int64_t>{}, std::int64_t(0));
+        Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, std::int64_t(0));
 
     HPX_TEST_EQ(result, std::int64_t(4950));
 

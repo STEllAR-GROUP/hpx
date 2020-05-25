@@ -14,8 +14,8 @@
 template <typename ValueType>
 struct Sentinel
 {
-    explicit Sentinel(ValueType stopValue)
-      : stop(stopValue)
+    explicit Sentinel(ValueType stop_value)
+      : stop(stop_value)
     {
     }
 
