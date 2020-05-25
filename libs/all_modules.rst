@@ -50,7 +50,8 @@ All modules
    /libs/include/docs/index.rst
    /libs/io_service/docs/index.rst
    /libs/iterator_support/docs/index.rst
-   /libs/lcos/docs/index.rst
+   /libs/itt_notify/docs/index.rst
+   /libs/lcos_distributed/docs/index.rst
    /libs/local_async/docs/index.rst
    /libs/local_lcos/docs/index.rst
    /libs/logging/docs/index.rst

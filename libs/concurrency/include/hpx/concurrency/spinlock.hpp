@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/itt_notify.hpp>
 
 #include <boost/smart_ptr/detail/spinlock.hpp>
 

@@ -8,7 +8,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/functional/detail/basic_function.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/itt_notify.hpp>
 
 #include <cstddef>
 #include <cstring>

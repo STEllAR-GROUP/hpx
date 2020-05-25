@@ -25,7 +25,7 @@
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/itt_notify.hpp>
 #endif
 
 #include <cstddef>

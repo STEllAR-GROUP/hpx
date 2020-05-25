@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/itt_notify.hpp>
 
 #include <cstddef>
 #include <memory>

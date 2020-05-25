@@ -9,12 +9,12 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/async/applier/applier.hpp>
+#include <hpx/itt_notify.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/async/applier/applier.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -24,8 +24,8 @@
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/threading_base/external_timer.hpp>
+#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <hpx/thread_support/atomic_count.hpp>
 

@@ -5,9 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/concurrency/thread_name.hpp>
-#include <hpx/thread_support/thread_specific_ptr.hpp>
+#include <hpx/itt_notify.hpp>
+#include <hpx/itt_notify/thread_name.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 
@@ -18,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
@@ -261,12 +261,10 @@ namespace hpx { namespace util { namespace itt {
     {
     }
 
-    struct thread_domain_tag;
-    hpx::util::thread_specific_ptr<___itt_domain, thread_domain_tag>
-        thread_domain_;
+    static thread_local std::unique_ptr<___itt_domain> thread_domain_;
 
     thread_domain::thread_domain()
-      : domain()
+      : domain_()
     {
         if (thread_domain_.get() == nullptr)
         {

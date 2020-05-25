@@ -21,8 +21,8 @@
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/hashing/fibhash.hpp>
+#include <hpx/itt_notify.hpp>
 
 #include <boost/smart_ptr/detail/spinlock.hpp>
 #include <boost/version.hpp>

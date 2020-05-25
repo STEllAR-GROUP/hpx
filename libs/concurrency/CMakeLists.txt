@@ -16,10 +16,8 @@ set(concurrency_headers
     hpx/concurrency/deque.hpp
     hpx/concurrency/detail/freelist.hpp
     hpx/concurrency/detail/tagged_ptr_pair.hpp
-    hpx/concurrency/itt_notify.hpp
     hpx/concurrency/spinlock.hpp
     hpx/concurrency/spinlock_pool.hpp
-    hpx/concurrency/thread_name.hpp
 )
 
 # Default location is $HPX_ROOT/libs/concurrency/include_compatibility
@@ -29,13 +27,12 @@ set(concurrency_compat_headers
     hpx/util/lockfree/deque.hpp
     hpx/util/lockfree/detail/tagged_ptr_pair.hpp
     hpx/util/lockfree/freelist.hpp
-    hpx/util/itt_notify.hpp
     hpx/util/spinlock.hpp
     hpx/util/spinlock_pool.hpp
 )
 
 # Default location is $HPX_ROOT/libs/concurrency/src
-set(concurrency_sources barrier.cpp itt_notify.cpp thread_name.cpp)
+set(concurrency_sources barrier.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -53,6 +50,7 @@ add_hpx_module(
     hpx_basic_execution
     hpx_errors
     hpx_hashing
+    hpx_itt_notify
     hpx_thread_support
   CMAKE_SUBDIRS examples tests
 )

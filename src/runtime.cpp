@@ -9,12 +9,12 @@
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling.hpp>
-#include <hpx/concurrency/thread_name.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional.hpp>
+#include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/config_entry.hpp>
