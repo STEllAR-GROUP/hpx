@@ -42,6 +42,7 @@ set(HPX_CANDIDATE_LIBS
     filesystem
     format
     functional
+    futures
     hardware
     hashing
     include

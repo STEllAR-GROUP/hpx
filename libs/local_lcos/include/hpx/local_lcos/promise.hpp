@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/traits/future_access.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <exception>
@@ -21,6 +21,10 @@
 
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
+        template <typename R,
+            typename SharedState = lcos::detail::future_data<R>>
+        class promise_base;
+
         template <typename R, typename SharedState>
         class promise_base
         {

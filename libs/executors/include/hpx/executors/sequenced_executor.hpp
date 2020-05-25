@@ -12,10 +12,11 @@
 #include <hpx/errors/exception_list.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
+#include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <cstddef>

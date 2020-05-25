@@ -11,7 +11,7 @@
 #include <hpx/async/async_fwd.hpp>
 #include <hpx/async/detail/async_colocated_fwd.hpp>
 #include <hpx/async/detail/async_implementations_fwd.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>

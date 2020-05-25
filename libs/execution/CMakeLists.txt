@@ -12,13 +12,13 @@ set(execution_headers
     hpx/execution/algorithms/detail/is_negative.hpp
     hpx/execution/algorithms/detail/predicates.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
+    hpx/execution/detail/future_exec.hpp
     hpx/execution/detail/post_policy_dispatch.hpp
     hpx/execution/detail/sync_launch_policy_dispatch.hpp
     hpx/execution/execution.hpp
     hpx/execution/executor_parameters.hpp
     hpx/execution/executors/auto_chunk_size.hpp
     hpx/execution/executors/dynamic_chunk_size.hpp
-    hpx/execution/executors/execution_fwd.hpp
     hpx/execution/executors/execution.hpp
     hpx/execution/executors/execution_information_fwd.hpp
     hpx/execution/executors/execution_information.hpp
@@ -37,6 +37,7 @@ set(execution_headers
     hpx/execution/traits/detail/vc/vector_pack_load_store.hpp
     hpx/execution/traits/detail/vc/vector_pack_type.hpp
     hpx/execution/traits/executor_traits.hpp
+    hpx/execution/traits/future_then_result_exec.hpp
     hpx/execution/traits/is_execution_policy.hpp
     hpx/execution/traits/is_executor.hpp
     hpx/execution/traits/is_executor_parameters.hpp
@@ -56,7 +57,6 @@ set(execution_compat_headers
     hpx/parallel/executor_parameters.hpp
     hpx/parallel/executors/auto_chunk_size.hpp
     hpx/parallel/executors/dynamic_chunk_size.hpp
-    hpx/parallel/executors/execution_fwd.hpp
     hpx/parallel/executors/execution.hpp
     hpx/parallel/executors/execution_information_fwd.hpp
     hpx/parallel/executors/execution_information.hpp

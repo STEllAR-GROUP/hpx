@@ -54,6 +54,7 @@ add_hpx_module(
     hpx_coroutines
     hpx_execution
     hpx_executors
+    hpx_futures
     hpx_hardware
     hpx_memory
     hpx_pack_traversal

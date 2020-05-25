@@ -38,7 +38,7 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

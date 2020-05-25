@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/traits/promise_local_result.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_remote_result.hpp>
 
 #include <vector>
 
@@ -26,13 +26,6 @@ namespace hpx
 
             struct future_data_refcnt_base;
         }
-
-        namespace local { namespace detail
-        {
-            template <typename R,
-                typename SharedState = lcos::detail::future_data<R> >
-            class promise_base;
-        }}
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         class HPX_EXPORT base_lco;

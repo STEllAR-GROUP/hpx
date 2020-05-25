@@ -102,15 +102,13 @@ namespace hpx {
 #include <hpx/lcos_fwd.hpp>    // forward declare wait_all()
 
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/futures/traits/detail/future_traits.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/lcos/detail/future_traits.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>

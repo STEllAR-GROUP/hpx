@@ -11,7 +11,7 @@
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
-#include <hpx/lcos/local/futures_factory.hpp>
+#include <hpx/futures/futures_factory.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/naming_base.hpp>
 #include <hpx/runtime.hpp>

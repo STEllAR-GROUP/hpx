@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute/host/target.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/get_os_thread_count.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/basic_execution.hpp>
 #include <hpx/concurrency.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/memory.hpp>
 #include <hpx/mpi_base/mpi.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>

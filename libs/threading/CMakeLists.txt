@@ -33,6 +33,7 @@ add_hpx_module(
     hpx_errors
     hpx_execution
     hpx_functional
+    hpx_futures
     hpx_memory
     hpx_synchronization
     hpx_threading_base

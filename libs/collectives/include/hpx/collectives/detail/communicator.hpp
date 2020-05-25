@@ -11,9 +11,10 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assertion.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/and_gate.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/decay.hpp>

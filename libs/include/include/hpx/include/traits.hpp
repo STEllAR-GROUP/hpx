@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/concepts/has_xxx.hpp>
@@ -20,6 +21,14 @@
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
+#include <hpx/futures/traits/acquire_future.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future_range.hpp>
+#include <hpx/futures/traits/is_future_tuple.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
@@ -29,21 +38,14 @@
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/serialization/traits/serialization_access_data.hpp>
 #include <hpx/timed_execution/traits/is_timed_executor.hpp>
-#include <hpx/traits/acquire_future.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_future_range.hpp>
-#include <hpx/traits/is_future_tuple.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/pointer_category.hpp>
-#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/functional/traits/is_action.hpp>
+#include <hpx/futures/traits/get_remote_result.hpp>
+#include <hpx/futures/traits/promise_remote_result.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
@@ -63,11 +65,9 @@
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
 #include <hpx/traits/managed_component_policies.hpp>
-#include <hpx/traits/promise_remote_result.hpp>
 #endif

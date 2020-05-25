@@ -6,7 +6,7 @@
 
 #include <hpx/local_async/apply.hpp>
 #include <hpx/local_async/async.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>

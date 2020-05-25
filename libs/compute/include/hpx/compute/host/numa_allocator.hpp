@@ -13,7 +13,7 @@
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/topology/topology.hpp>

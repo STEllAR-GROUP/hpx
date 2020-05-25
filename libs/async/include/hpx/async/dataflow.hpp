@@ -8,29 +8,29 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/detail/future_transforms.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/detail/future_transforms.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/acquire_future.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/local_async/dataflow.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/get_worker_thread_num.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/extract_action.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/is_future.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
-#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <hpx/execution/executors/execution.hpp>

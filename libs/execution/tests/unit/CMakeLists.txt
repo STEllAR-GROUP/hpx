@@ -10,6 +10,7 @@ set(tests
     executor_parameters
     executor_parameters_dispatching
     executor_parameters_timer_hooks
+    future_then_executor
     minimal_async_executor
     minimal_sync_executor
     parallel_executor
@@ -20,6 +21,8 @@ set(tests
     shared_parallel_executor
     standalone_thread_pool_executor
 )
+
+set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

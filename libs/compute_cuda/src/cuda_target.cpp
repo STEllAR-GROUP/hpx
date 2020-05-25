@@ -12,12 +12,12 @@
 #include <hpx/assertion.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/traits/future_access.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS)

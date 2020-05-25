@@ -10,7 +10,7 @@
 #include <hpx/async/detail/async_implementations.hpp>
 #include <hpx/async/detail/sync_implementations_fwd.hpp>
 #include <hpx/async/sync_fwd.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/action_select_direct_execution.hpp>

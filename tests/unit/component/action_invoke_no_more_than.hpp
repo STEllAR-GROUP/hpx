@@ -15,7 +15,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <cstddef>

@@ -13,8 +13,8 @@
 #include <hpx/async/dataflow.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/type_support/void_guard.hpp>

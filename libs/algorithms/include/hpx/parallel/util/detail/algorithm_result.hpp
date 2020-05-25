@@ -10,7 +10,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <type_traits>

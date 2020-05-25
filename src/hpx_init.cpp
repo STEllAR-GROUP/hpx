@@ -16,6 +16,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/filesystem.hpp>
 #include <hpx/format.hpp>
+#include <hpx/futures/detail/future_data.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/hpx_user_main_config.hpp>
@@ -708,6 +709,8 @@ namespace hpx
             hpx::set_pre_exception_handler(&detail::pre_exception_handler);
             hpx::set_thread_termination_handler(
                 [](std::exception_ptr const& e) { report_error(e); });
+            hpx::lcos::detail::set_run_on_completed_error_handler(
+                [](std::exception_ptr const& e) { report_exception_and_terminate(e); });
 #if defined(HPX_HAVE_VERIFY_LOCKS)
             hpx::util::set_registered_locks_error_handler(
                 &detail::registered_locks_error_handler);

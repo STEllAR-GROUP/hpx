@@ -6,5 +6,6 @@
 
 #pragma once
 
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>

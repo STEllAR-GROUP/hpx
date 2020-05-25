@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>

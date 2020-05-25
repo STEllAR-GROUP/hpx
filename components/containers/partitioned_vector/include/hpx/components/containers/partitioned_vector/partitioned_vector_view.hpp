@@ -13,7 +13,7 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <array>

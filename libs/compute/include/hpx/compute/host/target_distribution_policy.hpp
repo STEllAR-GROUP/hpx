@@ -15,7 +15,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/local_async/dataflow.hpp>
 #endif
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>

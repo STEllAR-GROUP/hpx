@@ -12,23 +12,23 @@
 #include <hpx/async/async_continue.hpp>
 #include <hpx/async/async_fwd.hpp>
 #include <hpx/async/detail/async_implementations.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/local_async/async.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
-#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 #include <hpx/util/bind_action.hpp>
 

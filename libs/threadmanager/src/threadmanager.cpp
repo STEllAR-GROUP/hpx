@@ -15,8 +15,8 @@
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/thread_pool_helpers.hpp>

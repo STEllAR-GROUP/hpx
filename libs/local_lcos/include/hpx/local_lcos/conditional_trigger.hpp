@@ -10,7 +10,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
 
 #include <utility>

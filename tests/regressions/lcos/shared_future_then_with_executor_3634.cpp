@@ -9,10 +9,9 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/lcos/future.hpp>
-
-#include <hpx/executors.hpp> // Workaround for a missing header file
-#include <hpx/executors/pool_executor.hpp>
+#include <hpx/futures.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/thread_executors.hpp>
 
 int main()
 {

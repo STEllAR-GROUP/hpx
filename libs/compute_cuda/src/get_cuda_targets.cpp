@@ -11,7 +11,7 @@
 #include <hpx/async.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>

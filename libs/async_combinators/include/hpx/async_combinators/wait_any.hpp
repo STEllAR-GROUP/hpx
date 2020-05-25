@@ -164,7 +164,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/wait_some.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/threading.hpp>
 #include <hpx/type_support/always_void.hpp>

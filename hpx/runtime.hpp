@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>

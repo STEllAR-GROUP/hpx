@@ -29,7 +29,7 @@
 #include <hpx/runtime/actions/preassigned_action_id.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/actions/transfer_continuation_action.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
@@ -42,7 +42,7 @@
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)

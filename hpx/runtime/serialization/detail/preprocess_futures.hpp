@@ -9,7 +9,7 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/datastructures.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>

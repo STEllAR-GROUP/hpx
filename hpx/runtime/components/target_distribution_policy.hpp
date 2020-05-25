@@ -11,20 +11,20 @@
 #include <hpx/config.hpp>
 #include <hpx/async/dataflow.hpp>
 #include <hpx/async/detail/async_implementations_fwd.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/find_here.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 
 #include <algorithm>
 #include <cstddef>

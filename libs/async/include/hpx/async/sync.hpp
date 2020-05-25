@@ -11,20 +11,20 @@
 #include <hpx/async/detail/sync_implementations.hpp>
 #include <hpx/async/sync.hpp>
 #include <hpx/async/sync_fwd.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/executors/sync.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/traits/is_action.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/local_async/sync.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_client.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/is_valid_action.hpp>
-#include <hpx/traits/promise_local_result.hpp>
 #include <hpx/util/bind_action.hpp>
 
 #include <type_traits>

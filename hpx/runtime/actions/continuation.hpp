@@ -22,7 +22,7 @@
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/traits/action_remote_result.hpp>
-#include <hpx/traits/future_traits.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/functional/serialization/serializable_unique_function.hpp>

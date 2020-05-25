@@ -107,7 +107,9 @@ add_hpx_module(
     hpx_config
     hpx_errors
     hpx_executors
+    hpx_execution
     hpx_format
+    hpx_futures
     hpx_local_async
     hpx_local_lcos
     hpx_naming_base

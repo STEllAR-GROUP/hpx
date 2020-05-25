@@ -16,7 +16,7 @@
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/is_client.hpp>
-#include <hpx/traits/is_future.hpp>
+#include <hpx/futures/traits/is_future.hpp>
 
 #include <boost/utility/string_ref.hpp>
 

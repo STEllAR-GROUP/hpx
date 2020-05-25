@@ -9,7 +9,7 @@
 
 #include <hpx/async.hpp>
 #include <hpx/execution.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/local_async.hpp>
 #include <hpx/mpi.hpp>
 #include <hpx/program_options.hpp>

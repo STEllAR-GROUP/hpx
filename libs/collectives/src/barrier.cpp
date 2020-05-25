@@ -5,13 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/collectives/barrier.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/run_as_hpx_thread.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/state.hpp>

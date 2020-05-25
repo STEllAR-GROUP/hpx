@@ -6,4 +6,5 @@
 
 #pragma once
 
-#include <hpx/lcos/future_exec.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/futures.hpp>

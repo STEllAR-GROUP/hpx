@@ -9,8 +9,8 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/first_argument.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/type_support/pack.hpp>

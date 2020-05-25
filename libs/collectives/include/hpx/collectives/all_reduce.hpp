@@ -140,15 +140,15 @@ namespace hpx { namespace lcos {
 #include <hpx/basic_execution.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/get_num_localities.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 

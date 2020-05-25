@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/launch_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
 #include <cstdint>

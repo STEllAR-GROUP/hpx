@@ -10,6 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <memory>

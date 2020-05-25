@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async/async.hpp>
 #include <hpx/async/detail/async_colocated.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/server/migrate_component.hpp>

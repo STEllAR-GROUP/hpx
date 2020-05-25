@@ -11,13 +11,11 @@
 
 set(hpx_SOURCES
     custom_exception_info.cpp
-    lcos/detail/future_data.cpp
     lcos/future.cpp
     hpx_init.cpp
     hpx_main_winsocket.cpp
     runtime.cpp
     runtime_handlers.cpp
-    runtime/launch_policy.cpp
     runtime/thread_pool_helpers.cpp
     runtime/threads/thread_pool_suspension_helpers.cpp
     state.cpp
@@ -168,11 +166,8 @@ set(hpx_HEADERS
     hpx/hpx_start_impl.hpp
     hpx/hpx_suspend.hpp
     hpx/hpx_user_main_config.hpp
-    hpx/lcos/future.hpp
     hpx/lcos/future_wait.hpp
     hpx/lcos_fwd.hpp
-    hpx/lcos/local/futures_factory.hpp
-    hpx/lcos/local/packaged_continuation.hpp
     hpx/runtime/config_entry.hpp
     hpx/runtime_fwd.hpp
     hpx/runtime/get_num_localities.hpp
@@ -181,7 +176,6 @@ set(hpx_HEADERS
     hpx/runtime/get_worker_thread_num.hpp
     hpx/runtime_handlers.hpp
     hpx/runtime.hpp
-    hpx/runtime/launch_policy.hpp
     hpx/runtime/report_error.hpp
     hpx/runtime/runtime_fwd.hpp
     hpx/runtime/serialization/detail/preprocess_container.hpp
@@ -196,19 +190,8 @@ set(hpx_HEADERS
     hpx/runtime/threads/run_as_os_thread.hpp
     hpx/runtime/threads/thread_pool_suspension_helpers.hpp
     hpx/state.hpp
-    hpx/traits/acquire_future.hpp
-    hpx/traits/acquire_shared_state.hpp
-    hpx/traits/future_access.hpp
-    hpx/traits/future_then_result.hpp
-    hpx/traits/future_traits.hpp
-    hpx/traits/is_future.hpp
-    hpx/traits/is_future_range.hpp
-    hpx/traits/is_future_tuple.hpp
-    hpx/traits/is_launch_policy.hpp
     hpx/traits/managed_component_policies.hpp
     hpx/traits/pointer_category.hpp
-    hpx/traits/promise_local_result.hpp
-    hpx/traits/promise_remote_result.hpp
     hpx/traits/rma_memory_region_traits.hpp
     hpx/util/debugging.hpp
     hpx/util/debug/thread_stacktrace.hpp
@@ -229,10 +212,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/components_fwd.hpp
     hpx/lcos/base_lco.hpp
     hpx/lcos/base_lco_with_value.hpp
-    hpx/lcos/detail/future_await_traits.hpp
-    hpx/lcos/detail/future_data.hpp
-    hpx/lcos/detail/future_traits.hpp
-    hpx/lcos/detail/future_transforms.hpp
     hpx/lcos/detail/promise_base.hpp
     hpx/lcos/detail/promise_lco.hpp
     hpx/lcos/object_semaphore.hpp
@@ -416,7 +395,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/traits/component_type_database.hpp
     hpx/traits/component_type_is_compatible.hpp
     hpx/traits/extract_action.hpp
-    hpx/traits/get_remote_result.hpp
     hpx/traits/is_client.hpp
     hpx/traits/is_component.hpp
     hpx/traits/is_continuation.hpp

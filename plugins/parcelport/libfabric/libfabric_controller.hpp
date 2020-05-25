@@ -12,7 +12,7 @@
 //
 #include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/lcos/promise.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 //
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>

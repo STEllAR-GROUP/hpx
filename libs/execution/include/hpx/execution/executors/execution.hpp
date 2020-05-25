@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 // Necessary to avoid circular include
-#include <hpx/execution/executors/execution_fwd.hpp>
+#include <hpx/basic_execution/execution.hpp>
 
 #include <hpx/assertion.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
@@ -19,16 +19,16 @@
 #include <hpx/errors.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution/traits/future_then_result_exec.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/future_access.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/traits/future_access.hpp>
-#include <hpx/traits/future_then_result_exec.hpp>
-#include <hpx/traits/future_traits.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/type_support/pack.hpp>
 

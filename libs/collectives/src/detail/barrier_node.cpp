@@ -6,14 +6,14 @@
 
 #include <hpx/assertion.hpp>
 #include <hpx/async.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>
