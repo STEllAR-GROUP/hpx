@@ -36,9 +36,11 @@ namespace hpx {
             serialization::input_archive& ar, unsigned)
         {
             int value = 0;
-            ar& value;
+            // clang-format off
+            ar & value;
             policy_ = static_cast<launch_policy>(value);
-            ar& value;
+            ar & value;
+            // clang-format on
             priority_ = static_cast<threads::thread_priority>(value);
         }
 
@@ -46,9 +48,11 @@ namespace hpx {
             serialization::output_archive& ar, unsigned) const
         {
             int value = static_cast<int>(policy_);
-            ar& value;
+            // clang-format off
+            ar & value;
             value = static_cast<int>(priority_);
-            ar& value;
+            ar & value;
+            // clang-format on
         }
     }    // namespace detail
 }    // namespace hpx
