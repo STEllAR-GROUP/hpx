@@ -16,10 +16,6 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace threads {
-    class executor;
-}}    // namespace hpx::threads
-
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
     struct static_chunk_size;
