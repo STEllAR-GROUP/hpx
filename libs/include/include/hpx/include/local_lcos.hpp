@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/local_async/dataflow.hpp>
+#include <hpx/async_local/dataflow.hpp>
 
 #include <hpx/local_lcos/channel.hpp>
 

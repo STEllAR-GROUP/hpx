@@ -7,7 +7,7 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ===========
-local_async
+async_local
 ===========
 
 This module contains functionality for asynchronously launching local work:
@@ -16,4 +16,4 @@ The :ref:`libs_async` module extends the functionality in this module to work
 with :term:`action`\ s.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx-docs/latest/html/libs/local_async/docs/index.html>`__.
+<https://stellar-group.github.io/hpx-docs/latest/html/libs/async_local/docs/index.html>`__.

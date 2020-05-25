@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local_async/apply.hpp>
-#include <hpx/local_async/async.hpp>
+#include <hpx/async_local/apply.hpp>
+#include <hpx/async_local/async.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>

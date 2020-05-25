@@ -13,7 +13,7 @@ async
 
 This module contains functionality for asynchronously launching work on remote
 localities: :cpp:func:`hpx::async`, :cpp:func:`hpx::apply`. This module extends
-the local-only functions in :ref:`libs_local_async`.
+the local-only functions in :ref:`libs_async_local`.
 
 See the :ref:`API reference <libs_async_api>` of this module for more
 details.

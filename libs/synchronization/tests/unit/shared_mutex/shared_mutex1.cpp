@@ -9,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/local_async/apply.hpp>
+#include <hpx/async_local/apply.hpp>
 
 #include <hpx/testing.hpp>
 

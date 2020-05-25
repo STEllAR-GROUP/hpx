@@ -14,7 +14,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/local_async/dataflow.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/local_async/apply.hpp>
+#include <hpx/async_local/apply.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async/applier/detail/apply_colocated.hpp>

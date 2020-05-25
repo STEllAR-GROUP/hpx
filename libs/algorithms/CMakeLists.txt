@@ -158,7 +158,7 @@ add_hpx_module(
     hpx_format
     hpx_functional
     hpx_iterator_support
-    hpx_local_async
+    hpx_async_local
     hpx_pack_traversal
     hpx_program_options
     hpx_statistics

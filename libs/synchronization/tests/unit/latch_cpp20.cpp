@@ -6,8 +6,8 @@
 
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/async_local.hpp>
 #include <hpx/latch.hpp>
-#include <hpx/local_async.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>

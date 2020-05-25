@@ -110,7 +110,7 @@ add_hpx_module(
     hpx_execution
     hpx_format
     hpx_futures
-    hpx_local_async
+    hpx_async_local
     hpx_local_lcos
     hpx_naming_base
     hpx_pack_traversal

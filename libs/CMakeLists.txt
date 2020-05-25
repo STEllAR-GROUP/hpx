@@ -51,7 +51,7 @@ set(HPX_CANDIDATE_LIBS
     iterator_support
     itt_notify
     lcos_distributed
-    local_async
+    async_local
     local_lcos
     logging
     memory

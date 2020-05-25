@@ -12,7 +12,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/hpx_finalize.hpp>
-#include <hpx/local_async.hpp>
+#include <hpx/async_local.hpp>
 
 #include <exception>
 #include <list>

@@ -18,7 +18,7 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/local_async/sync.hpp>
+#include <hpx/async_local/sync.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/extract_action.hpp>

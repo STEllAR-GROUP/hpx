@@ -5,15 +5,15 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_EXAMPLES)
-  add_hpx_pseudo_target(examples.modules.local_async)
-  add_hpx_pseudo_dependencies(examples.modules examples.modules.local_async)
+  add_hpx_pseudo_target(examples.modules.async_local)
+  add_hpx_pseudo_dependencies(examples.modules examples.modules.async_local)
   if(HPX_WITH_TESTS
      AND HPX_WITH_TESTS_EXAMPLES
-     AND HPX_LOCAL_ASYNC_WITH_TESTS
+     AND HPX_ASYNC_LOCAL_WITH_TESTS
   )
-    add_hpx_pseudo_target(tests.examples.modules.local_async)
+    add_hpx_pseudo_target(tests.examples.modules.async_local)
     add_hpx_pseudo_dependencies(
-      tests.examples.modules tests.examples.modules.local_async
+      tests.examples.modules tests.examples.modules.async_local
     )
   endif()
 endif()

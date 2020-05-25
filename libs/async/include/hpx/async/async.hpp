@@ -22,7 +22,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/local_async/async.hpp>
+#include <hpx/async_local/async.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/extract_action.hpp>

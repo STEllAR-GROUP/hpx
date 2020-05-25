@@ -13,7 +13,7 @@
 #include <hpx/resiliency/async_replay.hpp>
 
 #include <hpx/futures/future.hpp>
-#include <hpx/local_async.hpp>
+#include <hpx/async_local.hpp>
 
 #include <cstddef>
 #include <utility>

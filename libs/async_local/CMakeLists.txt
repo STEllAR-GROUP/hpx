@@ -8,15 +8,15 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(local_async_headers hpx/local_async/apply.hpp hpx/local_async/async.hpp
-                        hpx/local_async/dataflow.hpp hpx/local_async/sync.hpp
+set(async_local_headers hpx/async_local/apply.hpp hpx/async_local/async.hpp
+                        hpx/async_local/dataflow.hpp hpx/async_local/sync.hpp
 )
 
 include(HPX_AddModule)
 add_hpx_module(
-  local_async FORCE_LINKING_GEN
+  async_local FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
-  HEADERS ${local_async_headers}
+  HEADERS ${async_local_headers}
   DEPENDENCIES
     hpx_allocator_support
     hpx_async_base

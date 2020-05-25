@@ -11,7 +11,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
 
-#include <hpx/local_async/dataflow.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/timing.hpp>
 

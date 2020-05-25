@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async/applier/apply.hpp>
-#include <hpx/local_async/apply.hpp>
+#include <hpx/async_local/apply.hpp>
 #include <hpx/util/bind_action.hpp>
 
 #include <type_traits>

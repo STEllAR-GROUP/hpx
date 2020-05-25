@@ -22,7 +22,7 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/local_async/dataflow.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>

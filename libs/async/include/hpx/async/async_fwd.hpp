@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/local_async/async.hpp>
+#include <hpx/async_local/async.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <utility>
