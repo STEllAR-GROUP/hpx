@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-name: Linux CI (FetchContent)
+name: Linux CI (Debug)
 
 on: [pull_request]
 
@@ -19,18 +19,24 @@ jobs:
       shell: bash
       run: |
           cmake \
-              tests/unit/build/fetchcontent \
+              . \
               -Bbuild \
               -GNinja \
               -DCMAKE_BUILD_TYPE=Debug \
               -DHPX_WITH_MALLOC=system \
-              -DHPX_WITH_APEX=ON \
               -DHPX_WITH_EXAMPLES=ON \
-              -DHPX_WITH_TESTS=OFF \
-              -DHPX_REPOSITORY="file:////$(pwd)" \
-              -DHPX_TAG="$GITHUB_SHA"
+              -DHPX_WITH_TESTS=ON \
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
     - name: Build
       shell: bash
       run: |
           cmake --build build --target all
           cmake --build build --target examples
+    - name: Test
+      shell: bash
+      run: |
+          cd build
+          ctest \
+            --output-on-failure \
+            --tests-regex tests.examples \
+            --exclude-regex tests.examples.transpose.transpose_block_numa
