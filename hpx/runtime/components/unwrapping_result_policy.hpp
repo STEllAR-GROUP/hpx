@@ -9,10 +9,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async/detail/async_implementations.hpp>
-#include <hpx/async/detail/async_unwrap_result_implementations.hpp>
-#include <hpx/async/detail/sync_implementations.hpp>
-#include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async_distributed/detail/async_implementations.hpp>
+#include <hpx/async_distributed/detail/async_unwrap_result_implementations.hpp>
+#include <hpx/async_distributed/detail/sync_implementations.hpp>
+#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

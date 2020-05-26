@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/async/detail/async_colocated_fwd.hpp>
+#include <hpx/async_distributed/detail/async_colocated_fwd.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
-// #include <hpx/async/applier/register_apply_colocated.hpp>
+// #include <hpx/async_distributed/applier/register_apply_colocated.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/name.hpp>

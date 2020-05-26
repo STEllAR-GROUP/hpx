@@ -14,6 +14,6 @@
 #include <hpx/async_local.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/include/performance_counters.hpp>
 #endif

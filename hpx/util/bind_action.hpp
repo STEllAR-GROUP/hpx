@@ -14,9 +14,9 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
-#include <hpx/async/async_fwd.hpp>
+#include <hpx/async_distributed/async_fwd.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/async/applier/apply.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>

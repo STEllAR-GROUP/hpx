@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assertion.hpp>
-#include <hpx/async/applier/applier.hpp>
-#include <hpx/async/apply.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/async_distributed/apply.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>

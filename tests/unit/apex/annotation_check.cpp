@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/when_all.hpp>

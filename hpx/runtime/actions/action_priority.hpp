@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/async/async_fwd.hpp>
+#include <hpx/async_distributed/async_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/extract_action.hpp>

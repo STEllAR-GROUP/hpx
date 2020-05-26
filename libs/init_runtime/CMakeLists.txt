@@ -34,6 +34,6 @@ add_hpx_module(
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   target_link_libraries(
-    hpx_init_runtime PUBLIC hpx_async hpx_performance_counters
+    hpx_init_runtime PUBLIC hpx_async_distributed hpx_performance_counters
   )
 endif()

@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/async_local.hpp>

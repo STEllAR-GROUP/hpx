@@ -6,11 +6,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async/apply.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/async/applier/detail/apply_colocated.hpp>
+#include <hpx/async_distributed/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/get_colocation_id.hpp>
 #include <hpx/async_base/launch_policy.hpp>

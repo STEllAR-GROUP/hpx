@@ -74,7 +74,8 @@ add_hpx_module(
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  target_link_libraries(hpx_compute PUBLIC hpx_performance_counters hpx_async)
+  target_link_libraries(hpx_compute
+    PUBLIC hpx_performance_counters hpx_async_distributed)
 endif()
 
 # Temporary since the module still depends on some runtime files

@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>

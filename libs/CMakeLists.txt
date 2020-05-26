@@ -17,7 +17,7 @@ set(HPX_CANDIDATE_LIBS
     allocator_support
     asio
     assertion
-    async
+    async_distributed
     async_base
     async_combinators
     basic_execution

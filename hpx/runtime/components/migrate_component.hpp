@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async/async.hpp>
-#include <hpx/async/detail/async_colocated.hpp>
+#include <hpx/async_distributed/async.hpp>
+#include <hpx/async_distributed/detail/async_colocated.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/client_base.hpp>

@@ -10,7 +10,7 @@
 #include <hpx/async_local/apply.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/async/applier/detail/apply_colocated.hpp>
-#include <hpx/async/applier/detail/apply_colocated_callback.hpp>
-#include <hpx/async/apply.hpp>
+#include <hpx/async_distributed/applier/detail/apply_colocated.hpp>
+#include <hpx/async_distributed/applier/detail/apply_colocated_callback.hpp>
+#include <hpx/async_distributed/apply.hpp>
 #endif

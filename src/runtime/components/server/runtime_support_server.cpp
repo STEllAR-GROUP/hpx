@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/errors.hpp>

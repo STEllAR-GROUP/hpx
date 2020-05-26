@@ -8,7 +8,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/futures/future.hpp>

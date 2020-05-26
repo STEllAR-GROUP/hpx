@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/async/applier/applier.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 

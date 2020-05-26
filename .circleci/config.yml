@@ -630,7 +630,7 @@ jobs:
                   tests.unit.modules.allocator_support \
                   tests.unit.modules.asio \
                   tests.unit.modules.assertion \
-                  tests.unit.modules.async \
+                  tests.unit.modules.async_distributed \
                   tests.unit.modules.async_combinators \
                   tests.unit.modules.basic_execution \
                   tests.unit.modules.batch_environments \

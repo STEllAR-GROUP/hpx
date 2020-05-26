@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async/apply.hpp>
+#include <hpx/async_distributed/apply.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_distributed/server/channel.hpp>
