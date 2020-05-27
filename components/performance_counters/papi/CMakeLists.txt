@@ -6,7 +6,7 @@
 
 if(HPX_WITH_PAPI)
   set(HPX_COMPONENTS
-      ${HPX_COMPONENTS} papi
+      ${HPX_COMPONENTS} papi_counters
       CACHE INTERNAL "list of HPX components"
   )
 

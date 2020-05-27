@@ -41,7 +41,7 @@ int hpx_main(hpx::program_options::variables_map&)
     volatile double a = 0.0, b = 0.0, c = 0.0;
     for (i = 0; i < n; i++) a=b+c;
 
-    counter_value value1 = performance_counter::get_value(hpx::launch::sync, id);
+    counter_value value1 = counter.get_counter_value(hpx::launch::sync);
 
     // stop the counter w/o resetting
     counter.stop(hpx::launch::sync);
@@ -50,14 +50,14 @@ int hpx_main(hpx::program_options::variables_map&)
     for (i = 0; i < n; i++) a=b+c;
     // get value and reset, and start again
     counter_value value2 = counter.get_counter_value(hpx::launch::sync, true);
-    performance_counter::start(hpx::launch::sync, id);
+    counter.start(hpx::launch::sync);
 
     // perform 2*n ops, counted from 0 (or close to it)
     for (i = 0; i < 2*n; i++) a=b+c;
     counter_value value3 = counter.get_counter_value(hpx::launch::sync);
 
     // reset counter using reset-only interface
-    performance_counter::reset(hpx::launch::sync, id);
+    counter.reset(hpx::launch::sync);
 
     // perform n ops, counted from 0 (or close to it)
     for (i = 0; i < n; i++) a=b+c;
