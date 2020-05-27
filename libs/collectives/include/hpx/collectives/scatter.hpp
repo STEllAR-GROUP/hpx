@@ -9,6 +9,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
+// clang-format off
 namespace hpx { namespace lcos {
 
     /// Scatter (receive) a set of values to different call sites
@@ -43,7 +44,8 @@ namespace hpx { namespace lcos {
     template <typename T>
     hpx::future<T> scatter_from(char const* basename,
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1),
+        std::size_t root_site = 0);
 
     /// Scatter (send) a part of the value set at the given call site
     ///
@@ -77,7 +79,7 @@ namespace hpx { namespace lcos {
     hpx::future<T> scatter_to(char const* basename,
         hpx::future<std::vector<T>> result,
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1));
 
     /// Scatter (receive) a set of values to different call sites
     ///
@@ -111,7 +113,8 @@ namespace hpx { namespace lcos {
     template <typename T>
     hpx::future<T> scatter_from(char const* basename,
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+        std::size_t this_site = std::size_t(-1),
+        std::size_t root_site = 0);
 
     /// Scatter (send) a part of the value set at the given call site
     ///
@@ -143,73 +146,36 @@ namespace hpx { namespace lcos {
     ///
     template <typename T>
     hpx::future<T> scatter_to(char const* basename,
-        std::vector<T> const& result, std::size_t num_sites = std::size_t(-1),
+        std::vector<T> const& result,
+        std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1));
 
     template <typename T>
-    hpx::future<T> scatter_to(char const* basename, std::vector<T>&& result,
+    hpx::future<T> scatter_to(char const* basename,
+        std::vector<T>&& result,
+        std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
-/// \def HPX_REGISTER_SCATTER_DECLARATION(type, name)
-///
-/// \brief Declare a scatter object named \a name for a given data type \a type.
-///
-/// The macro \a HPX_REGISTER_SCATTER_DECLARATION can be used to declare
-/// all facilities necessary for a (possibly remote) scatter operation.
-///
-/// The parameter \a type specifies for which data type the scatter
-/// operations should be enabled.
-///
-/// The (optional) parameter \a name should be a unique C-style identifier
-/// which will be internally used to identify a particular scatter operation.
-/// If this defaults to \a \<type\>_scatter if not specified.
-///
-/// \note The macro \a HPX_REGISTER_SCATTER_DECLARATION can be used with 1
-///       or 2 arguments. The second argument is optional and defaults to
-///       \a \<type\>_scatter.
-///
-#define HPX_REGISTER_SCATTER_DECLARATION(type, name)
-
-/// \def HPX_REGISTER_SCATTER(type, name)
-///
-/// \brief Define a scatter object named \a name for a given data type \a type.
-///
-/// The macro \a HPX_REGISTER_SCATTER can be used to define
-/// all facilities necessary for a (possibly remote) scatter operation.
-///
-/// The parameter \a type specifies for which data type the scatter
-/// operations should be enabled.
-///
-/// The (optional) parameter \a name should be a unique C-style identifier
-/// which will be internally used to identify a particular scatter operation.
-/// If this defaults to \a \<type\>_scatter if not specified.
-///
-/// \note The macro \a HPX_REGISTER_SCATTER can be used with 1
-///       or 2 arguments. The second argument is optional and defaults to
-///       \a \<type\>_scatter.
-///
-#define HPX_REGISTER_SCATTER(type, name)
+        std::size_t this_site = std::size_t(-1));
 }}    // namespace hpx::lcos
+
+// clang-format on
 #else
 
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/async_distributed/dataflow.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/modules/basic_execution.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime_local/get_num_localities.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -227,7 +193,7 @@ namespace hpx { namespace traits {
     // support for scatter
     namespace communication {
         struct scatter_tag;
-    }
+    }    // namespace communication
 
     template <typename Communicator>
     struct communication_operation<Communicator, communication::scatter_tag>
@@ -242,7 +208,7 @@ namespace hpx { namespace traits {
         template <typename Result>
         Result get(std::size_t which)
         {
-            using arg_type = typename Communicator::arg_type;
+            using arg_type = typename Result::result_type;
             using mutex_type = typename Communicator::mutex_type;
 
             auto this_ = this->shared_from_this();
@@ -253,7 +219,9 @@ namespace hpx { namespace traits {
                 auto& communicator = this_->communicator_;
 
                 std::unique_lock<mutex_type> l(communicator.mtx_);
-                return std::move(communicator.data_[which]);
+
+                auto& data = communicator.template access_data<arg_type>(l);
+                return std::move(data[which]);
             };
 
             std::unique_lock<mutex_type> l(communicator_.mtx_);
@@ -266,6 +234,12 @@ namespace hpx { namespace traits {
             communicator_.gate_.synchronize(1, l);
             if (communicator_.gate_.set(which, l))
             {
+                HPX_ASSERT_DOESNT_OWN_LOCK(l);
+                {
+                    std::unique_lock<mutex_type> l(communicator_.mtx_);
+                    communicator_.invalidate_data(l);
+                }
+
                 // this is a one-shot object (generations counters are not
                 // supported), unregister ourselves (but only once)
                 hpx::unregister_with_basename(
@@ -276,7 +250,7 @@ namespace hpx { namespace traits {
         }
 
         template <typename Result, typename T>
-        Result set(std::size_t which, std::vector<T> t)
+        Result set(std::size_t which, std::vector<T>&& t)
         {
             using mutex_type = typename Communicator::mutex_type;
 
@@ -284,11 +258,20 @@ namespace hpx { namespace traits {
             util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
 
             communicator_.gate_.synchronize(1, l);
-            communicator_.data_ = std::move(t);
-            auto result = std::move(communicator_.data_[which]);
+
+            auto& data = communicator_.template access_data<T>(l);
+            data = std::move(t);
+
+            auto result = std::move(data[which]);
 
             if (communicator_.gate_.set(which, l))
             {
+                HPX_ASSERT_DOESNT_OWN_LOCK(l);
+                {
+                    std::unique_lock<mutex_type> l(communicator_.mtx_);
+                    communicator_.invalidate_data(l);
+                }
+
                 // this is a one-shot object (generations counters are not
                 // supported), unregister ourselves (but only once)
                 hpx::unregister_with_basename(
@@ -305,13 +288,12 @@ namespace hpx { namespace traits {
 namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    hpx::future<hpx::id_type> create_scatterer(char const* basename,
+    inline hpx::future<hpx::id_type> create_scatterer(char const* basename,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
-        return detail::create_communicator<T>(
+        return detail::create_communicator(
             basename, num_sites, generation, this_site, num_sites);
     }
 
@@ -328,7 +310,7 @@ namespace hpx { namespace lcos {
 
         auto scatter_data =
             [this_site](hpx::future<hpx::id_type>&& fid) -> hpx::future<T> {
-            using action_type = typename detail::communicator_server<T>::
+            using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::scatter_tag, hpx::future<T>>;
 
@@ -380,7 +362,7 @@ namespace hpx { namespace lcos {
         auto scatter_to_data =
             [this_site](hpx::future<hpx::id_type>&& fid,
                 hpx::future<std::vector<T>>&& local_result) -> hpx::future<T> {
-            using action_type = typename detail::communicator_server<T>::
+            using action_type = typename detail::communicator_server::
                 template communication_set_action<
                     traits::communication::scatter_tag, T, std::vector<T>>;
 
@@ -417,7 +399,7 @@ namespace hpx { namespace lcos {
         }
 
         return scatter_to(
-            create_scatterer<T>(basename, num_sites, generation, this_site),
+            create_scatterer(basename, num_sites, generation, this_site),
             std::move(result), this_site);
     }
 
@@ -435,7 +417,7 @@ namespace hpx { namespace lcos {
         auto scatter_to_data_direct =
             [this_site](hpx::future<hpx::id_type>&& fid,
                 std::vector<T>&& local_result) -> hpx::future<T> {
-            using action_type = typename detail::communicator_server<T>::
+            using action_type = typename detail::communicator_server::
                 template communication_set_action<
                     traits::communication::scatter_tag, T, std::vector<T>>;
 
@@ -477,12 +459,12 @@ namespace hpx { namespace lcos {
         }
 
         return scatter_to(
-            create_scatterer<T>(basename, num_sites, generation, this_site),
+            create_scatterer(basename, num_sites, generation, this_site),
             std::move(local_result), this_site);
     }
 }}    // namespace hpx::lcos
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
     using lcos::scatter_from;
     using lcos::scatter_to;
@@ -492,25 +474,7 @@ namespace hpx {
 #define HPX_REGISTER_SCATTER_DECLARATION(...) /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_SCATTER(...)                                              \
-    HPX_REGISTER_SCATTER_(__VA_ARGS__)                                         \
-    /**/
-
-#define HPX_REGISTER_SCATTER_(...)                                             \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_SCATTER_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))        \
-    /**/
-
-#define HPX_REGISTER_SCATTER_1(type)                                           \
-    HPX_REGISTER_SCATTER_2(type, HPX_PP_CAT(type, _scatter))                   \
-    /**/
-
-#define HPX_REGISTER_SCATTER_2(type, name)                                     \
-    typedef hpx::components::component<                                        \
-        hpx::lcos::detail::communicator_server<type>>                          \
-        HPX_PP_CAT(scatter_, name);                                            \
-    HPX_REGISTER_COMPONENT(HPX_PP_CAT(scatter_, name))                         \
-    /**/
+#define HPX_REGISTER_SCATTER(...)             /**/
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN

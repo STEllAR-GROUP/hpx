@@ -17,10 +17,8 @@
 #include <utility>
 #include <vector>
 
-char const* scatter_basename = "/test/scatter/";
-char const* scatter_direct_basename = "/test/scatter_direct/";
-
-HPX_REGISTER_SCATTER(std::uint32_t, test_scatter);
+constexpr char const* scatter_basename = "/test/scatter/";
+constexpr char const* scatter_direct_basename = "/test/scatter_direct/";
 
 int hpx_main(int argc, char* argv[])
 {

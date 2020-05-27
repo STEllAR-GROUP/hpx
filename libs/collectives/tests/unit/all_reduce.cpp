@@ -16,10 +16,8 @@
 #include <utility>
 #include <vector>
 
-char const* all_reduce_basename = "/test/all_reduce/";
-char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
-
-HPX_REGISTER_ALLREDUCE(std::uint32_t, test_all_reduce);
+constexpr char const* all_reduce_basename = "/test/all_reduce/";
+constexpr char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
 
 int hpx_main(int argc, char* argv[])
 {
