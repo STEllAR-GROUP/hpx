@@ -62,7 +62,7 @@ void test_remote_async(hpx::id_type const& target)
 
     {
         increment_with_future_action inc;
-        hpx::promise<std::int32_t> p;
+        hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<std::int32_t> f1 = hpx::async(inc, target, f);

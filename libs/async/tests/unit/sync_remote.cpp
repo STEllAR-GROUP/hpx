@@ -64,7 +64,7 @@ void test_remote_sync(hpx::id_type const& target)
 
     {
         increment_with_future_action inc;
-        hpx::promise<std::int32_t> p;
+        hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         p.set_value(42);

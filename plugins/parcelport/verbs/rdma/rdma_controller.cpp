@@ -648,7 +648,7 @@ int rdma_controller::start_server_connection(uint32_t remote_ip)
         << "( " << sockaddress(&local_addr_) << ")");
 
     // create a future for this connection
-    hpx::promise<verbs_endpoint_ptr> new_endpoint_promise;
+    hpx::lcos::promise<verbs_endpoint_ptr> new_endpoint_promise;
     hpx::future<verbs_endpoint_ptr>  new_endpoint_future =
         new_endpoint_promise.get_future();
 
@@ -689,7 +689,7 @@ rdma_controller::connect_to_server(uint32_t remote_ip)
                     << ipaddress(remote_ip));
                 // we must create a future for this connection as there is no entry
                 // in the connections_started_ map (a connect request from remote ip)
-                hpx::promise<verbs_endpoint_ptr> new_endpoint_promise;
+                hpx::lcos::promise<verbs_endpoint_ptr> new_endpoint_promise;
                 hpx::future<verbs_endpoint_ptr>  new_endpoint_future =
                     new_endpoint_promise.get_future();
                 //

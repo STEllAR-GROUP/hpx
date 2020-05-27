@@ -1479,6 +1479,16 @@ if(HPX_WITH_INIT_START_OVERLOADS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_INIT_START_OVERLOADS_COMPATIBILITY)
 endif()
 
+# HPX_WITH_PROMISE_ALIAS_COMPATIBILITY : introduced in V1.5.0?
+hpx_option(
+  HPX_WITH_PROMISE_ALIAS_COMPATIBILITY BOOL
+  "Enable deprecated alias of hpx::promise to hpx::lcos::promise (default: ON)"
+  ON ADVANCED
+)
+if(HPX_WITH_PROMISE_ALIAS_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_PROMISE_ALIAS_COMPATIBILITY)
+endif()
+
 # ##############################################################################
 # Check for compiler compatibility
 #
