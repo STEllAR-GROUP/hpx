@@ -1,0 +1,141 @@
+//  Copyright (c) 2020 Hartmut Kaiser
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/collectives.hpp>
+#include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/testing.hpp>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
+
+char const* gather_basename = "/test/gather/";
+char const* gather_direct_basename = "/test/gather_direct/";
+
+HPX_REGISTER_GATHER(std::uint32_t, test_gather);
+
+void test_gather_here_there()
+{
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST(num_localities >= 2);
+
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    // test functionality based on future<> of local result
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (this_locality == 0)
+        {
+            hpx::future<std::vector<std::uint32_t>> overall_result =
+                hpx::lcos::gather_here(gather_basename,
+                    hpx::make_ready_future(std::uint32_t(42)), num_localities,
+                    i);
+
+            std::vector<std::uint32_t> sol = overall_result.get();
+            for (std::size_t j = 0; j != sol.size(); ++j)
+            {
+                HPX_TEST(j + 42 == sol[j]);
+            }
+        }
+        else
+        {
+            hpx::future<std::vector<std::uint32_t>> overall_result =
+                hpx::lcos::gather_there(gather_basename,
+                    hpx::make_ready_future(this_locality + 42), i);
+
+            std::vector<std::uint32_t> sol = overall_result.get();
+            for (std::size_t j = 0; j != sol.size(); ++j)
+            {
+                HPX_TEST(j + 42 == sol[j]);
+            }
+        }
+    }
+
+    // test functionality based on immediate local result value
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (this_locality == 0)
+        {
+            hpx::future<std::vector<std::uint32_t>> overall_result =
+                hpx::lcos::gather_here(gather_direct_basename,
+                    std::uint32_t(42), num_localities, i);
+
+            std::vector<std::uint32_t> sol = overall_result.get();
+            for (std::size_t j = 0; j != sol.size(); ++j)
+            {
+                HPX_TEST(j + 42 == sol[j]);
+            }
+        }
+        else
+        {
+            hpx::future<std::vector<std::uint32_t>> overall_result =
+                hpx::lcos::gather_there(
+                    gather_direct_basename, this_locality + 42, i);
+
+            std::vector<std::uint32_t> sol = overall_result.get();
+            for (std::size_t j = 0; j != sol.size(); ++j)
+            {
+                HPX_TEST(j + 42 == sol[j]);
+            }
+        }
+    }
+}
+
+void test_gather()
+{
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST(num_localities >= 2);
+
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    // test functionality based on future<> of local result
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        hpx::future<std::vector<std::uint32_t>> overall_result =
+            hpx::gather(gather_basename,
+                hpx::make_ready_future(this_locality + 42), num_localities, i);
+
+        std::vector<std::uint32_t> sol = overall_result.get();
+        for (std::size_t j = 0; j != sol.size(); ++j)
+        {
+            HPX_TEST(j + 42 == sol[j]);
+        }
+    }
+
+    // test functionality based on immediate local result value
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        hpx::future<std::vector<std::uint32_t>> overall_result =
+            hpx::gather(gather_basename, this_locality + 42, num_localities, i);
+
+        std::vector<std::uint32_t> sol = overall_result.get();
+        for (std::size_t j = 0; j != sol.size(); ++j)
+        {
+            HPX_TEST(j + 42 == sol[j]);
+        }
+    }
+}
+
+int hpx_main(int argc, char* argv[])
+{
+    test_gather_here_there();
+    test_gather();
+
+    return hpx::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
+
+    HPX_TEST_EQ(hpx::init(argc, argv, cfg), 0);
+    return hpx::util::report_errors();
+}

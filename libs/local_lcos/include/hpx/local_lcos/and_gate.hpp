@@ -228,6 +228,7 @@ namespace hpx { namespace lcos { namespace local {
                 return true;
             }
 
+            outer_lock.unlock();
             return false;
         }
 

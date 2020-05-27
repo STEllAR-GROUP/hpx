@@ -146,6 +146,81 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  basename    The base name identifying the gather operation
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param root_site    The sequence number of the central gather point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    ///
+    /// \note       Each gather operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
+    ///             necessary internal facilities used by \a gather_here and
+    ///             \a gather_there
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             gathered values. It will become ready once the gather
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<typename std::decay<T>::type>> gather(
+        char const* basename, T&& result,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  basename    The base name identifying the gather operation
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param root_site    The sequence number of the central gather point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    ///
+    /// \note       Each gather operation has to be accompanied with a unique
+    ///             usage of the \a HPX_REGISTER_GATHER macro to define the
+    ///             necessary internal facilities used by \a gather_here and
+    ///             \a gather_there
+    ///
+    /// \returns    This function returns a future holding a vector with all
+    ///             gathered values. It will become ready once the gather
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<std::vector<T>> gather(char const* basename,
+        hpx::future<T>&& result, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
+
 /// \def HPX_REGISTER_GATHER_DECLARATION(type, name)
 ///
 /// \brief Declare a gather object named \a name for a given data type \a type.
@@ -247,12 +322,8 @@ namespace hpx { namespace traits {
 
                 auto& communicator = this_->communicator_;
 
-                std::vector<T> data(communicator.num_sites_);
-                {
-                    std::unique_lock<mutex_type> l(communicator.mtx_);
-                    std::swap(data, communicator.data_);
-                }
-                return data;
+                std::unique_lock<mutex_type> l(communicator.mtx_);
+                return communicator.data_;
             };
 
             std::unique_lock<mutex_type> l(communicator_.mtx_);
@@ -273,26 +344,6 @@ namespace hpx { namespace traits {
                     .get();
             }
             return f;
-        }
-
-        template <typename T>
-        void set(std::size_t which, T&& t)
-        {
-            using mutex_type = typename Communicator::mutex_type;
-
-            std::unique_lock<mutex_type> l(communicator_.mtx_);
-            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
-
-            communicator_.gate_.synchronize(1, l);
-            communicator_.data_[which] = std::forward<T>(t);
-            if (communicator_.gate_.set(which, l))
-            {
-                // this is a one-shot object (generations counters are not
-                // supported), unregister ourselves (but only once)
-                hpx::unregister_with_basename(
-                    std::move(communicator_.name_), communicator_.site_)
-                    .get();
-            }
         }
 
         Communicator& communicator_;
@@ -382,7 +433,7 @@ namespace hpx { namespace lcos {
             using action_type = typename detail::communicator_server<arg_type>::
                 template communication_get_action<
                     traits::communication::gather_tag,
-                    hpx::future<std::vector<arg_type>>>;
+                    hpx::future<std::vector<arg_type>>, arg_type>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = fid.get();
@@ -423,7 +474,7 @@ namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<void> gather_there(hpx::future<hpx::id_type>&& fid,
+    hpx::future<std::vector<T>> gather_there(hpx::future<hpx::id_type>&& fid,
         hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -433,10 +484,11 @@ namespace hpx { namespace lcos {
 
         auto gather_there_data =
             [this_site](hpx::future<hpx::id_type>&& fid,
-                hpx::future<T>&& local_result) -> hpx::future<void> {
+                hpx::future<T>&& local_result) -> hpx::future<std::vector<T>> {
             using action_type = typename detail::communicator_server<T>::
-                template communication_set_action<
-                    traits::communication::gather_tag, T>;
+                template communication_get_action<
+                    traits::communication::gather_tag,
+                    hpx::future<std::vector<T>>, T>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = fid.get();
@@ -454,7 +506,7 @@ namespace hpx { namespace lcos {
     }
 
     template <typename T>
-    hpx::future<void> gather_there(char const* basename,
+    hpx::future<std::vector<T>> gather_there(char const* basename,
         hpx::future<T>&& result, std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
@@ -474,8 +526,9 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     // gather plain values
     template <typename T>
-    hpx::future<void> gather_there(hpx::future<hpx::id_type>&& fid,
-        T&& local_result, std::size_t this_site = std::size_t(-1))
+    hpx::future<std::vector<typename util::decay<T>::type>> gather_there(
+        hpx::future<hpx::id_type>&& fid, T&& local_result,
+        std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
         {
@@ -486,10 +539,11 @@ namespace hpx { namespace lcos {
 
         auto gather_there_data_direct =
             [this_site](hpx::future<hpx::id_type>&& fid,
-                arg_type&& local_result) -> hpx::future<void> {
+                arg_type&& local_result) -> hpx::future<std::vector<arg_type>> {
             using action_type = typename detail::communicator_server<T>::
                 template communication_get_action<
-                    traits::communication::gather_tag, hpx::future<T>>;
+                    traits::communication::gather_tag,
+                    hpx::future<std::vector<arg_type>>, arg_type>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = fid.get();
@@ -507,7 +561,8 @@ namespace hpx { namespace lcos {
     }
 
     template <typename T>
-    hpx::future<void> gather_there(char const* basename, T&& local_result,
+    hpx::future<std::vector<typename util::decay<T>::type>> gather_there(
+        char const* basename, T&& local_result,
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
@@ -523,7 +578,59 @@ namespace hpx { namespace lcos {
         return gather_there(hpx::find_from_basename(std::move(name), root_site),
             std::forward<T>(local_result), this_site);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    hpx::future<std::vector<T>> gather(char const* basename,
+        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+    {
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
+
+        if (this_site == root_site)
+        {
+            return gather_here(basename, std::move(local_result), num_sites,
+                generation, this_site);
+        }
+
+        return gather_there(basename, std::move(local_result), generation,
+            this_site, root_site);
+    }
+
+    template <typename T>
+    hpx::future<std::vector<typename util::decay<T>::type>> gather(
+        char const* basename, T&& local_result,
+        std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+    {
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
+
+        if (this_site == root_site)
+        {
+            return gather_here(basename, std::forward<T>(local_result),
+                num_sites, generation, this_site);
+        }
+
+        return gather_there(basename, std::forward<T>(local_result), generation,
+            this_site, root_site);
+    }
 }}    // namespace hpx::lcos
+
+////////////////////////////////////////////////////////////////////////////////
+namespace hpx {
+    using lcos::create_gatherer;
+    using lcos::gather;
+    using lcos::gather_here;
+    using lcos::gather_there;
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_GATHER_DECLARATION(...) /**/

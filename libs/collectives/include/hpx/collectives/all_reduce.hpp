@@ -302,7 +302,9 @@ namespace hpx { namespace lcos {
 
         std::string name(basename);
         if (generation != std::size_t(-1))
+        {
             name += std::to_string(generation) + "/";
+        }
 
         return all_reduce(hpx::find_from_basename(std::move(name), root_site),
             std::move(local_result), std::forward<F>(op), this_site);
