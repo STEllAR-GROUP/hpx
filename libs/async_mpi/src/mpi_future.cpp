@@ -9,10 +9,10 @@
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/synchronization/mutex.hpp>
 
 #include <cstddef>
 #include <memory>
-#include <mutex>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -38,14 +38,14 @@ namespace hpx { namespace mpi { namespace experimental {
         // mutex needed to protect mpi request list, note that the
         // mpi poll function takes place inside the main scheduling loop
         // of hpx and not on an hpx worker thread, so we must use std:mutex
-        std::mutex& get_list_mtx()
+        mutex_type& get_list_mtx()
         {
-            static std::mutex list_mtx;
+            static mutex_type list_mtx;
             return list_mtx;
         }
 
         // an MPI error handling type that we can use to intercept
-        // MPI errors is we enable the error handler
+        // MPI errors if we enable the error handler
         MPI_Errhandler hpx_mpi_errhandler = 0;
 
         // an instance of mpi_info that we store data in
@@ -154,7 +154,7 @@ namespace hpx { namespace mpi { namespace experimental {
     // ready when found
     void poll()
     {
-        std::unique_lock<std::mutex> lk(
+        std::unique_lock<detail::mutex_type> lk(
             detail::get_list_mtx(), std::try_to_lock);
         if (!lk.owns_lock())
         {

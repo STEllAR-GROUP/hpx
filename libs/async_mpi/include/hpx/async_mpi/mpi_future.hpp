@@ -17,7 +17,6 @@
 
 #include <cstddef>
 #include <iosfwd>
-#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -29,13 +28,15 @@ namespace hpx { namespace mpi { namespace experimental {
 
     namespace detail {
 
+        using mutex_type = hpx::lcos::local::spinlock;
+
         // extract MPI error message
         HPX_EXPORT std::string error_message(int code);
 
         // mutex needed to protect mpi request list, note that the
         // mpi poll function takes place inside the main scheduling loop
         // of hpx and not on an hpx worker thread, so we must use std:mutex
-        HPX_EXPORT std::mutex& get_list_mtx();
+        HPX_EXPORT mutex_type& get_list_mtx();
 
         // -----------------------------------------------------------------
         // An implementation of future_data for MPI
@@ -171,7 +172,12 @@ namespace hpx { namespace mpi { namespace experimental {
     inline void wait()
     {
         hpx::util::yield_while([]() {
-            std::lock_guard<std::mutex> lk(detail::get_list_mtx());
+            std::unique_lock<detail::mutex_type> lk(
+                detail::get_list_mtx(), std::try_to_lock);
+            if (!lk.owns_lock())
+            {
+                return true;
+            }
             return (detail::get_active_futures().size() > 0);
         });
     }
@@ -180,7 +186,12 @@ namespace hpx { namespace mpi { namespace experimental {
     inline void wait(F&& f)
     {
         hpx::util::yield_while([&]() {
-            std::lock_guard<std::mutex> lk(detail::get_list_mtx());
+            std::unique_lock<detail::mutex_type> lk(
+                detail::get_list_mtx(), std::try_to_lock);
+            if (!lk.owns_lock())
+            {
+                return true;
+            }
             return (detail::get_active_futures().size() > 0) || f();
         });
     }
