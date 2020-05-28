@@ -30,6 +30,10 @@ namespace hpx { namespace cuda {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+        // -------------------------------------------------------------
+        // a callback on an NVidia cuda thread should be registered with
+        // hpx to ensure any thread local operations are valid
+        // @TODO - get rid of this
         struct runtime_registration_wrapper
         {
             runtime_registration_wrapper(hpx::runtime* rt);
@@ -41,6 +45,8 @@ namespace hpx { namespace cuda {
         template <typename Allocator>
         struct future_data;
 
+        // -------------------------------------------------------------
+        // helper struct to delete future data in destructor
         template <typename Allocator>
         struct release_on_exit
         {
@@ -58,8 +64,8 @@ namespace hpx { namespace cuda {
             future_data<Allocator>* data_;
         };
 
-        HPX_EXPORT hpx::future<void> get_future(cudaStream_t);
-
+        // -------------------------------------------------------------
+        // main API call to get a future from a stream using allocator
         template <typename Allocator>
         hpx::future<void> get_future(Allocator const& a, cudaStream_t stream)
         {
@@ -84,6 +90,12 @@ namespace hpx { namespace cuda {
                 p.release(), false);
         }
 
+        // -------------------------------------------------------------
+        // main API call to get a future from a stream
+        HPX_EXPORT hpx::future<void> get_future(cudaStream_t);
+
+        // -------------------------------------------------------------
+        // cuda future data implementation
         template <typename Allocator>
         struct future_data
           : lcos::detail::future_data_allocator<void, Allocator>

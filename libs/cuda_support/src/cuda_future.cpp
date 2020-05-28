@@ -47,6 +47,8 @@ namespace hpx { namespace cuda { namespace detail {
         hpx::unregister_thread(rt_);
     }
 
+    // -------------------------------------------------------------
+    // main API call to get a future from a stream
     hpx::future<void> get_future(cudaStream_t stream)
     {
         return get_future(hpx::util::internal_allocator<>{}, stream);
