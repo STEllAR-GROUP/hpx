@@ -6,8 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assertion.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/filesystem.hpp>
+#include <hpx/itt_notify.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>

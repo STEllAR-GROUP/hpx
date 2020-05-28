@@ -14,7 +14,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/itt_notify.hpp>
 #endif
 
 #include <cstddef>

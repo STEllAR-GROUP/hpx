@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/itt_notify.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
 
 #include <cstddef>
 #include <cstdint>

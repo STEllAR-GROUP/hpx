@@ -10,17 +10,18 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async/applier/applier.hpp>
 #include <hpx/async/apply.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/concurrency/thread_name.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/custom_exception_info.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional.hpp>
+#include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -38,7 +39,6 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

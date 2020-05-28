@@ -6,15 +6,15 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/logging.hpp>
 #include <hpx/async/applier/applier.hpp>
 #include <hpx/async/applier/bind_naming_wrappers.hpp>
+#include <hpx/itt_notify.hpp>
+#include <hpx/logging.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 

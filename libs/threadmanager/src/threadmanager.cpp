@@ -13,7 +13,6 @@
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/hardware/timestamp.hpp>

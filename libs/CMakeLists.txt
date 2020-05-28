@@ -48,6 +48,7 @@ set(HPX_CANDIDATE_LIBS
     include
     io_service
     iterator_support
+    itt_notify
     lcos_distributed
     local_async
     local_lcos

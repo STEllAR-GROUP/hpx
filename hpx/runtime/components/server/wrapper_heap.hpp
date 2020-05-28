@@ -8,12 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/concurrency/itt_notify.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/assertion.hpp>
+#include <hpx/itt_notify.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/wrapper_heap_base.hpp>
 

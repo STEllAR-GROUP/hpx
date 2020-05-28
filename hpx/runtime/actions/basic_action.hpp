@@ -46,7 +46,7 @@
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/concurrency/itt_notify.hpp>
+#include <hpx/itt_notify.hpp>
 #endif
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions/transfer_action.hpp>
