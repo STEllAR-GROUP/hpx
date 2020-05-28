@@ -112,7 +112,7 @@ set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(vector_zip_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 set(1d_wave_equation_PARAMETERS THREADS_PER_LOCALITY 4
-                                "-Ihpx.stacks.use_guard_pages=0"
+                                "-Ihpx.stacks.use_guard_pages!=0"
 )
 set(allow_unknown_options_PARAMETERS THREADS_PER_LOCALITY 4)
 set(command_line_handling_PARAMETERS THREADS_PER_LOCALITY 4)
