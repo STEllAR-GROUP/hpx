@@ -16,3 +16,4 @@ apex
 packages
 .vscode
 .ccls-cache
+.clangd
