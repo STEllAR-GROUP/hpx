@@ -126,12 +126,13 @@ namespace hpx { namespace debug {
         inline std::ostream& operator<<(
             std::ostream& os, const current_time_print_helper&)
         {
-            using namespace std::chrono;
-            static high_resolution_clock::time_point log_t_start =
-                high_resolution_clock::now();
+            static std::chrono::high_resolution_clock::time_point log_t_start =
+                std::chrono::high_resolution_clock::now();
             //
-            auto now = high_resolution_clock::now();
-            auto nowt = duration_cast<microseconds>(now - log_t_start).count();
+            auto now = std::chrono::high_resolution_clock::now();
+            auto nowt = std::chrono::duration_cast<std::chrono::microseconds>(
+                now - log_t_start)
+                            .count();
             //
             os << debug::dec<10>(nowt) << " ";
             return os;
