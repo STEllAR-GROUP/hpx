@@ -4,21 +4,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/futures/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-
-#include <hpx/async_distributed.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/async_local.hpp>
-#include <hpx/mpi.hpp>
 #include <hpx/program_options.hpp>
-
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
+//
+#include <hpx/async_mpi/mpi_future.hpp>
+//
 #include <array>
 #include <atomic>
 #include <iostream>
 #include <sstream>
-
+//
 #include <mpi.h>
 
 void msg_recv(int rank, int size, int /*to*/, int from, int token, unsigned tag)
@@ -57,35 +55,43 @@ int hpx_main(hpx::program_options::variables_map& vm)
         return hpx::finalize();
     }
 
-    if (rank == 0)
     {
-        std::cout << "Rank " << std::setfill(' ') << std::setw(3) << rank
-                  << " of " << std::setfill(' ') << std::setw(3) << size
-                  << std::endl;
-    }
-
-    {
-        // this needs to scope all uses of hpx::mpi::experimental::executor
+        //
+        // tell the scheduler that we want to handle mpi in the background
+        // here we use the provided hpx::mpi::experimental::poll function but
+        // a user provided function or lambda may be supplied
+        //
         hpx::mpi::experimental::enable_user_polling enable_polling;
+
+        if (rank == 0)
+        {
+            std::cout << "Rank " << std::setfill(' ') << std::setw(3) << rank
+                      << " of " << std::setfill(' ') << std::setw(3) << size
+                      << " scheduler is "
+                      << hpx::threads::get_self_id_data()
+                             ->get_scheduler_base()
+                             ->get_description()
+                      << "\n\n"
+                      << std::endl;
+        }
 
         // Ring send/recv around N ranks
         // Rank 0      : Send then Recv
         // Rank 1->N-1 : Recv then Send
 
-        hpx::mpi::experimental::executor exec(MPI_COMM_WORLD);
-
-        constexpr unsigned int n_loops = 20;
+        const int n_loops = 20;
         std::atomic<int> counter(n_loops);
         std::array<int, n_loops> tokens;
-        for (unsigned int i = 0; i != n_loops; ++i)
+        for (unsigned int i = 0; i < n_loops; ++i)
         {
             tokens[i] = (rank == 0) ? 1 : -1;
             int rank_from = (size + rank - 1) % size;
             int rank_to = (rank + 1) % size;
 
             // all ranks pre-post a receive
-            hpx::future<int> f_recv = hpx::async(
-                exec, MPI_Irecv, &tokens[i], 1, MPI_INT, rank_from, i);
+            hpx::future<int> f_recv =
+                hpx::mpi::experimental::detail::async(MPI_Irecv, &tokens[i], 1,
+                    MPI_INT, rank_from, i, MPI_COMM_WORLD);
 
             // when the recv completes,
             f_recv.then([=, &tokens, &counter](auto&&) {
@@ -94,12 +100,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 {
                     // send the incremented token to the next rank
                     ++tokens[i];
-                    hpx::future<void> f_send = hpx::async(
-                        exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
+                    hpx::future<void> f_send =
+                        hpx::mpi::experimental::detail::async(MPI_Isend,
+                            &tokens[i], 1, MPI_INT, rank_to, i, MPI_COMM_WORLD);
                     // when the send completes
                     f_send.then([=, &tokens, &counter](auto&&) {
                         msg_send(rank, size, rank_to, rank_from, tokens[i], i);
-                        // ranks > 0 are done when they have sent their token
+                        // ranks>0 are done when they have sent their token
                         --counter;
                     });
                 }
@@ -113,8 +120,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             // rank 0 starts the process with a send
             if (rank == 0)
             {
-                auto f_send = hpx::async(
-                    exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
+                auto f_send = hpx::mpi::experimental::detail::async(MPI_Isend,
+                    &tokens[i], 1, MPI_INT, rank_to, i, MPI_COMM_WORLD);
                 f_send.then([=, &tokens, &counter](auto&&) {
                     msg_send(rank, size, rank_to, rank_from, tokens[i], i);
                 });
@@ -130,7 +137,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // This is needed to make sure that one rank does not shut down
     // before others have completed. MPI does not handle that well.
     MPI_Barrier(MPI_COMM_WORLD);
-
     return hpx::finalize();
 }
 
@@ -139,7 +145,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
 // on an hpx thread
 int main(int argc, char* argv[])
 {
+    //
     // Init MPI
+    //
     int provided = MPI_THREAD_MULTIPLE;
     MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
     if (provided != MPI_THREAD_MULTIPLE)
@@ -147,11 +155,9 @@ int main(int argc, char* argv[])
         std::cout << "Provided MPI is not : MPI_THREAD_MULTIPLE " << provided
                   << std::endl;
     }
-
-    int result = hpx::init(argc, argv);
-
+    return hpx::init(argc, argv);
+    //
     // Finalize MPI
+    //
     MPI_Finalize();
-
-    return result;
 }

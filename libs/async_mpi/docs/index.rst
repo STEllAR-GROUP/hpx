@@ -8,7 +8,7 @@
 .. _libs_mpi:
 
 ===
-mpi
+async_mpi
 ===
 
 The MPI library is intended to simplify the process of integrating MPI based

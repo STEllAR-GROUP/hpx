@@ -21,8 +21,10 @@ if(NOT TARGET Mpi::mpi)
 endif()
 
 # Default location is $HPX_ROOT/libs/mpi/include
-set(mpi_headers hpx/mpi/force_linking.hpp hpx/mpi/mpi_executor.hpp
-                hpx/mpi/mpi_future.hpp
+set(async_mpi_headers
+  hpx/async_mpi/force_linking.hpp
+  hpx/async_mpi/mpi_executor.hpp
+  hpx/async_mpi/mpi_future.hpp
 )
 
 # Default location is $HPX_ROOT/libs/mpi/src
@@ -30,10 +32,10 @@ set(mpi_sources force_linking.cpp mpi_future.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
-  mpi
+  async_mpi
   GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_sources}
-  HEADERS ${mpi_headers}
+  HEADERS ${async_mpi_headers}
   DEPENDENCIES
     hpx_assertion
     hpx_basic_execution

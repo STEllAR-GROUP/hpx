@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
 #include <hpx/errors.hpp>
-#include <hpx/mpi/mpi_future.hpp>
+#include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/threading_base.hpp>
 
 #include <cstddef>

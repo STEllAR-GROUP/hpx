@@ -13,7 +13,7 @@ if(HPX_WITH_EXAMPLES)
   )
     add_hpx_pseudo_target(tests.examples.modules.mpi)
     add_hpx_pseudo_dependencies(
-      tests.examples.modules tests.examples.modules.mpi
+      tests.examples.modules tests.examples.modules.async_mpi
     )
   endif()
 endif()

@@ -4,18 +4,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once
+
 #include <hpx/config.hpp>
-#include <hpx/mpi/force_linking.hpp>
-#include <hpx/mpi/mpi_future.hpp>
+#include <hpx/async_mpi/mpi_future.hpp>
+
+#include <mpi.h>
 
 namespace hpx { namespace mpi {
 
-    // reference all symbols that have to be explicitly linked with the core
-    // library
-    force_linking_helper& force_linking()
+    struct force_linking_helper
     {
-        static force_linking_helper helper{
-            &experimental::detail::hpx_mpi_errhandler};
-        return helper;
-    }
+        MPI_Errhandler* mpi_errhandler;
+    };
+
+    force_linking_helper& force_linking();
 }}    // namespace hpx::mpi

@@ -55,7 +55,7 @@ set(HPX_CANDIDATE_LIBS
     local_lcos
     logging
     memory
-    mpi
+    async_mpi
     mpi_base
     naming_base
     pack_traversal

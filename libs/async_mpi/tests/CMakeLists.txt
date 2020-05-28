@@ -26,7 +26,7 @@ if(HPX_MPI_WITH_TESTS)
   if(HPX_WITH_TESTS_REGRESSIONS)
     add_hpx_pseudo_target(tests.regressions.modules.mpi)
     add_hpx_pseudo_dependencies(
-      tests.regressions.modules tests.regressions.modules.mpi
+      tests.regressions.modules tests.regressions.modules.async_mpi
     )
     add_subdirectory(regressions)
   endif()
@@ -34,18 +34,18 @@ if(HPX_MPI_WITH_TESTS)
   if(HPX_WITH_TESTS_BENCHMARKS)
     add_hpx_pseudo_target(tests.performance.modules.mpi)
     add_hpx_pseudo_dependencies(
-      tests.performance.modules tests.performance.modules.mpi
+      tests.performance.modules tests.performance.modules.async_mpi
     )
     add_subdirectory(performance)
   endif()
 
   if(HPX_WITH_TESTS_HEADERS)
     add_hpx_header_tests(
-      modules.mpi
-      HEADERS ${mpi_headers}
+      modules.async_mpi
+      HEADERS ${async_mpi_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       NOLIBS
-      DEPENDENCIES hpx_mpi
+      DEPENDENCIES hpx_async_mpi
     )
   endif()
 endif()
