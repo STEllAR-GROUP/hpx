@@ -19,7 +19,9 @@ namespace hpx { namespace traits {
     namespace detail {
         ////////////////////////////////////////////////////////////////////////
         template <typename NewType, typename OldType, typename Enable = void>
-        struct pack_traversal_rebind_container;
+        struct pack_traversal_rebind_container
+        {
+        };
 
         // Specialization for a container with a single type T (no allocator
         // support)
@@ -64,7 +66,7 @@ namespace hpx { namespace traits {
 
     template <typename NewType, typename OldType, typename Enable = void>
     struct pack_traversal_rebind_container
-      : pack_traversal_rebind_container<NewType, OldType>
+      : detail::pack_traversal_rebind_container<NewType, OldType>
     {
     };
 
