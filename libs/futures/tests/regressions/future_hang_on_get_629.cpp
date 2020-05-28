@@ -168,21 +168,27 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()("test-runs",
-        value<std::uint64_t>()->default_value(10),
-        "number of times to repeat the test (0 == infinite)")
+    // clang-format off
+    cmdline.add_options()
+        ("test-runs"
+        , value<std::uint64_t>()->default_value(10)
+        , "number of times to repeat the test (0 == infinite)")
 
-        ("verbose", "print state every iteration")
+        ("verbose"
+        , "print state every iteration")
 
-            ("children", value<std::uint64_t>()->default_value(8),
-                "number of children each node has")
+        ("children"
+        , value<std::uint64_t>()->default_value(8)
+        , "number of children each node has")
 
-                ("depth", value<std::uint64_t>()->default_value(3),
-                    "depth of the tree structure")
+        ("depth"
+        , value<std::uint64_t>()->default_value(3)
+        , "depth of the tree structure")
 
-                    ("delay-iterations",
-                        value<std::uint64_t>()->default_value(1000),
-                        "number of iterations in the delay loop");
+        ("delay-iterations"
+        , value<std::uint64_t>()->default_value(1000)
+        , "number of iterations in the delay loop");
+    // clang-format on
 
     // Initialize and run HPX.
     return hpx::init(cmdline, argc, argv);
