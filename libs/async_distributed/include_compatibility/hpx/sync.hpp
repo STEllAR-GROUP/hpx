@@ -15,7 +15,7 @@
 #pragma message("The header hpx/sync.hpp is deprecated, \
     please include hpx/async_distributed/sync.hpp instead")
 #else
-#warning "The header hpx/async.hpp is deprecated, \
+#warning "The header hpx/sync.hpp is deprecated, \
     please include hpx/async_distributed/sync.hpp instead"
 #endif
 #endif
