@@ -164,6 +164,7 @@ namespace hpx { namespace threads {
             threads::detail::reset_backtrace bt(id);
 #endif
             on_exit_reset_held_lock_data held_locks;
+            HPX_UNUSED(held_locks);
 
             HPX_ASSERT(thrd_data->get_state().state() == active);
             HPX_ASSERT(state != active);
