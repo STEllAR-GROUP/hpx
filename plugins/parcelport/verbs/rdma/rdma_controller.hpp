@@ -164,7 +164,7 @@ namespace verbs
 
         typedef std::tuple<
             verbs_endpoint_ptr,
-            hpx::promise<verbs_endpoint_ptr>,
+            hpx::lcos::promise<verbs_endpoint_ptr>,
             hpx::shared_future<verbs_endpoint_ptr>
         > promise_tuple_type;
         //

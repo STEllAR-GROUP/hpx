@@ -56,7 +56,7 @@ int hpx_main(int argc, char* argv[])
         hpx::id_type promise_id;
         hpx::future<int> f;
         {
-            hpx::promise<int> p;
+            hpx::lcos::promise<int> p;
             f = p.get_future();
             {
                 auto local_promise_id = p.get_id();
@@ -81,7 +81,7 @@ int hpx_main(int argc, char* argv[])
     {
         hpx::id_type promise_id;
         {
-            hpx::promise<int> p;
+            hpx::lcos::promise<int> p;
             p.get_future();
             {
                 auto local_promise_id = p.get_id();

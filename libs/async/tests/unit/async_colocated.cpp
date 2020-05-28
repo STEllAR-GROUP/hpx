@@ -89,7 +89,7 @@ void test_remote_async_colocated(test_client const& target)
     {
         increment_with_future_action inc;
 
-        hpx::promise<std::int32_t> p;
+        hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<std::int32_t> f1 =

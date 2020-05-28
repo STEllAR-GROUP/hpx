@@ -90,7 +90,7 @@ int test_async_continue_cb_colocated(test_client const& target)
             inc, make_continuation(), hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::promise<std::int32_t> p;
+        hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<int> f2 = hpx::async_continue_cb(
@@ -112,7 +112,7 @@ int test_async_continue_cb_colocated(test_client const& target)
         HPX_TEST_EQ(f1.get(), 43);
         HPX_TEST_EQ(callback_called.load(), 1);
 
-        hpx::promise<std::int32_t> p;
+        hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<int> f2 = hpx::async_continue_cb(

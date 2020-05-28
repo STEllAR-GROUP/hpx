@@ -48,7 +48,7 @@ int hpx_main()
             hpx::async_continue(inc, make_continuation(), hpx::find_here(), 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::promise<std::int32_t> p;
+        hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<int> f2 = hpx::async_continue(
@@ -66,7 +66,7 @@ int hpx_main()
             hpx::async_continue(inc, make_continuation(), localities[0], 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::promise<std::int32_t> p;
+        hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<int> f2 =

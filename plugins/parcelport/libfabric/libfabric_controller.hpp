@@ -104,7 +104,7 @@ namespace libfabric
         // endpoint when the connection completes and is ready
         // Note - only used during connection, then deleted
         typedef std::tuple<
-            hpx::promise<fid_ep *>,
+            hpx::lcos::promise<fid_ep *>,
             hpx::shared_future<fid_ep *>
         > promise_tuple_type;
 
@@ -1036,7 +1036,7 @@ namespace libfabric
                 << "( " << ipaddress(here_.ip_address()) << " )");
 
             //
-            hpx::promise<struct fid_ep*> new_endpoint_promise;
+            hpx::lcos::promise<struct fid_ep*> new_endpoint_promise;
             hpx::future<struct fid_ep*>  new_endpoint_future =
                 new_endpoint_promise.get_future();
             //

@@ -75,7 +75,7 @@ int hpx_main()
     }
 
     {
-        hpx::promise<std::int32_t> p;
+        hpx::lcos::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<std::int32_t> f1 = hpx::async(&increment_with_future, f);
