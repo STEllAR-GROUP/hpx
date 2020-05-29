@@ -13,10 +13,14 @@
 namespace mylib {
     HPX_INLINE_CONSTEXPR_VARIABLE struct foo_fn
     {
+        // We use std::declval<foo_fn> in the function signature instead of
+        // *this to work around a bug in GCC <= 8.
         template <typename T>
-        constexpr auto operator()(T&& x) const noexcept(
-            noexcept(hpx::functional::tag_invoke(*this, std::forward<T>(x))))
-            -> decltype(hpx::functional::tag_invoke(*this, std::forward<T>(x)))
+        constexpr auto operator()(T&& x) const
+            noexcept(noexcept(hpx::functional::tag_invoke(
+                std::declval<foo_fn>(), std::forward<T>(x))))
+                -> decltype(hpx::functional::tag_invoke(
+                    std::declval<foo_fn>(), std::forward<T>(x)))
         {
             return hpx::functional::tag_invoke(*this, std::forward<T>(x));
         }
@@ -24,12 +28,13 @@ namespace mylib {
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct bar_fn
     {
+        // See above for an explanation of std::declval<bar_fn>().
         template <typename T, typename U>
-        constexpr auto operator()(T&& x, U&& u) const
-            noexcept(noexcept(hpx::functional::tag_invoke(
-                *this, std::forward<T>(x), std::forward<U>(u))))
-                -> decltype(hpx::functional::tag_invoke(
-                    *this, std::forward<T>(x), std::forward<U>(u)))
+        constexpr auto operator()(T&& x, U&& u) const noexcept(
+            noexcept(hpx::functional::tag_invoke(std::declval<bar_fn>(),
+                std::forward<T>(x), std::forward<U>(u))))
+            -> decltype(hpx::functional::tag_invoke(
+                std::declval<bar_fn>(), std::forward<T>(x), std::forward<U>(u)))
         {
             return hpx::functional::tag_invoke(
                 *this, std::forward<T>(x), std::forward<U>(u));
