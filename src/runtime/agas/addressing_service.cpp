@@ -15,6 +15,7 @@
 #include <hpx/async.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/errors.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
