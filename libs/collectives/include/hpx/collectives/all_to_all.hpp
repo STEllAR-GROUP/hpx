@@ -313,9 +313,8 @@ namespace hpx { namespace lcos {
     }
 
     template <typename T>
-    hpx::future<std::vector<T>> all_to_all(
-        char const* basename, std::vector<T>&& local_result,
-        std::size_t num_sites = std::size_t(-1),
+    hpx::future<std::vector<T>> all_to_all(char const* basename,
+        std::vector<T>&& local_result, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {

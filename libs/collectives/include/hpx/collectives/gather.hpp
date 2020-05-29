@@ -154,9 +154,6 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t root_site = 0);
-
-}}    // namespace hpx::lcos
-
 }}    // namespace hpx::lcos
 
 // clang-format on
@@ -304,7 +301,9 @@ namespace hpx { namespace lcos {
         hpx::future<T>&& result, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
+        {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
 
         auto gather_data =
             [this_site](hpx::future<hpx::id_type>&& fid,
@@ -341,7 +340,9 @@ namespace hpx { namespace lcos {
                 hpx::get_num_localities(hpx::launch::sync));
         }
         if (this_site == std::size_t(-1))
+        {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
 
         return gather_here(
             create_gatherer(basename, num_sites, generation, this_site),
@@ -359,6 +360,7 @@ namespace hpx { namespace lcos {
         {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
         }
+
         typedef typename std::decay<T>::type arg_type;
 
         auto gather_data_direct =
@@ -443,14 +445,11 @@ namespace hpx { namespace lcos {
         hpx::future<T>&& result, std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
-        }
-
         std::string name(basename);
         if (generation != std::size_t(-1))
+        {
             name += std::to_string(generation) + "/";
+        }
 
         return gather_there(hpx::find_from_basename(std::move(name), root_site),
             std::move(result), this_site);
@@ -496,14 +495,11 @@ namespace hpx { namespace lcos {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
-        }
-
         std::string name(basename);
         if (generation != std::size_t(-1))
+        {
             name += std::to_string(generation) + "/";
+        }
 
         return gather_there(hpx::find_from_basename(std::move(name), root_site),
             std::forward<T>(local_result), this_site);

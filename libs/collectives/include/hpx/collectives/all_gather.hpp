@@ -97,15 +97,15 @@ namespace hpx { namespace lcos {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/async/dataflow.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/basic_execution.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/modules/basic_execution.hpp>
 #include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime_local/get_num_localities.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
