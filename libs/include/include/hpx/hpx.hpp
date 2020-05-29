@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_local.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/async_local.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/async_distributed.hpp>

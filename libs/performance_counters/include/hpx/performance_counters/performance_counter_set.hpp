@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>

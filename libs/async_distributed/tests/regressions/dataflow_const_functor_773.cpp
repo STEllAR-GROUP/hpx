@@ -7,9 +7,9 @@
 // This test case demonstrates the issue described in #773: local dataflow with
 // unwrapped: functor operators need to be const.
 
+#include <hpx/async_local/dataflow.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
 typedef hpx::lcos::shared_future<double> future_type;

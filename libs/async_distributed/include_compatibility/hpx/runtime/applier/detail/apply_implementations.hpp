@@ -17,8 +17,7 @@
     deprecated, please include \
     hpx/async_distributed/applier/detail/apply_implementations.hpp instead")
 #else
-#warning                                                                       \
-    "The header hpx/runtime/applier/detail/apply_implementations.hpp is \
+#warning "The header hpx/runtime/applier/detail/apply_implementations.hpp is \
     deprecated, please include \
     hpx/async_distributed/applier/detail/apply_implementations.hpp instead"
 #endif

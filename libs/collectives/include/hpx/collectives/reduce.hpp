@@ -75,8 +75,8 @@ namespace hpx { namespace lcos {
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async_distributed/detail/async_colocated.hpp>
 #include <hpx/async_combinators/when_all.hpp>
+#include <hpx/async_distributed/detail/async_colocated.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>

@@ -7,9 +7,9 @@
 // This test case demonstrates the issue described in #774: using local dataflow
 // without explicit namespace.
 
+#include <hpx/async_local/dataflow.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <iostream>

@@ -10,6 +10,7 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>

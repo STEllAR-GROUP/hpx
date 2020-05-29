@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>

@@ -11,8 +11,8 @@
 #include <hpx/assertion.hpp>
 #include <hpx/async_distributed/applier/apply_helper.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
-#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/async_local/apply.hpp>
+#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>

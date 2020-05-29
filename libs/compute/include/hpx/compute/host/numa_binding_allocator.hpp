@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assertion.hpp>
+#include <hpx/async_local/async.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/guided_pool_executor.hpp>
-#include <hpx/async_local/async.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/threadmanager.hpp>
