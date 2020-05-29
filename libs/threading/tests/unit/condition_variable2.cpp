@@ -379,7 +379,10 @@ template <typename Dur>
 void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
 {
     // test the basic jthread API
-    bool ready = false;
+
+    // ready_ instead of ready to not clash with state::ready and work around
+    // potential bug in GCC 10
+    bool ready_ = false;
     hpx::lcos::local::mutex ready_mtx;
     hpx::lcos::local::condition_variable_any ready_cv;
 
@@ -392,7 +395,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
 
     state t1_feedback{state::loop};
     {
-        hpx::jthread t1([&ready, &ready_mtx, &ready_cv, call_notify, dur,
+        hpx::jthread t1([&ready_, &ready_mtx, &ready_cv, call_notify, dur,
                             &t1_feedback](hpx::stop_token st) {
             auto t0 = std::chrono::steady_clock::now();
             int times_done{0};
@@ -402,7 +405,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
                 {
                     std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
                     auto ret = ready_cv.wait_for(
-                        lg, st, dur, [&ready] { return ready; });
+                        lg, st, dur, [&ready_] { return ready_; });
                     if (st.stop_requested())
                     {
                         throw "interrupted";
@@ -415,7 +418,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
                     if (ret)
                     {
                         t1_feedback = state::ready;
-                        HPX_TEST(ready);
+                        HPX_TEST(ready_);
                         HPX_TEST(!st.stop_requested());
                         HPX_TEST(call_notify);
                         ++times_done;
@@ -424,7 +427,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
                 catch (const char*)
                 {
                     t1_feedback = state::interrupted;
-                    HPX_TEST(!ready);
+                    HPX_TEST(!ready_);
                     HPX_TEST(!call_notify);
                     ++times_done;
                     if (times_done >= 3)
@@ -447,7 +450,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
         {
             {
                 std::lock_guard<hpx::lcos::local::mutex> lg(ready_mtx);
-                ready = true;
+                ready_ = true;
             }    // release lock
 
             auto t0 = std::chrono::steady_clock::now();
