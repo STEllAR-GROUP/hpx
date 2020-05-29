@@ -19,7 +19,9 @@ endif()
 if(HPX_ASYNC_DISTRIBUTED_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
     add_hpx_pseudo_target(tests.unit.modules.async_distributed)
-    add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.async_distributed)
+    add_hpx_pseudo_dependencies(
+      tests.unit.modules tests.unit.modules.async_distributed
+    )
     add_subdirectory(unit)
   endif()
 

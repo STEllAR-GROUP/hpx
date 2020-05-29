@@ -43,7 +43,9 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Modules/Async"
   )
 
-  add_hpx_regression_test("modules.async_distributed" ${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test(
+    "modules.async_distributed" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()
 
 # compile only tests

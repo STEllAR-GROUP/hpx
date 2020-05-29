@@ -6,7 +6,9 @@
 
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples.modules.async_distributed)
-  add_hpx_pseudo_dependencies(examples.modules examples.modules.async_distributed)
+  add_hpx_pseudo_dependencies(
+    examples.modules examples.modules.async_distributed
+  )
   if(HPX_WITH_TESTS
      AND HPX_WITH_TESTS_EXAMPLES
      AND HPX_ASYNC_DISTRIBUTED_WITH_TESTS
