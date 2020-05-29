@@ -10,6 +10,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/synchronization/mutex.hpp>
+#include <hpx/mpi_base/mpi_environment.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -328,19 +329,11 @@ namespace hpx { namespace mpi { namespace experimental {
     void init(
         bool init_mpi, std::string const& pool_name, bool init_errorhandler)
     {
-        // Check if MPI_Init has been called previously
-        int is_initialized = 0;
-        MPI_Initialized(&is_initialized);
-        if (is_initialized)
-        {
-            MPI_Comm_rank(MPI_COMM_WORLD, &detail::get_mpi_info().rank_);
-            MPI_Comm_size(MPI_COMM_WORLD, &detail::get_mpi_info().size_);
-        }
-        else if (init_mpi)
-        {
-            int provided;
+        if (init_mpi) {
             int required = MPI_THREAD_MULTIPLE;
-            MPI_Init_thread(nullptr, nullptr, required, &provided);
+            int minimal  = MPI_THREAD_FUNNELED;
+            int provided;
+            hpx::util::mpi_environment::init(nullptr, nullptr, required, minimal, provided);
             if (provided < MPI_THREAD_FUNNELED)
             {
                 mpi_debug.error(debug::str<>("hpx::mpi::experimental::init"),
@@ -351,7 +344,18 @@ namespace hpx { namespace mpi { namespace experimental {
             }
             MPI_Comm_rank(MPI_COMM_WORLD, &detail::get_mpi_info().rank_);
             MPI_Comm_size(MPI_COMM_WORLD, &detail::get_mpi_info().size_);
-            detail::get_mpi_info().mpi_initialized_ = true;
+        }
+        else {
+            // Check if MPI_Init has been called previously
+            if (detail::get_mpi_info().size_ == -1) {
+                int is_initialized = 0;
+                MPI_Initialized(&is_initialized);
+                if (is_initialized)
+                {
+                    MPI_Comm_rank(MPI_COMM_WORLD, &detail::get_mpi_info().rank_);
+                    MPI_Comm_size(MPI_COMM_WORLD, &detail::get_mpi_info().size_);
+                }
+            }
         }
 
         mpi_debug.debug(debug::str<>("hpx::mpi::experimental::init"),
@@ -395,10 +399,8 @@ namespace hpx { namespace mpi { namespace experimental {
             detail::hpx_mpi_errhandler = 0;
         }
 
-        if (detail::get_mpi_info().mpi_initialized_)
-        {
-            MPI_Finalize();
-        }
+        // clean up if we initialized mpi
+        hpx::util::mpi_environment::finalize();
 
         mpi_debug.debug(debug::str<>("Clearing mode"), detail::get_mpi_info(),
             "disable_user_polling");

@@ -90,6 +90,36 @@ namespace hpx { namespace util {
     int mpi_environment::is_initialized_ = -1;
 
     ///////////////////////////////////////////////////////////////////////////
+    int mpi_environment::init(
+        int* argc, char*** argv, const int required, const int minimal, int &provided)
+    {
+        has_called_init_ = false;
+
+        // Check if MPI_Init has been called previously
+        int is_initialized = 0;
+        int retval = MPI_Initialized(&is_initialized);
+        if (MPI_SUCCESS != retval) {
+            return retval;
+        }
+        if (!is_initialized)
+        {
+            retval = MPI_Init_thread(nullptr, nullptr, required, &provided);
+            if (MPI_SUCCESS != retval) {
+                return retval;
+            }
+
+            if (provided < minimal)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "hpx::util::mpi_environment::init",
+                    "MPI doesn't provide minimal requested thread level");
+            }
+            has_called_init_ = true;
+        }
+        return retval;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void mpi_environment::init(
         int* argc, char*** argv, util::runtime_configuration& rtcfg)
     {
@@ -109,60 +139,38 @@ namespace hpx { namespace util {
 
         rtcfg.add_entry("hpx.parcel.bootstrap", "mpi");
 
-        // Check if MPI_Init has been called previously
-        MPI_Initialized(&is_initialized_);
-        if (!is_initialized_)
-        {
+        int required = MPI_THREAD_SINGLE;
+        int minimal = MPI_THREAD_SINGLE;
 #if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
-            int flag =
-                (get_entry_as(rtcfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
-                MPI_THREAD_MULTIPLE :
-                MPI_THREAD_SINGLE;
+        required =
+            (get_entry_as(rtcfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
+            MPI_THREAD_MULTIPLE :
+            MPI_THREAD_SINGLE;
 
 #if defined(MVAPICH2_VERSION) && defined(_POSIX_SOURCE)
             // This enables multi threading support in MVAPICH2 if requested.
-            if (flag == MPI_THREAD_MULTIPLE)
+            if (required == MPI_THREAD_MULTIPLE)
                 setenv("MV2_ENABLE_AFFINITY", "0", 1);
 #endif
-
-            int retval =
-                MPI_Init_thread(argc, argv, flag, &provided_threading_flag_);
-#else
-            int retval = MPI_Init(argc, argv);
-            provided_threading_flag_ = MPI_THREAD_SINGLE;
 #endif
 
-            if (MPI_SUCCESS != retval)
-            {
-                if (MPI_ERR_OTHER != retval)
-                {
-                    // explicitly disable mpi if not run by mpirun
-                    rtcfg.add_entry("hpx.parcel.mpi.enable", "0");
-
-                    enabled_ = false;
-
-                    int msglen = 0;
-                    char message[MPI_MAX_ERROR_STRING + 1];
-                    MPI_Error_string(retval, message, &msglen);
-                    message[msglen] = '\0';
-
-                    std::string msg(
-                        "mpi_environment::init: MPI_Init_thread failed: ");
-                    msg = msg + message + ".";
-                    throw std::runtime_error(msg.c_str());
-                }
-
-                // somebody has already called MPI_Init before, we should be fine
-                has_called_init_ = false;
-            }
-            else
-            {
-                has_called_init_ = true;
-            }
-        }
-        else
+        int retval = init(argc, argv, required, minimal, provided_threading_flag_);
+        if (MPI_SUCCESS != retval && MPI_ERR_OTHER != retval)
         {
-            has_called_init_ = false;
+            // explicitly disable mpi if not run by mpirun
+            rtcfg.add_entry("hpx.parcel.mpi.enable", "0");
+
+            enabled_ = false;
+
+            int msglen = 0;
+            char message[MPI_MAX_ERROR_STRING + 1];
+            MPI_Error_string(retval, message, &msglen);
+            message[msglen] = '\0';
+
+            std::string msg(
+                "mpi_environment::init: MPI_Init_thread failed: ");
+            msg = msg + message + ".";
+            throw std::runtime_error(msg.c_str());
         }
 
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);

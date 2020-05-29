@@ -76,7 +76,6 @@ namespace hpx { namespace mpi { namespace experimental {
         // used extensivey with debug::print to display rank etc
         struct mpi_info
         {
-            bool mpi_initialized_ = false;
             bool error_handler_initialized_ = false;
             int rank_ = -1;
             int size_ = -1;
