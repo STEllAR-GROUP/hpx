@@ -15,8 +15,7 @@
 #include <cstdint>
 #include <iterator>
 
-template <std::int64_t stopValue>
-struct BitCountingIterator : public Iterator<std::int64_t, stopValue>
+struct BitCountingIterator : public Iterator<std::int64_t>
 {
     using difference_type = std::ptrdiff_t;
     using value_type = std::int64_t;
@@ -25,7 +24,7 @@ struct BitCountingIterator : public Iterator<std::int64_t, stopValue>
     using reference = std::int64_t const&;
 
     explicit BitCountingIterator(int64_t initialState)
-      : Iterator<int64_t, stopValue>(initialState)
+      : Iterator<int64_t>(initialState)
     {
     }
 
@@ -81,37 +80,37 @@ private:
 
 void test_count()
 {
-    using Iter = BitCountingIterator<std::int64_t{33}>;
+    using Iter = BitCountingIterator;
     using Sent = Sentinel<std::int64_t>;
 
     auto stdResult = std::count(Iter{0}, Iter{33}, std::int64_t{1});
 
     auto result = hpx::parallel::count(
-        hpx::parallel::execution::seq, Iter{0}, Sent{}, std::int64_t{1});
+        hpx::parallel::execution::seq, Iter{0}, Sent{33}, std::int64_t{1});
 
     HPX_TEST_EQ(result, stdResult);
 
     result = hpx::parallel::count(
-        hpx::parallel::execution::par, Iter{0}, Sent{}, std::int64_t{1});
+        hpx::parallel::execution::par, Iter{0}, Sent{33}, std::int64_t{1});
 
     HPX_TEST_EQ(result, stdResult);
 }
 
 void test_count_if()
 {
-    using Iter = BitCountingIterator<std::int64_t{33}>;
+    using Iter = BitCountingIterator;
     using Sent = Sentinel<std::int64_t>;
 
     auto predicate = [](std::int64_t v) { return v == 1; };
     auto stdResult = std::count_if(Iter{0}, Iter{33}, predicate);
 
     Iter::difference_type result = hpx::parallel::count_if(
-        hpx::parallel::execution::seq, Iter{0}, Sent{}, predicate);
+        hpx::parallel::execution::seq, Iter{0}, Sent{33}, predicate);
 
     HPX_TEST_EQ(result, stdResult);
 
     result = hpx::parallel::count_if(
-        hpx::parallel::execution::par, Iter{0}, Sent{}, predicate);
+        hpx::parallel::execution::par, Iter{0}, Sent{33}, predicate);
 
     HPX_TEST_EQ(result, stdResult);
 }

@@ -11,12 +11,24 @@
 #include <cstddef>
 #include <iterator>
 
-template <typename Value>
+template <typename ValueType>
 struct Sentinel
 {
+    explicit Sentinel(ValueType stop_value)
+      : stop(stop_value)
+    {
+    }
+
+    ValueType get_stop() const
+    {
+        return this->stop;
+    }
+
+private:
+    ValueType stop;
 };
 
-template <typename Value, Value stopValue>
+template <typename Value>
 struct Iterator
 {
     using difference_type = std::ptrdiff_t;
@@ -97,13 +109,13 @@ struct Iterator
         return this->state == that.state;
     }
 
-    friend bool operator==(Iterator i, Sentinel<Value>)
+    friend bool operator==(Iterator i, Sentinel<Value> s)
     {
-        return i.state == stopValue;
+        return i.state == s.get_stop();
     }
-    friend bool operator==(Sentinel<Value>, Iterator i)
+    friend bool operator==(Sentinel<Value> s, Iterator i)
     {
-        return i.state == stopValue;
+        return i.state == s.get_stop();
     }
 
     bool operator!=(const Iterator& that) const
@@ -111,13 +123,13 @@ struct Iterator
         return this->state != that.state;
     }
 
-    friend bool operator!=(Iterator i, Sentinel<Value>)
+    friend bool operator!=(Iterator i, Sentinel<Value> s)
     {
-        return i.state != stopValue;
+        return i.state != s.get_stop();
     }
-    friend bool operator!=(Sentinel<Value>, Iterator i)
+    friend bool operator!=(Sentinel<Value> s, Iterator i)
     {
-        return i.state != stopValue;
+        return i.state != s.get_stop();
     }
 
     bool operator<(const Iterator& that) const
