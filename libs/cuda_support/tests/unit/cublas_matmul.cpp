@@ -27,6 +27,7 @@
 
 #define BOOST_NO_CXX11_ALLOCATOR
 //
+#include <hpx/async.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
@@ -35,14 +36,13 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 //
+#include <hpx/cuda_support/cuda_executor.hpp>
 #include <hpx/cuda_support/target.hpp>
-#include <hpx/cuda_support/cublas_future_helper.hpp>
-#include <hpx/cuda_support/cuda_future_helper.hpp>
-#include <hpx/include/compute.hpp>
 #include <hpx/modules/timing.hpp>
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
 #include <hpx/compute/cuda/allocator.hpp>
 #endif
+
 // CUDA runtime
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
@@ -145,9 +145,9 @@ void matrixMultiply(
     hpx::parallel::for_each(par, h_B.begin(), h_B.end(), randfunc);
 
     // create a cublas helper object we'll use to futurize the cuda events
-    using namespace hpx::cuda;
-    cublas_helper<T> cublas(device);
-    using cublas_future = typename cublas_helper<T>::future_type;
+    using namespace hpx::cuda::experimental;
+    cublas_executor cublas(device);
+    using cublas_future = typename cuda_executor::future_type;
 
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     // for convenience
@@ -175,19 +175,22 @@ void matrixMultiply(
 
 #else
     T *d_A, *d_B, *d_C;
-    hpx::cuda::cuda_error(cudaMalloc((void**) &d_A, size_A * sizeof(T)));
+    hpx::cuda::experimental::cuda_error(
+        cudaMalloc((void**) &d_A, size_A * sizeof(T)));
 
-    hpx::cuda::cuda_error(cudaMalloc((void**) &d_B, size_B * sizeof(T)));
+    hpx::cuda::experimental::cuda_error(
+        cudaMalloc((void**) &d_B, size_B * sizeof(T)));
 
-    hpx::cuda::cuda_error(cudaMalloc((void**) &d_C, size_C * sizeof(T)));
+    hpx::cuda::experimental::cuda_error(
+        cudaMalloc((void**) &d_C, size_C * sizeof(T)));
 
     // adding async copy operations into the stream before cublas calls puts
     // the copies in the queue before the matrix operations.
-    cublas.memcpy_apply(
-        d_A, h_A.data(), size_A * sizeof(T), cudaMemcpyHostToDevice);
+    hpx::apply(cublas, cudaMemcpyAsync, d_A, h_A.data(), size_A * sizeof(T),
+        cudaMemcpyHostToDevice);
 
-    auto copy_future = cublas.memcpy_async(
-        d_B, h_B.data(), size_B * sizeof(T), cudaMemcpyHostToDevice);
+    auto copy_future = hpx::async(cublas, cudaMemcpyAsync, d_B, h_B.data(),
+        size_B * sizeof(T), cudaMemcpyHostToDevice);
 
     // we can call get_future multiple times on the cublas helper.
     // Each one returns a new future that will be set ready when the stream event
@@ -208,7 +211,7 @@ void matrixMultiply(
     hpx::util::high_resolution_timer t1;
     //
     std::cout << "calling CUBLAS...\n";
-    auto fut = cublas.async(&cublasSgemm, CUBLAS_OP_N, CUBLAS_OP_N,
+    auto fut = hpx::async(cublas, cublasSgemm, CUBLAS_OP_N, CUBLAS_OP_N,
         matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA, &alpha, d_B,
         matrix_size.uiWB, d_A, matrix_size.uiWA, &beta, d_C, matrix_size.uiWA);
 
@@ -219,23 +222,24 @@ void matrixMultiply(
     std::cout << "warmup: elapsed_microseconds " << us1 << std::endl;
 
     // once the future has been retrieved, the next call to
-    // get_future will create a new event and a new future so
-    // we can reuse the same cublas wrapper object and stream if we want
+    // get_future will create a new event attached to a new future
+    // so we can reuse the same cublas executor stream if we want
 
     hpx::util::high_resolution_timer t2;
     for (std::size_t j = 0; j < iterations; j++)
     {
-        cublas.apply(&cublasSgemm, CUBLAS_OP_N, CUBLAS_OP_N, matrix_size.uiWB,
-            matrix_size.uiHA, matrix_size.uiWA, &alpha, d_B, matrix_size.uiWB,
-            d_A, matrix_size.uiWA, &beta, d_C, matrix_size.uiWA);
+        hpx::apply(cublas, cublasSgemm, CUBLAS_OP_N, CUBLAS_OP_N,
+            matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA, &alpha, d_B,
+            matrix_size.uiWB, d_A, matrix_size.uiWA, &beta, d_C,
+            matrix_size.uiWA);
     }
     // get a future for when the stream reaches this point (matrix operations complete)
     auto matrix_finished = cublas.get_future();
 
 #ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     // when the matrix operations complete, copy the result to the host
-    auto copy_finished = cublas.memcpy_async(
-        h_CUBLAS.data(), d_C, size_C * sizeof(T), cudaMemcpyDeviceToHost);
+    auto copy_finished = hpx::async(cublas, cudaMemcpyAsync, h_CUBLAS.data(),
+        d_C, size_C * sizeof(T), cudaMemcpyDeviceToHost);
 
 #endif
 

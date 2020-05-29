@@ -32,11 +32,6 @@ namespace hpx { namespace cuda {
     template <typename T>
     struct cublas_helper : hpx::cuda::cuda_future_helper
     {
-#ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
-        using allocator_type = typename hpx::compute::cuda::allocator<T>;
-        using vector_type = typename hpx::compute::vector<T, allocator_type>;
-#endif
-
         // construct a cublas stream
         cublas_helper(std::size_t device = 0)
           : hpx::cuda::cuda_future_helper(device)
