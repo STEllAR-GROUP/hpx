@@ -143,19 +143,13 @@ namespace hpx { namespace lcos {
     ///             necessary internal facilities used by \a gather_here and
     ///             \a gather_there
     ///
-    /// \returns    This function returns a future holding a vector with all
-    ///             gathered values. It will become ready once the gather
-    ///             operation has been completed.
+    /// \returns    This function returns a future which will become ready once
+    ///             the gather operation has been completed.
     ///
     template <typename T>
-    hpx::future<std::vector<typename std::decay<T>::type>>
-    gather_there(char const* basename,
-        T&& result,
+    hpx::future<void> gather_there(char const* basename, T&& result,
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t root_site = 0);
-
-}}    // namespace hpx::lcos
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
 
 // clang-format on
 #else
