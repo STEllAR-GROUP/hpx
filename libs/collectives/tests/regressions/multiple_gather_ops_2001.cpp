@@ -44,15 +44,10 @@ int hpx_main(int argc, char* argv[])
         }
         else
         {
-            hpx::future<std::vector<std::uint32_t>> overall_result =
+            hpx::future<void> overall_result =
                 hpx::lcos::gather_there(gather_basename, std::move(value), i);
 
-            std::vector<std::uint32_t> sol = overall_result.get();
-
-            for (std::size_t j = 0; j < sol.size(); ++j)
-            {
-                HPX_TEST(j == sol[j]);
-            }
+            overall_result.get();
         }
     }
 

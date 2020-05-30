@@ -22,7 +22,7 @@ char const* gather_direct_basename = "/test/gather_direct/";
 
 HPX_REGISTER_GATHER(std::uint32_t, test_gather);
 
-void test_gather_here_there()
+int hpx_main(int argc, char* argv[])
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
     HPX_TEST(num_localities >= 2);
@@ -47,15 +47,9 @@ void test_gather_here_there()
         }
         else
         {
-            hpx::future<std::vector<std::uint32_t>> overall_result =
-                hpx::lcos::gather_there(gather_basename,
-                    hpx::make_ready_future(this_locality + 42), i);
-
-            std::vector<std::uint32_t> sol = overall_result.get();
-            for (std::size_t j = 0; j != sol.size(); ++j)
-            {
-                HPX_TEST(j + 42 == sol[j]);
-            }
+            hpx::future<void> overall_result = hpx::lcos::gather_there(
+                gather_basename, hpx::make_ready_future(this_locality + 42), i);
+            overall_result.get();
         }
     }
 
@@ -76,58 +70,11 @@ void test_gather_here_there()
         }
         else
         {
-            hpx::future<std::vector<std::uint32_t>> overall_result =
-                hpx::lcos::gather_there(
-                    gather_direct_basename, this_locality + 42, i);
-
-            std::vector<std::uint32_t> sol = overall_result.get();
-            for (std::size_t j = 0; j != sol.size(); ++j)
-            {
-                HPX_TEST(j + 42 == sol[j]);
-            }
+            hpx::future<void> overall_result = hpx::lcos::gather_there(
+                gather_direct_basename, this_locality + 42, i);
+            overall_result.get();
         }
     }
-}
-
-void test_gather()
-{
-    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    HPX_TEST(num_localities >= 2);
-
-    std::uint32_t this_locality = hpx::get_locality_id();
-
-    // test functionality based on future<> of local result
-    for (std::uint32_t i = 0; i != 10; ++i)
-    {
-        hpx::future<std::vector<std::uint32_t>> overall_result =
-            hpx::gather(gather_basename,
-                hpx::make_ready_future(this_locality + 42), num_localities, i);
-
-        std::vector<std::uint32_t> sol = overall_result.get();
-        for (std::size_t j = 0; j != sol.size(); ++j)
-        {
-            HPX_TEST(j + 42 == sol[j]);
-        }
-    }
-
-    // test functionality based on immediate local result value
-    for (std::uint32_t i = 0; i != 10; ++i)
-    {
-        hpx::future<std::vector<std::uint32_t>> overall_result =
-            hpx::gather(gather_basename, this_locality + 42, num_localities, i);
-
-        std::vector<std::uint32_t> sol = overall_result.get();
-        for (std::size_t j = 0; j != sol.size(); ++j)
-        {
-            HPX_TEST(j + 42 == sol[j]);
-        }
-    }
-}
-
-int hpx_main(int argc, char* argv[])
-{
-    test_gather_here_there();
-    test_gather();
 
     return hpx::finalize();
 }
