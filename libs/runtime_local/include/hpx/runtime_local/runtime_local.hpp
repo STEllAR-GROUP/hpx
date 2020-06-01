@@ -61,7 +61,7 @@ namespace hpx {
         /// name prefix
         using notification_policy_type = threads::policies::callback_notifier;
         virtual notification_policy_type get_notification_policy(
-            char const* prefix);
+            char const* prefix, basic_execution::thread_type type);
 
         state get_state() const;
         void set_state(state s);
@@ -446,11 +446,13 @@ namespace hpx {
 
         void deinit_tss_helper(char const* context, std::size_t num);
 
-        void init_tss_ex(char const* context, std::size_t local_thread_num,
-            std::size_t global_thread_num, char const* pool_name,
-            char const* postfix, bool service_thread, error_code& ec);
+        void init_tss_ex(char const* context, basic_execution::thread_type type,
+            std::size_t local_thread_num, std::size_t global_thread_num,
+            char const* pool_name, char const* postfix, bool service_thread,
+            error_code& ec);
 
-        void init_tss_helper(char const* context, std::size_t local_thread_num,
+        void init_tss_helper(char const* context,
+            basic_execution::thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
             char const* postfix, bool service_thread);
 

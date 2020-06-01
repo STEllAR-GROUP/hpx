@@ -41,8 +41,8 @@
 
 namespace hpx {
     threads::policies::callback_notifier get_notification_policy(
-        char const* prefix);
-}
+        char const* prefix, basic_execution::thread_type type);
+}    // namespace hpx
 
 namespace hpx { namespace threads { namespace executors { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
       , executor_name_(get_unique_name())
       , notifier_(notifier.has_value() ?
                 notifier.value() :
-                get_notification_policy(executor_name_.c_str()))
+                get_notification_policy(executor_name_.c_str(),
+                    basic_execution::thread_type::worker_thread))
       , pool_(nullptr)
       , network_background_callback_()
       , thread_pool_init_(executor_name_, 0,

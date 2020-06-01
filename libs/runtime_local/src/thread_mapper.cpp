@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime_local/thread_mapper.hpp>
+#include <hpx/util/thread_mapper.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -13,94 +13,114 @@
 #include <string>
 #include <thread>
 
-#if defined(__linux__)
+#if defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
 #include <sys/syscall.h>
+#elif defined(HPX_WINDOWS)
+#include <windows.h>
 #endif
 
 namespace hpx { namespace util {
-    ///////////////////////////////////////////////////////////////////////////
-    // static members
-    std::uint32_t const thread_mapper::invalid_index =
-        static_cast<std::uint32_t>(-1);
-    long const thread_mapper::invalid_tid = -1;
-    std::string const thread_mapper::invalid_label;
 
-    ///////////////////////////////////////////////////////////////////////////
-    // methods
-    bool thread_mapper::null_cb(std::uint32_t)
-    {
-        return true;
-    }
+    namespace detail {
 
-    long int thread_mapper::get_system_thread_id()
-    {
+        ///////////////////////////////////////////////////////////////////////
+        unsigned long get_system_thread_id()
+        {
 #if defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
-        // this has been tested only on x86_*
-        return syscall(SYS_gettid);
+            // this has been tested only on x86_*
+            return syscall(SYS_gettid);
+#elif defined(HPX_WINDOWS)
+            return GetCurrentThreadId();
 #else
-        return invalid_tid;
+            return invalid_tid;
 #endif
-    }
+        }
 
-    bool thread_mapper::unmap_thread(thread_map_type::iterator& it)
-    {
-        std::uint32_t tix = it->second;
-        thread_map_.erase(it);
-        if (tix >= thread_info_.size())
-            return false;                                        //-V104
-        thread_info_[tix].cleanup_ = &thread_mapper::null_cb;    //-V108
-        return thread_info_[tix].cleanup_(tix);                  //-V108
-    }
+        // thread-specific data
+        thread_data::thread_data(
+            std::string const& label, basic_execution::thread_type type)
+          : label_(label)
+          , tid_(get_system_thread_id())
+          , cleanup_()
+          , type_(type)
+        {
+        }
+
+        void thread_data::invalidate()
+        {
+            tid_ = thread_mapper::invalid_tid;
+            cleanup_.reset();
+        }
+
+        bool thread_data::is_valid() const
+        {
+            return tid_ != thread_mapper::invalid_tid;
+        }
+    }    // namespace detail
+
+    ///////////////////////////////////////////////////////////////////////////
+    thread_mapper::thread_mapper() = default;
 
     thread_mapper::~thread_mapper()
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        for (std::uint32_t i = 0; i < thread_info_.size(); i++)    //-V104
-            thread_info_[i].cleanup_(i);                           //-V108
+        std::size_t i = 0;
+        for (auto&& tinfo : thread_map_)
+        {
+            if (tinfo.cleanup_)
+            {
+                tinfo.cleanup_(i++);
+            }
+        }
     }
 
-    std::uint32_t thread_mapper::register_thread(char const* l, error_code& ec)
+    std::uint32_t thread_mapper::register_thread(
+        char const* name, basic_execution::thread_type type)
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        std::thread::id id = std::this_thread::get_id();
-        thread_map_type::iterator it = thread_map_.find(id);
-        if (it != thread_map_.end())
+        auto tid = detail::get_system_thread_id();
+        for (auto&& tinfo : thread_map_)
         {
-            // collision on boost thread ID (perhaps previous thread wasn't
-            // unregistered correctly)
-            unmap_thread(it);
+            if (tinfo.tid_ == tid)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "thread_mapper::register_thread",
+                    "thread already registered");
+            }
         }
 
         // create mappings
-        std::uint32_t tix = thread_map_[id] =
-            static_cast<std::uint32_t>(thread_info_.size());
-        thread_info_.push_back(thread_data(get_system_thread_id()));
+        thread_map_.push_back(detail::thread_data(name, type));
 
-        if (label_map_.left.find(l) != label_map_.left.end())
-        {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "hpx::thread_mapper::register_thread",
-                "attempted to register thread with a duplicate label");
-            return std::uint32_t(-1);
-        }
+        std::size_t idx = thread_map_.size() - 1;
+        label_map_[name] = idx;
 
-        label_map_.left.insert(label_map_type::left_value_type(l, tix));
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return tix;
+        return static_cast<std::uint32_t>(idx);
     }
 
     bool thread_mapper::unregister_thread()
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        std::thread::id id = std::this_thread::get_id();
-        thread_map_type::iterator it = thread_map_.find(id);
-        return (it == thread_map_.end()) ? false : unmap_thread(it);
+        std::size_t i = 0;
+        auto tid = detail::get_system_thread_id();
+        for (auto&& tinfo : thread_map_)
+        {
+            if (tinfo.tid_ == tid)
+            {
+                label_map_.erase(tinfo.label_);
+                if (tinfo.cleanup_)
+                {
+                    tinfo.cleanup_(i);
+                }
+                tinfo.invalidate();
+                return true;
+            }
+            ++i;
+        }
+        return false;
     }
 
     bool thread_mapper::register_callback(
@@ -108,9 +128,13 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        if (static_cast<std::size_t>(tix) >= thread_info_.size())
+        auto idx = static_cast<std::size_t>(tix);
+        if (idx >= thread_map_.size() || !thread_map_[tix].is_valid())
+        {
             return false;
-        thread_info_[static_cast<std::size_t>(tix)].cleanup_ = cb;
+        }
+
+        thread_map_[tix].cleanup_ = cb;
         return true;
     }
 
@@ -118,29 +142,52 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        if (static_cast<std::size_t>(tix) >= thread_info_.size())
+        auto idx = static_cast<std::size_t>(tix);
+        if (idx >= thread_map_.size() || !thread_map_[tix].is_valid())
+        {
             return false;
-        thread_info_[static_cast<std::size_t>(tix)].cleanup_ =
-            &thread_mapper::null_cb;
+        }
+
+        thread_map_[tix].cleanup_.reset();
         return true;
     }
 
-    long int thread_mapper::get_thread_id(std::uint32_t tix) const
+    unsigned long thread_mapper::get_thread_id(std::uint32_t tix) const
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        return (static_cast<std::size_t>(tix) < thread_info_.size()) ?
-            thread_info_[static_cast<std::size_t>(tix)].tid_ :
-            invalid_tid;
+        auto idx = static_cast<std::size_t>(tix);
+        if (idx >= thread_map_.size())
+        {
+            return thread_mapper::invalid_tid;
+        }
+        return thread_map_[idx].tid_;
     }
 
     std::string const& thread_mapper::get_thread_label(std::uint32_t tix) const
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        label_map_type::right_map::const_iterator it =
-            label_map_.right.find(tix);
-        return (it == label_map_.right.end()) ? invalid_label : it->second;
+        auto idx = static_cast<std::size_t>(tix);
+        if (idx >= thread_map_.size())
+        {
+            static std::string invalid_label;
+            return invalid_label;
+        }
+        return thread_map_[idx].label_;
+    }
+
+    basic_execution::thread_type thread_mapper::get_thread_type(
+        std::uint32_t tix) const
+    {
+        std::lock_guard<mutex_type> m(mtx_);
+
+        auto idx = static_cast<std::size_t>(tix);
+        if (idx >= thread_map_.size())
+        {
+            return basic_execution::thread_type::unknown;
+        }
+        return thread_map_[idx].type_;
     }
 
     std::uint32_t thread_mapper::get_thread_index(
@@ -148,15 +195,18 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        label_map_type::left_map::const_iterator it =
-            label_map_.left.find(label);
-        return (it == label_map_.left.end()) ? invalid_index : it->second;
+        auto it = label_map_.find(label);
+        if (it == label_map_.end())
+        {
+            return invalid_index;
+        }
+        return thread_map_[it->second].tid_;
     }
 
     std::uint32_t thread_mapper::get_thread_count() const
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        return static_cast<std::uint32_t>(thread_info_.size());
+        return static_cast<std::uint32_t>(label_map_.size());
     }
 }}    // namespace hpx::util

@@ -37,6 +37,30 @@ extern "C" int sched_yield(void);
 
 namespace hpx { namespace basic_execution {
 
+    namespace detail {
+        // clang-format off
+        static char const* const thread_type_names[] = {
+            "unknown",
+            "main-thread",
+            "worker-thread",
+            "io-thread",
+            "timer-thread",
+            "parcel-thread",
+            "custom-thread"
+        };
+        // clang-format on
+    }    // namespace detail
+
+    std::string get_thread_type_name(thread_type type)
+    {
+        int idx = static_cast<int>(type);
+        if (idx < -1 || idx > static_cast<int>(thread_type::custom_thread))
+        {
+            idx = -1;
+        }
+        return detail::thread_type_names[idx + 1];
+    }
+
     namespace {
 
         struct default_context : basic_execution::context_base

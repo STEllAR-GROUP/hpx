@@ -270,16 +270,19 @@ namespace hpx {
       , main_pool_notifier_()
       , main_pool_(1, main_pool_notifier_, "main_pool")
 #ifdef HPX_HAVE_IO_POOL
-      , io_pool_notifier_(runtime::get_notification_policy("io-thread"))
+      , io_pool_notifier_(runtime::get_notification_policy(
+            "io-thread", basic_execution::thread_type::io_thread))
       , io_pool_(
             rtcfg.get_thread_pool_size("io_pool"), io_pool_notifier_, "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-      , timer_pool_notifier_(runtime::get_notification_policy("timer-thread"))
+      , timer_pool_notifier_(runtime::get_notification_policy(
+            "timer-thread", basic_execution::thread_type::timer_thread))
       , timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
             timer_pool_notifier_, "timer_pool")
 #endif
-      , notifier_(runtime::get_notification_policy("worker-thread"))
+      , notifier_(runtime::get_notification_policy(
+            "worker-thread", basic_execution::thread_type::worker_thread))
       , thread_manager_(new hpx::threads::threadmanager(
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
@@ -304,21 +307,17 @@ namespace hpx {
 
     runtime::runtime(util::runtime_configuration& rtcfg,
         notification_policy_type&& notifier,
-        notification_policy_type&& main_pool_notifier
+        notification_policy_type&& main_pool_notifier,
 #ifdef HPX_HAVE_IO_POOL
-        ,
-        notification_policy_type&& io_pool_notifier
+        notification_policy_type&& io_pool_notifier,
 #endif
 #ifdef HPX_HAVE_IO_POOL
-        ,
-        notification_policy_type&& timer_pool_notifier
+        notification_policy_type&& timer_pool_notifier,
 #endif
 #ifdef HPX_HAVE_NETWORKING
-        ,
         threads::detail::network_background_callback_type
-            network_background_callback
+            network_background_callback,
 #endif
-        ,
         bool initialize)
       : ini_(rtcfg)
       , instance_number_(++instance_number_counter_)
@@ -1069,8 +1068,7 @@ namespace hpx { namespace threads {
             to_add_mode, to_remove_mode);
     }
 
-    void remove_scheduler_mode(
-        threads::policies::scheduler_mode m)
+    void remove_scheduler_mode(threads::policies::scheduler_mode m)
     {
         get_runtime().get_thread_manager().remove_scheduler_mode(m);
     }
@@ -1320,7 +1318,8 @@ namespace hpx {
         // Register this thread with the runtime system to allow calling
         // certain HPX functionality from the main thread. Also calls
         // registered startup callbacks.
-        init_tss_helper("main-thread", 0, 0, "", "", false);
+        init_tss_helper("main-thread",
+            basic_execution::thread_type::main_thread, 0, 0, "", "", false);
 
 #ifdef HPX_HAVE_IO_POOL
         // start the io pool
@@ -1341,8 +1340,7 @@ namespace hpx {
         threads::thread_init_data data(util::bind(&runtime::run_helper, this,
                                            func, std::ref(result_), true),
             "run_helper", threads::thread_priority_normal,
-            threads::thread_schedule_hint(0),
-            threads::thread_stacksize_large);
+            threads::thread_schedule_hint(0), threads::thread_stacksize_large);
 
         this->runtime::starting();
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -1714,7 +1712,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     threads::policies::callback_notifier runtime::get_notification_policy(
-        char const* prefix)
+        char const* prefix, basic_execution::thread_type type)
     {
         typedef bool (runtime::*report_error_t)(
             std::size_t, std::exception_ptr const&, bool);
@@ -1726,8 +1724,9 @@ namespace hpx {
 
         notification_policy_type notifier;
 
-        notifier.add_on_start_thread_callback(util::bind(
-            &runtime::init_tss_helper, This(), prefix, _1, _2, _3, _4, false));
+        notifier.add_on_start_thread_callback(
+            util::bind(&runtime::init_tss_helper, This(), prefix, type, _1, _2,
+                _3, _4, false));
         notifier.add_on_stop_thread_callback(
             util::bind(&runtime::deinit_tss_helper, This(), prefix, _1));
         notifier.set_on_error_callback(
@@ -1738,15 +1737,17 @@ namespace hpx {
     }
 
     void runtime::init_tss_helper(char const* context,
-        std::size_t local_thread_num, std::size_t global_thread_num,
-        char const* pool_name, char const* postfix, bool service_thread)
+        basic_execution::thread_type type, std::size_t local_thread_num,
+        std::size_t global_thread_num, char const* pool_name,
+        char const* postfix, bool service_thread)
     {
         error_code ec(lightweight);
-        return init_tss_ex(context, local_thread_num, global_thread_num,
+        return init_tss_ex(context, type, local_thread_num, global_thread_num,
             pool_name, postfix, service_thread, ec);
     }
 
-    void runtime::init_tss_ex(char const* context, std::size_t local_thread_num,
+    void runtime::init_tss_ex(char const* context,
+        basic_execution::thread_type type, std::size_t local_thread_num,
         std::size_t global_thread_num, char const* pool_name,
         char const* postfix, bool service_thread, error_code& ec)
     {
@@ -1766,7 +1767,7 @@ namespace hpx {
         char const* name = detail::thread_name().c_str();
 
         // initialize thread mapping for external libraries (i.e. PAPI)
-        thread_support_->register_thread(name, ec);
+        thread_support_->register_thread(name, type);
 
         // register this thread with any possibly active Intel tool
         HPX_ITT_THREAD_SET_NAME(name);
@@ -1902,8 +1903,9 @@ namespace hpx {
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss_ex(thread_name.c_str(), global_thread_num, global_thread_num,
-            "", nullptr, service_thread, ec);
+        init_tss_ex(thread_name.c_str(),
+            basic_execution::thread_type::custom_thread, global_thread_num,
+            global_thread_num, "", nullptr, service_thread, ec);
 
         return !ec ? true : false;
     }
@@ -1921,9 +1923,9 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     threads::policies::callback_notifier get_notification_policy(
-        char const* prefix)
+        char const* prefix, basic_execution::thread_type type)
     {
-        return get_runtime().get_notification_policy(prefix);
+        return get_runtime().get_notification_policy(prefix, type);
     }
 
     std::uint32_t get_locality_id(error_code& ec)
