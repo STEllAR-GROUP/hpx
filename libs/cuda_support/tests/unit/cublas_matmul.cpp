@@ -36,6 +36,7 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 //
+#include <hpx/cuda_support/cublas_executor.hpp>
 #include <hpx/cuda_support/cuda_executor.hpp>
 #include <hpx/cuda_support/target.hpp>
 #include <hpx/modules/timing.hpp>
@@ -144,7 +145,7 @@ void matrixMultiply(
     hpx::parallel::for_each(par, h_A.begin(), h_A.end(), randfunc);
     hpx::parallel::for_each(par, h_B.begin(), h_B.end(), randfunc);
 
-    // create a cublas helper object we'll use to futurize the cuda events
+    // create a cublas executor we'll use to futurize cuda events
     using namespace hpx::cuda::experimental;
     cublas_executor cublas(device);
     using cublas_future = typename cuda_executor::future_type;
@@ -175,13 +176,13 @@ void matrixMultiply(
 
 #else
     T *d_A, *d_B, *d_C;
-    hpx::cuda::experimental::cuda_error(
+    hpx::cuda::experimental::check_cuda_error(
         cudaMalloc((void**) &d_A, size_A * sizeof(T)));
 
-    hpx::cuda::experimental::cuda_error(
+    hpx::cuda::experimental::check_cuda_error(
         cudaMalloc((void**) &d_B, size_B * sizeof(T)));
 
-    hpx::cuda::experimental::cuda_error(
+    hpx::cuda::experimental::check_cuda_error(
         cudaMalloc((void**) &d_C, size_C * sizeof(T)));
 
     // adding async copy operations into the stream before cublas calls puts

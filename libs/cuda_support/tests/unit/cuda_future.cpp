@@ -48,10 +48,10 @@ int test_saxpy(hpx::cuda::experimental::cuda_executor& cudaexec)
     std::vector<float> h_B(N);
 
     float *d_A, *d_B;
-    hpx::cuda::experimental::cuda_error(
+    hpx::cuda::experimental::check_cuda_error(
         cudaMalloc((void**) &d_A, N * sizeof(float)));
 
-    hpx::cuda::experimental::cuda_error(
+    hpx::cuda::experimental::check_cuda_error(
         cudaMalloc((void**) &d_B, N * sizeof(float)));
 
     // init host data
@@ -121,10 +121,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // create a cuda target using device number 0,1,2...
     hpx::cuda::target target(device);
 
+    // for debug purposes, print out available targets
+    hpx::cuda::experimental::print_local_targets();
+
     // create a stream helper object
     hpx::cuda::experimental::cuda_executor cudaexec(device);
-    // for debug purposes, print out available targets
-    cudaexec.print_local_targets();
 
     float testf = 1.2345;
     std::cout << "Calling cuda kernel <float>  : " << testf << std::endl;
