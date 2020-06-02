@@ -95,20 +95,21 @@ namespace hpx { namespace lcos { namespace detail {
         {
         };
 
-        template <typename Operation, typename... Args>
-        void set_result(std::size_t which, Args... args)
+        template <typename Operation, typename Result, typename... Args>
+        Result set_result(std::size_t which, Args... args)
         {
             return std::make_shared<traits::communication_operation<
                 communicator_server, Operation>>(*this)
-                ->set(which, std::move(args)...);
+                ->template set<Result>(which, std::move(args)...);
         }
 
-        template <typename Operation, typename... Args>
+        template <typename Operation, typename Result, typename... Args>
         struct communication_set_action
-          : hpx::actions::make_action<void (communicator_server::*)(
+          : hpx::actions::make_action<Result (communicator_server::*)(
                                           std::size_t, Args...),
-                &communicator_server::template set_result<Operation, Args...>,
-                communication_set_action<Operation, Args...>>::type
+                &communicator_server::template set_result<Operation, Result,
+                    Args...>,
+                communication_set_action<Operation, Result, Args...>>::type
         {
         };
 

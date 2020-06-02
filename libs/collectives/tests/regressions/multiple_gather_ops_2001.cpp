@@ -9,6 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -38,15 +39,15 @@ int hpx_main(int argc, char* argv[])
 
             for (std::size_t j = 0; j < sol.size(); ++j)
             {
-                std::cout << "got residual " << sol[j] << " from " << j
-                          << std::endl;
+                HPX_TEST(j == sol[j]);
             }
         }
         else
         {
-            hpx::future<void> f =
+            hpx::future<void> overall_result =
                 hpx::lcos::gather_there(gather_basename, std::move(value), i);
-            f.get();
+
+            overall_result.get();
         }
     }
 

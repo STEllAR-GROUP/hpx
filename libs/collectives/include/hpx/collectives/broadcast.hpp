@@ -216,12 +216,8 @@ namespace hpx { namespace traits {
 
                 auto& communicator = this_->communicator_;
 
-                arg_type data;
-                {
-                    std::unique_lock<mutex_type> l(communicator.mtx_);
-                    data = communicator.data_[0];
-                }
-                return data;
+                std::unique_lock<mutex_type> l(communicator.mtx_);
+                return communicator.data_[0];
             };
 
             std::unique_lock<mutex_type> l(communicator_.mtx_);
@@ -243,8 +239,8 @@ namespace hpx { namespace traits {
             return f;
         }
 
-        template <typename T>
-        void set(std::size_t which, T&& t)
+        template <typename Result, typename T>
+        Result set(std::size_t which, T&& t)
         {
             using mutex_type = typename Communicator::mutex_type;
 
@@ -252,7 +248,7 @@ namespace hpx { namespace traits {
             util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
 
             communicator_.gate_.synchronize(1, l);
-            communicator_.data_[0] = std::forward<T>(t);
+            communicator_.data_[0] = t;
             if (communicator_.gate_.set(which, l))
             {
                 // this is a one-shot object (generations counters are not
@@ -261,6 +257,7 @@ namespace hpx { namespace traits {
                     std::move(communicator_.name_), communicator_.site_)
                     .get();
             }
+            return std::forward<T>(t);
         }
 
         Communicator& communicator_;
@@ -284,7 +281,7 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     // destination site needs to be handled differently
     template <typename T>
-    hpx::future<void> broadcast_to(hpx::future<hpx::id_type>&& fid,
+    hpx::future<T> broadcast_to(hpx::future<hpx::id_type>&& fid,
         hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
@@ -294,10 +291,10 @@ namespace hpx { namespace lcos {
 
         auto broadcast_data =
             [this_site](hpx::future<hpx::id_type>&& f,
-                hpx::future<T>&& local_result) -> hpx::future<void> {
+                hpx::future<T>&& local_result) -> hpx::future<T> {
             using action_type = typename detail::communicator_server<T>::
                 template communication_set_action<
-                    traits::communication::broadcast_tag, T>;
+                    traits::communication::broadcast_tag, T, T>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = f.get();
@@ -315,8 +312,30 @@ namespace hpx { namespace lcos {
     }
 
     template <typename T>
-    hpx::future<void> broadcast_to(hpx::future<hpx::id_type>&& fid,
-        T&& local_result, std::size_t this_site = std::size_t(-1))
+    hpx::future<T> broadcast_to(char const* basename,
+        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
+        std::size_t generation = std::size_t(-1),
+        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+    {
+        if (num_sites == std::size_t(-1))
+        {
+            num_sites = static_cast<std::size_t>(
+                hpx::get_num_localities(hpx::launch::sync));
+        }
+        if (this_site == std::size_t(-1))
+        {
+            this_site = static_cast<std::size_t>(hpx::get_locality_id());
+        }
+
+        return broadcast_to(
+            create_broadcast<T>(basename, num_sites, generation, root_site),
+            std::move(local_result), this_site);
+    }
+
+    template <typename T>
+    hpx::future<typename std::decay<T>::type> broadcast_to(
+        hpx::future<hpx::id_type>&& fid, T&& local_result,
+        std::size_t this_site = std::size_t(-1))
     {
         if (this_site == std::size_t(-1))
         {
@@ -327,10 +346,10 @@ namespace hpx { namespace lcos {
 
         auto broadcast_data =
             [this_site](hpx::future<hpx::id_type>&& f,
-                arg_type&& local_result) -> hpx::future<void> {
+                arg_type&& local_result) -> hpx::future<arg_type> {
             using action_type = typename detail::communicator_server<T>::
                 template communication_set_action<
-                    traits::communication::broadcast_tag, arg_type>;
+                    traits::communication::broadcast_tag, arg_type, arg_type>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = f.get();
@@ -348,39 +367,8 @@ namespace hpx { namespace lcos {
     }
 
     template <typename T>
-    hpx::future<void> broadcast_to(char const* basename,
-        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        if (num_sites == std::size_t(-1))
-        {
-            num_sites = static_cast<std::size_t>(
-                hpx::get_num_localities(hpx::launch::sync));
-        }
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
-        }
-
-        if (this_site == root_site)
-        {
-            return broadcast_to(create_broadcast<typename std::decay<T>::type>(
-                                    basename, num_sites, generation, root_site),
-                std::move(local_result), this_site);
-        }
-
-        std::string name(basename);
-        if (generation != std::size_t(-1))
-            name += std::to_string(generation) + "/";
-
-        return broadcast_to(hpx::find_from_basename(std::move(name), root_site),
-            std::move(local_result), this_site);
-    }
-
-    template <typename T>
-    hpx::future<void> broadcast_to(char const* basename, T&& local_result,
-        std::size_t num_sites = std::size_t(-1),
+    hpx::future<typename std::decay<T>::type> broadcast_to(char const* basename,
+        T&& local_result, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
@@ -443,7 +431,9 @@ namespace hpx { namespace lcos {
 
         std::string name(basename);
         if (generation != std::size_t(-1))
+        {
             name += std::to_string(generation) + "/";
+        }
 
         return broadcast_from<T>(
             hpx::find_from_basename(std::move(name), root_site), this_site);

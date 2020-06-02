@@ -247,12 +247,8 @@ namespace hpx { namespace traits {
 
                 auto& communicator = this_->communicator_;
 
-                std::vector<T> data(communicator.num_sites_);
-                {
-                    std::unique_lock<mutex_type> l(communicator.mtx_);
-                    std::swap(data, communicator.data_);
-                }
-                return data;
+                std::unique_lock<mutex_type> l(communicator.mtx_);
+                return communicator.data_;
             };
 
             std::unique_lock<mutex_type> l(communicator_.mtx_);
@@ -275,7 +271,7 @@ namespace hpx { namespace traits {
             return f;
         }
 
-        template <typename T>
+        template <typename Result, typename T>
         void set(std::size_t which, T&& t)
         {
             using mutex_type = typename Communicator::mutex_type;
@@ -284,7 +280,7 @@ namespace hpx { namespace traits {
             util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
 
             communicator_.gate_.synchronize(1, l);
-            communicator_.data_[which] = std::forward<T>(t);
+            communicator_.data_[which] = t;
             if (communicator_.gate_.set(which, l))
             {
                 // this is a one-shot object (generations counters are not
@@ -382,7 +378,7 @@ namespace hpx { namespace lcos {
             using action_type = typename detail::communicator_server<arg_type>::
                 template communication_get_action<
                     traits::communication::gather_tag,
-                    hpx::future<std::vector<arg_type>>>;
+                    hpx::future<std::vector<arg_type>>, arg_type>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = fid.get();
@@ -436,7 +432,7 @@ namespace hpx { namespace lcos {
                 hpx::future<T>&& local_result) -> hpx::future<void> {
             using action_type = typename detail::communicator_server<T>::
                 template communication_set_action<
-                    traits::communication::gather_tag, T>;
+                    traits::communication::gather_tag, void, T>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = fid.get();
@@ -488,8 +484,8 @@ namespace hpx { namespace lcos {
             [this_site](hpx::future<hpx::id_type>&& fid,
                 arg_type&& local_result) -> hpx::future<void> {
             using action_type = typename detail::communicator_server<T>::
-                template communication_get_action<
-                    traits::communication::gather_tag, hpx::future<T>>;
+                template communication_set_action<
+                    traits::communication::gather_tag, void, arg_type>;
 
             // make sure id is kept alive as long as the returned future
             hpx::id_type id = fid.get();
@@ -524,6 +520,13 @@ namespace hpx { namespace lcos {
             std::forward<T>(local_result), this_site);
     }
 }}    // namespace hpx::lcos
+
+////////////////////////////////////////////////////////////////////////////////
+namespace hpx {
+    using lcos::create_gatherer;
+    using lcos::gather_here;
+    using lcos::gather_there;
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_GATHER_DECLARATION(...) /**/
