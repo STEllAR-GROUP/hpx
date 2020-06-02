@@ -40,6 +40,7 @@ namespace hpx { namespace util {
         thread_data::thread_data(
             std::string const& label, basic_execution::thread_type type)
           : label_(label)
+          , id_(std::this_thread::get_id())
           , tid_(get_system_thread_id())
           , cleanup_()
           , type_(type)
@@ -115,7 +116,16 @@ namespace hpx { namespace util {
                 {
                     tinfo.cleanup_(i);
                 }
-                tinfo.invalidate();
+
+                std::size_t size = thread_map_.size();
+                if (i == size)
+                {
+                    thread_map_.resize(size - 1);
+                }
+                else
+                {
+                    tinfo.invalidate();
+                }
                 return true;
             }
             ++i;
@@ -152,7 +162,19 @@ namespace hpx { namespace util {
         return true;
     }
 
-    unsigned long thread_mapper::get_thread_id(std::uint32_t tix) const
+    std::thread::id thread_mapper::get_thread_id(std::uint32_t tix) const
+    {
+        std::lock_guard<mutex_type> m(mtx_);
+
+        auto idx = static_cast<std::size_t>(tix);
+        if (idx >= thread_map_.size())
+        {
+            return std::thread::id{};
+        }
+        return thread_map_[idx].id_;
+    }
+
+    unsigned long thread_mapper::get_thread_native_handle(std::uint32_t tix) const
     {
         std::lock_guard<mutex_type> m(mtx_);
 

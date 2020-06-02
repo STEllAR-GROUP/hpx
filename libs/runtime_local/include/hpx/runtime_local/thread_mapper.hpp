@@ -37,11 +37,12 @@ namespace hpx { namespace util {
         class HPX_EXPORT thread_data
         {
         public:
+            thread_data() = default;
             thread_data(
                 std::string const& label, basic_execution::thread_type type);
 
         protected:
-            friend class thread_mapper;
+            friend class util::thread_mapper;
 
             void invalidate();
             bool is_valid() const;
@@ -50,7 +51,10 @@ namespace hpx { namespace util {
             // label of this thread
             std::string label_;
 
-            // associated system thread ID, typically an ID of a kernel thread
+            // associated thread ID, typically an ID of a kernel thread
+            std::thread::id id_;
+
+            // the native_handle() of the associated thread
             unsigned long tid_;
 
             // callback function invoked when unregistering a thread
@@ -102,8 +106,11 @@ namespace hpx { namespace util {
         // cancel callback
         bool revoke_callback(std::uint32_t tix);
 
-        // returns low level thread id
-        unsigned long get_thread_id(std::uint32_t tix) const;
+        // returns thread id
+        std::thread::id get_thread_id(std::uint32_t tix) const;
+
+        // returns low level thread id (native_handle)
+        unsigned long get_thread_native_handle(std::uint32_t tix) const;
 
         // returns the label of registered thread tix
         std::string const& get_thread_label(std::uint32_t tix) const;

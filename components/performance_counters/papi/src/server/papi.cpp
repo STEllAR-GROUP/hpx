@@ -62,13 +62,13 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             "could not create PAPI event set", locstr);
         papi_call(PAPI_assign_eventset_component(evset_, 0),
             "cannot assign component index to event set", locstr);
-        long tid = tm.get_thread_id(tix);
+        unsigned long tid = tm.get_thread_native_handle(tix);
         if (tid == tm.invalid_tid)
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 NS_STR "thread_counters::thread_counters()",
                 "unable to retrieve correct OS thread ID for profiling "
                 "(perhaps thread was not registered)");
-        papi_call(PAPI_attach(evset_, tm.get_thread_id(tix)),
+        papi_call(PAPI_attach(evset_, tid),
             "failed to attach thread to PAPI event set", locstr);
         tm.register_callback(tix, [&](std::uint32_t i){return this->terminate(i);});
     }
