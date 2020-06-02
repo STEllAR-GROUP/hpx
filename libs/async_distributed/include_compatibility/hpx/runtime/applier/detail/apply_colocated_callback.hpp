@@ -13,11 +13,13 @@
 #if defined(HPX_ASYNC_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
-    "The header hpx/runtime/applier/detail/apply_colocated_callback.hpp is deprecated, \
-    please include hpx/async_distributed/applier/detail/apply_colocated_callback.hpp instead")
+    "The header hpx/runtime/applier/detail/apply_colocated_callback.hpp is \
+    deprecated, please include \
+    hpx/async_distributed/applier/detail/apply_colocated_callback.hpp instead")
 #else
 #warning                                                                       \
-    "The header hpx/runtime/applier/detail/apply_colocated_callback.hpp is deprecated, \
-    please include hpx/async_distributed/applier/detail/apply_colocated_callback.hpp instead"
+    "The header hpx/runtime/applier/detail/apply_colocated_callback.hpp is \
+    deprecated, please include \
+    hpx/async_distributed/applier/detail/apply_colocated_callback.hpp instead"
 #endif
 #endif

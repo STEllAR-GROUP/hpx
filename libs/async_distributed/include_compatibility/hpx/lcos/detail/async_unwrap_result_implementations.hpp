@@ -13,11 +13,15 @@
 #if defined(HPX_ASYNC_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
-    "The header hpx/lcos/detail/async_unwrap_result_implementations.hpp is deprecated, \
-    please include hpx/async_distributed/detail/async_unwrap_result_implementations.hpp instead")
+    "The header hpx/lcos/detail/async_unwrap_result_implementations.hpp is \
+    deprecated, please include \
+    hpx/async_distributed/detail/async_unwrap_result_implementations.hpp \
+    instead")
 #else
 #warning                                                                       \
-    "The header hpx/lcos/detail/async_unwrap_result_implementations.hpp is deprecated, \
-    please include hpx/async_distributed/detail/async_unwrap_result_implementations.hpp instead"
+    "The header hpx/lcos/detail/async_unwrap_result_implementations.hpp is \
+    deprecated, please include \
+    hpx/async_distributed/detail/async_unwrap_result_implementations.hpp \
+    instead"
 #endif
 #endif
