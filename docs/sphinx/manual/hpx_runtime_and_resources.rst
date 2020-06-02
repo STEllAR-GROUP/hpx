@@ -179,6 +179,8 @@ thread pool.
    It is simpler in some situations to schedule important tasks with high
    priority instead of using a separate thread pool.
 
+.. _using_resource_partitioner:
+
 Using the resource partitioner
 ------------------------------
 

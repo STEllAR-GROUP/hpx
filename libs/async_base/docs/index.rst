@@ -11,7 +11,10 @@
 async_base
 ==========
 
-TODO: High-level description of the library.
+The async_base module defines the basic functionality for spawning tasks on
+thread pools. This module does not implement any functionality on its own, but
+is extended by :ref:`libs_async_local` and :ref:`libs_async_distributed` with
+implementations for the local and distributed cases.
 
 See the :ref:`API reference <libs_async_base_api>` of this module for more
 details.

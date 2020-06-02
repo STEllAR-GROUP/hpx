@@ -11,3 +11,7 @@
 runtime_configuration
 =====================
 
+This module handles the configuration options required by the runtime.
+
+See the :ref:`API reference <libs_runtime_configuration_api>` of this module
+for more details.

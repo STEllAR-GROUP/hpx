@@ -11,3 +11,8 @@
 prefix
 ======
 
+This module provides utilities for handling the prefix of an |hpx| application,
+i.e. the paths used for searching components and plugins.
+
+See the :ref:`API reference <libs_prefix_api>` of this module for more
+details.

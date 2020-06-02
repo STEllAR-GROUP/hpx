@@ -11,7 +11,7 @@
 itt_notify
 ==========
 
-TODO: High-level description of the library.
+This module provides support for profiling with |vtune|_.
 
 See the :ref:`API reference <libs_itt_notify_api>` of this module for more
 details.

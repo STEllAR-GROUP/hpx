@@ -11,7 +11,9 @@
 timed_execution
 ===============
 
-TODO: High-level description of the library.
+This module provides extensions to the executor interfaces defined in the
+:ref:`libs_execution` module that allow timed submission of tasks on thread
+pools (at or after a specified time).
 
 See the :ref:`API reference <libs_timed_execution_api>` of this module for more
 details.

@@ -11,3 +11,8 @@
 asio
 ====
 
+The asio module is a thin wrapper around the Boost.ASIO library, providing a
+few additional helper functions.
+
+See the :ref:`API reference <libs_algorithms_api>` of the module for more
+details.
