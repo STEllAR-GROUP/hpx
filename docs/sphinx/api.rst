@@ -41,15 +41,42 @@ and release builds, and builds with different C++ standards.
    API in terms of our build system are the ``HPX::`` targets provided by
    ``find_package(HPX)``.
 
-Main |hpx| library reference
-============================
+The public API of |hpx| is presented below. Clicking on a name brings you to the
+full documentation for the class or function. Including the header specified in
+a heading brings in the features listed under that heading.
 
-.. doxygenindex::
+.. note::
 
-Modules reference
-=================
+   Names listed here are guaranteed stable with respect to semantic versioning.
+   However, at the moment the list is incomplete and certain unlisted features
+   are intended to be in the public API. While we work on completing the list,
+   if you're unsure about whether a particular unlisted name is part of the
+   public API you can get into contact with us or open an issue and we'll
+   clarify the situation.
 
 .. toctree::
    :maxdepth: 1
 
+   api/public_api.rst
+
+Full API
+========
+
+The full API of |hpx| is presented below. The listings for the public API above
+refer to the full documentation below.
+
+.. note::
+
+   Most names listed in the full API reference are implementation details or
+   considered unstable. They are listed mostly for completeness. If there is a
+   particular feature you think deserves being in the public API we may consider
+   promoting it. In general we prioritize making sure features corresponding to
+   C++ standard library features are stable and complete.
+
+|hpx| contains a lot of...
+
+.. toctree::
+   :maxdepth: 1
+
+   api/full_api.rst
 {}
