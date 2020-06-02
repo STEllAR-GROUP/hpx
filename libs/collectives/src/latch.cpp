@@ -6,7 +6,6 @@
 
 #include <hpx/modules/assertion.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/performance_counters/counters.hpp>
