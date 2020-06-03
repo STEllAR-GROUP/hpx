@@ -134,23 +134,20 @@ namespace hpx { namespace components
     {
         // the entries in this array need to be in exactly the same sequence
         // as the values defined in the component_type enumerator
-        char const* const names[] =
-        {
-            "component_runtime_support",                        /*  0 */
-            "component_plain_function",                         /*  1 */
-            "component_memory",                                 /*  2 */
-            "component_base_lco",                               /*  3 */
-            "component_base_lco_with_value_unmanaged",          /*  4 */
-            "component_base_lco_with_value",                    /*  5 */
-            "component_latch",                                  /*  6 (0x60006) */
-            "component_barrier",                                /*  7 (0x70004) */
-            "component_flex_barrier",                           /*  8 (0x80004) */
-            "component_promise",                                /*  9 (0x90006) */
+        char const* const names[] = {
+            "component_runtime_support",               /*  0 */
+            "component_plain_function",                /*  1 */
+            "component_base_lco",                      /*  2 */
+            "component_base_lco_with_value_unmanaged", /*  3 */
+            "component_base_lco_with_value",           /*  4 */
+            "component_latch",                         /*  5 (0x50005) */
+            "component_barrier",                       /*  6 (0x60006) */
+            "component_promise",                       /*  7 (0x70004) */
 
-            "component_agas_locality_namespace",                /* 10 */
-            "component_agas_primary_namespace",                 /* 11 */
-            "component_agas_component_namespace",               /* 12 */
-            "component_agas_symbol_namespace",                  /* 13 */
+            "component_agas_locality_namespace",  /*  8 */
+            "component_agas_primary_namespace",   /*  9 */
+            "component_agas_component_namespace", /* 10 */
+            "component_agas_symbol_namespace",    /* 11 */
         };
     }
 

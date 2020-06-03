@@ -48,7 +48,7 @@ namespace hpx { namespace applier {
         // destructor
         ~applier() = default;
 
-        void initialize(std::uint64_t rts, std::uint64_t mem);
+        void initialize(std::uint64_t rts);
 
         /// \brief Allow access to the AGAS client instance used with this
         ///        \a applier.
@@ -153,29 +153,12 @@ namespace hpx { namespace applier {
             return runtime_support_id_;
         }
 
-        /// By convention every memory address has gid identical to the prefix
-        /// of the locality the runtime_support is responsible for
-        naming::gid_type const& get_memory_raw_gid() const
-        {
-            HPX_ASSERT(memory_id_);
-            return memory_id_.get_gid();
-        }
-
-        /// By convention every memory address has gid identical to the prefix
-        /// of the locality the runtime_support is responsible for
-        naming::id_type const& get_memory_gid() const
-        {
-            HPX_ASSERT(memory_id_);
-            return memory_id_;
-        }
-
     private:
 #if defined(HPX_HAVE_NETWORKING)
         parcelset::parcelhandler& parcel_handler_;
 #endif
         threads::threadmanager& thread_manager_;
         naming::id_type runtime_support_id_;
-        naming::id_type memory_id_;
     };
 }}    // namespace hpx::applier
 

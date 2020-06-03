@@ -109,7 +109,6 @@ public:
     threads::thread_priority const action_priority_;
 
     std::uint64_t rts_lva_;
-    std::uint64_t mem_lva_;
 
     std::unique_ptr<component_namespace> component_ns_;
     std::unique_ptr<locality_namespace> locality_ns_;
@@ -144,11 +143,10 @@ public:
     void bootstrap(
         parcelset::parcelhandler& ph, util::runtime_configuration const& ini);
 
-    void initialize(parcelset::parcelhandler& ph, std::uint64_t rts_lva,
-        std::uint64_t mem_lva);
+    void initialize(parcelset::parcelhandler& ph, std::uint64_t rts_lva);
 #else
     void bootstrap(util::runtime_configuration const& ini);
-    void initialize(std::uint64_t rts_lva, std::uint64_t mem_lva);
+    void initialize(std::uint64_t rts_lva);
 #endif
 
     /// \brief Adjust the size of the local AGAS Address resolution cache

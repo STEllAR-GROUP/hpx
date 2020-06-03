@@ -83,9 +83,9 @@ char const* const primary_namespace_service_name = "primary/";
 ///                  the underlying object. For all user-defined components,
 ///                  these bits contain a unique 88-bit number which is
 ///                  assigned sequentially for each locality. For
-///                  \a hpx#components#component_runtime_support and
-///                  \a hpx#components#component_memory, the high 24 bits are
-///                  zeroed and the low 64 bits hold the LVA of the component.
+///                  \a hpx#components#component_runtime_support the high 24
+///                  bits are zeroed and the low 64 bits hold the LVA of the
+///                  component.
 ///
 /// The following address ranges are reserved. Some are either explicitly or
 /// implicitly protected by AGAS. The letter x represents a single-byte

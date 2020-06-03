@@ -34,7 +34,6 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
@@ -394,7 +393,6 @@ namespace hpx {
       , agas_client_(ini_, rtcfg.mode_)
       , applier_(*thread_manager_)
 #endif
-      , memory_(new components::server::memory)
       , runtime_support_(new components::server::runtime_support(ini_))
     {
         // This needs to happen first
@@ -424,17 +422,13 @@ namespace hpx {
 
         // now, launch AGAS and register all nodes, launch all other components
 #if defined(HPX_HAVE_NETWORKING)
-        agas_client_.initialize(parcel_handler_,
-            std::uint64_t(runtime_support_.get()),
-            std::uint64_t(memory_.get()));
+        agas_client_.initialize(
+            parcel_handler_, std::uint64_t(runtime_support_.get()));
         parcel_handler_.initialize(agas_client_, &applier_);
 #else
-        agas_client_.initialize(std::uint64_t(runtime_support_.get()),
-            std::uint64_t(memory_.get()));
+        agas_client_.initialize(std::uint64_t(runtime_support_.get()));
 #endif
-
-        applier_.initialize(std::uint64_t(runtime_support_.get()),
-            std::uint64_t(memory_.get()));
+        applier_.initialize(std::uint64_t(runtime_support_.get()));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1054,11 +1048,6 @@ namespace hpx {
     std::uint64_t runtime_distributed::get_runtime_support_lva() const
     {
         return reinterpret_cast<std::uint64_t>(runtime_support_.get());
-    }
-
-    std::uint64_t runtime_distributed::get_memory_lva() const
-    {
-        return reinterpret_cast<std::uint64_t>(memory_.get());
     }
 
     naming::gid_type get_next_id(std::size_t count = 1);
