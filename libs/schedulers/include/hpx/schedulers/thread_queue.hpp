@@ -643,6 +643,13 @@ namespace hpx { namespace threads { namespace policies {
             if (id)
                 *id = invalid_thread_id;
 
+            if (data.stacksize == threads::thread_stacksize_current)
+            {
+                data.stacksize = get_self_stacksize_enum();
+            }
+
+            HPX_ASSERT(data.stacksize != threads::thread_stacksize_current);
+
             if (data.run_now)
             {
                 threads::thread_id_type thrd;

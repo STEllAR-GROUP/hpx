@@ -76,6 +76,8 @@ namespace hpx { namespace threads {
         LTM_(debug) << "thread::thread(" << this << "), description("
                     << get_description() << ")";
 
+        HPX_ASSERT(stacksize_enum_ != threads::thread_stacksize_current);
+
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         // store the thread id of the parent thread, mainly for debugging
         // purposes
@@ -303,8 +305,11 @@ namespace hpx { namespace threads {
     thread_stacksize get_self_stacksize_enum()
     {
         thread_data* thrd_data = get_self_id_data();
-        return thrd_data ? thrd_data->get_stack_size_enum() :
-                           thread_stacksize_default;
+        thread_stacksize stacksize = thrd_data ?
+            thrd_data->get_stack_size_enum() :
+            thread_stacksize_default;
+        HPX_ASSERT(stacksize != thread_stacksize_current);
+        return stacksize;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE

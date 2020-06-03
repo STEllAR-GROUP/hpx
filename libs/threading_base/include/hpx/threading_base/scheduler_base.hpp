@@ -248,11 +248,11 @@ namespace hpx { namespace threads { namespace policies {
                 stacksize = get_self_stacksize_enum();
             }
 
+            HPX_ASSERT(stacksize != thread_stacksize_current);
+
             switch (stacksize)
             {
             case thread_stacksize_small:
-                HPX_FALLTHROUGH;
-            case thread_stacksize_current:
                 return thread_queue_init_.small_stacksize_;
 
             case thread_stacksize_medium:
