@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>

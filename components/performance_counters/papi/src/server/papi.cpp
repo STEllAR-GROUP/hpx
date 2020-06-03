@@ -11,12 +11,12 @@
 
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/components/server/component.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 
 #include <boost/version.hpp>

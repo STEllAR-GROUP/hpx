@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>

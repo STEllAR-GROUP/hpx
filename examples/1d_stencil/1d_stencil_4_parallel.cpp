@@ -17,7 +17,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/iterator_support.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <cstddef>
 #include <cstdint>

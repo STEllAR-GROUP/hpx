@@ -13,8 +13,8 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/search_path.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/filesystem.hpp>
 
 #include <boost/tokenizer.hpp>
 

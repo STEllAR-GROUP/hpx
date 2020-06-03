@@ -8,16 +8,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/manipulator.hpp>
-#include <hpx/naming_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/get_entry_as.hpp>
@@ -931,7 +931,7 @@ namespace hpx { namespace util { namespace detail
 #else  // HPX_HAVE_LOGGING
 
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/init_logging.hpp>
 

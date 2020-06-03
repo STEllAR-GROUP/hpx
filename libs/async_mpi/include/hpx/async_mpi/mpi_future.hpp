@@ -7,13 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution.hpp>
-#include <hpx/concurrency.hpp>
+#include <hpx/modules/basic_execution.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/memory.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/mpi_base/mpi.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/threading_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 #include <iosfwd>

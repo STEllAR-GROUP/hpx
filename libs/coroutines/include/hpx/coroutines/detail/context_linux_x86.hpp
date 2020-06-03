@@ -15,11 +15,11 @@
 #if defined(__linux) || defined(linux) || defined(__linux__)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/posix_utility.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <atomic>

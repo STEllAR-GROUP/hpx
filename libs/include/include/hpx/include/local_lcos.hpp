@@ -12,10 +12,10 @@
 
 #include <hpx/local_lcos/channel.hpp>
 
-#include <hpx/synchronization.hpp>
+#include <hpx/modules/synchronization.hpp>
 
-#include <hpx/execution.hpp>
-#include <hpx/futures.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/local_lcos/and_gate.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
 #include <hpx/local_lcos/promise.hpp>

@@ -14,8 +14,8 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/config/asio.hpp>
 #include <hpx/asio/asio_util.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/address_v4.hpp>

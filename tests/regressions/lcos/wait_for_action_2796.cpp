@@ -7,7 +7,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <chrono>

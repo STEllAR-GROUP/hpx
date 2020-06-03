@@ -16,11 +16,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <cstddef>

@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>

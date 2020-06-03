@@ -7,7 +7,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 //
 #include <hpx/async_mpi/mpi_future.hpp>

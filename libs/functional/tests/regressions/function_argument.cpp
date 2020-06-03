@@ -9,8 +9,8 @@
 #include <hpx/include/iostreams.hpp>
 
 #include <hpx/functional/function.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <vector>
 

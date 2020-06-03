@@ -158,7 +158,7 @@ namespace hpx { namespace lcos {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/async_distributed/detail/async_colocated.hpp>
 #include <hpx/datastructures/tuple.hpp>

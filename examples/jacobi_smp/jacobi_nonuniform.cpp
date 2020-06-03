@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #endif
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_char.hpp>
 #include <boost/spirit/include/qi_string.hpp>

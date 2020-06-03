@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/filesystem.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/process.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include "components/launch_process_test_server.hpp"
 

@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 

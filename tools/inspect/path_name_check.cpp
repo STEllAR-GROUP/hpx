@@ -9,7 +9,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/filesystem.hpp>
 #include <hpx/util/to_string.hpp>
 
 #include "path_name_check.hpp"

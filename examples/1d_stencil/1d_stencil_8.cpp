@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/collectives.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/type_support/unused.hpp>
 

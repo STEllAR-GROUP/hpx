@@ -81,7 +81,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>

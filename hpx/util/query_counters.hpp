@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>

@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <iostream>
 #include <sstream>

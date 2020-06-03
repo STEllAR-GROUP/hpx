@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <vector>
 

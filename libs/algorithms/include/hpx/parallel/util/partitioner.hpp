@@ -7,13 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/type_support/unused.hpp>
 

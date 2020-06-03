@@ -11,9 +11,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/threading.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 #include <chrono>
 #include <mutex>

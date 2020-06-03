@@ -13,9 +13,9 @@
 
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstdint>
 #include <cstdio>

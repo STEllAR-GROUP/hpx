@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
 #include <array>

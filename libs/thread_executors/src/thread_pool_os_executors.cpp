@@ -20,7 +20,7 @@
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #endif
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/optional.hpp>

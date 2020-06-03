@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/dll.hpp>

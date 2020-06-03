@@ -9,10 +9,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <boost/function.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstdint>
 #include <functional>

@@ -7,7 +7,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/traits.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

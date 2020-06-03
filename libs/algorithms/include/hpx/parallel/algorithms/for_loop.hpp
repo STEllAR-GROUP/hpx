@@ -15,7 +15,7 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>

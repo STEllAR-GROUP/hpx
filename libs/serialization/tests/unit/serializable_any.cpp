@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/serialization/serializable_any.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <hpx/util/storage/tuple.hpp>
 

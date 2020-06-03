@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/config_entry.hpp>

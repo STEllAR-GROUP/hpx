@@ -8,7 +8,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/sync.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstdint>

@@ -8,12 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/create_work.hpp>
 #include <hpx/threading_base/register_thread.hpp>

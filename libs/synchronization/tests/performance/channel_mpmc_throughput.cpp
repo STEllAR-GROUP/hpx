@@ -10,7 +10,7 @@
 #include <hpx/hpx_main.hpp>
 
 #include <hpx/synchronization/channel_mpmc.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <cstdint>

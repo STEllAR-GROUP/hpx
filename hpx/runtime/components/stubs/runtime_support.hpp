@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/async_distributed/detail/async_colocated_fwd.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>

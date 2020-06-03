@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_NETWORKING) &&                                            \
     (HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX))
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #endif
 
 namespace hpx { namespace actions { namespace detail {

@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <algorithm>
 #include <cstddef>

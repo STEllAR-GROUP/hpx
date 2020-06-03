@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/affinity/parse_affinity_options.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <hwloc.h>

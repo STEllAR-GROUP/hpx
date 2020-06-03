@@ -175,9 +175,9 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -185,7 +185,7 @@ namespace hpx {
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
-#include <hpx/threading.hpp>
+#include <hpx/modules/threading.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>
 

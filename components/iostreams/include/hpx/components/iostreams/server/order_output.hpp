@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>

@@ -11,8 +11,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 
 #include <boost/variant.hpp>

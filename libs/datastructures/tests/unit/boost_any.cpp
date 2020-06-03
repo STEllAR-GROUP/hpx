@@ -8,7 +8,7 @@
 
 #include <hpx/datastructures/any.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include "small_big_object.hpp"
 

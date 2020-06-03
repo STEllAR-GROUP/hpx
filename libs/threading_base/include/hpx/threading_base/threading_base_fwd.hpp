@@ -12,7 +12,7 @@
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/unique_function.hpp>
 

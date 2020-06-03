@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/async_distributed/detail/sync_implementations.hpp>

@@ -9,8 +9,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/synchronization.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <functional>

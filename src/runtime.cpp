@@ -6,16 +6,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/command_line_handling.hpp>
+#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/debugging/backtrace.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/functional.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
@@ -27,7 +27,7 @@
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/runtime_local/debugging.hpp>

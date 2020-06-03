@@ -5,11 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/basic_execution.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/basic_execution.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#include <hpx/thread_support.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -7,12 +7,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/agent_base.hpp>
 #include <hpx/basic_execution/context_base.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/errors/throw_exception.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <condition_variable>

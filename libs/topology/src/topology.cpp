@@ -6,10 +6,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/ios_flags_saver.hpp>

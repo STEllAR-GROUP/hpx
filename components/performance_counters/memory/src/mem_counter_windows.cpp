@@ -8,8 +8,8 @@
 
 #if defined(HPX_WINDOWS)
 
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <cstdint>
 #include <cstring>

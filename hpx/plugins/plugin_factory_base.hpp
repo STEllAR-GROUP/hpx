@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/type_support/pack.hpp>

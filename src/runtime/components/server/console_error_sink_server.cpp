@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>

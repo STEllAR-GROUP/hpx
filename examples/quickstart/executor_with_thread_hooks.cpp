@@ -12,10 +12,10 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/algorithms.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/functional.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <algorithm>
 #include <atomic>

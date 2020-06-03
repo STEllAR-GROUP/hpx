@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/errors.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/static.hpp>

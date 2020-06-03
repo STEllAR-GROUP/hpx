@@ -10,7 +10,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/parallel/util/prefetching.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iterator>

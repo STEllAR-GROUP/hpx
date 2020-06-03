@@ -13,7 +13,7 @@
 #if defined(HPX_HAVE_POOL_EXECUTOR_COMPATIBILITY)
 #include <hpx/execution/executors/thread_pool_executor.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 #include <string>
 #include <type_traits>

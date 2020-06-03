@@ -8,11 +8,11 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/execution.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>

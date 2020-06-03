@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 //
 struct W

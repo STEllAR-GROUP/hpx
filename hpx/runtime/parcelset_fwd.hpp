@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <boost/system/error_code.hpp>

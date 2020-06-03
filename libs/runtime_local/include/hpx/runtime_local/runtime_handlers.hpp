@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <boost/asio/io_service.hpp>

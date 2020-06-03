@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/naming_base.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
 #include <hpx/traits/component_pin_support.hpp>

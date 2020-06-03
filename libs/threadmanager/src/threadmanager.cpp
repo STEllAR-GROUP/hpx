@@ -9,25 +9,25 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/schedulers.hpp>
+#include <hpx/modules/schedulers.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
 

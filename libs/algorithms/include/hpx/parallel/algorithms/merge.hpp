@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>

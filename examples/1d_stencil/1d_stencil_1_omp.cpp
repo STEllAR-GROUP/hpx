@@ -17,7 +17,7 @@
 // nullptr
 #include <hpx/config.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <chrono>
 #include <cstddef>

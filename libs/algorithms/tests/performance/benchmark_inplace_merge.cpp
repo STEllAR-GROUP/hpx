@@ -6,17 +6,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_merge.hpp>
 #include <hpx/include/parallel_sort.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>

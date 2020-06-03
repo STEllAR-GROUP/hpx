@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <hpx/filesystem.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>

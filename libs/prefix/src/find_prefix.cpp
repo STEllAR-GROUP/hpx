@@ -8,10 +8,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/filesystem.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/include/partitioned_vector_view.hpp>
 #include <hpx/collectives/spmd_block.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <string>

@@ -8,7 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_find.hpp>
 #include <hpx/parallel/algorithm.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

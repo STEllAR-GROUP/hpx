@@ -14,7 +14,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/string_util.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstddef>

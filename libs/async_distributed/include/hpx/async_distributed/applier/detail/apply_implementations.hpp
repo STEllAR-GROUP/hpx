@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

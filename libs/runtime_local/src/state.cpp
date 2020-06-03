@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/state.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {

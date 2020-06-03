@@ -10,17 +10,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/debugging.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/hashing.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/debugging.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/hashing.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
-#include <hpx/type_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <memory>
 #include <string>

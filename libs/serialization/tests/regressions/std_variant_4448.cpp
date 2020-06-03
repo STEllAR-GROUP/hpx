@@ -9,7 +9,7 @@
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/serialization.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <cstdint>

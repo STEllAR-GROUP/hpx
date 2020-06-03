@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/agent_ref.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/synchronization/spinlock.hpp>

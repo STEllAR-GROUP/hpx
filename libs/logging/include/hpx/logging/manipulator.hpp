@@ -17,7 +17,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/logging/message.hpp>
 
 #include <boost/utility/string_ref.hpp>

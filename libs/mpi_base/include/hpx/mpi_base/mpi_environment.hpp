@@ -12,7 +12,7 @@
     defined(HPX_HAVE_LIB_MPI)
 
 #include <hpx/mpi_base/mpi.hpp>
-#include <hpx/runtime_configuration.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <cstdlib>
@@ -76,7 +76,7 @@ namespace hpx { namespace util {
 
 #else
 
-#include <hpx/runtime_configuration.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

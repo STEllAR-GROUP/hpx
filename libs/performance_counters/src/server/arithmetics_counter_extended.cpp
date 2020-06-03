@@ -12,7 +12,7 @@
 #include <hpx/performance_counters/server/arithmetics_counter_extended.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/string_util.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/count.hpp>

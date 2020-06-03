@@ -9,7 +9,7 @@
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <chrono>

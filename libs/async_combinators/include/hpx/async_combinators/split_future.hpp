@@ -65,7 +65,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>

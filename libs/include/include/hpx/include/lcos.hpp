@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_combinators.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/dataflow.hpp>
 #include <hpx/include/local_lcos.hpp>

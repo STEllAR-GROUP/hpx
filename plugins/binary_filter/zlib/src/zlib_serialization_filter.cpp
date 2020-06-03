@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter_factory.hpp>

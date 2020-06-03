@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_set_operations.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 void set_difference_small_test(int rounds)
 {

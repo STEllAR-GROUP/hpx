@@ -166,7 +166,7 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
-#include <hpx/threading.hpp>
+#include <hpx/modules/threading.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <array>

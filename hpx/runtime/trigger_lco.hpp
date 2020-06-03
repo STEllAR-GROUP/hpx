@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>

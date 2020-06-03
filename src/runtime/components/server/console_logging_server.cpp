@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 // This is needed to get rid of an undefined reference to

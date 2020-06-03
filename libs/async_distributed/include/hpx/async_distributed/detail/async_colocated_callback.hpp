@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/async_continue_callback.hpp>
 #include <hpx/async_distributed/detail/async_colocated.hpp>
 #include <hpx/async_distributed/detail/async_colocated_callback_fwd.hpp>

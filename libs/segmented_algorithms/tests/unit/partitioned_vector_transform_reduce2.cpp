@@ -10,7 +10,7 @@
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <iterator>
 

@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>

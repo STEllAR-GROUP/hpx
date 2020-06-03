@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/debugging.hpp>
-#include <hpx/hashing.hpp>
+#include <hpx/modules/debugging.hpp>
+#include <hpx/modules/hashing.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 

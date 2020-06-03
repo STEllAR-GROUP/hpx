@@ -10,7 +10,7 @@
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <string>

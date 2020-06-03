@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 void tuple_like_true()
 {

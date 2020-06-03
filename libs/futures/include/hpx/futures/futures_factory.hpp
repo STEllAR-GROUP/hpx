@@ -12,7 +12,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>

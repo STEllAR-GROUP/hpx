@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_distributed.hpp>
@@ -42,7 +42,7 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 

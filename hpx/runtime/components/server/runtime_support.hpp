@@ -9,15 +9,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>

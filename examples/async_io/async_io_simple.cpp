@@ -9,7 +9,7 @@
 // and how to synchronize the result of this IO task with a waiting HPX thread.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/runtime.hpp>

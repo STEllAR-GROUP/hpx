@@ -32,7 +32,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>

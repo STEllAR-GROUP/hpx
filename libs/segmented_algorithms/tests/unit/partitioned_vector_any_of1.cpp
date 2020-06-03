@@ -8,7 +8,7 @@
 #include <hpx/include/parallel_all_any_none_of.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

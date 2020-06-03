@@ -11,7 +11,7 @@
 #include <hpx/batch_environments/batch_environment.hpp>
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/host_name.hpp>

@@ -7,7 +7,7 @@
 
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

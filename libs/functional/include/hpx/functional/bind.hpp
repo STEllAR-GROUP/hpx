@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/one_shot.hpp>

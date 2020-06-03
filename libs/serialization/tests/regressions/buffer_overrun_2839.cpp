@@ -7,7 +7,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/serialization/complex.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <complex>
 #include <vector>

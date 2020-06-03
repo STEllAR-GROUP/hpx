@@ -10,7 +10,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/serialization/serialize_buffer.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <memory>

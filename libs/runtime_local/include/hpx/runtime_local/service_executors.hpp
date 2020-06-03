@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/executors/service_executors.hpp>
 
 #include <type_traits>

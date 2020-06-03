@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/program_options/include
 set(program_options_headers
-    hpx/program_options.hpp
+    hpx/modules/program_options.hpp
     hpx/program_options/cmdline.hpp
     hpx/program_options/config.hpp
     hpx/program_options/environment_iterator.hpp

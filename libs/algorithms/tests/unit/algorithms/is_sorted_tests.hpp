@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_is_sorted.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iterator>

@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/reduce_by_key.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 //
 #include <random>
 #include <utility>

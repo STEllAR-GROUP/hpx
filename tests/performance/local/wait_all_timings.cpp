@@ -4,14 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <cstdint>

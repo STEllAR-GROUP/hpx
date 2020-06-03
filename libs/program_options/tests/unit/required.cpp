@@ -5,11 +5,11 @@
 //  (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/filesystem.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <fstream>
 #include <iostream>

@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
-#include <hpx/functional.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>

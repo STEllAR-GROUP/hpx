@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/extract_action.hpp>

@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

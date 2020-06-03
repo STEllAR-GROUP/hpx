@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>

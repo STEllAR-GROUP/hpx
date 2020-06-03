@@ -6,8 +6,8 @@
 
 #include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/filesystem.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/util/from_string.hpp>
 

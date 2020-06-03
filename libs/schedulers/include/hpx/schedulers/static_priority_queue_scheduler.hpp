@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 

@@ -12,7 +12,7 @@
 #include "matrix.hh"
 
 #include <hpx/hpx.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <cassert>

@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>

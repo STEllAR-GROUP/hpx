@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>

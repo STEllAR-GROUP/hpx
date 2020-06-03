@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/async_distributed.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/runtime/agas/detail/hosted_locality_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>

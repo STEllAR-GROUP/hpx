@@ -10,7 +10,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <string>
 

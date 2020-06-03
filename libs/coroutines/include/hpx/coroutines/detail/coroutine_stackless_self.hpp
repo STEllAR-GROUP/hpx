@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>

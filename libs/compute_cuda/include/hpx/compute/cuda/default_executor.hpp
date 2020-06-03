@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>

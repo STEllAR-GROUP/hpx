@@ -9,9 +9,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>

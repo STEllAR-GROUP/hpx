@@ -17,7 +17,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/logging/format/named_write.hpp>
 #include <hpx/logging/level.hpp>
 

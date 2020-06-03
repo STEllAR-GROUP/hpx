@@ -27,7 +27,7 @@ namespace placeholders = hpx::util::placeholders;
 #include <functional>
 #include <iostream>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 //
 

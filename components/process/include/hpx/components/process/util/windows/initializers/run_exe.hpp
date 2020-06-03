@@ -15,7 +15,7 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/filesystem.hpp>
 #include <hpx/serialization/string.hpp>
 
 #include <string>

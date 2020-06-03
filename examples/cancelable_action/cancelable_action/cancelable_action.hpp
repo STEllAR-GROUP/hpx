@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/include/components.hpp>
 
 #include "stubs/cancelable_action.hpp"

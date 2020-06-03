@@ -9,9 +9,9 @@
 #if defined(HPX_HAVE_CUDA)
 
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/compute/cuda/target.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/runtime/find_here.hpp>

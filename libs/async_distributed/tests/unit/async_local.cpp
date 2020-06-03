@@ -9,7 +9,7 @@
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/local_lcos.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstdint>

@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>

@@ -12,7 +12,7 @@
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 
 #include "htts2.hpp"
 

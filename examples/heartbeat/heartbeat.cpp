@@ -15,8 +15,8 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/state.hpp>
-#include <hpx/format.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 #include <iostream>

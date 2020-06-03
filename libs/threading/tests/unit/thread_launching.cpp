@@ -7,7 +7,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threadmanager.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <functional>
 #include <string>

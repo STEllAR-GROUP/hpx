@@ -6,11 +6,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/include/parallel_transform.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <vector>
 

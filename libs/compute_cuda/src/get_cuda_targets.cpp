@@ -8,9 +8,9 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/async_distributed.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/compute/cuda/target.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime_fwd.hpp>

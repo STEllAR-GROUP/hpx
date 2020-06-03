@@ -20,12 +20,12 @@
 #include <utility>
 #include <vector>
 //
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_container_algorithm.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 //
 #include "test_utils.hpp"
 

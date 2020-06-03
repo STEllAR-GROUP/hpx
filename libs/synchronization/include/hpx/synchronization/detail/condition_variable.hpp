@@ -11,7 +11,7 @@
 #include <hpx/basic_execution/agent_ref.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>

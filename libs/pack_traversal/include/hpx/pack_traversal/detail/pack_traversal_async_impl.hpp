@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>

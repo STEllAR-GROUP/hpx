@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution.hpp>
-#include <hpx/memory.hpp>
+#include <hpx/modules/basic_execution.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/mutex.hpp>
-#include <hpx/thread_support.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <atomic>
 #include <cstddef>

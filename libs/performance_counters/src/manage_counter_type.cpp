@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
@@ -16,7 +16,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime_local.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/version.hpp>
 
 #include <cstddef>

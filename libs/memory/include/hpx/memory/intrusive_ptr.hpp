@@ -13,7 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/memory/config/defines.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/memory/detail/sp_convertible.hpp>
 
 #include <cstddef>

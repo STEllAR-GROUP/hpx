@@ -6,17 +6,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async_distributed.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_distributed.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/filesystem.hpp>
-#include <hpx/mpi_base.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
@@ -41,12 +41,12 @@
 #include <hpx/serialization/vector.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
-#include <hpx/collectives.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>

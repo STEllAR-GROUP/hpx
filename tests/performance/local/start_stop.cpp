@@ -10,10 +10,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <iostream>

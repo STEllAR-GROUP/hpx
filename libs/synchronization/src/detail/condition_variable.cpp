@@ -7,11 +7,11 @@
 
 #include <hpx/synchronization/condition_variable.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/memory.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>

@@ -12,7 +12,7 @@
 
 #include <hpx/resiliency/config.hpp>
 
-#include <hpx/async_local.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/pack.hpp>
 

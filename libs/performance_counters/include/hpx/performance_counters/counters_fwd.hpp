@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>

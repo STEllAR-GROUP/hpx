@@ -13,10 +13,10 @@
 // Necessary to avoid circular include
 #include <hpx/basic_execution/execution.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_local.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_callable.hpp>

@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/filesystem.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>

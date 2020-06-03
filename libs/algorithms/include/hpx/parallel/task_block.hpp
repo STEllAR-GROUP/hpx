@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>

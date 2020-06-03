@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <string>

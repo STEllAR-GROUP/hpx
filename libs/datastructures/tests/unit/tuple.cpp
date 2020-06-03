@@ -22,7 +22,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 // clang-format off
 #if defined(__clang__)

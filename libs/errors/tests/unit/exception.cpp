@@ -9,7 +9,7 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/throw_exception.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <exception>
 #include <thread>

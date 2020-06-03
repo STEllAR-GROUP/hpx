@@ -14,7 +14,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 namespace hpx { namespace components { namespace process { namespace windows {
 

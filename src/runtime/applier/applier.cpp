@@ -8,12 +8,12 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <hpx/runtime_distributed.hpp>

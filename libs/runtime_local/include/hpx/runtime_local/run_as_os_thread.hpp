@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/result_of.hpp>

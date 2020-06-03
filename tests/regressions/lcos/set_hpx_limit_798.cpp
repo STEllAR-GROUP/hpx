@@ -10,7 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/async_local/dataflow.hpp>
 

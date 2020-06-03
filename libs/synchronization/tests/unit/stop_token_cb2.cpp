@@ -10,8 +10,8 @@
 //  (http://creativecommons.org/licenses/by/4.0/).
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/synchronization.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <functional>
 #include <type_traits>

@@ -11,17 +11,17 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/config/asio.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/local_lcos/promise.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -34,9 +34,9 @@
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/state.hpp>
-#include <hpx/string_util.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/external_timer.hpp>

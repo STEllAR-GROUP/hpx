@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
 #include <hpx/util/get_and_reset_value.hpp>

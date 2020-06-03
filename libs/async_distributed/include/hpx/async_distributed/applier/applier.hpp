@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/applier_fwd.hpp>    // this needs to go first
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -19,7 +19,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 #include <cstddef>
 #include <cstdint>

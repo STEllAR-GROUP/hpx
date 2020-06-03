@@ -7,4 +7,4 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/resource_partitioner.hpp>
+#include <hpx/modules/resource_partitioner.hpp>

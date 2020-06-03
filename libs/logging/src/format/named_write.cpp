@@ -17,7 +17,7 @@
 #include <hpx/logging/format/named_write.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/logging/format/destinations.hpp>
 #include <hpx/logging/format/formatters.hpp>
 

@@ -8,7 +8,7 @@
 // local dataflow (copying futures?).
 
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/iostreams.hpp>

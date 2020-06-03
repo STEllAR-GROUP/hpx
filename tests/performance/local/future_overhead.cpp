@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
@@ -17,14 +17,14 @@
 #include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/thread_executors/limiting_executor.hpp>
-#include <hpx/synchronization.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <array>
 #include <atomic>

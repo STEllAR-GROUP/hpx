@@ -6,9 +6,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstdint>
 #include <iostream>

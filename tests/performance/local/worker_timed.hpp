@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 

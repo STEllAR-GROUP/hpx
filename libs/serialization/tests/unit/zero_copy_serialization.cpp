@@ -14,8 +14,8 @@
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/serialize_buffer.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
 #include <boost/predef/other/endian.h>

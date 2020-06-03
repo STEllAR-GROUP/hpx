@@ -9,9 +9,9 @@
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/config/asio.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>

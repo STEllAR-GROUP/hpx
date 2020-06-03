@@ -13,7 +13,7 @@
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <utility>

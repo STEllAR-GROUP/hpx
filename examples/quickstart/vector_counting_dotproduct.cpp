@@ -9,7 +9,7 @@
 #include <hpx/include/parallel_numeric.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/iterator_support.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>
 #include <iterator>

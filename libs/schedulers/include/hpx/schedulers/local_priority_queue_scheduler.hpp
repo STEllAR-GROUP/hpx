@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/functional.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>

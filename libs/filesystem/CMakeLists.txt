@@ -11,7 +11,7 @@ if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   set(__boost_filesystem Boost::filesystem)
 endif()
 
-set(filesystem_headers "hpx/filesystem.hpp")
+set(filesystem_headers "hpx/modules/filesystem.hpp")
 
 include(HPX_AddModule)
 add_hpx_module(

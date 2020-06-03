@@ -11,10 +11,10 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/schedulers.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <chrono>
 #include <cstddef>

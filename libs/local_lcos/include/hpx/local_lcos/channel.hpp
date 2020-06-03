@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>

@@ -11,11 +11,11 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/datastructures.hpp>
-#include <hpx/synchronization.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/threading.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <atomic>
 #include <chrono>

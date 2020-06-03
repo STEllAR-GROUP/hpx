@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>

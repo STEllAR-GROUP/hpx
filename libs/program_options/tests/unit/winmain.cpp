@@ -9,7 +9,7 @@
 #if defined(HPX_WINDOWS)
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/program_options/parsers.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cctype>
 #include <cstdlib>

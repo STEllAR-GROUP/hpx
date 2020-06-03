@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 struct X { void operator()(int); };
 struct Xc { void operator()(int) const; };

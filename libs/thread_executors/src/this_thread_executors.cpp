@@ -19,7 +19,7 @@
 #endif
 
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>

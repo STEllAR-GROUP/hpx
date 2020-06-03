@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/thread_pool_executor.hpp>
 

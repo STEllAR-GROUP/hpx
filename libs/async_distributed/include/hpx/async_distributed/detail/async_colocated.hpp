@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
 #include <hpx/async_distributed/async_fwd.hpp>
 #include <hpx/async_distributed/detail/async_colocated_fwd.hpp>

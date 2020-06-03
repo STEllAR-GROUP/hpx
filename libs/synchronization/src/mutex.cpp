@@ -7,11 +7,11 @@
 
 #include <hpx/synchronization/mutex.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>

@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/datastructures/tuple.hpp>

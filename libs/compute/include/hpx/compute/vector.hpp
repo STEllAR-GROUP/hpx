@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/compute/detail/iterator.hpp>
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_all_any_none_of.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

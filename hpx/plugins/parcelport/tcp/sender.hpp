@@ -13,7 +13,7 @@
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>

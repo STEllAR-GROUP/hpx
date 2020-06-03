@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>

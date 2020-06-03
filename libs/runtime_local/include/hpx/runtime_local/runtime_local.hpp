@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
@@ -21,8 +21,8 @@
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/state.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/threadmanager.hpp>
-#include <hpx/topology.hpp>
+#include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/util_fwd.hpp>
 
 #include <atomic>

@@ -9,11 +9,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/concurrency.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <cstddef>
 #include <memory>

@@ -16,7 +16,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/serialization/base_object.hpp>

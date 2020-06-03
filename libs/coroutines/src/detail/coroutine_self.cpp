@@ -6,7 +6,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 
 #include <cstddef>

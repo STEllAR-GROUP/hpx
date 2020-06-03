@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/include/components.hpp>
 
 #include "server/template_accumulator.hpp"

@@ -8,9 +8,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/async_distributed.hpp>
-#include <hpx/collectives.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/collectives.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/component_action.hpp>

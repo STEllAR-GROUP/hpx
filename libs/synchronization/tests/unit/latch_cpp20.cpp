@@ -6,9 +6,9 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/async_local.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/latch.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

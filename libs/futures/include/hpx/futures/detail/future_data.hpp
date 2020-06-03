@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/traits/future_access.hpp>

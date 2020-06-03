@@ -13,7 +13,7 @@
 
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstdlib>
 
