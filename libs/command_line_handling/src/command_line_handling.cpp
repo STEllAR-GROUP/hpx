@@ -861,12 +861,12 @@ namespace hpx { namespace util {
 
         // If the user has not specified an explicit runtime mode we
         // retrieve it from the command line.
-        if (hpx::runtime_mode_default == rtcfg_.mode_)
+        if (hpx::runtime_mode::default_ == rtcfg_.mode_)
         {
 #if defined(HPX_HAVE_NETWORKING)
             // The default mode is console, i.e. all workers need to be
             // started with --worker/-w.
-            rtcfg_.mode_ = hpx::runtime_mode_console;
+            rtcfg_.mode_ = hpx::runtime_mode::console;
             if (vm.count("hpx:local") + vm.count("hpx:console") +
                     vm.count("hpx:worker") + vm.count("hpx:connect") >
                 1)
@@ -881,7 +881,7 @@ namespace hpx { namespace util {
             // hpx_main, except if specified otherwise.
             if (vm.count("hpx:worker"))
             {
-                rtcfg_.mode_ = hpx::runtime_mode_worker;
+                rtcfg_.mode_ = hpx::runtime_mode::worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
@@ -895,25 +895,25 @@ namespace hpx { namespace util {
             }
             else if (vm.count("hpx:connect"))
             {
-                rtcfg_.mode_ = hpx::runtime_mode_connect;
+                rtcfg_.mode_ = hpx::runtime_mode::connect;
             }
             else if (vm.count("hpx:local"))
             {
-                rtcfg_.mode_ = hpx::runtime_mode_local;
+                rtcfg_.mode_ = hpx::runtime_mode::local;
             }
 #elif defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-            rtcfg_.mode_ = hpx::runtime_mode_console;
+            rtcfg_.mode_ = hpx::runtime_mode::console;
 #else
-            rtcfg_.mode_ = hpx::runtime_mode_local;
+            rtcfg_.mode_ = hpx::runtime_mode::local;
 #endif
         }
 
 #if defined(HPX_HAVE_NETWORKING)
-        if (rtcfg_.mode_ != hpx::runtime_mode_local)
+        if (rtcfg_.mode_ != hpx::runtime_mode::local)
         {
             // we initialize certain settings if --node is specified (or data
             // has been retrieved from the environment)
-            if (rtcfg_.mode_ == hpx::runtime_mode_connect)
+            if (rtcfg_.mode_ == hpx::runtime_mode::connect)
             {
                 // when connecting we need to select a unique port
                 hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
@@ -950,7 +950,7 @@ namespace hpx { namespace util {
                     {
                         // console node, by default runs AGAS
                         run_agas_server = true;
-                        rtcfg_.mode_ = hpx::runtime_mode_console;
+                        rtcfg_.mode_ = hpx::runtime_mode::console;
                     }
                     else
                     {
@@ -960,7 +960,7 @@ namespace hpx { namespace util {
 
                         // each node gets an unique port
                         hpx_port = static_cast<std::uint16_t>(hpx_port + node);
-                        rtcfg_.mode_ = hpx::runtime_mode_worker;
+                        rtcfg_.mode_ = hpx::runtime_mode::worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                         // do not execute any explicit hpx_main except if asked
@@ -996,7 +996,7 @@ namespace hpx { namespace util {
             }
 
             if ((vm.count("hpx:connect") ||
-                    rtcfg_.mode_ == hpx::runtime_mode_connect) &&
+                    rtcfg_.mode_ == hpx::runtime_mode::connect) &&
                 hpx_host == "127.0.0.1")
             {
                 hpx_host = hpx::util::resolve_public_ip_address();
@@ -1096,7 +1096,7 @@ namespace hpx { namespace util {
         agas_host = mapnames.map(agas_host, agas_port);
 
         // sanity checks
-        if (rtcfg_.mode_ != hpx::runtime_mode_local && num_localities_ == 1 &&
+        if (rtcfg_.mode_ != hpx::runtime_mode::local && num_localities_ == 1 &&
             !vm.count("hpx:agas") && !vm.count("hpx:node"))
         {
             // We assume we have to run the AGAS server if the number of
@@ -1104,17 +1104,17 @@ namespace hpx { namespace util {
             // and no additional option (--hpx:agas or --hpx:node) has been
             // specified. That simplifies running small standalone
             // applications on one locality.
-            run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
+            run_agas_server = rtcfg_.mode_ != runtime_mode::connect;
         }
 
-        if (rtcfg_.mode_ != hpx::runtime_mode_local)
+        if (rtcfg_.mode_ != hpx::runtime_mode::local)
         {
 #if defined(HPX_HAVE_NETWORKING)
             if (hpx_host == agas_host && hpx_port == agas_port)
             {
                 // we assume that we need to run the agas server if the user
                 // asked for the same network addresses for HPX and AGAS
-                run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
+                run_agas_server = rtcfg_.mode_ != runtime_mode::connect;
             }
             else if (run_agas_server)
             {
@@ -1131,7 +1131,7 @@ namespace hpx { namespace util {
             {
                 // in batch mode, if the network addresses are different and we
                 // should not run the AGAS server we assume to be in worker mode
-                rtcfg_.mode_ = hpx::runtime_mode_worker;
+                rtcfg_.mode_ = hpx::runtime_mode::worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
@@ -1158,7 +1158,7 @@ namespace hpx { namespace util {
             }
 
             // we can't run the AGAS server while connecting
-            if (run_agas_server && rtcfg_.mode_ == runtime_mode_connect)
+            if (run_agas_server && rtcfg_.mode_ == runtime_mode::connect)
             {
                 throw hpx::detail::command_line_error(
                     "Command line option error: can't run AGAS server"
@@ -1172,7 +1172,7 @@ namespace hpx { namespace util {
 
         enable_logging_settings(vm, ini_config);
 
-        if (rtcfg_.mode_ != hpx::runtime_mode_local)
+        if (rtcfg_.mode_ != hpx::runtime_mode::local)
         {
             // Set number of localities in configuration (do it everywhere,
             // even if this information is only used by the AGAS server).

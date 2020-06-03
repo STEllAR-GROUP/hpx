@@ -94,9 +94,9 @@ namespace hpx {
     /// \var mode           The mode the created runtime environment
     ///                     should be initialized in. There has to be exactly
     ///                     one locality in each HPX application which is
-    ///                     executed in console mode (\a hpx::runtime_mode_console),
+    ///                     executed in console mode (\a hpx::runtime_mode::console),
     ///                     all other localities have to be run in worker mode
-    ///                     (\a hpx::runtime_mode_worker). Normally this is
+    ///                     (\a hpx::runtime_mode::worker). Normally this is
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     /// \var rp_mode        The mode the resource partitioner should be created
@@ -114,7 +114,7 @@ namespace hpx {
         std::vector<std::string> cfg;
         mutable startup_function_type startup;
         mutable shutdown_function_type shutdown;
-        hpx::runtime_mode mode = ::hpx::runtime_mode_default;
+        hpx::runtime_mode mode = ::hpx::runtime_mode::default_;
         hpx::resource::partitioner_mode rp_mode = ::hpx::resource::mode_default;
         hpx::resource::rp_callback_type rp_callback;
     };

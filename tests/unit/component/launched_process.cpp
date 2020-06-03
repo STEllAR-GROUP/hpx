@@ -81,8 +81,8 @@ int main(int argc, char* argv[])
         "hpx.expect_connecting_localities!=1"
     };
 
-    // Note: this uses runtime_mode_connect to instruct this locality to
+    // Note: this uses runtime_mode::connect to instruct this locality to
     // connect to the existing HPX applications
-    return hpx::init(desc_commandline, argc, argv, cfg, hpx::runtime_mode_connect);
+    return hpx::init(desc_commandline, argc, argv, cfg, hpx::runtime_mode::connect);
 }
 

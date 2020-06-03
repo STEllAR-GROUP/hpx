@@ -32,7 +32,7 @@ namespace hpx { namespace util {
         hpx::program_options::options_description const& app_options,
         std::string const& cmdline, hpx::program_options::variables_map& vm,
         std::size_t node, int error_mode = return_on_error,
-        hpx::runtime_mode mode = runtime_mode_default,
+        hpx::runtime_mode mode = runtime_mode::default_,
         hpx::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
 
@@ -41,7 +41,7 @@ namespace hpx { namespace util {
         std::string const& arg0, std::vector<std::string> const& args,
         hpx::program_options::variables_map& vm, std::size_t node,
         int error_mode = return_on_error,
-        hpx::runtime_mode mode = runtime_mode_default,
+        hpx::runtime_mode mode = runtime_mode::default_,
         hpx::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
 

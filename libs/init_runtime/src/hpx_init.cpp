@@ -393,7 +393,7 @@ namespace hpx {
             // initialize logging
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             util::detail::init_logging(
-                cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
+                cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode::console);
 #endif
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -610,7 +610,7 @@ namespace hpx {
             // infos (on console only).
             bool print_counters_locally =
                 vm.count("hpx:print-counters-locally") != 0;
-            if (mode == runtime_mode_console || print_counters_locally)
+            if (mode == runtime_mode::console || print_counters_locally)
                 handle_list_and_print_options(rt, vm, print_counters_locally);
 #endif
 
@@ -860,10 +860,10 @@ namespace hpx {
                 std::unique_ptr<hpx::runtime> rt;
 
                 // Command line handling should have updated this by now.
-                HPX_ASSERT(cms.rtcfg_.mode_ != runtime_mode_default);
+                HPX_ASSERT(cms.rtcfg_.mode_ != runtime_mode::default_);
                 switch (cms.rtcfg_.mode_)
                 {
-                case runtime_mode_local:
+                case runtime_mode::local:
                 {
                     LPROGRESS_ << "creating local runtime";
                     rt.reset(new hpx::runtime(cms.rtcfg_));

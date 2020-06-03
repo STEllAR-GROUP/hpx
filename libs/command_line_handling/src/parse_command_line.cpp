@@ -382,7 +382,7 @@ namespace hpx { namespace util {
 
             switch (mode)
             {
-            case runtime_mode_default:
+            case runtime_mode::default_:
 #if defined(HPX_HAVE_NETWORKING)
                 // clang-format off
                 hpx_options.add_options()
@@ -400,9 +400,9 @@ namespace hpx { namespace util {
                 break;
 
 #if defined(HPX_HAVE_NETWORKING)
-            case runtime_mode_worker:
-            case runtime_mode_console:
-            case runtime_mode_connect:
+            case runtime_mode::worker:
+            case runtime_mode::console:
+            case runtime_mode::connect:
                 // If the runtime for this application is always run in
                 // worker mode, silently ignore the worker option for
                 // hpx_pbs compatibility.
@@ -416,7 +416,7 @@ namespace hpx { namespace util {
                 // clang-format on
                 break;
 #else
-            case runtime_mode_console:
+            case runtime_mode::console:
                 // clang-format off
                 hidden_options.add_options()
                     ("hpx:console", "run this instance in console mode")
@@ -424,10 +424,10 @@ namespace hpx { namespace util {
                 // clang-format on
                 break;
 #endif
-            case runtime_mode_local:
+            case runtime_mode::local:
                 break;
 
-            case runtime_mode_invalid:
+            case runtime_mode::invalid:
             default:
                 throw hpx::detail::command_line_error(
                     "Invalid runtime mode specified");

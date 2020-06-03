@@ -1489,6 +1489,15 @@ if(HPX_WITH_PROMISE_ALIAS_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_PROMISE_ALIAS_COMPATIBILITY)
 endif()
 
+# HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY : introduced in V1.5.0
+hpx_option(
+  HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY BOOL
+  "Enable deprecated unscoped enums (default: ON)" ON ADVANCED
+)
+if(HPX_WITH_UNSCOPED_ENUM_COMPATIBILITY)
+  hpx_add_config_define(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
+endif()
+
 # ##############################################################################
 # Check for compiler compatibility
 #

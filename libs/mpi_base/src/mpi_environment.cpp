@@ -189,11 +189,11 @@ namespace hpx { namespace util {
 
         if (this_rank == 0)
         {
-            rtcfg.mode_ = hpx::runtime_mode_console;
+            rtcfg.mode_ = hpx::runtime_mode::console;
         }
         else
         {
-            rtcfg.mode_ = hpx::runtime_mode_worker;
+            rtcfg.mode_ = hpx::runtime_mode::worker;
         }
 
         rtcfg.add_entry("hpx.parcel.mpi.rank", std::to_string(this_rank));
