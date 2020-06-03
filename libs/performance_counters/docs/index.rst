@@ -11,7 +11,9 @@
 performance_counters
 ====================
 
-TODO: High-level description of the library.
+This module provides the basic functionality required for defining performance
+counters. See :ref:`performance_counters` for more information about
+performance counters.
 
 See the :ref:`API reference <libs_performance_counters_api>` of this module for more
 details.

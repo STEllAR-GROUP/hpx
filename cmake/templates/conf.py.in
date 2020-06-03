@@ -427,6 +427,8 @@ rst_prolog += '''
 .. _hwloc: https://www.open-mpi.org/projects/hwloc/
 .. |tbb| replace:: Intel Threading Building Blocks (TBB)
 .. _tbb: https://www.threadingbuildingblocks.org/
+.. |vtune| replace:: Intel VTune
+.. _vtune: https://software.intel.com/content/www/us/en/develop/tools/vtune-profiler.html
 .. |ppl| replace:: Microsoft Parallel Patterns Library (PPL)
 .. _ppl: https://msdn.microsoft.com/en-us/library/dd492418.aspx
 .. |cilk_pp| replace:: Cilk++

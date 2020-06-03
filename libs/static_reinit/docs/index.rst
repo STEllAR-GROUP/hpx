@@ -11,3 +11,8 @@
 static_reinit
 =============
 
+This module provides a simple wrapper around static variables that can be
+reinitialized.
+
+See the :ref:`API reference <libs_futures_api>` of this module for more
+details.

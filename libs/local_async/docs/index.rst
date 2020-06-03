@@ -11,7 +11,9 @@
 local_async
 ===========
 
-TODO: High-level description of the library.
+This module extends :ref:`libs_async_base` to provide local implementations of
+:cpp:func:`hpx::async`, :cpp:func:`hpx::apply`, :cpp:func:`hpx::sync`, and
+:cpp:func:`hpx::dataflow`.
 
 See the :ref:`API reference <libs_local_async_api>` of this module for more
 details.

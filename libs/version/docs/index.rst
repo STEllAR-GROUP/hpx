@@ -11,3 +11,8 @@
 version
 =======
 
+This module macros and functions for accessing version information about |hpx|
+and its dependencies.
+
+See the :ref:`API reference <libs_futures_api>` of this module for more
+details.

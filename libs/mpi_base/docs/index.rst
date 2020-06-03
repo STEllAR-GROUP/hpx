@@ -11,7 +11,7 @@
 mpi_base
 ========
 
-TODO: High-level description of the library.
+This module provides helper functionality for detecting MPI environments.
 
 See the :ref:`API reference <libs_mpi_base_api>` of this module for more
 details.

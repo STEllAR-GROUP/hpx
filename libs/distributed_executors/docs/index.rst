@@ -11,7 +11,9 @@
 distributed_executors
 =====================
 
-TODO: High-level description of the library.
+This module provides the executor
+:cpp:class:`hpx::parallel::execution::disribution_policy_executor`. It allows
+one to create work that is implicitly distributed over multiple localities.
 
 See the :ref:`API reference <libs_distributed_executors_api>` of this module for more
 details.

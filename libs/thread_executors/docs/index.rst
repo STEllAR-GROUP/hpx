@@ -11,7 +11,8 @@
 thread_executors
 ================
 
-TODO: High-level description of the library.
+This module provides executors implementing the executor interface proposed in
+|cpp11_n3562|_. These executors are deprecated.
 
 See the :ref:`API reference <libs_thread_executors_api>` of this module for more
 details.
