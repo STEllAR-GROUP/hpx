@@ -47,14 +47,12 @@ namespace hpx { namespace applier {
     }
 #endif
 
-    void applier::initialize(std::uint64_t rts, std::uint64_t mem)
+    void applier::initialize(std::uint64_t rts)
     {
         naming::resolver_client& agas_client = get_agas_client();
         runtime_support_id_ =
             naming::id_type(agas_client.get_local_locality().get_msb(), rts,
                 naming::id_type::unmanaged);
-        memory_id_ = naming::id_type(agas_client.get_local_locality().get_msb(),
-            mem, naming::id_type::unmanaged);
     }
 
     naming::resolver_client& applier::get_agas_client()

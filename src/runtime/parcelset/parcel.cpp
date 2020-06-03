@@ -405,11 +405,6 @@ namespace hpx { namespace parcelset
                 HPX_ASSERT(false);
             }
         }
-        else if (comptype == components::component_memory)
-        {
-            HPX_ASSERT(naming::refers_to_virtual_memory(data_.dest_));
-            lva = hpx::applier::get_applier().get_memory_raw_gid().get_lsb();
-        }
 
         // make sure the component_type of the action matches the
         // component type in the destination address

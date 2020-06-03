@@ -13,7 +13,6 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
@@ -262,8 +261,6 @@ namespace hpx {
 
         std::uint64_t get_runtime_support_lva() const;
 
-        std::uint64_t get_memory_lva() const;
-
         naming::gid_type get_next_id(std::size_t count = 1);
 
         util::unique_id_ranges& get_id_pool();
@@ -406,7 +403,6 @@ namespace hpx {
         using used_cores_map_type = std::map<std::string, std::uint32_t>;
         used_cores_map_type used_cores_map_;
 
-        std::unique_ptr<components::server::memory> memory_;
         std::unique_ptr<components::server::runtime_support> runtime_support_;
         std::shared_ptr<performance_counters::registry> counters_;
         std::shared_ptr<util::query_counters> active_counters_;

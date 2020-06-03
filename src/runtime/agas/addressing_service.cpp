@@ -151,7 +151,6 @@ addressing_service::addressing_service(
   , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
   , action_priority_(threads::thread_priority_boost)
   , rts_lva_(0)
-  , mem_lva_(0)
   , state_(state_starting)
   , locality_()
 {
@@ -174,10 +173,9 @@ void addressing_service::bootstrap(
 } // }}}
 
 void addressing_service::initialize(parcelset::parcelhandler& ph,
-    std::uint64_t rts_lva, std::uint64_t mem_lva)
+    std::uint64_t rts_lva)
 { // {{{
     rts_lva_ = rts_lva;
-    mem_lva_ = mem_lva;
 
     // now, boot the parcel port
     std::shared_ptr<parcelset::parcelport> pp = ph.get_bootstrap_parcelport();
@@ -212,10 +210,9 @@ void addressing_service::bootstrap(util::runtime_configuration const& ini)
     launch_bootstrap(endpoints, ini);
 } // }}}
 
-void addressing_service::initialize(std::uint64_t rts_lva, std::uint64_t mem_lva)
+void addressing_service::initialize(std::uint64_t rts_lva)
 { // {{{
     rts_lva_ = rts_lva;
-    mem_lva_ = mem_lva;
 
     HPX_ASSERT(service_type == service_mode_bootstrap);
     set_status(state_running);
@@ -1058,15 +1055,6 @@ bool addressing_service::resolve_locally_known_addresses(
             // handle (non-migratable) components located on this locality first
             addr.type_ = naming::detail::get_component_type_from_gid(msb);
             addr.address_ = lsb;
-            return true;
-        }
-
-        if (naming::refers_to_virtual_memory(msb))
-        {
-            HPX_ASSERT(mem_lva_);
-
-            addr.type_ = components::component_memory;
-            addr.address_ = mem_lva_;
             return true;
         }
     }

@@ -66,7 +66,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/components/component_type.cpp
     runtime/components/console_error_sink.cpp
     runtime/components/console_logging.cpp
-    runtime/components/memory.cpp
     runtime/components/runtime_support.cpp
     runtime/components/server/component_base.cpp
     runtime/components/server/console_error_sink_server.cpp
@@ -75,7 +74,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/components/server/destroy_component.cpp
     runtime/components/server/runtime_support_server.cpp
     runtime/components/server/wrapper_heap.cpp
-    runtime/components/stubs/memory_stub.cpp
     runtime/components/stubs/runtime_support_stubs.cpp
     runtime/get_locality_name.cpp
     runtime/naming/address.cpp
@@ -326,14 +324,12 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components/server/invoke_function.hpp
     hpx/runtime/components/server/locking_hook.hpp
     hpx/runtime/components/server/managed_component_base.hpp
-    hpx/runtime/components/server/memory.hpp
     hpx/runtime/components/server/migrate_component.hpp
     hpx/runtime/components/server/migration_support.hpp
     hpx/runtime/components/server/runtime_support.hpp
     hpx/runtime/components/server/simple_component_base.hpp
     hpx/runtime/components/server/wrapper_heap.hpp
     hpx/runtime/components/server/wrapper_heap_list.hpp
-    hpx/runtime/components/stubs/memory.hpp
     hpx/runtime/components/stubs/runtime_support.hpp
     hpx/runtime/components/stubs/stub_base.hpp
     hpx/runtime/components/target_distribution_policy.hpp

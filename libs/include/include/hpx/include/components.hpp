@@ -22,8 +22,6 @@
 
 #include <hpx/runtime/components/runtime_support.hpp>
 
-#include <hpx/runtime/components/server/memory.hpp>
-
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 

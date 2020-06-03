@@ -625,13 +625,6 @@ void notify_worker(notification_header const& header)
     runtime_support_gid.set_lsb(std::uint64_t(0));
     agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
-    naming::gid_type const memory_gid(header.prefix.get_msb()
-      , rtd.get_memory_lva());
-    naming::address const memory_address(here
-      , components::get_component_type<components::server::memory>()
-      , rtd.get_memory_lva());
-    agas_client.bind_local(memory_gid, memory_address);
-
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
     naming::gid_type parcel_lower, parcel_upper;

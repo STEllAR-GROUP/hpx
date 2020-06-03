@@ -31,7 +31,6 @@
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/server/component_database.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
@@ -870,7 +869,6 @@ namespace hpx { namespace components { namespace server
 
                 // unregister fixed components
                 agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
-                agas_client.unbind_local(appl.get_memory_raw_gid(), ec);
 
                 if (remove_from_remote_caches)
                     remove_here_from_connection_cache();
