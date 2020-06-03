@@ -105,8 +105,9 @@ namespace hpx { namespace parallel { namespace execution {
         thread_pool_bulk_async_execute_helper(threads::thread_pool_base* pool,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize, threads::thread_schedule_hint,
-            std::size_t first_thread, std::size_t num_threads, launch policy,
-            F&& f, S const& shape, Ts&&... ts)
+            std::size_t first_thread, std::size_t num_threads,
+            std::size_t hierarchical_threshold, launch policy, F&& f,
+            S const& shape, Ts&&... ts)
         {
             HPX_ASSERT(pool);
 
@@ -133,7 +134,7 @@ namespace hpx { namespace parallel { namespace execution {
                 threads::thread_schedule_hint hint{
                     static_cast<std::int16_t>(first_thread + t)};
 
-                if (part_size > 1)
+                if (part_size > hierarchical_threshold)
                 {
                     detail::post_policy_dispatch<decltype(policy)>::call(policy,
                         desc, pool, priority, threads::thread_stacksize_small,
@@ -152,17 +153,23 @@ namespace hpx { namespace parallel { namespace execution {
                             }
                             l.count_down(part_size);
                         });
+
+                    std::advance(it, part_size);
                 }
-                else if (part_size == 1)
+                else
                 {
-                    results[part_begin] =
-                        hpx::detail::async_launch_policy_dispatch<decltype(
-                            policy)>::call(policy, pool, priority, stacksize,
-                            hint, f, *it, ts...);
-                    l.count_down(1);
+                    for (std::size_t part_i = part_begin; part_i < part_end;
+                         ++part_i)
+                    {
+                        results[part_i] =
+                            hpx::detail::async_launch_policy_dispatch<decltype(
+                                policy)>::call(policy, pool, priority,
+                                stacksize, hint, f, *it, ts...);
+                        ++it;
+                    }
+                    l.count_down(part_size);
                 }
 
-                std::advance(it, part_size);
                 part_begin = part_end;
             }
 
@@ -230,6 +237,8 @@ namespace hpx { namespace parallel { namespace execution {
     /// and a BulkTwoWayExecutor
     class thread_pool_executor
     {
+        static constexpr std::size_t hierarchical_threshold_default_ = 6;
+
     public:
         /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
@@ -244,11 +253,14 @@ namespace hpx { namespace parallel { namespace execution {
                                           threads::thread_priority_default,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
-            threads::thread_schedule_hint schedulehint = {})
+            threads::thread_schedule_hint schedulehint = {},
+            std::size_t hierarchical_threshold =
+                hierarchical_threshold_default_)
           : pool_(this_thread::get_pool())
           , priority_(priority)
           , stacksize_(stacksize)
           , schedulehint_(schedulehint)
+          , hierarchical_threshold_(hierarchical_threshold)
         {
             HPX_ASSERT(pool_);
         }
@@ -259,10 +271,13 @@ namespace hpx { namespace parallel { namespace execution {
                 threads::thread_priority_default,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
-            threads::thread_schedule_hint schedulehint = {})
+            threads::thread_schedule_hint schedulehint = {},
+            std::size_t hierarchical_threshold =
+                hierarchical_threshold_default_)
           : priority_(priority)
           , stacksize_(stacksize)
           , schedulehint_(schedulehint)
+          , hierarchical_threshold_(hierarchical_threshold)
         {
             HPX_ASSERT(scheduler);
             pool_ = scheduler->get_parent_pool();
@@ -274,11 +289,14 @@ namespace hpx { namespace parallel { namespace execution {
                 threads::thread_priority_default,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
-            threads::thread_schedule_hint schedulehint = {})
+            threads::thread_schedule_hint schedulehint = {},
+            std::size_t hierarchical_threshold =
+                hierarchical_threshold_default_)
           : pool_(pool)
           , priority_(priority)
           , stacksize_(stacksize)
           , schedulehint_(schedulehint)
+          , hierarchical_threshold_(hierarchical_threshold)
         {
             HPX_ASSERT(pool_);
         }
@@ -336,8 +354,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::thread_pool_bulk_async_execute_helper(pool_,
                 priority_, stacksize_, schedulehint_, 0,
-                pool_->get_os_thread_count(), launch::async, std::forward<F>(f),
-                shape, std::forward<Ts>(ts)...);
+                pool_->get_os_thread_count(), hierarchical_threshold_,
+                launch::async, std::forward<F>(f), shape,
+                std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -358,6 +377,7 @@ namespace hpx { namespace parallel { namespace execution {
         threads::thread_stacksize stacksize_ =
             threads::thread_stacksize_default;
         threads::thread_schedule_hint schedulehint_ = {};
+        std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
     };
 }}}    // namespace hpx::parallel::execution
 
