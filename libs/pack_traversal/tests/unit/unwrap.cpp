@@ -11,8 +11,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <array>
 #include <atomic>

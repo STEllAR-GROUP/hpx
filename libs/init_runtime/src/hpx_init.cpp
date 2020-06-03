@@ -9,15 +9,11 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/executors/exception_list.hpp>
-#include <hpx/modules/filesystem.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -25,8 +21,15 @@
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
@@ -40,12 +43,9 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/modules/schedulers.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
-#include <hpx/modules/testing.hpp>
 #include <hpx/threading/thread.hpp>
-#include <hpx/modules/timing.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/from_string.hpp>
 

@@ -6,13 +6,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/packaged_continuation.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counter_parser.hpp>

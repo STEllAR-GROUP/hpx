@@ -20,10 +20,10 @@
 #include <utility>
 #include <vector>
 //
-#include <hpx/modules/format.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_sort.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 //
 #include "test_utils.hpp"

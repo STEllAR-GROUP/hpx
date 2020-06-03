@@ -10,8 +10,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <array>
 #include <atomic>

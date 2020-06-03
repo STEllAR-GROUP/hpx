@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>

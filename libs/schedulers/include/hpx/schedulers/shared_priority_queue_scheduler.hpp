@@ -11,9 +11,9 @@
 #endif
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/debugging/print.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>

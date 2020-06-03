@@ -8,8 +8,8 @@
 // program_options library. It includes a number of different value types.
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 
 #include <iostream>
 #include <sstream>

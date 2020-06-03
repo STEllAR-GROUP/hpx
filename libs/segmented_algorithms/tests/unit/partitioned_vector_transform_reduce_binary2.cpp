@@ -8,9 +8,9 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/modules/testing.hpp>
 
 #include <iterator>
 

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
@@ -22,6 +21,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>

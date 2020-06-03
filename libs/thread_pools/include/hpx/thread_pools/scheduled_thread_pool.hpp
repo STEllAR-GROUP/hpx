@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/concurrency/barrier.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>

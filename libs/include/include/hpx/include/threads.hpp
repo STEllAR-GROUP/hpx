@@ -6,13 +6,13 @@
 
 #pragma once
 
+#include <hpx/modules/thread_executors.hpp>
+#include <hpx/modules/thread_pools.hpp>
+#include <hpx/modules/threading.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/runtime_local/run_as_hpx_thread.hpp>
 #include <hpx/runtime_local/run_as_os_thread.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/modules/thread_executors.hpp>
-#include <hpx/modules/thread_pools.hpp>
-#include <hpx/modules/threading.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_specific_ptr.hpp>
 #include <hpx/topology/topology.hpp>

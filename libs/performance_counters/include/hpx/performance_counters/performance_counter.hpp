@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/modules/execution.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include <hpx/performance_counters/counters_fwd.hpp>

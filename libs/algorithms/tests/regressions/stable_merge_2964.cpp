@@ -7,8 +7,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/parallel/algorithms/merge.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/merge.hpp>
 
 #include <algorithm>
 #include <cstddef>

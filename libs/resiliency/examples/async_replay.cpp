@@ -12,8 +12,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/future.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/resiliency/resiliency.hpp>
 
 #include <atomic>
 #include <iostream>

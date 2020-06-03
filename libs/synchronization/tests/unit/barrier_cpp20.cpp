@@ -6,8 +6,8 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/modules/async_local.hpp>
 #include <hpx/barrier.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>

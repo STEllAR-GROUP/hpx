@@ -36,13 +36,13 @@
 #endif
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/detail/context_base.hpp>
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <cstddef>
 #include <utility>

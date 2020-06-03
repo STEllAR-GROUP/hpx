@@ -8,14 +8,14 @@
 #include <hpx/futures/future.hpp>
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <cstddef>

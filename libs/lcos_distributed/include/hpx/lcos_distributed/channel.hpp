@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_distributed/server/channel.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/naming_fwd.hpp>

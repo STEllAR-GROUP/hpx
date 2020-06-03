@@ -8,11 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/applier/apply_helper.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
 #include <hpx/async_local/apply.hpp>
 #include <hpx/functional/traits/is_action.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/runtime/parcelset/put_parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/modules/threading_base.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_continuation.hpp>

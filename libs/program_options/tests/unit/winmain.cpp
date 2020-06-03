@@ -7,9 +7,9 @@
 #include <hpx/hpx_main.hpp>
 
 #if defined(HPX_WINDOWS)
+#include <hpx/modules/testing.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/program_options/parsers.hpp>
-#include <hpx/modules/testing.hpp>
 
 #include <cctype>
 #include <cstdlib>

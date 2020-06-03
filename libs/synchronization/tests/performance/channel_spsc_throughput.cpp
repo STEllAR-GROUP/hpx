@@ -9,8 +9,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/synchronization/channel_spsc.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/synchronization/channel_spsc.hpp>
 
 #include <cstddef>
 #include <cstdint>

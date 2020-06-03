@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
 
 #include <cstddef>

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/serialization/serializable_any.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/serialization/serializable_any.hpp>
 
 #include "small_big_object.hpp"
 

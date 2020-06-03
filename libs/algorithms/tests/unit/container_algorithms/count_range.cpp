@@ -7,8 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_count.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
 #include <cstddef>

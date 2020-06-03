@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/modules/distributed_executors.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/modules/distributed_executors.hpp>
 #include <hpx/modules/testing.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

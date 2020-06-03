@@ -7,11 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <cstdint>

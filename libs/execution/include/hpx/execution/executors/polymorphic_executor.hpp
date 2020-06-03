@@ -9,11 +9,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
 
 #include <algorithm>

@@ -10,10 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/concurrency/barrier.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 
 #include <boost/asio/io_service.hpp>

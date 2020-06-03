@@ -12,8 +12,8 @@
 #include <hpx/modules/assertion.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>

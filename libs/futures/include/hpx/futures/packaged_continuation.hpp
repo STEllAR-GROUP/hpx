@@ -11,12 +11,12 @@
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 

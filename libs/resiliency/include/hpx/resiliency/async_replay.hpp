@@ -12,8 +12,8 @@
 
 #include <hpx/resiliency/config.hpp>
 
-#include <hpx/modules/async_local.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>

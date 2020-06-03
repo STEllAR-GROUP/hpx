@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <type_traits>
 

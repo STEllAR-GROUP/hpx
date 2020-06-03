@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/local_lcos/conditional_trigger.hpp>
 #include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/local_lcos/conditional_trigger.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>

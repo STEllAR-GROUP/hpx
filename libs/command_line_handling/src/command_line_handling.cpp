@@ -5,19 +5,19 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/modules/asio.hpp>
 #include <hpx/modules/assertion.hpp>
 #include <hpx/modules/batch_environments.hpp>
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/modules/mpi_base.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 

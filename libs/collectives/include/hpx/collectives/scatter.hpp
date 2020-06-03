@@ -199,10 +199,10 @@ namespace hpx { namespace lcos {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/modules/basic_execution.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/modules/basic_execution.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

@@ -7,10 +7,10 @@
 // This test case demonstrates the issue described in #1037:
 // implicit unwrapping of futures in async broken
 
-#include <hpx/modules/async_distributed.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/testing.hpp>
 
 hpx::future<int> f(int i)

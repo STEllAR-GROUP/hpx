@@ -10,8 +10,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/detail/runtime_local_fwd.hpp>

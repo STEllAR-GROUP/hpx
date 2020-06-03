@@ -10,8 +10,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/resiliency/resiliency.hpp>
 
 #include <atomic>
 #include <iostream>

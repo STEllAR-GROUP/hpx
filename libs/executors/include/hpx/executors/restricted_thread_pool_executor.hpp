@@ -10,9 +10,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/thread_pool_executor.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <atomic>
 #include <cstddef>

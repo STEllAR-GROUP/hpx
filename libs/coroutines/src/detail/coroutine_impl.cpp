@@ -30,10 +30,10 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/modules/assertion.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <cstddef>
 #include <exception>

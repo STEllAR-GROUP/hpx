@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
 #include <hpx/async_distributed/async_fwd.hpp>
 #include <hpx/async_distributed/detail/async_colocated_fwd.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>

@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_executor_parameters.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>

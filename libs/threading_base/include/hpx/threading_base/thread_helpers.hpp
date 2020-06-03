@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_description.hpp>

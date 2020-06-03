@@ -7,8 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/parallel/container_algorithms/transform.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/container_algorithms/transform.hpp>
 
 #include <cstddef>
 #include <iostream>

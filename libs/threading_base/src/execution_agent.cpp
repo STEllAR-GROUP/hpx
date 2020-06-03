@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/throw_exception.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/thread_data.hpp>

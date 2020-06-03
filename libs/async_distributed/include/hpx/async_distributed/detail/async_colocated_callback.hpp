@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/async_continue_callback.hpp>
 #include <hpx/async_distributed/detail/async_colocated.hpp>
 #include <hpx/async_distributed/detail/async_colocated_callback_fwd.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/traits/extract_action.hpp>

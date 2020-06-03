@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/one_shot.hpp>
@@ -18,6 +17,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
