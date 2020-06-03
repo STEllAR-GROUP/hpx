@@ -668,6 +668,7 @@ jobs:
                   tests.unit.modules.resiliency \
                   tests.unit.modules.resource_partitioner \
                   tests.unit.modules.runtime_configuration \
+                  tests.unit.modules.runtime_local \
                   tests.unit.modules.schedulers \
                   tests.unit.modules.serialization \
                   tests.unit.modules.static_reinit \

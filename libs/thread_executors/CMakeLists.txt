@@ -80,7 +80,6 @@ add_hpx_module(
     hpx_threading_base
     hpx_timing
     hpx_resource_partitioner
-    hpx_runtime_local
     hpx_static_reinit
     hpx_synchronization
     hpx_threadmanager

@@ -332,13 +332,10 @@ namespace hpx {
         bool register_thread(char const* name, std::size_t num = 0,
             bool service_thread = true, error_code& ec = throws) override;
 
-        /// Unregister an external OS-thread with HPX
-        bool unregister_thread() override;
-
         /// Generate a new notification policy instance for the given thread
         /// name prefix
         notification_policy_type get_notification_policy(
-            char const* prefix, basic_execution::thread_type type) override;
+            char const* prefix, runtime_local::os_thread_type type) override;
 
         std::uint32_t get_locality_id(error_code& ec) const override;
 
@@ -378,14 +375,14 @@ namespace hpx {
             std::mutex& mtx, std::condition_variable& cond, bool& running);
 
         void init_tss_helper(char const* context,
-            basic_execution::thread_type type, std::size_t local_thread_num,
+            runtime_local::os_thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
             char const* postfix, bool service_thread);
 
         void deinit_tss_helper(char const* context, std::size_t num);
 
         void init_tss_ex(std::string const& locality, char const* context,
-            basic_execution::thread_type type, std::size_t local_thread_num,
+            runtime_local::os_thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
             char const* postfix, bool service_thread, error_code& ec);
 

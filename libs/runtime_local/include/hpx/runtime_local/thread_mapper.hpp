@@ -10,8 +10,10 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/runtime_local/os_thread_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -34,12 +36,12 @@ namespace hpx { namespace util {
             util::function_nonser<bool(std::uint32_t)>;
 
         // thread-specific data
-        class HPX_EXPORT thread_data
+        class HPX_EXPORT os_thread_data
         {
         public:
-            thread_data() = default;
-            thread_data(
-                std::string const& label, basic_execution::thread_type type);
+            os_thread_data() = default;
+            os_thread_data(
+                std::string const& label, runtime_local::os_thread_type type);
 
         protected:
             friend class util::thread_mapper;
@@ -55,16 +57,17 @@ namespace hpx { namespace util {
             std::thread::id id_;
 
             // the native_handle() of the associated thread
-            unsigned long tid_;
+            std::uint64_t tid_;
 
             // callback function invoked when unregistering a thread
             thread_mapper_callback_type cleanup_;
 
-            // type of this os-thread in the context of the runtime
-            basic_execution::thread_type type_;
+            // type of this OS thread in the context of the runtime
+            runtime_local::os_thread_type type_;
         };
     }    // namespace detail
 
+    ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT thread_mapper
     {
     public:
@@ -77,7 +80,7 @@ namespace hpx { namespace util {
         static constexpr std::uint32_t invalid_index = std::uint32_t(-1);
 
         // erroneous low-level thread ID
-        static constexpr unsigned long invalid_tid = -1ul;
+        static constexpr std::uint64_t invalid_tid = std::uint64_t(-1);
 
     public:
         thread_mapper();
@@ -86,7 +89,7 @@ namespace hpx { namespace util {
         ///////////////////////////////////////////////////////////////////////
         // registers invoking OS thread with a unique label
         std::uint32_t register_thread(
-            char const* label, basic_execution::thread_type type);
+            char const* label, runtime_local::os_thread_type type);
 
         // unregisters the calling OS thread
         bool unregister_thread();
@@ -110,18 +113,25 @@ namespace hpx { namespace util {
         std::thread::id get_thread_id(std::uint32_t tix) const;
 
         // returns low level thread id (native_handle)
-        unsigned long get_thread_native_handle(std::uint32_t tix) const;
+        std::uint64_t get_thread_native_handle(std::uint32_t tix) const;
 
         // returns the label of registered thread tix
         std::string const& get_thread_label(std::uint32_t tix) const;
 
         // returns the type of the registered thread
-        basic_execution::thread_type get_thread_type(std::uint32_t tix) const;
+        runtime_local::os_thread_type get_thread_type(std::uint32_t tix) const;
+
+        // enumerate all registered OS threads
+        bool enumerate_os_threads(
+            util::function_nonser<bool(os_thread_data const&)> const& f) const;
+
+        // retrieve all data stored for a given thread
+        os_thread_data get_os_thread_data(std::string const& label) const;
 
     private:
         using mutex_type = hpx::lcos::local::spinlock;
 
-        using thread_map_type = std::vector<detail::thread_data>;
+        using thread_map_type = std::vector<detail::os_thread_data>;
         using label_map_type = std::map<std::string, std::size_t>;
 
         // main lock

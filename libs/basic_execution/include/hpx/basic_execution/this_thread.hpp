@@ -23,21 +23,6 @@
 namespace hpx { namespace basic_execution {
 
     ///////////////////////////////////////////////////////////////////////////
-    // types of OS threads registered with the runtime
-    enum class thread_type
-    {
-        unknown = -1,
-        main_thread = 0,
-        worker_thread,
-        io_thread,
-        timer_thread,
-        parcel_thread,
-        custom_thread
-    };
-
-    HPX_EXPORT std::string get_thread_type_name(thread_type type);
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace this_thread {
         namespace detail {
 

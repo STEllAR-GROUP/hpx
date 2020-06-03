@@ -4,8 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/util/thread_mapper.hpp>
+#include <hpx/runtime_local/os_thread_type.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -13,10 +15,10 @@
 #include <string>
 #include <thread>
 
-#if defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
-#include <sys/syscall.h>
-#elif defined(HPX_WINDOWS)
+#if defined(HPX_WINDOWS)
 #include <windows.h>
+#else
+#include <pthread.h>
 #endif
 
 namespace hpx { namespace util {
@@ -24,21 +26,18 @@ namespace hpx { namespace util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        unsigned long get_system_thread_id()
+        std::uint64_t get_system_thread_id()
         {
-#if defined(__linux__) && !defined(__ANDROID__) && !defined(ANDROID)
-            // this has been tested only on x86_*
-            return syscall(SYS_gettid);
-#elif defined(HPX_WINDOWS)
-            return GetCurrentThreadId();
+#if defined(HPX_WINDOWS)
+            return std::uint64_t(::GetCurrentThreadId());
 #else
-            return invalid_tid;
+            return std::uint64_t(::pthread_self());
 #endif
         }
 
         // thread-specific data
-        thread_data::thread_data(
-            std::string const& label, basic_execution::thread_type type)
+        os_thread_data::os_thread_data(
+            std::string const& label, runtime_local::os_thread_type type)
           : label_(label)
           , id_(std::this_thread::get_id())
           , tid_(get_system_thread_id())
@@ -47,13 +46,13 @@ namespace hpx { namespace util {
         {
         }
 
-        void thread_data::invalidate()
+        void os_thread_data::invalidate()
         {
             tid_ = thread_mapper::invalid_tid;
             cleanup_.reset();
         }
 
-        bool thread_data::is_valid() const
+        bool os_thread_data::is_valid() const
         {
             return tid_ != thread_mapper::invalid_tid;
         }
@@ -77,7 +76,7 @@ namespace hpx { namespace util {
     }
 
     std::uint32_t thread_mapper::register_thread(
-        char const* name, basic_execution::thread_type type)
+        char const* name, runtime_local::os_thread_type type)
     {
         std::lock_guard<mutex_type> m(mtx_);
 
@@ -93,7 +92,7 @@ namespace hpx { namespace util {
         }
 
         // create mappings
-        thread_map_.push_back(detail::thread_data(name, type));
+        thread_map_.push_back(detail::os_thread_data(name, type));
 
         std::size_t idx = thread_map_.size() - 1;
         label_map_[name] = idx;
@@ -174,7 +173,8 @@ namespace hpx { namespace util {
         return thread_map_[idx].id_;
     }
 
-    unsigned long thread_mapper::get_thread_native_handle(std::uint32_t tix) const
+    std::uint64_t thread_mapper::get_thread_native_handle(
+        std::uint32_t tix) const
     {
         std::lock_guard<mutex_type> m(mtx_);
 
@@ -199,7 +199,7 @@ namespace hpx { namespace util {
         return thread_map_[idx].label_;
     }
 
-    basic_execution::thread_type thread_mapper::get_thread_type(
+    runtime_local::os_thread_type thread_mapper::get_thread_type(
         std::uint32_t tix) const
     {
         std::lock_guard<mutex_type> m(mtx_);
@@ -207,7 +207,7 @@ namespace hpx { namespace util {
         auto idx = static_cast<std::size_t>(tix);
         if (idx >= thread_map_.size())
         {
-            return basic_execution::thread_type::unknown;
+            return runtime_local::os_thread_type::unknown;
         }
         return thread_map_[idx].type_;
     }
@@ -222,7 +222,7 @@ namespace hpx { namespace util {
         {
             return invalid_index;
         }
-        return thread_map_[it->second].tid_;
+        return it->second;
     }
 
     std::uint32_t thread_mapper::get_thread_count() const
@@ -231,4 +231,48 @@ namespace hpx { namespace util {
 
         return static_cast<std::uint32_t>(label_map_.size());
     }
+
+    // retrieve all data stored for a given thread
+    os_thread_data thread_mapper::get_os_thread_data(
+        std::string const& label) const
+    {
+        std::lock_guard<mutex_type> m(mtx_);
+
+        auto it = label_map_.find(label);
+        if (it == label_map_.end())
+        {
+            return runtime_local::os_thread_data{"", std::thread::id{},
+                thread_mapper::invalid_tid,
+                runtime_local::os_thread_type::unknown};
+        }
+
+        auto idx = static_cast<std::size_t>(it->second);
+        if (idx >= thread_map_.size())
+        {
+            return runtime_local::os_thread_data{"", std::thread::id{},
+                thread_mapper::invalid_tid,
+                runtime_local::os_thread_type::unknown};
+        }
+
+        auto const& tinfo = thread_map_[idx];
+        return runtime_local::os_thread_data{
+            tinfo.label_, tinfo.id_, tinfo.tid_, tinfo.type_};
+    }
+
+    bool thread_mapper::enumerate_os_threads(
+        util::function_nonser<bool(os_thread_data const&)> const& f) const
+    {
+        std::lock_guard<mutex_type> m(mtx_);
+        for (auto const& tinfo : thread_map_)
+        {
+            os_thread_data data{
+                tinfo.label_, tinfo.id_, tinfo.tid_, tinfo.type_};
+            if (!f(data))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }}    // namespace hpx::util

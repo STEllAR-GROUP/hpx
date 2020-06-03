@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/force_linking.hpp>
+#include <hpx/runtime_local/os_thread_type.hpp>
 
 #if defined(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
 #include <hpx/util/thread_aware_timer.hpp>
@@ -16,8 +17,9 @@ namespace hpx { namespace runtime_local {
     {
         static force_linking_helper helper
         {
+            &hpx::runtime_local::get_os_thread_type_name,
 #if defined(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
-            &hpx::util::thread_aware_timer::take_time_stamp
+                &hpx::util::thread_aware_timer::take_time_stamp
 #endif
         };
         return helper;
