@@ -1463,7 +1463,9 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
         hpx::program_options::options_description const& desc_cmdline, int argc,
-        char** argv)
+        char** argv,
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries)
     {
         // set the flag signaling that command line parsing has been done
         cmd_line_parsed_ = true;
@@ -1544,7 +1546,7 @@ namespace hpx { namespace util {
         // load plugin modules (after first pass of command line handling,
         // so that settings given on command line could propagate to modules)
         std::vector<std::shared_ptr<plugins::plugin_registry_base>>
-            plugin_registries = rtcfg_.load_modules();
+            plugin_registries = rtcfg_.load_modules(component_registries);
 
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.

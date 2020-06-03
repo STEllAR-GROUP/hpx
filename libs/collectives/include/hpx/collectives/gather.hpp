@@ -202,8 +202,8 @@ namespace hpx { namespace lcos {
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime_local/get_num_localities.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 

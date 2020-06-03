@@ -9,7 +9,7 @@
 #include <hpx/async/apply.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/actions/plain_action.hpp>

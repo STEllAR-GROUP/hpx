@@ -17,6 +17,7 @@
 #include <hpx/program_options.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -133,6 +134,8 @@ namespace hpx { namespace resource {
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries,
             int* result);
     }
 
@@ -145,6 +148,8 @@ namespace hpx { namespace resource {
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries,
             int* result);
 
         partitioner(util::function_nonser<int(
@@ -152,9 +157,12 @@ namespace hpx { namespace resource {
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries,
             int* result)
           : partitioner_(detail::create_partitioner(f, desc_cmdline, argc, argv,
-                std::move(ini_config), rpmode, mode, check, result))
+                std::move(ini_config), rpmode, mode, check,
+                component_registries, result))
         {
         }
 
@@ -229,10 +237,12 @@ namespace hpx { namespace resource {
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries,
             int* result)
         {
             return ::hpx::resource::partitioner(f, desc_cmdline, argc, argv,
-                ini_config, rpmode, mode, check, result);
+                ini_config, rpmode, mode, check, component_registries, result);
         }
     }    // namespace detail
 }}       // namespace hpx::resource

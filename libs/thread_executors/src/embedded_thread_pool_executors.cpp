@@ -22,6 +22,7 @@
 #include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -71,7 +72,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
                 "max_punit shouldn't be smaller than min_punit");
             return;
         }
-        if (max_punits > hpx::get_os_thread_count())
+        if (max_punits >
+            hpx::parallel::execution::detail::get_os_thread_count())
         {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "embedded_thread_pool_executor<Scheduler>::"
@@ -475,7 +477,8 @@ namespace hpx { namespace threads { namespace executors {
     local_queue_executor::local_queue_executor()
       : scheduled_executor(new detail::embedded_thread_pool_executor<
             policies::local_queue_scheduler<>>(
-            get_os_thread_count(), 1, "local_queue_executor"))
+            parallel::execution::detail::get_os_thread_count(), 1,
+            "local_queue_executor"))
     {
     }
 
@@ -493,7 +496,8 @@ namespace hpx { namespace threads { namespace executors {
     static_queue_executor::static_queue_executor()
       : scheduled_executor(new detail::embedded_thread_pool_executor<
             policies::static_queue_scheduler<>>(
-            get_os_thread_count(), 1, "static_queue_executor"))
+            parallel::execution::detail::get_os_thread_count(), 1,
+            "static_queue_executor"))
     {
     }
 
@@ -510,7 +514,8 @@ namespace hpx { namespace threads { namespace executors {
     local_priority_queue_executor::local_priority_queue_executor()
       : scheduled_executor(new detail::embedded_thread_pool_executor<
             policies::local_priority_queue_scheduler<>>(
-            get_os_thread_count(), 1, "local_priority_queue_executor"))
+            parallel::execution::detail::get_os_thread_count(), 1,
+            "local_priority_queue_executor"))
     {
     }
 
@@ -530,7 +535,8 @@ namespace hpx { namespace threads { namespace executors {
     static_priority_queue_executor::static_priority_queue_executor()
       : scheduled_executor(new detail::embedded_thread_pool_executor<
             policies::static_priority_queue_scheduler<>>(
-            get_os_thread_count(), 1, "static_priority_queue_executor"))
+            parallel::execution::detail::get_os_thread_count(), 1,
+            "static_priority_queue_executor"))
     {
     }
 

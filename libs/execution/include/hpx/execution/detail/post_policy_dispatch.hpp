@@ -10,8 +10,8 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstdint>

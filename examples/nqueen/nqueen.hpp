@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/runtime.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/client.hpp>
 
 #include "server/nqueen.hpp"

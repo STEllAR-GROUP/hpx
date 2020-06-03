@@ -13,6 +13,7 @@ set(execution_headers
     hpx/execution/algorithms/detail/predicates.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
     hpx/execution/detail/future_exec.hpp
+    hpx/execution/detail/execution_parameter_callbacks.hpp
     hpx/execution/detail/post_policy_dispatch.hpp
     hpx/execution/detail/sync_launch_policy_dispatch.hpp
     hpx/execution/execution.hpp
@@ -47,7 +48,9 @@ set(execution_headers
     hpx/execution/traits/vector_pack_type.hpp
 )
 
-set(execution_sources force_linking.cpp polymorphic_executor.cpp)
+set(execution_sources execution_parameter_callbacks.cpp force_linking.cpp
+                      polymorphic_executor.cpp
+)
 
 set(execution_compat_headers
     hpx/async_launch_policy_dispatch.hpp

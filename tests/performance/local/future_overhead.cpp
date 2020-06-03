@@ -11,6 +11,7 @@
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/async_combinators/wait_each.hpp>
@@ -23,7 +24,6 @@
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/thread_executors/limiting_executor.hpp>
-#include <hpx/thread_executors/pool_executor.hpp>
 #include <hpx/synchronization.hpp>
 
 #include <array>

@@ -11,7 +11,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/from_string.hpp>

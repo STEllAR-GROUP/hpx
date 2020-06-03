@@ -46,6 +46,7 @@ set(HPX_CANDIDATE_LIBS
     hardware
     hashing
     include
+    init_runtime
     io_service
     iterator_support
     itt_notify
@@ -66,6 +67,7 @@ set(HPX_CANDIDATE_LIBS
     resiliency
     resource_partitioner
     runtime_configuration
+    runtime_local
     schedulers
     segmented_algorithms
     serialization

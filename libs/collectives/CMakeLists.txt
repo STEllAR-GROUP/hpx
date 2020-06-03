@@ -64,7 +64,6 @@ add_hpx_module(
     hpx_datastructures
     hpx_errors
     hpx_execution
-    hpx_executors
     hpx_format
     hpx_functional
     hpx_hardware
@@ -78,6 +77,7 @@ add_hpx_module(
     hpx_preprocessor
     hpx_program_options
     hpx_runtime_configuration
+    hpx_runtime_local
     hpx_serialization
     hpx_synchronization
     hpx_timing

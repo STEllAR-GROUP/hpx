@@ -12,7 +12,6 @@
 #include <hpx/logging.hpp>
 #include <hpx/plugin.hpp>
 #include <hpx/prefix/find_prefix.hpp>
-#include <hpx/runtime/startup_function.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
@@ -292,7 +291,10 @@ namespace hpx { namespace util {
     }
 
     void load_component_factory(hpx::util::plugin::dll& d, util::section& ini,
-        std::string const& curr, std::string name, error_code& ec)
+        std::string const& curr,
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries,
+        std::string name, error_code& ec)
     {
         hpx::util::plugin::plugin_factory<components::component_registry_base>
             pf(d, "registry");
@@ -333,8 +335,7 @@ namespace hpx { namespace util {
                     return;
 
                 registry->get_component_info(ini_data, curr);
-                hpx::register_startup_function(
-                    [registry]() { registry->register_component_type(); });
+                component_registries.push_back(registry);
             }
         }
 
@@ -404,7 +405,9 @@ namespace hpx { namespace util {
     std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     init_ini_data_default(std::string const& libs, util::section& ini,
         std::map<std::string, filesystem::path>& basenames,
-        std::map<std::string, hpx::util::plugin::dll>& modules)
+        std::map<std::string, hpx::util::plugin::dll>& modules,
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries)
     {
         namespace fs = filesystem;
 
@@ -520,7 +523,8 @@ namespace hpx { namespace util {
 
             // get the component factory
             std::string curr_fullname(p.first.parent_path().string());
-            load_component_factory(d, ini, curr_fullname, p.second, ec);
+            load_component_factory(
+                d, ini, curr_fullname, component_registries, p.second, ec);
             if (ec)
             {
                 LRT_(info) << "skipping (load_component_factory failed): "

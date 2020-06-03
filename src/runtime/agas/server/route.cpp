@@ -10,7 +10,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
 #include <hpx/format.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>

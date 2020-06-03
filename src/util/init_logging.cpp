@@ -13,11 +13,11 @@
 #include <hpx/logging/manipulator.hpp>
 #include <hpx/naming_base.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/static.hpp>
 #include <hpx/util/get_entry_as.hpp>

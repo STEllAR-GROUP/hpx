@@ -8,7 +8,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions/base_action.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>

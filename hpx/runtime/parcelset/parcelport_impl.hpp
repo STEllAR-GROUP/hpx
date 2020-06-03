@@ -17,7 +17,7 @@
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>

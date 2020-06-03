@@ -22,6 +22,7 @@
 #include <atomic>
 #include <cstddef>
 #include <iosfwd>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -166,7 +167,9 @@ namespace hpx { namespace resource { namespace detail {
             hpx::program_options::options_description desc_cmdline, int argc,
             char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode,
-            bool fill_internal_topology = true);
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries,
+            bool fill_internal_topology);
 
         scheduler_function get_pool_creator(size_t index) const;
 

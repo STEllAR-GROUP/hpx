@@ -10,17 +10,17 @@
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/custom_exception_info.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/thread_hooks.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/state.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>
@@ -30,9 +30,9 @@
 #include <hpx/threadmanager.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/debugging.hpp>
+#include <hpx/runtime_local/debugging.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/util/thread_mapper.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>

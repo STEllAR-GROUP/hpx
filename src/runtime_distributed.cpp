@@ -17,7 +17,7 @@
 #include <hpx/collectives/latch.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/custom_exception_info.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional.hpp>
@@ -27,7 +27,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -37,16 +37,16 @@
 #include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/thread_hooks.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
@@ -57,11 +57,11 @@
 #include <hpx/threadmanager.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology.hpp>
-#include <hpx/util/debugging.hpp>
+#include <hpx/runtime_local/debugging.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/thread_mapper.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>

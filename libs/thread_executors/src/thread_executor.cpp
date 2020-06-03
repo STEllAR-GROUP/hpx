@@ -9,9 +9,9 @@
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <cstddef>

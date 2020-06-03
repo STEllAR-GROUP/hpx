@@ -7,17 +7,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 //
-#include <hpx/executors.hpp>
-#include <hpx/parallel/algorithms/for_loop.hpp>
-//
-#include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/thread_executors/guided_pool_executor.hpp>
-#include <hpx/thread_executors/pool_executor.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-//
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/parallel_executors.hpp>
+#include <hpx/include/parallel_for_loop.hpp>
+#include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/include/threads.hpp>
 //
 #include <cmath>
 #include <cstddef>
@@ -145,7 +140,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     using hint_type1 = pool_numa_hint<guided_test_tag>;
     // create an executor using that hint type
     hpx::parallel::execution::guided_pool_executor<hint_type1> guided_exec(
-        CUSTOM_POOL_NAME);
+        &hpx::resource::get_thread_pool(CUSTOM_POOL_NAME));
     // invoke an async function using our numa hint executor
     hpx::future<void> gf1 = hpx::async(guided_exec, &async_guided,
         std::size_t(5), true, std::string("Guided function"));
@@ -163,7 +158,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     using hint_type2 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
     hpx::parallel::execution::guided_pool_executor<hint_type2>
-        guided_lambda_exec(CUSTOM_POOL_NAME);
+        guided_lambda_exec(&hpx::resource::get_thread_pool(CUSTOM_POOL_NAME));
     // invoke a lambda asynchronously and use the numa executor
     hpx::future<double> gf2 = hpx::async(
         guided_lambda_exec,
@@ -208,7 +203,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     using hint_type3 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
     hpx::parallel::execution::guided_pool_executor<hint_type3> guided_cont_exec(
-        CUSTOM_POOL_NAME);
+        &hpx::resource::get_thread_pool(CUSTOM_POOL_NAME));
     // invoke the lambda asynchronously and use the numa executor
     auto new_future = hpx::async([]() -> double {
         return 2 * 3.1415;

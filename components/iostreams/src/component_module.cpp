@@ -6,8 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>

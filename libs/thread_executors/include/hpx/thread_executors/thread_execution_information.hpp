@@ -7,8 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/runtime/get_os_thread_count.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -18,6 +16,17 @@
 #include <type_traits>
 #include <utility>
 
+// NOTE: Thread executors are deprecated and will be removed. Until then this
+// forward declaration serves to make sure the thread_executors module does not
+// depend on the runtime_local module (although it really does).
+namespace hpx {
+    namespace threads {
+        class executor;
+    }
+
+    HPX_EXPORT std::size_t get_os_thread_count(threads::executor const& exec);
+}    // namespace hpx
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads {
     template <typename Executor, typename Parameters>
@@ -25,7 +34,7 @@ namespace hpx { namespace threads {
         std::size_t>::type
     processing_units_count(Parameters&&, Executor&& exec)
     {
-        return hpx::get_os_thread_count(exec);
+        return get_os_thread_count(exec);
     }
 
     template <typename Executor>

@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threadmanager.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/include/actions.hpp>

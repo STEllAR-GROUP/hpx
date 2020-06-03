@@ -48,6 +48,7 @@ All modules
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
    /libs/include/docs/index.rst
+   /libs/init_runtime/docs/index.rst
    /libs/io_service/docs/index.rst
    /libs/iterator_support/docs/index.rst
    /libs/itt_notify/docs/index.rst
@@ -68,6 +69,7 @@ All modules
    /libs/resiliency/docs/index.rst
    /libs/resource_partitioner/docs/index.rst
    /libs/runtime_configuration/docs/index.rst
+   /libs/runtime_local/docs/index.rst
    /libs/schedulers/docs/index.rst
    /libs/segmented_algorithms/docs/index.rst
    /libs/serialization/docs/index.rst

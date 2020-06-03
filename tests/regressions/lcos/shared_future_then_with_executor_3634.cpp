@@ -9,9 +9,8 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/futures.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/thread_executors.hpp>
+#include <hpx/include/thread_executors.hpp>
+#include <hpx/include/lcos.hpp>
 
 int main()
 {

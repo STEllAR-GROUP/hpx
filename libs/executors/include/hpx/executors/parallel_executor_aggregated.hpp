@@ -22,7 +22,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>

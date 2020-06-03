@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/threadmanager.hpp>
 
 #include <cstddef>
 #include <cstdint>

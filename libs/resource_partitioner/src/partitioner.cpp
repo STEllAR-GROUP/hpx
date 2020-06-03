@@ -144,6 +144,8 @@ namespace hpx { namespace resource {
             hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv, std::vector<std::string> ini_config,
             resource::partitioner_mode rpmode, runtime_mode mode, bool check,
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries,
             int* result)
         {
             std::unique_ptr<detail::partitioner>& rp =
@@ -172,7 +174,8 @@ namespace hpx { namespace resource {
             else
             {
                 int r = rp->parse(f, desc_cmdline, argc, argv,
-                    std::move(ini_config), rpmode, mode);
+                    std::move(ini_config), rpmode, mode, component_registries,
+                    true);
                 if (result != nullptr)
                 {
                     *result = r;
