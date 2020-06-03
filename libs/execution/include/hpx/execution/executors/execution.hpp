@@ -463,7 +463,7 @@ namespace hpx { namespace parallel { namespace execution {
                 std::forward<Ts>(ts)...))
             {
                 // use post, if exposed
-                exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
+                return exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
             }
 
             template <typename TwoWayExecutor, typename F, typename... Ts>
