@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async.hpp>
-#include <hpx/async/apply.hpp>
+#include <hpx/async_distributed.hpp>
+#include <hpx/async_distributed/apply.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/functional/bind.hpp>
 

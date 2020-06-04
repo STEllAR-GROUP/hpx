@@ -13,7 +13,7 @@
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/errors.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local_async/dataflow.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #endif
 
 #include <hpx/execution/executors/execution.hpp>

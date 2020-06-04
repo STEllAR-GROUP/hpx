@@ -13,8 +13,8 @@
 #include <hpx/errors.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/async/applier/apply.hpp>
-#include <hpx/async/applier/apply_callback.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/async_distributed/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>

@@ -15,7 +15,7 @@
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/local_async.hpp>
+#include <hpx/async_local.hpp>
 #include <hpx/program_options.hpp>
 #include <hpx/testing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>

@@ -128,10 +128,10 @@ namespace hpx { namespace lcos {
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async/applier/detail/apply_colocated.hpp>
-#include <hpx/async/apply.hpp>
-#include <hpx/async/detail/async_colocated.hpp>
 #include <hpx/async_combinators/when_all.hpp>
+#include <hpx/async_distributed/applier/detail/apply_colocated.hpp>
+#include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_distributed/detail/async_colocated.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/futures/future.hpp>

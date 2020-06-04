@@ -136,7 +136,7 @@ namespace hpx { namespace lcos {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/async/dataflow.hpp>
+#include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/basic_execution.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/functional/bind_back.hpp>

@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/async/dataflow.hpp>
+#include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>

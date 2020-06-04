@@ -12,7 +12,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/config/asio.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async/applier/applier.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/errors.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>

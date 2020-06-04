@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/collectives.hpp>
 #include <hpx/format.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>

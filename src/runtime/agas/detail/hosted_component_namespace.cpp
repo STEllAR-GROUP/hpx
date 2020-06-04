@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/runtime/agas/detail/hosted_component_namespace.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/serialization/vector.hpp>

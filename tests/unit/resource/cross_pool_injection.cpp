@@ -20,7 +20,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/local_async.hpp>
+#include <hpx/async_local.hpp>
 #include <hpx/testing.hpp>
 
 #include <atomic>

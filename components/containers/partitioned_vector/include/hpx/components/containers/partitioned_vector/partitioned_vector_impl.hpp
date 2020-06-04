@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/runtime/components/client_base.hpp>

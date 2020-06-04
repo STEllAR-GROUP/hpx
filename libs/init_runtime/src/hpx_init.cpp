@@ -54,7 +54,7 @@
 #include <hpx/program_options/variables_map.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/async.hpp>
+#include <hpx/async_distributed.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>

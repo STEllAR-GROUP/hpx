@@ -9,7 +9,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assertion.hpp>
-#include <hpx/async/applier/applier.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/itt_notify.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/actions/base_action.hpp>

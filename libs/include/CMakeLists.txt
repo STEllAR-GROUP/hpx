@@ -110,7 +110,7 @@ add_hpx_module(
     hpx_execution
     hpx_format
     hpx_futures
-    hpx_local_async
+    hpx_async_local
     hpx_local_lcos
     hpx_naming_base
     hpx_pack_traversal
@@ -129,7 +129,7 @@ add_hpx_module(
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   # cmake-format: off
   target_link_libraries(hpx_include PUBLIC
-    hpx_async
+    hpx_async_distributed
     hpx_lcos_distributed
     hpx_performance_counters
     hpx_segmented_algorithms

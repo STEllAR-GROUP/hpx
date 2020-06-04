@@ -13,7 +13,7 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/assertion.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local_async/dataflow.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #endif
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>

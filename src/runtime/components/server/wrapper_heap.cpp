@@ -7,8 +7,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion.hpp>
-#include <hpx/async/applier/applier.hpp>
-#include <hpx/async/applier/bind_naming_wrappers.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/async_distributed/applier/bind_naming_wrappers.hpp>
 #include <hpx/itt_notify.hpp>
 #include <hpx/logging.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>

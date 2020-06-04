@@ -62,5 +62,5 @@ add_hpx_module(
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  target_link_libraries(hpx_compute_cuda PUBLIC hpx_async)
+  target_link_libraries(hpx_compute_cuda PUBLIC hpx_async_distributed)
 endif()

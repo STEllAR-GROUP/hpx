@@ -6,10 +6,10 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/async_local/apply.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/local_async/apply.hpp>
 
 #include <hpx/testing.hpp>
 

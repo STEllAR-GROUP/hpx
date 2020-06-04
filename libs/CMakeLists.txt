@@ -17,7 +17,7 @@ set(HPX_CANDIDATE_LIBS
     allocator_support
     asio
     assertion
-    async
+    async_distributed
     async_base
     async_combinators
     basic_execution
@@ -51,11 +51,11 @@ set(HPX_CANDIDATE_LIBS
     iterator_support
     itt_notify
     lcos_distributed
-    local_async
+    async_local
     local_lcos
     logging
     memory
-    mpi
+    async_mpi
     mpi_base
     naming_base
     pack_traversal

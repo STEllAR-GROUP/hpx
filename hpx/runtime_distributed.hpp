@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async/applier/applier.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>

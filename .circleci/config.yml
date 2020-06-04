@@ -630,7 +630,7 @@ jobs:
                   tests.unit.modules.allocator_support \
                   tests.unit.modules.asio \
                   tests.unit.modules.assertion \
-                  tests.unit.modules.async \
+                  tests.unit.modules.async_distributed \
                   tests.unit.modules.async_combinators \
                   tests.unit.modules.basic_execution \
                   tests.unit.modules.batch_environments \
@@ -656,7 +656,7 @@ jobs:
                   tests.unit.modules.hashing \
                   tests.unit.modules.iterator_support \
                   tests.unit.modules.lcos_distributed \
-                  tests.unit.modules.local_async \
+                  tests.unit.modules.async_local \
                   tests.unit.modules.local_lcos \
                   tests.unit.modules.logging \
                   tests.unit.modules.memory \
