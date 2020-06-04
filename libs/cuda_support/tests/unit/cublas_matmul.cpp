@@ -146,7 +146,7 @@ void matrixMultiply(
     hpx::parallel::for_each(par, h_B.begin(), h_B.end(), randfunc);
 
     // create a cublas executor we'll use to futurize cuda events
-    using namespace hpx::cuda::experimental;
+    using namespace hpx::cuda;
     cublas_executor cublas(device);
     using cublas_future = typename cuda_executor::future_type;
 
@@ -176,14 +176,11 @@ void matrixMultiply(
 
 #else
     T *d_A, *d_B, *d_C;
-    hpx::cuda::experimental::check_cuda_error(
-        cudaMalloc((void**) &d_A, size_A * sizeof(T)));
+    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_A, size_A * sizeof(T)));
 
-    hpx::cuda::experimental::check_cuda_error(
-        cudaMalloc((void**) &d_B, size_B * sizeof(T)));
+    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_B, size_B * sizeof(T)));
 
-    hpx::cuda::experimental::check_cuda_error(
-        cudaMalloc((void**) &d_C, size_C * sizeof(T)));
+    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_C, size_C * sizeof(T)));
 
     // adding async copy operations into the stream before cublas calls puts
     // the copies in the queue before the matrix operations.
@@ -235,7 +232,7 @@ void matrixMultiply(
             matrix_size.uiWA);
     }
     // get a future for when the stream reaches this point (matrix operations complete)
-    auto matrix_finished = cublas.get_future();
+    auto matrix_finished = cublas.get_future_with_event();
 
 #ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     // when the matrix operations complete, copy the result to the host
@@ -307,6 +304,9 @@ void matrixMultiply(
 // -------------------------------------------------------------------------
 int hpx_main(hpx::program_options::variables_map& vm)
 {
+    // install cuda future polling handler
+    hpx::cuda::enable_user_polling poll("default");
+    //
     std::size_t device = vm["device"].as<std::size_t>();
     std::size_t sizeMult = vm["sizemult"].as<std::size_t>();
     std::size_t iterations = vm["iterations"].as<std::size_t>();

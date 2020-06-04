@@ -51,6 +51,20 @@ namespace hpx { namespace cuda {
 
         return targets;
     }
+
+    void print_local_targets(void)
+    {
+        auto targets = get_local_targets();
+        for (auto target : targets)
+        {
+            std::cout << "GPU Device " << target.native_handle().get_device()
+                      << ": \"" << target.native_handle().processor_name()
+                      << "\" "
+                      << "with compute capability "
+                      << target.native_handle().processor_family() << "\n";
+        }
+    }
+
 }}    // namespace hpx::cuda
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)

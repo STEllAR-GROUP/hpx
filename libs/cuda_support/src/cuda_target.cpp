@@ -197,9 +197,14 @@ namespace hpx { namespace cuda {
         }
     }
 
-    hpx::future<void> target::get_future() const
+    hpx::future<void> target::get_future_with_event() const
     {
-        return detail::get_future(handle_.get_stream());
+        return detail::get_future_with_event(handle_.get_stream());
+    }
+
+    hpx::future<void> target::get_future_with_callback() const
+    {
+        return detail::get_future_with_callback(handle_.get_stream());
     }
 
     target& get_default_target()

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/execution.hpp>
+#include <hpx/cuda_support/cuda_exception.hpp>
 #include <hpx/cuda_support/cuda_future.hpp>
 #include <hpx/cuda_support/target.hpp>
 #include <hpx/errors/exception.hpp>
@@ -20,54 +21,7 @@
 //
 #include <sstream>
 
-namespace hpx { namespace cuda { namespace experimental {
-
-    // -------------------------------------------------------------------------
-    // utility function to print target information for this helper object
-    HPX_EXPORT void print_local_targets(void)
-    {
-        auto targets = hpx::cuda::target::get_local_targets();
-        for (auto target : targets)
-        {
-            std::cout << "GPU Device " << target.native_handle().get_device()
-                      << ": \"" << target.native_handle().processor_name()
-                      << "\" "
-                      << "with compute capability "
-                      << target.native_handle().processor_family() << "\n";
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // exception type for failed launch of cuda functions
-    struct HPX_EXPORT cuda_exception : hpx::exception
-    {
-        cuda_exception(const std::string& msg, cudaError_t err)
-          : hpx::exception(hpx::bad_function_call, msg)
-          , err_(err)
-        {
-        }
-        cudaError_t get_cuda_errorcode()
-        {
-            return err_;
-        }
-
-    protected:
-        cudaError_t err_;
-    };
-
-    // -------------------------------------------------------------------------
-    // Error message handler for cuda calls
-    inline cudaError_t check_cuda_error(cudaError_t err)
-    {
-        if (err != cudaSuccess)
-        {
-            std::stringstream temp;
-            temp << "cuda function returned error code :"
-                 << cudaGetErrorString(err);
-            throw cuda_exception(temp.str(), err);
-        }
-        return err;
-    }
+namespace hpx { namespace cuda {
 
     namespace detail {
         // -------------------------------------------------------------------------
@@ -130,9 +84,16 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------------------
         // get a future to synchronize this cuda/cublas stream with
-        inline future_type get_future()
+        inline future_type get_future_with_callback()
         {
-            return target_.get_future();
+            return target_.get_future_with_callback();
+        }
+
+        // -------------------------------------------------------------------------
+        // get a future to synchronize this cuda/cublas stream with
+        inline future_type get_future_with_event()
+        {
+            return target_.get_future_with_event();
         }
 
     protected:
@@ -211,7 +172,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 // insert the stream handle in the arg list and call the cuda function
                 detail::dispatch_helper<R, Params...> helper{};
                 helper(cuda_kernel, std::forward<Args>(args)..., stream_);
-                result = std::move(target_.get_future());
+                result = std::move(target_.get_future_with_event());
             }
             catch (const hpx::exception& e)
             {
@@ -222,21 +183,19 @@ namespace hpx { namespace cuda { namespace experimental {
         }
     };
 
-}}}    // namespace hpx::cuda::experimental
+}}    // namespace hpx::cuda
 
 namespace hpx { namespace parallel { namespace execution {
 
     /// \cond NOINTERNAL
     template <>
-    struct is_one_way_executor<hpx::cuda::experimental::cuda_executor>
-      : std::true_type
+    struct is_one_way_executor<hpx::cuda::cuda_executor> : std::true_type
     {
         // we support fire and forget without returning a waitable/future
     };
 
     template <>
-    struct is_two_way_executor<hpx::cuda::experimental::cuda_executor>
-      : std::true_type
+    struct is_two_way_executor<hpx::cuda::cuda_executor> : std::true_type
     {
         // we support returning a waitable/future
     };

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/execution.hpp>
+#include <hpx/cuda_support/cuda_exception.hpp>
 #include <hpx/cuda_support/cuda_executor.hpp>
 #include <hpx/cuda_support/cuda_future.hpp>
 #include <hpx/cuda_support/target.hpp>
@@ -21,7 +22,7 @@
 //
 #include <sstream>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx { namespace cuda {
 
     namespace detail {
 
@@ -111,7 +112,7 @@ namespace hpx { namespace cuda { namespace experimental {
     {
         // construct a cublas stream
         cublas_executor(std::size_t device = 0)
-          : hpx::cuda::experimental::cuda_executor(device)
+          : hpx::cuda::cuda_executor(device)
         {
             handle_ = 0;
             check_cublas_error(cublasCreate(&handle_));
@@ -195,7 +196,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 // insert the cublas handle in the arg list and call the cublas function
                 detail::dispatch_helper<R, Params...> helper;
                 helper(cublas_function, handle_, std::forward<Args>(args)...);
-                result = std::move(target_.get_future());
+                result = std::move(target_.get_future_with_callback());
             }
             catch (const hpx::exception& e)
             {
@@ -226,20 +227,18 @@ namespace hpx { namespace cuda { namespace experimental {
         cublasHandle_t handle_;
     };
 
-}}}    // namespace hpx::cuda::experimental
+}}    // namespace hpx::cuda
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
-    struct is_one_way_executor<hpx::cuda::experimental::cublas_executor>
-      : std::true_type
+    struct is_one_way_executor<hpx::cuda::cublas_executor> : std::true_type
     {
         // we support fire and forget without returning a waitable/future
     };
 
     template <>
-    struct is_two_way_executor<hpx::cuda::experimental::cublas_executor>
-      : std::true_type
+    struct is_two_way_executor<hpx::cuda::cublas_executor> : std::true_type
     {
         // we support returning a waitable/future
     };

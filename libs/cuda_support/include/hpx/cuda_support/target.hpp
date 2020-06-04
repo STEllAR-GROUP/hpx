@@ -178,12 +178,20 @@ namespace hpx { namespace cuda {
             return locality_;
         }
 
-        hpx::future<void> get_future() const;
+        hpx::future<void> get_future_with_event() const;
+        hpx::future<void> get_future_with_callback() const;
 
         template <typename Allocator>
-        hpx::future<void> get_future(Allocator const& alloc) const
+        hpx::future<void> get_future_with_event(Allocator const& alloc) const
         {
-            return detail::get_future(alloc, handle_.get_stream());
+            return detail::get_future_with_event(alloc, handle_.get_stream());
+        }
+
+        template <typename Allocator>
+        hpx::future<void> get_future_with_callback(Allocator const& alloc) const
+        {
+            return detail::get_future_with_callback(
+                alloc, handle_.get_stream());
         }
 
         static std::vector<target> get_local_targets()
@@ -214,7 +222,7 @@ namespace hpx { namespace cuda {
         hpx::id_type locality_;
     };
 
-    using detail::get_future;
+    using detail::get_future_with_callback;
     HPX_EXPORT target& get_default_target();
 }}    // namespace hpx::cuda
 
