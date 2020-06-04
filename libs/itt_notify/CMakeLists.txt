@@ -9,7 +9,9 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/itt_notify/include
-set(itt_notify_headers hpx/modules/itt_notify.hpp hpx/itt_notify/thread_name.hpp)
+set(itt_notify_headers hpx/modules/itt_notify.hpp
+                       hpx/itt_notify/thread_name.hpp
+)
 
 # Default location is $HPX_ROOT/libs/itt_notify/include_compatibility
 set(itt_notify_compat_headers hpx/util/itt_notify.hpp)
