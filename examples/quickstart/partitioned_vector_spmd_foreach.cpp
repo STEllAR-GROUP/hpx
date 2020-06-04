@@ -17,7 +17,7 @@
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_generate.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <cstdlib>

@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>

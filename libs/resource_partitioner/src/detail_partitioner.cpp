@@ -5,12 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/mpi_base.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/mpi_base.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>

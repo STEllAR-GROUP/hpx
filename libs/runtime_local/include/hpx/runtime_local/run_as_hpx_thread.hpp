@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/result_of.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 

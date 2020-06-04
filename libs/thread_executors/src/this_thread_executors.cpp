@@ -19,10 +19,10 @@
 #endif
 
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/thread_executors/manage_thread_executor.hpp>
 #include <hpx/thread_executors/resource_manager.hpp>

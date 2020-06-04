@@ -7,9 +7,9 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/parallel/spmd_block.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
-#include <hpx/testing.hpp>
 
 #include <array>
 #include <atomic>

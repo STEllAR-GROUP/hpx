@@ -10,7 +10,7 @@
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/mpi_base.hpp>
+#include <hpx/modules/mpi_base.hpp>
 
 #include <type_traits>
 #include <utility>

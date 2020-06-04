@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/concurrency/spinlock.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>

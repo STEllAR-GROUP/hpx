@@ -10,7 +10,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstdint>
 

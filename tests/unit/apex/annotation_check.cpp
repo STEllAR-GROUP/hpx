@@ -11,16 +11,16 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/async_distributed.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/lcos/when_all.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/execution/executors/pool_executor.hpp>
 #include <hpx/util/annotated_function.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 #include "apex_options.hpp"
 
 #include <atomic>

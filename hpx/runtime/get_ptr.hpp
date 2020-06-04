@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -18,7 +18,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/traits/component_pin_support.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/functional/bind_back.hpp>

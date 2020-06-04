@@ -7,7 +7,7 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/asio/map_hostnames.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstdint>
 #include <iostream>

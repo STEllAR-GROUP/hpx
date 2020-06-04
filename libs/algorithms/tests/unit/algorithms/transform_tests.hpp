@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/include/parallel_transform.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

@@ -22,9 +22,9 @@ namespace std {
 #endif
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/serialization/serializable_any.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/testing.hpp>
 
 #include "small_big_object.hpp"
 

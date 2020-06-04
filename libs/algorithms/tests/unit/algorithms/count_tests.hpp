@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/include/parallel_count.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>

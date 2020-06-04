@@ -17,7 +17,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
 #include <boost/range/irange.hpp>

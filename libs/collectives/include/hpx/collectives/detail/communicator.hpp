@@ -10,13 +10,13 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/execution.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/and_gate.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/basename_registration.hpp>

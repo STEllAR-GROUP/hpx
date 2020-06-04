@@ -10,7 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <functional>

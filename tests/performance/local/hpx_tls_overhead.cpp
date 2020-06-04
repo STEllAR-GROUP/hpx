@@ -6,12 +6,12 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/thread_support/thread_specific_ptr.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <boost/config.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <thread>
 #include <cstdint>

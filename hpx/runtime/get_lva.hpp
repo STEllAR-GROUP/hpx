@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/naming_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/traits/is_component.hpp>
 

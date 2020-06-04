@@ -8,7 +8,7 @@
 #include <hpx/include/naming.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

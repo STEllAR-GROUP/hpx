@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/serialization/binary_filter.hpp>
 

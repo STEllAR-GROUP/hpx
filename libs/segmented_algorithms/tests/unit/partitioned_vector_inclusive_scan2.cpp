@@ -7,9 +7,9 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include "partitioned_vector_scan.hpp"
 

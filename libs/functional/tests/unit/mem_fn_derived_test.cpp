@@ -26,7 +26,7 @@
 #include <iostream>
 #include <memory>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 struct B
 {

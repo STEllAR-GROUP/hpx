@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/type_support/static.hpp>
 

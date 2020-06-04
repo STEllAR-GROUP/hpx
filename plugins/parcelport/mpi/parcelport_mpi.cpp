@@ -10,7 +10,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 
-#include <hpx/mpi_base.hpp>
+#include <hpx/modules/mpi_base.hpp>
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 

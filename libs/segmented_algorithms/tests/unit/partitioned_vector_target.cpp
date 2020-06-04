@@ -8,7 +8,7 @@
 #include <hpx/include/compute.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <vector>

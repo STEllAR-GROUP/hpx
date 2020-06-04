@@ -13,7 +13,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/util/from_string.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

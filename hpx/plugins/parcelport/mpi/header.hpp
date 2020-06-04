@@ -11,8 +11,8 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 
-#include <hpx/assertion.hpp>
-#include <hpx/mpi_base.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/mpi_base.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 
 #include <array>

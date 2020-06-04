@@ -8,7 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "htts2.hpp"
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <tbb/task.h>
 #include <tbb/task_scheduler_init.h>

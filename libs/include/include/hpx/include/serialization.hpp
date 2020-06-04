@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/serialization.hpp>
+#include <hpx/modules/serialization.hpp>

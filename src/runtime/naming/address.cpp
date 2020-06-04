@@ -6,7 +6,7 @@
 
 #include <hpx/runtime/naming/address.hpp>
 
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/util/ios_flags_saver.hpp>

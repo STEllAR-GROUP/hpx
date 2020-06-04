@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/apply.hpp>
@@ -19,10 +19,10 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/functional.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -53,9 +53,9 @@
 #include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/topology.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/runtime_local/debugging.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>

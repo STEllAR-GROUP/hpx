@@ -10,8 +10,8 @@
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

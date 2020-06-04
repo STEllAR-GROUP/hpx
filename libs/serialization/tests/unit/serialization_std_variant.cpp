@@ -13,7 +13,7 @@
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/variant.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <string>
 #include <variant>

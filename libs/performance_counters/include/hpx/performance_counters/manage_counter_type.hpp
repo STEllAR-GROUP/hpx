@@ -12,8 +12,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 
 #include <cstddef>

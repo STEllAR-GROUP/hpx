@@ -8,13 +8,13 @@
 #pragma once
 
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/barrier.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/schedulers.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/schedulers.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>

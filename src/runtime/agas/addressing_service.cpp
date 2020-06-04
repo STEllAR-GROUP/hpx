@@ -11,18 +11,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/apply.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/async_distributed.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>

@@ -12,8 +12,8 @@
 #include <sys/mman.h>
 #include <sys/param.h>
 
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>

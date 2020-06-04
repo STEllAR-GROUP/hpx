@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/lcos_fwd.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

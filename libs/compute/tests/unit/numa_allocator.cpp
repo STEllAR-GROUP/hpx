@@ -15,7 +15,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 //
-#include <hpx/executors.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/for_loop.hpp>
 //
 #include <hpx/resource_partitioner/partitioner.hpp>
@@ -26,7 +26,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/runtime.hpp>
 //
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 //
 #include <cmath>
 #include <cstddef>

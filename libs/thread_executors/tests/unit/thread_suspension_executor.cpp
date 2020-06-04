@@ -11,7 +11,7 @@
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/thread_executors.hpp>
 #include <hpx/include/threadmanager.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

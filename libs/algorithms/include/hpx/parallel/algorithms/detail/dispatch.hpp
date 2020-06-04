@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/type_support/decay.hpp>
 

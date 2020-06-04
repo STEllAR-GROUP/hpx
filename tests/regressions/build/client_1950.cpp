@@ -9,7 +9,7 @@
 
 #include <hpx/include/iostreams.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include "server_1950.hpp"
 

@@ -19,7 +19,7 @@ been moved to the ``namespace hpx::program_options``. We have also replaced all
 Boost facilities the library depends on with either the equivalent facilities
 from the standard library or from |hpx|. As a result, the |hpx| program_options module
 is fully interface compatible with Boost.ProgramOptions (sans the ``hpx``
-namespace and the ``#include <hpx/program_options.hpp>`` changes that need to be
+namespace and the ``#include <hpx/modules/program_options.hpp>`` changes that need to be
 applied to all code relying on this library).
 
 All credit goes to Vladimir Prus, the author of the excellent Boost.ProgramOptions

@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional.hpp>
-#include <hpx/program_options.hpp>
-#include <hpx/runtime_configuration.hpp>
-#include <hpx/util.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <cstddef>
 #include <memory>

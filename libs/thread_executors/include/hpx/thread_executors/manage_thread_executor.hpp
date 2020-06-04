@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>
 
 #include <cstddef>

@@ -10,12 +10,12 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/async_combinators/when_all.hpp>
-#include <hpx/async_local.hpp>
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

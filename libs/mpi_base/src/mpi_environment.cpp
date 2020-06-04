@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/mpi_base.hpp>
-#include <hpx/runtime_configuration.hpp>
-#include <hpx/util.hpp>
+#include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <boost/tokenizer.hpp>
 

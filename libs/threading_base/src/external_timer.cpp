@@ -6,7 +6,7 @@
 //
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 

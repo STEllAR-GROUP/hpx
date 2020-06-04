@@ -8,7 +8,7 @@
 #include <hpx/include/parallel_reduce.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <boost/range/functions.hpp>
 

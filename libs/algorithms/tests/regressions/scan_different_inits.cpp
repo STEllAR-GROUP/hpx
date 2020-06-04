@@ -8,7 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_scan.hpp>
 #include <hpx/include/parallel_transform_scan.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

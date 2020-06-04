@@ -6,13 +6,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/error_code.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/exception_info.hpp>
-#include <hpx/format.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/logging.hpp>
 
 #if defined(HPX_WINDOWS)
 #include <process.h>

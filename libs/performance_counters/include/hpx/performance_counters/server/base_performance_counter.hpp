@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>

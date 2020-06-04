@@ -43,10 +43,10 @@
 // This needs to be first for building on Macs
 #include <hpx/coroutines/detail/context_impl.hpp>
 
-#include <hpx/assertion.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>    //for swap hints
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <atomic>
 #include <cstddef>

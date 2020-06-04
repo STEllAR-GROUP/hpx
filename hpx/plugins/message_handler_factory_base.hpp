@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/plugin.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/plugins/plugin_factory_base.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 

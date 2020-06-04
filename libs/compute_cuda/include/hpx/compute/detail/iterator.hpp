@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <hpx/compute/detail/get_proxy_type.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>

@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/logging/include
 set(logging_headers
-    hpx/logging.hpp
+    hpx/modules/logging.hpp
     hpx/logging/detail/macros.hpp
     hpx/logging/detail/logger.hpp
     hpx/logging/format/destinations.hpp

@@ -14,9 +14,9 @@
 
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/execution.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>

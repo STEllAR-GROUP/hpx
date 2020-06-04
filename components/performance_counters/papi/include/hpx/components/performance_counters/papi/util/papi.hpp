@@ -10,10 +10,10 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstdint>
 #include <cstring>

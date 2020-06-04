@@ -14,7 +14,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 #include <boost/intrusive_ptr.hpp>

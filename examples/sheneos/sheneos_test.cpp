@@ -18,7 +18,7 @@
 #include "sheneos/interpolator.hpp"
 
 #include <boost/dynamic_bitset.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
 

@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <string>
 

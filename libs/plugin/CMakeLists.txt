@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/plugin/include
 set(plugin_headers
-    hpx/plugin.hpp
+    hpx/modules/plugin.hpp
     hpx/plugin/abstract_factory.hpp
     hpx/plugin/concrete_factory.hpp
     hpx/plugin/config.hpp

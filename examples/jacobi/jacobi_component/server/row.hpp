@@ -9,7 +9,7 @@
 
 #include "../row_range.hpp"
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 

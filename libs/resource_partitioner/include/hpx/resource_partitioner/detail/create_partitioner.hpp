@@ -13,7 +13,7 @@
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <memory>

@@ -7,7 +7,7 @@
 #include <hpx/execution/executors/this_thread_executors.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

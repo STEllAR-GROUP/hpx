@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assertion.hpp>
-#include <hpx/async_distributed.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>

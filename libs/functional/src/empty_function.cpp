@@ -8,7 +8,7 @@
 
 #include <hpx/functional/detail/empty_function.hpp>
 
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 namespace hpx { namespace util { namespace detail {
     HPX_NORETURN void throw_bad_function_call()

@@ -7,8 +7,8 @@
 #include <hpx/async_local/apply.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/synchronization.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

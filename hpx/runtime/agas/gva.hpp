@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstdint>
 

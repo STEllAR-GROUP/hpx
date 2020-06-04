@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/threadmanager/config/defines.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 #if defined(HPX_THREADMANAGER_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

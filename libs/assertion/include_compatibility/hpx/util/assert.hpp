@@ -14,16 +14,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assertion/config/defines.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #if defined(HPX_ASSERTION_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/assert.hpp is deprecated,                             \
-    please include hpx/assertion.hpp instead")
+    please include hpx/modules/assertion.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/util/assert.hpp is deprecated,                        \
-    please include hpx/assertion.hpp instead"
+    please include hpx/modules/assertion.hpp instead"
 #endif
 #endif

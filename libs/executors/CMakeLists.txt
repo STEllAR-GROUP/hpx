@@ -14,7 +14,7 @@ set(executors_headers
     hpx/executors/datapar/execution_policy_fwd.hpp
     hpx/executors/datapar/execution_policy.hpp
     hpx/executors/guided_pool_executor.hpp
-    hpx/executors.hpp
+    hpx/modules/executors.hpp
     hpx/executors/apply.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp

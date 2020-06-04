@@ -7,9 +7,9 @@
 
 #define HPX_NO_VERSION_CHECK
 
-#include <hpx/assertion.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/util.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <atomic>
 #include <cstddef>

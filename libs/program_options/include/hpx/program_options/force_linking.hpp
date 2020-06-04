@@ -19,7 +19,7 @@ namespace hpx { namespace program_options {
 }}    // namespace hpx::program_options
 #else
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <functional>
 #include <iosfwd>

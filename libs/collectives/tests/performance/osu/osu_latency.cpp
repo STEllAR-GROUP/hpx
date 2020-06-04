@@ -10,7 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <boost/range/irange.hpp>
 

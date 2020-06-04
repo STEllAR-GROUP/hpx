@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstdint>
 

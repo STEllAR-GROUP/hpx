@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/naming_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>

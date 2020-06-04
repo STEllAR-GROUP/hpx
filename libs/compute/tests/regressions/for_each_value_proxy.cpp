@@ -8,7 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_for_each.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

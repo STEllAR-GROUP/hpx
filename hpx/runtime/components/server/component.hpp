@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/traits/component_heap_type.hpp>
 

@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 HPX_REGISTER_CHANNEL(int);    // add to one source file
 

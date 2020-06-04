@@ -17,8 +17,8 @@
 /// classes are asynchronous API which return the futures.
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/collectives.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -31,7 +31,7 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <iostream>

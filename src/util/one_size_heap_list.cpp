@@ -6,14 +6,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/state.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/util/one_size_heap_list.hpp>
 #if defined(HPX_DEBUG)
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #endif
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

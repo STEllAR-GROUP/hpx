@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>

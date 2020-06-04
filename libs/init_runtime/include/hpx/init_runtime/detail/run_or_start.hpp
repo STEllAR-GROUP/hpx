@@ -8,7 +8,7 @@
 
 #include <hpx/functional/function.hpp>
 #include <hpx/hpx_init_params.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 namespace hpx {
     /// \cond NOINTERNAL

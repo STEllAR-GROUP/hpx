@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/async_local.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/hpx_finalize.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <exception>
 #include <list>

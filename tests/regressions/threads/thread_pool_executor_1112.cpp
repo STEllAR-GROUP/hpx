@@ -9,7 +9,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_execution.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <iostream>

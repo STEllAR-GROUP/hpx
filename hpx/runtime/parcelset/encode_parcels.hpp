@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

@@ -8,7 +8,7 @@
 // line arguments before last `=` sign)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 char const* argv[] = {"command_line_argument_test",
     // We need only one thread, this argument should be gone in hpx_main

@@ -13,7 +13,7 @@
 // For more information, see http://www.boost.org
 
 #include <hpx/functional/function.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 struct tried_to_copy
 {

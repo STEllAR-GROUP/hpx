@@ -9,18 +9,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/debugging/backtrace.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/logging.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/naming_base.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>

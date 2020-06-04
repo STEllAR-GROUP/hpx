@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>

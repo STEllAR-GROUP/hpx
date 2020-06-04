@@ -11,7 +11,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 struct test_server : hpx::components::simple_component_base<test_server>
 {

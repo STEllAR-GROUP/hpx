@@ -9,12 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>

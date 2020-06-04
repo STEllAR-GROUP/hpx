@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/async_distributed/applier/trigger.hpp>

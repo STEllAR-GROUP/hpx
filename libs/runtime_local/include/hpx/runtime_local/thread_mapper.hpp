@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <boost/bimap.hpp>

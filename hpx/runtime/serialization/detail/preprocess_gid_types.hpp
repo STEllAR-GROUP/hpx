@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
-#include <hpx/datastructures.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming_fwd.hpp>

@@ -7,14 +7,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/command_line_handling.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <memory>

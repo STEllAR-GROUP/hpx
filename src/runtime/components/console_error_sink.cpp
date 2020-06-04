@@ -6,10 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async_distributed.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/state.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>

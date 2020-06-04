@@ -9,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

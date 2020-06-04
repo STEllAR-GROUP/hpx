@@ -6,10 +6,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/reduce_by_key.hpp>
-#include <hpx/testing.hpp>
 //
 #include <random>
 #include <utility>

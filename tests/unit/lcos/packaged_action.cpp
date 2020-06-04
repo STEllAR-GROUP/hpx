@@ -9,7 +9,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <string>
 #include <vector>

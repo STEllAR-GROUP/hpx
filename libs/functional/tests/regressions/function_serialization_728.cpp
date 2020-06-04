@@ -16,7 +16,7 @@
 #endif
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/parcel_coalescing.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <vector>

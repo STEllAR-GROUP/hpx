@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <hpx/local_lcos/composable_guard.hpp>
 

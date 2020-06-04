@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/synchronization/spinlock.hpp>

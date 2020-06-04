@@ -8,7 +8,7 @@
 #include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/coarray/coarray.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <string>

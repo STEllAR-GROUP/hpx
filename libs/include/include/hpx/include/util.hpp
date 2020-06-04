@@ -7,10 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
-#include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -19,6 +17,8 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>

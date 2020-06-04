@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/synchronization/spinlock.hpp>

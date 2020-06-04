@@ -10,7 +10,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/component_storage.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 

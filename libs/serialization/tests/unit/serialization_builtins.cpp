@@ -35,7 +35,7 @@ struct A
     }
 };
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 void test_bool()
 {

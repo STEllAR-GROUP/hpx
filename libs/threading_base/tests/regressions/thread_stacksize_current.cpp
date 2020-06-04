@@ -12,9 +12,9 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/async_local.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/threading_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <iostream>
 #include <string>

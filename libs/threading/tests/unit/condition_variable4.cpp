@@ -10,9 +10,9 @@
 //  (http://creativecommons.org/licenses/by/4.0/).
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/synchronization.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/threading.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading.hpp>
 
 #include <chrono>
 #include <mutex>

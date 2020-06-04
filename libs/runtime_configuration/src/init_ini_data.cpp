@@ -6,11 +6,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/filesystem.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/logging.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>

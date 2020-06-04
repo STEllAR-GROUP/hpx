@@ -9,8 +9,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/parallel_task_block.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
-#include <hpx/testing.hpp>
 
 #include <string>
 #include <vector>

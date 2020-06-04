@@ -17,8 +17,8 @@
 //       to be in iterator_adaptor_test.cpp.
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/iterator_support.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include "iterator_tests.hpp"
 

@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_WINDOWS)
-#include <hpx/collectives.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <hpx/serialization/string.hpp>
 

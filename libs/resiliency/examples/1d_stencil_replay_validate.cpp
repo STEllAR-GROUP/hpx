@@ -9,8 +9,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/resiliency/resiliency.hpp>
-#include <hpx/timing.hpp>
 
 #include <algorithm>
 #include <cmath>

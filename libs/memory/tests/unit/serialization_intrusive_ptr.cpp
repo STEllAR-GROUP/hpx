@@ -6,8 +6,8 @@
 
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/memory/serialization/intrusive_ptr.hpp>
-#include <hpx/serialization.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <memory>
 #include <vector>

@@ -22,7 +22,7 @@ set(schedulers_headers
     hpx/schedulers/static_queue_scheduler.hpp
     hpx/schedulers/thread_queue.hpp
     hpx/schedulers/thread_queue_mc.hpp
-    hpx/schedulers.hpp
+    hpx/modules/schedulers.hpp
 )
 
 set(schedulers_compat_headers

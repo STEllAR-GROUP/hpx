@@ -12,12 +12,12 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>

@@ -23,8 +23,8 @@ const char* hpx_no_inspect = "hpx-" "no-inspect";
 //  Files that contain the hpx_no_inspect value are not inspected.
 
 #include <hpx/config.hpp>
-#include <hpx/filesystem.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>

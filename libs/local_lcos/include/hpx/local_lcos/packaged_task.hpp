@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <exception>

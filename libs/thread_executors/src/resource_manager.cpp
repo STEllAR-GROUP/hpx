@@ -8,14 +8,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/thread_executors/resource_manager.hpp>
 #include <hpx/thread_executors/thread_executor.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/topology.hpp>
 
 #include <algorithm>
 #include <cstddef>

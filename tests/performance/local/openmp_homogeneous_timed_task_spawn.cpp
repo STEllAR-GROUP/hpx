@@ -32,11 +32,11 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/assertion.hpp>
-#include <hpx/format.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/timing.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstdint>
 #include <iostream>

@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/naming_base.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
@@ -597,6 +597,6 @@ namespace hpx {
 
 }    // namespace hpx
 
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <hpx/config/warnings_suffix.hpp>

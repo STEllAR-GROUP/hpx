@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>

@@ -11,7 +11,7 @@
 
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime.hpp>
@@ -23,7 +23,7 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cctype>
 #include <cstdint>

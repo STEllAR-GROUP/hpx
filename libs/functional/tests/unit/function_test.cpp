@@ -28,7 +28,7 @@
 #pragma GCC diagnostic pop
 #endif
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <functional>
 #include <string>

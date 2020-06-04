@@ -13,9 +13,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 

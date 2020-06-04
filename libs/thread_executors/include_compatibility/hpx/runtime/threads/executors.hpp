@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/thread_executors/config/defines.hpp>
-#include <hpx/thread_executors.hpp>
+#include <hpx/modules/thread_executors.hpp>
 
 // Note that the header thread_executors is automatically generated
 

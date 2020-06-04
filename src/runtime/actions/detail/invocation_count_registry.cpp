@@ -5,11 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
 
 #include <regex>
