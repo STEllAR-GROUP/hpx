@@ -12,7 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/modules/io_service.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/detail/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
@@ -25,7 +26,6 @@
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>

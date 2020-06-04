@@ -16,7 +16,6 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <cstddef>
 #include <exception>

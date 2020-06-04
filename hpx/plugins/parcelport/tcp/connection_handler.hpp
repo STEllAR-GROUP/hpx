@@ -18,7 +18,6 @@
 #include <hpx/plugins/parcelport/tcp/locality.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/tcp.hpp>

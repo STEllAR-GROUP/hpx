@@ -36,6 +36,7 @@
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>

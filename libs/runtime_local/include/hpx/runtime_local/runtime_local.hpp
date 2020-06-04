@@ -24,7 +24,6 @@
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/state.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <atomic>
 #include <condition_variable>

@@ -146,11 +146,9 @@ set(hpx_HEADERS
     hpx/runtime/serialization/detail/preprocess_container.hpp
     hpx/runtime/serialization/detail/preprocess_futures.hpp
     hpx/runtime/serialization/detail/preprocess_gid_types.hpp
-    hpx/runtime/threads_fwd.hpp
     hpx/traits/managed_component_policies.hpp
     hpx/traits/pointer_category.hpp
     hpx/traits/rma_memory_region_traits.hpp
-    hpx/util_fwd.hpp
     hpx/util/serialize_exception.hpp
 )
 

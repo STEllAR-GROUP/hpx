@@ -8,7 +8,6 @@
 
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <string>
 #include <vector>
