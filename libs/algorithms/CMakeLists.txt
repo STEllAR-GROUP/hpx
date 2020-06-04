@@ -108,6 +108,7 @@ set(algorithms_headers
     hpx/parallel/util/detail/algorithm_result.hpp
     hpx/parallel/util/detail/chunk_size.hpp
     hpx/parallel/util/detail/chunk_size_iterator.hpp
+    hpx/parallel/util/detail/handle_exception_termination_handler.hpp
     hpx/parallel/util/detail/handle_local_exceptions.hpp
     hpx/parallel/util/detail/handle_remote_exceptions.hpp
     hpx/parallel/util/detail/partitioner_iteration.hpp
@@ -139,6 +140,8 @@ set(algorithms_compat_headers
 )
 # cmake-format: on
 
+set(algorithms_sources handle_exception_termination_handler.cpp)
+
 include(HPX_AddModule)
 add_hpx_module(
   algorithms
@@ -146,6 +149,7 @@ add_hpx_module(
   DEPRECATION_WARNINGS FORCE_LINKING_GEN
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
+  SOURCES ${algorithms_sources}
   DEPENDENCIES
     hpx_assertion
     hpx_concepts
