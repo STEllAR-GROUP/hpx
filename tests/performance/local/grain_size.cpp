@@ -154,7 +154,7 @@ void measure_function_futures_for_loop_spt(std::uint64_t count, bool csv,
 
     // stop the clock
     const double duration = walltime.elapsed();
-    std::cout<<"split type:"<<split_type<<std::endl;
+//    std::cout<<"split type:"<<split_type<<std::endl;
 
     print_stats("for_loop", "par", "splittable_executor", count, duration, csv);
 }

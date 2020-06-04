@@ -10,6 +10,7 @@
 
 #include <type_traits>
 #include <utility>
+#include <hpx/include/iostreams.hpp>
 
 template <typename F>
 struct splittable_task
@@ -52,7 +53,7 @@ struct splittable_task
             start_ = start_ + remainder;
         }
 
-	//std::cout << " task index: " << index_ << " from: " << start_<< " to: " << stop_ << std::endl;
+	hpx::cout << " task index: " << index_ << " from: " << start_<< " to: " << stop_ << hpx::flush;
         f_(hpx::util::make_tuple(start_, stop_ - start_, index_));
 
         if (result.valid())
