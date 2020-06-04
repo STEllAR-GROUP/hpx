@@ -14,7 +14,7 @@ set(affinity_headers
 )
 
 set(affinity_compat_headers
-    hpx/runtime/threads/detail/partlit.hpp
+    hpx/affinity.hpp hpx/runtime/threads/detail/partlit.hpp
     hpx/runtime/threads/policies/affinity_data.hpp
     hpx/runtime/threads/policies/parse_affinity_options.hpp
 )

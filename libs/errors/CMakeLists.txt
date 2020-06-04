@@ -23,8 +23,13 @@ set(errors_headers
 
 # Default location is $HPX_ROOT/libs/errors/include_compatibility
 set(errors_compat_headers
-    hpx/error.hpp hpx/error_code.hpp hpx/exception_fwd.hpp
-    hpx/exception_info.hpp hpx/exception_list.hpp hpx/throw_exception.hpp
+    hpx/errors.hpp
+    hpx/error.hpp
+    hpx/error_code.hpp
+    hpx/exception_fwd.hpp
+    hpx/exception_info.hpp
+    hpx/exception_list.hpp
+    hpx/throw_exception.hpp
 )
 
 # Default location is $HPX_ROOT/libs/errors/src

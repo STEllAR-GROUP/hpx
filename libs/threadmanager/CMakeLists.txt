@@ -10,7 +10,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(threadmanager_headers hpx/modules/threadmanager.hpp)
 
-set(threadmanager_compat_headers hpx/runtime/threads/threadmanager.hpp)
+set(threadmanager_compat_headers hpx/threadmanager.hpp
+                                 hpx/runtime/threads/threadmanager.hpp
+)
 
 set(threadmanager_sources threadmanager.cpp)
 

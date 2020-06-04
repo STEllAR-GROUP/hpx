@@ -32,6 +32,8 @@ set(program_options_headers
     hpx/program_options/detail/value_semantic.hpp
 )
 
+set(program_options_compat_headers hpx/program_options.hpp)
+
 # Default location is $HPX_ROOT/libs/program_options/src
 set(program_options_sources
     cmdline.cpp
@@ -51,9 +53,12 @@ set(program_options_sources
 include(HPX_AddModule)
 add_hpx_module(
   program_options
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   SOURCES ${program_options_sources}
   HEADERS ${program_options_headers}
+  COMPAT_HEADERS ${program_options_compat_headers}
   DEPENDENCIES hpx_assertion hpx_config hpx_datastructures hpx_format
                hpx_iterator_support ${__boost_program_options}
   CMAKE_SUBDIRS examples tests

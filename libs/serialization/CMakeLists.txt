@@ -131,6 +131,7 @@ set(serialization_compat_headers
     hpx/runtime/serialization/serialization_chunk.hpp
     hpx/runtime/serialization/serialization_fwd.hpp
     hpx/runtime/serialization/serialize.hpp
+    hpx/serialization.hpp
     hpx/traits/brace_initializable_traits.hpp
     hpx/traits/is_bitwise_serializable.hpp
     hpx/traits/needs_automatic_registration.hpp

@@ -31,7 +31,7 @@ set(compute_headers
 )
 
 set(compute_compat_headers
-    hpx/parallel/util/numa_allocator.hpp
+    hpx/compute.hpp hpx/parallel/util/numa_allocator.hpp
     hpx/parallel/util/numa_binding_allocator.hpp hpx/util/functional/new.hpp
 )
 

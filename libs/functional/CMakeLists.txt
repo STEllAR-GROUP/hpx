@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/functional/include
 set(functional_headers
+    hpx/functional.hpp
     hpx/functional/deferred_call.hpp
     hpx/functional/detail/basic_function.hpp
     hpx/functional/detail/empty_function.hpp
