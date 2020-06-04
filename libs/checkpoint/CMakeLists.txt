@@ -16,7 +16,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(checkpoint_headers hpx/checkpoint/checkpoint.hpp)
 
 # Default location is $HPX_ROOT/libs/checkpoint/include_compatibility
-set(checkpoint_compat_headers hpx/util/checkpoint.hpp)
+set(checkpoint_compat_headers hpx/checkpoint.hpp hpx/util/checkpoint.hpp)
 
 set(checkpoint_sources)
 

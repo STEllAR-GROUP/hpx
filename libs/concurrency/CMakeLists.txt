@@ -23,6 +23,7 @@ set(concurrency_headers
 # Default location is $HPX_ROOT/libs/concurrency/include_compatibility
 set(concurrency_compat_headers
     hpx/compat/barrier.hpp
+    hpx/concurrency.hpp
     hpx/util/lockfree/concurrentqueue.hpp
     hpx/util/lockfree/deque.hpp
     hpx/util/lockfree/detail/tagged_ptr_pair.hpp

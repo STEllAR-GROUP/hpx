@@ -33,6 +33,7 @@ set(coroutines_headers
 )
 
 set(coroutines_compat_headers
+    hpx/coroutines.hpp
     hpx/runtime/threads/coroutines/coroutine.hpp
     hpx/runtime/threads/coroutines/coroutine_fwd.hpp
     hpx/runtime/threads/coroutines/detail/context_base.hpp

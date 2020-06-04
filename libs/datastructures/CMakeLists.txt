@@ -35,6 +35,7 @@ set(datastructures_headers
 )
 
 set(datastructures_compat_headers
+    hpx/datastructures.hpp
     hpx/datastructures/detail/pack.hpp
     hpx/traits/supports_streaming_with_any.hpp
     hpx/traits/is_tuple_like.hpp
