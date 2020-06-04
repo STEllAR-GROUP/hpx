@@ -12,10 +12,11 @@ set(init_runtime_headers
     hpx/hpx_finalize.hpp
     hpx/hpx_init.hpp
     hpx/hpx_init_impl.hpp
+    hpx/hpx_main_winsocket.hpp
     hpx/hpx_start.hpp
     hpx/hpx_start_impl.hpp
     hpx/hpx_suspend.hpp
-    hpx/hpx_main_winsocket.hpp
+    hpx/hpx_user_main_config.hpp
     hpx/init_runtime/detail/run_or_start.hpp
     hpx/init_runtime/force_linking.hpp
 )
