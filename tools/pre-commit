@@ -18,6 +18,8 @@
 # cp tools/pre-commit .git/hooks/pre-commit
 # chmod +x .git/hooks/pre-commit
 
+# @todo : add support for the hpx inspect tool to be run as well
+
 red=$(tput setaf 1)
 green=$(tput setaf 2)
 yellow=$(tput setaf 3)
@@ -33,9 +35,13 @@ done
 
 cmakefiles=()
 for file in `git diff --cached --name-only --diff-filter=ACMRT | grep -E "(CMakeLists\.txt|\.cmake)$"`; do
-    if ! cmp -s <(git show :${file}) <(git show :${file}|cmake-format); then
+    tmpfile=$(mktemp /tmp/cmake-check.XXXXXX)
+    git show :${file} > $tmpfile
+    cmake-format -c $(pwd)/.cmake-format.py -i $tmpfile
+    if ! cmp -s <(git show :${file}) <(cat $tmpfile); then
         cmakefiles+=("${file}")
     fi
+    rm $tmpfile
 done
 
 returncode=0
