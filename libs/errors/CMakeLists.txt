@@ -51,6 +51,7 @@ add_hpx_module(
     hpx_config
     hpx_filesystem
     hpx_format
+    hpx_functional
     hpx_logging
     hpx_preprocessor
     hpx_thread_support

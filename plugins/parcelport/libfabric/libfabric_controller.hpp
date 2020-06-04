@@ -10,9 +10,10 @@
 // config
 #include <hpx/config/defines.hpp>
 //
-#include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/lcos/promise.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 //
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -654,9 +655,9 @@ namespace libfabric
 
         // types we need for connection and disconnection callback functions
         // into the main parcelport code.
-        typedef std::function<void(fid_ep *endpoint, uint32_t ipaddr)>
+        typedef util::function_nonser<void(fid_ep* endpoint, uint32_t ipaddr)>
             ConnectionFunction;
-        typedef std::function<void(fid_ep *endpoint, uint32_t ipaddr)>
+        typedef util::function_nonser<void(fid_ep* endpoint, uint32_t ipaddr)>
             DisconnectionFunction;
 
         // --------------------------------------------------------------------

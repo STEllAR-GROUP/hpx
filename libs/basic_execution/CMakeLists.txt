@@ -36,6 +36,7 @@ add_hpx_module(
   SOURCES ${basic_execution_sources}
   HEADERS ${basic_execution_headers}
   COMPAT_HEADERS ${basic_execution_compat_headers}
-  DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_format hpx_timing
+  DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_format hpx_functional
+               hpx_timing
   CMAKE_SUBDIRS examples tests
 )

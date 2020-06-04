@@ -155,7 +155,7 @@ namespace hpx { namespace threads { namespace policies {
         // depending on the predicate
         std::vector<std::size_t> domain_threads(std::size_t local_id,
             const std::vector<std::size_t>& ts,
-            std::function<bool(std::size_t, std::size_t)> pred);
+            util::function_nonser<bool(std::size_t, std::size_t)> pred);
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         virtual std::uint64_t get_creation_time(bool reset) = 0;

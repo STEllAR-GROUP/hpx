@@ -13,6 +13,7 @@
 #include <hpx/config/asio.hpp>
 #include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -107,12 +108,13 @@ namespace hpx { namespace threads {
     }
 
     namespace detail {
-        using get_default_pool_type = std::function<thread_pool_base*()>;
+        using get_default_pool_type =
+            util::function_nonser<thread_pool_base*()>;
         HPX_EXPORT void set_get_default_pool(get_default_pool_type f);
         HPX_EXPORT thread_pool_base* get_self_or_default_pool();
 
         using get_default_timer_service_type =
-            std::function<boost::asio::io_service*()>;
+            util::function_nonser<boost::asio::io_service*()>;
         HPX_EXPORT void set_get_default_timer_service(
             get_default_timer_service_type f);
         HPX_EXPORT boost::asio::io_service* get_default_timer_service();

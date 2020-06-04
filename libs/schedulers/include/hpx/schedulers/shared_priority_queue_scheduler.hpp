@@ -475,10 +475,10 @@ namespace hpx { namespace threads { namespace policies {
                 bool steal_by_function(std::size_t domain, std::size_t q_index,
                     bool steal_numa, bool steal_core,
                     thread_holder_type* origin, T& var, const char* prefix,
-                    std::function<bool(std::size_t, std::size_t,
+                    util::function_nonser<bool(std::size_t, std::size_t,
                         thread_holder_type*, T&, bool, bool)>
                         operation_HP,
-                    std::function<bool(std::size_t, std::size_t,
+                    util::function_nonser<bool(std::size_t, std::size_t,
                         thread_holder_type*, T&, bool, bool)>
                         operation)
                 {
