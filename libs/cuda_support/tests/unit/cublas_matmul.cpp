@@ -147,7 +147,7 @@ void matrixMultiply(
 
     // create a cublas executor we'll use to futurize cuda events
     using namespace hpx::cuda;
-    cublas_executor cublas(device);
+    cublas_executor cublas(device, hpx::cuda::event_mode{});
     using cublas_future = typename cuda_executor::future_type;
 
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
@@ -232,7 +232,7 @@ void matrixMultiply(
             matrix_size.uiWA);
     }
     // get a future for when the stream reaches this point (matrix operations complete)
-    auto matrix_finished = cublas.get_future_with_event();
+    auto matrix_finished = cublas.get_future();
 
 #ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     // when the matrix operations complete, copy the result to the host
@@ -355,17 +355,23 @@ int main(int argc, char** argv)
 
     using namespace hpx::program_options;
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-    cmdline.add_options()("device",
+    // clang-format off
+    cmdline.add_options()
+        ("device",
         hpx::program_options::value<std::size_t>()->default_value(0),
-        "Device to use")("sizemult",
+        "Device to use")
+        ("sizemult",
         hpx::program_options::value<std::size_t>()->default_value(5),
-        "Multiplier")("iterations",
+        "Multiplier")
+        ("iterations",
         hpx::program_options::value<std::size_t>()->default_value(30),
-        "iterations")("no-cpu",
+        "iterations")
+        ("no-cpu",
         hpx::program_options::value<bool>()->default_value(false),
-        "disable CPU validation to save time")("seed,s",
+        "disable CPU validation to save time")
+        ("seed,s",
         hpx::program_options::value<unsigned int>(),
         "the random number generator seed to use for this run");
-
+    // clang-format on
     return hpx::init(cmdline, argc, argv);
 }

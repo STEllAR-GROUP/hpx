@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 John Biddiscombe
+//  Copyright (c) 2020 Teodor Nikolov
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -72,32 +73,34 @@ namespace hpx { namespace cuda {
     {
         using future_type = hpx::future<void>;
 
+        cuda_executor_base(cuda_executor_base& other) = delete;
+        cuda_executor_base(const cuda_executor_base& other) = delete;
+        cuda_executor_base operator=(const cuda_executor_base& other) = delete;
+
         // -------------------------------------------------------------------------
-        // construct - create a cuda stream that all tasks invoked by
+        // constructors - create a cuda stream that all tasks invoked by
         // this helper will use
-        cuda_executor_base(std::size_t device = 0)
+        // assume event mode is the default
+        cuda_executor_base(std::size_t device, bool event_mode)
           : device_(device)
+          , event_mode_(event_mode)
           , target_(device)
         {
             stream_ = target_.native_handle().get_stream();
         }
 
-        // -------------------------------------------------------------------------
-        // get a future to synchronize this cuda/cublas stream with
-        inline future_type get_future_with_callback()
+        inline future_type get_future()
         {
+            if (event_mode_)
+            {
+                return target_.get_future_with_event();
+            }
             return target_.get_future_with_callback();
-        }
-
-        // -------------------------------------------------------------------------
-        // get a future to synchronize this cuda/cublas stream with
-        inline future_type get_future_with_event()
-        {
-            return target_.get_future_with_event();
         }
 
     protected:
         int device_;
+        bool event_mode_;
         cudaStream_t stream_;
         hpx::cuda::target target_;
     };
@@ -111,8 +114,8 @@ namespace hpx { namespace cuda {
         // -------------------------------------------------------------------------
         // construct - create a cuda stream that all tasks invoked by
         // this helper will use
-        cuda_executor(std::size_t device = 0)
-          : cuda_executor_base(device)
+        cuda_executor(std::size_t device, bool event_mode = true)
+          : cuda_executor_base(device, event_mode)
         {
         }
 
@@ -172,7 +175,7 @@ namespace hpx { namespace cuda {
                 // insert the stream handle in the arg list and call the cuda function
                 detail::dispatch_helper<R, Params...> helper{};
                 helper(cuda_kernel, std::forward<Args>(args)..., stream_);
-                result = std::move(target_.get_future_with_event());
+                result = std::move(get_future());
             }
             catch (const hpx::exception& e)
             {

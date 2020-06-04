@@ -16,7 +16,7 @@
 #include <hpx/debugging/print.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/memory.hpp>
-#include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/threading_base.hpp>
 //
 #include <cuda_runtime.h>
@@ -34,8 +34,8 @@ namespace hpx { namespace cuda {
     static constexpr print_on cud_debug("CUDAFUT");
 
     // clang-format off
-    struct cuda_callback_tag {};
-    struct cuda_event_tag {};
+    using event_mode = std::true_type;
+    using callback_mode = std::false_type;
     // clang-format on
 
     ///////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ namespace hpx { namespace cuda {
 
             // constructor used by callback based futures
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cudaStream_t stream, cuda_callback_tag)
+                cudaStream_t stream, callback_mode)
               : lcos::detail::future_data_allocator<void, Allocator>(
                     no_addref, alloc)
               , rt_(hpx::get_runtime_ptr())
@@ -119,7 +119,7 @@ namespace hpx { namespace cuda {
 
             // constructor used by event based futures
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cudaStream_t stream, cuda_event_tag)
+                cudaStream_t stream, event_mode)
               : lcos::detail::future_data_allocator<void, Allocator>(
                     no_addref, alloc)
             {
@@ -142,6 +142,9 @@ namespace hpx { namespace cuda {
                         "recompile with a larger event stack size");
                 }
                 check_cuda_error(cudaEventRecord(event_, stream));
+
+                cud_debug.debug(
+                    debug::str<>("init_event"), "event", debug::hex<8>(event_));
             }
 
             void init_callback(cudaStream_t stream)
@@ -160,6 +163,8 @@ namespace hpx { namespace cuda {
                     // report error
                     check_cuda_error(error);
                 }
+                cud_debug.debug(
+                    debug::str<>("init_callback"), "event", debug::ptr(this));
             }
 
             // this is called from the nvidia backend on a non-hpx thread
@@ -183,6 +188,8 @@ namespace hpx { namespace cuda {
                 }
 
                 this_->set_data(hpx::util::unused);
+                cud_debug.debug(debug::str<>("set data callback"), "event",
+                    debug::ptr(this_));
             }
 
             // the runtime pointer is needed by the callback based future
@@ -210,13 +217,13 @@ namespace hpx { namespace cuda {
         // returned from MPI. Instead the requests are placed into a queue
         // and the polling code pops them prior to calling Testany
         using queue_type = concurrency::ConcurrentQueue<future_data_ptr>;
-        queue_type& get_request_queue();
+        queue_type& get_event_queue();
 
         // -----------------------------------------------------------------
         // used internally to add an cuda_event_type to the lockfree queue
         // that will be used by the polling routines to check when requests
         // have completed
-        HPX_EXPORT void add_to_request_queue(future_data_ptr data);
+        HPX_EXPORT void add_to_event_queue(future_data_ptr data);
 
         // -----------------------------------------------------------------
         // used internally to add a request to the main polling vector/list
@@ -245,7 +252,7 @@ namespace hpx { namespace cuda {
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
             traits::construct(alloc, p.get(), init_no_addref{}, alloc, stream,
-                cuda_callback_tag{});
+                callback_mode{});
 
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);
@@ -272,36 +279,23 @@ namespace hpx { namespace cuda {
             unique_ptr p(traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            traits::construct(alloc, p.get(), init_no_addref{}, alloc, stream,
-                cuda_event_tag{});
+            traits::construct(
+                alloc, p.get(), init_no_addref{}, alloc, stream, event_mode{});
 
             // queue the future state internally for processing
-            detail::add_to_request_queue(p.get());
+            detail::add_to_event_queue(p.get());
 
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);
         }
 
         // -------------------------------------------------------------
-        // get a future with a callback set
+        // non allocator version of : get future with a callback set
         HPX_EXPORT hpx::future<void> get_future_with_callback(cudaStream_t);
 
         // -------------------------------------------------------------
-        // get a future with an event set
+        // non allocator version of : get future with an event set
         HPX_EXPORT hpx::future<void> get_future_with_event(cudaStream_t);
-
-        // -------------------------------------------------------------
-        // main API calls to get a future from a stream
-        // tag dispatch used to distinguish between future handling methods
-        inline hpx::future<void> get_future(cudaStream_t s, cuda_event_tag)
-        {
-            return get_future_with_event(s);
-        }
-
-        inline hpx::future<void> get_future(cudaStream_t s, cuda_callback_tag)
-        {
-            return get_future_with_callback(s);
-        }
 
         // -------------------------------------------------------------
         void register_polling(hpx::threads::thread_pool_base& pool);

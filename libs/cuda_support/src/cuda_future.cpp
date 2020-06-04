@@ -81,24 +81,26 @@ namespace hpx { namespace cuda { namespace detail {
     }
 
     // -------------------------------------------------------------
-    queue_type& get_request_queue()
+    queue_type& get_event_queue()
     {
-        static queue_type request_queue;
-        return request_queue;
+        static queue_type event_queue;
+        return event_queue;
     }
 
     // -------------------------------------------------------------
     // used internally to add a cuda event to the lockfree queue
     // that will be used by the polling routines to check when requests
     // have completed
-    void add_to_request_queue(future_data_ptr data)
+    void add_to_event_queue(future_data_ptr data)
     {
         // place this future data request in our queue for handling
-        get_request_queue().enqueue(data);
+        get_event_queue().enqueue(data);
 
-        cud_debug.debug(debug::str<>("request queued"), "request",
-            debug::hex<8>(data->event_), "active futures",
-            debug::dec<3>(get_active_futures().size()));
+        // clang-format off
+        cud_debug.debug(debug::str<>("event queued")
+            , "request", debug::hex<8>(data->event_)
+            , "futures", debug::dec<3>(get_active_futures().size()));
+        // clang-format on
     }
 
     // -------------------------------------------------------------
@@ -110,9 +112,9 @@ namespace hpx { namespace cuda { namespace detail {
         get_active_futures().push_back(data);
 
         // clang-format off
-        cud_debug.debug(debug::str<>("add request"),
-            "request", debug::hex<8>(data->event_),
-            "list size", debug::dec<3>(get_active_futures().size()));
+        cud_debug.debug(debug::str<>("event -> poll")
+            , "event", debug::hex<8>(data->event_)
+            , "futures", debug::dec<3>(get_active_futures().size()));
         // clang-format on
     }
 
@@ -137,7 +139,7 @@ namespace hpx { namespace cuda { namespace detail {
                     cud_debug.make_timer(1, debug::str<>("Poll - lock failed"));
                 // clang-format off
                 cud_debug.timed(poll_deb,
-                    "futures", debug::dec<>(detail::get_active_futures().size()));
+                    "futures", debug::dec<3>(get_active_futures().size()));
                 // clang-format on
             }
             return;
@@ -152,7 +154,7 @@ namespace hpx { namespace cuda { namespace detail {
                 cud_debug.make_timer(1, debug::str<>("Poll - lock success"));
             // clang-format off
              cud_debug.timed(poll_deb,
-                 "futures", debug::dec<>(detail::get_active_futures().size()));
+                 "futures", debug::dec<3>(get_active_futures().size()));
             // clang-format on
         }
 
@@ -175,13 +177,23 @@ namespace hpx { namespace cuda { namespace detail {
             }
             else if (status == cudaSuccess)
             {
-                // event is done and can be reused
+                fdp->set_data(hpx::util::unused);
+                // clang-format off
+                cud_debug.debug(debug::str<>("set ready vector")
+                    , "event", debug::hex<8>(fdp->event_)
+                    , "futures", debug::dec<3>(get_active_futures().size()));
+                // clang-format on
+                // drop future and reuse event
                 it = future_data_vector.erase(it);
                 pool.push(fdp->event_);
-                fdp->set_data(hpx::util::unused);
             }
             else
             {
+                // clang-format off
+                cud_debug.debug(debug::str<>("set exception vector")
+                    , "event", debug::hex<8>(fdp->event_)
+                    , "futures", debug::dec<3>(get_active_futures().size()));
+                // clang-format on
                 fdp->set_exception(std::make_exception_ptr(cuda_exception(
                     std::string("cuda function returned error code :") +
                         cudaGetErrorString(status),
@@ -192,7 +204,7 @@ namespace hpx { namespace cuda { namespace detail {
         // have any requests been made that need to be handled?
         // if so, move them all from the lockfree request list, onto the
         // polling list
-        while (detail::get_request_queue().try_dequeue(fdp))
+        while (detail::get_event_queue().try_dequeue(fdp))
         {
             cudaError_t status = cudaEventQuery(fdp->event_);
             if (status == cudaErrorNotReady)
@@ -203,12 +215,22 @@ namespace hpx { namespace cuda { namespace detail {
             }
             else if (status == cudaSuccess)
             {
+                fdp->set_data(hpx::util::unused);
+                // clang-format off
+                cud_debug.debug(debug::str<>("set ready queue")
+                    , "event", debug::hex<8>(fdp->event_)
+                    , "futures", debug::dec<3>(get_active_futures().size()));
+                // clang-format on
                 // event is done and can be reused
                 pool.push(fdp->event_);
-                fdp->set_data(hpx::util::unused);
             }
             else
             {
+                // clang-format off
+                cud_debug.debug(debug::str<>("set exception queue")
+                    , "event", debug::hex<8>(fdp->event_)
+                    , "futures", debug::dec<3>(get_active_futures().size()));
+                // clang-format on
                 fdp->set_exception(std::make_exception_ptr(cuda_exception(
                     std::string("cuda function returned error code :") +
                         cudaGetErrorString(status),

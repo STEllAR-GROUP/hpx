@@ -21,8 +21,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/cuda_support/include
 set(cuda_support_headers
-    hpx/cuda_support/cuda_future.hpp hpx/cuda_support/cuda_future_helper.hpp
-    hpx/cuda_support/cublas_future_helper.hpp hpx/cuda_support/get_targets.hpp
+    hpx/cuda_support/cuda_event.hpp
+    hpx/cuda_support/cuda_executor.hpp
+    hpx/cuda_support/cuda_exception.hpp
+    hpx/cuda_support/cuda_future.hpp
+    hpx/cuda_support/cublas_executor.hpp
+    hpx/cuda_support/get_targets.hpp
     hpx/cuda_support/target.hpp
 )
 

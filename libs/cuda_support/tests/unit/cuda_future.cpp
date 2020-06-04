@@ -126,7 +126,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::cuda::print_local_targets();
 
     // create a stream helper object
-    hpx::cuda::cuda_executor cudaexec(device);
+    hpx::cuda::cuda_executor cudaexec(device, hpx::cuda::event_mode{});
 
     float testf = 1.2345;
     std::cout << "Calling cuda kernel <float>  : " << testf << std::endl;

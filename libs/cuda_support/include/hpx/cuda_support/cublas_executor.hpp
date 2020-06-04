@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 John Biddiscombe
+//  Copyright (c) 2020 Teodor Nikolov
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +26,8 @@
 namespace hpx { namespace cuda {
 
     namespace detail {
+        using print_on = debug::enable_print<false>;
+        static constexpr print_on cub_debug("CUBLAS_");
 
         // -------------------------------------------------------------------------
         // Error handling in cublas calls
@@ -111,9 +114,12 @@ namespace hpx { namespace cuda {
     struct cublas_executor : cuda_executor
     {
         // construct a cublas stream
-        cublas_executor(std::size_t device = 0)
-          : hpx::cuda::cuda_executor(device)
+        cublas_executor(std::size_t device, bool event_mode = false)
+          : hpx::cuda::cuda_executor(device, event_mode)
         {
+            detail::cub_debug.debug(
+                debug::str<>("cublas_executor"), "event mode", event_mode);
+
             handle_ = 0;
             check_cublas_error(cublasCreate(&handle_));
         }
@@ -196,7 +202,7 @@ namespace hpx { namespace cuda {
                 // insert the cublas handle in the arg list and call the cublas function
                 detail::dispatch_helper<R, Params...> helper;
                 helper(cublas_function, handle_, std::forward<Args>(args)...);
-                result = std::move(target_.get_future_with_callback());
+                result = std::move(get_future());
             }
             catch (const hpx::exception& e)
             {
