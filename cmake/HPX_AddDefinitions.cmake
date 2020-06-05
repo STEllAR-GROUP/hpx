@@ -28,12 +28,10 @@ function(hpx_add_config_cond_define definition)
   list(LENGTH Args ArgsLen)
   if(ArgsLen GREATER 0)
     set_property(
-      GLOBAL APPEND PROPERTY HPX_CONFIG_COND_DEFINITIONS
-                             "${definition} ${ARGN}"
+      GLOBAL APPEND PROPERTY HPX_CONFIG_COND_DEFINITIONS "${definition} ${ARGN}"
     )
   else()
-    set_property(
-      GLOBAL APPEND PROPERTY HPX_CONFIG_COND_DEFINITIONS "${definition}"
+    set_property(GLOBAL APPEND PROPERTY HPX_CONFIG_COND_DEFINITIONS "${definition}"
     )
   endif()
 
@@ -52,6 +50,27 @@ function(hpx_add_config_define_namespace)
   )
 
   set(DEF_VAR HPX_CONFIG_DEFINITIONS_${OPTION_NAMESPACE})
+
+  # to avoid extra trailing spaces (no value), use an if check
+  if(OPTION_VALUE)
+    set_property(
+      GLOBAL APPEND PROPERTY ${DEF_VAR} "${OPTION_DEFINE} ${OPTION_VALUE}"
+    )
+  else()
+    set_property(GLOBAL APPEND PROPERTY ${DEF_VAR} "${OPTION_DEFINE}")
+  endif()
+
+endfunction()
+
+function(hpx_add_config_cond_define_namespace)
+  set(options)
+  set(one_value_args DEFINE NAMESPACE)
+  set(multi_value_args VALUE)
+  cmake_parse_arguments(
+    OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
+  )
+
+  set(DEF_VAR HPX_CONFIG_COND_DEFINITIONS_${OPTION_NAMESPACE})
 
   # to avoid extra trailing spaces (no value), use an if check
   if(OPTION_VALUE)
@@ -85,6 +104,10 @@ function(write_config_defines_file)
     get_property(
       DEFINITIONS_VAR GLOBAL
       PROPERTY HPX_CONFIG_DEFINITIONS_${OPTION_NAMESPACE}
+    )
+    get_property(
+      COND_DEFINITIONS_VAR GLOBAL
+      PROPERTY HPX_CONFIG_COND_DEFINITIONS_${OPTION_NAMESPACE}
     )
   endif()
 

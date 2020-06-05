@@ -57,8 +57,9 @@ function(add_hpx_module name)
     CATEGORY "Modules"
   )
   if(${HPX_${name_upper}_WITH_DEPRECATION_WARNINGS})
-    hpx_add_config_define_namespace(
+    hpx_add_config_cond_define_namespace(
       DEFINE HPX_${name_upper}_HAVE_DEPRECATION_WARNINGS
+      VALUE 1
       NAMESPACE ${name_upper}
     )
   endif()
