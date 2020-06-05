@@ -77,6 +77,11 @@ namespace hpx { namespace util {
                 data_.addr_ = desc.get_address();
             }
         }
+        else
+        {
+            type_ = data_type_description;
+            data_.desc_ = "<unknown>";
+        }
 #endif
     }
 }}    // namespace hpx::util
