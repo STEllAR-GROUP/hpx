@@ -38,7 +38,9 @@ set(hpx_wrap_HEADERS
     ""
     CACHE INTERNAL "Headers for libhpx_wrap." FORCE
 )
-list(APPEND hpx_wrap_HEADERS hpx/hpx_main.hpp hpx/hpx_main_impl.hpp)
+list(APPEND hpx_wrap_HEADERS hpx/hpx_main.hpp hpx/wrap_main.hpp
+     hpx/wrap_main_impl.hpp
+)
 
 set(hpx_wrap_SOURCES
     ""
