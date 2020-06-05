@@ -10,7 +10,7 @@
 #include <hpx/concepts/config/defines.hpp>
 #include <hpx/concepts/has_xxx.hpp>
 
-#if defined(HPX_CONCEPTS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CONCEPTS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/traits/has_xxx.hpp is deprecated, \
     please include hpx/concepts/has_xxx.hpp instead")

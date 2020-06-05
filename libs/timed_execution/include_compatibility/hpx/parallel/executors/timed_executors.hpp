@@ -10,7 +10,7 @@
 #include <hpx/timed_execution/config/defines.hpp>
 #include <hpx/timed_execution/timed_executors.hpp>
 
-#if defined(HPX_TIMED_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_TIMED_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/timed_executors.hpp is deprecated, \

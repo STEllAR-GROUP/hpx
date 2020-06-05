@@ -10,7 +10,7 @@
 #include <hpx/affinity/config/defines.hpp>
 #include <hpx/affinity/detail/partlit.hpp>
 
-#if defined(HPX_AFFINITY_HAVE_DEPRECATION_WARNINGS)
+#if HPX_AFFINITY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/detail/partlit.hpp is deprecated, \

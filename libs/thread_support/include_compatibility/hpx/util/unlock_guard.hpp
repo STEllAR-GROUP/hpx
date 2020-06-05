@@ -10,7 +10,7 @@
 #include <hpx/thread_support/config/defines.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
-#if defined(HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/unlock_guard.hpp is deprecated, \
     please include hpx/thread_support/unlock_guard.hpp instead")

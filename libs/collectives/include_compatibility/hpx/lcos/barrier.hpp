@@ -10,7 +10,7 @@
 #include <hpx/collectives/config/defines.hpp>
 #include <hpx/collectives/barrier.hpp>
 
-#if defined(HPX_COLLECTIVES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_COLLECTIVES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/barrier.hpp is deprecated, \
     please include hpx/collectives/barrier.hpp instead")

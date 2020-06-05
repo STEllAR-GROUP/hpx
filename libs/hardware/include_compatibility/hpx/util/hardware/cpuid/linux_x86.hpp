@@ -10,7 +10,7 @@
 #include <hpx/hardware/config/defines.hpp>
 #include <hpx/hardware/cpuid/linux_x86.hpp>
 
-#if defined(HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/hardware/cpuid/linux_x86.hpp is deprecated,           \

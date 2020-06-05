@@ -9,7 +9,7 @@
 #include <hpx/preprocessor/config/defines.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 
-#if defined(HPX_PREPROCESSOR_HAVE_DEPRECATION_WARNINGS)
+#if HPX_PREPROCESSOR_HAVE_DEPRECATION_WARNINGS
 #if defined(_MSC_VER)
 #pragma message(                                                               \
     "The header hpx/util/detail/pp/cat.hpp is deprecated,                      \

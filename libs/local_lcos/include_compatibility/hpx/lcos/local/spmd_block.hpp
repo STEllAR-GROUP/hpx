@@ -10,7 +10,7 @@
 #include <hpx/local_lcos/config/defines.hpp>
 #include <hpx/local_lcos/spmd_block.hpp>
 
-#if defined(HPX_LOCAL_LCOS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_LOCAL_LCOS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/local/spmd_block.hpp is deprecated, \
     please include hpx/local_lcos/spmd_block.hpp instead")

@@ -10,7 +10,7 @@
 #include <hpx/datastructures/config/defines.hpp>
 #include <hpx/datastructures/any.hpp>
 
-#if defined(HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/any.hpp is deprecated, \
     please include hpx/datastructures/any.hpp instead. If you need for any to be\

@@ -10,7 +10,7 @@
 #include <hpx/functional/config/defines.hpp>
 #include <hpx/functional/first_argument.hpp>
 
-#if defined(HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/first_argument.hpp is deprecated, \
     please include hpx/functional/first_argument.hpp instead")

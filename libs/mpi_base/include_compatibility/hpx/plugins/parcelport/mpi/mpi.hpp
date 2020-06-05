@@ -10,7 +10,7 @@
 #include <hpx/mpi_base/config/defines.hpp>
 #include <hpx/mpi_base/mpi.hpp>
 
-#if defined(HPX_MPI_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_MPI_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/plugins/parcelport/mpi/mpi.hpp is deprecated, \

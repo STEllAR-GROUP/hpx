@@ -10,7 +10,7 @@
 #include <hpx/runtime_configuration/config/defines.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 
-#if defined(HPX_RUNTIME_CONFIGURATION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_RUNTIME_CONFIGURATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/runtime_configuration.hpp is deprecated, \

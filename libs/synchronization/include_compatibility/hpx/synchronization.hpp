@@ -10,7 +10,7 @@
 #include <hpx/synchronization/config/defines.hpp>
 #include <hpx/modules/synchronization.hpp>
 
-#if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/synchronization.hpp is deprecated, \
     please include hpx/modules/synchronization.hpp instead")

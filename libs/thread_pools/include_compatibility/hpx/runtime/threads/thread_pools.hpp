@@ -11,7 +11,7 @@
 #include <hpx/thread_data/thread_pool_base.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 
-#if defined(HPX_THREAD_POOLS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_POOLS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/thread_pools.hpp is deprecated, \

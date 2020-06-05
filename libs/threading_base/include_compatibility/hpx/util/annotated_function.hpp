@@ -10,7 +10,7 @@
 #include <hpx/threading_base/config/defines.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
-#if defined(HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/annotated_function.hpp is deprecated, \
     please include hpx/threading_base/annotated_function.hpp instead")

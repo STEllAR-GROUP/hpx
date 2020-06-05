@@ -10,7 +10,7 @@
 #include <hpx/topology/config/defines.hpp>
 #include <hpx/topology/topology.hpp>
 
-#if defined(HPX_TOPOLOGY_HAVE_DEPRECATION_WARNINGS)
+#if HPX_TOPOLOGY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/runtime/threads/topology.hpp is deprecated, \
     please include hpx/topology/topology.hpp instead")
