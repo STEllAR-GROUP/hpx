@@ -13,6 +13,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(async_headers
+    hpx/async.hpp
     hpx/modules/async_distributed.hpp
     hpx/async_distributed/applier/applier.hpp
     hpx/async_distributed/applier/apply_callback.hpp

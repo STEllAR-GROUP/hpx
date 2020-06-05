@@ -24,6 +24,7 @@ set(logging_headers
 
 # Default location is $HPX_ROOT/libs/logging/include_compatibility
 set(logging_compat_headers
+    hpx/logging.hpp
     hpx/util/logging.hpp
     hpx/util/logging/writer/format_write.hpp
     hpx/util/logging/writer/named_write.hpp

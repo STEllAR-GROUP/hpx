@@ -5,17 +5,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/async_mpi/force_linking.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
-#include <hpx/mpi/force_linking.hpp>
 
-namespace hpx { namespace mpi {
+namespace hpx { namespace async_mpi {
 
     // reference all symbols that have to be explicitly linked with the core
     // library
     force_linking_helper& force_linking()
     {
         static force_linking_helper helper{
-            &experimental::detail::hpx_mpi_errhandler};
+            &mpi::experimental::detail::hpx_mpi_errhandler};
         return helper;
     }
-}}    // namespace hpx::mpi
+}}    // namespace hpx::async_mpi

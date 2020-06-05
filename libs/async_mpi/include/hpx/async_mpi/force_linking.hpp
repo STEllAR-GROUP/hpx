@@ -11,7 +11,7 @@
 
 #include <mpi.h>
 
-namespace hpx { namespace mpi {
+namespace hpx { namespace async_mpi {
 
     struct force_linking_helper
     {
@@ -19,4 +19,4 @@ namespace hpx { namespace mpi {
     };
 
     force_linking_helper& force_linking();
-}}    // namespace hpx::mpi
+}}    // namespace hpx::async_mpi

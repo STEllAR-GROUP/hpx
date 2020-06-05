@@ -16,7 +16,7 @@ set(assertion_headers
 )
 
 # Default location is $HPX_ROOT/libs/assertion/include_compatibility
-set(assertion_compat_headers hpx/util/assert.hpp)
+set(assertion_compat_headers hpx/assertion.hpp hpx/util/assert.hpp)
 
 # Default location is $HPX_ROOT/libs/assertion/src
 set(assertion_sources assertion.cpp force_linking.cpp source_location.cpp)

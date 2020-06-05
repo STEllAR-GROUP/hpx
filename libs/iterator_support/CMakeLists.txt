@@ -19,6 +19,7 @@ set(iterator_support_headers
 )
 
 set(iterator_support_compat_headers
+    hpx/iterator_support.hpp
     hpx/traits/is_iterator.hpp
     hpx/traits/is_range.hpp
     hpx/util/iterator_adaptor.hpp

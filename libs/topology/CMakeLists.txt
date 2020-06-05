@@ -12,7 +12,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(topology_headers hpx/topology/cpu_mask.hpp hpx/topology/topology.hpp)
 
 # Default location is $HPX_ROOT/libs/topology/include_compatibility
-set(topology_compat_headers hpx/runtime/threads/cpu_mask.hpp
+set(topology_compat_headers hpx/topology.hpp hpx/runtime/threads/cpu_mask.hpp
                             hpx/runtime/threads/topology.hpp
 )
 

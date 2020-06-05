@@ -26,6 +26,7 @@ set(plugin_headers
 
 # Default location is $HPX_ROOT/libs/plugin/include_compatibility
 set(plugin_compat_headers
+    hpx/plugin.hpp
     hpx/util/plugin.hpp
     hpx/util/plugin/abstract_factory.hpp
     hpx/util/plugin/concrete_factory.hpp

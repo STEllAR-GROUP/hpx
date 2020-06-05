@@ -15,9 +15,9 @@ set(thread_support_headers
 )
 
 set(thread_support_compat_headers
-    hpx/util/assert_owns_lock.hpp hpx/util/atomic_count.hpp
-    hpx/util/set_thread_name.hpp hpx/util/thread_specific_ptr.hpp
-    hpx/util/unlock_guard.hpp
+    hpx/thread_support.hpp hpx/util/assert_owns_lock.hpp
+    hpx/util/atomic_count.hpp hpx/util/set_thread_name.hpp
+    hpx/util/thread_specific_ptr.hpp hpx/util/unlock_guard.hpp
 )
 
 set(thread_support_sources set_thread_name.cpp)

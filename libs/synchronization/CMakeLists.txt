@@ -60,6 +60,7 @@ set(synchronization_compat_headers
     hpx/lcos/local/spinlock.hpp
     hpx/lcos/local/spinlock_no_backoff.hpp
     hpx/lcos/local/spinlock_pool.hpp
+    hpx/synchronization.hpp
 )
 
 set(synchronization_sources detail/condition_variable.cpp force_linking.cpp

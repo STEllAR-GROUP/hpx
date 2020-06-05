@@ -11,7 +11,7 @@ set(concepts_headers hpx/concepts/concepts.hpp hpx/concepts/has_member_xxx.hpp
 )
 
 set(concepts_compat_headers
-    hpx/traits/concepts.hpp hpx/traits/has_member_xxx.hpp
+    hpx/concepts.hpp hpx/traits/concepts.hpp hpx/traits/has_member_xxx.hpp
     hpx/traits/has_xxx.hpp
 )
 
