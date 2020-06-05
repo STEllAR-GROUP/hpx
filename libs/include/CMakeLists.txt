@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
+    hpx/distributed/runtime.hpp
     hpx/hpx.hpp
     hpx/include/actions.hpp
     hpx/include/agas.hpp
@@ -93,6 +94,7 @@ set(include_headers
     hpx/include/threads.hpp
     hpx/include/traits.hpp
     hpx/include/util.hpp
+    hpx/runtime.hpp
 )
 
 include(HPX_AddModule)
