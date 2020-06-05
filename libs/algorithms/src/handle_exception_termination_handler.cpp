@@ -7,6 +7,8 @@
 #include <hpx/config.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 
+#include <exception>
+
 namespace hpx { namespace parallel { namespace util { namespace detail {
     parallel_exception_termination_handler_type&
     get_parallel_exception_termination_handler()
