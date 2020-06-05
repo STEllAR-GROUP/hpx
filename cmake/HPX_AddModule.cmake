@@ -76,12 +76,6 @@ function(add_hpx_module name)
       ADVANCED
       CATEGORY "Modules"
     )
-    if(HPX_${name_upper}_WITH_COMPATIBILITY_HEADERS)
-      hpx_add_config_define_namespace(
-        DEFINE HPX_${name_upper}_HAVE_COMPATIBILITY_HEADERS
-        NAMESPACE ${name_upper}
-      )
-    endif()
   endif()
 
   # Main directories of the module
