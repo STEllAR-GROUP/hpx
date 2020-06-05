@@ -21,13 +21,12 @@ if(NOT TARGET Mpi::mpi)
 endif()
 
 # Default location is $HPX_ROOT/libs/mpi/include
-set(async_mpi_headers
-    hpx/async_mpi/force_linking.hpp hpx/async_mpi/mpi_executor.hpp
-    hpx/async_mpi/mpi_future.hpp
+set(async_mpi_headers hpx/async_mpi/mpi_executor.hpp
+                      hpx/async_mpi/mpi_future.hpp
 )
 
 # Default location is $HPX_ROOT/libs/mpi/src
-set(mpi_sources force_linking.cpp mpi_future.cpp)
+set(mpi_sources mpi_future.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

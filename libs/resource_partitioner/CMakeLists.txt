@@ -29,7 +29,7 @@ include(HPX_AddModule)
 add_hpx_module(
   resource_partitioner
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${resource_partitioner_sources}
   HEADERS ${resource_partitioner_headers}

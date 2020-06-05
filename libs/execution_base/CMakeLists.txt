@@ -41,7 +41,7 @@ include(HPX_AddModule)
 add_hpx_module(
   execution_base
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${execution_base_sources}
   HEADERS ${execution_base_headers}

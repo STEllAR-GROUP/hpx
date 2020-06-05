@@ -29,7 +29,7 @@ include(HPX_AddModule)
 add_hpx_module(
   thread_pools
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${thread_pools_sources}
   HEADERS ${thread_pools_headers}

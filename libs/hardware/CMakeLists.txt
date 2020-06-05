@@ -44,7 +44,7 @@ include(HPX_AddModule)
 add_hpx_module(
   hardware
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/hardware/cpuid/linux_x86.hpp"
     "hpx/hardware/cpuid/msvc.hpp"

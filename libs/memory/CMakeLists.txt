@@ -20,7 +20,7 @@ set(memory_sources)
 
 include(HPX_AddModule)
 add_hpx_module(
-  memory FORCE_LINKING_GEN
+  memory
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON

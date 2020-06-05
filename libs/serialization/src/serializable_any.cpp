@@ -91,8 +91,4 @@ namespace hpx { namespace util {
     template HPX_EXPORT std::size_t
     hash_any::operator()(const basic_any<serialization::input_archive,
         serialization::output_archive, wchar_t, std::true_type>& elem) const;
-
-    // this is just to force linking with serializable_any.cpp
-    void hash_any::dummy() {}
-
 }}    // namespace hpx::util

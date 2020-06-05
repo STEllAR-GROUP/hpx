@@ -91,8 +91,6 @@ endif()
 
 list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
 
-set(hpx_generated_SOURCES ${PROJECT_BINARY_DIR}/libs/modules.cpp)
-
 set(hpx_external_objects_SOURCES)
 if(MSVC)
   if(HPX_WITH_SWAP_CONTEXT_EMULATION)
@@ -516,7 +514,9 @@ foreach(_module ${HPX_LIBS})
                          "-Wl,--no-whole-archive"
       )
     endif(APPLE)
-  endif(UNIX)
+  elseif(MSVC)
+    set(_module_target -WHOLEARCHIVE:$<TARGET_FILE:${_module_target}>)
+  endif()
 
   # add module binaries as PRIVATE dependencies to the core hpx library to avoid
   # dependent applications have to link against those

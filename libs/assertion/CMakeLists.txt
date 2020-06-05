@@ -11,15 +11,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Default location is $HPX_ROOT/libs/assertion/include
 set(assertion_headers
     hpx/assert.hpp hpx/modules/assertion.hpp hpx/assertion/current_function.hpp
-    hpx/assertion/evaluate_assert.hpp hpx/assertion/force_linking.hpp
-    hpx/assertion/source_location.hpp
+    hpx/assertion/evaluate_assert.hpp hpx/assertion/source_location.hpp
 )
 
 # Default location is $HPX_ROOT/libs/assertion/include_compatibility
 set(assertion_compat_headers hpx/assertion.hpp hpx/util/assert.hpp)
 
 # Default location is $HPX_ROOT/libs/assertion/src
-set(assertion_sources assertion.cpp force_linking.cpp source_location.cpp)
+set(assertion_sources assertion.cpp source_location.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

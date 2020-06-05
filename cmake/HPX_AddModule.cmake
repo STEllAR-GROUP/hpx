@@ -8,7 +8,7 @@ include(HPX_ExportTargets)
 
 function(add_hpx_module name)
   # Retrieve arguments
-  set(options DEPRECATION_WARNINGS FORCE_LINKING_GEN CUDA CONFIG_FILES)
+  set(options DEPRECATION_WARNINGS CUDA CONFIG_FILES)
   # Compatibility needs to be on/off to allow 3 states : ON/OFF and disabled
   set(one_value_args COMPATIBILITY_HEADERS GLOBAL_HEADER_GEN)
   set(multi_value_args SOURCES HEADERS COMPAT_HEADERS DEPENDENCIES
@@ -128,7 +128,6 @@ function(add_hpx_module name)
       # Exclude the files specified
       if((NOT (${header_file} IN_LIST ${name}_EXCLUDE_FROM_GLOBAL_HEADER))
          AND (NOT ("${header_file}" MATCHES "detail"))
-         AND NOT ("${header_file}" MATCHES "force_linking.hpp$")
       )
         set(module_headers "${module_headers}#include <${header_file}>\n")
       endif()
@@ -138,26 +137,6 @@ function(add_hpx_module name)
       "${global_header}"
     )
     set(generated_headers ${global_header})
-  endif()
-
-  if(${name}_FORCE_LINKING_GEN)
-    # Add a header to force linking of modules on Windows
-    set(force_linking_header
-        "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}/force_linking.hpp"
-    )
-    configure_file(
-      "${PROJECT_SOURCE_DIR}/cmake/templates/force_linking.hpp.in"
-      "${force_linking_header}"
-    )
-
-    # Add a source file implementing the above function
-    set(force_linking_source
-        "${CMAKE_CURRENT_BINARY_DIR}/src/force_linking.cpp"
-    )
-    configure_file(
-      "${PROJECT_SOURCE_DIR}/cmake/templates/force_linking.cpp.in"
-      "${force_linking_source}"
-    )
   endif()
 
   set(config_entries_source
@@ -204,16 +183,16 @@ function(add_hpx_module name)
     # cmake-format: off
     cuda_add_library(
       hpx_${name} STATIC
-      ${sources} ${force_linking_source} ${config_entries_source}
-      ${headers} ${force_linking_header} ${generated_headers} ${compat_headers}
+      ${sources} ${config_entries_source}
+      ${headers} ${generated_headers} ${compat_headers}
     )
     # cmake-format: on
   else()
     # cmake-format: off
     add_library(
       hpx_${name} STATIC
-      ${sources} ${force_linking_source} ${config_entries_source}
-      ${headers} ${force_linking_header} ${generated_headers} ${compat_headers}
+      ${sources} ${config_entries_source}
+      ${headers} ${generated_headers} ${compat_headers}
     )
     # cmake-format: on
   endif()
@@ -285,20 +264,6 @@ function(add_hpx_module name)
       ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
       CLASS "Generated Files"
       TARGETS ${generated_headers}
-    )
-  endif()
-  if(${name}_FORCE_LINKING_GEN)
-    add_hpx_source_group(
-      NAME hpx_{name}
-      ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
-      CLASS "Generated Files"
-      TARGETS ${force_linking_header}
-    )
-    add_hpx_source_group(
-      NAME hpx_{name}
-      ROOT ${CMAKE_CURRENT_BINARY_DIR}/src
-      CLASS "Generated Files"
-      TARGETS ${force_linking_source}
     )
   endif()
   add_hpx_source_group(

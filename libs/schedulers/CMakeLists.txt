@@ -46,7 +46,7 @@ include(HPX_AddModule)
 add_hpx_module(
   schedulers
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   SOURCES ${schedulers_sources}
   HEADERS ${schedulers_headers}

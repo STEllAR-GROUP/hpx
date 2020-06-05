@@ -19,10 +19,9 @@ set(init_runtime_headers
     hpx/hpx_suspend.hpp
     hpx/hpx_user_main_config.hpp
     hpx/init_runtime/detail/run_or_start.hpp
-    hpx/init_runtime/force_linking.hpp
 )
 
-set(init_runtime_sources force_linking.cpp hpx_init.cpp hpx_main_winsocket.cpp)
+set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

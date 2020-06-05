@@ -28,7 +28,6 @@ add_hpx_module(
   lcos_distributed
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
-  FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN ON
   SOURCES ${lcos_distributed_sources}
   HEADERS ${lcos_distributed_headers}
