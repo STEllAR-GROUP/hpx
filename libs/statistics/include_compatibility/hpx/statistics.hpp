@@ -8,7 +8,7 @@
 #include <hpx/statistics/config/defines.hpp>
 #include <hpx/modules/statistics.hpp>
 
-#if defined(HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/statistics.hpp is deprecated, \
     please include hpx/modules/statistics.hpp instead")

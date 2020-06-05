@@ -8,7 +8,7 @@
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/modules/serialization.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/serialization.hpp is deprecated, \
     please include hpx/modules/serialization.hpp instead")

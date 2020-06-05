@@ -8,7 +8,7 @@
 #include <hpx/batch_environments/config/defines.hpp>
 #include <hpx/modules/batch_environments.hpp>
 
-#if defined(HPX_BATCH_ENVIRONMENTS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_BATCH_ENVIRONMENTS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/batch_environments.hpp is deprecated, \
     please include hpx/modules/batch_environments.hpp instead")

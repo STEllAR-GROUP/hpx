@@ -8,7 +8,7 @@
 #include <hpx/topology/config/defines.hpp>
 #include <hpx/modules/topology.hpp>
 
-#if defined(HPX_TOPOLOGY_HAVE_DEPRECATION_WARNINGS)
+#if HPX_TOPOLOGY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/topology.hpp is deprecated, \
     please include hpx/modules/topology.hpp instead")

@@ -10,7 +10,7 @@
 #include <hpx/io_service/config/defines.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 
-#if defined(HPX_IO_SERVICE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_IO_SERVICE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/io_service_pool.hpp is deprecated, \
     please include hpx/io_service/io_service_pool.hpp instead")

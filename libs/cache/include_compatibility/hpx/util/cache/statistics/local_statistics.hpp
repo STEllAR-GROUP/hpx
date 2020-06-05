@@ -10,7 +10,7 @@
 #include <hpx/cache/config/defines.hpp>
 #include <hpx/cache/statistics/local_statistics.hpp>
 
-#if defined(HPX_CACHE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CACHE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/cache/statistics/local_statistics.hpp is deprecated, \

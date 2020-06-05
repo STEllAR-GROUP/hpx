@@ -10,7 +10,7 @@
 #include <hpx/pack_traversal/config/defines.hpp>
 #include <hpx/pack_traversal/detail/pack_traversal_async_impl.hpp>
 
-#if defined(HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/detail/pack_traversal_async_impl.hpp is deprecated, \

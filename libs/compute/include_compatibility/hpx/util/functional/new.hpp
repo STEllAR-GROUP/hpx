@@ -10,7 +10,7 @@
 #include <hpx/compute/config/defines.hpp>
 #include <hpx/compute/detail/new.hpp>
 
-#if defined(HPX_COMPUTE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_COMPUTE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/functional/new.hpp is deprecated, \
     please include hpx/compute/detail/new.hpp instead")

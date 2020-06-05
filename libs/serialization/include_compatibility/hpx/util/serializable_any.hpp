@@ -10,7 +10,7 @@
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/serialization/serializable_any.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/serialiable_any.hpp is deprecated, \
     please include hpx/serialization/serializable_any.hpp instead")

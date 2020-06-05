@@ -10,7 +10,7 @@
 #include <hpx/functional/config/defines.hpp>
 #include <hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp>
 
-#if defined(HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/detail/vtable/serializable_function_vtable.hpp is \

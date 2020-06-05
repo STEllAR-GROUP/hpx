@@ -8,7 +8,7 @@
 #include <hpx/concurrency/config/defines.hpp>
 #include <hpx/modules/concurrency.hpp>
 
-#if defined(HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/concurrency.hpp is deprecated, \
     please include hpx/modules/concurrency.hpp instead")

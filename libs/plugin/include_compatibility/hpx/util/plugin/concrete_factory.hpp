@@ -10,7 +10,7 @@
 #include <hpx/plugin/config/defines.hpp>
 #include <hpx/plugin/concrete_factory.hpp>
 
-#if defined(HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS)
+#if HPX_PLUGIN_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/plugin/concrete_factory.hpp is deprecated, \

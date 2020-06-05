@@ -10,7 +10,7 @@
 #include <hpx/thread_executors/config/defines.hpp>
 #include <hpx/thread_executors/default_executor.hpp>
 
-#if defined(HPX_THREAD_EXECUTORS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_EXECUTORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/executors/default_executor.hpp is \

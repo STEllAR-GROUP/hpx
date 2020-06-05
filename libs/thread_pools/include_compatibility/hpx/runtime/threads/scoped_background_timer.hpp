@@ -10,7 +10,7 @@
 #include <hpx/thread_pools/config/defines.hpp>
 #include <hpx/thread_pools/detail/scoped_background_timer.hpp>
 
-#if defined(HPX_THREAD_POOLS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_POOLS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/scoped_background_timer.hpp is deprecated, \

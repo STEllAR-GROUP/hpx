@@ -10,7 +10,7 @@
 #include <hpx/basic_execution/config/defines.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 
-#if defined(HPX_BASIC_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_BASIC_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/yield_while.hpp is deprecated, \
     please include hpx/basic_execution/this_thread.hpp instead")

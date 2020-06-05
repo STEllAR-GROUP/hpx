@@ -12,7 +12,7 @@
 
 // Note that the header thread_executors is automatically generated
 
-#if defined(HPX_THREAD_EXECUTORS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_EXECUTORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/runtime/threads/executors.hpp is deprecated, \
     please include hpx/thread_executors.hpp instead")

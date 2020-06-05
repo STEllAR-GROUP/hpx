@@ -10,7 +10,7 @@
 #include <hpx/executors/config/defines.hpp>
 #include <hpx/executors/limiting_executor.hpp>
 
-#if defined(HPX_EXECUTORS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_EXECUTORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/execution/executors/limiting_executor.hpp is deprecated, \

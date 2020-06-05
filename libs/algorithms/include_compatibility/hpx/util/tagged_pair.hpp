@@ -10,7 +10,7 @@
 #include <hpx/algorithms/config/defines.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 
-#if defined(HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/tagged_pair.hpp is deprecated, \
     please include hpx/datastructures/tagged_pair.hpp or \

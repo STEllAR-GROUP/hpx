@@ -10,7 +10,7 @@
 #include <hpx/allocator_support/config/defines.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 
-#if defined(HPX_ALLOCATOR_SUPPORT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ALLOCATOR_SUPPORT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/internal_allocator.hpp is deprecated, \
     please include hpx/allocator_support/internal_allocator.hpp instead")

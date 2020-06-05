@@ -10,7 +10,7 @@
 #include <hpx/concurrency/config/defines.hpp>
 #include <hpx/concurrency/concurrentqueue.hpp>
 
-#if defined(HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/lockfree/concurrentqueue.hpp is deprecated, \

@@ -10,7 +10,7 @@
 #include <hpx/datastructures/config/defines.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
 
-#if defined(HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/traits/is_tuple_like.hpp is deprecated, \
     please include datastructures/traits/is_tuple_like.hpp instead.")

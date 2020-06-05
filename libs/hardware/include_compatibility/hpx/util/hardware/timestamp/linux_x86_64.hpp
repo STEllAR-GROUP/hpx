@@ -10,7 +10,7 @@
 #include <hpx/hardware/config/defines.hpp>
 #include <hpx/hardware/timestamp/linux_x86_64.hpp>
 
-#if defined(HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/hardware/timestamp/linux_x86_64.hpp is deprecated,    \

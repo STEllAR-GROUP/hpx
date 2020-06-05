@@ -10,7 +10,7 @@
 #include <hpx/lcos_distributed/config/defines.hpp>
 #include <hpx/lcos_distributed/channel.hpp>
 
-#if defined(HPX_LCOS_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS)
+#if HPX_LCOS_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/channel.hpp is deprecated, \
     please include hpx/lcos_distributed/channel.hpp instead")

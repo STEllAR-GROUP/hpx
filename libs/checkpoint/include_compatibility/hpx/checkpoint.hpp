@@ -8,7 +8,7 @@
 #include <hpx/checkpoint/config/defines.hpp>
 #include <hpx/modules/checkpoint.hpp>
 
-#if defined(HPX_CHECKPOINT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CHECKPOINT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/checkpoint.hpp is deprecated, \
     please include hpx/modules/checkpoint.hpp instead")

@@ -10,7 +10,7 @@
 #include <hpx/schedulers/config/defines.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
 
-#if defined(HPX_SCHEDULERS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SCHEDULERS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/queue_helpers.hpp is deprecated, \

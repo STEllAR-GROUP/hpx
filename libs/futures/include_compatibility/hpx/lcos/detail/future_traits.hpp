@@ -10,7 +10,7 @@
 #include <hpx/futures/config/defines.hpp>
 #include <hpx/futures/traits/detail/future_traits.hpp>
 
-#if defined(HPX_FUTURES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_FUTURES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/detail/future_traits.hpp is deprecated, \
     please include hpx/futures/traits/detail/future_traits.hpp instead")

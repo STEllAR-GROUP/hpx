@@ -10,7 +10,7 @@
 #include <hpx/pack_traversal/config/defines.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
 
-#if defined(HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/detail/container_category.hpp is deprecated, \
