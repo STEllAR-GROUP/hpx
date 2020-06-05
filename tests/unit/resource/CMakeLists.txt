@@ -13,7 +13,7 @@ set(tests
     suspend_runtime
     suspend_thread
     suspend_thread_external
-    suspend_thread_timed
+    # suspend_thread_timed
 )
 
 if(HPX_WITH_SHARED_PRIORITY_SCHEDULER)
