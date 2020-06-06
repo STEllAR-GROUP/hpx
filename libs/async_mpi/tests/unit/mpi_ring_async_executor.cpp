@@ -13,6 +13,7 @@
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <hpx/testing.hpp>
 
 #include <array>
 #include <atomic>
@@ -20,6 +21,13 @@
 #include <sstream>
 
 #include <mpi.h>
+
+// This test send a message from rank 0 to rank 1 and from R1->R2 in a ring
+// until the last rank which sends it back to R0.and completes an iteration
+//
+// For benchmarking the test has been extended to allow many iterations
+// but unfortunately, if we prepost too many receives, MPI has problems
+// so we do 1000 iterations per main loop and another loop around that.
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;
@@ -29,6 +37,8 @@ static bool output = true;
 
 void msg_recv(int rank, int size, int /*to*/, int from, int token, unsigned tag)
 {
+    // to reduce string corruption on stdout from multiple threads
+    // writing simultaneously, we use a stringstream as a buffer
     if (output) {
         std::ostringstream temp;
         temp << "Rank " << std::setfill(' ') << std::setw(3) << rank << " of "
@@ -61,11 +71,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (size < 2)
-    {
-        std::cout << "This test requires N > 1 ranks" << std::endl;
-        return hpx::finalize();
-    }
+    // if comm size < 2 this test should fail
+    // it needs to run on N>2 ranks to be useful
+    HPX_TEST_MSG(size>1, "This test requires N>1 mpi ranks");
 
     const std::uint64_t iterations = vm["iterations"].as<std::uint64_t>();
     //
@@ -201,5 +209,6 @@ int main(int argc, char* argv[])
     // Finalize MPI
     MPI_Finalize();
 
-    return result;
+    return result || hpx::util::report_errors();
+
 }
