@@ -23,7 +23,6 @@
 //
 #include <cstddef>
 #include <iosfwd>
-#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -41,8 +40,9 @@ namespace hpx { namespace cuda {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        //        using mutex_type = hpx::lcos::local::spinlock;
-        using mutex_type = std::mutex;
+        // this code runs on a std::thread, but we will use a spinlock
+        // as we never suspend - only ever try_lock, or exit
+        using mutex_type = hpx::lcos::local::spinlock;
         using cuda_event_type = cudaEvent_t;
 
         // mutex needed to protect mpi request list

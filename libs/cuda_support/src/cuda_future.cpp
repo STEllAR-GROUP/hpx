@@ -128,7 +128,7 @@ namespace hpx { namespace cuda { namespace detail {
     void poll()
     {
         // don't poll if another thread is already polling
-        std::unique_lock<std::mutex> lk(
+        std::unique_lock<hpx::cuda::detail::mutex_type> lk(
             detail::get_list_mtx(), std::try_to_lock);
         if (!lk.owns_lock())
         {
@@ -145,7 +145,7 @@ namespace hpx { namespace cuda { namespace detail {
             return;
         }
 
-        auto& future_data_vector = detail::get_active_futures();
+        auto& future_vec = detail::get_active_futures();
 
         if (cud_debug.is_enabled())
         {
@@ -164,9 +164,7 @@ namespace hpx { namespace cuda { namespace detail {
         // iterate over our list of events and see if any have completed
         detail::future_data_ptr fdp;
         using i_type = std::vector<future_data_ptr>::iterator;
-        i_type it = future_data_vector.begin();
-        i_type et = future_data_vector.end();
-        for (; it != et; ++it)
+        for (i_type it = future_vec.begin(); it != future_vec.end();)
         {
             fdp = *it;
             cudaError_t status = cudaEventQuery(fdp->event_);
@@ -184,7 +182,7 @@ namespace hpx { namespace cuda { namespace detail {
                     , "futures", debug::dec<3>(get_active_futures().size()));
                 // clang-format on
                 // drop future and reuse event
-                it = future_data_vector.erase(it);
+                it = future_vec.erase(it);
                 pool.push(fdp->event_);
             }
             else
@@ -198,6 +196,7 @@ namespace hpx { namespace cuda { namespace detail {
                     std::string("cuda function returned error code :") +
                         cudaGetErrorString(status),
                     status)));
+                ++it;
             }
         }
 
