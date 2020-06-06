@@ -48,12 +48,12 @@ struct splittable_task
         {
             num_free_ -= 1;
             result = hpx::async(splittable_task(f_,
-                hpx::util::make_tuple(start_, start_ + remainder, index_ + 1),
+                hpx::util::make_tuple(stop_ - remainder, stop_, index_ + 1),
                 num_free_, split_type_));
-            start_ = start_ + remainder;
+            stop_ = stop_ - remainder;
         }
 
-	hpx::cout << " task index: " << index_ << " from: " << start_<< " to: " << stop_ << hpx::flush;
+	//hpx::cout << " task index: " << index_ << " from: " << start_<< " to: " << stop_ << hpx::flush;
         f_(hpx::util::make_tuple(start_, stop_ - start_, index_));
 
         if (result.valid())
