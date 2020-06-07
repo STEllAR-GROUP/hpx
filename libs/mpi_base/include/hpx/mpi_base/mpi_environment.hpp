@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_LIB_MPI)
+    defined(HPX_HAVE_LIB_MPI_BASE)
 
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/mpi_base/mpi.hpp>
