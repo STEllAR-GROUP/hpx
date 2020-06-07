@@ -4,9 +4,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests mpi_ring_async mpi_ring_async_executor)
+set(tests mpi_ring_async_executor)
 
-set(mpi_ring_async_PARAMETERS THREADS_PER_LOCALITY 4 LOCALITIES 2 RUNWRAPPER mpi)
 set(mpi_ring_async_executor_PARAMETERS THREADS_PER_LOCALITY 4 LOCALITIES 2 RUNWRAPPER mpi)
 
 foreach(test ${tests})
@@ -24,6 +23,6 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/MPI"
   )
 
-  add_hpx_unit_test("modules.mpi" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test("modules.async_mpi" ${test} ${${test}_PARAMETERS})
 
 endforeach()
