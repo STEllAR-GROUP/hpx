@@ -894,7 +894,7 @@ namespace hpx { namespace resource { namespace detail {
         cfg_.hpx_main_f_ = f;
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_LIB_MPI)
+    defined(HPX_HAVE_LIB_MPI_BASE)
         // getting localities from MPI environment (support mpirun)
         if (util::mpi_environment::check_mpi_environment(cfg_.rtcfg_))
         {

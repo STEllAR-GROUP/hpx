@@ -20,7 +20,7 @@
 #include <boost/version.hpp>
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_LIB_MPI)
+    defined(HPX_HAVE_LIB_MPI_BASE)
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcast-qual"
@@ -86,7 +86,7 @@ namespace hpx {
     }
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_LIB_MPI)
+    defined(HPX_HAVE_LIB_MPI_BASE)
     std::string mpi_version()
     {
         std::ostringstream strm;
@@ -266,7 +266,7 @@ namespace hpx {
                                                 "  Boost: {}\n"
                                                 "  Hwloc: {}\n"
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_LIB_MPI)
+    defined(HPX_HAVE_LIB_MPI_BASE)
                                                 "  MPI: {}\n"
 #endif
                                                 "\n"
@@ -278,7 +278,7 @@ namespace hpx {
                                                 "  Standard Library: {}\n",
             build_string(), boost_version(), hwloc_version(),
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
-    defined(HPX_HAVE_LIB_MPI)
+    defined(HPX_HAVE_LIB_MPI_BASE)
             mpi_version(),
 #endif
             build_type(), build_date_time(), boost_platform(), boost_compiler(),
