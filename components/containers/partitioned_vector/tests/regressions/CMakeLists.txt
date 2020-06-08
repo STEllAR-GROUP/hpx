@@ -19,7 +19,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Components/Containers"
+    FOLDER "Tests/Regressions/Components/Containers/PartitionedVector"
   )
 
   add_hpx_regression_test(

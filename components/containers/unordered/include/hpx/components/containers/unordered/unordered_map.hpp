@@ -83,6 +83,10 @@ namespace hpx { namespace server
         {}
 
         unordered_map_config_data(std::vector<partition_data> const& partitions)
+          : partitions_(partitions)
+        {}
+
+        unordered_map_config_data(std::vector<partition_data>&& partitions)
           : partitions_(std::move(partitions))
         {}
 
@@ -313,7 +317,12 @@ namespace hpx
         void get_data_helper(id_type id,
             server::unordered_map_config_data data)
         {
-            std::swap(partitions_, data.partitions_);
+            partitions_.clear();
+            partitions_.reserve(data.partitions_.size());
+
+            std::move(data.partitions_.begin(), data.partitions_.end(),
+                std::back_inserter(partitions_));
+
             base_type::reset(std::move(id));
         }
 
@@ -472,8 +481,9 @@ namespace hpx
     public:
         future<void> connect_to(std::string const& symbolic_name)
         {
-            return base_type::connect_to(symbolic_name,
-                [=](future<id_type> && f) -> future<void> {
+            this->base_type::connect_to(symbolic_name);
+            return this->base_type::share().then(
+                [=](shared_future<id_type>&& f) -> hpx::future<void> {
                     return connect_to_helper(f.get());
                 });
         }
@@ -481,13 +491,20 @@ namespace hpx
         // Register this unordered_map with AGAS using the given symbolic name
         future<void> register_as(std::string const& symbolic_name)
         {
-            server::unordered_map_config_data data(partitions_);
+            std::vector<server::unordered_map_config_data::partition_data>
+                partitions;
+            partitions.reserve(partitions_.size());
 
-            base_type::reset(hpx::new_<
-                    typename base_type::server_component_type> >(
-                hpx::find_here(), std::move(data)));
+            std::copy(partitions_.begin(), partitions_.end(),
+                std::back_inserter(partitions));
 
-            return base_type::register_as(symbolic_name);
+            server::unordered_map_config_data data(std::move(partitions));
+            this->base_type::reset(
+                hpx::new_<components::server::distributed_metadata_base<
+                server::unordered_map_config_data>>(
+                    hpx::find_here(), std::move(data)));
+
+            return this->base_type::register_as(symbolic_name);
         }
 
     public:
