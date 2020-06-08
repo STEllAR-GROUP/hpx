@@ -88,47 +88,8 @@ namespace hpx { namespace lcos {
         F&& op, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0);
-
-/// \def HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
-///
-/// \brief Declare a all_reduce object named \a name for a given data type \a type.
-///
-/// The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used to declare
-/// all facilities necessary for a (possibly remote) all_reduce operation.
-///
-/// The parameter \a type specifies for which data type the all_reduce
-/// operations should be enabled.
-///
-/// The (optional) parameter \a name should be a unique C-style identifier
-/// that will be internally used to identify a particular all_reduce operation.
-/// If this defaults to \a \<type\>_all_reduce if not specified.
-///
-/// \note The macro \a HPX_REGISTER_ALLREDUCE_DECLARATION can be used with 1
-///       or 2 arguments. The second argument is optional and defaults to
-///       \a \<type\>_all_reduce.
-///
-#define HPX_REGISTER_ALLREDUCE_DECLARATION(type, name)
-
-    /// \def HPX_REGISTER_ALLREDUCE(type, name)
-    ///
-    /// \brief Define a all_reduce object named \a name for a given data type \a type.
-    ///
-    /// The macro \a HPX_REGISTER_ALLREDUCE can be used to define
-    /// all facilities necessary for a (possibly remote) all_reduce operation.
-    ///
-    /// The parameter \a type specifies for which data type the all_reduce
-    /// operations should be enabled.
-    ///
-    /// The (optional) parameter \a name should be a unique C-style identifier
-    /// that will be internally used to identify a particular all_reduce operation.
-    /// If this defaults to \a \<type\>_all_reduce if not specified.
-    ///
-    /// \note The macro \a HPX_REGISTER_ALLREDUCE can be used with 1
-    ///       or 2 arguments. The second argument is optional and defaults to
-    ///       \a \<type\>_all_reduce.
-    ///
-    #define HPX_REGISTER_ALLREDUCE(type, name)
 }}    // namespace hpx::lcos
+
 // clang-format on
 #else
 
@@ -136,19 +97,17 @@ namespace hpx { namespace lcos {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/modules/basic_execution.hpp>
-#include <hpx/collectives/detail/communicator.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/basename_registration.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/runtime_local/get_num_localities.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/async_local/dataflow.hpp>
+#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/modules/basic_execution.hpp>
+#include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime_local/get_num_localities.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -164,7 +123,7 @@ namespace hpx { namespace traits {
 
     namespace communication {
         struct all_reduce_tag;
-    }
+    }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////
     // support for all_reduce
@@ -183,6 +142,7 @@ namespace hpx { namespace traits {
         {
             using arg_type = typename std::decay<T>::type;
             using mutex_type = typename Communicator::mutex_type;
+            using lock_type = std::unique_lock<mutex_type>;
 
             auto this_ = this->shared_from_this();
             auto on_ready =
@@ -192,28 +152,36 @@ namespace hpx { namespace traits {
 
                 auto& communicator = this_->communicator_;
 
-                std::vector<arg_type> data;
-                {
-                    std::unique_lock<mutex_type> l(communicator.mtx_);
-                    data = communicator.data_;
-                }
+                lock_type l(communicator.mtx_);
+                util::ignore_while_checking<lock_type> il(&l);
+
+                auto& data = communicator.template access_data<arg_type>(l);
 
                 auto it = data.begin();
                 return hpx::parallel::reduce(hpx::parallel::execution::par,
                     ++it, data.end(), *data.begin(), op);
             };
 
-            std::unique_lock<mutex_type> l(communicator_.mtx_);
-            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+            lock_type l(communicator_.mtx_);
+            util::ignore_while_checking<lock_type> il(&l);
 
             hpx::future<arg_type> f =
                 communicator_.gate_.get_shared_future(l).then(
                     hpx::launch::sync, std::move(on_ready));
 
             communicator_.gate_.synchronize(1, l);
-            communicator_.data_[which] = std::forward<T>(t);
+
+            auto& data = communicator_.template access_data<arg_type>(l);
+            data[which] = std::forward<T>(t);
+
             if (communicator_.gate_.set(which, l))
             {
+                HPX_ASSERT_DOESNT_OWN_LOCK(l);
+                {
+                    lock_type l(communicator_.mtx_);
+                    communicator_.invalidate_data(l);
+                }
+
                 // this is a one-shot object (generations counters are not
                 // supported), unregister ourselves (but only once)
                 hpx::unregister_with_basename(
@@ -230,13 +198,12 @@ namespace hpx { namespace traits {
 namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    hpx::future<hpx::id_type> create_all_reduce(char const* basename,
+    inline hpx::future<hpx::id_type> create_all_reduce(char const* basename,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
-        return detail::create_communicator<T>(
+        return detail::create_communicator(
             basename, num_sites, generation, this_site);
     }
 
@@ -256,7 +223,7 @@ namespace hpx { namespace lcos {
             [op = std::forward<F>(op), this_site](hpx::future<hpx::id_type>&& f,
                 hpx::future<T>&& local_result) mutable -> hpx::future<T> {
             using func_type = typename std::decay<F>::type;
-            using action_type = typename detail::communicator_server<T>::
+            using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::all_reduce_tag, hpx::future<T>, T,
                     func_type>;
@@ -295,8 +262,8 @@ namespace hpx { namespace lcos {
 
         if (this_site == root_site)
         {
-            return all_reduce(create_all_reduce<T>(
-                                  basename, num_sites, generation, root_site),
+            return all_reduce(
+                create_all_reduce(basename, num_sites, generation, root_site),
                 std::move(local_result), std::forward<F>(op), this_site);
         }
 
@@ -330,7 +297,7 @@ namespace hpx { namespace lcos {
                 this_site](hpx::future<hpx::id_type>&& f) mutable
             -> hpx::future<arg_type> {
             using func_type = typename std::decay<F>::type;
-            using action_type = typename detail::communicator_server<arg_type>::
+            using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::all_reduce_tag,
                     hpx::future<arg_type>, arg_type, func_type>;
@@ -367,8 +334,8 @@ namespace hpx { namespace lcos {
 
         if (this_site == root_site)
         {
-            return all_reduce(create_all_reduce<T>(
-                                  basename, num_sites, generation, root_site),
+            return all_reduce(
+                create_all_reduce(basename, num_sites, generation, root_site),
                 std::forward<T>(local_result), std::forward<F>(op), this_site);
         }
 
@@ -391,25 +358,7 @@ namespace hpx {
 #define HPX_REGISTER_ALLREDUCE_DECLARATION(...) /**/
 
 ////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_ALLREDUCE(...)                                            \
-    HPX_REGISTER_ALLREDUCE_(__VA_ARGS__)                                       \
-    /**/
-
-#define HPX_REGISTER_ALLREDUCE_(...)                                           \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_ALLREDUCE_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))      \
-    /**/
-
-#define HPX_REGISTER_ALLREDUCE_1(type)                                         \
-    HPX_REGISTER_ALLREDUCE_2(type, HPX_PP_CAT(type, _all_reduce))              \
-    /**/
-
-#define HPX_REGISTER_ALLREDUCE_2(type, name)                                   \
-    typedef hpx::components::component<                                        \
-        hpx::lcos::detail::communicator_server<type>>                          \
-        HPX_PP_CAT(all_reduce_, name);                                         \
-    HPX_REGISTER_COMPONENT(HPX_PP_CAT(all_reduce_, name))                      \
-    /**/
+#define HPX_REGISTER_ALLREDUCE(...)             /**/
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN

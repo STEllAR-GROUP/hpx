@@ -20,6 +20,7 @@ set(collectives_headers
     hpx/collectives/broadcast.hpp
     hpx/collectives/broadcast_direct.hpp
     hpx/collectives/detail/communicator.hpp
+    hpx/collectives/force_linking.hpp
     hpx/collectives/fold.hpp
     hpx/collectives/gather.hpp
     hpx/collectives/latch.hpp
@@ -42,18 +43,21 @@ set(collectives_compat_headers
 )
 
 # Default location is $HPX_ROOT/libs/collectives/src
-set(collectives_sources barrier.cpp latch.cpp detail/barrier_node.cpp)
+set(collectives_sources barrier.cpp force_linking.cpp latch.cpp
+                        detail/barrier_node.cpp detail/communicator.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(
   collectives
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   SOURCES ${collectives_sources}
   HEADERS ${collectives_headers}
   COMPAT_HEADERS ${collectives_compat_headers}
   DEPENDENCIES
     hpx_affinity
+    hpx_algorithms
     hpx_allocator_support
     hpx_assertion
     hpx_async_distributed
@@ -68,6 +72,7 @@ add_hpx_module(
     hpx_functional
     hpx_hardware
     hpx_hashing
+    hpx_init_runtime
     hpx_iterator_support
     hpx_local_lcos
     hpx_logging

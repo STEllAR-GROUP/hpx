@@ -16,10 +16,8 @@
 #include <utility>
 #include <vector>
 
-char const* broadcast_basename = "/test/broadcast/";
-char const* broadcast_direct_basename = "/test/broadcast_direct/";
-
-HPX_REGISTER_BROADCAST(std::uint32_t, test_broadcast);
+constexpr char const* broadcast_basename = "/test/broadcast/";
+constexpr char const* broadcast_direct_basename = "/test/broadcast_direct/";
 
 int hpx_main(int argc, char* argv[])
 {

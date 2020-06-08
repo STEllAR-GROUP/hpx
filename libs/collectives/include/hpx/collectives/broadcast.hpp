@@ -43,9 +43,11 @@ namespace hpx { namespace lcos {
     ///
     template <typename T>
     hpx::future<void> broadcast_to(char const* basename,
-        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
+        hpx::future<T>&& local_result,
+        std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1),
+        std::size_t root_site = 0)
 
     /// Broadcast a value to different call sites
     ///
@@ -78,9 +80,11 @@ namespace hpx { namespace lcos {
     ///
     template <typename T>
     hpx::future<void> broadcast_to(char const* basename,
-        T&& local_result, std::size_t num_sites = std::size_t(-1),
+        T&& local_result,
+        std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1),
+        std::size_t root_site = 0)
 
     /// Receive a value that was broadcast to different call sites
     ///
@@ -96,9 +100,6 @@ namespace hpx { namespace lcos {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
-    ///                     broadcast support object. This value is optional
-    ///                     and defaults to '0' (zero).
     ///
     /// \note       Each broadcast operation has to be accompanied with a unique
     ///             usage of the \a HPX_REGISTER_BROADCAST macro to define the
@@ -111,48 +112,10 @@ namespace hpx { namespace lcos {
     template <typename T>
     hpx::future<T> broadcast_from(char const* basename,
         std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
+        std::size_t this_site = std::size_t(-1))
 
-/// \def HPX_REGISTER_BROADCAST_DECLARATION(type, name)
-///
-/// \brief Declare a broadcast object named \a name for a given data type \a type.
-///
-/// The macro \a HPX_REGISTER_BROADCAST_DECLARATION can be used to declare
-/// all facilities necessary for a (possibly remote) broadcast operation.
-///
-/// The parameter \a type specifies for which data type the broadcast
-/// operations should be enabled.
-///
-/// The (optional) parameter \a name should be a unique C-style identifier
-/// that will be internally used to identify a particular broadcast operation.
-/// If this defaults to \a \<type\>_broadcast if not specified.
-///
-/// \note The macro \a HPX_REGISTER_BROADCAST_DECLARATION can be used with 1
-///       or 2 arguments. The second argument is optional and defaults to
-///       \a \<type\>_broadcast.
-///
-#define HPX_REGISTER_BROADCAST_DECLARATION(type, name)
-
-/// \def HPX_REGISTER_BROADCAST(type, name)
-///
-/// \brief Define a broadcast object named \a name for a given data type \a type.
-///
-/// The macro \a HPX_REGISTER_BROADCAST can be used to define
-/// all facilities necessary for a (possibly remote) broadcast operation.
-///
-/// The parameter \a type specifies for which data type the broadcast
-/// operations should be enabled.
-///
-/// The (optional) parameter \a name should be a unique C-style identifier
-/// that will be internally used to identify a particular broadcast operation.
-/// If this defaults to \a \<type\>_broadcast if not specified.
-///
-/// \note The macro \a HPX_REGISTER_BROADCAST can be used with 1
-///       or 2 arguments. The second argument is optional and defaults to
-///       \a \<type\>_broadcast.
-///
-#define HPX_REGISTER_BROADCAST(type, name)
 }}    // namespace hpx::lcos
+
 // clang-format on
 #else
 
@@ -160,20 +123,15 @@ namespace hpx { namespace lcos {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/modules/basic_execution.hpp>
-#include <hpx/collectives/detail/communicator.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/basename_registration.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/runtime_local/get_num_localities.hpp>
-#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/async_local/dataflow.hpp>
+#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/modules/basic_execution.hpp>
+#include <hpx/runtime/basename_registration.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime_local/get_num_localities.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -191,7 +149,7 @@ namespace hpx { namespace traits {
     // support for broadcast
     namespace communication {
         struct broadcast_tag;
-    }
+    }    // namespace communication
 
     template <typename Communicator>
     struct communication_operation<Communicator, communication::broadcast_tag>
@@ -206,7 +164,7 @@ namespace hpx { namespace traits {
         template <typename Result>
         Result get(std::size_t which)
         {
-            using arg_type = typename Communicator::arg_type;
+            using arg_type = typename Result::result_type;
             using mutex_type = typename Communicator::mutex_type;
 
             auto this_ = this->shared_from_this();
@@ -217,7 +175,7 @@ namespace hpx { namespace traits {
                 auto& communicator = this_->communicator_;
 
                 std::unique_lock<mutex_type> l(communicator.mtx_);
-                return communicator.data_[0];
+                return communicator.template access_data<arg_type>(l)[0];
             };
 
             std::unique_lock<mutex_type> l(communicator_.mtx_);
@@ -230,6 +188,12 @@ namespace hpx { namespace traits {
             communicator_.gate_.synchronize(1, l);
             if (communicator_.gate_.set(which, l))
             {
+                HPX_ASSERT_DOESNT_OWN_LOCK(l);
+                {
+                    std::unique_lock<mutex_type> l(communicator_.mtx_);
+                    communicator_.invalidate_data(l);
+                }
+
                 // this is a one-shot object (generations counters are not
                 // supported), unregister ourselves (but only once)
                 hpx::unregister_with_basename(
@@ -242,15 +206,24 @@ namespace hpx { namespace traits {
         template <typename Result, typename T>
         Result set(std::size_t which, T&& t)
         {
+            using arg_type = typename std::decay<T>::type;
             using mutex_type = typename Communicator::mutex_type;
 
             std::unique_lock<mutex_type> l(communicator_.mtx_);
             util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
 
             communicator_.gate_.synchronize(1, l);
-            communicator_.data_[0] = t;
+
+            communicator_.template access_data<arg_type>(l)[0] = t;
+
             if (communicator_.gate_.set(which, l))
             {
+                HPX_ASSERT_DOESNT_OWN_LOCK(l);
+                {
+                    std::unique_lock<mutex_type> l(communicator_.mtx_);
+                    communicator_.invalidate_data(l);
+                }
+
                 // this is a one-shot object (generations counters are not
                 // supported), unregister ourselves (but only once)
                 hpx::unregister_with_basename(
@@ -267,14 +240,13 @@ namespace hpx { namespace traits {
 namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    hpx::future<hpx::id_type> create_broadcast(char const* basename,
+    inline hpx::future<hpx::id_type> create_broadcast(char const* basename,
         std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1))
     {
         // everybody waits for exactly one value
-        return detail::create_communicator<T>(
+        return detail::create_communicator(
             basename, num_sites, generation, this_site, 1);
     }
 
@@ -292,7 +264,7 @@ namespace hpx { namespace lcos {
         auto broadcast_data =
             [this_site](hpx::future<hpx::id_type>&& f,
                 hpx::future<T>&& local_result) -> hpx::future<T> {
-            using action_type = typename detail::communicator_server<T>::
+            using action_type = typename detail::communicator_server::
                 template communication_set_action<
                     traits::communication::broadcast_tag, T, T>;
 
@@ -328,7 +300,7 @@ namespace hpx { namespace lcos {
         }
 
         return broadcast_to(
-            create_broadcast<T>(basename, num_sites, generation, root_site),
+            create_broadcast(basename, num_sites, generation, root_site),
             std::move(local_result), this_site);
     }
 
@@ -347,7 +319,7 @@ namespace hpx { namespace lcos {
         auto broadcast_data =
             [this_site](hpx::future<hpx::id_type>&& f,
                 arg_type&& local_result) -> hpx::future<arg_type> {
-            using action_type = typename detail::communicator_server<T>::
+            using action_type = typename detail::communicator_server::
                 template communication_set_action<
                     traits::communication::broadcast_tag, arg_type, arg_type>;
 
@@ -382,8 +354,8 @@ namespace hpx { namespace lcos {
             this_site = static_cast<std::size_t>(hpx::get_locality_id());
         }
 
-        return broadcast_to(create_broadcast<typename std::decay<T>::type>(
-                                basename, num_sites, generation, root_site),
+        return broadcast_to(
+            create_broadcast(basename, num_sites, generation, root_site),
             std::forward<T>(local_result), this_site);
     }
 
@@ -401,7 +373,7 @@ namespace hpx { namespace lcos {
 
         auto broadcast_data_direct =
             [this_site](hpx::future<hpx::id_type>&& fid) -> hpx::future<T> {
-            using action_type = typename detail::communicator_server<T>::
+            using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::broadcast_tag, hpx::future<T>>;
 
@@ -451,25 +423,7 @@ namespace hpx {
 #define HPX_REGISTER_BROADCAST_DECLARATION(...) /**/
 
 ////////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST(...)                                            \
-    HPX_REGISTER_BROADCAST_(__VA_ARGS__)                                       \
-    /**/
-
-#define HPX_REGISTER_BROADCAST_(...)                                           \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_BROADCAST_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))      \
-    /**/
-
-#define HPX_REGISTER_BROADCAST_1(type)                                         \
-    HPX_REGISTER_BROADCAST_2(type, HPX_PP_CAT(type, _broadcast))               \
-    /**/
-
-#define HPX_REGISTER_BROADCAST_2(type, name)                                   \
-    typedef hpx::components::component<                                        \
-        hpx::lcos::detail::communicator_server<type>>                          \
-        HPX_PP_CAT(broadcast_, name);                                          \
-    HPX_REGISTER_COMPONENT(HPX_PP_CAT(broadcast_, name))                       \
-    /**/
+#define HPX_REGISTER_BROADCAST(...)             /**/
 
 #endif    // COMPUTE_HOST_CODE
 #endif    // DOXYGEN

@@ -16,10 +16,8 @@
 #include <utility>
 #include <vector>
 
-char const* all_to_all_basename = "/test/all_to_all/";
-char const* all_to_all_direct_basename = "/test/all_to_all_direct/";
-
-HPX_REGISTER_ALLTOALL(std::uint32_t, test_all_to_all);
+constexpr char const* all_to_all_basename = "/test/all_to_all/";
+constexpr char const* all_to_all_direct_basename = "/test/all_to_all_direct/";
 
 int hpx_main(int argc, char* argv[])
 {

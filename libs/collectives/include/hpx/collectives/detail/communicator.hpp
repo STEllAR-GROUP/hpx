@@ -11,20 +11,21 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/datastructures/any.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/and_gate.hpp>
 #include <hpx/modules/assertion.hpp>
+#include <hpx/modules/basic_execution.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/basename_registration.hpp>
-#include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime_local/get_num_localities.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
@@ -46,30 +47,29 @@ namespace hpx { namespace traits {
 namespace hpx { namespace lcos { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    class communicator_server;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
     class communicator_server
-      : public hpx::components::component_base<communicator_server<T>>
+      : public hpx::components::component_base<communicator_server>
     {
         using mutex_type = lcos::local::spinlock;
-        using arg_type = T;
 
     public:
         communicator_server()    //-V730
+          : num_values_(0)
+          , num_sites_(0)
+          , site_(0)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
 
         communicator_server(std::size_t num_sites, std::string const& name,
             std::size_t site, std::size_t num_values)
-          : data_(num_values)
+          : data_()
           , gate_(num_sites)
           , name_(name)
+          , num_values_(num_values)
           , num_sites_(num_sites)
           , site_(site)
+          , needs_initialization_(true)
         {
             HPX_ASSERT(num_values != 0);
             HPX_ASSERT(num_sites != 0);
@@ -114,84 +114,64 @@ namespace hpx { namespace lcos { namespace detail {
         };
 
     private:
+        // re-initialize data
+        template <typename T, typename Lock>
+        void reinitialize_data(Lock& l)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+            if (needs_initialization_)
+            {
+                needs_initialization_ = false;
+                data_ = std::vector<T>(num_values_);
+            }
+        }
+
+        template <typename T, typename Lock>
+        std::vector<T>& access_data(Lock& l)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+            reinitialize_data<T>(l);
+            return hpx::util::any_cast<std::vector<T>&>(data_);
+        }
+
+        template <typename Lock>
+        void invalidate_data(Lock& l)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+            if (needs_initialization_)
+            {
+                needs_initialization_ = true;
+                data_.reset();
+            }
+        }
+
+    private:
         template <typename Communicator, typename Operation>
         friend struct hpx::traits::communication_operation;
 
     private:
         mutex_type mtx_;
-        std::vector<T> data_;
+        hpx::util::unique_any_nonser data_;
         lcos::local::and_gate gate_;
         std::string name_;
+        std::size_t const num_values_;
         std::size_t const num_sites_;
         std::size_t const site_;
-    };    // namespace detail
+        bool needs_initialization_;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline hpx::future<hpx::id_type> register_communicator_name(
-        hpx::future<hpx::id_type>&& f, std::string basename, std::size_t site)
-    {
-        hpx::id_type target = f.get();
+    HPX_EXPORT hpx::future<hpx::id_type> register_communicator_name(
+        hpx::future<hpx::id_type>&& f, std::string basename, std::size_t site);
 
-        // Register unmanaged id to avoid cyclic dependencies, unregister
-        // is done after all data has been collected in the component above.
-        hpx::future<bool> result =
-            hpx::register_with_basename(basename, target, site);
-
-        return result.then(hpx::launch::sync,
-            [target = std::move(target), basename = std::move(basename)](
-                hpx::future<bool>&& f) -> hpx::id_type {
-                bool result = f.get();
-                if (!result)
-                {
-                    HPX_THROW_EXCEPTION(bad_parameter,
-                        "hpx::lcos::detail::register_communicator_name",
-                        "the given base name for the communicator "
-                        "operation was already registered: " +
-                            basename);
-                }
-                return target;
-            });
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    hpx::future<hpx::id_type> create_communicator(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
+    HPX_EXPORT hpx::future<hpx::id_type> create_communicator(
+        char const* basename, std::size_t num_sites = std::size_t(-1),
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
-        std::size_t num_values = std::size_t(-1))
-    {
-        if (num_sites == std::size_t(-1))
-        {
-            num_sites = static_cast<std::size_t>(
-                hpx::get_num_localities(hpx::launch::sync));
-        }
-        if (this_site == std::size_t(-1))
-        {
-            this_site = static_cast<std::size_t>(hpx::get_locality_id());
-        }
-        if (num_values == std::size_t(-1))
-        {
-            num_values = num_sites;
-        }
+        std::size_t num_values = std::size_t(-1));
 
-        std::string name(basename);
-        if (generation != std::size_t(-1))
-        {
-            name += std::to_string(generation) + "/";
-        }
-
-        // create a new communicator_server
-        using result_type = typename util::decay<T>::type;
-        hpx::future<hpx::id_type> id =
-            hpx::new_<detail::communicator_server<result_type>>(
-                hpx::find_here(), num_sites, name, this_site, num_values);
-
-        // register the communicator's id using the given basename
-        return id.then(hpx::launch::sync,
-            util::bind_back(&detail::register_communicator_name,
-                std::move(name), this_site));
-    }
+    // force linking only
+    HPX_EXPORT void dummy();
 }}}    // namespace hpx::lcos::detail
 
 #endif    // COMPUTE_HOST_CODE

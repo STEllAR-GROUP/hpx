@@ -17,10 +17,8 @@
 #include <utility>
 #include <vector>
 
-char const* gather_basename = "/test/gather/";
-char const* gather_direct_basename = "/test/gather_direct/";
-
-HPX_REGISTER_GATHER(std::uint32_t, test_gather);
+constexpr char const* gather_basename = "/test/gather/";
+constexpr char const* gather_direct_basename = "/test/gather_direct/";
 
 int hpx_main(int argc, char* argv[])
 {
