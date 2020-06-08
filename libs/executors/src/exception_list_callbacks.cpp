@@ -9,6 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/executors/exception_list.hpp>
 
+#include <exception>
+
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     exception_list_termination_handler_type&
     get_exception_list_termination_handler()

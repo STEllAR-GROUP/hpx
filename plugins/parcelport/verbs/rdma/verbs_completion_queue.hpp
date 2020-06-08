@@ -11,11 +11,12 @@
 //
 #include <hpx/util/to_string.hpp>
 //
-#include <inttypes.h>
+#include <exception>
 #include <infiniband/verbs.h>
-#include <string>
+#include <inttypes.h>
 #include <memory>
 #include <mutex>
+#include <string>
 
 namespace hpx {
 namespace parcelset {

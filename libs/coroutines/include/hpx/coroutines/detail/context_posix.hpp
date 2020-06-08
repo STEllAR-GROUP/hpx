@@ -63,6 +63,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <limits>
 #include "pth/pth.h"
 

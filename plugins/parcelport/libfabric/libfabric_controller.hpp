@@ -26,22 +26,23 @@
 //
 #include <plugins/parcelport/unordered_map.hpp>
 //
-#include <memory>
-#include <deque>
-#include <chrono>
-#include <iostream>
-#include <functional>
-#include <map>
-#include <atomic>
-#include <string>
-#include <utility>
 #include <array>
-#include <vector>
-#include <unordered_map>
-#include <sstream>
-#include <cstdint>
+#include <atomic>
+#include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <deque>
+#include <exception>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 //
 #include <rdma/fabric.h>
 #include <rdma/fi_cm.h>
