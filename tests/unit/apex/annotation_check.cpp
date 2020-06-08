@@ -11,25 +11,25 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/modules/async_distributed.hpp>
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/lcos/when_all.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/execution/executors/pool_executor.hpp>
-#include <hpx/util/annotated_function.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/runtime_local/pool_executor.hpp>
+#include <hpx/util/annotated_function.hpp>
 #include "apex_options.hpp"
 
 #include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <type_traits>
 
 //
 // This test generates a set of tasks with certain names, then checks
@@ -62,7 +62,7 @@ void dummy_task(std::size_t n)
 
 // --------------------------------------------------------------------------
 // string for a policy
-std::string policy_string(const hpx::launch &policy)
+std::string policy_string(const hpx::launch& policy)
 {
     if (policy == hpx::launch::async)
     {
@@ -92,7 +92,7 @@ std::string policy_string(const hpx::launch &policy)
 
 // string for an executor
 template <typename Executor>
-std::string exec_string(const Executor &)
+std::string exec_string(const Executor&)
 {
     bool threaded = hpx::traits::is_threads_executor<Executor>::value;
     return "Executor " + std::string(threaded ? "threaded" : "non-threaded");
@@ -101,21 +101,32 @@ std::string exec_string(const Executor &)
 // --------------------------------------------------------------------------
 template <typename Executor>
 typename std::enable_if<hpx::traits::is_threads_executor<Executor>::value,
-         std::string>::type
-execution_string(const Executor &exec) { return exec_string(exec); }
+    std::string>::type
+execution_string(const Executor& exec)
+{
+    return exec_string(exec);
+}
 
 template <typename Executor>
-typename std::enable_if<hpx::traits::is_executor_any<Executor>::value, std::string>::type
-execution_string(const Executor &exec) { return exec_string(exec); }
+typename std::enable_if<hpx::traits::is_executor_any<Executor>::value,
+    std::string>::type
+execution_string(const Executor& exec)
+{
+    return exec_string(exec);
+}
 
 template <typename Policy>
-typename std::enable_if<hpx::traits::is_launch_policy<Policy>::value, std::string>::type
-execution_string(const Policy &policy) { return policy_string(policy); }
+typename std::enable_if<hpx::traits::is_launch_policy<Policy>::value,
+    std::string>::type
+execution_string(const Policy& policy)
+{
+    return policy_string(policy);
+}
 
 // --------------------------------------------------------------------------
 // can be called with an executor or a policy
 template <typename Execution>
-void test_execution(Execution &exec)
+void test_execution(Execution& exec)
 {
     static int prefix = 1;
     // these string need to have lifetimes that don't go out of scope
@@ -130,35 +141,25 @@ void test_execution(Execution &exec)
     {
         hpx::future<int> f1 = hpx::make_ready_future(5);
         hpx::future<int> f2 = hpx::make_ready_future(5);
-        results.emplace_back(hpx::dataflow(
-            exec,
+        results.emplace_back(hpx::dataflow(exec,
             hpx::util::annotated_function(
-                [](auto &&, auto &&) {
-                    dummy_task(std::size_t(1000));
-                },
+                [](auto&&, auto&&) { dummy_task(std::size_t(1000)); },
                 dfs.c_str()),
-                f1, f2));
+            f1, f2));
     }
     {
         hpx::future<int> f1 = hpx::make_ready_future(5);
-        results.emplace_back(f1.then(
-            exec,
+        results.emplace_back(f1.then(exec,
             hpx::util::annotated_function(
-                [](auto &&f1) {
-                    dummy_task(std::size_t(1000));
-                },
+                [](auto&& f1) { dummy_task(std::size_t(1000)); },
                 pcs.c_str())));
     }
     {
         hpx::future<int> f1 = hpx::make_ready_future(5);
-        results.emplace_back(f1.then(
-            exec,
-            hpx::util::unwrapping(
-                hpx::util::annotated_function(
-                    [](auto &&f1) {
-                        dummy_task(std::size_t(1000));
-                    },
-                    pcsu.c_str()))));
+        results.emplace_back(f1.then(exec,
+            hpx::util::unwrapping(hpx::util::annotated_function(
+                [](auto&& f1) { dummy_task(std::size_t(1000)); },
+                pcsu.c_str()))));
     }
     // wait for completion
     hpx::when_all(results).get();
@@ -178,27 +179,20 @@ void test_none()
         hpx::future<int> f2 = hpx::make_ready_future(5);
         results.emplace_back(hpx::dataflow(
             hpx::util::annotated_function(
-                [](auto &&, auto &&) {
-                    dummy_task(std::size_t(1000));
-                },
+                [](auto&&, auto&&) { dummy_task(std::size_t(1000)); },
                 dfs.c_str()),
             f1, f2));
     }
 
     {
         hpx::future<int> f1 = hpx::make_ready_future(5);
-        results.emplace_back(f1.then(
-            hpx::util::annotated_function(
-                [](auto &&f1) {
-                    dummy_task(std::size_t(1000));
-                },
-                pcs.c_str())));
+        results.emplace_back(f1.then(hpx::util::annotated_function(
+            [](auto&& f1) { dummy_task(std::size_t(1000)); }, pcs.c_str())));
     }
 
     // wait for completion
     hpx::when_all(results).get();
 }
-
 
 int hpx_main()
 {
