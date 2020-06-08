@@ -142,7 +142,6 @@ endif()
 
 # List all headers (local and distributed)
 set(hpx_HEADERS
-    hpx/hpx_user_main_config.hpp
     hpx/lcos_fwd.hpp
     hpx/runtime/serialization/detail/preprocess_container.hpp
     hpx/runtime/serialization/detail/preprocess_futures.hpp
