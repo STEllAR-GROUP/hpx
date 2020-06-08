@@ -43,6 +43,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
