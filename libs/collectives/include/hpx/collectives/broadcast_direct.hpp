@@ -136,6 +136,7 @@ namespace hpx { namespace lcos {
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

@@ -9,15 +9,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/lcos/packaged_action.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/find_here.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -25,7 +27,6 @@
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
 
 #include <algorithm>
 #include <cstddef>
