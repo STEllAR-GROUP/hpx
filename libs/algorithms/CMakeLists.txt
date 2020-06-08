@@ -13,6 +13,7 @@ set(algorithms_headers
     hpx/algorithms/traits/projected_range.hpp
     hpx/algorithms/traits/segmented_iterator_traits.hpp
     hpx/numeric.hpp
+    hpx/memory.hpp
     hpx/parallel/algorithm.hpp
     hpx/parallel/algorithms/adjacent_difference.hpp
     hpx/parallel/algorithms/adjacent_find.hpp
@@ -127,6 +128,7 @@ set(algorithms_headers
     hpx/parallel/util/transfer.hpp
     hpx/parallel/util/transform_loop.hpp
     hpx/parallel/util/zip_iterator.hpp
+    hpx/task_block.hpp
 )
 
 # cmake-format: off
