@@ -8,12 +8,11 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/futures/future.hpp>
-#include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <array>
 #include <atomic>
