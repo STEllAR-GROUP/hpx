@@ -147,7 +147,8 @@ void matrixMultiply(
 
     // create a cublas executor we'll use to futurize cuda events
     using namespace hpx::cuda;
-    cublas_executor cublas(device, hpx::cuda::event_mode{});
+    cublas_executor cublas(
+        device, CUBLAS_POINTER_MODE_HOST, hpx::cuda::event_mode{});
     using cublas_future = typename cuda_executor::future_type;
 
 #ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR

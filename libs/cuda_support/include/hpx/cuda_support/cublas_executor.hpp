@@ -116,8 +116,11 @@ namespace hpx { namespace cuda {
     struct cublas_executor : cuda_executor
     {
         // construct a cublas stream
-        cublas_executor(std::size_t device, bool event_mode = false)
+        cublas_executor(std::size_t device,
+            cublasPointerMode_t pointer_mode = CUBLAS_POINTER_MODE_HOST,
+            bool event_mode = false)
           : hpx::cuda::cuda_executor(device, event_mode)
+          , pointer_mode_(pointer_mode)
         {
             detail::cub_debug.debug(
                 debug::str<>("cublas_executor"), "event mode", event_mode);
@@ -167,6 +170,7 @@ namespace hpx { namespace cuda {
             check_cuda_error(cudaSetDevice(device_));
             // make sure this operation takes place on our stream
             check_cublas_error(cublasSetStream(handle_, stream_));
+            check_cublas_error(cublasSetPointerMode(handle_, pointer_mode_));
             // insert the cublas handle in the arg list and call the cublas function
             detail::dispatch_helper<R, Params...> helper{};
             return helper(
@@ -233,6 +237,7 @@ namespace hpx { namespace cuda {
 
     private:
         cublasHandle_t handle_;
+        cublasPointerMode_t pointer_mode_;
     };
 
 }}    // namespace hpx::cuda

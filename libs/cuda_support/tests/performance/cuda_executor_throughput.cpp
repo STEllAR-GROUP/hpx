@@ -87,7 +87,8 @@ void matrixMultiply(
     hpx::parallel::for_each(par, h_B.begin(), h_B.end(), zerofunc);
 
     // create a cublas executor we'll use to futurize cuda events
-    hpx::cuda::cublas_executor cublas(device, hpx::cuda::callback_mode{});
+    hpx::cuda::cublas_executor cublas(
+        device, CUBLAS_POINTER_MODE_HOST, hpx::cuda::callback_mode{});
     using cublas_future = typename hpx::cuda::cublas_executor::future_type;
 
     T *d_A, *d_B, *d_C;
@@ -136,7 +137,8 @@ void matrixMultiply(
     };
 
     // call our test function using a callback style executor
-    hpx::cuda::cublas_executor exec_callback(0, hpx::cuda::callback_mode{});
+    hpx::cuda::cublas_executor exec_callback(
+        0, CUBLAS_POINTER_MODE_HOST, hpx::cuda::callback_mode{});
     test_function(exec_callback, "Warmup", 100);
     test_function(exec_callback, "Callback based executor", iterations);
 
@@ -146,7 +148,8 @@ void matrixMultiply(
         // install cuda future polling handler for this scope block
         hpx::cuda::enable_user_polling poll("default");
 
-        hpx::cuda::cublas_executor exec_event(0, hpx::cuda::event_mode{});
+        hpx::cuda::cublas_executor exec_event(
+            0, CUBLAS_POINTER_MODE_HOST, hpx::cuda::event_mode{});
         test_function(exec_event, "Event polling based executor", iterations);
     }
 
