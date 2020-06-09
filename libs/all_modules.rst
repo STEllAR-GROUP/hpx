@@ -19,9 +19,10 @@ All modules
    /libs/allocator_support/docs/index.rst
    /libs/asio/docs/index.rst
    /libs/assertion/docs/index.rst
-   /libs/async_distributed/docs/index.rst
    /libs/async_base/docs/index.rst
    /libs/async_combinators/docs/index.rst
+   /libs/async_cuda/docs/index.rst
+   /libs/async_distributed/docs/index.rst
    /libs/async_local/docs/index.rst
    /libs/execution_base/docs/index.rst
    /libs/batch_environments/docs/index.rst
@@ -36,7 +37,6 @@ All modules
    /libs/config/docs/index.rst
    /libs/config_registry/docs/index.rst
    /libs/coroutines/docs/index.rst
-   /libs/cuda_support/docs/index.rst
    /libs/datastructures/docs/index.rst
    /libs/debugging/docs/index.rst
    /libs/distributed_executors/docs/index.rst

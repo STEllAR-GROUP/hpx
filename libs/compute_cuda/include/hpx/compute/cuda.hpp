@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/async_cuda/get_targets.hpp>
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/cuda/concurrent_executor.hpp>
 #include <hpx/compute/cuda/default_executor.hpp>
@@ -17,5 +19,3 @@
 #include <hpx/compute/cuda/traits/access_target.hpp>
 #include <hpx/compute/cuda/transfer.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
-#include <hpx/cuda_support/get_targets.hpp>
-#include <hpx/cuda_support/target.hpp>

@@ -47,7 +47,7 @@ add_hpx_module(
     hpx_allocator_support
     hpx_assertion
     hpx_compute
-    hpx_cuda_support
+    hpx_async_cuda
     hpx_config
     hpx_errors
     hpx_execution

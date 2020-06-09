@@ -8,7 +8,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <hpx/cuda_support/target.hpp>
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/include/compute.hpp>
 
 #include <algorithm>

@@ -13,8 +13,8 @@
 #if defined(HPX_HAVE_CUDA)
 
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/cuda/traits/access_target.hpp>
-#include <hpx/cuda_support/target.hpp>
 
 #include <type_traits>
 

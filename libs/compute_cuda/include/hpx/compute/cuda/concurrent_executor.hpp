@@ -11,11 +11,11 @@
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/execution/traits/executor_traits.hpp>
 
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/cuda/concurrent_executor_parameters.hpp>
 #include <hpx/compute/cuda/default_executor.hpp>
 #include <hpx/compute/host/block_executor.hpp>
 #include <hpx/compute/host/target.hpp>
-#include <hpx/cuda_support/target.hpp>
 
 #include <array>
 #include <atomic>

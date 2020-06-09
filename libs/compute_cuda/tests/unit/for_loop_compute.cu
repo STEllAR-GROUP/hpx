@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/cuda_support/target.hpp>
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/parallel_copy.hpp>
