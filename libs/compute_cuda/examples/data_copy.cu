@@ -39,21 +39,19 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     hpx::compute::vector<int, allocator_type> d_A(N, alloc);
 
-    hpx::future<void> f = target.get_future();
+    hpx::future<void> f = target.get_future_with_callback();
 
     f.get();
 
     // copy data from host to device
     hpx::parallel::copy(
-        hpx::parallel::execution::par,
-        h_A.begin(), h_A.end(), d_A.begin());
+        hpx::parallel::execution::par, h_A.begin(), h_A.end(), d_A.begin());
 
     // copy data from device to host
     hpx::parallel::copy(
-        hpx::parallel::execution::par,
-        d_A.begin(), d_A.end(), h_B.begin());
+        hpx::parallel::execution::par, d_A.begin(), d_A.end(), h_B.begin());
 
-    if(std::equal(h_A.begin(), h_A.end(), h_B.begin()))
+    if (std::equal(h_A.begin(), h_A.end(), h_B.begin()))
         std::cout << "Copy succeeded!\n";
     else
         std::cout << "Copy not successful :(\n";
@@ -68,10 +66,8 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("seed,s", value<unsigned int>(),
-        "the random number generator seed to use for this run")
-        ;
+    desc_commandline.add_options()("seed,s", value<unsigned int>(),
+        "the random number generator seed to use for this run");
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

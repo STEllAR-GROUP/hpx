@@ -176,7 +176,7 @@ namespace hpx { namespace compute { namespace cuda {
         hpx::future<void> async_execute(F&& f, Ts&&... ts) const
         {
             post(std::forward<F>(f), std::forward<Ts>(ts)...);
-            return target_.get_future();
+            return target_.get_future_with_callback();
         }
 
         template <typename F, typename... Ts>
@@ -200,7 +200,7 @@ namespace hpx { namespace compute { namespace cuda {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
 
             std::vector<hpx::future<void>> result;
-            result.push_back(target_.get_future());
+            result.push_back(target_.get_future_with_callback());
             return result;
         }
 

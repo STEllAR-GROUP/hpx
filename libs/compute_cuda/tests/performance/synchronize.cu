@@ -62,11 +62,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
         for (std::size_t i = 0; i != iterations; ++i)
         {
             executor.post([] HPX_DEVICE() {});
-            target.get_future().get();
+            target.get_future_with_callback().get();
         }
         double elapsed = timer.elapsed();
-        std::cout << "executor.post([](){}) + get_future().get(): " << elapsed
-                  << '\n';
+        std::cout
+            << "executor.post([](){}) + get_future_with_callback().get(): "
+            << elapsed << '\n';
     }
     {
         hpx::util::high_resolution_timer timer;
