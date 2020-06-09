@@ -15,6 +15,7 @@ set(thread_executors_headers
     hpx/execution/executors/thread_pool_os_executors.hpp
     hpx/thread_executors/current_executor.hpp
     hpx/thread_executors/default_executor.hpp
+    hpx/thread_executors/detail/on_self_reset.hpp
     hpx/thread_executors/embedded_thread_pool_executors.hpp
     hpx/thread_executors/executors.hpp
     hpx/thread_executors/force_linking.hpp

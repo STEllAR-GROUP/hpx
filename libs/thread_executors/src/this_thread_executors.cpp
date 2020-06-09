@@ -24,6 +24,7 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/thread_executors/detail/on_self_reset.hpp>
 #include <hpx/thread_executors/manage_thread_executor.hpp>
 #include <hpx/thread_executors/resource_manager.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
@@ -258,18 +259,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct on_self_reset
-    {
-        on_self_reset(threads::thread_self* self)
-        {
-            threads::detail::set_self_ptr(self);
-        }
-        ~on_self_reset()
-        {
-            threads::detail::set_self_ptr(nullptr);
-        }
-    };
-
     template <typename Scheduler>
     void this_thread_executor<Scheduler>::suspend_back_into_calling_context()
     {

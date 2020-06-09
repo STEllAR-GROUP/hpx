@@ -541,6 +541,10 @@ endif()
 
 target_compile_definitions(hpx_core PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
+if(HPX_WITH_UNITY_BUILD)
+  set_target_properties(hpx_core PROPERTIES UNITY_BUILD ON)
+endif()
+
 # ##############################################################################
 # Emulation of SwapContext on Windows
 # ##############################################################################
