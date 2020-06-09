@@ -333,10 +333,12 @@ namespace hpx
             > base_type;
 
     public:
-        partitioned_vector_partition() {}
-        partitioned_vector_partition(id_type const& gid);
+        partitioned_vector_partition() = default;
 
-        partitioned_vector_partition(hpx::shared_future<id_type> const& gid);
+        explicit partitioned_vector_partition(id_type const& gid);
+
+        explicit partitioned_vector_partition(
+            hpx::shared_future<id_type> const& gid);
 
         // Return the pinned pointer to the underlying component
         std::shared_ptr<server::partitioned_vector<T, Data> > get_ptr() const;

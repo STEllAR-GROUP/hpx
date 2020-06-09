@@ -39,14 +39,14 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
           : max_messages_(0)
         {}
 
-        message_buffer(std::size_t max_messages)
+        explicit message_buffer(std::size_t max_messages)
           : max_messages_(max_messages)
         {
             messages_.reserve(max_messages);
             handlers_.reserve(max_messages);
         }
 
-        message_buffer(message_buffer && rhs)
+        message_buffer(message_buffer && rhs) noexcept
           : dest_(std::move(rhs.dest_)),
             messages_(std::move(rhs.messages_)),
             handlers_(std::move(rhs.handlers_)),

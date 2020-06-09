@@ -28,12 +28,11 @@ namespace examples
     public:
         // Default construct an empty client side representation (not
         // connected to any existing component).
-        cancelable_action()
-        {}
+        cancelable_action() = default;
 
         /// Create a client side representation of an object which is newly
         /// created on the given locality
-        cancelable_action(hpx::naming::id_type const& target_gid)
+        explicit cancelable_action(hpx::naming::id_type const& target_gid)
           : base_type(stub_type::create_async(target_gid))
         {}
 

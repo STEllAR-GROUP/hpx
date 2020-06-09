@@ -62,7 +62,7 @@ namespace lcos {
             typedef typename base_type::result_type result_type;
 
         public:
-            promise_lco_base(shared_state_ptr const& shared_state)
+            explicit promise_lco_base(shared_state_ptr const& shared_state)
               : shared_state_(shared_state)
             {
             }
@@ -116,7 +116,7 @@ namespace lcos {
             typedef typename base_type::result_type result_type;
 
         public:
-            promise_lco(shared_state_ptr const& shared_state)
+            explicit promise_lco(shared_state_ptr const& shared_state)
               : base_type(shared_state)
             {
             }
@@ -152,7 +152,7 @@ namespace lcos {
             using base_type = promise_lco_base<void, hpx::util::unused_type>;
 
         public:
-            promise_lco(shared_state_ptr const& shared_state)
+            explicit promise_lco(shared_state_ptr const& shared_state)
               : base_type(shared_state)
             {
             }

@@ -32,12 +32,13 @@ namespace hpx { namespace components
     struct unwrapping_result_policy
     {
     public:
-        unwrapping_result_policy(id_type const& id)
+        explicit unwrapping_result_policy(id_type const& id)
           : id_(id)
         {}
 
         template <typename Client, typename Stub>
-        unwrapping_result_policy(client_base<Client, Stub> const& client)
+        explicit unwrapping_result_policy(
+            client_base<Client, Stub> const& client)
           : id_(client.get_id())
         {}
 

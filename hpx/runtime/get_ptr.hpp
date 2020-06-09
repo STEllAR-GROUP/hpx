@@ -34,7 +34,10 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         struct get_ptr_deleter
         {
-            get_ptr_deleter(naming::id_type const& id) : id_(id) {}
+            explicit get_ptr_deleter(naming::id_type const& id)
+              : id_(id)
+            {
+            }
 
             template <typename Component>
             void operator()(Component* p)
@@ -48,7 +51,10 @@ namespace hpx
 
         struct get_ptr_no_unpin_deleter
         {
-            get_ptr_no_unpin_deleter(naming::id_type const& id) : id_(id) {}
+            explicit get_ptr_no_unpin_deleter(naming::id_type const& id)
+              : id_(id)
+            {
+            }
 
             template <typename Component>
             void operator()(Component* p)
@@ -61,7 +67,7 @@ namespace hpx
 
         struct get_ptr_for_migration_deleter
         {
-            get_ptr_for_migration_deleter(naming::id_type const& id)
+            explicit get_ptr_for_migration_deleter(naming::id_type const& id)
               : id_(id)
             {}
 

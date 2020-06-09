@@ -35,8 +35,7 @@ namespace hpx {
                 DataType &>;
 
     public:
-        partitioned_vector_local_view_iterator()
-        {}
+        partitioned_vector_local_view_iterator() = default;
 
         explicit partitioned_vector_local_view_iterator(
             BaseIter && it, BaseIter && end)
@@ -101,14 +100,14 @@ namespace hpx {
                 DataType const &>;
 
     public:
-        const_partitioned_vector_local_view_iterator()
-        {}
+        const_partitioned_vector_local_view_iterator() = default;
 
-        template<typename RightBaseIter>
-        const_partitioned_vector_local_view_iterator(
-            partitioned_vector_local_view_iterator<DataType,RightBaseIter>
-                const & other)
-            : base_type(other.base()), end_(other.end_)
+        template <typename RightBaseIter>
+        explicit const_partitioned_vector_local_view_iterator(
+            partitioned_vector_local_view_iterator<DataType,
+                RightBaseIter> const& other)
+          : base_type(other.base())
+          , end_(other.end_)
         {}
 
         explicit const_partitioned_vector_local_view_iterator(

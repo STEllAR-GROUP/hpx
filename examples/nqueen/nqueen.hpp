@@ -22,13 +22,15 @@ namespace nqueen
         typedef hpx::components::client_base<board, server::board> base_type;
 
     public:
-        board() {}
-        board(hpx::id_type&& gid)
+        board() = default;
+
+        board(hpx::future<hpx::id_type>&& gid)
           : base_type(std::move(gid))
         {
         }
-        board(hpx::future<hpx::id_type>&& gid)
-          : base_type(std::move(gid))
+
+        explicit board(hpx::id_type&& id)
+          : base_type(std::move(id))
         {
         }
 

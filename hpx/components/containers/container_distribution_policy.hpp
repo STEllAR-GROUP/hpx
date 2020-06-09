@@ -130,7 +130,7 @@ namespace hpx
             num_partitions_(num_partitions)
         {}
 
-        container_distribution_policy(hpx::id_type const& locality)
+        explicit container_distribution_policy(hpx::id_type const& locality)
           : components::default_distribution_policy(locality),
             num_partitions_(1)
         {}

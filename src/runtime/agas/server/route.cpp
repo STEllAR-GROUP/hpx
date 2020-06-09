@@ -50,8 +50,6 @@ namespace hpx { namespace agas { namespace server
         );
         counter_data_.increment_route_count();
 
-        error_code& ec = throws;
-
         naming::gid_type const& gid = p.destination();
         naming::address& addr = p.addr();
         resolved_type cache_address;
@@ -63,6 +61,8 @@ namespace hpx { namespace agas { namespace server
         // them, otherwise it's an error
         {
             std::unique_lock<mutex_type> l(mutex_);
+
+            error_code& ec = throws;
 
             // wait for any migration to be completed
             if (naming::detail::is_migratable(gid))

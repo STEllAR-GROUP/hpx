@@ -88,7 +88,7 @@ struct clientB : hpx::components::client_base<clientB, B>
 {
     typedef hpx::components::client_base<clientB, B> base_type;
 
-    clientB(hpx::shared_future<hpx::id_type> const& gid)
+    explicit clientB(hpx::shared_future<hpx::id_type> const& gid)
       : base_type(gid)
     {}
 

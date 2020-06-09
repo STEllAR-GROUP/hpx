@@ -47,7 +47,7 @@ std::size_t hello_world_worker(std::size_t desired)
         char const* msg = "hello world from OS-thread {1} on locality {2}\n";
 
         hpx::util::format_to(hpx::cout, msg, desired, hpx::get_locality_id())
-            << hpx::flush;
+            << std::flush;
 
         return desired;
     }
@@ -64,9 +64,6 @@ void hello_world_foreman()
 {
     // Get the number of worker OS-threads in use by this locality.
     std::size_t const os_threads = hpx::get_os_thread_count();
-
-    // Find the global name of the current locality.
-    hpx::naming::id_type const here = hpx::find_here();
 
     // Populate a set with the OS-thread numbers of all OS-threads on this
     // locality. When the hello world message has been printed on a particular

@@ -230,7 +230,8 @@ namespace hpx { namespace components
           : back_ptr_(nullptr)
         {}
 
-        managed_component_base(managed_component<Component, Wrapper>* back_ptr)
+        explicit managed_component_base(
+            managed_component<Component, Wrapper>* back_ptr)
           : back_ptr_(back_ptr)
         {
             HPX_ASSERT(back_ptr);

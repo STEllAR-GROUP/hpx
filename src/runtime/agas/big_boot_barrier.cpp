@@ -82,9 +82,9 @@ namespace hpx { namespace agas { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct unassigned_typename_sequence
     {
-        unassigned_typename_sequence() {}
+        unassigned_typename_sequence() = default;
 
-        unassigned_typename_sequence(bool /*dummy*/)
+        explicit unassigned_typename_sequence(bool /*dummy*/)
           : serialization_typenames(hpx::serialization::detail::id_registry::
                 instance().get_unassigned_typenames())
           , action_typenames(hpx::actions::detail::action_registry::
@@ -114,9 +114,10 @@ namespace hpx { namespace agas { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct assigned_id_sequence
     {
-        assigned_id_sequence() {}
+        assigned_id_sequence() = default;
 
-        assigned_id_sequence(unassigned_typename_sequence const& typenames)
+        explicit assigned_id_sequence(
+            unassigned_typename_sequence const& typenames)
         {
             register_ids_on_main_loc(typenames);
         }

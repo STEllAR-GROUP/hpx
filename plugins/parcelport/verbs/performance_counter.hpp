@@ -49,7 +49,7 @@ namespace verbs
     {
         performance_counter() : value_{T()} {}
 
-        performance_counter(const T& init) : value_{init} {}
+        explicit performance_counter(const T& init) : value_{init} {}
 
         inline operator T() { return value_; }
 
