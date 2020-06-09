@@ -16,6 +16,7 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/runtime_local/os_thread_type.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
@@ -61,7 +62,7 @@ namespace hpx {
         /// name prefix
         using notification_policy_type = threads::policies::callback_notifier;
         virtual notification_policy_type get_notification_policy(
-            char const* prefix);
+            char const* prefix, runtime_local::os_thread_type type);
 
         state get_state() const;
         void set_state(state s);
@@ -337,7 +338,7 @@ namespace hpx {
         /// \note This function should be called for each thread exactly once. It
         ///       will fail if it is called more than once.
         ///
-        /// \returns This function will return whether th erequested operation
+        /// \returns This function will return whether the requested operation
         ///          succeeded or not.
         ///
         virtual bool register_thread(char const* name, std::size_t num = 0,
@@ -352,10 +353,19 @@ namespace hpx {
         ///       if the thread has not been registered before (see
         ///       \a register_thread).
         ///
-        /// \returns This function will return whether th erequested operation
+        /// \returns This function will return whether the requested operation
         ///          succeeded or not.
         ///
         virtual bool unregister_thread();
+
+        /// Access data for a given OS thread that was previously registered by
+        /// \a register_thread.
+        virtual runtime_local::os_thread_data get_os_thread_data(
+            std::string const& label) const;
+
+        /// Enumerate all OS threads that have registered with the runtime.
+        virtual bool enumerate_os_threads(util::function_nonser<bool(
+                runtime_local::os_thread_data const&)> const& f) const;
 
         notification_policy_type::on_startstop_type on_start_func() const;
         notification_policy_type::on_startstop_type on_stop_func() const;
@@ -446,11 +456,13 @@ namespace hpx {
 
         void deinit_tss_helper(char const* context, std::size_t num);
 
-        void init_tss_ex(char const* context, std::size_t local_thread_num,
+        void init_tss_ex(char const* context,
+            runtime_local::os_thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
             char const* postfix, bool service_thread, error_code& ec);
 
-        void init_tss_helper(char const* context, std::size_t local_thread_num,
+        void init_tss_helper(char const* context,
+            runtime_local::os_thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
             char const* postfix, bool service_thread);
 

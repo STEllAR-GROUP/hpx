@@ -45,6 +45,7 @@ add_hpx_module(
     hpx_local_lcos
     hpx_memory
     hpx_mpi_base
+    hpx_runtime_local
     hpx_threading_base
     Mpi::mpi
   CMAKE_SUBDIRS examples tests

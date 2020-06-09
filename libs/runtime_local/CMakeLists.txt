@@ -19,6 +19,7 @@ set(runtime_local_headers
     hpx/runtime_local/get_thread_name.hpp
     hpx/runtime_local/get_worker_thread_num.hpp
     hpx/runtime_local/interval_timer.hpp
+    hpx/runtime_local/os_thread_type.hpp
     hpx/runtime_local/pool_executor.hpp
     hpx/runtime_local/report_error.hpp
     hpx/runtime_local/run_as_hpx_thread.hpp
@@ -68,6 +69,7 @@ set(runtime_local_sources
     debugging.cpp
     force_linking.cpp
     interval_timer.cpp
+    os_thread_type.cpp
     runtime_handlers.cpp
     runtime_local.cpp
     state.cpp
@@ -94,6 +96,7 @@ add_hpx_module(
     hpx_logging
     hpx_program_options
     hpx_threadmanager
+    hpx_thread_executors
     hpx_topology
   CMAKE_SUBDIRS examples tests
 )

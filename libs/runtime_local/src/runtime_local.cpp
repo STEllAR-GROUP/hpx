@@ -19,6 +19,7 @@
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
+#include <hpx/runtime_local/os_thread_type.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
@@ -270,16 +271,19 @@ namespace hpx {
       , main_pool_notifier_()
       , main_pool_(1, main_pool_notifier_, "main_pool")
 #ifdef HPX_HAVE_IO_POOL
-      , io_pool_notifier_(runtime::get_notification_policy("io-thread"))
+      , io_pool_notifier_(runtime::get_notification_policy(
+            "io-thread", runtime_local::os_thread_type::io_thread))
       , io_pool_(
             rtcfg.get_thread_pool_size("io_pool"), io_pool_notifier_, "io_pool")
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-      , timer_pool_notifier_(runtime::get_notification_policy("timer-thread"))
+      , timer_pool_notifier_(runtime::get_notification_policy(
+            "timer-thread", runtime_local::os_thread_type::timer_thread))
       , timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
             timer_pool_notifier_, "timer_pool")
 #endif
-      , notifier_(runtime::get_notification_policy("worker-thread"))
+      , notifier_(runtime::get_notification_policy(
+            "worker-thread", runtime_local::os_thread_type::worker_thread))
       , thread_manager_(new hpx::threads::threadmanager(
 #ifdef HPX_HAVE_TIMER_POOL
             timer_pool_,
@@ -711,24 +715,40 @@ namespace hpx {
         return thread_name;
     }
 
-    /// Register the current kernel thread with HPX, this should be done once
-    /// for each external OS-thread intended to invoke HPX functionality.
-    /// Calling this function more than once will silently fail
-    /// (will return false).
+    // Register the current kernel thread with HPX, this should be done once
+    // for each external OS-thread intended to invoke HPX functionality.
+    // Calling this function more than once will silently fail
+    // (will return false).
     bool register_thread(runtime* rt, char const* name, error_code& ec)
     {
         HPX_ASSERT(rt);
         return rt->register_thread(name, 0, true, ec);
     }
 
-    /// Unregister the thread from HPX, this should be done once in
-    /// the end before the external thread exists.
+    // Unregister the thread from HPX, this should be done once in
+    // the end before the external thread exists.
     void unregister_thread(runtime* rt)
     {
         HPX_ASSERT(rt);
         rt->unregister_thread();
     }
 
+    // Access data for a given OS thread that was previously registered by
+    // \a register_thread. This function must be called from a thread that was
+    // previously registered with the runtime.
+    runtime_local::os_thread_data get_os_thread_data(std::string const& label)
+    {
+        return get_runtime().get_os_thread_data(label);
+    }
+
+    /// Enumerate all OS threads that have registered with the runtime.
+    bool enumerate_os_threads(
+        util::function_nonser<bool(os_thread_data const&)> const& f)
+    {
+        return get_runtime().enumerate_os_threads(f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void report_error(std::size_t num_thread, std::exception_ptr const& e)
     {
         // Early and late exceptions
@@ -1319,7 +1339,8 @@ namespace hpx {
         // Register this thread with the runtime system to allow calling
         // certain HPX functionality from the main thread. Also calls
         // registered startup callbacks.
-        init_tss_helper("main-thread", 0, 0, "", "", false);
+        init_tss_helper("main-thread",
+            runtime_local::os_thread_type::main_thread, 0, 0, "", "", false);
 
 #ifdef HPX_HAVE_IO_POOL
         // start the io pool
@@ -1712,7 +1733,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     threads::policies::callback_notifier runtime::get_notification_policy(
-        char const* prefix)
+        char const* prefix, runtime_local::os_thread_type type)
     {
         typedef bool (runtime::*report_error_t)(
             std::size_t, std::exception_ptr const&, bool);
@@ -1724,8 +1745,9 @@ namespace hpx {
 
         notification_policy_type notifier;
 
-        notifier.add_on_start_thread_callback(util::bind(
-            &runtime::init_tss_helper, This(), prefix, _1, _2, _3, _4, false));
+        notifier.add_on_start_thread_callback(
+            util::bind(&runtime::init_tss_helper, This(), prefix, type, _1, _2,
+                _3, _4, false));
         notifier.add_on_stop_thread_callback(
             util::bind(&runtime::deinit_tss_helper, This(), prefix, _1));
         notifier.set_on_error_callback(
@@ -1736,15 +1758,17 @@ namespace hpx {
     }
 
     void runtime::init_tss_helper(char const* context,
-        std::size_t local_thread_num, std::size_t global_thread_num,
-        char const* pool_name, char const* postfix, bool service_thread)
+        runtime_local::os_thread_type type, std::size_t local_thread_num,
+        std::size_t global_thread_num, char const* pool_name,
+        char const* postfix, bool service_thread)
     {
         error_code ec(lightweight);
-        return init_tss_ex(context, local_thread_num, global_thread_num,
+        return init_tss_ex(context, type, local_thread_num, global_thread_num,
             pool_name, postfix, service_thread, ec);
     }
 
-    void runtime::init_tss_ex(char const* context, std::size_t local_thread_num,
+    void runtime::init_tss_ex(char const* context,
+        runtime_local::os_thread_type type, std::size_t local_thread_num,
         std::size_t global_thread_num, char const* pool_name,
         char const* postfix, bool service_thread, error_code& ec)
     {
@@ -1764,7 +1788,7 @@ namespace hpx {
         char const* name = detail::thread_name().c_str();
 
         // initialize thread mapping for external libraries (i.e. PAPI)
-        thread_support_->register_thread(name, ec);
+        thread_support_->register_thread(name, type);
 
         // register this thread with any possibly active Intel tool
         HPX_ITT_THREAD_SET_NAME(name);
@@ -1900,8 +1924,9 @@ namespace hpx {
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss_ex(thread_name.c_str(), global_thread_num, global_thread_num,
-            "", nullptr, service_thread, ec);
+        init_tss_ex(thread_name.c_str(),
+            runtime_local::os_thread_type::custom_thread, global_thread_num,
+            global_thread_num, "", nullptr, service_thread, ec);
 
         return !ec ? true : false;
     }
@@ -1917,11 +1942,28 @@ namespace hpx {
         return true;
     }
 
+    // Access data for a given OS thread that was previously registered by
+    // \a register_thread. This function must be called from a thread that was
+    // previously registered with the runtime.
+    runtime_local::os_thread_data runtime::get_os_thread_data(
+        std::string const& label) const
+    {
+        return thread_support_->get_os_thread_data(label);
+    }
+
+    /// Enumerate all OS threads that have registered with the runtime.
+    bool runtime::enumerate_os_threads(
+        util::function_nonser<bool(os_thread_data const&)> const& f) const
+    {
+        return thread_support_->enumerate_os_threads(f);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     threads::policies::callback_notifier get_notification_policy(
         char const* prefix)
     {
-        return get_runtime().get_notification_policy(prefix);
+        return get_runtime().get_notification_policy(
+            prefix, runtime_local::os_thread_type::worker_thread);
     }
 
     std::uint32_t get_locality_id(error_code& ec)

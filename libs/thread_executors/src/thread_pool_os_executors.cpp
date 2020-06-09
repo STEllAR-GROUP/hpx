@@ -42,7 +42,7 @@
 namespace hpx {
     threads::policies::callback_notifier get_notification_policy(
         char const* prefix);
-}
+}    // namespace hpx
 
 namespace hpx { namespace threads { namespace executors { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
