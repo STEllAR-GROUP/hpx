@@ -12,7 +12,7 @@
 // CUDA runtime
 #include <cuda_runtime.h>
 //
-#include <sstream>
+#include <string>
 
 namespace hpx { namespace cuda {
 
@@ -40,10 +40,9 @@ namespace hpx { namespace cuda {
     {
         if (err != cudaSuccess)
         {
-            std::stringstream temp;
-            temp << "cuda function returned error code :"
-                 << cudaGetErrorString(err);
-            throw cuda_exception(temp.str(), err);
+            auto temp = std::string("cuda function returned error code :") +
+                cudaGetErrorString(err);
+            throw cuda_exception(temp, err);
         }
         return err;
     }

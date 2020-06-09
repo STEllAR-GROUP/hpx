@@ -21,7 +21,10 @@
 // CuBLAS
 #include <cublas_v2.h>
 //
-#include <sstream>
+#include <cstddef>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace cuda {
 
@@ -84,10 +87,9 @@ namespace hpx { namespace cuda {
     {
         if (err != CUBLAS_STATUS_SUCCESS)
         {
-            std::stringstream temp;
-            temp << "cublas function returned error code :"
-                 << detail::_cublasGetErrorString(err);
-            throw cublas_exception(temp.str(), err);
+            auto temp = std::string("cublas function returned error code :") +
+                detail::_cublasGetErrorString(err);
+            throw cublas_exception(temp, err);
         }
         return err;
     }

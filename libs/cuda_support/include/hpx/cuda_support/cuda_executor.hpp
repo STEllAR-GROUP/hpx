@@ -20,7 +20,9 @@
 // CUDA runtime
 #include <cuda_runtime.h>
 //
-#include <sstream>
+#include <cstddef>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace cuda {
 

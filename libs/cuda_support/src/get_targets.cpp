@@ -24,6 +24,7 @@
 
 #include <hpx/cuda_support/target.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
