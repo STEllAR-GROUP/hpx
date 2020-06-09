@@ -26,6 +26,7 @@ import functools, signal
 import traceback
 import time
 import threading
+import re
 
 from optparse import OptionParser
 
@@ -54,17 +55,37 @@ def subproc(cmd):
 
 # Run with no run wrapper
 # This is just starting "localities" processes on the local node
-def run_none(cmd, localities, verbose):
-    if localities > 1:
-        for locality in range(localities):
-            exec_cmd = cmd + ['--hpx:node=' + str(locality)]
-            if verbose:
-                print('Executing command: ' + ' '.join(exec_cmd))
-            subproc(exec_cmd)
+def run_none(cmd, localities, nodes, verbose):
+    if nodes is None:
+        if localities > 1:
+            for locality in range(localities):
+                exec_cmd = cmd + ['--hpx:node=' + str(locality)]
+                if verbose:
+                    print('Executing command: ' + ' '.join(exec_cmd))
+                subproc(exec_cmd)
+        else:
+             if verbose:
+                 print('Executing command: ' + ' '.join(cmd))
+             subproc(cmd)
     else:
-         if verbose:
-             print('Executing command: ' + ' '.join(cmd))
-         subproc(cmd)
+        assert len(nodes) == localities, "Number of localities must mach number of nodes."
+        if localities > 1:
+            for locality in range(localities):
+                node = nodes[locality]
+                node0 = nodes[0]
+                g = re.match(r'([\d.]+):(\d+)$', node)
+                ip = g.group(1)
+                port = g.group(2)
+                exec_cmd = ["ssh", ip ] + cmd + ['--hpx:hpx=' + node, '--hpx:agas=' + node0] # yyy
+                if locality != 0:
+                    exec_cmd += ["--hpx:worker"]
+                if verbose:
+                    print('Executing command: ' + ' '.join(exec_cmd))
+                subproc(exec_cmd)
+        else:
+             if verbose:
+                 print('Executing command: ' + ' '.join(cmd))
+             subproc(cmd)
 
 # Run with mpiexec
 # This is executing mpiexec with the "-np" option set to the number of localities
@@ -99,14 +120,17 @@ def run_jsrun(cmd, localities, verbose):
     subproc(exec_cmd)
 
 # Select the appropriate run function based on runwrapper
-def run(cmd, runwrapper, localities, verbose):
+def run(cmd, runwrapper, localities, nodes, verbose):
     if runwrapper == 'none':
-        run_none(cmd, localities, verbose)
+        run_none(cmd, localities, nodes, verbose)
     if runwrapper == 'mpi':
+        assert nodes is None, "nodes option only valid with tcp parcelport."
         run_mpi(cmd, localities, verbose)
     if runwrapper == 'srun':
+        assert nodes is None, "nodes option only valid with tcp parcelport."
         run_srun(cmd, localities, verbose)
     if runwrapper == 'jsrun':
+        assert nodes is None, "nodes option only valid with tcp parcelport."
         run_jsrun(cmd, localities, verbose)
 
 # Building the command line. This function concatenates the different options
@@ -209,6 +233,11 @@ if __name__ == '__main__':
     default_env = (lambda env, default:
         os.environ[env] if env in os.environ else default)
 
+    parser.add_option('-n', '--nodes'
+      , action='store', type='str'
+      , dest='nodes', default=default_env('HPXRUN_NODES', '')
+      , help='Comma delimited list of ip addresses to run on')
+
     parser.add_option('-l', '--localities'
       , action='store', type='int'
       , dest='localities', default=default_env('HPXRUN_LOCALITIES', '1')
@@ -256,7 +285,14 @@ if __name__ == '__main__':
     if options.verbose:
         print('Base command is "' + ' '.join(cmd) + '"')
 
-    run(cmd, options.runwrapper, options.localities, options.verbose)
+    if options.nodes == '':
+        nodes = None
+    else:
+        assert re.match(r'^\d+(\.\d+){3}:\d+(,\d+(\.\d+){3}:\d+)*$', options.nodes), \
+            "nodes must be a comma-delimited list of 'ip address:port' units."
+        nodes = options.nodes.split(',')
+
+    run(cmd, options.runwrapper, options.localities, nodes, options.verbose)
 
     if options.expected == 0:
         ret_expected = (lambda ret : True if ret == 0 else False)
