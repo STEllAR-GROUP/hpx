@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 #include <hpx/preprocessor/cat.hpp>

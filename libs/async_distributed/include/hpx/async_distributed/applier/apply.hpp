@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/apply_helper.hpp>
 #include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
 #include <hpx/async_local/apply.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime/actions/action_priority.hpp>
 #include <hpx/runtime/actions/action_support.hpp>

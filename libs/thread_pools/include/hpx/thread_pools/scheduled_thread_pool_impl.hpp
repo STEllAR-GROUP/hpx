@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/affinity/affinity_data.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>

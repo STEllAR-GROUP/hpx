@@ -10,9 +10,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 // include unist.d conditionally to check for POSIX version. Not all OSs have the

@@ -10,12 +10,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
+#include <hpx/assert.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
 #include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/statistics/min.hpp>
 #include <hpx/type_support/unused.hpp>

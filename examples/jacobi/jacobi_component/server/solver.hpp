@@ -11,7 +11,7 @@
 #include "../stencil_iterator.hpp"
 #include "stencil_iterator.hpp"
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/modules/timing.hpp>

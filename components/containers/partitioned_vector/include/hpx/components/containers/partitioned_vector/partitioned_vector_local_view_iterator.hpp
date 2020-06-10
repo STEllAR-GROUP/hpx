@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 

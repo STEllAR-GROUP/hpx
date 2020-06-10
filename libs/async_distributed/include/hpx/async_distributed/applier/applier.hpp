@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier_fwd.hpp>    // this needs to go first
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>

@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>

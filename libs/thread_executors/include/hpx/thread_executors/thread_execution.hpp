@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
+#include <hpx/assert.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/type_support/pack.hpp>

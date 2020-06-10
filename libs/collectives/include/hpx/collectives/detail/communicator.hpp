@@ -10,12 +10,12 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/and_gate.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/basic_execution.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>

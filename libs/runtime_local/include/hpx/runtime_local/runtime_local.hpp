@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/topology.hpp>

@@ -33,9 +33,9 @@
 #include <winnt.h>
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 

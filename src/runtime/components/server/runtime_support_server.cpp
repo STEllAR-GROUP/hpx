@@ -47,7 +47,7 @@
 #include <hpx/modules/collectives.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>

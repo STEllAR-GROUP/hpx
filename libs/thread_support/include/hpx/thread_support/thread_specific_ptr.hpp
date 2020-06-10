@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 
 // Needed to get potentially get _GLIBCXX_HAVE_TLS
 #include <cstdlib>

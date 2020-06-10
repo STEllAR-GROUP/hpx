@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/executors/execution_policy.hpp>

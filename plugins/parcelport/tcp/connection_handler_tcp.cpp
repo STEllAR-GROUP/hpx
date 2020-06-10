@@ -12,7 +12,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/asio/asio_util.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/futures/future.hpp>
