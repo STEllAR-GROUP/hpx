@@ -212,8 +212,10 @@ namespace boost
         {"(\\bstd\\s*::\\s*declval\\b)", "std::declval", "utility"},
         {"(\\bstd\\s*::\\s*pair\\b)", "std::pair", "utility"},
         {"(\\bstd\\s*::\\s*make_pair\\b)", "std::make_pair", "utility"},
+        // exception
         {"(\\bstd\\s*::\\s*exception_ptr\\b)", "std::exception_ptr",
             "exception"},
+        {"(\\bstd\\s*::\\s*terminate\\b)", "std::terminate", "exception"},
         // algorithm
         {"(\\bstd\\s*::\\s*swap_ranges\\b)", "std::swap_ranges", "algorithm"},
         {"(\\bstd\\s*::\\s*iter_swap\\b)", "std::iter_swap", "algorithm"},

@@ -21,18 +21,19 @@
 #include <plugins/parcelport/verbs/rdma/verbs_completion_queue.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_device.hpp>
 //
-#include <poll.h>
-#include <errno.h>
-#include <iomanip>
-#include <sstream>
-#include <queue>
-#include <stdio.h>
-#include <thread>
-#include <fstream>
-#include <memory>
-#include <utility>
 #include <cstdint>
 #include <cstring>
+#include <errno.h>
+#include <exception>
+#include <fstream>
+#include <iomanip>
+#include <memory>
+#include <poll.h>
+#include <queue>
+#include <sstream>
+#include <stdio.h>
+#include <thread>
+#include <utility>
 //
 #include <netinet/in.h>
 

@@ -30,6 +30,7 @@
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
@@ -734,6 +735,8 @@ namespace hpx {
                 []() { return hpx::get_os_thread_count(); });
             hpx::parallel::v1::detail::set_exception_list_termination_handler(
                 &hpx::terminate);
+            hpx::parallel::util::detail::
+                set_parallel_exception_termination_handler(&hpx::terminate);
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");

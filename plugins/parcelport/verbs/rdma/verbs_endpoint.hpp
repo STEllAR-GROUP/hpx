@@ -20,8 +20,9 @@
 #include <plugins/parcelport/verbs/rdma/verbs_memory_region.hpp>
 #include <plugins/parcelport/verbs/rdma/verbs_protection_domain.hpp>
 //
-#include <inttypes.h>
 #include <atomic>
+#include <exception>
+#include <inttypes.h>
 #include <iomanip>
 #include <iostream>
 #include <memory>

@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/hpx_finalize.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 
 #include <exception>
 #include <list>
@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_NORETURN static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
-            hpx::terminate();
+            parallel_exception_termination_handler();
         }
 
         template <typename T>
@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             for (hpx::future<T> const& f : workitems)
             {
                 if (f.has_exception())
-                    hpx::terminate();
+                    parallel_exception_termination_handler();
             }
         }
 
@@ -102,7 +102,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             for (hpx::shared_future<T> const& f : workitems)
             {
                 if (f.has_exception())
-                    hpx::terminate();
+                    parallel_exception_termination_handler();
             }
         }
     };
