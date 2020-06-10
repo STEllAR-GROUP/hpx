@@ -6,4 +6,8 @@
 
 #pragma once
 
-#include <hpx/wrap_main.hpp>
+#include <hpx/hpx_finalize.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/hpx_init_params.hpp>
+#include <hpx/hpx_start.hpp>
+#include <hpx/hpx_suspend.hpp>
