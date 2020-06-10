@@ -928,6 +928,14 @@ hpx_option(
   HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF
   CATEGORY "Profiling"
 )
+
+# LibCDS option
+hpx_option(
+        HPX_WITH_LIBCDS BOOL "Enable LibCDS support." OFF)
+if(HPX_WITH_LIBCDS)
+  hpx_add_config_define(HPX_HAVE_LIBCDS) # tell HPX that we use LibCDS
+endif()
+
 # ##############################################################################
 # enable OpenMP emulation
 # ##############################################################################
@@ -2156,6 +2164,8 @@ include(HPX_SetupPapi)
 include(HPX_SetupHpxmp)
 include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
+
+include(HPX_SetupLibCDS)
 
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)
