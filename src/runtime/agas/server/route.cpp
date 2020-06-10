@@ -27,17 +27,17 @@
 #include <utility>
 #include <vector>
 
-
-namespace {
+namespace hpx { namespace detail {
     void update_agas_cache(hpx::naming::gid_type const& gid,
         hpx::naming::address const& addr, std::uint64_t count,
         std::uint64_t offset)
     {
-        hpx::naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
+        hpx::naming::get_agas_client().update_cache_entry(
+            gid, addr, count, offset);
     }
-}
+}}    // namespace hpx::detail
 
-HPX_PLAIN_ACTION_ID(update_agas_cache, update_agas_cache_action,
+HPX_PLAIN_ACTION_ID(hpx::detail::update_agas_cache, update_agas_cache_action,
     hpx::actions::update_agas_cache_action_id)
 
 namespace hpx { namespace agas { namespace server

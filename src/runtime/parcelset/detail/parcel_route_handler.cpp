@@ -9,10 +9,11 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime/parcelset/detail/parcel_route_handler.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime_distributed.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail

@@ -318,6 +318,10 @@ function(add_hpx_module name)
     hpx_${name} PROPERTIES FOLDER "Core/Modules" POSITION_INDEPENDENT_CODE ON
   )
 
+  if(HPX_WITH_UNITY_BUILD)
+    set_target_properties(hpx_${name} PROPERTIES UNITY_BUILD ON)
+  endif()
+
   if(MSVC)
     set_target_properties(
       hpx_${name}
