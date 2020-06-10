@@ -22,6 +22,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_local/get_num_localities.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
