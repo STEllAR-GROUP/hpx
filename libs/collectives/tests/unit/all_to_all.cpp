@@ -9,6 +9,7 @@
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -21,13 +22,18 @@ constexpr char const* all_to_all_direct_basename = "/test/all_to_all_direct/";
 
 int hpx_main(int argc, char* argv[])
 {
+    std::uint32_t this_locality = hpx::get_locality_id();
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST(num_localities >= 2);
 
     // test functionality based on future<> of local result
     for (int i = 0; i != 10; ++i)
     {
-        hpx::future<std::uint32_t> value =
-            hpx::make_ready_future(hpx::get_locality_id());
+        std::vector<std::uint32_t> values(num_localities);
+        std::fill(values.begin(), values.end(), this_locality);
+
+        hpx::future<std::vector<std::uint32_t>> value =
+            hpx::make_ready_future(std::move(values));
 
         hpx::future<std::vector<std::uint32_t>> overall_result =
             hpx::all_to_all(
@@ -45,11 +51,12 @@ int hpx_main(int argc, char* argv[])
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        std::uint32_t value = hpx::get_locality_id();
+        std::vector<std::uint32_t> values(num_localities);
+        std::fill(values.begin(), values.end(), this_locality);
 
         hpx::future<std::vector<std::uint32_t>> overall_result =
-            hpx::all_to_all(
-                all_to_all_direct_basename, value, num_localities, i);
+            hpx::all_to_all(all_to_all_direct_basename, std::move(values),
+                num_localities, i);
 
         std::vector<std::uint32_t> r = overall_result.get();
         HPX_TEST_EQ(r.size(), num_localities);

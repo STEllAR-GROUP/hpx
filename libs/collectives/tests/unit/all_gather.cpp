@@ -16,8 +16,8 @@
 #include <utility>
 #include <vector>
 
-constexpr char const* all_reduce_basename = "/test/all_reduce/";
-constexpr char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
+constexpr char const* all_gather_basename = "/test/all_gather/";
+constexpr char const* all_gather_direct_basename = "/test/all_gather_direct/";
 
 int hpx_main(int argc, char* argv[])
 {
@@ -30,16 +30,17 @@ int hpx_main(int argc, char* argv[])
         hpx::future<std::uint32_t> value =
             hpx::make_ready_future(hpx::get_locality_id());
 
-        hpx::future<std::uint32_t> overall_result =
-            hpx::all_reduce(all_reduce_basename, std::move(value),
-                std::plus<std::uint32_t>{}, num_localities, i);
+        hpx::future<std::vector<std::uint32_t>> overall_result =
+            hpx::all_gather(
+                all_gather_basename, std::move(value), num_localities, i);
 
-        std::uint32_t sum = 0;
-        for (std::uint32_t j = 0; j != num_localities; ++j)
+        std::vector<std::uint32_t> r = overall_result.get();
+        HPX_TEST_EQ(r.size(), num_localities);
+
+        for (std::size_t j = 0; j != r.size(); ++j)
         {
-            sum += j;
+            HPX_TEST_EQ(r[j], j);
         }
-        HPX_TEST_EQ(sum, overall_result.get());
     }
 
     // test functionality based on immediate local result value
@@ -47,16 +48,17 @@ int hpx_main(int argc, char* argv[])
     {
         std::uint32_t value = hpx::get_locality_id();
 
-        hpx::future<std::uint32_t> overall_result =
-            hpx::all_reduce(all_reduce_direct_basename, value,
-                std::plus<std::uint32_t>{}, num_localities, i);
+        hpx::future<std::vector<std::uint32_t>> overall_result =
+            hpx::all_gather(
+                all_gather_direct_basename, value, num_localities, i);
 
-        std::uint32_t sum = 0;
-        for (std::uint32_t j = 0; j != num_localities; ++j)
+        std::vector<std::uint32_t> r = overall_result.get();
+        HPX_TEST_EQ(r.size(), num_localities);
+
+        for (std::size_t j = 0; j != r.size(); ++j)
         {
-            sum += j;
+            HPX_TEST_EQ(r[j], j);
         }
-        HPX_TEST_EQ(sum, overall_result.get());
     }
 
     return hpx::finalize();
