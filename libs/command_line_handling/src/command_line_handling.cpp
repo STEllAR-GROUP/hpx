@@ -861,27 +861,27 @@ namespace hpx { namespace util {
 
         // If the user has not specified an explicit runtime mode we
         // retrieve it from the command line.
-        if (hpx::runtime_mode_default == rtcfg_.mode_)
+        if (hpx::runtime_mode::default_ == rtcfg_.mode_)
         {
 #if defined(HPX_HAVE_NETWORKING)
             // The default mode is console, i.e. all workers need to be
             // started with --worker/-w.
-            rtcfg_.mode_ = hpx::runtime_mode_console;
-            if (vm.count("hpx:console") + vm.count("hpx:worker") +
-                    vm.count("hpx:connect") >
+            rtcfg_.mode_ = hpx::runtime_mode::console;
+            if (vm.count("hpx:local") + vm.count("hpx:console") +
+                    vm.count("hpx:worker") + vm.count("hpx:connect") >
                 1)
             {
                 throw hpx::detail::command_line_error(
                     "Ambiguous command line options. "
-                    "Do not specify more than one of --hpx:console, "
-                    "--hpx:worker, or --hpx:connect");
+                    "Do not specify more than one of --hpx:local, "
+                    "--hpx:console, --hpx:worker, or --hpx:connect");
             }
 
             // In these cases we default to executing with an empty
             // hpx_main, except if specified otherwise.
             if (vm.count("hpx:worker"))
             {
-                rtcfg_.mode_ = hpx::runtime_mode_worker;
+                rtcfg_.mode_ = hpx::runtime_mode::worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
@@ -895,105 +895,115 @@ namespace hpx { namespace util {
             }
             else if (vm.count("hpx:connect"))
             {
-                rtcfg_.mode_ = hpx::runtime_mode_connect;
+                rtcfg_.mode_ = hpx::runtime_mode::connect;
             }
+            else if (vm.count("hpx:local"))
+            {
+                rtcfg_.mode_ = hpx::runtime_mode::local;
+            }
+#elif defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+            rtcfg_.mode_ = hpx::runtime_mode::console;
 #else
-            rtcfg_.mode_ = hpx::runtime_mode_console;
+            rtcfg_.mode_ = hpx::runtime_mode::local;
 #endif
         }
 
 #if defined(HPX_HAVE_NETWORKING)
-        // we initialize certain settings if --node is specified (or data
-        // has been retrieved from the environment)
-        if (rtcfg_.mode_ == hpx::runtime_mode_connect)
+        if (rtcfg_.mode_ != hpx::runtime_mode::local)
         {
-            // when connecting we need to select a unique port
-            hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
-                hpx::util::from_string<std::uint16_t>(rtcfg_.get_entry(
-                    "hpx.parcel.port", HPX_CONNECTING_IP_PORT)));
+            // we initialize certain settings if --node is specified (or data
+            // has been retrieved from the environment)
+            if (rtcfg_.mode_ == hpx::runtime_mode::connect)
+            {
+                // when connecting we need to select a unique port
+                hpx_port = cfgmap.get_value<std::uint16_t>("hpx.parcel.port",
+                    hpx::util::from_string<std::uint16_t>(rtcfg_.get_entry(
+                        "hpx.parcel.port", HPX_CONNECTING_IP_PORT)));
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
-            // do not execute any explicit hpx_main except if asked
-            // otherwise
-            if (!vm.count("hpx:run-hpx-main") &&
-                !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
-            {
-                util::detail::reset_function(hpx_main_f_);
-            }
+                // do not execute any explicit hpx_main except if asked
+                // otherwise
+                if (!vm.count("hpx:run-hpx-main") &&
+                    !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
+                {
+                    util::detail::reset_function(hpx_main_f_);
+                }
 #endif
-        }
-        else if (node != std::size_t(-1) || vm.count("hpx:node"))
-        {
-            // command line overwrites the environment
-            if (vm.count("hpx:node"))
-            {
-                if (vm.count("hpx:agas"))
-                {
-                    throw hpx::detail::command_line_error(
-                        "Command line option --hpx:node "
-                        "is not compatible with --hpx:agas");
-                }
-                node = vm["hpx:node"].as<std::size_t>();
             }
-
-            if (!vm.count("hpx:worker"))
+            else if (node != std::size_t(-1) || vm.count("hpx:node"))
             {
-                if (env.agas_node() == node)
+                // command line overwrites the environment
+                if (vm.count("hpx:node"))
                 {
-                    // console node, by default runs AGAS
-                    run_agas_server = true;
-                    rtcfg_.mode_ = hpx::runtime_mode_console;
-                }
-                else
-                {
-                    // don't use port zero for non-console localities
-                    if (hpx_port == 0 && node != 0)
-                        hpx_port = HPX_INITIAL_IP_PORT;
-
-                    // each node gets an unique port
-                    hpx_port = static_cast<std::uint16_t>(hpx_port + node);
-                    rtcfg_.mode_ = hpx::runtime_mode_worker;
-
-#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
-                    // do not execute any explicit hpx_main except if asked
-                    // otherwise
-                    if (!vm.count("hpx:run-hpx-main") &&
-                        !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
+                    if (vm.count("hpx:agas"))
                     {
-                        util::detail::reset_function(hpx_main_f_);
+                        throw hpx::detail::command_line_error(
+                            "Command line option --hpx:node "
+                            "is not compatible with --hpx:agas");
                     }
+                    node = vm["hpx:node"].as<std::size_t>();
+                }
+
+                if (!vm.count("hpx:worker"))
+                {
+                    if (env.agas_node() == node)
+                    {
+                        // console node, by default runs AGAS
+                        run_agas_server = true;
+                        rtcfg_.mode_ = hpx::runtime_mode::console;
+                    }
+                    else
+                    {
+                        // don't use port zero for non-console localities
+                        if (hpx_port == 0 && node != 0)
+                            hpx_port = HPX_INITIAL_IP_PORT;
+
+                        // each node gets an unique port
+                        hpx_port = static_cast<std::uint16_t>(hpx_port + node);
+                        rtcfg_.mode_ = hpx::runtime_mode::worker;
+
+#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
+                        // do not execute any explicit hpx_main except if asked
+                        // otherwise
+                        if (!vm.count("hpx:run-hpx-main") &&
+                            !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
+                        {
+                            util::detail::reset_function(hpx_main_f_);
+                        }
 #endif
+                    }
+                }
+
+                // store node number in configuration, don't do that if we're on a
+                // worker and the node number is zero
+                if (!vm.count("hpx:worker") || node != 0)
+                {
+                    ini_config.emplace_back(
+                        "hpx.locality!=" + std::to_string(node));
                 }
             }
 
-            // store node number in configuration, don't do that if we're on a
-            // worker and the node number is zero
-            if (!vm.count("hpx:worker") || node != 0)
+            if (vm.count("hpx:hpx"))
             {
-                ini_config.emplace_back(
-                    "hpx.locality!=" + std::to_string(node));
+                if (!util::split_ip_address(
+                        vm["hpx:hpx"].as<std::string>(), hpx_host, hpx_port))
+                {
+                    std::cerr
+                        << "hpx::init: command line warning: illegal port "
+                           "number given, using default value instead."
+                        << std::endl;
+                }
             }
-        }
 
-        if (vm.count("hpx:hpx"))
-        {
-            if (!util::split_ip_address(
-                    vm["hpx:hpx"].as<std::string>(), hpx_host, hpx_port))
+            if ((vm.count("hpx:connect") ||
+                    rtcfg_.mode_ == hpx::runtime_mode::connect) &&
+                hpx_host == "127.0.0.1")
             {
-                std::cerr << "hpx::init: command line warning: illegal port "
-                             "number given, using default value instead."
-                          << std::endl;
+                hpx_host = hpx::util::resolve_public_ip_address();
             }
-        }
 
-        if ((vm.count("hpx:connect") ||
-                rtcfg_.mode_ == hpx::runtime_mode_connect) &&
-            hpx_host == "127.0.0.1")
-        {
-            hpx_host = hpx::util::resolve_public_ip_address();
+            ini_config.emplace_back("hpx.node!=" + std::to_string(node));
         }
-
-        ini_config.emplace_back("hpx.node!=" + std::to_string(node));
 #endif
 
         // handle setting related to schedulers
@@ -1086,129 +1096,140 @@ namespace hpx { namespace util {
         agas_host = mapnames.map(agas_host, agas_port);
 
         // sanity checks
-        if (num_localities_ == 1 && !vm.count("hpx:agas") &&
-            !vm.count("hpx:node"))
+        if (rtcfg_.mode_ != hpx::runtime_mode::local && num_localities_ == 1 &&
+            !vm.count("hpx:agas") && !vm.count("hpx:node"))
         {
             // We assume we have to run the AGAS server if the number of
             // localities to run on is not specified (or is '1')
             // and no additional option (--hpx:agas or --hpx:node) has been
             // specified. That simplifies running small standalone
             // applications on one locality.
-            run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
+            run_agas_server = rtcfg_.mode_ != runtime_mode::connect;
         }
 
+        if (rtcfg_.mode_ != hpx::runtime_mode::local)
+        {
 #if defined(HPX_HAVE_NETWORKING)
-        if (hpx_host == agas_host && hpx_port == agas_port)
-        {
-            // we assume that we need to run the agas server if the user
-            // asked for the same network addresses for HPX and AGAS
-            run_agas_server = rtcfg_.mode_ != runtime_mode_connect;
-        }
-        else if (run_agas_server)
-        {
-            // otherwise, if the user instructed us to run the AGAS server,
-            // we set the AGAS network address to the same value as the HPX
-            // network address
-            if (agas_host == HPX_INITIAL_IP_ADDRESS)
+            if (hpx_host == agas_host && hpx_port == agas_port)
             {
-                agas_host = hpx_host;
-                agas_port = hpx_port;
+                // we assume that we need to run the agas server if the user
+                // asked for the same network addresses for HPX and AGAS
+                run_agas_server = rtcfg_.mode_ != runtime_mode::connect;
             }
-        }
-        else if (env.found_batch_environment())
-        {
-            // in batch mode, if the network addresses are different and we
-            // should not run the AGAS server we assume to be in worker mode
-            rtcfg_.mode_ = hpx::runtime_mode_worker;
+            else if (run_agas_server)
+            {
+                // otherwise, if the user instructed us to run the AGAS server,
+                // we set the AGAS network address to the same value as the HPX
+                // network address
+                if (agas_host == HPX_INITIAL_IP_ADDRESS)
+                {
+                    agas_host = hpx_host;
+                    agas_port = hpx_port;
+                }
+            }
+            else if (env.found_batch_environment())
+            {
+                // in batch mode, if the network addresses are different and we
+                // should not run the AGAS server we assume to be in worker mode
+                rtcfg_.mode_ = hpx::runtime_mode::worker;
 
 #if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
-            // do not execute any explicit hpx_main except if asked
-            // otherwise
-            if (!vm.count("hpx:run-hpx-main") &&
-                !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
-            {
-                util::detail::reset_function(hpx_main_f_);
-            }
+                // do not execute any explicit hpx_main except if asked
+                // otherwise
+                if (!vm.count("hpx:run-hpx-main") &&
+                    !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
+                {
+                    util::detail::reset_function(hpx_main_f_);
+                }
 #endif
-        }
+            }
 
-        // write HPX and AGAS network parameters to the proper ini-file entries
-        ini_config.emplace_back("hpx.parcel.address=" + hpx_host);
-        ini_config.emplace_back("hpx.parcel.port=" + std::to_string(hpx_port));
-        ini_config.emplace_back("hpx.agas.address=" + agas_host);
-        ini_config.emplace_back("hpx.agas.port=" + std::to_string(agas_port));
+            // write HPX and AGAS network parameters to the proper ini-file entries
+            ini_config.emplace_back("hpx.parcel.address=" + hpx_host);
+            ini_config.emplace_back(
+                "hpx.parcel.port=" + std::to_string(hpx_port));
+            ini_config.emplace_back("hpx.agas.address=" + agas_host);
+            ini_config.emplace_back(
+                "hpx.agas.port=" + std::to_string(agas_port));
 
-        if (run_agas_server)
-        {
-            ini_config.emplace_back("hpx.agas.service_mode=bootstrap");
-        }
+            if (run_agas_server)
+            {
+                ini_config.emplace_back("hpx.agas.service_mode=bootstrap");
+            }
 
-        // we can't run the AGAS server while connecting
-        if (run_agas_server && rtcfg_.mode_ == runtime_mode_connect)
-        {
-            throw hpx::detail::command_line_error(
-                "Command line option error: can't run AGAS server"
-                "while connecting to a running application.");
-        }
+            // we can't run the AGAS server while connecting
+            if (run_agas_server && rtcfg_.mode_ == runtime_mode::connect)
+            {
+                throw hpx::detail::command_line_error(
+                    "Command line option error: can't run AGAS server"
+                    "while connecting to a running application.");
+            }
 
 #else
-        ini_config.emplace_back("hpx.agas.service_mode=bootstrap");
+            ini_config.emplace_back("hpx.agas.service_mode=bootstrap");
 #endif
+        }
 
         enable_logging_settings(vm, ini_config);
 
-        // Set number of localities in configuration (do it everywhere,
-        // even if this information is only used by the AGAS server).
-        ini_config.emplace_back(
-            "hpx.localities!=" + std::to_string(num_localities_));
-
-        // FIXME: AGAS V2: if a locality is supposed to run the AGAS
-        //        service only and requests to use 'priority_local' as the
-        //        scheduler, switch to the 'local' scheduler instead.
-        ini_config.emplace_back(std::string("hpx.runtime_mode=") +
-            get_runtime_mode_name(rtcfg_.mode_));
-
-        bool noshutdown_evaluate = false;
-        if (vm.count("hpx:print-counter-at"))
+        if (rtcfg_.mode_ != hpx::runtime_mode::local)
         {
-            std::vector<std::string> print_counters_at =
-                vm["hpx:print-counter-at"].as<std::vector<std::string>>();
+            // Set number of localities in configuration (do it everywhere,
+            // even if this information is only used by the AGAS server).
+            ini_config.emplace_back(
+                "hpx.localities!=" + std::to_string(num_localities_));
 
-            for (std::string const& s : print_counters_at)
+            // FIXME: AGAS V2: if a locality is supposed to run the AGAS
+            //        service only and requests to use 'priority_local' as the
+            //        scheduler, switch to the 'local' scheduler instead.
+            ini_config.emplace_back(std::string("hpx.runtime_mode=") +
+                get_runtime_mode_name(rtcfg_.mode_));
+
+            bool noshutdown_evaluate = false;
+            if (vm.count("hpx:print-counter-at"))
             {
-                if (0 == std::string("startup").find(s))
-                {
-                    ini_config.emplace_back("hpx.print_counter.startup!=1");
-                    continue;
-                }
-                if (0 == std::string("shutdown").find(s))
-                {
-                    ini_config.emplace_back("hpx.print_counter.shutdown!=1");
-                    continue;
-                }
-                if (0 == std::string("noshutdown").find(s))
-                {
-                    ini_config.emplace_back("hpx.print_counter.shutdown!=0");
-                    noshutdown_evaluate = true;
-                    continue;
-                }
+                std::vector<std::string> print_counters_at =
+                    vm["hpx:print-counter-at"].as<std::vector<std::string>>();
 
-                throw hpx::detail::command_line_error(hpx::util::format(
-                    "Invalid argument for option --hpx:print-counter-at: "
-                    "'{1}', allowed values: 'startup', 'shutdown' (default), "
-                    "'noshutdown'",
-                    s));
+                for (std::string const& s : print_counters_at)
+                {
+                    if (0 == std::string("startup").find(s))
+                    {
+                        ini_config.emplace_back("hpx.print_counter.startup!=1");
+                        continue;
+                    }
+                    if (0 == std::string("shutdown").find(s))
+                    {
+                        ini_config.emplace_back(
+                            "hpx.print_counter.shutdown!=1");
+                        continue;
+                    }
+                    if (0 == std::string("noshutdown").find(s))
+                    {
+                        ini_config.emplace_back(
+                            "hpx.print_counter.shutdown!=0");
+                        noshutdown_evaluate = true;
+                        continue;
+                    }
+
+                    throw hpx::detail::command_line_error(hpx::util::format(
+                        "Invalid argument for option --hpx:print-counter-at: "
+                        "'{1}', allowed values: 'startup', 'shutdown' "
+                        "(default), "
+                        "'noshutdown'",
+                        s));
+                }
             }
-        }
 
-        // if any counters have to be evaluated, always print at the end
-        if (vm.count("hpx:print-counter") ||
-            vm.count("hpx:print-counter-reset"))
-        {
-            if (!noshutdown_evaluate)
-                ini_config.emplace_back("hpx.print_counter.shutdown!=1");
-            if (vm.count("hpx:reset-counters"))
-                ini_config.emplace_back("hpx.print_counter.reset!=1");
+            // if any counters have to be evaluated, always print at the end
+            if (vm.count("hpx:print-counter") ||
+                vm.count("hpx:print-counter-reset"))
+            {
+                if (!noshutdown_evaluate)
+                    ini_config.emplace_back("hpx.print_counter.shutdown!=1");
+                if (vm.count("hpx:reset-counters"))
+                    ini_config.emplace_back("hpx.print_counter.reset!=1");
+            }
         }
 
         if (debug_clp)

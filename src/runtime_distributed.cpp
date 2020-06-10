@@ -160,7 +160,7 @@ namespace hpx {
         runtime& rt = get_runtime();
 
         int exit_code = 0;
-        if (runtime_mode_connect == mode)
+        if (runtime_mode::connect == mode)
         {
             lbt_ << "(2nd stage) pre_main: locality is in connect mode, "
                     "skipping 2nd and 3rd stage startup synchronization";

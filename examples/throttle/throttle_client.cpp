@@ -101,6 +101,6 @@ int main(int argc, char* argv[])
     };
 
     hpx::util::function_nonser<void()> const empty;
-    return hpx::init(cmdline, argc, argv, cfg, empty, empty, hpx::runtime_mode_connect);
+    return hpx::init(cmdline, argc, argv, cfg, empty, empty, hpx::runtime_mode::connect);
 }
 

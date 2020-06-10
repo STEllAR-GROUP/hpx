@@ -16,17 +16,40 @@
 namespace hpx {
     /// A HPX runtime can be executed in two different modes: console mode
     /// and worker mode.
-    enum runtime_mode
+    enum class runtime_mode
     {
-        runtime_mode_invalid = -1,
-        runtime_mode_console = 0,    ///< The runtime is the console locality
-        runtime_mode_worker = 1,     ///< The runtime is a worker locality
-        runtime_mode_connect = 2,    ///< The runtime is a worker locality
-                                     ///< connecting late
-        runtime_mode_default = 3,    ///< The runtime mode will be determined
-                                     ///< based on the command line arguments
-        runtime_mode_last
+        invalid = -1,
+        console = 0,     ///< The runtime is the console locality
+        worker = 1,      ///< The runtime is a worker locality
+        connect = 2,     ///< The runtime is a worker locality
+                         ///< connecting late
+        local = 3,       ///< The runtime is fully local
+        default_ = 4,    ///< The runtime mode will be determined
+                         ///< based on the command line arguments
+        last
     };
+
+#if defined(HPX_HAVE_UNSCOPED_ENUM_COMPATIBILITY)
+#define HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG                         \
+    "The unscoped runtime_mode names are deprecated. Please use "              \
+    "runtime_mode::mode instead."
+
+    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    static constexpr runtime_mode runtime_mode_invalid = runtime_mode::invalid;
+    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    static constexpr runtime_mode runtime_mode_console = runtime_mode::console;
+    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    static constexpr runtime_mode runtime_mode_worker = runtime_mode::worker;
+    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    static constexpr runtime_mode runtime_mode_connect = runtime_mode::connect;
+    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    static constexpr runtime_mode runtime_mode_local = runtime_mode::local;
+    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    static constexpr runtime_mode runtime_mode_default = runtime_mode::default_;
+    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    static constexpr runtime_mode runtime_mode_last = runtime_mode::last;
+#undef HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG
+#endif
 
     /// Get the readable string representing the name of the given runtime_mode
     /// constant.

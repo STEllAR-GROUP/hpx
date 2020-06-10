@@ -393,7 +393,7 @@ namespace hpx {
             // initialize logging
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             util::detail::init_logging(
-                cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode_console);
+                cms.rtcfg_, cms.rtcfg_.mode_ == runtime_mode::console);
 #endif
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -610,7 +610,7 @@ namespace hpx {
             // infos (on console only).
             bool print_counters_locally =
                 vm.count("hpx:print-counters-locally") != 0;
-            if (mode == runtime_mode_console || print_counters_locally)
+            if (mode == runtime_mode::console || print_counters_locally)
                 handle_list_and_print_options(rt, vm, print_counters_locally);
 #endif
 
@@ -857,13 +857,42 @@ namespace hpx {
                     resource::get_partitioner().get_command_line_switches();
 
                 // Build and configure this runtime instance.
+                std::unique_ptr<hpx::runtime> rt;
+
+                // Command line handling should have updated this by now.
+                HPX_ASSERT(cms.rtcfg_.mode_ != runtime_mode::default_);
+                switch (cms.rtcfg_.mode_)
+                {
+                case runtime_mode::local:
+                {
+                    LPROGRESS_ << "creating local runtime";
+                    rt.reset(new hpx::runtime(cms.rtcfg_));
+                    break;
+                }
+                default:
+                {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-                using runtime_type = hpx::runtime_distributed;
+                    LPROGRESS_ << "creating distributed runtime";
+                    rt.reset(new hpx::runtime_distributed(cms.rtcfg_));
+                    break;
 #else
-                using runtime_type = hpx::runtime;
+                    char const* mode_name =
+                        get_runtime_mode_name(cms.rtcfg_.mode_);
+                    std::ostringstream s;
+                    s << "Attempted to start the runtime in the mode \""
+                      << mode_name
+                      << "\", but HPX was compiled with "
+                         "HPX_WITH_DISTRIBUTED_RUNTIME=OFF, and \""
+                      << mode_name
+                      << "\" requires HPX_WITH_DISTRIBUTED_RUNTIME=ON. "
+                         "Recompile HPX with HPX_WITH_DISTRIBUTED_RUNTIME=ON "
+                         "or change the runtime mode.";
+                    HPX_THROW_EXCEPTION(
+                        invalid_status, "run_or_start", s.str());
+                    break;
 #endif
-                runtime_type* rt_impl = new runtime_type(cms.rtcfg_);
-                std::unique_ptr<hpx::runtime> rt(rt_impl);
+                }
+                }
 
                 result = run_or_start(blocking, std::move(rt), cms,
                     std::move(params.startup), std::move(params.shutdown));

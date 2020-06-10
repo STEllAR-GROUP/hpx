@@ -179,14 +179,14 @@ public:
     ///        locality.
     bool is_console() const
     {
-        return runtime_type == runtime_mode_console;
+        return runtime_type == runtime_mode::console;
     }
 
     /// \brief Returns whether this addressing_service is connecting to a
     ///        running application
     bool is_connecting() const
     {
-        return runtime_type == runtime_mode_connect;
+        return runtime_type == runtime_mode::connect;
     }
 
     bool resolve_locally_known_addresses(

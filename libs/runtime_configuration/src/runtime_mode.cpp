@@ -20,24 +20,26 @@ namespace hpx {
             "console",    // 0
             "worker",     // 1
             "connect",    // 2
-            "default",    // 3
+            "local",      // 3
+            "default",    // 4
         };
     }
 
     char const* get_runtime_mode_name(runtime_mode state)
     {
-        if (state < runtime_mode_invalid || state >= runtime_mode_last)
+        if (state < runtime_mode::invalid || state >= runtime_mode::last)
             return "invalid (value out of bounds)";
-        return strings::runtime_mode_names[state + 1];
+        return strings::runtime_mode_names[static_cast<int>(state) + 1];
     }
 
     runtime_mode get_runtime_mode_from_name(std::string const& mode)
     {
-        for (std::size_t i = 0; i < runtime_mode_last; ++i)
+        for (std::size_t i = 0;
+             static_cast<runtime_mode>(i) < runtime_mode::last; ++i)
         {
             if (mode == strings::runtime_mode_names[i])
                 return static_cast<runtime_mode>(i - 1);
         }
-        return runtime_mode_invalid;
+        return runtime_mode::invalid;
     }
 }    // namespace hpx

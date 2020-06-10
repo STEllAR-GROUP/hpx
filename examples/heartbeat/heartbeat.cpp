@@ -147,6 +147,6 @@ int main(int argc, char* argv[])
 
     hpx::util::function_nonser<void()> const empty;
     return hpx::init(desc_commandline, argc, argv, cfg, empty,
-        empty, hpx::runtime_mode_connect);
+        empty, hpx::runtime_mode::connect);
 }
 
