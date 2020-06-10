@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_THREAD_AWARE_TIMER_COMPATIBILITY)
 #include <hpx/futures/future.hpp>
-#include <hpx/local_lcos/promise.hpp>
+#include <hpx/lcos_local/promise.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>

@@ -8,7 +8,7 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/local_lcos.hpp>
+#include <hpx/include/lcos_local.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/testing.hpp>
 

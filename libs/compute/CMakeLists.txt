@@ -80,4 +80,4 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 # Temporary since the module still depends on some runtime files
-target_link_libraries(hpx_compute PUBLIC hpx_static_reinit hpx_local_lcos)
+target_link_libraries(hpx_compute PUBLIC hpx_static_reinit hpx_lcos_local)

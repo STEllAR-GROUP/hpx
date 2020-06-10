@@ -92,7 +92,7 @@ add_hpx_module(
     hpx_assertion
     hpx_config
     hpx_errors
-    hpx_local_lcos
+    hpx_lcos_local
     hpx_logging
     hpx_program_options
     hpx_threadmanager

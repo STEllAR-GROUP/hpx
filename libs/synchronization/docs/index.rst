@@ -29,7 +29,7 @@ the C++ standard ones in |hpx| threads:
 * :cpp:class:`hpx::lcos::local::spinlock_no_backoff` (`boost::mutex` compatible spinlock)
 * :cpp:class:`hpx::lcos::local::spinlock_pool`
 
-See :ref:`libs_local_lcos`, :ref:`libs_async_combinators`, and :ref:`libs_async`
+See :ref:`libs_lcos_local`, :ref:`libs_async_combinators`, and :ref:`libs_async`
 for higher level synchronization facilities.
 
 See the :ref:`API reference <libs_synchronization_api>` of this module for more

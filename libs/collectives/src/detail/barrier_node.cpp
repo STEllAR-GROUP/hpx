@@ -9,7 +9,7 @@
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/local_lcos/promise.hpp>
+#include <hpx/lcos_local/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/execution.hpp>

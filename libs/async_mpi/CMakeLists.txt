@@ -42,7 +42,7 @@ add_hpx_module(
     hpx_config
     hpx_errors
     hpx_execution
-    hpx_local_lcos
+    hpx_lcos_local
     hpx_memory
     hpx_mpi_base
     hpx_runtime_local

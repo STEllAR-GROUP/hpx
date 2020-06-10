@@ -52,7 +52,7 @@ set(HPX_CANDIDATE_LIBS
     itt_notify
     lcos_distributed
     async_local
-    local_lcos
+    lcos_local
     logging
     memory
     async_mpi

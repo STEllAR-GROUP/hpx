@@ -659,7 +659,7 @@ jobs:
                   tests.unit.modules.iterator_support \
                   tests.unit.modules.lcos_distributed \
                   tests.unit.modules.async_local \
-                  tests.unit.modules.local_lcos \
+                  tests.unit.modules.lcos_local \
                   tests.unit.modules.logging \
                   tests.unit.modules.memory \
                   tests.unit.modules.naming_base \

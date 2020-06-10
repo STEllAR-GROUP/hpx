@@ -54,7 +54,7 @@ All modules
    /libs/iterator_support/docs/index.rst
    /libs/itt_notify/docs/index.rst
    /libs/lcos_distributed/docs/index.rst
-   /libs/local_lcos/docs/index.rst
+   /libs/lcos_local/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
    /libs/mpi/docs/index.rst

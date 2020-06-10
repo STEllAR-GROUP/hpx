@@ -10,7 +10,7 @@
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/futures/traits/promise_remote_result.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/local_lcos/channel.hpp>
+#include <hpx/lcos_local/channel.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

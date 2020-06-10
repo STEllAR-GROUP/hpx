@@ -45,7 +45,7 @@
 #include <hpx/modules/threadmanager.hpp>
 
 #include <hpx/modules/collectives.hpp>
-#include <hpx/local_lcos/packaged_task.hpp>
+#include <hpx/lcos_local/packaged_task.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
