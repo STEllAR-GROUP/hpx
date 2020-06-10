@@ -10,20 +10,22 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
+#include <hpx/libcds/hpx_tls_manager.hpp>
 #include <hpx/modules/synchronization.hpp>
 
 #include <cds/gc/hp.h>    // for cds::HP (Hazard Pointer) SMR
-#include <cds/init.h>     // for cds::Initialize and cds::Terminate
 
 #include <array>
 #include <atomic>
@@ -40,18 +42,15 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::find_here;
-using hpx::naming::id_type;
+using hpx::finalize;
+using hpx::init;
 
 using hpx::apply;
 using hpx::async;
 using hpx::future;
 using hpx::lcos::wait_each;
 
-using hpx::chrono::high_resolution_timer;
-
-using hpx::cout;
-using hpx::flush;
+using hpx::util::high_resolution_timer;
 
 // global vars we stick here to make printouts easy for plotting
 static std::string queuing = "default";
@@ -87,7 +86,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     //hpx::util::print_cdash_timing(title, duration);
 }
 
-const char* exec_name(hpx::execution::parallel_executor const& exec)
+const char* exec_name(hpx::parallel::execution::parallel_executor const& exec)
 {
     return "parallel_executor";
 }
@@ -98,32 +97,21 @@ const char* exec_name(
     return "parallel_executor_aggregated";
 }
 
+const char* exec_name(
+    hpx::parallel::execution::thread_pool_executor const& exec)
+{
+    return "thread_pool_executor";
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
 std::uint64_t num_iterations = 0;
 
-///////////////////////////////////////////////////////////////////////////////
-struct libcds_thread_manager_wrapper
-{
-    explicit libcds_thread_manager_wrapper(bool uselibcds)
-      : uselibcds_(uselibcds)
-    {
-        if (uselibcds_)
-            cds::gc::hp::smr::attach_thread();
-    }
-    ~libcds_thread_manager_wrapper()
-    {
-        if (uselibcds_)
-            cds::gc::hp::smr::detach_thread();
-    }
-
-    bool uselibcds_;
-};
-
 double null_function(bool uselibcds) noexcept
 {
-    libcds_thread_manager_wrapper wrap(uselibcds);
+    // enable this thread/task to run using libcds support
+    hpx::cds::hpxthread_manager_wrapper cds_hpx_wrap;
 
     if (num_iterations > 0)
     {
@@ -138,6 +126,8 @@ double null_function(bool uselibcds) noexcept
         }
         return dummy[0];
     }
+    if (uselibcds)
+        cds::threading::Manager::detachThread();
     return 0.0;
 }
 
@@ -214,10 +204,10 @@ void measure_function_futures_create_thread_hierarchical_placement(
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto desc = hpx::util::thread_description();
-    auto prio = hpx::threads::thread_priority::normal;
-    auto stack_size = hpx::threads::thread_stacksize::small_;
-    auto num_threads = hpx::get_num_worker_threads();
+    auto const desc = hpx::util::thread_description();
+    auto prio = hpx::threads::thread_priority_normal;
+    auto const stack_size = hpx::threads::thread_stacksize_small;
+    auto const num_threads = hpx::get_num_worker_threads();
     hpx::error_code ec;
 
     // start the clock
@@ -227,7 +217,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
         auto const hint =
             hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
         auto spawn_func = [&thread_func, sched, hint, t, count, num_threads,
-                              desc, prio, stack_size]() {
+                              desc, prio]() {
             std::uint64_t const count_start = t * count / num_threads;
             std::uint64_t const count_end = (t + 1) * count / num_threads;
             hpx::error_code ec;
@@ -235,8 +225,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
             {
                 hpx::threads::thread_init_data init(
                     hpx::threads::thread_function_type(thread_func), desc, prio,
-                    hint, stack_size,
-                    hpx::threads::thread_schedule_state::pending, false, sched);
+                    hint, stack_size, hpx::threads::pending, false, sched);
                 sched->create_thread(init, nullptr, ec);
             }
         };
@@ -246,8 +235,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
 
         hpx::threads::thread_init_data init(
             hpx::threads::thread_function_type(thread_spawn_func), desc, prio,
-            hint, stack_size, hpx::threads::thread_schedule_state::pending,
-            false, sched);
+            hint, stack_size, hpx::threads::pending, false, sched);
         sched->create_thread(init, nullptr, ec);
     }
     l.wait();
@@ -259,25 +247,10 @@ void measure_function_futures_create_thread_hierarchical_placement(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct libcds_wrapper
-{
-    libcds_wrapper()
-    {
-        // Initialize libcds
-        cds::Initialize();
-    }
-
-    ~libcds_wrapper()
-    {
-        // Terminate libcds
-        cds::Terminate();
-    }
-};
-
 int hpx_main(variables_map& vm)
 {
     // Initialize libcds
-    libcds_wrapper wrapper;
+    hpx::cds::libcds_wrapper cds_init_wrapper;
 
     {
         if (vm.count("hpx:queuing"))
@@ -302,10 +275,9 @@ int hpx_main(variables_map& vm)
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        cds::gc::HP hpGC;
-
-        hpx::execution::parallel_executor par;
+        hpx::parallel::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
+        hpx::parallel::execution::thread_pool_executor tpe;
 
         for (int i = 0; i < repetitions; i++)
         {
@@ -316,10 +288,13 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_thread_count(
                     count, csv, par, bool(cds));
                 measure_function_futures_thread_count(
-                    count, csv, par_agg, bool(cds));
+                    count, csv, tpe, bool(cds));
             }
         }
     }
+
+    // Terminate libcds
+    cds::Terminate();
 
     return hpx::finalize();
 }
@@ -332,24 +307,21 @@ int main(int argc, char* argv[])
 
     // clang-format off
     cmdline.add_options()
-        ("futures", value<std::uint64_t>()->default_value(500000),
+        ("futures", value<std::uint64_t>()->default_value(50000),
             "number of futures to invoke")
 
-        ("delay-iterations", value<std::uint64_t>()->default_value(0),
-            "number of iterations in the delay loop")
+            ("delay-iterations", value<std::uint64_t>()->default_value(0),
+             "number of iterations in the delay loop")
 
-        ("csv", "output results as csv (format: count,duration)")
-        ("test-all", "run all benchmarks")
-        ("repetitions", value<int>()->default_value(1),
-            "number of repetitions of the full benchmark")
+            ("csv", "output results as csv (format: count,duration)")
+            ("test-all", "run all benchmarks")
+            ("repetitions", value<int>()->default_value(1),
+             "number of repetitions of the full benchmark")
 
-        ("info", value<std::string>()->default_value("no-info"),
-            "extra info for plot output (e.g. branch name)");
+            ("info", value<std::string>()->default_value("no-info"),
+             "extra info for plot output (e.g. branch name)");
     // clang-format on
 
     // Initialize and run HPX.
-    hpx::init_params init_args;
-    init_args.desc_cmdline = cmdline;
-
-    return hpx::init(argc, argv, init_args);
+    return init(cmdline, argc, argv);
 }

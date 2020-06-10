@@ -1033,31 +1033,20 @@ if(HPX_WITH_APEX)
   )
 endif()
 
-# cmake-format: off
 # LibCDS option
-# NOTE: The libcds option is disabled for the 1.5.0 release as it is not ready
-# for public consumption yet.
-# hpx_option(
-#   HPX_WITH_LIBCDS BOOL "Enable LibCDS support (experimental)." OFF
-#   CATEGORY "Thread Manager" ADVANCED
-# )
-# if(HPX_WITH_LIBCDS)
-#   hpx_option(
-#     HPX_WITH_LIBCDS_GIT_REPOSITORY STRING
-#     "Define the LibCDS git repository to use."
-#     https://github.com/STEllAR-GROUP/libcds CATEGORY "Thread Manager" ADVANCED
-#   )
-#   hpx_option(
-#     HPX_WITH_LIBCDS_GIT_TAG STRING "Define the LibCDS git tag to use." hpx-1.5
-#     CATEGORY "Thread Manager" ADVANCED
-#   )
-#   include(HPX_SetupLibCDS)
-#   if(NOT libcds_POPULATED)
-#     hpx_error("HPX_WITH_LIBCDS was set to ON, but HPX failed to fetch LibCDS")
-#   endif()
-#   hpx_add_config_define(HPX_HAVE_LIBCDS) # tell HPX that we use LibCDS
-# endif()
-# cmake-format: on
+hpx_option(HPX_WITH_LIBCDS BOOL "Enable LibCDS support." OFF)
+if(HPX_WITH_LIBCDS)
+  hpx_option(
+    HPX_WITH_LIBCDS_GIT_REPOSITORY STRING
+    "Define the LibCDS git repository to use."
+    https://github.com/khizmax/libcds.git CATEGORY "Thread Manager" ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_LIBCDS_GIT_TAG STRING "Define the LibCDS git tag to use." hpx-1.5
+    CATEGORY "Thread Manager" ADVANCED
+  )
+  hpx_add_config_define(HPX_HAVE_LIBCDS)
+endif()
 
 hpx_option(
   HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF
@@ -1088,6 +1077,29 @@ hpx_option(
   HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF
   CATEGORY "Profiling"
 )
+# ##############################################################################
+# enable OpenMP emulation
+# ##############################################################################
+hpx_option(
+  HPX_WITH_HPXMP BOOL "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP"
+)
+if(HPX_WITH_HPXMP)
+  if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+                   OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
+  )
+    hpx_option(
+      HPX_WITH_HPXMP_NO_UPDATE BOOL
+      "Do not update code from remote hpxMP repository." OFF CATEGORY "OpenMP"
+    )
+    hpx_option(
+      HPX_WITH_HPXMP_TAG STRING "hpxMP repository tag or branch" "v0.3.0"
+      CATEGORY "OpenMP"
+    )
+  else()
+    hpx_warn("hpxMP can be used only when compiling with clang or gcc")
+    set(HPX_WITH_HPXMP OFF)
+  endif()
+endif()
 
 # Experimental settings
 hpx_option(

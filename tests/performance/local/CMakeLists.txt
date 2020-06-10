@@ -28,10 +28,6 @@ if(NOT HPX_WITH_CUDA)
   list(APPEND benchmarks stream)
 endif()
 
-if(NOT HPX_WITH_SANITIZERS)
-  list(APPEND benchmarks start_stop)
-endif()
-
 if(HPX_WITH_LIBCDS)
   list(APPEND benchmarks libcds_hazard_pointer_overhead)
   set(libcds_hazard_pointer_overhead_FLAGS DEPENDENCIES iostreams_component)
@@ -198,10 +194,6 @@ foreach(benchmark ${benchmarks})
   endif()
 
 endforeach()
-
-if(HPX_WITH_LIBCDS)
-  target_link_libraries(libcds_hazard_pointer_overhead_test PRIVATE cds)
-endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(
