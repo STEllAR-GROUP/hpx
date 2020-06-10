@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/execution.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/execution.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/runtime/threads/thread_pool_base.hpp>

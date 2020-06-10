@@ -20,7 +20,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/thread_executors/limiting_executor.hpp>

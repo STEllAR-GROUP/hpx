@@ -13,8 +13,8 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-#include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution_base/execution.hpp>
 
 #include <algorithm>
 #include <cstddef>

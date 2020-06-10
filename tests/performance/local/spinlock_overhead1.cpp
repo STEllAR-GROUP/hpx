@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>

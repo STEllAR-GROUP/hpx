@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/basic_execution/agent_base.hpp>
-#include <hpx/basic_execution/context_base.hpp>
-#include <hpx/basic_execution/resource_base.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/execution_base/agent_base.hpp>
+#include <hpx/execution_base/context_base.hpp>
+#include <hpx/execution_base/resource_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
@@ -24,16 +24,16 @@
 
 namespace hpx { namespace threads {
 
-    struct HPX_EXPORT execution_context : hpx::basic_execution::context_base
+    struct HPX_EXPORT execution_context : hpx::execution_base::context_base
     {
-        hpx::basic_execution::resource_base const& resource() const override
+        hpx::execution_base::resource_base const& resource() const override
         {
             return resource_;
         }
-        hpx::basic_execution::resource_base resource_;
+        hpx::execution_base::resource_base resource_;
     };
 
-    struct HPX_EXPORT execution_agent : hpx::basic_execution::agent_base
+    struct HPX_EXPORT execution_agent : hpx::execution_base::agent_base
     {
         explicit execution_agent(
             coroutines::detail::coroutine_impl* coroutine) noexcept;

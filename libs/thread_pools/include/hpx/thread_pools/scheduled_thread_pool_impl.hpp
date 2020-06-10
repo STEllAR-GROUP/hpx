@@ -9,8 +9,8 @@
 
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/barrier.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/modules/errors.hpp>

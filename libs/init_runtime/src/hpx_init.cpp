@@ -10,10 +10,10 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>

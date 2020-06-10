@@ -35,7 +35,7 @@ add_hpx_module(
     hpx_asio
     hpx_assertion
     hpx_affinity
-    hpx_basic_execution
+    hpx_execution_base
     hpx_batch_environments
     hpx_concurrency
     hpx_config

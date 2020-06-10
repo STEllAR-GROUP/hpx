@@ -44,7 +44,7 @@ add_hpx_module(
     hpx_allocator_support
     hpx_assertion
     hpx_async_base
-    hpx_basic_execution
+    hpx_execution_base
     hpx_config
     hpx_datastructures
     hpx_errors

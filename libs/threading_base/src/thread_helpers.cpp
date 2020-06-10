@@ -11,9 +11,9 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/modules/errors.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #endif
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/threading_base/detail/reset_lco_description.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>

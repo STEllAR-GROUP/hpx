@@ -57,13 +57,13 @@ namespace hpx { namespace threads {
 
     public:
         coroutine_type::result_type call(
-            hpx::basic_execution::this_thread::detail::agent_storage*
+            hpx::execution_base::this_thread::detail::agent_storage*
                 agent_storage)
         {
             HPX_ASSERT(get_state().state() == active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
 
-            hpx::basic_execution::this_thread::reset_agent ctx(
+            hpx::execution_base::this_thread::reset_agent ctx(
                 agent_storage, agent_);
             return coroutine_(set_state_ex(wait_signaled));
         }

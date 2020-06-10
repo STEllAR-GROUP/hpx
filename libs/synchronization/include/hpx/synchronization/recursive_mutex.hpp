@@ -12,8 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/agent_ref.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/agent_ref.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
@@ -33,7 +33,7 @@ namespace hpx { namespace lcos { namespace local {
 
         private:
             std::atomic<std::uint64_t> recursion_count;
-            std::atomic<hpx::basic_execution::agent_ref> locking_context;
+            std::atomic<hpx::execution_base::agent_ref> locking_context;
             Mutex mtx;
 
         public:
@@ -52,7 +52,7 @@ namespace hpx { namespace lcos { namespace local {
             /// \throws Never throws.
             bool try_lock()
             {
-                auto ctx = hpx::basic_execution::this_thread::agent();
+                auto ctx = hpx::execution_base::this_thread::agent();
                 HPX_ASSERT(ctx);
 
                 return try_recursive_lock(ctx) || try_basic_lock(ctx);
@@ -67,7 +67,7 @@ namespace hpx { namespace lcos { namespace local {
             ///         called outside of a HPX-thread.
             void lock()
             {
-                auto ctx = hpx::basic_execution::this_thread::agent();
+                auto ctx = hpx::execution_base::this_thread::agent();
                 HPX_ASSERT(ctx);
 
                 if (!try_recursive_lock(ctx))
@@ -89,7 +89,7 @@ namespace hpx { namespace lcos { namespace local {
             {
                 if (0 == --recursion_count)
                 {
-                    locking_context.exchange(hpx::basic_execution::agent_ref());
+                    locking_context.exchange(hpx::execution_base::agent_ref());
                     util::unregister_lock(this);
                     util::reset_ignored(&mtx);
                     mtx.unlock();
@@ -98,7 +98,7 @@ namespace hpx { namespace lcos { namespace local {
 
         private:
             bool try_recursive_lock(
-                hpx::basic_execution::agent_ref current_context)
+                hpx::execution_base::agent_ref current_context)
             {
                 if (locking_context.load(std::memory_order_acquire) ==
                     current_context)
@@ -110,7 +110,7 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            bool try_basic_lock(hpx::basic_execution::agent_ref current_context)
+            bool try_basic_lock(hpx::execution_base::agent_ref current_context)
             {
                 if (mtx.try_lock())
                 {

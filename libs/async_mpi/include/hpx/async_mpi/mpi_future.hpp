@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/modules/basic_execution.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/mpi_base/mpi.hpp>

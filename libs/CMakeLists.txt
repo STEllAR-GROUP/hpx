@@ -20,7 +20,7 @@ set(HPX_CANDIDATE_LIBS
     async_distributed
     async_base
     async_combinators
-    basic_execution
+    execution_base
     batch_environments
     cache
     checkpoint

@@ -632,7 +632,7 @@ jobs:
                   tests.unit.modules.assertion \
                   tests.unit.modules.async_distributed \
                   tests.unit.modules.async_combinators \
-                  tests.unit.modules.basic_execution \
+                  tests.unit.modules.execution_base \
                   tests.unit.modules.batch_environments \
                   tests.unit.modules.cache \
                   tests.unit.modules.checkpoint \

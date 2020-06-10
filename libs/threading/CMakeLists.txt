@@ -27,7 +27,7 @@ add_hpx_module(
   COMPAT_HEADERS ${threading_compat_headers}
   DEPENDENCIES
     hpx_assertion
-    hpx_basic_execution
+    hpx_execution_base
     hpx_config
     hpx_coroutines
     hpx_errors

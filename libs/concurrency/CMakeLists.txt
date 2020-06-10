@@ -48,7 +48,7 @@ add_hpx_module(
     hpx_assertion
     hpx_concepts
     hpx_config
-    hpx_basic_execution
+    hpx_execution_base
     hpx_errors
     hpx_hashing
     hpx_itt_notify

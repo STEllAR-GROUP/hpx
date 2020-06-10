@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/agent_ref.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -41,13 +41,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             using hook_type = boost::intrusive::slist_member_hook<
                 boost::intrusive::link_mode<boost::intrusive::normal_link>>;
 
-            queue_entry(hpx::basic_execution::agent_ref ctx, void* q)
+            queue_entry(hpx::execution_base::agent_ref ctx, void* q)
               : ctx_(ctx)
               , q_(q)
             {
             }
 
-            hpx::basic_execution::agent_ref ctx_;
+            hpx::execution_base::agent_ref ctx_;
             void* q_;
             hook_type slist_hook_;
         };

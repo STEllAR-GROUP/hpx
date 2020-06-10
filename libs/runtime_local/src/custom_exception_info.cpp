@@ -7,9 +7,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/debugging/backtrace.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>

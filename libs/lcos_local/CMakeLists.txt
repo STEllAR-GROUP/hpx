@@ -47,7 +47,7 @@ add_hpx_module(
   COMPAT_HEADERS ${lcos_local_compat_headers}
   DEPENDENCIES
     hpx_config
-    hpx_basic_execution
+    hpx_execution_base
     hpx_allocator_support
     hpx_assertion
     hpx_errors

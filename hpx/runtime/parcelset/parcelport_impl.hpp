@@ -29,7 +29,7 @@
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 
 #include <boost/predef/other/endian.h>
 
@@ -173,7 +173,7 @@ namespace hpx { namespace parcelset
         void flush_parcels() override
         {
             // We suspend our thread, which will make progress on the network
-            hpx::basic_execution::this_thread::yield(
+            hpx::execution_base::this_thread::yield(
                 "parcelport_impl::flush_parcels");
 
             // make sure no more work is pending, wait for service pool to get
@@ -833,7 +833,7 @@ namespace hpx { namespace parcelset
             // We yield here for a short amount of time to give another
             // HPX thread the chance to put a subsequent parcel which
             // leads to a more effective parcel buffering
-            //             hpx::basic_execution::this_thread::yield();
+            //             hpx::execution_base::this_thread::yield();
         }
 
 
@@ -937,7 +937,7 @@ namespace hpx { namespace parcelset
                     std::move(handlers));
             }
 
-            hpx::basic_execution::this_thread::yield();
+            hpx::execution_base::this_thread::yield();
         }
 
     public:
