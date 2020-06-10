@@ -88,15 +88,6 @@ endif()
 
 # Default location is $HPX_ROOT/libs/serialization/include_compatibility
 set(serialization_compat_headers
-    
-    
-    
-    
-    
-    
-    
-    
-    
     hpx/runtime/serialization/array.hpp
     hpx/runtime/serialization/bitset.hpp
     hpx/runtime/serialization/complex.hpp

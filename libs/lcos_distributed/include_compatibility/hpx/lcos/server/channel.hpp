@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos_distributed/config/defines.hpp>
-#include <hpx/lcos_distributed/server/channel.hpp>
+#include <hpx/include/lcos.hpp>
 
 #if HPX_LCOS_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/server/channel.hpp is deprecated, \
-    please include hpx/lcos_distributed/server/channel.hpp instead")
+    please include hpx/include/lcos.hpp instead")
 #else
 #warning "The header hpx/lcos/server/channel.hpp is deprecated, \
-    please include hpx/lcos_distributed/server/channel.hpp instead"
+    please include hpx/include/lcos.hpp instead"
 #endif
 #endif

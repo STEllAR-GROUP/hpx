@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/topology/config/defines.hpp>
-#include <hpx/topology/cache_aligned_data.hpp>
+#include <hpx/modules/topology.hpp>
 
 #if HPX_TOPOLOGY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/cache_aligned_data.hpp is deprecated, \
-    please include hpx/topology/topology.hpp instead")
+    please include hpx/modules/topology.hpp instead")
 #else
 #warning "The header hpx/util/cache_aligned_data.hpp is deprecated, \
-    please include hpx/topology/topology.hpp instead"
+    please include hpx/modules/topology.hpp instead"
 #endif
 #endif

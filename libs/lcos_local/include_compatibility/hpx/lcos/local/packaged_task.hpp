@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos_local/config/defines.hpp>
-#include <hpx/lcos_local/packaged_task.hpp>
+#include <hpx/future.hpp>
 
 #if HPX_LCOS_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/local/packaged_task.hpp is deprecated, \
-    please include hpx/lcos_local/packaged_task.hpp instead")
+    please include hpx/future.hpp instead")
 #else
 #warning "The header hpx/lcos/local/packaged_task.hpp is deprecated, \
-    please include hpx/lcos_local/packaged_task.hpp instead"
+    please include hpx/future.hpp instead"
 #endif
 #endif

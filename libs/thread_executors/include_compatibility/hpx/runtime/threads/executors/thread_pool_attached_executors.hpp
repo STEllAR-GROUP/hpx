@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/thread_executors/config/defines.hpp>
-#include <hpx/thread_executors/thread_pool_attached_executors.hpp>
+#include <hpx/include/thread_executors.hpp>
 
 #if HPX_THREAD_EXECUTORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)

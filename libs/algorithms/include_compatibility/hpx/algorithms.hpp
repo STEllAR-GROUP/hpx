@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/config/defines.hpp>
-#include <hpx/modules/algorithms.hpp>
+#include <hpx/algorithm.hpp>
 
 #if HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/algorithms.hpp is deprecated, \
-    please include hpx/modules/algorithms.hpp instead")
+    please include hpx/algorithm.hpp instead")
 #else
 #warning "The header hpx/algorithms.hpp is deprecated, \
-    please include hpx/modules/algorithms.hpp instead"
+    please include hpx/algorithm.hpp instead"
 #endif
 #endif

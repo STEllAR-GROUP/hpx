@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_configuration/config/defines.hpp>
-#include <hpx/runtime_configuration/component_registry_base.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 #if HPX_RUNTIME_CONFIGURATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime_configuration/component_registry_base.hpp is deprecated, \
-    please include hpx/runtime_configuration/component_registry_base.hpp instead")
+    please include hpx/modules/runtime_configuration.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime_configuration/component_registry_base.hpp is deprecated, \
-    please include hpx/runtime_configuration/component_registry_base.hpp instead"
+    please include hpx/modules/runtime_configuration.hpp instead"
 #endif
 #endif

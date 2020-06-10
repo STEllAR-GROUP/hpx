@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/config/defines.hpp>
-#include <hpx/concurrency/concurrentqueue.hpp>
+#include <hpx/modules/concurrency.hpp>
 
 #if HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/lockfree/concurrentqueue.hpp is deprecated, \
-    please include hpx/concurrency/concurrentqueue.hpp instead")
+    please include hpx/modules/concurrency.hpp instead")
 #else
 #warning "The header hpx/util/lockfree/concurrentqueue.hpp is deprecated, \
-    please include hpx/concurrency/concurrentqueue.hpp instead"
+    please include hpx/modules/concurrency.hpp instead"
 #endif
 #endif

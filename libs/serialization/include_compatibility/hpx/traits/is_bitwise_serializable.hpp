@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization.hpp>
 
 #if HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/traits/is_bitwise_serializable.hpp is deprecated, \
-    please include hpx/serialization/traits/is_bitwise_serializable.hpp instead")
+    please include hpx/serialization.hpp instead")
 #else
 #warning "The header hpx/traits/is_bitwise_serializable.hpp is deprecated, \
-    please include hpx/serialization/traits/is_bitwise_serializable.hpp instead"
+    please include hpx/serialization.hpp instead"
 #endif
 #endif

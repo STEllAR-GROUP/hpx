@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/static_reinit/config/defines.hpp>
-#include <hpx/static_reinit/static_reinit.hpp>
+#include <hpx/modules/static_reinit.hpp>
 
 #if HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/static_reinit.hpp is deprecated, \
-    please include hpx/static_reinit/static_reinit.hpp instead")
+    please include hpx/modules/static_reinit.hpp instead")
 #else
 #warning "The header hpx/util/static_reinit.hpp is deprecated, \
-    please include hpx/static_reinit/static_reinit.hpp instead"
+    please include hpx/modules/static_reinit.hpp instead"
 #endif
 #endif

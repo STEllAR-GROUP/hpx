@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/config/defines.hpp>
-#include <hpx/async_distributed/applier/bind_naming_wrappers.hpp>
+#include <hpx/include/async.hpp>
 
 #if HPX_ASYNC_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/applier/bind_naming_wrappers.hpp is deprecated, \
-    please include hpx/async_distributed/applier/bind_naming_wrappers.hpp instead")
+    please include hpx/include/async.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/applier/bind_naming_wrappers.hpp is deprecated, \
-    please include hpx/async_distributed/applier/bind_naming_wrappers.hpp instead"
+    please include hpx/include/async.hpp instead"
 #endif
 #endif

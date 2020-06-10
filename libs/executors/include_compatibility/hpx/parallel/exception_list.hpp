@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/executors/config/defines.hpp>
-#include <hpx/executors/exception_list.hpp>
+#include <hpx/include/parallel_executors.hpp>
 
 #if HPX_EXECUTORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/parallel/exception_list.hpp is deprecated, \
-    please include hpx/executors/exception_list.hpp instead")
+    please include hpx/include/parallel_executors.hpp instead")
 #else
 #warning "The header hpx/parallel/exception_list.hpp is deprecated, \
-    please include hpx/executors/exception_list.hpp instead"
+    please include hpx/include/parallel_executors.hpp instead"
 #endif
 #endif

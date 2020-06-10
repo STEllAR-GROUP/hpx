@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/thread_executors/config/defines.hpp>
-#include <hpx/thread_executors/thread_execution.hpp>
+#include <hpx/include/thread_executors.hpp>
 
 #if HPX_THREAD_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/thread_execution.hpp is deprecated, \
-    please include hpx/thread_executors/thread_execution.hpp instead")
+    please include hpx/include/thread_executors.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/parallel/executors/thread_execution.hpp is deprecated, \
-    please include hpx/thread_executors/thread_execution.hpp instead"
+    please include hpx/include/thread_executors.hpp instead"
 #endif
 #endif

@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/segmented_algorithms/config/defines.hpp>
-#include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
+#include <hpx/modules/segmented_algorithms.hpp>
 
 #if HPX_SEGMENTED_ALGORITHMS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/zip_iterator.hpp is deprecated, please \
-    include hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp instead")
+    include hpx/modules/segmented_algorithms.hpp instead")
 #else
 #warning "The header hpx/util/zip_iterator.hpp is deprecated, please \
-    include hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp instead"
+    include hpx/modules/segmented_algorithms.hpp instead"
 #endif
 #endif

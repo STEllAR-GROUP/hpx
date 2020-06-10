@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/config/defines.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #if HPX_RUNTIME_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/custom_exception_info.hpp \
-    is deprecated, please include hpx/runtime_local/custom_exception_info.hpp instead")
+    is deprecated, please include hpx/modules/runtime_local.hpp instead")
 #else
 #warning "The header hpx/custom_exception_info.hpp \
-    is deprecated, please include hpx/runtime_local/custom_exception_info.hpp instead"
+    is deprecated, please include hpx/modules/runtime_local.hpp instead"
 #endif
 #endif

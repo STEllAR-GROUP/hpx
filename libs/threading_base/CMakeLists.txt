@@ -38,11 +38,6 @@ set(threading_base_headers
 )
 
 set(threading_base_compat_headers
-    
-    
-    
-    
-    
     hpx/runtime/threads/execution_agent.hpp
     hpx/runtime/threads/policies/callback_notifier.hpp
     hpx/runtime/threads/policies/scheduler_base.hpp

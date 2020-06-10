@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/config/defines.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional.hpp>
 
 #if HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/bind_front.hpp is deprecated, \
-    please include hpx/functional/bind_front.hpp instead")
+    please include hpx/functional.hpp instead")
 #else
 #warning "The header hpx/util/bind_front.hpp is deprecated, \
-    please include hpx/functional/bind_front.hpp instead"
+    please include hpx/functional.hpp instead"
 #endif
 #endif

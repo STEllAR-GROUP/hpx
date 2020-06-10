@@ -33,25 +33,9 @@ set(coroutines_headers
 )
 
 set(coroutines_compat_headers
-    hpx/coroutines.hpp
-    hpx/runtime/threads/coroutines/coroutine.hpp
+    hpx/coroutines.hpp hpx/runtime/threads/coroutines/coroutine.hpp
     hpx/runtime/threads/coroutines/coroutine_fwd.hpp
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    hpx/runtime/threads/thread_enums.hpp
-    hpx/runtime/threads/thread_id_type.hpp
+    hpx/runtime/threads/thread_enums.hpp hpx/runtime/threads/thread_id_type.hpp
 )
 
 set(coroutines_sources

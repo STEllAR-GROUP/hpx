@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/affinity/config/defines.hpp>
-#include <hpx/affinity/parse_affinity_options.hpp>
+#include <hpx/modules/affinity.hpp>
 
 #if HPX_AFFINITY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/parse_affinity_options.hpp is deprecated, \
-    please include hpx/affinity/parse_affinity_options.hpp instead")
+    please include hpx/modules/affinity.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/parse_affinity_options.hpp is deprecated, \
-    please include hpx/affinity/parse_affinity_options.hpp instead"
+    please include hpx/modules/affinity.hpp instead"
 #endif
 #endif

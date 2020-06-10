@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/timing/config/defines.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/chrono.hpp>
 
 #if HPX_TIMING_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/high_resolution_clock.hpp is deprecated, \
-    please include hpx/timing/high_resolution_clock.hpp instead")
+    please include hpx/chrono.hpp instead")
 #else
 #warning "The header hpx/util/high_resolution_clock.hpp is deprecated, \
-    please include hpx/timing/high_resolution_clock.hpp instead"
+    please include hpx/chrono.hpp instead"
 #endif
 #endif

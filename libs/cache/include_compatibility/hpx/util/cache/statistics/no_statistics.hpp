@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/cache/config/defines.hpp>
-#include <hpx/cache/statistics/no_statistics.hpp>
+#include <hpx/modules/cache.hpp>
 
 #if HPX_CACHE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/cache/statistics/no_statistics.hpp is deprecated, \
-    please include hpx/cache/statistics/no_statistics.hpp instead")
+    please include hpx/modules/cache.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/util/cache/statistics/no_statistics.hpp is deprecated, \
-    please include hpx/cache/statistics/no_statistics.hpp instead"
+    please include hpx/modules/cache.hpp instead"
 #endif
 #endif

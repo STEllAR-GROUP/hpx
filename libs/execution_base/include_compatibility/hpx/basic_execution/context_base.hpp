@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution_base/config/defines.hpp>
-#include <hpx/execution_base/context_base.hpp>
+#include <hpx/modules/execution_base.hpp>
 
 #if defined(HPX_EXECUTION_BASE_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/basic_execution/context_base.hpp is deprecated, \
-    please include hpx/execution_base/context_base.hpp instead")
+    please include hpx/modules/execution_base.hpp instead")
 #else
 #warning "The header hpx/basic_execution/context_base.hpp is deprecated, \
-    please include hpx/execution_base/context_base.hpp instead"
+    please include hpx/modules/execution_base.hpp instead"
 #endif
 #endif

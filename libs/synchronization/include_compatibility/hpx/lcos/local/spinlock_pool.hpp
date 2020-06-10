@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/config/defines.hpp>
-#include <hpx/synchronization/spinlock_pool.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #if HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/local/spinlock_pool.hpp is deprecated, \
-    please include hpx/synchronization/spinlock_pool.hpp instead")
+    please include hpx/modules/synchronization.hpp instead")
 #else
 #warning "The header hpx/lcos/local/spinlock_pool.hpp is deprecated, \
-    please include hpx/synchronization/spinlock_pool.hpp instead"
+    please include hpx/modules/synchronization.hpp instead"
 #endif
 #endif

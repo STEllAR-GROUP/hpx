@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/config/defines.hpp>
-#include <hpx/algorithms/traits/projected_range.hpp>
+#include <hpx/algorithm.hpp>
 
 #if HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)

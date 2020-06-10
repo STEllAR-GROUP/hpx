@@ -20,14 +20,8 @@ set(pack_traversal_headers
 )
 
 set(pack_traversal_compat_headers
-    hpx/traits/pack_traversal_rebind_container.hpp
-    
-    
-    
-    
-    hpx/util/pack_traversal.hpp
-    hpx/util/pack_traversal_async.hpp
-    hpx/util/unwrap.hpp
+    hpx/traits/pack_traversal_rebind_container.hpp hpx/util/pack_traversal.hpp
+    hpx/util/pack_traversal_async.hpp hpx/util/unwrap.hpp
 )
 
 include(HPX_AddModule)

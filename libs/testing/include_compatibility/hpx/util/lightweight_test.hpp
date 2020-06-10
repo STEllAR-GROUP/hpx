@@ -14,10 +14,10 @@
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/lightweight_test.hpp is deprecated,                   \
-    please include hpx/testing.hpp instead")
+    please include hpx/modules/testing.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/util/lightweight_test.hpp is deprecated,                   \
-    please include hpx/testing.hpp instead"
+    please include hpx/modules/testing.hpp instead"
 #endif
 #endif

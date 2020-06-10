@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
-#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/util.hpp>
 
 #if HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/datastructures.hpp is deprecated, \
-    please include hpx/modules/datastructures.hpp instead")
+    please include hpx/modules/util.hpp instead")
 #else
 #warning "The header hpx/datastructures.hpp is deprecated, \
-    please include hpx/modules/datastructures.hpp instead"
+    please include hpx/modules/util.hpp instead"
 #endif
 #endif

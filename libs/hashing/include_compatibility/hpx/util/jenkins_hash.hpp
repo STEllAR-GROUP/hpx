@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hashing/config/defines.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
+#include <hpx/modules/hashing.hpp>
 
 #if HPX_HASHING_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/jenkins_hash.hpp is deprecated, \
-    please include hpx/hashing/jenkins_hash.hpp instead")
+    please include hpx/modules/hashing.hpp instead")
 #else
 #warning "The header hpx/util/jenkins_hash.hpp is deprecated, \
-    please include hpx/hashing/jenkins_hash.hpp instead"
+    please include hpx/modules/hashing.hpp instead"
 #endif
 #endif

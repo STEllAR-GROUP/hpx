@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
+#include <hpx/execution.hpp>
 
 #if HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/sync_launch_policy_dispatch.hpp is deprecated, please \
-    include hpx/execution/detail/sync_launch_policy_dispatch.hpp instead")
+    include hpx/execution.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/sync_launch_policy_dispatch.hpp is deprecated, please \
-    include hpx/execution/detail/sync_launch_policy_dispatch.hpp instead"
+    include hpx/execution.hpp instead"
 #endif
 #endif

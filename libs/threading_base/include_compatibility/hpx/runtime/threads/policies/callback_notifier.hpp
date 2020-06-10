@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/config/defines.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #if HPX_THREADING_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/callback_notifier.hpp is deprecated, \
-    please include hpx/threading_base/callback_notifier.hpp instead")
+    please include hpx/modules/threading_base.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/callback_notifier.hpp is deprecated, \
-    please include hpx/threading_base/callback_notifier.hpp instead"
+    please include hpx/modules/threading_base.hpp instead"
 #endif
 #endif

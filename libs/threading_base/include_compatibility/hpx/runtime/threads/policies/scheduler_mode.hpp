@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/config/defines.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #if HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/scheduler_mode.hpp is deprecated, \
-    please include hpx/threading_base/scheduler_mode.hpp instead")
+    please include hpx/modules/threading_base.hpp instead")
 #else
 #warning "The header hpx/runtime/threads/scheduler_mode.hpp is deprecated, \
-    please include hpx/threading_base/scheduler_mode.hpp instead"
+    please include hpx/modules/threading_base.hpp instead"
 #endif
 #endif
