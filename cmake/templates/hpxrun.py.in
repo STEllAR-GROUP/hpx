@@ -28,6 +28,29 @@ import time
 import threading
 import re
 
+try:
+    from paramiko import SSHClient
+    has_paramiko = True
+except:
+    has_paramiko = False
+
+# This class allows Paramiko to behave
+# like a subprocess.Popen() proc.
+class ParamikoProc:
+
+    def __init__(self, sout, serr):
+        self.sout = sout
+        self.serr = serr
+
+    def wait(self):
+        self.returncode = self.sout.channel.recv_exit_status()
+        outs = self.sout.read().decode().strip()
+        if outs != '':
+            print(outs)
+        errs = self.serr.read().decode().strip()
+        if errs != '':
+            print(errs)
+
 from optparse import OptionParser
 
 import subprocess
@@ -43,6 +66,13 @@ def subproc(cmd):
             kwargs['creationflags'] = subprocess.CREATE_NEW_PROCESS_GROUP
         except:
             pass
+
+        # If this is to be an ssh command and we are on windows
+        # use the Paramiko (http://www.paramiko.org) instead.
+        if cmd[0] == "ssh":
+            ssh_subproc(cmd)
+            return
+
     proc = Popen(cmd, **kwargs)
     procs.append(proc)
 
@@ -52,6 +82,53 @@ def subproc(cmd):
         signal.signal(signal.SIGBREAK, handler)
     else:
         signal.signal(signal.SIGTERM, handler)
+
+def ssh_subproc(cmd):
+    global SSHClient, procs
+    if not has_paramiko:
+
+        # Attempt to install Paramiko automatically...
+        try:
+            from pip import main as pip_main
+            has_pip = True
+        except:
+            has_pip = False
+        if not has_pip:
+            try:
+                from pip._internal import main as pip_main
+                has_pip = True
+            except:
+                pass
+
+        if has_pip:
+            print("You need the Paramiko SSH client, installing...")
+            pip_main(["install","--user","paramiko"])
+            print("The Paramiko SSH client has been installed. Please re-run your command.")
+        else:
+            print("Please install 'pip install --user paramiko' in order to run this command.")
+            raise Exception()
+
+        exit(1)
+
+    cmd_str = ''
+    for c in cmd[2:]:
+        if cmd_str != '':
+            cmd_str += ' '
+        if re.search(r'\s', c):
+            if not re.search(r"'", c):
+                cmd_str += "'" + c + "'"
+            elif not re.search(r'"', c):
+                cmd_str += '"' + c + '"'
+            else:
+                cmd_str += '"' + re.sub(r'"','\\"',c) + '"'
+        else:
+            cmd_str += c
+
+    client = SSHClient()
+    client.load_system_host_keys()
+    client.connect(cmd[1])
+    sin, sout, serr = client.exec_command(cmd_str)
+    procs += [ParamikoProc(sout, serr)]
 
 # Run with no run wrapper
 # This is just starting "localities" processes on the local node
@@ -75,8 +152,7 @@ def run_none(cmd, localities, nodes, verbose):
                 node0 = nodes[0]
                 g = re.match(r'([\d.]+):(\d+)$', node)
                 ip = g.group(1)
-                port = g.group(2)
-                exec_cmd = ["ssh", ip ] + cmd + ['--hpx:hpx=' + node, '--hpx:agas=' + node0] # yyy
+                exec_cmd = ['ssh', ip] + cmd + ['--hpx:hpx=' + node, '--hpx:agas=' + node0]
                 if locality != 0:
                     exec_cmd += ["--hpx:worker"]
                 if verbose:
@@ -236,7 +312,12 @@ if __name__ == '__main__':
     parser.add_option('-n', '--nodes'
       , action='store', type='str'
       , dest='nodes', default=default_env('HPXRUN_NODES', '')
-      , help='Comma delimited list of ip addresses to run on')
+      , help= \
+'''Comma delimited list of ip addresses (possibly including port) to run on.
+E.g.  167.96.129.220,167.96.131.223  or 167.96.129.220:7910,167.96.131.223:7910. 
+If the port is not specified, port 7910 will be assumed.
+Used by the tcp parcelport only.
+      ''')
 
     parser.add_option('-l', '--localities'
       , action='store', type='int'
@@ -288,9 +369,16 @@ if __name__ == '__main__':
     if options.nodes == '':
         nodes = None
     else:
-        assert re.match(r'^\d+(\.\d+){3}:\d+(,\d+(\.\d+){3}:\d+)*$', options.nodes), \
+        assert re.match(r'^\d+(\.\d+){3}(?::\d+|)(,\d+(\.\d+){3}(?::\d+|))*$', options.nodes), \
             "nodes must be a comma-delimited list of 'ip address:port' units."
-        nodes = options.nodes.split(',')
+        nodes = []
+        for node in options.nodes.split(','):
+            g = re.match(r'([\d.]+)(?::(\d+)|)$', node)
+            ip = g.group(1)
+            port = g.group(2)
+            if port is None:
+                port = "7910"
+            nodes += [ ip + ":" + port ]
 
     run(cmd, options.runwrapper, options.localities, nodes, options.verbose)
 
