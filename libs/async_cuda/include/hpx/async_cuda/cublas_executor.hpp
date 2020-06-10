@@ -107,6 +107,21 @@ namespace hpx { namespace cuda {
             }
         };
 
+        struct cublas_handle
+        {
+            static cublasHandle_t create()
+            {
+                cublasHandle_t handle;
+                check_cublas_error(cublasCreate(&handle));
+                return handle;
+            }
+
+            // deleter for shared_ptr
+            void operator()(cublasHandle_t handle) const
+            {
+                check_cublas_error(cublasDestroy(handle));
+            }
+        };
     }    // namespace detail
 
     // -------------------------------------------------------------------------
@@ -115,6 +130,9 @@ namespace hpx { namespace cuda {
     // -------------------------------------------------------------------------
     struct cublas_executor : cuda_executor
     {
+        // cublas handle is type : struct cublasContext *
+        using handle_ptr = std::shared_ptr<struct cublasContext>;
+
         // construct a cublas stream
         cublas_executor(std::size_t device,
             cublasPointerMode_t pointer_mode = CUBLAS_POINTER_MODE_HOST,
@@ -125,18 +143,11 @@ namespace hpx { namespace cuda {
             detail::cub_debug.debug(
                 debug::str<>("cublas_executor"), "event mode", event_mode);
 
-            handle_ = 0;
-            check_cublas_error(cublasCreate(&handle_));
+            handle_ = handle_ptr(
+                detail::cublas_handle::create(), detail::cublas_handle{});
         }
 
-        cublas_executor(cublas_executor& other) = delete;
-        cublas_executor(const cublas_executor& other) = delete;
-        cublas_executor operator=(const cublas_executor& other) = delete;
-
-        ~cublas_executor()
-        {
-            check_cublas_error(cublasDestroy(handle_));
-        }
+        ~cublas_executor() {}
 
         // -------------------------------------------------------------------------
         // OneWay Execution
@@ -169,12 +180,13 @@ namespace hpx { namespace cuda {
             // make sure we run on the correct device
             check_cuda_error(cudaSetDevice(device_));
             // make sure this operation takes place on our stream
-            check_cublas_error(cublasSetStream(handle_, stream_));
-            check_cublas_error(cublasSetPointerMode(handle_, pointer_mode_));
+            check_cublas_error(cublasSetStream(handle_.get(), stream_));
+            check_cublas_error(
+                cublasSetPointerMode(handle_.get(), pointer_mode_));
             // insert the cublas handle in the arg list and call the cublas function
             detail::dispatch_helper<R, Params...> helper{};
             return helper(
-                cublas_function, handle_, std::forward<Args>(args)...);
+                cublas_function, handle_.get(), std::forward<Args>(args)...);
         }
 
         // -------------------------------------------------------------------------
@@ -204,10 +216,11 @@ namespace hpx { namespace cuda {
                 // make sue we run on the correct device
                 check_cuda_error(cudaSetDevice(device_));
                 // make sure this operation takes place on our stream
-                check_cublas_error(cublasSetStream(handle_, stream_));
+                check_cublas_error(cublasSetStream(handle_.get(), stream_));
                 // insert the cublas handle in the arg list and call the cublas function
                 detail::dispatch_helper<R, Params...> helper;
-                helper(cublas_function, handle_, std::forward<Args>(args)...);
+                helper(cublas_function, handle_.get(),
+                    std::forward<Args>(args)...);
                 result = std::move(get_future());
             }
             catch (const hpx::exception& e)
@@ -232,11 +245,11 @@ namespace hpx { namespace cuda {
         // return a copy of the cublas handle
         cublasHandle_t get_handle()
         {
-            return handle_;
+            return handle_.get();
         }
 
-    private:
-        cublasHandle_t handle_;
+    protected:
+        handle_ptr handle_;
         cublasPointerMode_t pointer_mode_;
     };
 

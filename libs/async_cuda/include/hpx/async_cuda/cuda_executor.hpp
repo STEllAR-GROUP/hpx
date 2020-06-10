@@ -75,10 +75,6 @@ namespace hpx { namespace cuda {
     {
         using future_type = hpx::future<void>;
 
-        cuda_executor_base(cuda_executor_base& other) = delete;
-        cuda_executor_base(const cuda_executor_base& other) = delete;
-        cuda_executor_base operator=(const cuda_executor_base& other) = delete;
-
         // -------------------------------------------------------------------------
         // constructors - create a cuda stream that all tasks invoked by
         // this helper will use
@@ -86,25 +82,25 @@ namespace hpx { namespace cuda {
         cuda_executor_base(std::size_t device, bool event_mode)
           : device_(device)
           , event_mode_(event_mode)
-          , target_(device)
         {
-            stream_ = target_.native_handle().get_stream();
+            target_ = std::make_shared<hpx::cuda::target>(device);
+            stream_ = target_->native_handle().get_stream();
         }
 
         inline future_type get_future()
         {
             if (event_mode_)
             {
-                return target_.get_future_with_event();
+                return target_->get_future_with_event();
             }
-            return target_.get_future_with_callback();
+            return target_->get_future_with_callback();
         }
 
     protected:
         int device_;
         bool event_mode_;
         cudaStream_t stream_;
-        hpx::cuda::target target_;
+        std::shared_ptr<hpx::cuda::target> target_;
     };
 
     // -------------------------------------------------------------------------
@@ -120,10 +116,6 @@ namespace hpx { namespace cuda {
           : cuda_executor_base(device, event_mode)
         {
         }
-
-        cuda_executor(cuda_executor& other) = delete;
-        cuda_executor(const cuda_executor& other) = delete;
-        cuda_executor operator=(const cuda_executor& other) = delete;
 
         // -------------------------------------------------------------------------
         // target destructor will clean up stream handle

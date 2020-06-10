@@ -129,20 +129,34 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::cuda::cuda_executor cudaexec(device, hpx::cuda::event_mode{});
 
     float testf = 1.2345;
-    std::cout << "Calling cuda kernel <float>  : " << testf << std::endl;
+    std::cout << "apply : cuda kernel <float>  : " << testf << std::endl;
     hpx::apply(cudaexec, cuda_trivial_kernel<float>, testf);
 
+    std::cout << "async : cuda kernel <float>  : " << testf + 1 << std::endl;
+    auto f1 = hpx::async(cudaexec, cuda_trivial_kernel<float>, testf + 1);
+    f1.get();
+
     double testd = 2.3456;
-    std::cout << "Calling cuda kernel <double> : " << testd << std::endl;
+    std::cout << "apply : cuda kernel <double> : " << testd << std::endl;
     hpx::apply(cudaexec, cuda_trivial_kernel<double>, testd);
 
+    std::cout << "apply : cuda kernel <double> : " << testd + 1 << std::endl;
+    auto f2 = hpx::async(cudaexec, cuda_trivial_kernel<double>, testd + 1);
+    f2.get();
+
     double testd2 = 3.1415;
-    std::cout << "Attaching future/continuation to kernel : " << testd2
-              << std::endl;
-    auto f = hpx::async(cudaexec, cuda_trivial_kernel<double>, testd2);
-    f.then([](hpx::future<void>&& f) {
-         std::cout << "continuation triggered\n";
-     }).get();
+    std::cout << "future/continuation : " << testd2 << std::endl;
+    auto f3 = hpx::async(cudaexec, cuda_trivial_kernel<double>, testd2);
+    f3.then([](hpx::future<void>&& f) {
+          std::cout << "continuation triggered\n";
+      }).get();
+
+    std::cout << "Copying executor : " << testd2 + 1 << std::endl;
+    auto exec_copy = cudaexec;
+    auto f4 = hpx::async(exec_copy, cuda_trivial_kernel<double>, testd2 + 1);
+    f4.then([exec_copy](hpx::future<void>&& f) {
+          std::cout << "copy continuation triggered\n";
+      }).get();
 
     test_saxpy(cudaexec);
 
