@@ -26,6 +26,6 @@ add_hpx_module(
   SOURCES ${testing_sources}
   HEADERS ${testing_headers}
   COMPAT_HEADERS ${testing_compat_headers}
-  DEPENDENCIES hpx_assertion hpx_config hpx_preprocessor hpx_util
+  DEPENDENCIES hpx_assertion hpx_config hpx_functional hpx_preprocessor hpx_util
   CMAKE_SUBDIRS examples tests
 )

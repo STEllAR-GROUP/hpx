@@ -9,13 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
@@ -54,7 +53,7 @@ namespace hpx { namespace lcos {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
     using run_on_completed_error_handler_type =
-        std::function<void(std::exception_ptr const& e)>;
+        util::function_nonser<void(std::exception_ptr const& e)>;
     void set_run_on_completed_error_handler(
         run_on_completed_error_handler_type f);
 

@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
-#include <functional>
 #include <map>
 #include <memory>
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
@@ -83,7 +83,7 @@ namespace hpx { namespace util {
     HPX_EXPORT void ignore_all_locks();
     HPX_EXPORT void reset_ignored_all();
 
-    using registered_locks_error_handler_type = std::function<void()>;
+    using registered_locks_error_handler_type = util::function_nonser<void()>;
 
     /// Sets a handler which gets called when verifying that no locks are held
     /// fails. Can be used to print information at the point of failure such as
@@ -91,7 +91,7 @@ namespace hpx { namespace util {
     HPX_EXPORT void set_registered_locks_error_handler(
         registered_locks_error_handler_type);
 
-    using register_locks_predicate_type = std::function<bool()>;
+    using register_locks_predicate_type = util::function_nonser<bool()>;
 
     /// Sets a predicate which gets called each time a lock is registered,
     /// unregistered, or when locks are verified. If the predicate returns

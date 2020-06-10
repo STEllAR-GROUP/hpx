@@ -12,6 +12,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <exception>
@@ -177,7 +178,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 #endif
 
-        using exception_list_termination_handler_type = std::function<void()>;
+        using exception_list_termination_handler_type =
+            hpx::util::function_nonser<void()>;
         HPX_EXPORT void set_exception_list_termination_handler(
             exception_list_termination_handler_type f);
         HPX_NORETURN HPX_EXPORT void exception_list_termination_handler();

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstddef>
@@ -42,7 +43,7 @@ namespace hpx { namespace threads {
     ///                  is pre-initialized to \a hpx#throws the function will throw
     ///                  on error instead.
     HPX_EXPORT void resume_processing_unit_cb(thread_pool_base& pool,
-        std::function<void(void)> callback, std::size_t virt_core,
+        util::function_nonser<void(void)> callback, std::size_t virt_core,
         error_code& ec = throws);
 
     /// Suspends the given processing unit. When the processing unit has been
@@ -77,7 +78,7 @@ namespace hpx { namespace threads {
     ///                  is pre-initialized to \a hpx#throws the function will throw
     ///                  on error instead.
     HPX_EXPORT void suspend_processing_unit_cb(
-        std::function<void(void)> callback, thread_pool_base& pool,
+        util::function_nonser<void(void)> callback, thread_pool_base& pool,
         std::size_t virt_core, error_code& ec = throws);
 
     /// Resumes the thread pool. When the all OS threads on the thread pool have
@@ -100,7 +101,7 @@ namespace hpx { namespace threads {
     ///                 is pre-initialized to \a hpx#throws the function will throw
     ///                 on error instead.
     HPX_EXPORT void resume_pool_cb(thread_pool_base& pool,
-        std::function<void(void)> callback, error_code& ec = throws);
+        util::function_nonser<void(void)> callback, error_code& ec = throws);
 
     /// Suspends the thread pool. When the all OS threads on the thread pool
     /// have been suspended the returned future will be ready.
@@ -129,6 +130,5 @@ namespace hpx { namespace threads {
     /// \throws hpx::exception if called from an HPX thread which is running
     ///         on the pool itself.
     HPX_EXPORT void suspend_pool_cb(thread_pool_base& pool,
-        std::function<void(void)> callback, error_code& ec = throws);
-}}
-
+        util::function_nonser<void(void)> callback, error_code& ec = throws);
+}}    // namespace hpx::threads

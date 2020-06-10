@@ -9,9 +9,10 @@
 // config
 #include <hpx/config/defines.hpp>
 //
-#include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/lcos/promise.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_error.hpp>
@@ -65,8 +66,10 @@ namespace verbs
 
         // types we need for connection and disconnection callback functions
         // into the main parcelport code.
-        typedef std::function<void(verbs_endpoint_ptr)>       ConnectionFunction;
-        typedef std::function<int(verbs_endpoint_ptr client)> DisconnectionFunction;
+        typedef util::function_nonser<void(verbs_endpoint_ptr)>
+            ConnectionFunction;
+        typedef util::function_nonser<int(verbs_endpoint_ptr client)>
+            DisconnectionFunction;
 
         // Set a callback which will be called immediately after
         // RDMA_CM_EVENT_ESTABLISHED has been received.
@@ -109,7 +112,8 @@ namespace verbs
             return memory_pool_;
         }
 
-        typedef std::function<int(struct ibv_wc completion, verbs_endpoint *client)>
+        typedef util::function_nonser<int(
+            struct ibv_wc completion, verbs_endpoint* client)>
             CompletionFunction;
 
         void setCompletionFunction(CompletionFunction f) {

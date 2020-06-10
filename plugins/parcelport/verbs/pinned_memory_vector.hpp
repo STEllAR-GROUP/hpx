@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/functional.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/verbs/rdma/rdma_memory_pool.hpp>
@@ -38,8 +39,8 @@ namespace verbs
         typedef typename std::vector<T>::size_type size_type;
         typedef Allocator allocator_type;
 
-        typedef std::function<void()> deleter_callback;
-        T *m_array_;
+        typedef util::function_nonser<void()> deleter_callback;
+        T* m_array_;
         int m_size_;
         deleter_callback m_cb_;
         allocator_type *m_alloc_;

@@ -7,10 +7,11 @@
 #include <hpx/async_local/apply.hpp>
 #include <hpx/async_local/async.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -26,7 +27,7 @@ namespace hpx { namespace threads {
                 "resume_processing_unit_cb instead");
         }
         else if (!pool.get_scheduler()->has_scheduler_mode(
-                  policies::enable_elasticity))
+                     policies::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "resume_processing_unit",
@@ -40,10 +41,11 @@ namespace hpx { namespace threads {
     }
 
     void resume_processing_unit_cb(thread_pool_base& pool,
-        std::function<void(void)> callback, std::size_t virt_core,
+        util::function_nonser<void(void)> callback, std::size_t virt_core,
         error_code& ec)
     {
-        if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
+        if (!pool.get_scheduler()->has_scheduler_mode(
+                policies::enable_elasticity))
         {
             HPX_THROWS_IF(ec, invalid_status, "resume_processing_unit_cb",
                 "this thread pool does not support suspending "
@@ -76,14 +78,16 @@ namespace hpx { namespace threads {
                 "cannot call suspend_processing_unit from outside HPX, use"
                 "suspend_processing_unit_cb instead");
         }
-        else if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
+        else if (!pool.get_scheduler()->has_scheduler_mode(
+                     policies::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
                     "this thread pool does not support suspending "
                     "processing units"));
         }
-        else if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_stealing) &&
+        else if (!pool.get_scheduler()->has_scheduler_mode(
+                     policies::enable_stealing) &&
             hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
@@ -98,10 +102,11 @@ namespace hpx { namespace threads {
     }
 
     void suspend_processing_unit_cb(thread_pool_base& pool,
-        std::function<void(void)> callback, std::size_t virt_core,
+        util::function_nonser<void(void)> callback, std::size_t virt_core,
         error_code& ec)
     {
-        if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_elasticity))
+        if (!pool.get_scheduler()->has_scheduler_mode(
+                policies::enable_elasticity))
         {
             HPX_THROWS_IF(ec, invalid_status, "suspend_processing_unit_cb",
                 "this thread pool does not support suspending processing "
@@ -117,7 +122,8 @@ namespace hpx { namespace threads {
 
         if (threads::get_self_ptr())
         {
-            if (!pool.get_scheduler()->has_scheduler_mode(policies::enable_stealing) &&
+            if (!pool.get_scheduler()->has_scheduler_mode(
+                    policies::enable_stealing) &&
                 hpx::this_thread::get_pool() == &pool)
             {
                 HPX_THROW_EXCEPTION(invalid_status,
@@ -150,10 +156,10 @@ namespace hpx { namespace threads {
     }
 
     void resume_pool_cb(thread_pool_base& pool,
-        std::function<void(void)> callback, error_code& ec)
+        util::function_nonser<void(void)> callback, error_code& ec)
     {
-        auto resume_direct_wrapper = [&pool,
-                                         callback = std::move(callback)]() -> void {
+        auto resume_direct_wrapper =
+            [&pool, callback = std::move(callback)]() -> void {
             pool.resume_direct(throws);
             callback();
         };
@@ -191,7 +197,7 @@ namespace hpx { namespace threads {
     }
 
     void suspend_pool_cb(thread_pool_base& pool,
-        std::function<void(void)> callback, error_code& ec)
+        util::function_nonser<void(void)> callback, error_code& ec)
     {
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
         {
@@ -200,7 +206,8 @@ namespace hpx { namespace threads {
             return;
         }
 
-        auto suspend_direct_wrapper = [&pool, callback = std::move(callback)]() {
+        auto suspend_direct_wrapper = [&pool,
+                                          callback = std::move(callback)]() {
             pool.suspend_direct(throws);
             callback();
         };

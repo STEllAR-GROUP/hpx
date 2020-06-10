@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/assertion.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -21,14 +22,13 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <functional>
 #include <iostream>
 #include <mutex>
 #include <sstream>
 
 namespace hpx { namespace util {
 
-    using test_failure_handler_type = std::function<void()>;
+    using test_failure_handler_type = function_nonser<void()>;
     HPX_EXPORT void set_test_failure_handler(test_failure_handler_type f);
 
     enum counter_type

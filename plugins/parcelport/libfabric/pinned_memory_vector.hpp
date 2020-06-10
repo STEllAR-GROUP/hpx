@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/functional.hpp>
 //
 #include <plugins/parcelport/parcelport_logging.hpp>
 #include <plugins/parcelport/rma_memory_pool.hpp>
@@ -42,7 +43,7 @@ namespace libfabric
 
         typedef pinned_memory_vector<T, Offset, region_type, allocator_type> vector_type;
 
-        typedef std::function<void()> deleter_callback;
+        typedef util::function_nonser<void()> deleter_callback;
 
         // internal vars
         T                   *m_array_;
