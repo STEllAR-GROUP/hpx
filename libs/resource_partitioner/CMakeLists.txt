@@ -17,8 +17,8 @@ set(resource_partitioner_headers
 
 set(resource_partitioner_compat_headers
     hpx/resource_partitioner.hpp
-    hpx/runtime/resource/detail/create_partitioner.hpp
-    hpx/runtime/resource/detail/partitioner.hpp
+    
+    
     hpx/runtime/resource/partitioner.hpp
     hpx/runtime/resource/partitioner_fwd.hpp
 )

@@ -45,9 +45,6 @@ set(synchronization_compat_headers
     hpx/lcos/local/barrier.hpp
     hpx/lcos/local/condition_variable.hpp
     hpx/lcos/local/counting_semaphore.hpp
-    hpx/lcos/local/detail/condition_variable.hpp
-    hpx/lcos/local/detail/counting_semaphore.hpp
-    hpx/lcos/local/detail/sliding_semaphore.hpp
     hpx/lcos/local/event.hpp
     hpx/lcos/local/latch.hpp
     hpx/lcos/local/mutex.hpp

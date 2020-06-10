@@ -36,8 +36,6 @@ set(plugin_compat_headers
     hpx/util/plugin/plugin_factory.hpp
     hpx/util/plugin/plugin_wrapper.hpp
     hpx/util/plugin/virtual_constructor.hpp
-    hpx/util/plugin/detail/dll_dlopen.hpp
-    hpx/util/plugin/detail/dll_windows.hpp
     hpx/traits/plugin_config_data.hpp
 )
 

@@ -88,15 +88,15 @@ endif()
 
 # Default location is $HPX_ROOT/libs/serialization/include_compatibility
 set(serialization_compat_headers
-    hpx/runtime/serialization/detail/non_default_constructible.hpp
-    hpx/runtime/serialization/detail/pointer.hpp
-    hpx/runtime/serialization/detail/polymorphic_id_factory.hpp
-    hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp
-    hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp
-    hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
-    hpx/runtime/serialization/detail/raw_ptr.hpp
-    hpx/runtime/serialization/detail/serialize_collection.hpp
-    hpx/runtime/serialization/detail/vc.hpp
+    
+    
+    
+    
+    
+    
+    
+    
+    
     hpx/runtime/serialization/array.hpp
     hpx/runtime/serialization/bitset.hpp
     hpx/runtime/serialization/complex.hpp

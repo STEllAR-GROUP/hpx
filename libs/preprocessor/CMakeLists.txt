@@ -16,11 +16,7 @@ set(preprocessor_headers
 )
 
 # Default location is $HPX_ROOT/libs/preprocessor/include_compatibility
-set(preprocessor_compat_headers
-    hpx/util/detail/pp/cat.hpp hpx/util/detail/pp/config.hpp
-    hpx/util/detail/pp/expand.hpp hpx/util/detail/pp/nargs.hpp
-    hpx/util/detail/pp/stringize.hpp hpx/util/detail/pp/strip_parens.hpp
-)
+set(preprocessor_compat_headers)
 
 # Default location is $HPX_ROOT/libs/preprocessor/src
 set(preprocessor_sources)

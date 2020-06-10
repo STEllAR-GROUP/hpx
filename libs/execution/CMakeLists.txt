@@ -53,8 +53,8 @@ set(execution_sources execution_parameter_callbacks.cpp
 
 set(execution_compat_headers
     hpx/async_launch_policy_dispatch.hpp
-    hpx/parallel/algorithms/detail/is_negative.hpp
-    hpx/parallel/algorithms/detail/predicates.hpp
+    
+    
     hpx/parallel/execution.hpp
     hpx/parallel/executor_parameters.hpp
     hpx/parallel/executors/auto_chunk_size.hpp
@@ -71,10 +71,10 @@ set(execution_compat_headers
     hpx/parallel/executors/rebind_executor.hpp
     hpx/parallel/executors/static_chunk_size.hpp
     hpx/parallel/executors/thread_pool_executor.hpp
-    hpx/parallel/traits/detail/vc/vector_pack_alignment_size.hpp
-    hpx/parallel/traits/detail/vc/vector_pack_count_bits.hpp
-    hpx/parallel/traits/detail/vc/vector_pack_load_store.hpp
-    hpx/parallel/traits/detail/vc/vector_pack_type.hpp
+    
+    
+    
+    
     hpx/parallel/traits/vector_pack_alignment_size.hpp
     hpx/parallel/traits/vector_pack_count_bits.hpp
     hpx/parallel/traits/vector_pack_load_store.hpp

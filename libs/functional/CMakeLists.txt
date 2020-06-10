@@ -56,9 +56,6 @@ set(functional_compat_headers
     hpx/util/bind_back.hpp
     hpx/util/bind_front.hpp
     hpx/util/deferred_call.hpp
-    hpx/util/detail/serializable_basic_function.hpp
-    hpx/util/detail/vtable/serializable_function_vtable.hpp
-    hpx/util/detail/vtable/serializable_vtable.hpp
     hpx/util/first_argument.hpp
     hpx/util/function.hpp
     hpx/util/function_ref.hpp

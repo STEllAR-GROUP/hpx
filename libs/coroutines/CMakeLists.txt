@@ -36,20 +36,20 @@ set(coroutines_compat_headers
     hpx/coroutines.hpp
     hpx/runtime/threads/coroutines/coroutine.hpp
     hpx/runtime/threads/coroutines/coroutine_fwd.hpp
-    hpx/runtime/threads/coroutines/detail/context_base.hpp
-    hpx/runtime/threads/coroutines/detail/context_generic_context.hpp
-    hpx/runtime/threads/coroutines/detail/context_impl.hpp
-    hpx/runtime/threads/coroutines/detail/context_linux_x86.hpp
-    hpx/runtime/threads/coroutines/detail/context_posix.hpp
-    hpx/runtime/threads/coroutines/detail/context_windows_fibers.hpp
-    hpx/runtime/threads/coroutines/detail/coroutine_accessor.hpp
-    hpx/runtime/threads/coroutines/detail/coroutine_impl.hpp
-    hpx/runtime/threads/coroutines/detail/coroutine_self.hpp
-    hpx/runtime/threads/coroutines/detail/get_stack_pointer.hpp
-    hpx/runtime/threads/coroutines/detail/posix_utility.hpp
-    hpx/runtime/threads/coroutines/detail/swap_context.hpp
-    hpx/runtime/threads/coroutines/detail/tss.hpp
-    hpx/runtime/threads/detail/combined_tagged_state.hpp
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     hpx/runtime/threads/thread_enums.hpp
     hpx/runtime/threads/thread_id_type.hpp
 )
