@@ -145,7 +145,7 @@ def run_none(cmd, localities, nodes, verbose):
                  print('Executing command: ' + ' '.join(cmd))
              subproc(cmd)
     else:
-        assert len(nodes) == localities, "Number of localities must mach number of nodes."
+        assert len(nodes) == localities, "Number of localities must match number of nodes."
         if localities > 1:
             for locality in range(localities):
                 node = nodes[locality]
@@ -439,4 +439,3 @@ Used by the tcp parcelport only.
         proc_watchdog.join()
 
     sys.exit(returncode)
-
