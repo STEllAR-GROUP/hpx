@@ -48,12 +48,11 @@ set(logging_sources
     logging.cpp
     manipulator.cpp
     format/named_write.cpp
-    format/destination/defaults.cpp
+    format/destination/defaults_destination.cpp
     format/destination/file.cpp
     format/formatter/high_precision_time.cpp
-    format/formatter/defaults.cpp
+    format/formatter/defaults_formatter.cpp
     format/formatter/thread_id.cpp
-    format/named_write.cpp
 )
 
 include(HPX_AddModule)
