@@ -18,6 +18,7 @@ set(benchmarks
     native_tls_overhead
     print_heterogeneous_payloads
     resume_suspend
+    stream
     timed_task_spawn
 )
 
@@ -156,7 +157,6 @@ set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component hpx_timing)
-set(stream_FLAGS DEPENDENCIES iostreams_component)
 set(partitioned_vector_foreach_FLAGS DEPENDENCIES iostreams_component
                                      partitioned_vector_component hpx_timing
 )
