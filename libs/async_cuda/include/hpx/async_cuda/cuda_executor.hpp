@@ -169,7 +169,7 @@ namespace hpx { namespace cuda {
                 // insert the stream handle in the arg list and call the cuda function
                 detail::dispatch_helper<R, Params...> helper{};
                 helper(cuda_kernel, std::forward<Args>(args)..., stream_);
-                result = std::move(get_future());
+                result = get_future();
             }
             catch (const hpx::exception& e)
             {

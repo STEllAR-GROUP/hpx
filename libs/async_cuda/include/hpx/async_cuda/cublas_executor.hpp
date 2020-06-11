@@ -221,7 +221,7 @@ namespace hpx { namespace cuda {
                 detail::dispatch_helper<R, Params...> helper;
                 helper(cublas_function, handle_.get(),
                     std::forward<Args>(args)...);
-                result = std::move(get_future());
+                result = get_future();
             }
             catch (const hpx::exception& e)
             {
