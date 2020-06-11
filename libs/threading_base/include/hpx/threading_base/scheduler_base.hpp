@@ -276,15 +276,38 @@ namespace hpx { namespace threads { namespace policies {
             return thread_queue_init_.small_stacksize_;
         }
 
-        void set_user_polling_function(util::function_nonser<void()> const& f)
+        using PollingFunctionPtr = void (*)();
+
+        static void null_polling_function() {}
+
+        void set_mpi_polling_function(PollingFunctionPtr mpi_func)
         {
-            user_polling_function_ = f;
+            polling_function_mpi_ = mpi_func;
         }
 
-        void user_polling_function()
+        void clear_mpi_polling_function()
         {
-            if (user_polling_function_)
-                user_polling_function_();
+            polling_function_mpi_ = &null_polling_function;
+        }
+
+        void set_cuda_polling_function(PollingFunctionPtr cuda_func)
+        {
+            polling_function_cuda_ = cuda_func;
+        }
+
+        void clear_cuda_polling_function()
+        {
+            polling_function_cuda_ = &null_polling_function;
+        }
+
+        inline void custom_polling_function() const
+        {
+#if defined(HPX_HAVE_LIB_ASYNC_MPI)
+            (*polling_function_mpi_)();
+#endif
+#if defined(HPX_HAVE_LIB_ASYNC_CUDA)
+            (*polling_function_cuda_)();
+#endif
         }
 
     protected:
@@ -319,7 +342,11 @@ namespace hpx { namespace threads { namespace policies {
 
         std::atomic<std::int64_t> background_thread_count_;
 
-        util::function_nonser<void()> user_polling_function_;
+        // the scheduler mode, protected from false sharing
+        PollingFunctionPtr polling_function_mpi_;
+        PollingFunctionPtr polling_function_cuda_;
+
+        std::vector<util::function_nonser<void()>> user_callback_functions_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:
