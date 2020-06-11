@@ -25,8 +25,6 @@
 // Currently, nvcc does not handle lambda functions properly and it is simpler to use
 // cudaMalloc/cudaMemcpy etc, so we do not #define HPX_CUBLAS_DEMO_WITH_ALLOCATOR
 
-#define BOOST_NO_CXX11_ALLOCATOR
-//
 #include <hpx/async.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -39,10 +37,8 @@
 #include <hpx/async_cuda/cublas_executor.hpp>
 #include <hpx/async_cuda/cuda_executor.hpp>
 #include <hpx/async_cuda/target.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
-#ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
-#include <hpx/compute/cuda/allocator.hpp>
-#endif
 
 // CUDA runtime
 #include <cublas_v2.h>
@@ -125,7 +121,7 @@ inline bool compare_L2_err(const float* reference, const float* data,
 // Run a simple test matrix multiply using CUBLAS
 // -------------------------------------------------------------------------
 template <typename T>
-void matrixMultiply(
+void matrixMultiply(hpx::cuda::cublas_executor& cublas,
     sMatrixSize& matrix_size, std::size_t device, std::size_t iterations)
 {
     using hpx::parallel::execution::par;
@@ -147,35 +143,8 @@ void matrixMultiply(
 
     // create a cublas executor we'll use to futurize cuda events
     using namespace hpx::cuda;
-    cublas_executor cublas(
-        device, CUBLAS_POINTER_MODE_HOST, hpx::cuda::event_mode{});
     using cublas_future = typename cuda_executor::future_type;
 
-#ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
-    // for convenience
-    using device_allocator = typename cublas_helper<T>::allocator_type;
-    using device_vector = typename cublas_helper<T>::vector_type;
-    // The policy used in the parallel algorithms
-    auto policy = hpx::parallel::execution::par;
-
-    // Create a cuda allocator
-    device_allocator alloc(cublas.target());
-
-    // Allocate device memory
-    device_vector d_vA(size_A, alloc);
-    device_vector d_vB(size_B, alloc);
-    device_vector d_vC(size_C, alloc);
-
-    // copy host memory to device
-    hpx::parallel::copy(policy, h_A.begin(), h_A.end(), d_vA.begin());
-    hpx::parallel::copy(policy, h_B.begin(), h_B.end(), d_vB.begin());
-
-    // just to make the rest of code the same for both cases
-    T* d_A = d_vA.device_data();
-    T* d_B = d_vB.device_data();
-    T* d_C = d_vC.device_data();
-
-#else
     T *d_A, *d_B, *d_C;
     hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_A, size_A * sizeof(T)));
 
@@ -198,8 +167,6 @@ void matrixMultiply(
         std::cout << "The async host->device copy operation completed"
                   << std::endl;
     });
-
-#endif
 
     std::cout << "Computing result using CUBLAS...\n";
     const T alpha = 1.0f;
@@ -235,12 +202,9 @@ void matrixMultiply(
     // get a future for when the stream reaches this point (matrix operations complete)
     auto matrix_finished = cublas.get_future();
 
-#ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     // when the matrix operations complete, copy the result to the host
     auto copy_finished = hpx::async(cublas, cudaMemcpyAsync, h_CUBLAS.data(),
         d_C, size_C * sizeof(T), cudaMemcpyDeviceToHost);
-
-#endif
 
     // attach a continuation to the cublas future
     auto new_future = matrix_finished.then([&](cublas_future&& f) {
@@ -263,13 +227,8 @@ void matrixMultiply(
     auto finished = new_future.then([&](cublas_future&& f) {
         // compute reference solution on the CPU
         std::cout << "\nComputing result using host CPU...\n";
-#ifdef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
-        // copy result from device to host
-        hpx::parallel::copy(policy, d_C.begin(), d_C.end(), h_CUBLAS.begin());
-#else
         // just wait for the device->host copy to complete if it hasn't already
         copy_finished.get();
-#endif
 
         // compute reference solution on the CPU
         // allocate storage for the CPU result
@@ -285,21 +244,20 @@ void matrixMultiply(
         // check result (CUBLAS)
         bool resCUBLAS =
             compare_L2_err(reference.data(), h_CUBLAS.data(), size_C, 1e-6);
-        if (resCUBLAS != true)
-        {
-            throw std::runtime_error("matrix CPU/GPU comparison error");
-        }
+        HPX_TEST_MSG(resCUBLAS, "matrix CPU/GPU comparison error");
+
         // if the result was incorrect, we throw an exception, so here it's ok
-        std::cout
-            << "\nComparing CUBLAS Matrix Multiply with CPU results: OK \n";
+        if (resCUBLAS)
+        {
+            std::cout
+                << "\nComparing CUBLAS Matrix Multiply with CPU results: OK \n";
+        }
     });
 
     finished.get();
-#ifndef HPX_CUBLAS_DEMO_WITH_ALLOCATOR
     cudaFree(d_A);
     cudaFree(d_B);
     cudaFree(d_C);
-#endif
 }
 
 // -------------------------------------------------------------------------
@@ -345,7 +303,26 @@ int hpx_main(hpx::program_options::variables_map& vm)
         matrix_size.uiWA, matrix_size.uiHA, matrix_size.uiWB, matrix_size.uiHB,
         matrix_size.uiWC, matrix_size.uiHC);
 
-    matrixMultiply<float>(matrix_size, device, iterations);
+    // --------------------------------
+    // test matrix multiply using cublas executor
+    hpx::cuda::cublas_executor cublas(
+        device, CUBLAS_POINTER_MODE_HOST, hpx::cuda::event_mode{});
+    matrixMultiply<float>(cublas, matrix_size, device, iterations);
+
+    // --------------------------------
+    // sanity check : test again using a copy of the cublas executor
+    std::cout << "\n\n\n------------" << std::endl;
+    std::cout << "Checking copy semantics of cublas executor" << std::endl;
+    hpx::cuda::cublas_executor cublas2 = cublas;
+    matrixMultiply<float>(cublas2, matrix_size, device, 1);
+
+    // --------------------------------
+    // sanity check : test again using a moved copy of the cublas executor
+    std::cout << "\n\n\n------------" << std::endl;
+    std::cout << "Checking move semantics of cublas executor" << std::endl;
+    hpx::cuda::cublas_executor cublas3(std::move(cublas));
+    matrixMultiply<float>(cublas3, matrix_size, device, 1);
+
     return hpx::finalize();
 }
 
@@ -374,5 +351,6 @@ int main(int argc, char** argv)
         hpx::program_options::value<unsigned int>(),
         "the random number generator seed to use for this run");
     // clang-format on
-    return hpx::init(cmdline, argc, argv);
+    auto result = hpx::init(cmdline, argc, argv);
+    return result || hpx::util::report_errors();
 }

@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#define BOOST_NO_CXX11_ALLOCATOR
-//
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_copy.hpp>
@@ -13,6 +11,7 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
+#include <hpx/modules/testing.hpp>
 //
 #include <hpx/async_cuda/cuda_executor.hpp>
 #include <hpx/async_cuda/target.hpp>
@@ -101,7 +100,7 @@ int test_saxpy(hpx::cuda::cuda_executor& cudaexec)
     // returns and the task above goes out of scope and the refs it holds
     // are invalidated.
 
-    return 0;
+    return 1;
 }
 
 // -------------------------------------------------------------------------
@@ -128,6 +127,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // create a stream helper object
     hpx::cuda::cuda_executor cudaexec(device, hpx::cuda::event_mode{});
 
+    // --------------------
+    // test kernel launch<float> using apply and async
     float testf = 1.2345;
     std::cout << "apply : cuda kernel <float>  : " << testf << std::endl;
     hpx::apply(cudaexec, cuda_trivial_kernel<float>, testf);
@@ -136,14 +137,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
     auto f1 = hpx::async(cudaexec, cuda_trivial_kernel<float>, testf + 1);
     f1.get();
 
+    // --------------------
+    // test kernel launch<double> using apply and async
     double testd = 2.3456;
     std::cout << "apply : cuda kernel <double> : " << testd << std::endl;
     hpx::apply(cudaexec, cuda_trivial_kernel<double>, testd);
 
-    std::cout << "apply : cuda kernel <double> : " << testd + 1 << std::endl;
+    std::cout << "async : cuda kernel <double> : " << testd + 1 << std::endl;
     auto f2 = hpx::async(cudaexec, cuda_trivial_kernel<double>, testd + 1);
     f2.get();
 
+    // --------------------
+    // test adding a continuation to a cuda call
     double testd2 = 3.1415;
     std::cout << "future/continuation : " << testd2 << std::endl;
     auto f3 = hpx::async(cudaexec, cuda_trivial_kernel<double>, testd2);
@@ -151,6 +156,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
           std::cout << "continuation triggered\n";
       }).get();
 
+    // --------------------
+    // test using a copy of a cuda executor
+    // and adding a continuation with a copy of a copy
     std::cout << "Copying executor : " << testd2 + 1 << std::endl;
     auto exec_copy = cudaexec;
     auto f4 = hpx::async(exec_copy, cuda_trivial_kernel<double>, testd2 + 1);
@@ -158,7 +166,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
           std::cout << "copy continuation triggered\n";
       }).get();
 
-    test_saxpy(cudaexec);
+    // --------------------
+    // test a full kernel example
+    HPX_TEST(test_saxpy(cudaexec));
 
     return hpx::finalize();
 }
@@ -177,5 +187,6 @@ int main(int argc, char** argv)
         "iterations")("seed,s", hpx::program_options::value<unsigned int>(),
         "the random number generator seed to use for this run");
 
-    return hpx::init(cmdline, argc, argv);
+    auto result = hpx::init(cmdline, argc, argv);
+    return result || hpx::util::report_errors();
 }

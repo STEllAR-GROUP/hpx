@@ -25,8 +25,6 @@
 // Currently, nvcc does not handle lambda functions properly and it is simpler to use
 // cudaMalloc/cudaMemcpy etc, so we do not #define HPX_CUBLAS_DEMO_WITH_ALLOCATOR
 
-#define BOOST_NO_CXX11_ALLOCATOR
-//
 #include <hpx/async.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -39,7 +37,8 @@
 #include <hpx/async_cuda/cublas_executor.hpp>
 #include <hpx/async_cuda/cuda_executor.hpp>
 #include <hpx/async_cuda/target.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
 // CUDA runtime
 #include <cublas_v2.h>
@@ -205,5 +204,7 @@ int main(int argc, char** argv)
         hpx::program_options::value<std::size_t>()->default_value(30),
         "iterations");
     // clang-format on
-    return hpx::init(cmdline, argc, argv);
+
+    auto result = hpx::init(cmdline, argc, argv);
+    return result || hpx::util::report_errors();
 }
