@@ -139,8 +139,8 @@ namespace hpx
             int archive_flags_, std::uint64_t max_outbound_size)
         {
             HPX_ASSERT(buffer.data_.empty());
+
             // collect argument sizes from parcels
-            std::size_t num_chunks = 0;
             std::size_t arg_size = 0;
             std::size_t parcels_sent = 0;
             std::size_t parcels_size = 1;
@@ -162,6 +162,7 @@ namespace hpx
                         archive_flags |= serialization::enable_compression;
 
                     // preallocate data
+                    std::size_t num_chunks = 0;
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
                     {
                         if (arg_size >= max_outbound_size)

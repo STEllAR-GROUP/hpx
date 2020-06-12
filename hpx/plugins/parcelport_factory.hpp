@@ -30,9 +30,9 @@ namespace hpx { namespace plugins
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a parcelport_factory provides a minimal implementation of a
-    /// parcelport's factory. If no additional functionality is required
+    /// parcelport factory. If no additional functionality is required
     /// this type can be used to implement the full set of minimally required
-    /// functions to be exposed by a parcelport's factory instance.
+    /// functions to be exposed by a parcelport factory instance.
     ///
     /// \tparam Parcelport The parcelport type this factory should be
     ///                        responsible for.
@@ -60,14 +60,14 @@ namespace hpx { namespace plugins
             parcelset::parcelhandler::add_parcelport_factory(this);
         }
 
-        parcelport_factory(
+        explicit parcelport_factory(
             std::vector<plugins::parcelport_factory_base*>& factories)
         {
             factories.push_back(this);
         }
 
         ///
-        ~parcelport_factory() override {}
+        ~parcelport_factory() override = default;
 
         void get_plugin_info(std::vector<std::string> & fillini) override
         {

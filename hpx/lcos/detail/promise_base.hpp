@@ -36,9 +36,9 @@ namespace lcos {
         {
             typedef typename task_base<Result>::init_no_addref init_no_addref;
 
-            promise_data() {}
+            promise_data() = default;
 
-            promise_data(init_no_addref no_addref)
+            explicit promise_data(init_no_addref no_addref)
               : task_base<Result>(no_addref)
             {}
 
@@ -81,7 +81,7 @@ namespace lcos {
                         rebind_alloc<promise_data_allocator>
                 other_allocator;
 
-            promise_data_allocator(other_allocator const& alloc)
+            explicit promise_data_allocator(other_allocator const& alloc)
               : alloc_(alloc)
             {}
 
@@ -307,7 +307,7 @@ namespace lcos {
 
                 wrapping_ptr ptr_;
 
-                keep_alive(wrapping_ptr& ptr)
+                explicit keep_alive(wrapping_ptr& ptr)
                   : ptr_(ptr.release(), &wrapping_deleter)
                 {}
 

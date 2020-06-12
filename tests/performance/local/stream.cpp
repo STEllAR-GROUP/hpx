@@ -450,7 +450,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
         // Get the host targets we want to run on
         auto host_targets = hpx::compute::host::get_local_targets();
 
-        auto numa_nodes = hpx::compute::host::numa_domains();
         allocator_type alloc(target);
         executor_type exec(target, host_targets);
         auto policy = hpx::parallel::execution::par.on(exec);

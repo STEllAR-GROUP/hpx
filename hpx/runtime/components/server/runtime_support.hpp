@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // constructor
-        runtime_support(hpx::util::runtime_configuration & cfg);
+        explicit runtime_support(hpx::util::runtime_configuration & cfg);
 
         ~runtime_support()
         {

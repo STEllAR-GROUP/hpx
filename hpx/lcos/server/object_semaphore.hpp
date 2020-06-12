@@ -46,7 +46,7 @@ struct object_semaphore
             boost::intrusive::link_mode<boost::intrusive::normal_link>
         > hook_type;
 
-        queue_thread_entry(naming::id_type const& id)
+        explicit queue_thread_entry(naming::id_type const& id)
           : id_(id) {}
 
         naming::id_type id_;
@@ -126,7 +126,7 @@ struct object_semaphore
     } // }}}
 
   public:
-    object_semaphore() {}
+    object_semaphore() = default;
 
     ~object_semaphore()
     { // {{{

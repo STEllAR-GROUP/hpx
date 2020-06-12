@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 
 #include "server/partition.hpp"
 
@@ -39,8 +40,8 @@ namespace interpolate1d
         {
             init(datafilename, dim, num_nodes);
         }
-        partition(hpx::naming::id_type gid)
-          : base_type(gid)
+        explicit partition(hpx::id_type gid)
+          : base_type(std::move(gid))
         {}
 
         // initialize this partition

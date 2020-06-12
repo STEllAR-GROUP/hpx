@@ -43,8 +43,7 @@ namespace hpx { namespace components
     public:
         /// Default-construct a new instance of a \a colocating_distribution_policy.
         /// This policy will represent the local locality.
-        colocating_distribution_policy()
-        {}
+        colocating_distribution_policy() = default;
 
         /// Create a new \a colocating_distribution_policy representing the
         /// locality where the given object os current located
@@ -269,7 +268,7 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        colocating_distribution_policy(id_type const& id)
+        explicit colocating_distribution_policy(id_type const& id)
           : id_(id)
         {}
 

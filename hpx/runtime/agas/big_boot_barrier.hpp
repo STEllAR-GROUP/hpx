@@ -70,9 +70,7 @@ public:
         big_boot_barrier& bbb;
 
     public:
-        scoped_lock(
-            big_boot_barrier& bbb_
-            )
+        explicit scoped_lock(big_boot_barrier& bbb_)
           : bbb(bbb_)
         {
             bbb.mtx.lock();

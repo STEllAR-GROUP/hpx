@@ -63,7 +63,7 @@ namespace hpx { namespace plugins { namespace parcel
     // existing instance).
     struct num_parcels_counter_surrogate
     {
-        num_parcels_counter_surrogate(std::string const& parameters)
+        explicit num_parcels_counter_surrogate(std::string const& parameters)
           : parameters_(parameters)
         {}
 
@@ -141,7 +141,7 @@ namespace hpx { namespace plugins { namespace parcel
     ///////////////////////////////////////////////////////////////////////////
     struct num_messages_counter_surrogate
     {
-        num_messages_counter_surrogate(std::string const& parameters)
+        explicit num_messages_counter_surrogate(std::string const& parameters)
           : parameters_(parameters)
         {}
 
@@ -219,7 +219,8 @@ namespace hpx { namespace plugins { namespace parcel
     ///////////////////////////////////////////////////////////////////////////
     struct num_parcels_per_message_counter_surrogate
     {
-        num_parcels_per_message_counter_surrogate(std::string const& parameters)
+        explicit num_parcels_per_message_counter_surrogate(
+            std::string const& parameters)
           : parameters_(parameters)
         {}
 
@@ -298,7 +299,7 @@ namespace hpx { namespace plugins { namespace parcel
     ///////////////////////////////////////////////////////////////////////////
     struct average_time_between_parcels_counter_surrogate
     {
-        average_time_between_parcels_counter_surrogate(
+        explicit average_time_between_parcels_counter_surrogate(
                 std::string const& parameters)
           : parameters_(parameters)
         {}

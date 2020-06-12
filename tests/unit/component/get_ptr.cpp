@@ -39,8 +39,10 @@ struct test_client
 {
     typedef hpx::components::client_base<test_client, test_server> base_type;
 
-    test_client(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
-    test_client(hpx::id_type && id) : base_type(std::move(id)) {}
+    test_client(hpx::future<hpx::id_type>&& id) noexcept
+      : base_type(std::move(id))
+    {
+    }
 
     std::size_t check_ptr() { return check_ptr_action()(this->get_id()); }
 };
@@ -145,7 +147,6 @@ int main()
     HPX_TEST(test_get_ptr2(hpx::find_here()));
     HPX_TEST(test_get_ptr3(hpx::find_here()));
     HPX_TEST(test_get_ptr4(hpx::find_here()));
-
 
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
     for (hpx::id_type const& id : localities)

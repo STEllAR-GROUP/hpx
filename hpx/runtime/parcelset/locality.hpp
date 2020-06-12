@@ -73,7 +73,7 @@ namespace hpx { namespace parcelset
                 typename util::decay<Impl>::type>::value>::type,
             typename Enable2 = typename std::enable_if<
                 !traits::is_iterator<Impl>::value>::type>
-        locality(Impl&& i)
+        explicit locality(Impl&& i)
           : impl_(new impl<typename util::decay<Impl>::type>(
                 std::forward<Impl>(i)))
         {}

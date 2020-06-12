@@ -33,7 +33,7 @@ namespace examples { namespace server
     private:
         struct reset_id
         {
-            reset_id(cancelable_action& this_)
+            explicit reset_id(cancelable_action& this_)
               : outer_(this_)
             {
                 {

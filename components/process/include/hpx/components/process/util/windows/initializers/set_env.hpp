@@ -44,7 +44,7 @@ private:
 
     struct copy_env
     {
-        copy_env(Char* curr)
+        explicit copy_env(Char* curr)
           : curr_(curr)
         {}
 
@@ -65,7 +65,7 @@ public:
         env_[0] = 0;
     }
 
-    set_env_(const Range &envs)
+    explicit set_env_(const Range &envs)
     {
         std::size_t s = std::accumulate(envs.begin(), envs.end(),
             std::size_t(0), &set_env_::get_size);

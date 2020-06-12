@@ -137,7 +137,7 @@ namespace allocator
     ///////////////////////////////////////////////////////////////////////////
     struct alloc_page
     {
-        HPX_FORCEINLINE alloc_page(std::size_t size) noexcept
+        HPX_FORCEINLINE explicit alloc_page(std::size_t size) noexcept
           : next(nullptr)
           , allocated_blocks(0)
           , block_size(size)

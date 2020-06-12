@@ -48,6 +48,7 @@ int hpx_main()
     {
         hpx::components::client<matrix_multiply_multiplier> comp =
             hpx::new_<matrix_multiply_multiplier>(remote_ids[0], std::move(m));
+        comp.get();
     }
 
     return hpx::finalize();

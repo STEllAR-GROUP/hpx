@@ -41,7 +41,7 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 // Our partition data type
 struct partition_data
 {
-    partition_data(std::size_t size)
+    explicit partition_data(std::size_t size)
       : data_(new double [size]), size_(size)
     {}
 

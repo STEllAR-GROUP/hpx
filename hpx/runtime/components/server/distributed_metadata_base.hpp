@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace server
     public:
         distributed_metadata_base() { HPX_ASSERT(false); }
 
-        distributed_metadata_base(ConfigData const& data)
+        explicit distributed_metadata_base(ConfigData const& data)
           : data_(data)
         {}
 
