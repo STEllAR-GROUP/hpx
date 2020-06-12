@@ -19,3 +19,7 @@
     please include hpx/async_cuda/get_targets.hpp instead"
 #endif
 #endif
+
+namespace hpx { namespace compute { namespace cuda {
+    using hpx::cuda::target;
+}}}    // namespace hpx::compute::cuda
