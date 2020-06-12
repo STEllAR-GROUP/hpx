@@ -100,26 +100,26 @@ namespace hpx { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename FD, typename T>
-        struct result_of_impl : result_of_function_object<T>
+        struct invoke_result_impl : result_of_function_object<T>
         {
         };
 
         template <typename M, typename C, typename F, typename... Ts>
-        struct result_of_impl<M C::*, F(Ts...)>
+        struct invoke_result_impl<M C::*, F(Ts...)>
           : result_of_member_pointer<C, M C::*(Ts...)>
         {
         };
 
         template <typename R, typename C, typename... Ps, typename F,
             typename... Ts>
-        struct result_of_impl<R (C::*)(Ps...), F(Ts...)>
+        struct invoke_result_impl<R (C::*)(Ps...), F(Ts...)>
           : result_of_member_pointer<C, R (C::*(Ts...))(Ps...)>
         {
         };
 
         template <typename R, typename C, typename... Ps, typename F,
             typename... Ts>
-        struct result_of_impl<R (C::*)(Ps...) const, F(Ts...)>
+        struct invoke_result_impl<R (C::*)(Ps...) const, F(Ts...)>
           : result_of_member_pointer<C, R (C::*(Ts...))(Ps...) const>
         {
         };
@@ -127,18 +127,20 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct result_of;
+    struct HPX_DEPRECATED(
+        HPX_DEPRECATED_MSG " Use invoke_result instead.") result_of;
 
     template <typename F, typename... Ts>
     struct result_of<F(Ts...)>
-      : detail::result_of_impl<typename std::decay<F>::type, F(Ts...)>
+      : detail::invoke_result_impl<typename std::decay<F>::type, F(Ts...)>
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
     struct invoke_result
-      : detail::result_of_impl<typename std::decay<F>::type, F && (Ts && ...)>
+      : detail::invoke_result_impl<typename std::decay<F>::type,
+            F && (Ts && ...)>
     {
     };
 }}    // namespace hpx::util

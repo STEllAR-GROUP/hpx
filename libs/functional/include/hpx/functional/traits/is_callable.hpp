@@ -5,9 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:is_callable
-// hpxinspect:nodeprecatedname:util::result_of
-
 #pragma once
 
 #include <hpx/config.hpp>
@@ -19,43 +16,56 @@
 namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <typename T, typename R, typename Enable = void>
-        struct is_callable_impl : std::false_type
+        template <typename T, typename Enable = void>
+        struct is_invocable_impl : std::false_type
         {
         };
 
-        template <typename T>
-        struct is_callable_impl<T, void,
-            typename util::always_void<typename util::result_of<T>::type>::type>
+        template <typename F, typename... Ts>
+        struct is_invocable_impl<F(Ts...),
+            typename util::always_void<
+                typename util::invoke_result<F, Ts...>::type>::type>
           : std::true_type
         {
         };
 
-        template <typename T, typename R>
-        struct is_callable_impl<T, R,
-            typename util::always_void<typename util::result_of<T>::type>::type>
-          : std::is_convertible<typename util::result_of<T>::type, R>
+        template <typename T, typename R,
+            bool IsInvocable = is_invocable_impl<T>::value>
+        struct is_invocable_r_impl : std::false_type
+        {
+        };
+
+        template <typename F, typename... Ts, typename R>
+        struct is_invocable_r_impl<F(Ts...), R, /*IsInvocable=*/true>
+          : std::is_convertible<typename util::invoke_result<F, Ts...>::type, R>
         {
         };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename R = void>
-    struct is_callable;
+    struct HPX_DEPRECATED(
+        HPX_DEPRECATED_MSG " Use is_invocable instead.") is_callable;
 
     template <typename F, typename... Ts, typename R>
-    struct is_callable<F(Ts...), R> : detail::is_callable_impl<F(Ts...), R>
+    struct is_callable<F(Ts...), R> : detail::is_invocable_impl<F(Ts...), R>
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    struct is_invocable : detail::is_callable_impl<F && (Ts && ...), void>
+    struct is_invocable : detail::is_invocable_impl<F && (Ts && ...), void>
     {
     };
 
     template <typename R, typename F, typename... Ts>
-    struct is_invocable_r : detail::is_callable_impl<F && (Ts && ...), R>
+    struct is_invocable_r : detail::is_invocable_r_impl<F && (Ts && ...), R>
+    {
+    };
+
+    template <typename F, typename... Ts>
+    struct is_invocable_r<void, F, Ts...>
+      : detail::is_invocable_impl<F && (Ts && ...)>
     {
     };
 }}    // namespace hpx::traits

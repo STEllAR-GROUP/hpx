@@ -4,9 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:hpx::traits::is_callable
-// hpxinspect:nodeprecatedname:hpx::util::result_of
-
 #pragma once
 
 #if defined(DOXYGEN)
@@ -136,7 +133,7 @@ namespace hpx { namespace functional {
 
     template <typename Tag, typename... Args>
     using is_tag_invocable =
-        hpx::traits::is_callable<decltype(tag_invoke)(Tag, Args...)>;
+        hpx::traits::is_invocable<decltype(tag_invoke), Tag, Args...>;
 
     template <typename Tag, typename... Args>
     constexpr bool is_tag_invocable_v = is_tag_invocable<Tag, Args...>::value;
@@ -173,8 +170,9 @@ namespace hpx { namespace functional {
         is_nothrow_tag_invocable<Tag, Args...>::value;
 
     template <typename Tag, typename... Args>
-    using tag_invoke_result = hpx::util::result_of<decltype(
-        hpx::functional::tag_invoke)(Tag, Args...)>;
+    using tag_invoke_result =
+        hpx::util::invoke_result<decltype(hpx::functional::tag_invoke), Tag,
+            Args...>;
 
     template <typename Tag, typename... Args>
     using tag_invoke_result_t = typename tag_invoke_result<Tag, Args...>::type;

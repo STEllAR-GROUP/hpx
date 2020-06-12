@@ -74,10 +74,8 @@ void for_each_zipiter_test(ExPolicy&& policy, IteratorTag)
 //                hpx::parallel::util::projection_identity,
 //                decltype(begin)>
 //        >::value,
-        hpx::traits::is_callable<
-            set_42(
-                typename std::iterator_traits<decltype(begin)>::value_type&
-            )
+//        hpx::traits::is_invocable<
+//            set_42, typename std::iterator_traits<decltype(begin)>::value_type&,
 //            typename hpx::parallel::traits::detail::projected_result_of_indirect<
 //            hpx::parallel::traits::projected<
 //                hpx::parallel::util::projection_identity,

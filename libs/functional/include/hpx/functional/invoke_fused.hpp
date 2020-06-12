@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:util::result_of
-
 #pragma once
 
 #include <hpx/config.hpp>
@@ -31,35 +29,36 @@ namespace hpx { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Tuple, typename Is>
-        struct fused_result_of_impl;
+        struct invoke_fused_result_impl;
 
         template <typename F, typename Tuple, std::size_t... Is>
-        struct fused_result_of_impl<F, Tuple&, index_pack<Is...>>
-          : util::result_of<F(
-                typename util::tuple_element<Is, Tuple>::type&...)>
+        struct invoke_fused_result_impl<F, Tuple&, index_pack<Is...>>
+          : util::invoke_result<F,
+                typename util::tuple_element<Is, Tuple>::type&...>
         {
         };
 
         template <typename F, typename Tuple, std::size_t... Is>
-        struct fused_result_of_impl<F, Tuple&&, index_pack<Is...>>
-          : util::result_of<F(
-                typename util::tuple_element<Is, Tuple>::type&&...)>
+        struct invoke_fused_result_impl<F, Tuple&&, index_pack<Is...>>
+          : util::invoke_result<F,
+                typename util::tuple_element<Is, Tuple>::type&&...>
         {
         };
 
         template <typename T>
-        struct fused_result_of;
+        struct HPX_DEPRECATED(HPX_DEPRECATED_MSG
+            " Use invoke_fused_result instead.") fused_result_of;
 
         template <typename F, typename Tuple>
         struct fused_result_of<F(Tuple)>
-          : fused_result_of_impl<F, Tuple&&,
+          : invoke_fused_result_impl<F, Tuple&&,
                 typename fused_index_pack<Tuple>::type>
         {
         };
 
         template <typename F, typename Tuple>
         struct invoke_fused_result
-          : fused_result_of_impl<F, Tuple&&,
+          : invoke_fused_result_impl<F, Tuple&&,
                 typename fused_index_pack<Tuple>::type>
         {
         };

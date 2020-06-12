@@ -5,8 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:hpx::traits::is_callable
-
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/functional/traits/is_callable.hpp>
@@ -25,14 +23,14 @@ struct p {
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    using hpx::traits::is_callable;
+    using hpx::traits::is_invocable;
     using hpx::util::invoke;
 
     typedef int (s::*mem_fun_ptr)();
-    HPX_TEST_MSG((is_callable<mem_fun_ptr(p)>::value == false), "mem-fun-ptr");
+    HPX_TEST_MSG((is_invocable<mem_fun_ptr, p>::value == false), "mem-fun-ptr");
 
     typedef int (s::*const_mem_fun_ptr)() const;
-    HPX_TEST_MSG((is_callable<const_mem_fun_ptr(p)>::value == true),
+    HPX_TEST_MSG((is_invocable<const_mem_fun_ptr, p>::value == true),
         "const-mem-fun-ptr");
 
     HPX_TEST_EQ(invoke(&s::f, p()), 42);
