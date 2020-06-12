@@ -8,22 +8,27 @@
 #include <hpx/testing.hpp>
 #include "iter_sent.hpp"
 
+#include <string>
 #include <vector>
-
 
 void is_sentinel_for()
 {
-    //Iterator<std::int64_t> iter{0};
-    //Sentinel<int64_t> sent{100};
+    HPX_TEST_MSG((hpx::traits::is_sentinel_for<Sentinel<int64_t>,
+                      Iterator<std::int64_t>>::value == true),
+        "sent for iter");
 
-    HPX_TEST_MSG((hpx::traits::is_sentinel_for<Iterator<std::int64_t>, Sentinel<int64_t>>::value == true), "sent for iter");
-    //HPX_TEST_MSG((hpx::traits::is_sentinel_for<Iterator<std::int64_t>, std::int64_t>::value == true), "sent for iter");
-    HPX_TEST_MSG((hpx::traits::is_sentinel_for< std::vector<std::int64_t>, int64_t>::value == true), "sent for iter");
+    HPX_TEST_MSG(
+        (hpx::traits::is_sentinel_for<std::int64_t, std::int64_t>::value ==
+            false),
+        "incompatible pair int - int");
 
+    HPX_TEST_MSG((hpx::traits::is_sentinel_for<std::vector<int>::iterator,
+                      std::vector<int>::iterator>::value == true),
+        "iterator begin / end pair");
 
-    //static_assert(hpx::traits::is_sentinel_for<Iterator<std::int64_t>,
-    //                  Sentinel<int64_t>>::value,
-    //    "Nop");
+    HPX_TEST_MSG((hpx::traits::is_sentinel_for<std::string,
+                      std::string::iterator>::value == false),
+        "string / iterator pair");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
