@@ -171,7 +171,7 @@ namespace hpx { namespace cuda {
             }
 
             // this is called from the nvidia backend on a non-hpx thread
-            // extrem care must be taken to not lock/block or take too long
+            // extreme care must be taken to not lock/block or take too long
             // in this callback
             static void CUDART_CB stream_callback(
                 cudaStream_t stream, cudaError_t error, void* user_data)
