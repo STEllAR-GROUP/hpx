@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/topology.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <type_traits>

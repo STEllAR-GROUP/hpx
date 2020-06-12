@@ -15,7 +15,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <functional>

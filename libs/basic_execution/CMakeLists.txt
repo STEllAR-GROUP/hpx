@@ -18,7 +18,7 @@ set(basic_execution_headers
 )
 
 set(basic_execution_compat_headers
-    hpx/parallel/executors/execution_fwd.hpp
+    hpx/basic_execution.hpp hpx/parallel/executors/execution_fwd.hpp
     hpx/synchronization/detail/yield_k.hpp hpx/util/register_locks.hpp
     hpx/util/yield_while.hpp
 )
@@ -36,6 +36,7 @@ add_hpx_module(
   SOURCES ${basic_execution_sources}
   HEADERS ${basic_execution_headers}
   COMPAT_HEADERS ${basic_execution_compat_headers}
-  DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_format hpx_timing
+  DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_format hpx_functional
+               hpx_timing
   CMAKE_SUBDIRS examples tests
 )

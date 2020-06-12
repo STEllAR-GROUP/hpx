@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <string>
 #include <vector>

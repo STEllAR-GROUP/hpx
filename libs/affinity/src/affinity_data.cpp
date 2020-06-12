@@ -6,9 +6,9 @@
 
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/affinity/parse_affinity_options.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
 

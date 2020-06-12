@@ -7,19 +7,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/async/apply.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/async.hpp>
+#include <hpx/async_distributed/apply.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/async/applier/apply.hpp>
-#include <hpx/async/applier/apply_callback.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/async_distributed/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <cstdint>
 #include <string>

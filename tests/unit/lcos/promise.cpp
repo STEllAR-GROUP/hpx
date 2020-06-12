@@ -8,7 +8,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <functional>
 #include <string>

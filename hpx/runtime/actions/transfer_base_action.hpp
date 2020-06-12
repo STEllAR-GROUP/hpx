@@ -15,7 +15,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions_fwd.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>
@@ -34,7 +34,7 @@
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #endif
 
 #include <atomic>

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/async.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/include/client.hpp>
 
 #include <cstdint>

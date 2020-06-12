@@ -6,13 +6,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/naming_base.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_APEX)
@@ -75,6 +75,8 @@ namespace hpx { namespace threads {
     {
         LTM_(debug) << "thread::thread(" << this << "), description("
                     << get_description() << ")";
+
+        HPX_ASSERT(stacksize_enum_ != threads::thread_stacksize_current);
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         // store the thread id of the parent thread, mainly for debugging
@@ -303,8 +305,11 @@ namespace hpx { namespace threads {
     thread_stacksize get_self_stacksize_enum()
     {
         thread_data* thrd_data = get_self_id_data();
-        return thrd_data ? thrd_data->get_stack_size_enum() :
-                           thread_stacksize_default;
+        thread_stacksize stacksize = thrd_data ?
+            thrd_data->get_stack_size_enum() :
+            thread_stacksize_default;
+        HPX_ASSERT(stacksize != thread_stacksize_current);
+        return stacksize;
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE

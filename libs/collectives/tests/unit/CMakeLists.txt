@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    all_gather
     all_reduce
     all_to_all
     barrier
@@ -13,19 +14,25 @@ set(tests
     broadcast_apply
     broadcast_component
     fold
+    gather
     global_spmd_block
     reduce
     remote_latch
+    scatter
 )
 
+set(all_gather_PARAMETERS LOCALITIES 2)
 set(all_reduce_PARAMETERS LOCALITIES 2)
 set(all_to_all_PARAMETERS LOCALITIES 2)
 set(broadcast_PARAMETERS LOCALITIES 2)
 set(broadcast_direct_PARAMETERS LOCALITIES 2)
 set(broadcast_apply_PARAMETERS LOCALITIES 2)
 set(broadcast_component_PARAMETERS LOCALITIES 2)
+set(gather_PARAMETERS LOCALITIES 2)
 set(remote_latch_PARAMETERS LOCALITIES 2)
 set(reduce_PARAMETERS LOCALITIES 2)
+set(scatter_PARAMETERS LOCALITIES 2)
+
 set(global_spmd_block_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})

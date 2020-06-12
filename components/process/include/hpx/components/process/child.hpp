@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/async_base/launch_policy.hpp>

@@ -41,6 +41,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
       hpx_plugin
       hpx_program_options
       hpx_runtime_configuration
+      hpx_runtime_local
       hpx_serialization
       hpx_threading
       hpx_threadmanager

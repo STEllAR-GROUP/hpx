@@ -7,12 +7,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) && defined(HPX_HAVE_NETWORKING)
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter_registry.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
 
 #include <cstdint>

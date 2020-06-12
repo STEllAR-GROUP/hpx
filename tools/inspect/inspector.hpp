@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/filesystem.hpp>
 
 #include <cstddef>
 #include <iostream>

@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/filesystem.hpp>
 
 #include "inspector.hpp"
 

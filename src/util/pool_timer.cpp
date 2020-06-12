@@ -5,13 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/functional/deferred_call.hpp>

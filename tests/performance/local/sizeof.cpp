@@ -9,7 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 
 using hpx::program_options::variables_map;
 using hpx::program_options::options_description;

@@ -24,8 +24,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/checkpoint.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/modules/checkpoint.hpp>
 
 #include <boost/range/irange.hpp>
 

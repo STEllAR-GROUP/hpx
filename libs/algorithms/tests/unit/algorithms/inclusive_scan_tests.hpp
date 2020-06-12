@@ -10,8 +10,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_scan.hpp>
-#include <hpx/iterator_support.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

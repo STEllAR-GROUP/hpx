@@ -17,7 +17,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/iterator_support.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -41,7 +41,7 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 // Our partition data type
 struct partition_data
 {
-    partition_data(std::size_t size)
+    explicit partition_data(std::size_t size)
       : data_(new double [size]), size_(size)
     {}
 

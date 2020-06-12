@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/base_object.hpp>

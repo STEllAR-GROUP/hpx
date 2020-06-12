@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <cstddef>

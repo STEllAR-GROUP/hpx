@@ -12,10 +12,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/async/sync_fwd.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/async_distributed/sync_fwd.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -46,7 +46,7 @@
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #endif
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions/transfer_action.hpp>

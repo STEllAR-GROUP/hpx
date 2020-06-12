@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/serialization/binary_filter.hpp>
 #include <hpx/serialization/container.hpp>
 #include <hpx/serialization/serialization_chunk.hpp>

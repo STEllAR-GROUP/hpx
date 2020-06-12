@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/runtime_configuration_fwd.hpp>
 
 #include <string>

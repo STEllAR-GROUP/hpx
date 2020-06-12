@@ -15,7 +15,7 @@
 
 #include <hpx/config.hpp>
 //#include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
@@ -62,7 +62,7 @@ namespace hpx
             > base_type;
 
     public:
-        segment_unordered_map_iterator(BaseIter const& it,
+        explicit segment_unordered_map_iterator(BaseIter const& it,
                 unordered_map<Key, T, Hash, KeyEqual>* data = nullptr)
           : base_type(it), data_(data)
         {}
@@ -103,7 +103,7 @@ namespace hpx
             > base_type;
 
     public:
-        const_segment_unordered_map_iterator(BaseIter const& it,
+        explicit const_segment_unordered_map_iterator(BaseIter const& it,
                 unordered_map<Key, T, Hash, KeyEqual> const* data = nullptr)
           : base_type(it), data_(data)
         {}

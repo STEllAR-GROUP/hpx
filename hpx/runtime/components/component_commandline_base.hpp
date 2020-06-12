@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/plugin.hpp>
-#include <hpx/program_options.hpp>
+#include <hpx/modules/plugin.hpp>
+#include <hpx/modules/program_options.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

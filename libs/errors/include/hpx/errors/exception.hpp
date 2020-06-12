@@ -14,6 +14,7 @@
 #include <hpx/errors/error_code.hpp>
 #include <hpx/errors/exception_fwd.hpp>
 #include <hpx/errors/exception_info.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>
@@ -106,13 +107,13 @@ namespace hpx {
     };
 
     using custom_exception_info_handler_type =
-        std::function<hpx::exception_info(
+        util::function_nonser<hpx::exception_info(
             std::string const&, std::string const&, long, std::string const&)>;
 
     HPX_EXPORT void set_custom_exception_info_handler(
         custom_exception_info_handler_type f);
 
-    using pre_exception_handler_type = std::function<void()>;
+    using pre_exception_handler_type = util::function_nonser<void()>;
 
     HPX_EXPORT void set_pre_exception_handler(pre_exception_handler_type f);
 

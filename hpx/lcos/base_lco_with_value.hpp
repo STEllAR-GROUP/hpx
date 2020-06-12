@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -22,7 +22,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/type_support/unused.hpp>

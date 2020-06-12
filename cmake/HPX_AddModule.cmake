@@ -126,7 +126,9 @@ function(add_hpx_module name)
   # headers are included
   if(${name}_GLOBAL_HEADER_GEN)
     # Add a global include file that include all module headers
-    set(global_header "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${name}.hpp")
+    set(global_header
+        "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${name}.hpp"
+    )
     set(module_headers)
     foreach(header_file ${${name}_HEADERS})
       # Exclude the files specified
@@ -315,6 +317,10 @@ function(add_hpx_module name)
   set_target_properties(
     hpx_${name} PROPERTIES FOLDER "Core/Modules" POSITION_INDEPENDENT_CODE ON
   )
+
+  if(HPX_WITH_UNITY_BUILD)
+    set_target_properties(hpx_${name} PROPERTIES UNITY_BUILD ON)
+  endif()
 
   if(MSVC)
     set_target_properties(

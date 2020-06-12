@@ -9,7 +9,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/std_tuple.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>

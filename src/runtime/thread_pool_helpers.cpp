@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/resource_partitioner.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/thread_pool_helpers.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 #include <cstddef>
 #include <cstdint>

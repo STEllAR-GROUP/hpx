@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
-#include <hpx/util/interval_timer.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 
@@ -23,7 +23,8 @@ namespace performance_counters { namespace sine { namespace server
     {
     public:
         sine_counter() : current_value_(0), evaluated_at_(0) {}
-        sine_counter(hpx::performance_counters::counter_info const& info);
+        explicit sine_counter(
+            hpx::performance_counters::counter_info const& info);
 
         /// This function will be called in order to query the current value of
         /// this performance counter

@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/async/applier/trigger.hpp>
+#include <hpx/async_distributed/applier/trigger.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
@@ -46,7 +46,7 @@ struct object_semaphore
             boost::intrusive::link_mode<boost::intrusive::normal_link>
         > hook_type;
 
-        queue_thread_entry(naming::id_type const& id)
+        explicit queue_thread_entry(naming::id_type const& id)
           : id_(id) {}
 
         naming::id_type id_;
@@ -126,7 +126,7 @@ struct object_semaphore
     } // }}}
 
   public:
-    object_semaphore() {}
+    object_semaphore() = default;
 
     ~object_semaphore()
     { // {{{

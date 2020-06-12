@@ -9,11 +9,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local_async/dataflow.hpp>
+#include <hpx/async_local/dataflow.hpp>
 #endif
 
 #include <hpx/execution/executors/execution.hpp>

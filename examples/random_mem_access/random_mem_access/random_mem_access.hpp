@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/runtime.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/client.hpp>
 
 #include "server/random_mem_access.hpp"

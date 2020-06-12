@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -48,6 +48,7 @@ int hpx_main()
     {
         hpx::components::client<matrix_multiply_multiplier> comp =
             hpx::new_<matrix_multiply_multiplier>(remote_ids[0], std::move(m));
+        comp.get();
     }
 
     return hpx::finalize();

@@ -9,12 +9,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/functional.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/thread_support.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -13,7 +13,7 @@
 #include <hpx/resiliency/config.hpp>
 
 #include <hpx/futures/future.hpp>
-#include <hpx/local_async.hpp>
+#include <hpx/modules/async_local.hpp>
 
 #include <cstddef>
 #include <exception>

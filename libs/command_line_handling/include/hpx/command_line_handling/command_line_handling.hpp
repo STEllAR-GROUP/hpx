@@ -7,12 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional.hpp>
-#include <hpx/program_options.hpp>
-#include <hpx/runtime_configuration.hpp>
-#include <hpx/util.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -41,7 +42,7 @@ namespace hpx { namespace util {
     struct command_line_handling
     {
         command_line_handling()
-          : rtcfg_(nullptr, runtime_mode_default)
+          : rtcfg_(nullptr, runtime_mode::default_)
           , node_(std::size_t(-1))
           , num_threads_(1)
           , num_cores_(1)
@@ -58,7 +59,9 @@ namespace hpx { namespace util {
         }
 
         int call(hpx::program_options::options_description const& desc_cmdline,
-            int argc, char** argv);
+            int argc, char** argv,
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries);
 
         hpx::program_options::variables_map vm_;
         util::runtime_configuration rtcfg_;

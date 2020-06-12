@@ -7,9 +7,9 @@
 
 #include <hpx/threading_base/thread_helpers.hpp>
 
-#include <hpx/assertion.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/basic_execution/register_locks.hpp>
 #endif

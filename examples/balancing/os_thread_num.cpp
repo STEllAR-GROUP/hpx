@@ -9,7 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <cstddef>

@@ -11,7 +11,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/async_combinators/wait_each.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -9,7 +9,7 @@
 
 #include "htts2.hpp"
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstdint>
 #include <iostream>

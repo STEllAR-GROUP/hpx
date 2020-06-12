@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/collectives.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/collectives.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -16,10 +16,8 @@
 #include <utility>
 #include <vector>
 
-char const* broadcast_basename = "/test/broadcast/";
-char const* broadcast_direct_basename = "/test/broadcast_direct/";
-
-HPX_REGISTER_BROADCAST(std::uint32_t, test_broadcast);
+constexpr char const* broadcast_basename = "/test/broadcast/";
+constexpr char const* broadcast_direct_basename = "/test/broadcast_direct/";
 
 int hpx_main(int argc, char* argv[])
 {
@@ -31,9 +29,10 @@ int hpx_main(int argc, char* argv[])
     {
         if (hpx::get_locality_id() == 0)
         {
-            hpx::future<void> f = broadcast_to(broadcast_basename,
+            hpx::future<std::uint32_t> result = broadcast_to(broadcast_basename,
                 hpx::make_ready_future(i + 42), num_localities, i);
-            f.get();
+
+            HPX_TEST_EQ(i + 42, result.get());
         }
         else
         {
@@ -49,9 +48,10 @@ int hpx_main(int argc, char* argv[])
     {
         if (hpx::get_locality_id() == 0)
         {
-            hpx::future<void> f = hpx::broadcast_to(
+            hpx::future<std::uint32_t> result = hpx::broadcast_to(
                 broadcast_direct_basename, i + 42, num_localities, i);
-            f.get();
+
+            HPX_TEST_EQ(i + 42, result.get());
         }
         else
         {

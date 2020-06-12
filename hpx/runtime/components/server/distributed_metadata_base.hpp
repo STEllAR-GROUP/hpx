@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/preprocessor/cat.hpp>
@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace server
     public:
         distributed_metadata_base() { HPX_ASSERT(false); }
 
-        distributed_metadata_base(ConfigData const& data)
+        explicit distributed_metadata_base(ConfigData const& data)
           : data_(data)
         {}
 

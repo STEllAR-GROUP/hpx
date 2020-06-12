@@ -9,7 +9,7 @@
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <functional>

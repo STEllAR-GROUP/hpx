@@ -9,27 +9,25 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
+#include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime/thread_pool_helpers.hpp>
 #include <hpx/runtime/threads/thread_pool_suspension_helpers.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_fwd.hpp>
-#include <hpx/schedulers.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/threadmanager.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
 
@@ -124,49 +122,49 @@ namespace hpx { namespace threads {
 
         std::size_t max_background_threads =
             hpx::util::from_string<std::size_t>(
-                hpx::get_config_entry("hpx.max_background_threads",
+                cfg_.rtcfg_.get_entry("hpx.max_background_threads",
                     (std::numeric_limits<std::size_t>::max)()));
         std::size_t const max_idle_loop_count =
-            hpx::util::from_string<std::int64_t>(hpx::get_config_entry(
+            hpx::util::from_string<std::int64_t>(cfg_.rtcfg_.get_entry(
                 "hpx.max_idle_loop_count", HPX_IDLE_LOOP_COUNT_MAX));
         std::size_t const max_busy_loop_count =
-            hpx::util::from_string<std::int64_t>(hpx::get_config_entry(
+            hpx::util::from_string<std::int64_t>(cfg_.rtcfg_.get_entry(
                 "hpx.max_busy_loop_count", HPX_BUSY_LOOP_COUNT_MAX));
 
         std::int64_t const max_thread_count =
             hpx::util::from_string<std::int64_t>(
-                hpx::get_config_entry("hpx.thread_queue.max_thread_count",
+                cfg_.rtcfg_.get_entry("hpx.thread_queue.max_thread_count",
                     std::to_string(HPX_THREAD_QUEUE_MAX_THREAD_COUNT)));
         std::int64_t const min_tasks_to_steal_pending =
-            hpx::util::from_string<std::int64_t>(hpx::get_config_entry(
+            hpx::util::from_string<std::int64_t>(cfg_.rtcfg_.get_entry(
                 "hpx.thread_queue.min_tasks_to_steal_pending",
                 std::to_string(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING)));
         std::int64_t const min_tasks_to_steal_staged =
-            hpx::util::from_string<std::int64_t>(hpx::get_config_entry(
+            hpx::util::from_string<std::int64_t>(cfg_.rtcfg_.get_entry(
                 "hpx.thread_queue.min_tasks_to_steal_staged",
                 std::to_string(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED)));
         std::int64_t const min_add_new_count =
             hpx::util::from_string<std::int64_t>(
-                hpx::get_config_entry("hpx.thread_queue.min_add_new_count",
+                cfg_.rtcfg_.get_entry("hpx.thread_queue.min_add_new_count",
                     std::to_string(HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT)));
         std::int64_t const max_add_new_count =
             hpx::util::from_string<std::int64_t>(
-                hpx::get_config_entry("hpx.thread_queue.max_add_new_count",
+                cfg_.rtcfg_.get_entry("hpx.thread_queue.max_add_new_count",
                     std::to_string(HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT)));
         std::int64_t const min_delete_count =
             hpx::util::from_string<std::int64_t>(
-                hpx::get_config_entry("hpx.thread_queue.min_delete_count",
+                cfg_.rtcfg_.get_entry("hpx.thread_queue.min_delete_count",
                     std::to_string(HPX_THREAD_QUEUE_MIN_DELETE_COUNT)));
         std::int64_t const max_delete_count =
             hpx::util::from_string<std::int64_t>(
-                hpx::get_config_entry("hpx.thread_queue.max_delete_count",
+                cfg_.rtcfg_.get_entry("hpx.thread_queue.max_delete_count",
                     std::to_string(HPX_THREAD_QUEUE_MAX_DELETE_COUNT)));
         std::int64_t const max_terminated_threads =
             hpx::util::from_string<std::int64_t>(
-                hpx::get_config_entry("hpx.thread_queue.max_terminated_threads",
+                cfg_.rtcfg_.get_entry("hpx.thread_queue.max_terminated_threads",
                     std::to_string(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)));
         double const max_idle_backoff_time = hpx::util::from_string<double>(
-            hpx::get_config_entry("hpx.max_idle_backoff_time",
+            cfg_.rtcfg_.get_entry("hpx.max_idle_backoff_time",
                 std::to_string(HPX_IDLE_BACKOFF_TIME_MAX)));
 
         std::ptrdiff_t small_stacksize = get_stack_size(thread_stacksize_small);
@@ -182,7 +180,7 @@ namespace hpx { namespace threads {
             max_idle_backoff_time, small_stacksize, medium_stacksize,
             large_stacksize, huge_stacksize);
 
-        if (!hpx::is_networking_enabled())
+        if (!cfg_.rtcfg_.enable_networking())
         {
             max_background_threads = 0;
         }

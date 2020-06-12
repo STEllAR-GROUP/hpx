@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/threads/run_as_os_thread.hpp>
+#include <hpx/runtime_local/run_as_os_thread.hpp>
 
 #include <iostream>
 #include <mutex>

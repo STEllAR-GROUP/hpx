@@ -9,13 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/compute/detail/iterator.hpp>
 #include <hpx/compute/traits/access_target.hpp>
 #include <hpx/compute/traits/allocator_traits.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/parallel/util/transfer.hpp>
-#include <hpx/runtime/report_error.hpp>
+#include <hpx/runtime_local/report_error.hpp>
 
 #include <cstddef>
 #include <initializer_list>

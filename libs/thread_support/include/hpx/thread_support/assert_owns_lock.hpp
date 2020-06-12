@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <type_traits>
 
@@ -18,6 +18,11 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Lock>
     void assert_owns_lock(Lock const&, int)
+    {
+    }
+
+    template <typename Lock>
+    void assert_doesnt_own_lock(Lock const&, int)
     {
     }
 
@@ -31,7 +36,17 @@ namespace hpx { namespace util { namespace detail {
         HPX_ASSERT(l.owns_lock());
     }
 
+    template <typename Lock>
+    typename std::enable_if<has_owns_lock<Lock>::value>::type
+    assert_doesnt_own_lock(Lock const& l, long)
+    {
+        HPX_ASSERT(!l.owns_lock());
+    }
+
 #endif
 }}}    // namespace hpx::util::detail
 
 #define HPX_ASSERT_OWNS_LOCK(l) ::hpx::util::detail::assert_owns_lock(l, 0L)
+
+#define HPX_ASSERT_DOESNT_OWN_LOCK(l)                                          \
+    ::hpx::util::detail::assert_doesnt_own_lock(l, 0L)

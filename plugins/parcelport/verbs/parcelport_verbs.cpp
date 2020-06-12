@@ -9,8 +9,8 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 // util
-#include <hpx/assertion.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
@@ -32,7 +32,7 @@
 #include <hpx/plugins/parcelport_factory.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 //
-#include <hpx/util/debug/thread_stacktrace.hpp>
+#include <hpx/runtime_local/thread_stacktrace.hpp>
 //
 #include <boost/asio/ip/host_name.hpp>
 //
@@ -96,6 +96,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <exception>
 #include <iostream>
 #include <list>
 #include <memory>

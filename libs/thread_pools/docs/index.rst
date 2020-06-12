@@ -11,7 +11,11 @@
 thread_pools
 ============
 
-TODO: High-level description of the library.
+This module defines the thread pools and utilities used by the |hpx| runtime.
+The only thread pool implementation provided by this module is
+:cpp:class:`hpx::threads::detail::scheduled_thread_pool`, which is derived from
+:cpp:class:`hpx::threads::detail::thread_pool_base` defined in the
+:ref:`libs_threading_base` module.
 
 See the :ref:`API reference <libs_thread_pools_api>` of this module for more
 details.

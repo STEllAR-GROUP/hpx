@@ -8,8 +8,8 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/filesystem.hpp>
-#include <hpx/string_util.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include "link_check.hpp"
 #include "function_hyper.hpp"

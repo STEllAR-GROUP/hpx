@@ -9,13 +9,13 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
-#include <hpx/runtime/startup_function.hpp>
-#include <hpx/format.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <hpx/components/performance_counters/io/io_counters.hpp>
 
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_uint.hpp>

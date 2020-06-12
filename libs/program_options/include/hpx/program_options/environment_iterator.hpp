@@ -21,7 +21,7 @@ namespace hpx { namespace program_options {
 
 #else
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/program_options/eof_iterator.hpp>
 
 #include <string>

@@ -12,7 +12,7 @@
 #include <hpx/threading_base/print.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 //
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/unused.hpp>
 //

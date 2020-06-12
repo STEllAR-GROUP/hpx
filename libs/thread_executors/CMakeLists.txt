@@ -15,15 +15,14 @@ set(thread_executors_headers
     hpx/execution/executors/thread_pool_os_executors.hpp
     hpx/thread_executors/current_executor.hpp
     hpx/thread_executors/default_executor.hpp
+    hpx/thread_executors/detail/on_self_reset.hpp
     hpx/thread_executors/embedded_thread_pool_executors.hpp
     hpx/thread_executors/executors.hpp
     hpx/thread_executors/force_linking.hpp
     hpx/thread_executors/guided_pool_executor.hpp
     hpx/thread_executors/limiting_executor.hpp
     hpx/thread_executors/manage_thread_executor.hpp
-    hpx/thread_executors/pool_executor.hpp
     hpx/thread_executors/resource_manager.hpp
-    hpx/thread_executors/service_executors.hpp
     hpx/thread_executors/this_thread_executors.hpp
     hpx/thread_executors/thread_execution.hpp
     hpx/thread_executors/thread_execution_information.hpp
@@ -47,8 +46,6 @@ set(thread_executors_compat_headers
     hpx/runtime/threads/executors/guided_pool_executor.hpp
     hpx/runtime/threads/executors/limiting_executor.hpp
     hpx/runtime/threads/executors/manage_thread_executor.hpp
-    hpx/runtime/threads/executors/pool_executor.hpp
-    hpx/runtime/threads/executors/service_executors.hpp
     hpx/runtime/threads/executors/this_thread_executors.hpp
     hpx/runtime/threads/executors/thread_pool_attached_executors.hpp
     hpx/runtime/threads/executors/thread_pool_os_executors.hpp

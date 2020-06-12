@@ -8,16 +8,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/local_async/dataflow.hpp>
+#include <hpx/async_local/dataflow.hpp>
 
 #include <hpx/local_lcos/channel.hpp>
 
-#include <hpx/synchronization.hpp>
+#include <hpx/modules/synchronization.hpp>
 
-#include <hpx/execution.hpp>
-#include <hpx/futures.hpp>
 #include <hpx/local_lcos/and_gate.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/local_lcos/receive_buffer.hpp>
 #include <hpx/local_lcos/trigger.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/futures.hpp>

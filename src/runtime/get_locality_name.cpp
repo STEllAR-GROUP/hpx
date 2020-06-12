@@ -5,11 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
-#include <hpx/async/apply.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/async_distributed/apply.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/get_locality_name.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/actions/plain_action.hpp>

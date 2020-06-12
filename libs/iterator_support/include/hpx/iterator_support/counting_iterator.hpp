@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
-#include <hpx/type_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <iterator>

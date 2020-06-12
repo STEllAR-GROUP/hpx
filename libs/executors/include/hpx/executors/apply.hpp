@@ -49,9 +49,8 @@ namespace hpx { namespace detail {
             traits::is_threads_executor<Executor>::value>::type>
     {
         template <typename Executor_, typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value, bool>::type
-        call(Executor_&& exec, F&& f, Ts&&... ts)
+        HPX_FORCEINLINE static decltype(auto) call(
+            Executor_&& exec, F&& f, Ts&&... ts)
         {
             parallel::execution::post(std::forward<Executor_>(exec),
                 std::forward<F>(f), std::forward<Ts>(ts)...);

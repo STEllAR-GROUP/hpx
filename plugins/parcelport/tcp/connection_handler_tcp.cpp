@@ -12,8 +12,8 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/asio/asio_util.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/plugins/parcelport/tcp/connection_handler.hpp>

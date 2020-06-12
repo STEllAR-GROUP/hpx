@@ -11,3 +11,8 @@
 affinity
 ========
 
+The affinity module contains helper functionality for mapping worker threads to
+hardware resources.
+
+See the :ref:`API reference <libs_affinity_api>` of the module for more
+details.

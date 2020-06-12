@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/custom_exception_info.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -39,8 +39,10 @@ struct test_client
 {
     typedef hpx::components::client_base<test_client, test_server> base_type;
 
-    test_client(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
-    test_client(hpx::id_type && id) : base_type(std::move(id)) {}
+    test_client(hpx::future<hpx::id_type>&& id) noexcept
+      : base_type(std::move(id))
+    {
+    }
 
     std::size_t check_ptr() { return check_ptr_action()(this->get_id()); }
 };
@@ -145,7 +147,6 @@ int main()
     HPX_TEST(test_get_ptr2(hpx::find_here()));
     HPX_TEST(test_get_ptr3(hpx::find_here()));
     HPX_TEST(test_get_ptr4(hpx::find_here()));
-
 
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
     for (hpx::id_type const& id : localities)

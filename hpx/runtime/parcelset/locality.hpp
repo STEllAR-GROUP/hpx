@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -73,7 +73,7 @@ namespace hpx { namespace parcelset
                 typename util::decay<Impl>::type>::value>::type,
             typename Enable2 = typename std::enable_if<
                 !traits::is_iterator<Impl>::value>::type>
-        locality(Impl&& i)
+        explicit locality(Impl&& i)
           : impl_(new impl<typename util::decay<Impl>::type>(
                 std::forward<Impl>(i)))
         {}

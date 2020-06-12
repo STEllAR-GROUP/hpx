@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(config_registry_headers hpx/config_registry.hpp)
+set(config_registry_headers hpx/modules/config_registry.hpp)
 
 set(config_registry_sources config_registry.cpp)
 

@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/datastructures/any.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <iostream>
 #include <sstream>

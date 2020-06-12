@@ -9,13 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async/dataflow.hpp>
-#include <hpx/async/detail/async_implementations_fwd.hpp>
+#include <hpx/async_distributed/dataflow.hpp>
+#include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/async_base/launch_policy.hpp>
@@ -42,8 +42,7 @@ namespace hpx { namespace components
     public:
         /// Default-construct a new instance of a \a target_distribution_policy.
         /// This policy will represent one locality (the local locality).
-        target_distribution_policy()
-        {}
+        target_distribution_policy() = default;
 
         /// Create a new \a target_distribution_policy representing the given
         /// locality
@@ -208,7 +207,7 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        target_distribution_policy(hpx::id_type const& id)
+        explicit target_distribution_policy(hpx::id_type const& id)
           : id_(id)
         {}
 

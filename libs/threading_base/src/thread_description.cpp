@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/util/to_string.hpp>
@@ -76,6 +76,11 @@ namespace hpx { namespace util {
                 HPX_ASSERT(type_ == data_type_address);
                 data_.addr_ = desc.get_address();
             }
+        }
+        else
+        {
+            type_ = data_type_description;
+            data_.desc_ = "<unknown>";
         }
 #endif
     }

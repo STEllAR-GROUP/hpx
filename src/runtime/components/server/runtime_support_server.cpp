@@ -6,17 +6,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_distributed.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/filesystem.hpp>
-#include <hpx/mpi_base.hpp>
-#include <hpx/logging.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/logging.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
@@ -31,23 +31,23 @@
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/server/component_database.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
-#include <hpx/collectives.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
@@ -870,7 +870,6 @@ namespace hpx { namespace components { namespace server
 
                 // unregister fixed components
                 agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
-                agas_client.unbind_local(appl.get_memory_raw_gid(), ec);
 
                 if (remove_from_remote_caches)
                     remove_here_from_connection_cache();

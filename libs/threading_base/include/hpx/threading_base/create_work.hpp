@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>

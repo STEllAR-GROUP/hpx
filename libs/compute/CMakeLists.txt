@@ -31,7 +31,7 @@ set(compute_headers
 )
 
 set(compute_compat_headers
-    hpx/parallel/util/numa_allocator.hpp
+    hpx/compute.hpp hpx/parallel/util/numa_allocator.hpp
     hpx/parallel/util/numa_binding_allocator.hpp hpx/util/functional/new.hpp
 )
 
@@ -62,6 +62,7 @@ add_hpx_module(
     hpx_program_options
     hpx_resource_partitioner
     hpx_runtime_configuration
+    hpx_runtime_local
     hpx_serialization
     hpx_synchronization
     hpx_threading
@@ -73,7 +74,9 @@ add_hpx_module(
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  target_link_libraries(hpx_compute PUBLIC hpx_performance_counters hpx_async)
+  target_link_libraries(
+    hpx_compute PUBLIC hpx_performance_counters hpx_async_distributed
+  )
 endif()
 
 # Temporary since the module still depends on some runtime files

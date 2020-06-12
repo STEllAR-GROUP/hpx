@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
-#include <hpx/datastructures.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/synchronization/spinlock.hpp>

@@ -13,10 +13,11 @@
 
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/include/parallel_execution.hpp>
+#include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/local_async.hpp>
-#include <hpx/program_options.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <atomic>

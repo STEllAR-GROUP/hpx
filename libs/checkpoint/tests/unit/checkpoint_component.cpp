@@ -9,10 +9,10 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/checkpoint.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/modules/checkpoint.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
-#include <hpx/testing.hpp>
 
 #include <iostream>
 #include <memory>

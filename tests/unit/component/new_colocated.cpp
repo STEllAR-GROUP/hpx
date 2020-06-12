@@ -7,7 +7,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <utility>
 

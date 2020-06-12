@@ -16,7 +16,7 @@
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/protect.hpp>

@@ -10,9 +10,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/thread_pool_executor.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -22,8 +22,11 @@
 #include <vector>
 
 namespace hpx { namespace parallel { namespace execution {
-    struct restricted_thread_pool_executor
+    class restricted_thread_pool_executor
     {
+        static constexpr std::size_t hierarchical_threshold_default_ = 6;
+
+    public:
         /// Associate the parallel_execution_tag executor tag type as a default
         /// with this executor.
         typedef parallel_execution_tag execution_category;
@@ -39,11 +42,14 @@ namespace hpx { namespace parallel { namespace execution {
                 threads::thread_priority_default,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize_default,
-            threads::thread_schedule_hint schedulehint = {})
+            threads::thread_schedule_hint schedulehint = {},
+            std::size_t hierarchical_threshold =
+                hierarchical_threshold_default_)
           : pool_(this_thread::get_pool())
           , priority_(priority)
           , stacksize_(stacksize)
           , schedulehint_(schedulehint)
+          , hierarchical_threshold_(hierarchical_threshold)
           , first_thread_(first_thread)
           , num_threads_(num_threads)
           , os_thread_(first_thread_)
@@ -132,8 +138,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             return detail::thread_pool_bulk_async_execute_helper(pool_,
                 priority_, stacksize_, schedulehint_, first_thread_,
-                num_threads_, launch::async, std::forward<F>(f), shape,
-                std::forward<Ts>(ts)...);
+                num_threads_, hierarchical_threshold_, launch::async,
+                std::forward<F>(f), shape, std::forward<Ts>(ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -155,6 +161,7 @@ namespace hpx { namespace parallel { namespace execution {
         threads::thread_stacksize stacksize_ =
             threads::thread_stacksize_default;
         threads::thread_schedule_hint schedulehint_ = {};
+        std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
 
         std::size_t first_thread_;
         std::size_t num_threads_;

@@ -16,8 +16,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <algorithm>
 #include <cstddef>

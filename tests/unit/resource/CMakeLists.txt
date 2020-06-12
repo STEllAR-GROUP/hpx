@@ -9,7 +9,8 @@ set(tests
     shutdown_suspended_pus
     suspend_disabled
     suspend_pool
-    # suspend_pool_external suspend_runtime
+    suspend_pool_external
+    suspend_runtime
     suspend_thread
     suspend_thread_external
     # suspend_thread_timed

@@ -212,8 +212,10 @@ namespace boost
         {"(\\bstd\\s*::\\s*declval\\b)", "std::declval", "utility"},
         {"(\\bstd\\s*::\\s*pair\\b)", "std::pair", "utility"},
         {"(\\bstd\\s*::\\s*make_pair\\b)", "std::make_pair", "utility"},
+        // exception
         {"(\\bstd\\s*::\\s*exception_ptr\\b)", "std::exception_ptr",
             "exception"},
+        {"(\\bstd\\s*::\\s*terminate\\b)", "std::terminate", "exception"},
         // algorithm
         {"(\\bstd\\s*::\\s*swap_ranges\\b)", "std::swap_ranges", "algorithm"},
         {"(\\bstd\\s*::\\s*iter_swap\\b)", "std::iter_swap", "algorithm"},
@@ -237,8 +239,8 @@ namespace boost
         {"(\\bHPX_PP_STRIP_PARENS\\b)", "HPX_PP_STRIP_PARENS",
             "hpx/preprocessor/strip_parens.hpp"},
         //
-        {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", "hpx/assertion.hpp"},
-        {"(\\HPX_ASSERT_MSG\\b)", "HPX_ASSERT_MSG", "hpx/assertion.hpp"},
+        {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", "hpx/modules/assertion.hpp"},
+        {"(\\HPX_ASSERT_MSG\\b)", "HPX_ASSERT_MSG", "hpx/modules/assertion.hpp"},
         {nullptr, nullptr, nullptr}};
 
     //  include_check constructor  -------------------------------------------//

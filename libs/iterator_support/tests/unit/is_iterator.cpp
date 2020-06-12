@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>

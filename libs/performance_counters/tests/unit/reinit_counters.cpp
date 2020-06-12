@@ -7,8 +7,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <atomic>
 #include <cstdint>

@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <hpx/async/dataflow.hpp>
+#include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>

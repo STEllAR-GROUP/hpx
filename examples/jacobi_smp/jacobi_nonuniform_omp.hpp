@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <cstdint>

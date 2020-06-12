@@ -23,7 +23,7 @@
 
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/synchronization.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <boost/range/irange.hpp>
 
 #include <cstddef>

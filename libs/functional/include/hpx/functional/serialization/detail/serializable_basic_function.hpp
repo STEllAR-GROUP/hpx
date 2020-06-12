@@ -10,12 +10,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/functional/detail/basic_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 #include <hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp>
 #include <hpx/functional/serialization/detail/vtable/serializable_vtable.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <string>

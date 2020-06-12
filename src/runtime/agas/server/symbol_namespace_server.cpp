@@ -9,9 +9,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
@@ -21,7 +21,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
-#include <hpx/async/applier/apply.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/scoped_timer.hpp>

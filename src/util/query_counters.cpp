@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/performance_counters/apex_sample_value.hpp>
@@ -14,9 +14,9 @@
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/runtime/get_thread_name.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/get_thread_name.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
@@ -653,4 +653,3 @@ namespace hpx { namespace util
         return result;
     }
 }}
-

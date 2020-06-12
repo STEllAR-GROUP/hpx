@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async/async.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/async_distributed/async.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>

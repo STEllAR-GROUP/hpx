@@ -7,12 +7,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
-#include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>

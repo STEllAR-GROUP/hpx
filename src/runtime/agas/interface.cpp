@@ -7,14 +7,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/assertion.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 
 #include <algorithm>

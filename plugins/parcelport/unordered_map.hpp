@@ -96,7 +96,7 @@ namespace concurrent {
           , iterator_lock_(mutex_, defer_lock())
         {}
 
-        unordered_map(const allocator_type& a)
+        explicit unordered_map(const allocator_type& a)
           : map_(a)
           , iterator_lock_(mutex_, defer_lock())
         {}
@@ -107,7 +107,7 @@ namespace concurrent {
         {}
 
         // C++11 specific
-        unordered_map(unordered_map&& other)
+        unordered_map(unordered_map&& other) noexcept
           : map_(std::forward<unordered_map>(other))
           , mutex_()
           , iterator_lock_(mutex_, defer_lock())
@@ -134,21 +134,24 @@ namespace concurrent {
         unordered_map& operator=(const unordered_map& other)
         {
             write_lock lock(other.mutex_);
-            return map_ = other;
+            map_ = other;
+            return *this;
         }
 
         // C++11 specific
-        unordered_map& operator=(unordered_map&& other)
+        unordered_map& operator=(unordered_map&& other) noexcept
         {
             write_lock lock(other.mutex_);
             mutex_ = rw_mutex_type();
-            return map_ = std::forward<unordered_map>(other);
+            map_ = std::move(other);
+            return *this;
         }
 
         unordered_map& operator=(std::initializer_list<value_type> il)
         {
             write_lock lock(mutex_);
-            return map_ = il;
+            map_ = il;
+            return *this;
         }
 
         void swap(unordered_map& other)

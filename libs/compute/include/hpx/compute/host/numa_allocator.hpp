@@ -8,14 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <cstddef>

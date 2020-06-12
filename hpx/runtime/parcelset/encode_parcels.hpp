@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/naming/split_gid.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
@@ -139,8 +139,8 @@ namespace hpx
             int archive_flags_, std::uint64_t max_outbound_size)
         {
             HPX_ASSERT(buffer.data_.empty());
+
             // collect argument sizes from parcels
-            std::size_t num_chunks = 0;
             std::size_t arg_size = 0;
             std::size_t parcels_sent = 0;
             std::size_t parcels_size = 1;
@@ -162,6 +162,7 @@ namespace hpx
                         archive_flags |= serialization::enable_compression;
 
                     // preallocate data
+                    std::size_t num_chunks = 0;
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
                     {
                         if (arg_size >= max_outbound_size)

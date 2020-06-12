@@ -41,14 +41,14 @@ It is also recommended that you check out the latest stable tag:
 The minimum dependencies needed to use |hpx| are |boost|_ and |hwloc|_. If these
 are not available through your system package manager, see
 :ref:`boost_installation` and :ref:`hwloc_installation` for instructions on how
-to build them yourself. In addition to |boost|_ and |hwloc|_, it is recommended
+to build them yourself. In addition to |boost| and |hwloc|, it is recommended
 that you don't use the system allocator, but instead use either ``tcmalloc``
 from |google_perftools|_ (default) or |jemalloc|_ for better performance. If you
-would like to try |hpx| without a custom allocator at this point you can
+would like to try |hpx| without a custom allocator at this point, you can
 configure |hpx| to use the system allocator in the next step.
 
 A full list of required and optional dependencies, including recommended
-versions is available at :ref:`prerequisites`.
+versions, is available at :ref:`prerequisites`.
 
 Building |hpx|
 ==============
@@ -65,9 +65,9 @@ known to |cmake|, the following gets you started:
     make install
 
 This will build the core |hpx| libraries and examples, and install them to your
-chosen location. If you want to install |hpx| to system folders simply leave out
+chosen location. If you want to install |hpx| to system folders, simply leave out
 the ``CMAKE_INSTALL_PREFIX`` option. This may take a while. To speed up the
-process launch more jobs by passing the ``-jN`` option to ``make``.
+process, launch more jobs by passing the ``-jN`` option to ``make``.
 
 .. tip::
 
@@ -76,13 +76,13 @@ process launch more jobs by passing the ``-jN`` option to ``make``.
 
 .. tip::
 
-   If you want to change |cmake|_ variables for your build it is usually a good
+   If you want to change |cmake| variables for your build, it is usually a good
    idea to start with a clean build directory to avoid configuration problems.
    It is especially important that you use a clean build directory when changing
    between ``Release`` and ``Debug`` modes.
 
-If your dependencies are in custom locations you may need to tell |cmake|_ where
-to find them by passing one or more of the following options to |cmake|_:
+If your dependencies are in custom locations, you may need to tell |cmake| where
+to find them by passing one or more of the following options to |cmake|:
 
 .. code-block:: sh
 
@@ -92,22 +92,22 @@ to find them by passing one or more of the following options to |cmake|_:
     -DJEMALLOC_ROOT=/path/to/jemalloc
 
 If you want to try |hpx| without using a custom allocator pass
-``-DHPX_WITH_MALLOC=system`` to |cmake|_.
+``-DHPX_WITH_MALLOC=system`` to |cmake|.
 
 .. important::
 
-   If you are building |hpx| for a system with more than 64 processing units you
-   must change the |cmake| variables ``HPX_WITH_MORE_THAN_64_THREADS`` (to
+   If you are building |hpx| for a system with more than 64 processing units,
+   you must change the |cmake| variables ``HPX_WITH_MORE_THAN_64_THREADS`` (to
    ``On``) and ``HPX_WITH_MAX_CPU_COUNT`` (to a value at least as big as the
    number of (virtual) cores on your system).
 
-To build the tests run ``make tests``. To run the tests run either ``make test``
+To build the tests, run ``make tests``. To run the tests, run either ``make test``
 or use ``ctest`` for more control over which tests to run. You can run single
 tests for example with ``ctest --output-on-failure -R
 tests.unit.parallel.algorithms.for_loop`` or a whole group of tests with ``ctest
 --output-on-failure -R tests.unit``.
 
-If you did not run ``make install`` earlier do so now or build the
+If you did not run ``make install`` earlier, do so now or build the
 ``hello_world_1`` example by running:
 
 .. code-block:: sh
@@ -125,7 +125,7 @@ can now run ``hello_world_1`` and should see the following output:
 You've just run an example which prints ``Hello World!`` from the |hpx| runtime.
 The source for the example is in ``examples/quickstart/hello_world_1.cpp``. The
 ``hello_world_distributed`` example (also available in the
-``examples/quickstart`` directory) is a distributed hello world program which is
+``examples/quickstart`` directory) is a distributed hello world program, which is
 described in :ref:`examples_hello_world`. It provides a gentle introduction to
 the distributed aspects of |hpx|.
 
@@ -146,7 +146,7 @@ the distributed aspects of |hpx|.
       ... examples.quickstart.hello_world_distributed
       ... hello_world_distributed
 
-   It is also possible to build e.g. all quickstart examples using ``make
+   It is also possible to build, for instance, all quickstart examples using ``make
    examples.quickstart``.
 
 Installing and building |hpx| via vcpkg
@@ -171,7 +171,7 @@ Hello, World!
 =============
 
 The following ``CMakeLists.txt`` is a minimal example of what you need in order to
-build an executable using |cmake|_ and |hpx|:
+build an executable using |cmake| and |hpx|:
 
 .. code-block:: cmake
 
@@ -190,7 +190,7 @@ build an executable using |cmake|_ and |hpx|:
 .. note::
 
    ``HPX::iostreams_component`` is optional for a minimal project but lets us
-   use the |hpx| equivalent of ``std::cout``, i.e. the |hpx| :ref:`iostreams`
+   use the |hpx| equivalent of ``std::cout``, i.e., the |hpx| :ref:`iostreams`
    functionality in our application.
 
 Create a new project directory and a ``CMakeLists.txt`` with the contents above.
@@ -218,7 +218,7 @@ futures, ``async``, parallel algorithms and more which make use of the |hpx|
 runtime with lightweight threads. ``hpx::cout`` is a replacement for
 ``std::cout`` to make sure printing never blocks a lightweight thread. You can
 read more about ``hpx::cout`` in :ref:`iostreams`. If you rebuild and run your
-program now you should see the familiar ``Hello World!``:
+program now, you should see the familiar ``Hello World!``:
 
 .. code-block:: sh
 
@@ -248,7 +248,7 @@ program now you should see the familiar ``Hello World!``:
    When including ``hpx_main.hpp`` the user-defined ``main`` gets renamed and
    the real ``main`` function is defined by |hpx|. This means that the
    user-defined ``main`` must include a return statement, unlike the real
-   ``main``. If you do not include the return statement you may end up with
+   ``main``. If you do not include the return statement, you may end up with
    confusing compile time errors mentioning ``user_main`` or even runtime
    errors.
 
@@ -272,7 +272,7 @@ programs:
 
 * lightweight thread: Essential for good performance with task-based programs.
   Lightweight refers to smaller stacks and faster context switching compared to
-  OS-threads. Smaller overheads allow the program to be broken up into smaller
+  OS threads. Smaller overheads allow the program to be broken up into smaller
   tasks, which in turns helps the runtime fully utilize all processing units.
 
 * ``async``: The most basic way of launching tasks asynchronously. Returns a
@@ -307,7 +307,7 @@ tricky to get right (the continuation needs to take the future as an argument).
 .. note::
 
    |hpx| programs accept command line arguments. The most important one is
-   :option:`--hpx:threads`\ ``=N`` to set the number of OS-threads used by
+   :option:`--hpx:threads`\ ``=N`` to set the number of OS threads used by
    |hpx|. |hpx| uses one thread per core by default. Play around with the
    example above and see what difference the number of threads makes on the
    ``sort`` function. See :ref:`launching_and_configuring` for more details on
@@ -322,7 +322,7 @@ tricky to get right (the continuation needs to take the future as an argument).
 
 .. tip::
 
-   If possible, prefer to use the provided parallel algorithms instead of
+   If possible, try to use the provided parallel algorithms instead of
    writing your own implementation. This can save you time and the resulting
    program is often faster.
 

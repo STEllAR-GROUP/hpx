@@ -34,6 +34,7 @@ if(HPX_WITH_PARCELPORT_TCP)
       hpx_performance_counters
       hpx_plugin
       hpx_program_options
+      hpx_runtime_local
       hpx_serialization
       hpx_threading
       hpx_threadmanager

@@ -10,8 +10,8 @@
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
-#include <hpx/debugging.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/debugging.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 

@@ -12,10 +12,10 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/algorithms.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/functional.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -33,7 +33,7 @@ namespace executor_example {
     private:
         struct on_exit
         {
-            on_exit(executor_with_thread_hooks const& exec)
+            explicit on_exit(executor_with_thread_hooks const& exec)
               : exec_(exec)
             {
                 exec_.on_start_();

@@ -6,8 +6,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/program_options.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include "components/launch_process_test_server.hpp"
 
@@ -81,8 +81,8 @@ int main(int argc, char* argv[])
         "hpx.expect_connecting_localities!=1"
     };
 
-    // Note: this uses runtime_mode_connect to instruct this locality to
+    // Note: this uses runtime_mode::connect to instruct this locality to
     // connect to the existing HPX applications
-    return hpx::init(desc_commandline, argc, argv, cfg, hpx::runtime_mode_connect);
+    return hpx::init(desc_commandline, argc, argv, cfg, hpx::runtime_mode::connect);
 }
 

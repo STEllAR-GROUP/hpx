@@ -19,9 +19,10 @@ All modules
    /libs/allocator_support/docs/index.rst
    /libs/asio/docs/index.rst
    /libs/assertion/docs/index.rst
-   /libs/async/docs/index.rst
+   /libs/async_distributed/docs/index.rst
    /libs/async_base/docs/index.rst
    /libs/async_combinators/docs/index.rst
+   /libs/async_local/docs/index.rst
    /libs/basic_execution/docs/index.rst
    /libs/batch_environments/docs/index.rst
    /libs/cache/docs/index.rst
@@ -48,11 +49,11 @@ All modules
    /libs/hardware/docs/index.rst
    /libs/hashing/docs/index.rst
    /libs/include/docs/index.rst
+   /libs/init_runtime/docs/index.rst
    /libs/io_service/docs/index.rst
    /libs/iterator_support/docs/index.rst
    /libs/itt_notify/docs/index.rst
    /libs/lcos_distributed/docs/index.rst
-   /libs/local_async/docs/index.rst
    /libs/local_lcos/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
@@ -68,6 +69,7 @@ All modules
    /libs/resiliency/docs/index.rst
    /libs/resource_partitioner/docs/index.rst
    /libs/runtime_configuration/docs/index.rst
+   /libs/runtime_local/docs/index.rst
    /libs/schedulers/docs/index.rst
    /libs/segmented_algorithms/docs/index.rst
    /libs/serialization/docs/index.rst

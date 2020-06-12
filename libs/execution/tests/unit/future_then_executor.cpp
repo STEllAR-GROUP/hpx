@@ -12,7 +12,7 @@
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <chrono>
 #include <memory>

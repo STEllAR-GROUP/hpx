@@ -8,22 +8,23 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/util/thread_description.hpp>
 
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/async/applier/applier.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -47,14 +48,12 @@ namespace hpx { namespace applier {
     }
 #endif
 
-    void applier::initialize(std::uint64_t rts, std::uint64_t mem)
+    void applier::initialize(std::uint64_t rts)
     {
         naming::resolver_client& agas_client = get_agas_client();
         runtime_support_id_ =
             naming::id_type(agas_client.get_local_locality().get_msb(), rts,
                 naming::id_type::unmanaged);
-        memory_id_ = naming::id_type(agas_client.get_local_locality().get_msb(),
-            mem, naming::id_type::unmanaged);
     }
 
     naming::resolver_client& applier::get_agas_client()

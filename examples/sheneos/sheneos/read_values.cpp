@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/hpx.hpp>
 
@@ -114,7 +114,7 @@ namespace sheneos
             // Return size of dataset.
             return dims[0];
         }
-        catch (H5::Exception e) {
+        catch (H5::Exception const& e) {
             std::string msg = e.getDetailMsg().c_str();
             HPX_THROW_EXCEPTION(hpx::no_success,
                 "sheneos::extract_data_range", msg);

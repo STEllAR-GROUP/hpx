@@ -7,46 +7,46 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/assertion.hpp>
-#include <hpx/async/applier/applier.hpp>
-#include <hpx/async/apply.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/async_distributed/apply.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/custom_exception_info.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/functional.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime/config_entry.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
-#include <hpx/runtime/thread_hooks.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
@@ -54,14 +54,14 @@
 #include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
-#include <hpx/threadmanager.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/topology.hpp>
-#include <hpx/util/debugging.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/runtime_local/debugging.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/thread_mapper.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -161,7 +161,7 @@ namespace hpx {
         runtime& rt = get_runtime();
 
         int exit_code = 0;
-        if (runtime_mode_connect == mode)
+        if (runtime_mode::connect == mode)
         {
             lbt_ << "(2nd stage) pre_main: locality is in connect mode, "
                     "skipping 2nd and 3rd stage startup synchronization";
@@ -365,28 +365,26 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_distributed::runtime_distributed(util::runtime_configuration& rtcfg)
-      : runtime(
-            rtcfg,
-            runtime_distributed::get_notification_policy("worker-thread"),
-            notification_policy_type {}
+      : runtime(rtcfg,
+            runtime_distributed::get_notification_policy(
+                "worker-thread", runtime_local::os_thread_type::worker_thread),
+            notification_policy_type{},
 #ifdef HPX_HAVE_IO_POOL
-            ,
-            runtime_distributed::get_notification_policy("io-thread")
+            runtime_distributed::get_notification_policy(
+                "io-thread", runtime_local::os_thread_type::io_thread),
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-                ,
-            runtime_distributed::get_notification_policy("timer-thread")
+            runtime_distributed::get_notification_policy(
+                "timer-thread", runtime_local::os_thread_type::timer_thread),
 #endif
 #ifdef HPX_HAVE_NETWORKING
-                ,
-            &detail::network_background_callback
+            &detail::network_background_callback,
 #endif
-            ,
             false)
       , mode_(rtcfg.mode_)
 #if defined(HPX_HAVE_NETWORKING)
-      , parcel_handler_notifier_(
-            runtime_distributed::get_notification_policy("parcel-thread"))
+      , parcel_handler_notifier_(runtime_distributed::get_notification_policy(
+            "parcel-thread", runtime_local::os_thread_type::parcel_thread))
       , parcel_handler_(rtcfg, thread_manager_.get(), parcel_handler_notifier_)
       , agas_client_(ini_, rtcfg.mode_)
       , applier_(parcel_handler_, *thread_manager_)
@@ -394,7 +392,6 @@ namespace hpx {
       , agas_client_(ini_, rtcfg.mode_)
       , applier_(*thread_manager_)
 #endif
-      , memory_(new components::server::memory)
       , runtime_support_(new components::server::runtime_support(ini_))
     {
         // This needs to happen first
@@ -424,17 +421,13 @@ namespace hpx {
 
         // now, launch AGAS and register all nodes, launch all other components
 #if defined(HPX_HAVE_NETWORKING)
-        agas_client_.initialize(parcel_handler_,
-            std::uint64_t(runtime_support_.get()),
-            std::uint64_t(memory_.get()));
+        agas_client_.initialize(
+            parcel_handler_, std::uint64_t(runtime_support_.get()));
         parcel_handler_.initialize(agas_client_, &applier_);
 #else
-        agas_client_.initialize(std::uint64_t(runtime_support_.get()),
-            std::uint64_t(memory_.get()));
+        agas_client_.initialize(std::uint64_t(runtime_support_.get()));
 #endif
-
-        applier_.initialize(std::uint64_t(runtime_support_.get()),
-            std::uint64_t(memory_.get()));
+        applier_.initialize(std::uint64_t(runtime_support_.get()));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -565,7 +558,8 @@ namespace hpx {
         // Register this thread with the runtime system to allow calling
         // certain HPX functionality from the main thread. Also calls
         // registered startup callbacks.
-        init_tss_helper("main-thread", 0, 0, "", "", false);
+        init_tss_helper("main-thread",
+            runtime_local::os_thread_type::main_thread, 0, 0, "", "", false);
 
         // start runtime_support services
         runtime_support_->run();
@@ -598,8 +592,7 @@ namespace hpx {
             util::bind(&runtime_distributed::run_helper, this, func,
                 std::ref(result_)),
             "run_helper", threads::thread_priority_normal,
-            threads::thread_schedule_hint(0),
-            threads::thread_stacksize_large);
+            threads::thread_schedule_hint(0), threads::thread_stacksize_large);
 
         this->runtime::starting();
         threads::thread_id_type id = threads::invalid_thread_id;
@@ -1056,11 +1049,6 @@ namespace hpx {
         return reinterpret_cast<std::uint64_t>(runtime_support_.get());
     }
 
-    std::uint64_t runtime_distributed::get_memory_lva() const
-    {
-        return reinterpret_cast<std::uint64_t>(memory_.get());
-    }
-
     naming::gid_type get_next_id(std::size_t count = 1);
 
     util::unique_id_ranges& runtime_distributed::get_id_pool()
@@ -1435,7 +1423,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     threads::policies::callback_notifier
-    runtime_distributed::get_notification_policy(char const* prefix)
+    runtime_distributed::get_notification_policy(
+        char const* prefix, runtime_local::os_thread_type type)
     {
         typedef bool (runtime_distributed::*report_error_t)(
             std::size_t, std::exception_ptr const&, bool);
@@ -1449,7 +1438,7 @@ namespace hpx {
 
         notifier.add_on_start_thread_callback(
             util::bind(&runtime_distributed::init_tss_helper, This(), prefix,
-                _1, _2, _3, _4, false));
+                type, _1, _2, _3, _4, false));
         notifier.add_on_stop_thread_callback(util::bind(
             &runtime_distributed::deinit_tss_helper, This(), prefix, _1));
         notifier.set_on_error_callback(util::bind(
@@ -1460,21 +1449,23 @@ namespace hpx {
     }
 
     void runtime_distributed::init_tss_helper(char const* context,
-        std::size_t local_thread_num, std::size_t global_thread_num,
-        char const* pool_name, char const* postfix, bool service_thread)
+        runtime_local::os_thread_type type, std::size_t local_thread_num,
+        std::size_t global_thread_num, char const* pool_name,
+        char const* postfix, bool service_thread)
     {
         // prefix thread name with locality number, if needed
-        std::string locality = "";    //locality_prefix(get_config());
+        std::string locality = locality_prefix(get_config());
 
         error_code ec(lightweight);
-        return init_tss_ex(locality, context, local_thread_num,
+        return init_tss_ex(locality, context, type, local_thread_num,
             global_thread_num, pool_name, postfix, service_thread, ec);
     }
 
     void runtime_distributed::init_tss_ex(std::string const& locality,
-        char const* context, std::size_t local_thread_num,
-        std::size_t global_thread_num, char const* pool_name,
-        char const* postfix, bool service_thread, error_code& ec)
+        char const* context, runtime_local::os_thread_type type,
+        std::size_t local_thread_num, std::size_t global_thread_num,
+        char const* pool_name, char const* postfix, bool service_thread,
+        error_code& ec)
     {
         // initialize our TSS
         runtime::init_tss();
@@ -1502,7 +1493,7 @@ namespace hpx {
         char const* name = detail::thread_name().c_str();
 
         // initialize thread mapping for external libraries (i.e. PAPI)
-        thread_support_->register_thread(name, ec);
+        thread_support_->register_thread(name, type);
 
         // register this thread with any possibly active Intel tool
         HPX_ITT_THREAD_SET_NAME(name);
@@ -1638,21 +1629,11 @@ namespace hpx {
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss_ex(locality, thread_name.c_str(), global_thread_num,
+        init_tss_ex(locality, thread_name.c_str(),
+            runtime_local::os_thread_type::custom_thread, global_thread_num,
             global_thread_num, "", nullptr, service_thread, ec);
 
         return !ec ? true : false;
-    }
-
-    /// Unregister an external OS-thread with HPX
-    bool runtime_distributed::unregister_thread()
-    {
-        if (nullptr != get_runtime_ptr())
-            return false;    // never registered
-
-        deinit_tss_helper(
-            detail::thread_name().c_str(), hpx::get_worker_thread_num());
-        return true;
     }
 
 #if defined(HPX_HAVE_NETWORKING)

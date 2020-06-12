@@ -15,8 +15,8 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/state.hpp>
-#include <hpx/format.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -147,6 +147,6 @@ int main(int argc, char* argv[])
 
     hpx::util::function_nonser<void()> const empty;
     return hpx::init(desc_commandline, argc, argv, cfg, empty,
-        empty, hpx::runtime_mode_connect);
+        empty, hpx::runtime_mode::connect);
 }
 

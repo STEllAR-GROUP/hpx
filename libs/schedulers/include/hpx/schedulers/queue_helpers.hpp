@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>

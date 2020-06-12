@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -11,8 +11,12 @@
 threading
 =========
 
-TODO: High-level description of the library.
+This module provides the equivalents of ``std::thread`` and ``std::jthread``
+for lightweight |hpx| threads:
 
-See the :ref:`API reference <libs_thread_api>` of this module for more
+* :cpp:class:`hpx::thread`
+* :cpp:class:`hpx::jthread`
+
+See the :ref:`API reference <libs_threading_api>` of this module for more
 details.
 

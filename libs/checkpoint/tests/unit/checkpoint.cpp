@@ -10,8 +10,8 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/checkpoint.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/checkpoint.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <fstream>
 #include <string>

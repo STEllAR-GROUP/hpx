@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/synchronization/mutex.hpp>
-#include <hpx/util/interval_timer.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -24,13 +24,15 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util
-{
+namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT query_counters
     {
         // avoid warning about using this in member initializer list
-        query_counters* this_() { return this; }
+        query_counters* this_()
+        {
+            return this;
+        }
 
     public:
         query_counters(std::vector<std::string> const& names,
@@ -70,8 +72,8 @@ namespace hpx { namespace util
             std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream, typename Future>
-        void print_values(Stream* output, std::vector<Future> &&,
-            std::vector<std::size_t> && indices,
+        void print_values(Stream* output, std::vector<Future>&&,
+            std::vector<std::size_t>&& indices,
             std::vector<performance_counters::counter_info> const& infos);
 
         template <typename Stream>
@@ -84,8 +86,7 @@ namespace hpx { namespace util
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
-        void print_name_csv(Stream& out,
-            std::string const& name);
+        void print_name_csv(Stream& out, std::string const& name);
 
         template <typename Stream>
         void print_value_csv(Stream* out,
@@ -97,8 +98,7 @@ namespace hpx { namespace util
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
-        void print_name_csv_short(Stream& out,
-            std::string const& name);
+        void print_name_csv_short(Stream& out, std::string const& name);
 
     private:
         typedef lcos::local::mutex mutex_type;
@@ -121,7 +121,6 @@ namespace hpx { namespace util
         std::map<std::string, util::itt::counter> itt_counters_;
 #endif
     };
-}}
+}}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
-

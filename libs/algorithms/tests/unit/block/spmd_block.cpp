@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/custom_exception_info.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/parallel/spmd_block.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 
 #include <array>
 #include <atomic>

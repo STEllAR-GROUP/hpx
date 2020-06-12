@@ -6,9 +6,9 @@
 
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/local_async.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/threading_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <atomic>
 #include <cstddef>

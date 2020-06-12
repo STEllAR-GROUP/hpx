@@ -144,26 +144,26 @@ namespace hpx {
             typename const_pvector_iterator::segment_iterator;
         using indices = typename hpx::util::make_index_pack<N>::type;
 
-    template<std::size_t... I>
-    std::size_t  increment_solver( std::size_t dist,
-        hpx::util::index_pack<I...> ) const
-    {
-        std::size_t max = N-1;
-        std::size_t offset = 0;
-        std::size_t carry = dist;
-        std::size_t tmp;
+        template<std::size_t... I>
+        std::size_t  increment_solver( std::size_t dist,
+            hpx::util::index_pack<I...> ) const
+        {
+            std::size_t max = N-1;
+            std::size_t offset = 0;
+            std::size_t carry = dist;
+            std::size_t tmp;
 
-        // More expensive than a usual incrementation but did not find another
-        // solution
-        (void)std::initializer_list<int>
-        { ( static_cast<void>(
-                carry   -= tmp = (carry/sw_basis_[max-I]) * sw_basis_[max-I],
-                offset  += (tmp/sw_basis_[max-I]) * hw_basis_[max-I]),
-            0 )...
-        };
+            // More expensive than a usual incrementation but did not find another
+            // solution
+            (void)std::initializer_list<int>
+            { ( static_cast<void>(
+                    carry   -= tmp = (carry/sw_basis_[max-I]) * sw_basis_[max-I],
+                    offset  += (tmp/sw_basis_[max-I]) * hw_basis_[max-I]),
+                0 )...
+            };
 
-        return offset;
-    }
+            return offset;
+        }
 
     public:
         using const_element_type = hpx::detail::const_view_element<T,Data>;
@@ -201,7 +201,7 @@ namespace hpx {
         {}
 
         // Note : partitioned_vector_view_iterator is not assignable
-        // because it owns references members
+        // because it owns reference members
         const_partitioned_vector_view_iterator
         operator=(const_partitioned_vector_view_iterator const &) = delete;
 
@@ -234,10 +234,11 @@ namespace hpx {
             return this->count_ == other.count_;
         }
 
-        // Will not return a datatype but a view_element type
+        // Will not return a data type but a view_element type
         const_element_type dereference() const
         {
-            return hpx::detail::const_view_element<T,Data>(block_,begin_,end_,t_);
+            return hpx::detail::const_view_element<T, Data>(
+                block_, begin_, end_, t_);
         }
 
         std::ptrdiff_t distance_to(

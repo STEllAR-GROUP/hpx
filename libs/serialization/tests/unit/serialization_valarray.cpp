@@ -13,7 +13,7 @@
 #include <hpx/serialization/valarray.hpp>
 #include <hpx/serialization/vector.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <array>
 #include <cstddef>

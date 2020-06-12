@@ -8,7 +8,7 @@
 #include <hpx/include/parallel_transform_scan.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <vector>

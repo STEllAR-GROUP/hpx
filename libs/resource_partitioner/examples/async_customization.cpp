@@ -6,21 +6,20 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/thread_executors/default_executor.hpp>
-#include <hpx/thread_executors/pool_executor.hpp>
+#include <hpx/include/threadmanager.hpp>
 #define GUIDED_EXECUTOR_DEBUG 1
 #include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/thread_executors/guided_pool_executor.hpp>
 //#include <hpx/topology/cpu_mask.hpp>
 //#include <hpx/include/parallel_executors.hpp>
-#include <hpx/async.hpp>
+#include <hpx/modules/async_distributed.hpp>
 
 // we should not need these
 #include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 
-#include <hpx/async/dataflow.hpp>
 #include <hpx/async_combinators/when_all.hpp>
+#include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -39,7 +38,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 // --------------------------------------------------------------------
 // custom executor async/then/when/dataflow specialization example
@@ -508,7 +507,7 @@ int hpx_main()
     try
     {
         hpx::parallel::execution::guided_pool_executor<dummy_hint> exec2(
-            "default");
+            &hpx::resource::get_thread_pool("default"));
         test("Testing guided_pool_executor<dummy_hint>", exec2);
     }
     catch (std::exception& e)
@@ -520,7 +519,7 @@ int hpx_main()
     try
     {
         hpx::parallel::execution::guided_pool_executor_shim<dummy_hint> exec3(
-            true, "default");
+            true, &hpx::resource::get_thread_pool("default"));
         test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
     }
     catch (std::exception& e)

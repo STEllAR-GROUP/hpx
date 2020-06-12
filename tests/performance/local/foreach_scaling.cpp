@@ -9,7 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <hpx/executors/parallel_executor_aggregated.hpp>
 

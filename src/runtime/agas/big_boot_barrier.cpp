@@ -11,10 +11,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
@@ -42,7 +42,7 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 
@@ -82,9 +82,9 @@ namespace hpx { namespace agas { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct unassigned_typename_sequence
     {
-        unassigned_typename_sequence() {}
+        unassigned_typename_sequence() = default;
 
-        unassigned_typename_sequence(bool /*dummy*/)
+        explicit unassigned_typename_sequence(bool /*dummy*/)
           : serialization_typenames(hpx::serialization::detail::id_registry::
                 instance().get_unassigned_typenames())
           , action_typenames(hpx::actions::detail::action_registry::
@@ -114,9 +114,10 @@ namespace hpx { namespace agas { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     struct assigned_id_sequence
     {
-        assigned_id_sequence() {}
+        assigned_id_sequence() = default;
 
-        assigned_id_sequence(unassigned_typename_sequence const& typenames)
+        explicit assigned_id_sequence(
+            unassigned_typename_sequence const& typenames)
         {
             register_ids_on_main_loc(typenames);
         }
@@ -624,13 +625,6 @@ void notify_worker(notification_header const& header)
 
     runtime_support_gid.set_lsb(std::uint64_t(0));
     agas_client.bind_local(runtime_support_gid, runtime_support_address);
-
-    naming::gid_type const memory_gid(header.prefix.get_msb()
-      , rtd.get_memory_lva());
-    naming::address const memory_address(here
-      , components::get_component_type<components::server::memory>()
-      , rtd.get_memory_lva());
-    agas_client.bind_local(memory_gid, memory_address);
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.

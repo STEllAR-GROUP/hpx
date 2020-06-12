@@ -13,8 +13,8 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <string>

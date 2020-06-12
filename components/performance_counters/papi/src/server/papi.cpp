@@ -11,13 +11,13 @@
 
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/components/server/component.hpp>
-#include <hpx/timing.hpp>
-#include <hpx/util/thread_mapper.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 
 #include <boost/version.hpp>
 
@@ -62,13 +62,13 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             "could not create PAPI event set", locstr);
         papi_call(PAPI_assign_eventset_component(evset_, 0),
             "cannot assign component index to event set", locstr);
-        long tid = tm.get_thread_id(tix);
+        unsigned long tid = tm.get_thread_native_handle(tix);
         if (tid == tm.invalid_tid)
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 NS_STR "thread_counters::thread_counters()",
                 "unable to retrieve correct OS thread ID for profiling "
                 "(perhaps thread was not registered)");
-        papi_call(PAPI_attach(evset_, tm.get_thread_id(tix)),
+        papi_call(PAPI_attach(evset_, tid),
             "failed to attach thread to PAPI event set", locstr);
         tm.register_callback(tix, [&](std::uint32_t i){return this->terminate(i);});
     }

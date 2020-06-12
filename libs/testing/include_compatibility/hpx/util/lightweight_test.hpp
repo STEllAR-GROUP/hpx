@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/testing/config/defines.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #if defined(HPX_TESTING_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)

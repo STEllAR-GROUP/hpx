@@ -43,7 +43,7 @@
 #endif
 #endif
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
@@ -63,6 +63,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <limits>
 #include "pth/pth.h"
 

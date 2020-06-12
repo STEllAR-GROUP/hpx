@@ -13,7 +13,7 @@ set(debugging_headers
 )
 
 set(debugging_compat_headers
-    hpx/util/backtrace.hpp hpx/util/backtrace/backtrace.hpp
+    hpx/debugging.hpp hpx/util/backtrace.hpp hpx/util/backtrace/backtrace.hpp
     hpx/util/debug/demangle_helper.hpp
 )
 

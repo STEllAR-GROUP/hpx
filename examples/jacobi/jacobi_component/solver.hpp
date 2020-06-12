@@ -10,7 +10,7 @@
 #include "server/solver.hpp"
 #include "grid.hpp"
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/include/naming.hpp>
 
 #include <cstddef>

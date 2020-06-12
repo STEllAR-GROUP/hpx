@@ -16,7 +16,7 @@
 #if defined(HPX_HAVE_CXX17_STD_VARIANT)
 
 #include <hpx/datastructures/variant_helper.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>

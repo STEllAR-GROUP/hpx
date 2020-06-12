@@ -5,15 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/mpi_base.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/mpi_base.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/config_entry.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -25,6 +24,7 @@
 #include <cstddef>
 #include <iosfwd>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -234,7 +234,7 @@ namespace hpx { namespace resource { namespace detail {
 #endif
 
         std::string default_scheduler_mode_str =
-            hpx::get_config_entry("hpx.default_scheduler_mode", std::string());
+            cfg_.rtcfg_.get_entry("hpx.default_scheduler_mode", std::string());
         if (!default_scheduler_mode_str.empty())
         {
             default_scheduler_mode_ = threads::policies::scheduler_mode(
@@ -882,6 +882,8 @@ namespace hpx { namespace resource { namespace detail {
         hpx::program_options::options_description desc_cmdline, int argc,
         char** argv, std::vector<std::string> ini_config,    // -V813
         resource::partitioner_mode rpmode, runtime_mode mode,
+        std::vector<std::shared_ptr<components::component_registry_base>>&
+            component_registries,
         bool fill_internal_topology)
     {
         mode_ = rpmode;
@@ -905,7 +907,8 @@ namespace hpx { namespace resource { namespace detail {
 #endif
         // parse command line and set options
         // terminate set if program options contain --hpx:help or --hpx:version ...
-        cfg_.parse_result_ = cfg_.call(desc_cmdline, argc, argv);
+        cfg_.parse_result_ =
+            cfg_.call(desc_cmdline, argc, argv, component_registries);
 
         // set all parameters related to affinity data
         std::string affinity_description;
@@ -913,7 +916,7 @@ namespace hpx { namespace resource { namespace detail {
 
         pus_needed_ = affinity_data_.init(cfg_.num_threads_,
             hpx::util::from_string<std::size_t>(
-                get_config_entry("hpx.cores", 0), 0),
+                cfg_.rtcfg_.get_entry("hpx.cores", 0), 0),
             get_pu_offset(cfg_), get_pu_step(cfg_),
             static_cast<std::size_t>(cfg_.rtcfg_.get_first_used_core()),
             get_affinity_domain(cfg_), affinity_description,

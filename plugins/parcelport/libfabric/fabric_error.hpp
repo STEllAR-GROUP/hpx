@@ -8,9 +8,10 @@
 
 #include <plugins/parcelport/parcelport_logging.hpp>
 //
+#include <exception>
 #include <stdexcept>
-#include <string>
 #include <string.h>
+#include <string>
 //
 #include <rdma/fi_errno.h>
 //

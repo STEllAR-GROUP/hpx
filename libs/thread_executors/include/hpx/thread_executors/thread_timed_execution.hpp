@@ -11,7 +11,7 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/packaged_task.hpp>
-#include <hpx/timed_execution.hpp>
+#include <hpx/modules/timed_execution.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <type_traits>

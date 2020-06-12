@@ -8,10 +8,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/async/applier/applier.hpp>
-#include <hpx/itt_notify.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/modules/itt_notify.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -404,11 +404,6 @@ namespace hpx { namespace parcelset
             default:
                 HPX_ASSERT(false);
             }
-        }
-        else if (comptype == components::component_memory)
-        {
-            HPX_ASSERT(naming::refers_to_virtual_memory(data_.dest_));
-            lva = hpx::applier::get_applier().get_memory_raw_gid().get_lsb();
         }
 
         // make sure the component_type of the action matches the

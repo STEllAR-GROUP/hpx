@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>

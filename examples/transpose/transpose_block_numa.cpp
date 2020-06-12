@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_numeric.hpp>

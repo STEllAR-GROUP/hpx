@@ -11,10 +11,10 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
-#include <hpx/mpi_base.hpp>
+#include <hpx/modules/mpi_base.hpp>
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
 

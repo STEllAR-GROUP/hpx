@@ -35,7 +35,7 @@ add_hpx_module(
   COMPAT_HEADERS ${lcos_distributed_compat_headers}
   DEPENDENCIES
     hpx_assertion
-    hpx_async
+    hpx_async_distributed
     hpx_config
     hpx_local_lcos
     hpx_preprocessor

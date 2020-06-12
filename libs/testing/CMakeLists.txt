@@ -9,10 +9,10 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/testing/include
-set(testing_headers hpx/testing.hpp)
+set(testing_headers hpx/modules/testing.hpp)
 
 # Default location is $HPX_ROOT/libs/testing/include_compatibility
-set(testing_compat_headers hpx/util/lightweight_test.hpp)
+set(testing_compat_headers hpx/testing.hpp hpx/util/lightweight_test.hpp)
 
 # Default location is $HPX_ROOT/libs/testing/src
 set(testing_sources testing.cpp)
@@ -26,6 +26,6 @@ add_hpx_module(
   SOURCES ${testing_sources}
   HEADERS ${testing_headers}
   COMPAT_HEADERS ${testing_compat_headers}
-  DEPENDENCIES hpx_assertion hpx_config hpx_preprocessor hpx_util
+  DEPENDENCIES hpx_assertion hpx_config hpx_functional hpx_preprocessor hpx_util
   CMAKE_SUBDIRS examples tests
 )

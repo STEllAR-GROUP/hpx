@@ -9,13 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async/detail/async_colocated.hpp>
-#include <hpx/async/detail/async_colocated_callback.hpp>
-#include <hpx/async/detail/async_implementations.hpp>
+#include <hpx/async_distributed/detail/async_colocated.hpp>
+#include <hpx/async_distributed/detail/async_colocated_callback.hpp>
+#include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/async/applier/detail/apply_colocated_callback_fwd.hpp>
-#include <hpx/async/applier/detail/apply_colocated_fwd.hpp>
-#include <hpx/async/applier/detail/apply_implementations.hpp>
+#include <hpx/async_distributed/applier/detail/apply_colocated_callback_fwd.hpp>
+#include <hpx/async_distributed/applier/detail/apply_colocated_fwd.hpp>
+#include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/async_base/launch_policy.hpp>
@@ -43,8 +43,7 @@ namespace hpx { namespace components
     public:
         /// Default-construct a new instance of a \a colocating_distribution_policy.
         /// This policy will represent the local locality.
-        colocating_distribution_policy()
-        {}
+        colocating_distribution_policy() = default;
 
         /// Create a new \a colocating_distribution_policy representing the
         /// locality where the given object os current located
@@ -269,7 +268,7 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        colocating_distribution_policy(id_type const& id)
+        explicit colocating_distribution_policy(id_type const& id)
           : id_(id)
         {}
 

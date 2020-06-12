@@ -7,8 +7,8 @@
 #include "worker_timed.hpp"
 
 #include <hpx/concurrency/barrier.hpp>
-#include <hpx/format.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -20,7 +20,7 @@
 #include <thread>
 #include <vector>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 char const* benchmark_name = "Delay Baseline";
 

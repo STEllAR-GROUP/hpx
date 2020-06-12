@@ -9,10 +9,10 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/datastructures.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/threading.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading.hpp>
 
 #include <atomic>
 #include <chrono>

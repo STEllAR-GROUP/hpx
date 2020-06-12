@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/functional/result_of.hpp>
-#include <hpx/async/applier/detail/apply_implementations_fwd.hpp>
-#include <hpx/async/applier/apply.hpp>
+#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/type_support/decay.hpp>

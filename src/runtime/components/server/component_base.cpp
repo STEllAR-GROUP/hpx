@@ -6,18 +6,18 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/async/applier/applier.hpp>
-#include <hpx/async/applier/bind_naming_wrappers.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/async_distributed/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstdint>
 #include <mutex>

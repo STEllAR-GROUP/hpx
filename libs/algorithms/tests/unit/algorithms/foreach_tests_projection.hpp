@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstddef>

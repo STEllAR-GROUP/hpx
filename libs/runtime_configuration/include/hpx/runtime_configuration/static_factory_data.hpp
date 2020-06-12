@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 

@@ -9,7 +9,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include "iterator_tests.hpp"
 

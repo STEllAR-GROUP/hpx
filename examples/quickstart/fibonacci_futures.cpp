@@ -58,7 +58,7 @@ hpx::future<std::uint64_t> fibonacci_future_one(std::uint64_t n);
 
 struct fibonacci_future_one_continuation
 {
-    fibonacci_future_one_continuation(std::uint64_t n)
+    explicit fibonacci_future_one_continuation(std::uint64_t n)
       : n_(n)
     {}
 

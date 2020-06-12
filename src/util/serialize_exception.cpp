@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assertion.hpp>
-#include <hpx/custom_exception_info.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/util/serialize_exception.hpp>
 

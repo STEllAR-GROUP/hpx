@@ -16,7 +16,7 @@
 
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
-#include <hpx/itt_notify.hpp>
+#include <hpx/modules/itt_notify.hpp>
 
 #include <atomic>
 #include <cstddef>

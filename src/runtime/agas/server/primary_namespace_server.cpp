@@ -9,15 +9,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/async.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
@@ -25,7 +25,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/async/applier/apply.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>

@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/itt_notify.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
+#include <hpx/modules/itt_notify.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 

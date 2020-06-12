@@ -12,9 +12,9 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/local_async.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/thread_executors/default_executor.hpp>
 
 #include <atomic>

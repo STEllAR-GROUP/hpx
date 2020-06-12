@@ -8,16 +8,15 @@
 #include <hpx/config.hpp>
 
 #include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/async_combinators/wait_each.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/testing.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <chrono>
 #include <cstddef>

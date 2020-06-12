@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config/defines.hpp>   // avoid issues with Intel14/libstdc++4.4 nullptr
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <cstdint>

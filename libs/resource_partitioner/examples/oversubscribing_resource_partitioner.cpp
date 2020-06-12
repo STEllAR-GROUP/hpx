@@ -6,17 +6,12 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-//
-#include <hpx/execution/execution.hpp>
-#include <hpx/parallel/algorithms/for_loop.hpp>
-//
-#include <hpx/executors/pool_executor.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-//
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/parallel_executors.hpp>
+#include <hpx/include/parallel_for_loop.hpp>
+#include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/include/threads.hpp>
 //
 #include <cmath>
 #include <cstddef>
@@ -98,7 +93,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (use_pools)
     {
         // get executors
-        mpi_executor = hpx::parallel::execution::pool_executor("mpi");
+        mpi_executor = hpx::parallel::execution::thread_pool_executor(
+            &hpx::resource::get_thread_pool("mpi"));
         hpx::cout << "\n[hpx_main] got mpi executor " << std::endl;
     }
     else

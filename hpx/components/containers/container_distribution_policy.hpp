@@ -11,7 +11,7 @@
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/serialization/vector.hpp>
@@ -130,7 +130,7 @@ namespace hpx
             num_partitions_(num_partitions)
         {}
 
-        container_distribution_policy(hpx::id_type const& locality)
+        explicit container_distribution_policy(hpx::id_type const& locality)
           : components::default_distribution_policy(locality),
             num_partitions_(1)
         {}

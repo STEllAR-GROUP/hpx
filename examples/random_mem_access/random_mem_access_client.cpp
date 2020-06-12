@@ -13,7 +13,7 @@
 #include <ctime>
 #include <vector>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include "random_mem_access/random_mem_access.hpp"
 

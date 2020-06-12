@@ -51,16 +51,16 @@ namespace hpx { namespace iostreams { namespace server
 
         // STL OutputIterator
         template <typename Iterator>
-        output_stream(Iterator it)
+        explicit output_stream(Iterator it)
           : write_f(make_iterator_write_function(it))
         {}
 
         // std::ostream
-        output_stream(std::ostream& os)
+        explicit output_stream(std::ostream& os)
           : write_f(make_std_ostream_write_function(os))
         {}
 
-        output_stream(std::reference_wrapper<std::ostream> const& os)
+        explicit output_stream(std::reference_wrapper<std::ostream> const& os)
           : write_f(make_std_ostream_write_function(os.get()))
         {}
 

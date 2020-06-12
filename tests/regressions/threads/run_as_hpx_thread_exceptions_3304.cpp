@@ -6,8 +6,8 @@
 
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/threads/run_as_hpx_thread.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/runtime_local/run_as_hpx_thread.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <functional>
 #include <mutex>

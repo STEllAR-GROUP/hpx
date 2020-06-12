@@ -11,7 +11,7 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/from_string.hpp>
@@ -63,7 +63,7 @@ namespace hpx { namespace plugins { namespace parcel
     // existing instance).
     struct num_parcels_counter_surrogate
     {
-        num_parcels_counter_surrogate(std::string const& parameters)
+        explicit num_parcels_counter_surrogate(std::string const& parameters)
           : parameters_(parameters)
         {}
 
@@ -141,7 +141,7 @@ namespace hpx { namespace plugins { namespace parcel
     ///////////////////////////////////////////////////////////////////////////
     struct num_messages_counter_surrogate
     {
-        num_messages_counter_surrogate(std::string const& parameters)
+        explicit num_messages_counter_surrogate(std::string const& parameters)
           : parameters_(parameters)
         {}
 
@@ -219,7 +219,8 @@ namespace hpx { namespace plugins { namespace parcel
     ///////////////////////////////////////////////////////////////////////////
     struct num_parcels_per_message_counter_surrogate
     {
-        num_parcels_per_message_counter_surrogate(std::string const& parameters)
+        explicit num_parcels_per_message_counter_surrogate(
+            std::string const& parameters)
           : parameters_(parameters)
         {}
 
@@ -298,7 +299,7 @@ namespace hpx { namespace plugins { namespace parcel
     ///////////////////////////////////////////////////////////////////////////
     struct average_time_between_parcels_counter_surrogate
     {
-        average_time_between_parcels_counter_surrogate(
+        explicit average_time_between_parcels_counter_surrogate(
                 std::string const& parameters)
           : parameters_(parameters)
         {}

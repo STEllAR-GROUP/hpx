@@ -6,13 +6,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/async/applier/apply.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/format.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/packaged_continuation.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counter_parser.hpp>
@@ -22,9 +22,10 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/get_num_localities.hpp>
-#include <hpx/runtime/thread_pool_helpers.hpp>
+#include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_local/get_num_localities.hpp>
+#include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>

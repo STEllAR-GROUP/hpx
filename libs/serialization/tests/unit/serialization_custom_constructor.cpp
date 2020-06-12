@@ -10,7 +10,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <iostream>
 #include <memory>

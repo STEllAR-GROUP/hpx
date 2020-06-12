@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/local_lcos/promise.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/synchronization/barrier.hpp>

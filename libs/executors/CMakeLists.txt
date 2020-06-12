@@ -14,7 +14,7 @@ set(executors_headers
     hpx/executors/datapar/execution_policy_fwd.hpp
     hpx/executors/datapar/execution_policy.hpp
     hpx/executors/guided_pool_executor.hpp
-    hpx/executors.hpp
+    hpx/modules/executors.hpp
     hpx/executors/apply.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
@@ -25,7 +25,6 @@ set(executors_headers
     hpx/executors/limiting_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
-    hpx/executors/pool_executor.hpp
     hpx/executors/restricted_thread_pool_executor.hpp
     hpx/executors/sequenced_executor.hpp
     hpx/executors/service_executors.hpp
@@ -45,10 +44,8 @@ set(executors_compat_headers
     hpx/execution/executors/limiting_executor.hpp
     hpx/execution/executors/parallel_executor_aggregated.hpp
     hpx/execution/executors/parallel_executor.hpp
-    hpx/execution/executors/pool_executor.hpp
     hpx/execution/executors/restricted_thread_pool_executor.hpp
     hpx/execution/executors/sequenced_executor.hpp
-    hpx/execution/executors/service_executors.hpp
     hpx/execution/executors/thread_pool_attached_executors.hpp
     hpx/parallel/datapar/execution_policy_fwd.hpp
     hpx/parallel/datapar/execution_policy.hpp
@@ -58,13 +55,13 @@ set(executors_compat_headers
     hpx/parallel/executors.hpp
     hpx/parallel/executors/parallel_executor_aggregated.hpp
     hpx/parallel/executors/parallel_executor.hpp
-    hpx/parallel/executors/pool_executor.hpp
     hpx/parallel/executors/sequenced_executor.hpp
-    hpx/parallel/executors/service_executors.hpp
     hpx/parallel/executors/thread_pool_attached_executors.hpp
 )
 
-set(executors_sources current_executor.cpp force_linking.cpp)
+set(executors_sources current_executor.cpp exception_list_callbacks.cpp
+                      force_linking.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(

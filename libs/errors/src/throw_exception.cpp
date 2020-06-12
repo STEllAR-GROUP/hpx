@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception.hpp>
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/filesystem.hpp>
 
 #include <boost/system/error_code.hpp>
 

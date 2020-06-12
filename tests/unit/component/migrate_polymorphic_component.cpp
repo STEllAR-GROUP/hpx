@@ -11,7 +11,7 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstdint>
 #include <cstddef>

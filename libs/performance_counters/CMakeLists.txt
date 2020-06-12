@@ -64,7 +64,7 @@ add_hpx_module(
   HEADERS ${performance_counters_headers}
   DEPENDENCIES
     hpx_assertion
-    hpx_async
+    hpx_async_distributed
     hpx_config
     hpx_errors
     hpx_execution
@@ -73,6 +73,7 @@ add_hpx_module(
     hpx_functional
     hpx_logging
     hpx_pack_traversal
+    hpx_runtime_local
     hpx_serialization
     hpx_synchronization
     hpx_static_reinit

@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/collectives.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/collectives.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -16,14 +16,13 @@
 #include <utility>
 #include <vector>
 
-char const* all_reduce_basename = "/test/all_reduce/";
-char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
-
-HPX_REGISTER_ALLREDUCE(std::uint32_t, test_all_reduce);
+constexpr char const* all_reduce_basename = "/test/all_reduce/";
+constexpr char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
 
 int hpx_main(int argc, char* argv[])
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST(num_localities >= 2);
 
     // test functionality based on future<> of local result
     for (int i = 0; i != 10; ++i)

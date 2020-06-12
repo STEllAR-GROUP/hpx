@@ -12,15 +12,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/util_fwd.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <condition_variable>
@@ -70,9 +69,7 @@ public:
         big_boot_barrier& bbb;
 
     public:
-        scoped_lock(
-            big_boot_barrier& bbb_
-            )
+        explicit scoped_lock(big_boot_barrier& bbb_)
           : bbb(bbb_)
         {
             bbb.mtx.lock();

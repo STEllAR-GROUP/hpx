@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/runtime/config_entry.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <atomic>

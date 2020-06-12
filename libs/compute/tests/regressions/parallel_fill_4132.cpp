@@ -9,7 +9,7 @@
 #include <hpx/include/compute.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_fill.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <vector>

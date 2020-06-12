@@ -8,7 +8,7 @@
 
 #include <hpx/affinity/parse_affinity_options.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <cstddef>

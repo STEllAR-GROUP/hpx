@@ -8,21 +8,19 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async/applier/applier.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/query_counters.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <condition_variable>
 #include <cstddef>
@@ -262,8 +260,6 @@ namespace hpx {
 
         std::uint64_t get_runtime_support_lva() const;
 
-        std::uint64_t get_memory_lva() const;
-
         naming::gid_type get_next_id(std::size_t count = 1);
 
         util::unique_id_ranges& get_id_pool();
@@ -335,13 +331,10 @@ namespace hpx {
         bool register_thread(char const* name, std::size_t num = 0,
             bool service_thread = true, error_code& ec = throws) override;
 
-        /// Unregister an external OS-thread with HPX
-        bool unregister_thread() override;
-
         /// Generate a new notification policy instance for the given thread
         /// name prefix
         notification_policy_type get_notification_policy(
-            char const* prefix) override;
+            char const* prefix, runtime_local::os_thread_type type) override;
 
         std::uint32_t get_locality_id(error_code& ec) const override;
 
@@ -380,16 +373,17 @@ namespace hpx {
         void wait_helper(
             std::mutex& mtx, std::condition_variable& cond, bool& running);
 
-        void init_tss_helper(char const* context, std::size_t local_thread_num,
+        void init_tss_helper(char const* context,
+            runtime_local::os_thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
             char const* postfix, bool service_thread);
 
         void deinit_tss_helper(char const* context, std::size_t num);
 
         void init_tss_ex(std::string const& locality, char const* context,
-            std::size_t local_thread_num, std::size_t global_thread_num,
-            char const* pool_name, char const* postfix, bool service_thread,
-            error_code& ec);
+            runtime_local::os_thread_type type, std::size_t local_thread_num,
+            std::size_t global_thread_num, char const* pool_name,
+            char const* postfix, bool service_thread, error_code& ec);
 
         static void default_errorsink(std::string const&);
 
@@ -406,7 +400,6 @@ namespace hpx {
         using used_cores_map_type = std::map<std::string, std::uint32_t>;
         used_cores_map_type used_cores_map_;
 
-        std::unique_ptr<components::server::memory> memory_;
         std::unique_ptr<components::server::runtime_support> runtime_support_;
         std::shared_ptr<performance_counters::registry> counters_;
         std::shared_ptr<util::query_counters> active_counters_;
@@ -414,4 +407,3 @@ namespace hpx {
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
-

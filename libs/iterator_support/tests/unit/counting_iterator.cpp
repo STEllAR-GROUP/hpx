@@ -8,9 +8,9 @@
 // (C) Copyright David Abrahams 2001.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/iterator_support.hpp>
-#include <hpx/program_options.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <climits>

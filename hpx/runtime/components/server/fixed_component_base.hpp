@@ -8,16 +8,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/async/applier/applier.hpp>
-#include <hpx/async/applier/bind_naming_wrappers.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/async_distributed/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime_fwd.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/functional/unique_function.hpp>
 

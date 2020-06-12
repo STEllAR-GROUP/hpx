@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <chrono>

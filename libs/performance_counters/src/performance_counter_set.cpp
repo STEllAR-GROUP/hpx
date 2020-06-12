@@ -5,18 +5,18 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
-#include <hpx/runtime/get_locality_id.hpp>
 #include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -16,7 +16,7 @@ set(statistics_headers
 
 # Default location is $HPX_ROOT/libs/statistics/include_compatibility
 set(statistics_compat_headers
-    hpx/util/histogram.hpp hpx/util/max.hpp hpx/util/min.hpp
+    hpx/statistics.hpp hpx/util/histogram.hpp hpx/util/max.hpp hpx/util/min.hpp
     hpx/util/rolling_max.hpp hpx/util/rolling_min.hpp
 )
 

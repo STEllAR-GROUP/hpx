@@ -7,16 +7,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -31,7 +30,7 @@
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     using thread_termination_handler_type =
-        std::function<void(std::exception_ptr const& e)>;
+        util::function_nonser<void(std::exception_ptr const& e)>;
     void set_thread_termination_handler(thread_termination_handler_type f);
 
     class HPX_EXPORT thread

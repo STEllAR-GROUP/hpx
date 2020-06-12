@@ -11,13 +11,18 @@ if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   set(__boost_filesystem Boost::filesystem)
 endif()
 
-set(filesystem_headers "hpx/filesystem.hpp")
+set(filesystem_headers hpx/modules/filesystem.hpp)
+
+set(filesystem_compat_headers hpx/filesystem.hpp)
 
 include(HPX_AddModule)
 add_hpx_module(
   filesystem FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
   HEADERS ${filesystem_headers}
+  COMPAT_HEADERS ${filesystem_compat_headers}
   DEPENDENCIES hpx_config ${__boost_filesystem}
   CMAKE_SUBDIRS examples tests
 )

@@ -11,7 +11,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <iterator>

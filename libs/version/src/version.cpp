@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/config/config_strings.hpp>
 #include <hpx/config/version.hpp>
-#include <hpx/config_registry.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/config_registry.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/version.hpp>

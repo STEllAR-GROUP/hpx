@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
@@ -15,6 +14,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 

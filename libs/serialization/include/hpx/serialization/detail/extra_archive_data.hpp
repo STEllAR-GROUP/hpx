@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 
 #include <memory>
 #include <type_traits>

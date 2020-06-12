@@ -12,7 +12,7 @@
 // For more information, see http://www.boost.org/
 
 #include <hpx/functional/function.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 double mul_ints(int x, int y)
 {

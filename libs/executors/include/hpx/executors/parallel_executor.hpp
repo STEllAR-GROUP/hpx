@@ -11,7 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
@@ -27,6 +26,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/synchronization/latch.hpp>
@@ -216,9 +216,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts) const
         {
-            char const* annotation =
-                hpx::traits::get_function_annotation<F>::call(f);
-            hpx::util::thread_description desc(f, annotation);
+            hpx::util::thread_description desc(f);
 
             detail::post_policy_dispatch<Policy>::call(policy_, desc, priority_,
                 stacksize_, schedulehint_, std::forward<F>(f),

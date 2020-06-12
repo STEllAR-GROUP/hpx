@@ -34,9 +34,9 @@
 
 #include "worker_timed.hpp"
 
-#include <hpx/assertion.hpp>
-#include <hpx/format.hpp>
-#include <hpx/timing.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <tbb/task.h>
 #include <tbb/task_scheduler_init.h>
@@ -46,7 +46,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 using hpx::program_options::variables_map;
 using hpx::program_options::options_description;

@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/thread_executors.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 int main()
 {

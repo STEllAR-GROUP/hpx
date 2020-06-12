@@ -61,7 +61,7 @@ public:
     {}
 
     // Create a new (uninitialized) partition of the given size.
-    partition_data(std::size_t size)
+    explicit partition_data(std::size_t size)
       : data_(std::allocator<double>().allocate(size), size, buffer_type::take)
       , size_(size)
       , min_index_(0)

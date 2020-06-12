@@ -16,12 +16,13 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 //
-#include <utility>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
+#include <utility>
 
 namespace hpx {
 namespace parcelset {

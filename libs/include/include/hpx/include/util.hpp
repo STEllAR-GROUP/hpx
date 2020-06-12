@@ -7,10 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
-#include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -19,12 +17,15 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
@@ -32,7 +33,6 @@
 #include <hpx/type_support/decay.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/interval_timer.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/util/to_string.hpp>
 

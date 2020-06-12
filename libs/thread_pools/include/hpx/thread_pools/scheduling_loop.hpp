@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/itt_notify.hpp>
-#include <hpx/logging.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>

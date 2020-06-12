@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/detail/tss.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/functional/unique_function.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>

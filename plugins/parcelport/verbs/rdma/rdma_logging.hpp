@@ -14,7 +14,7 @@
 //
 #include <hpx/config.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/threading.hpp>
+#include <hpx/modules/threading.hpp>
 #include <hpx/util/detail/pp/stringize.hpp>
 //
 #include <hpx/config/parcelport_defines.hpp>

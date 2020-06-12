@@ -11,9 +11,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/assertion.hpp>
 #include <hpx/compute/cuda/target.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cuda_runtime.h>
 

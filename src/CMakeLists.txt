@@ -10,23 +10,8 @@
 # gather sources
 
 set(hpx_SOURCES
-    custom_exception_info.cpp
-    lcos/future.cpp
-    hpx_init.cpp
-    hpx_main_winsocket.cpp
-    runtime.cpp
-    runtime_handlers.cpp
-    runtime/thread_pool_helpers.cpp
-    runtime/threads/thread_pool_suspension_helpers.cpp
-    state.cpp
-    util/debugging.cpp
-    util/debug/thread_stacktrace.cpp
-    util/interval_timer.cpp
-    util/pool_timer.cpp
-    util/register_locks_globally.cpp
+    lcos/future.cpp runtime/threads/thread_pool_suspension_helpers.cpp
     util/serialize_exception.cpp
-    util/thread_aware_timer.cpp
-    util/thread_mapper.cpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -66,7 +51,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/components/component_type.cpp
     runtime/components/console_error_sink.cpp
     runtime/components/console_logging.cpp
-    runtime/components/memory.cpp
     runtime/components/runtime_support.cpp
     runtime/components/server/component_base.cpp
     runtime/components/server/console_error_sink_server.cpp
@@ -75,7 +59,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/components/server/destroy_component.cpp
     runtime/components/server/runtime_support_server.cpp
     runtime/components/server/wrapper_heap.cpp
-    runtime/components/stubs/memory_stub.cpp
     runtime/components/stubs/runtime_support_stubs.cpp
     runtime/get_locality_name.cpp
     runtime/naming/address.cpp
@@ -93,13 +76,16 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     runtime/threads/threadmanager_counters.cpp
     runtime/trigger_lco.cpp
     runtime_distributed.cpp
+    state.cpp
     util/activate_counters.cpp
     util/generate_unique_ids.cpp
     util/init_logging.cpp
     util/integer/int128.cpp
     util/integer/uint128.cpp
     util/one_size_heap_list.cpp
+    util/pool_timer.cpp
     util/query_counters.cpp
+    util/register_locks_globally.cpp
   )
 endif()
 
@@ -156,52 +142,14 @@ endif()
 
 # List all headers (local and distributed)
 set(hpx_HEADERS
-    hpx/custom_exception_info.hpp
-    hpx/hpx_finalize.hpp
-    hpx/hpx_init.hpp
-    hpx/hpx_init_impl.hpp
-    hpx/hpx_init_params.hpp
-    hpx/hpx_main_winsocket.hpp
-    hpx/hpx_start.hpp
-    hpx/hpx_start_impl.hpp
-    hpx/hpx_suspend.hpp
-    hpx/hpx_user_main_config.hpp
-    hpx/lcos/future_wait.hpp
     hpx/lcos_fwd.hpp
-    hpx/runtime/config_entry.hpp
-    hpx/runtime_fwd.hpp
-    hpx/runtime/get_num_localities.hpp
-    hpx/runtime/get_os_thread_count.hpp
-    hpx/runtime/get_thread_name.hpp
-    hpx/runtime/get_worker_thread_num.hpp
-    hpx/runtime_handlers.hpp
-    hpx/runtime.hpp
-    hpx/runtime/report_error.hpp
-    hpx/runtime/runtime_fwd.hpp
     hpx/runtime/serialization/detail/preprocess_container.hpp
     hpx/runtime/serialization/detail/preprocess_futures.hpp
     hpx/runtime/serialization/detail/preprocess_gid_types.hpp
-    hpx/runtime/shutdown_function.hpp
-    hpx/runtime/startup_function.hpp
-    hpx/runtime/thread_hooks.hpp
-    hpx/runtime/thread_pool_helpers.hpp
-    hpx/runtime/threads_fwd.hpp
-    hpx/runtime/threads/run_as_hpx_thread.hpp
-    hpx/runtime/threads/run_as_os_thread.hpp
-    hpx/runtime/threads/thread_pool_suspension_helpers.hpp
-    hpx/state.hpp
     hpx/traits/managed_component_policies.hpp
     hpx/traits/pointer_category.hpp
     hpx/traits/rma_memory_region_traits.hpp
-    hpx/util/debugging.hpp
-    hpx/util/debug/thread_stacktrace.hpp
-    hpx/util_fwd.hpp
-    hpx/util/interval_timer.hpp
-    hpx/util/pool_timer.hpp
-    hpx/util/register_locks_globally.hpp
     hpx/util/serialize_exception.hpp
-    hpx/util/thread_aware_timer.hpp
-    hpx/util/thread_mapper.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -242,6 +190,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/plugin_factory_base.hpp
     hpx/plugins/plugin_registry.hpp
     hpx/plugins/unique_plugin_name.hpp
+    hpx/runtime_fwd.hpp
     hpx/runtime/actions/action_priority.hpp
     hpx/runtime/actions/action_support.hpp
     hpx/runtime/actions/base_action.hpp
@@ -326,14 +275,12 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components/server/invoke_function.hpp
     hpx/runtime/components/server/locking_hook.hpp
     hpx/runtime/components/server/managed_component_base.hpp
-    hpx/runtime/components/server/memory.hpp
     hpx/runtime/components/server/migrate_component.hpp
     hpx/runtime/components/server/migration_support.hpp
     hpx/runtime/components/server/runtime_support.hpp
     hpx/runtime/components/server/simple_component_base.hpp
     hpx/runtime/components/server/wrapper_heap.hpp
     hpx/runtime/components/server/wrapper_heap_list.hpp
-    hpx/runtime/components/stubs/memory.hpp
     hpx/runtime/components/stubs/runtime_support.hpp
     hpx/runtime/components/stubs/stub_base.hpp
     hpx/runtime/components/target_distribution_policy.hpp
@@ -342,7 +289,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/find_here.hpp
     hpx/runtime/find_localities.hpp
     hpx/runtime/get_colocation_id.hpp
-    hpx/runtime/get_locality_id.hpp
     hpx/runtime/get_locality_name.hpp
     hpx/runtime/get_lva.hpp
     hpx/runtime/get_ptr.hpp
@@ -372,9 +318,11 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/parcelset/parcelport_impl.hpp
     hpx/runtime/parcelset/policies/message_handler.hpp
     hpx/runtime/parcelset/put_parcel.hpp
+    hpx/runtime/runtime_fwd.hpp
     hpx/runtime/set_parcel_write_handler.hpp
     hpx/runtime/threads/threadmanager_counters.hpp
     hpx/runtime/trigger_lco.hpp
+    hpx/state.hpp
     hpx/traits/action_continuation.hpp
     hpx/traits/action_decorate_continuation.hpp
     hpx/traits/action_decorate_function.hpp
@@ -412,7 +360,9 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/integer/int128.hpp
     hpx/util/integer/uint128.hpp
     hpx/util/one_size_heap_list.hpp
+    hpx/util/pool_timer.hpp
     hpx/util/query_counters.hpp
+    hpx/util/register_locks_globally.hpp
     hpx/util/remove_local_destinations.hpp
     hpx/util/storage/tuple.hpp
     hpx/util/wrapper_heap_base.hpp
@@ -588,6 +538,10 @@ if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 endif()
 
 target_compile_definitions(hpx_core PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
+
+if(HPX_WITH_UNITY_BUILD)
+  set_target_properties(hpx_core PROPERTIES UNITY_BUILD ON)
+endif()
 
 # ##############################################################################
 # Emulation of SwapContext on Windows

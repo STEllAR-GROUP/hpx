@@ -49,7 +49,7 @@ struct executor
     {
         executor &e_;
 
-        call_on_CreateProcess_setup(executor &e) : e_(e) {}
+        explicit call_on_CreateProcess_setup(executor &e) : e_(e) {}
 
         template <class Arg>
         void operator()(Arg& arg) const
@@ -62,7 +62,7 @@ struct executor
     {
         executor &e_;
 
-        call_on_CreateProcess_error(executor &e) : e_(e) {}
+        explicit call_on_CreateProcess_error(executor &e) : e_(e) {}
 
         template <class Arg>
         void operator()(Arg& arg) const
@@ -75,7 +75,7 @@ struct executor
     {
         executor &e_;
 
-        call_on_CreateProcess_success(executor &e) : e_(e) {}
+        explicit call_on_CreateProcess_success(executor &e) : e_(e) {}
 
         template <class Arg>
         void operator()(Arg& arg) const

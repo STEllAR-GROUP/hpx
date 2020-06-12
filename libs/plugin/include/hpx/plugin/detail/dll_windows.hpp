@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/plugin/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/filesystem.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/filesystem.hpp>
 
 #include <iostream>
 #include <sstream>

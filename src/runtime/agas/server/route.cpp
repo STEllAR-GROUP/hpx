@@ -8,15 +8,15 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/assertion.hpp>
-#include <hpx/format.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/async/applier/apply.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 
@@ -27,17 +27,17 @@
 #include <utility>
 #include <vector>
 
-
-namespace {
+namespace hpx { namespace detail {
     void update_agas_cache(hpx::naming::gid_type const& gid,
         hpx::naming::address const& addr, std::uint64_t count,
         std::uint64_t offset)
     {
-        hpx::naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
+        hpx::naming::get_agas_client().update_cache_entry(
+            gid, addr, count, offset);
     }
-}
+}}    // namespace hpx::detail
 
-HPX_PLAIN_ACTION_ID(update_agas_cache, update_agas_cache_action,
+HPX_PLAIN_ACTION_ID(hpx::detail::update_agas_cache, update_agas_cache_action,
     hpx::actions::update_agas_cache_action_id)
 
 namespace hpx { namespace agas { namespace server
@@ -50,8 +50,6 @@ namespace hpx { namespace agas { namespace server
         );
         counter_data_.increment_route_count();
 
-        error_code& ec = throws;
-
         naming::gid_type const& gid = p.destination();
         naming::address& addr = p.addr();
         resolved_type cache_address;
@@ -63,6 +61,8 @@ namespace hpx { namespace agas { namespace server
         // them, otherwise it's an error
         {
             std::unique_lock<mutex_type> l(mutex_);
+
+            error_code& ec = throws;
 
             // wait for any migration to be completed
             if (naming::detail::is_migratable(gid))

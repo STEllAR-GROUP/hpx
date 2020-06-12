@@ -11,7 +11,7 @@
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <vector>
 

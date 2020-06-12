@@ -9,10 +9,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/runtime/get_os_thread_count.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/runtime_local/get_os_thread_count.hpp>
+#include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>

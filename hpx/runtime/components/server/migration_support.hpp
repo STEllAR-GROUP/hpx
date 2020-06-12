@@ -7,16 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/threads_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/functional/bind_front.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -31,9 +31,9 @@ namespace hpx { namespace components
     struct migration_support : BaseComponent
     {
     private:
-        typedef Mutex mutex_type;
-        typedef BaseComponent base_type;
-        typedef typename base_type::this_component_type this_component_type;
+        using mutex_type = Mutex;
+        using base_type = BaseComponent;
+        using this_component_type = typename base_type::this_component_type;
 
     public:
         template <typename ...Arg>
@@ -82,10 +82,13 @@ namespace hpx { namespace components
         }
         bool unpin()
         {
+            using lock_type = std::unique_lock<mutex_type>;
+
             {
                 // no need to go through AGAS if the object is currently pinned
                 // more than once
-                std::unique_lock<mutex_type> l(mtx_);
+                lock_type l(this->mtx_);
+
                 if (pin_count_ != ~0x0u && pin_count_ > 1)
                 {
                     --pin_count_;
@@ -97,7 +100,8 @@ namespace hpx { namespace components
                 // action run on this object)
                 if (!was_marked_for_migration_)
                 {
-                    --pin_count_;
+                    if (pin_count_ != ~0x0u)
+                        --pin_count_;
                     return false;
                 }
             }
@@ -107,7 +111,11 @@ namespace hpx { namespace components
             agas::mark_as_migrated(this->gid_,
                 [this, &was_migrated]() mutable -> std::pair<bool, hpx::future<void> >
                 {
-                    std::unique_lock<mutex_type> l(mtx_);
+                    lock_type l(this->mtx_);
+
+                    // avoid locking errors while handling asserts below
+                    util::ignore_while_checking<lock_type> il(&l);
+
                     was_migrated = this->pin_count_ == ~0x0u;
                     HPX_ASSERT(this->pin_count_ != 0);
                     if (this->pin_count_ != ~0x0u)
@@ -144,8 +152,13 @@ namespace hpx { namespace components
         }
         void mark_as_migrated()
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            using lock_type = std::unique_lock<mutex_type>;
+            lock_type l(mtx_);
+
+            // avoid locking errors while handling asserts below
+            util::ignore_while_checking<lock_type> il(&l);
             HPX_ASSERT(1 == pin_count_);
+
             pin_count_ = ~0x0u;
         }
 
@@ -189,7 +202,7 @@ namespace hpx { namespace components
         /// has been finished
         constexpr void on_migrated() {}
 
-        typedef void decorates_action;
+        using decorates_action = void;
 
         /// This is the hook implementation for decorate_action which makes
         /// sure that the object becomes pinned during the execution of an

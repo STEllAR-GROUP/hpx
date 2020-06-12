@@ -11,8 +11,9 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
@@ -200,6 +201,13 @@ namespace hpx { namespace threads { namespace policies {
             // thread has not been created yet
             if (id)
                 *id = invalid_thread_id;
+
+            if (data.stacksize == threads::thread_stacksize_current)
+            {
+                data.stacksize = get_self_stacksize_enum();
+            }
+
+            HPX_ASSERT(data.stacksize != threads::thread_stacksize_current);
 
             if (data.run_now)
             {

@@ -10,7 +10,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 #include <utility>
 
 bool null_action_executed = false;

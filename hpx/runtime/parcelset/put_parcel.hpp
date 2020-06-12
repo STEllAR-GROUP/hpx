@@ -10,10 +10,10 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/runtime.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>

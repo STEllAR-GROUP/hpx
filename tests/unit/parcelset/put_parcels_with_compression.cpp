@@ -10,7 +10,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/compression_registration.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>

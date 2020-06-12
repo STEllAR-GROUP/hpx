@@ -8,7 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/datapar.hpp>
 #include <hpx/include/parallel_for_each.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include "../algorithms/test_utils.hpp"
 

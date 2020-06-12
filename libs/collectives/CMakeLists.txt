@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,16 +14,19 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/collectives/include
 set(collectives_headers
+    hpx/collectives/all_gather.hpp
     hpx/collectives/all_reduce.hpp
     hpx/collectives/all_to_all.hpp
     hpx/collectives/barrier.hpp
     hpx/collectives/broadcast.hpp
     hpx/collectives/broadcast_direct.hpp
     hpx/collectives/detail/communicator.hpp
+    hpx/collectives/force_linking.hpp
     hpx/collectives/fold.hpp
     hpx/collectives/gather.hpp
     hpx/collectives/latch.hpp
     hpx/collectives/reduce.hpp
+    hpx/collectives/scatter.hpp
     hpx/collectives/spmd_block.hpp
     hpx/collectives/detail/barrier_node.hpp
     hpx/collectives/detail/latch.hpp
@@ -41,21 +44,24 @@ set(collectives_compat_headers
 )
 
 # Default location is $HPX_ROOT/libs/collectives/src
-set(collectives_sources barrier.cpp latch.cpp detail/barrier_node.cpp)
+set(collectives_sources barrier.cpp force_linking.cpp latch.cpp
+                        detail/barrier_node.cpp detail/communicator.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(
   collectives
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   SOURCES ${collectives_sources}
   HEADERS ${collectives_headers}
   COMPAT_HEADERS ${collectives_compat_headers}
   DEPENDENCIES
     hpx_affinity
+    hpx_algorithms
     hpx_allocator_support
     hpx_assertion
-    hpx_async
+    hpx_async_distributed
     hpx_cache
     hpx_concurrency
     hpx_config
@@ -63,11 +69,11 @@ add_hpx_module(
     hpx_datastructures
     hpx_errors
     hpx_execution
-    hpx_executors
     hpx_format
     hpx_functional
     hpx_hardware
     hpx_hashing
+    hpx_init_runtime
     hpx_iterator_support
     hpx_local_lcos
     hpx_logging
@@ -77,6 +83,7 @@ add_hpx_module(
     hpx_preprocessor
     hpx_program_options
     hpx_runtime_configuration
+    hpx_runtime_local
     hpx_serialization
     hpx_synchronization
     hpx_timing

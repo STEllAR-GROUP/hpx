@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/plugin.hpp>
-#include <hpx/runtime/shutdown_function.hpp>
-#include <hpx/runtime/startup_function.hpp>
+#include <hpx/modules/plugin.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

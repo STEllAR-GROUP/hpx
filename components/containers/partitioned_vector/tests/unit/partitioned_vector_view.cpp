@@ -12,7 +12,7 @@
 #include <hpx/collectives/spmd_block.hpp>
 #include <hpx/executors/execution_policy.hpp>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <string>

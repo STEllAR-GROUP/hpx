@@ -8,12 +8,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/assertion.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include <cstdint>
+#include <utility>
 
 namespace hpx { namespace lcos
 {
@@ -31,9 +32,12 @@ namespace hpx { namespace lcos
             lcos::server::object_semaphore<ValueType>
         > base_type;
 
-        object_semaphore() {}
+        object_semaphore() = default;
 
-        object_semaphore(naming::id_type gid) : base_type(gid) {}
+        explicit object_semaphore(naming::id_type gid)
+          : base_type(std::move(gid))
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
         lcos::future<void> signal(launch::async_policy,

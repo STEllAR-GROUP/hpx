@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 
 struct X
 {

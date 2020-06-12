@@ -9,9 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/filesystem.hpp>
-#include <hpx/plugin.hpp>
+#include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/agas_service_mode.hpp>
+#include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/runtime_configuration/runtime_configuration_fwd.hpp>
@@ -50,7 +51,9 @@ namespace hpx { namespace util {
         void reconfigure(std::vector<std::string> const& ini_defs);
 
         std::vector<std::shared_ptr<plugins::plugin_registry_base>>
-        load_modules();
+        load_modules(
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries);
 
         void load_components_static(
             std::vector<components::static_factory_load_data_type> const&
@@ -162,6 +165,8 @@ namespace hpx { namespace util {
         void load_component_paths(
             std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
                 plugin_registries,
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries,
             std::string const& component_base_paths,
             std::string const& component_path_suffixes,
             std::set<std::string>& component_paths,
@@ -170,6 +175,8 @@ namespace hpx { namespace util {
         void load_component_path(
             std::vector<std::shared_ptr<plugins::plugin_registry_base>>&
                 plugin_registries,
+            std::vector<std::shared_ptr<components::component_registry_base>>&
+                component_registries,
             std::string const& path, std::set<std::string>& component_paths,
             std::map<std::string, filesystem::path>& basenames);
 

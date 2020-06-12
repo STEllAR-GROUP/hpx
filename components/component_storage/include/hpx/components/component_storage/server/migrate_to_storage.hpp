@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/errors.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/functional/bind_back.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>

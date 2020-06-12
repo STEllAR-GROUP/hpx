@@ -10,9 +10,10 @@
 // config
 #include <hpx/config/defines.hpp>
 //
-#include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/lcos/promise.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 //
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
@@ -26,22 +27,23 @@
 //
 #include <plugins/parcelport/unordered_map.hpp>
 //
-#include <memory>
-#include <deque>
-#include <chrono>
-#include <iostream>
-#include <functional>
-#include <map>
-#include <atomic>
-#include <string>
-#include <utility>
 #include <array>
-#include <vector>
-#include <unordered_map>
-#include <sstream>
-#include <cstdint>
+#include <atomic>
+#include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <deque>
+#include <exception>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 //
 #include <rdma/fabric.h>
 #include <rdma/fi_cm.h>
@@ -654,9 +656,9 @@ namespace libfabric
 
         // types we need for connection and disconnection callback functions
         // into the main parcelport code.
-        typedef std::function<void(fid_ep *endpoint, uint32_t ipaddr)>
+        typedef util::function_nonser<void(fid_ep* endpoint, uint32_t ipaddr)>
             ConnectionFunction;
-        typedef std::function<void(fid_ep *endpoint, uint32_t ipaddr)>
+        typedef util::function_nonser<void(fid_ep* endpoint, uint32_t ipaddr)>
             DisconnectionFunction;
 
         // --------------------------------------------------------------------

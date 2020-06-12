@@ -9,8 +9,8 @@
 #include <hpx/hpx_main.hpp>
 
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/iterator_support.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <functional>

@@ -47,7 +47,7 @@ namespace parcelset
     {
         performance_counter() : value_{T()} {}
 
-        performance_counter(const T& init) : value_{init} {}
+        explicit performance_counter(const T& init) : value_{init} {}
 
         inline operator T() const { return value_; }
 
@@ -81,25 +81,25 @@ namespace parcelset
     template <typename T>
     struct performance_counter<T, false>
     {
-        performance_counter() {}
+        constexpr performance_counter() = default;
 
-        performance_counter(const T&) {}
+        explicit constexpr performance_counter(const T&) {}
 
-        inline operator T() const { return 0; }
+        inline constexpr operator T() const { return 0; }
 
-        inline T operator=(const T&) { return 0; }
+        inline constexpr T operator=(const T&) { return 0; }
 
-        inline T operator++() { return 0; }
+        inline constexpr T operator++() { return 0; }
 
-        inline T operator++(int) { return 0; }
+        inline constexpr T operator++(int) { return 0; }
 
-        inline T operator+=(const T&) { return 0; }
+        inline constexpr T operator+=(const T&) { return 0; }
 
-        inline T operator--() { return 0; }
+        inline constexpr T operator--() { return 0; }
 
-        inline T operator--(int) { return 0; }
+        inline constexpr T operator--(int) { return 0; }
 
-        inline T operator-=(const T&) { return 0; }
+        inline constexpr T operator-=(const T&) { return 0; }
 
         friend std::ostream& operator<<(std::ostream& os,
             const performance_counter<T, false>& x)

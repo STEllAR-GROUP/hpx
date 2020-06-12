@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
+    hpx/distributed/runtime.hpp
     hpx/hpx.hpp
     hpx/include/actions.hpp
     hpx/include/agas.hpp
@@ -93,6 +94,7 @@ set(include_headers
     hpx/include/threads.hpp
     hpx/include/traits.hpp
     hpx/include/util.hpp
+    hpx/runtime.hpp
 )
 
 include(HPX_AddModule)
@@ -110,7 +112,7 @@ add_hpx_module(
     hpx_execution
     hpx_format
     hpx_futures
-    hpx_local_async
+    hpx_async_local
     hpx_local_lcos
     hpx_naming_base
     hpx_pack_traversal
@@ -129,7 +131,7 @@ add_hpx_module(
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   # cmake-format: off
   target_link_libraries(hpx_include PUBLIC
-    hpx_async
+    hpx_async_distributed
     hpx_lcos_distributed
     hpx_performance_counters
     hpx_segmented_algorithms

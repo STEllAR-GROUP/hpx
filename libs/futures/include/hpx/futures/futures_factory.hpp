@@ -12,15 +12,15 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/basic_execution/execution.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -131,7 +131,7 @@ namespace hpx { namespace lcos { namespace local {
                     threads::make_thread_function_nullary(util::deferred_call(
                         &base_type::run_impl, std::move(this_))),
                     util::thread_description(f_, annotation), priority,
-                    schedulehint, stacksize, threads::pending, false);
+                    schedulehint, stacksize, threads::pending);
 
                 threads::register_work(data, pool, ec);
                 return threads::invalid_thread_id;

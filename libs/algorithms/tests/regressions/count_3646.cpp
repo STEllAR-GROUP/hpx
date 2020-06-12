@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_count.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 #include "iter_sent.hpp"
 
 #include <cstddef>

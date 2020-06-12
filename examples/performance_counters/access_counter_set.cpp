@@ -11,7 +11,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-#include <hpx/program_options.hpp>
+#include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
 #include <iomanip>

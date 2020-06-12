@@ -13,7 +13,7 @@ set(memory_headers
 )
 
 # Default location is $HPX_ROOT/libs/memory/include_compatibility
-set(memory_compat_headers)
+set(memory_compat_headers hpx/memory.hpp)
 
 # Default location is $HPX_ROOT/libs/memory/src
 set(memory_sources)
@@ -21,10 +21,13 @@ set(memory_sources)
 include(HPX_AddModule)
 add_hpx_module(
   memory FORCE_LINKING_GEN
+  COMPATIBILITY_HEADERS ON
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/memory/serialization/intrusive_ptr.hpp"
   SOURCES ${memory_sources}
   HEADERS ${memory_headers}
+  COMPAT_HEADERS ${memory_compat_headers}
   DEPENDENCIES hpx_config hpx_assertion hpx_serialization
   CMAKE_SUBDIRS examples tests
 )
