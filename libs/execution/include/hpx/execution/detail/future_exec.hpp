@@ -17,7 +17,7 @@
 #include <hpx/execution/traits/future_then_result_exec.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/packaged_continuation.hpp>

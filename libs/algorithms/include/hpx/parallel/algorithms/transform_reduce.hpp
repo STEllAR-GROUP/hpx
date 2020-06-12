@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/result_of.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/invoke_result.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>

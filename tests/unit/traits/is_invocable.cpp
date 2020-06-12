@@ -50,19 +50,19 @@ void functions_byval_params()
     using hpx::traits::is_invocable;
 
     typedef void (*f)(int);
-    HPX_TEST_MSG((is_invocable<f,int)>::value == true), "fun-value/value");
-    HPX_TEST_MSG((is_invocable<f,int&)>::value == true), "fun-value/lvref");
-    HPX_TEST_MSG((is_invocable<f,int const&)>::value == true), "fun-value/const-lvref");
-    HPX_TEST_MSG((is_invocable<f,int &&)>::value == true), "fun-value/rvref");
-    HPX_TEST_MSG((is_invocable<f,int const &&)>::value == true), "fun-value/const-rvref");
+    HPX_TEST_MSG((is_invocable<f,int>::value == true), "fun-value/value");
+    HPX_TEST_MSG((is_invocable<f,int&>::value == true), "fun-value/lvref");
+    HPX_TEST_MSG((is_invocable<f,int const&>::value == true), "fun-value/const-lvref");
+    HPX_TEST_MSG((is_invocable<f,int &&>::value == true), "fun-value/rvref");
+    HPX_TEST_MSG((is_invocable<f,int const &&>::value == true), "fun-value/const-rvref");
 
     typedef void (*fc)(int const);
-    HPX_TEST_MSG((is_invocable<fc,int)>::value == true), "fun-const-value/value");
-    HPX_TEST_MSG((is_invocable<fc,int&)>::value == true), "fun-const-value/lvref");
-    HPX_TEST_MSG((is_invocable<fc,int const&)>::value == true),
+    HPX_TEST_MSG((is_invocable<fc,int>::value == true), "fun-const-value/value");
+    HPX_TEST_MSG((is_invocable<fc,int&>::value == true), "fun-const-value/lvref");
+    HPX_TEST_MSG((is_invocable<fc,int const&>::value == true),
         "fun-const-value/const-lvref");
-    HPX_TEST_MSG((is_invocable<fc,int &&)>::value == true), "fun-const-value/rvref");
-    HPX_TEST_MSG((is_invocable<fc,int const &&)>::value == true),
+    HPX_TEST_MSG((is_invocable<fc,int &&>::value == true), "fun-const-value/rvref");
+    HPX_TEST_MSG((is_invocable<fc,int const &&>::value == true),
         "fun-const-value/const-rvref");
 }
 

@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/naming/name.hpp>

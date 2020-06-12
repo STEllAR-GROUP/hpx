@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/type_support/decay.hpp>
 

@@ -19,7 +19,7 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>

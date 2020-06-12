@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>

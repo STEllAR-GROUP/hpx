@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/async_local.hpp>

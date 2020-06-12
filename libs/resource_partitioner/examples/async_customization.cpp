@@ -25,7 +25,7 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/pack_traversal/pack_traversal.hpp>
 #include <hpx/type_support/decay.hpp>
 //

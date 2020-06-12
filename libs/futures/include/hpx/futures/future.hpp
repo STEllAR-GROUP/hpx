@@ -14,7 +14,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/detail/future_await_traits.hpp>

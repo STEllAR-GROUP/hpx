@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/modules/testing.hpp>
 
