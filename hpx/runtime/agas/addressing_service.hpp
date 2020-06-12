@@ -14,7 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/runtime/agas_fwd.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -28,7 +28,6 @@
 #include <hpx/state.hpp>
 #include <hpx/cache/lru_cache.hpp>
 #include <hpx/cache/statistics/local_full_statistics.hpp>
-#include <hpx/util_fwd.hpp>
 #include <hpx/functional/function.hpp>
 
 #include <boost/dynamic_bitset.hpp>

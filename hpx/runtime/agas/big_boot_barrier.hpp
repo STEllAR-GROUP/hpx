@@ -20,7 +20,6 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/util_fwd.hpp>
 #include <boost/lockfree/queue.hpp>
 
 #include <condition_variable>

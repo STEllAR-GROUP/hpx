@@ -21,7 +21,6 @@
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/query_counters.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <condition_variable>
 #include <cstddef>

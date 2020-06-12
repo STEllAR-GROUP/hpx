@@ -15,14 +15,15 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/async_distributed/applier_fwd.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/runtime/parcelset/detail/per_action_data_counter.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <atomic>
 #include <cstddef>
