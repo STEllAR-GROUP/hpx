@@ -59,7 +59,7 @@ public:
       : size_(0)
     {}
 
-    partition_data(std::size_t size)
+    explicit partition_data(std::size_t size)
       : data_(new double [size]), size_(size)
     {}
 

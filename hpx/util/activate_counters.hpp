@@ -22,7 +22,7 @@ namespace hpx { namespace util
     class HPX_EXPORT activate_counters
     {
     public:
-        activate_counters(std::vector<std::string> const& names);
+        explicit activate_counters(std::vector<std::string> const& names);
 
         ~activate_counters();
 

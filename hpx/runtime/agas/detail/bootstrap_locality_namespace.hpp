@@ -28,7 +28,8 @@ namespace hpx { namespace agas { namespace detail
 {
     struct bootstrap_locality_namespace : locality_namespace
     {
-        bootstrap_locality_namespace(server::primary_namespace *primary);
+        explicit bootstrap_locality_namespace(
+            server::primary_namespace* primary);
 
         naming::address::address_type ptr() const override
         {

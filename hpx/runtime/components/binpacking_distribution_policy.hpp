@@ -60,7 +60,7 @@ namespace hpx { namespace components
         template <typename Component>
         struct create_helper
         {
-            create_helper(std::vector<hpx::id_type> const& localities)
+            explicit create_helper(std::vector<hpx::id_type> const& localities)
               : localities_(localities)
             {}
 
@@ -85,7 +85,8 @@ namespace hpx { namespace components
             typedef std::pair<hpx::id_type, std::vector<hpx::id_type> >
                 bulk_locality_result;
 
-            create_bulk_helper(std::vector<hpx::id_type> const& localities)
+            explicit create_bulk_helper(
+                std::vector<hpx::id_type> const& localities)
               : localities_(localities)
             {}
 

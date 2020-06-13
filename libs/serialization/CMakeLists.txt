@@ -23,6 +23,7 @@ endif()
 
 # Default location is $HPX_ROOT/libs/serialization/include
 set(serialization_headers
+    hpx/serialization.hpp
     hpx/serialization/detail/extra_archive_data.hpp
     hpx/serialization/detail/non_default_constructible.hpp
     hpx/serialization/detail/pointer.hpp
@@ -131,7 +132,6 @@ set(serialization_compat_headers
     hpx/runtime/serialization/serialization_chunk.hpp
     hpx/runtime/serialization/serialization_fwd.hpp
     hpx/runtime/serialization/serialize.hpp
-    hpx/serialization.hpp
     hpx/traits/brace_initializable_traits.hpp
     hpx/traits/is_bitwise_serializable.hpp
     hpx/traits/needs_automatic_registration.hpp

@@ -114,7 +114,7 @@ namespace sheneos
             // Return size of dataset.
             return dims[0];
         }
-        catch (H5::Exception e) {
+        catch (H5::Exception const& e) {
             std::string msg = e.getDetailMsg().c_str();
             HPX_THROW_EXCEPTION(hpx::no_success,
                 "sheneos::extract_data_range", msg);

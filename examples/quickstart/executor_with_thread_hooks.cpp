@@ -33,7 +33,7 @@ namespace executor_example {
     private:
         struct on_exit
         {
-            on_exit(executor_with_thread_hooks const& exec)
+            explicit on_exit(executor_with_thread_hooks const& exec)
               : exec_(exec)
             {
                 exec_.on_start_();

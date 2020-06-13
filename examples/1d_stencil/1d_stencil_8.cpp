@@ -49,7 +49,7 @@ private:
     typedef hpx::lcos::local::spinlock mutex_type;
 
 public:
-    partition_allocator(std::size_t max_size = std::size_t(-1))
+    explicit partition_allocator(std::size_t max_size = std::size_t(-1))
       : max_size_(max_size)
     {}
 
@@ -123,7 +123,7 @@ public:
     {}
 
     // Create a new (uninitialized) partition of the given size.
-    partition_data(std::size_t size)
+    explicit partition_data(std::size_t size)
       : data_(alloc_.allocate(size), size, buffer_type::take,
             &partition_data::deallocate),
         size_(size),
@@ -225,9 +225,9 @@ struct partition_server
     };
 
     // construct new instances
-    partition_server() {}
+    partition_server() = default;
 
-    partition_server(partition_data const& data)
+    explicit partition_server(partition_data const& data)
       : data_(data)
     {}
 
@@ -289,7 +289,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
 {
     typedef hpx::components::client_base<partition, partition_server> base_type;
 
-    partition() {}
+    partition() = default;
 
     // Create new component on locality 'where' and initialize the held data
     partition(hpx::id_type where, std::size_t size, double initial_value)
@@ -303,13 +303,13 @@ struct partition : hpx::components::client_base<partition, partition_server>
     {}
 
     // Attach a future representing a (possibly remote) partition.
-    partition(hpx::future<hpx::id_type> && id)
+    partition(hpx::future<hpx::id_type> && id) noexcept
       : base_type(std::move(id))
     {}
 
     // Unwrap a future<partition> (a partition already is a future to the
     // id of the referenced object, thus unwrapping accesses this inner future).
-    partition(hpx::future<partition> && c)
+    partition(hpx::future<partition> && c) noexcept
       : base_type(std::move(c))
     {}
 
@@ -330,9 +330,9 @@ struct stepper_server : hpx::components::component_base<stepper_server>
     // Our data for one time step
     typedef std::vector<partition> space;
 
-    stepper_server() {}
+    stepper_server() = default;
 
-    stepper_server(std::size_t nl)
+    explicit stepper_server(std::size_t nl)
       : left_(hpx::find_from_basename(
             stepper_basename, idx(hpx::get_locality_id(), -1, nl))),
         right_(hpx::find_from_basename(
@@ -446,14 +446,14 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
     typedef hpx::components::client_base<stepper, stepper_server> base_type;
 
     // construct new instances/wrap existing steppers from other localities
-    stepper(std::size_t num_localities)
+    explicit stepper(std::size_t num_localities)
       : base_type(hpx::new_<stepper_server>(hpx::find_here(), num_localities))
     {
         hpx::register_with_basename(stepper_basename, get_id(),
             hpx::get_locality_id());
     }
 
-    stepper(hpx::future<hpx::id_type> && id)
+    stepper(hpx::future<hpx::id_type> && id) noexcept
       : base_type(std::move(id))
     {}
 

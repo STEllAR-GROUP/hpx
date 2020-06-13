@@ -26,7 +26,7 @@ HPX_PLAIN_ACTION(factorial, factorial_action);
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t factorial(std::uint64_t n)
 {
-    if (0 >= n)
+    if (n == 0)
         return 1;
 
     hpx::lcos::future<std::uint64_t> n1 =

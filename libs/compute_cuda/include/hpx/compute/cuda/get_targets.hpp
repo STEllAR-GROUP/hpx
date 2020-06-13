@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/lcos_fwd.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
 #include <vector>

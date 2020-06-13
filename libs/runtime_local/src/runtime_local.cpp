@@ -972,9 +972,8 @@ namespace hpx {
             return false;
         }
 
-        bool numa_sensitive = false;
         if (std::size_t(-1) != get_worker_thread_num())
-            return numa_sensitive;
+            return false;
         return false;
     }
 

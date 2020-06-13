@@ -328,18 +328,20 @@ namespace hpx { namespace components
 
     protected:
         /// \cond NOINTERNAL
-        default_distribution_policy(std::vector<id_type> const& localities)
+        explicit default_distribution_policy(
+            std::vector<id_type> const& localities)
           : localities_(std::make_shared<std::vector<id_type>>(localities))
         {
             if (localities_->empty())
             {
                 HPX_THROW_EXCEPTION(invalid_status,
-                    "default_distribution_policy::default_distribution_policy",
+                    "default_distribution_policy::default_distribution_"
+                    "policy",
                     "unexpectedly empty list of localities");
             }
         }
 
-        default_distribution_policy(std::vector<id_type> && localities)
+        explicit default_distribution_policy(std::vector<id_type> && localities)
           : localities_(std::make_shared<std::vector<id_type>>(std::move(localities)))
         {
             if (localities_->empty())
@@ -350,7 +352,7 @@ namespace hpx { namespace components
             }
         }
 
-        default_distribution_policy(id_type const& locality)
+        explicit default_distribution_policy(id_type const& locality)
           : localities_(std::make_shared<std::vector<id_type>>(1, locality))
         {}
 

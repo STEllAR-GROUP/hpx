@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/lcos_fwd.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <string>

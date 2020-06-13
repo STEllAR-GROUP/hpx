@@ -27,7 +27,6 @@
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/util_fwd.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -91,7 +90,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // constructor
-        runtime_support(hpx::util::runtime_configuration & cfg);
+        explicit runtime_support(hpx::util::runtime_configuration & cfg);
 
         ~runtime_support()
         {

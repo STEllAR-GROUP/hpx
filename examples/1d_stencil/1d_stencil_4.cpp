@@ -54,7 +54,7 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 struct partition_data
 {
 public:
-    partition_data(std::size_t size)
+    explicit partition_data(std::size_t size)
       : data_(new double[size]), size_(size)
     {}
 
@@ -67,7 +67,7 @@ public:
             data_[i] = base_value + double(i);
     }
 
-    partition_data(partition_data && other)
+    partition_data(partition_data && other) noexcept
       : data_(std::move(other.data_))
       , size_(other.size_)
     {}

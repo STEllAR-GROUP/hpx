@@ -59,7 +59,7 @@ namespace hpx { namespace plugins { namespace compression
             int result = this->compress(flush ? finish : run);
             this->after(src_begin, dest_begin);
             (bzip2_error::check)(result);
-            return !(eof_ = result == stream_end);
+            return !(eof_ = (result == stream_end));
         }
 
         bool bzip2_compdecomp::load(char const*& src_begin, char const* src_end,
@@ -84,7 +84,7 @@ namespace hpx { namespace plugins { namespace compression
                 result = this->check_end(src_begin, dest_begin);
             this->after(src_begin, dest_begin);
             (bzip2_error::check)(result);
-            eof_ = result == stream_end;
+            eof_ = (result == stream_end);
             return true;
         }
 
