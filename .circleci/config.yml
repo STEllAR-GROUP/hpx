@@ -34,17 +34,6 @@ move_debug_log: &move_debug_log
         mkdir -p ${CIRCLE_JOB}
         cp debug-log.txt ${CIRCLE_JOB} || true
 
-collect_coverage: &collect_coverage
-    name: Collecting coverage reports
-    command: |
-        mkdir -p /hpx/coverage
-        lcov -q --gcov-tool llvm-cov-wrapper --no-external --capture --base-directory /hpx/source/ --directory /hpx/build/ --output-file /hpx/coverage/${CIRCLE_JOB}.info
-
-persist_coverage: &persist_coverage
-    root: /hpx
-    paths:
-      - ./coverage
-
 gh_pages_filter: &gh_pages_filter
     filters:
       branches:
@@ -202,25 +191,24 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=Debug \
-                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
-                -DCMAKE_CXX_FLAGS="--coverage -fcolor-diagnostics" \
-                -DCMAKE_EXE_LINKER_FLAGS="--coverage" \
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} \
                 -DHPX_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
                 -DHPX_WITH_GIT_TAG="${CIRCLE_TAG}" \
                 -DHPX_WITH_TOOLS=On \
+                -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
                 -DHPX_WITH_TESTS_HEADERS=On \
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=On \
+                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
                 -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
                 -DHPX_WITH_TESTS_DEBUG_LOG=On \
                 -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
                 -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
                 -DHPX_WITH_DOCUMENTATION=On \
                 -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}"
       - persist_to_workspace:
@@ -384,14 +372,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.examples
       - store_artifacts:
           path: tests.examples
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.actions:
     <<: *defaults
@@ -414,14 +398,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.actions
       - store_artifacts:
           path: tests.unit.actions
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.agas:
     <<: *defaults
@@ -444,14 +424,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.agas
       - store_artifacts:
           path: tests.unit.agas
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.build:
     <<: *defaults
@@ -481,14 +457,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.build
       - store_artifacts:
           path: tests.unit.build
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.component:
     <<: *defaults
@@ -511,14 +483,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.component
       - store_artifacts:
           path: tests.unit.component
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.lcos:
     <<: *defaults
@@ -541,14 +509,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.lcos
       - store_artifacts:
           path: tests.unit.lcos
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.parcelset:
     <<: *defaults
@@ -571,14 +535,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.parcelset
       - store_artifacts:
           path: tests.unit.parcelset
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.resource:
     <<: *defaults
@@ -601,14 +561,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.resource
       - store_artifacts:
           path: tests.unit.resource
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.traits:
     <<: *defaults
@@ -631,14 +587,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.traits
       - store_artifacts:
           path: tests.unit.traits
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.util:
     <<: *defaults
@@ -661,14 +613,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.util
       - store_artifacts:
           path: tests.unit.util
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.modules:
     <<: *defaults
@@ -761,14 +709,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.modules
       - store_artifacts:
           path: tests.unit.modules
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.modules.algorithms:
     <<: *defaults
@@ -791,14 +735,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.modules.algorithms
       - store_artifacts:
           path: tests.unit.modules.algorithms
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.modules.execution:
     <<: *defaults
@@ -821,14 +761,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.modules.execution
       - store_artifacts:
           path: tests.unit.modules.execution
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.unit.modules.segmented_algorithms:
     <<: *defaults
@@ -853,14 +789,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.unit.modules.segmented_algorithms
       - store_artifacts:
           path: tests.unit.modules.segmented_algorithms
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.regressions:
     <<: *defaults
@@ -882,14 +814,10 @@ jobs:
           <<: *move_core_dump
       - run:
           <<: *move_debug_log
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.regressions
       - store_artifacts:
           path: tests.regressions
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.headers:
     <<: *defaults
@@ -902,14 +830,10 @@ jobs:
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure -R tests.headers -E tests.headers.modules
       - run:
           <<: *convert_xml
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.headers
       - store_artifacts:
           path: tests.headers
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.headers.modules:
     <<: *defaults
@@ -922,14 +846,10 @@ jobs:
               ctest --timeout 60 -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules
       - run:
           <<: *convert_xml
-      - run:
-          <<: *collect_coverage
       - store_test_results:
           path: tests.headers.modules
       - store_artifacts:
           path: tests.headers.modules
-      - persist_to_workspace:
-          <<: *persist_coverage
 
   tests.performance:
     <<: *defaults
@@ -954,20 +874,6 @@ jobs:
           root: /hpx
           paths:
             - ./build
-
-  coverage:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Generating Coverage Reports
-          command: |
-              lcov --gcov-tool llvm-cov-wrapper --no-external --capture --initial --base-directory /hpx/source/ --directory /hpx/build/ --output-file /hpx/coverage/baseline.info
-              TRACE_FILES_ARGS=`find /hpx/coverage -type f -iname '*.info' -exec sh -c "echo --add-tracefile {}" \;`
-              lcov ${TRACE_FILES_ARGS} --output-file "/hpx/coverage/combined.info"
-              lcov --remove combined.info '*CMakeCXXCompilerId.cpp*' '*static_parcelports.hpp*' '*modules.cpp*' '*config_entries.cpp*' '*force_linking.cpp' -o coverage.info
-              bash <(curl -s https://codecov.io/bash) -f coverage.info
 
   install:
     docker:
@@ -1178,28 +1084,6 @@ workflows:
             - tests.regressions
             - examples
           <<: *gh_pages_filter
-      - coverage:
-          requires:
-            - core
-            - tests.examples
-            - tests.unit.actions
-            - tests.unit.agas
-            - tests.unit.build
-            - tests.unit.component
-            - tests.unit.lcos
-            - tests.unit.parcelset
-            - tests.unit.resource
-            - tests.unit.traits
-            - tests.unit.util
-            - tests.unit.modules
-            - tests.unit.modules.algorithms
-            - tests.unit.modules.execution
-            - tests.unit.modules.segmented_algorithms
-            - tests.headers
-            - tests.headers.modules
-            - tests.performance
-            - tests.regressions
-            - examples
       - push_stable_tag:
           requires:
             - install
