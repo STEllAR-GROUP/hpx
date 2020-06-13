@@ -929,13 +929,6 @@ hpx_option(
   CATEGORY "Profiling"
 )
 
-# LibCDS option
-hpx_option(
-        HPX_WITH_LIBCDS BOOL "Enable LibCDS support." OFF)
-if(HPX_WITH_LIBCDS)
-  hpx_add_config_define(HPX_HAVE_LIBCDS) # tell HPX that we use LibCDS
-endif()
-
 # ##############################################################################
 # enable OpenMP emulation
 # ##############################################################################
@@ -2165,8 +2158,6 @@ include(HPX_SetupHpxmp)
 include(HPX_SetupGooglePerfTools)
 include(HPX_SetupValgrind)
 
-include(HPX_SetupLibCDS)
-
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)
 endif()
@@ -2537,6 +2528,14 @@ include(HPX_ForwardCacheVariables)
 # ##############################################################################
 # External build system support (FindHPX.cmake and pkg-config).
 include(HPX_GeneratePackage)
+
+# LibCDS option
+hpx_option(
+        HPX_WITH_LIBCDS BOOL "Enable LibCDS support." OFF)
+if(HPX_WITH_LIBCDS)
+  hpx_add_config_define(HPX_HAVE_LIBCDS) # tell HPX that we use LibCDS
+  include(HPX_SetupLibCDS)
+endif()
 
 message("")
 message("HPX will be installed to ${CMAKE_INSTALL_PREFIX}")
