@@ -15,7 +15,7 @@
 #include <hpx/command_line_handling/command_line_handling.hpp>
 
 // parcelport
-#include <hpx/runtime.hpp>
+#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 
