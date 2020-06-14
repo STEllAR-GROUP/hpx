@@ -18,6 +18,7 @@
 #include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -105,6 +106,8 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         std::int64_t get_idle_core_count() const override;
+
+        void get_idle_core_mask(mask_type&) const override;
 
         std::int64_t get_background_thread_count() override
         {

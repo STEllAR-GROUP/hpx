@@ -9,6 +9,7 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -86,6 +87,11 @@ namespace hpx { namespace threads {
     std::int64_t get_idle_core_count()
     {
         return get_thread_manager().get_idle_core_count();
+    }
+
+    mask_type get_idle_core_mask()
+    {
+        return get_thread_manager().get_idle_core_mask();
     }
 
     bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
