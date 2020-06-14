@@ -6,11 +6,16 @@
 
 #pragma once
 
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/always_void.hpp>
-#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
+#include <type_traits>
 #include <utility>
 
+// The trait checks whether sentinel Sent is proper for iterator I.
+// There are two requirements for this:
+// 1. iterator I should be an input or output iterator
+// 2. I and S should oblige with the weakly-equality-comparable concept
 
 namespace hpx { namespace traits {
 
@@ -22,7 +27,7 @@ namespace hpx { namespace traits {
     template <typename Sent, typename Iter>
     struct is_sentinel_for<Sent, Iter,
         typename util::always_void<
-            typename is_iterator<Iter>::type,
+            typename std::enable_if<is_iterator<Iter>::value>::type,
             typename detail::equality_result<Iter, Sent>::type,
             typename detail::equality_result<Sent, Iter>::type,
             typename detail::inequality_result<Iter, Sent>::type,

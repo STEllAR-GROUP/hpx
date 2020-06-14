@@ -5,9 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
-#include <hpx/testing.hpp>
+#include <hpx/modules/testing.hpp>
 #include "iter_sent.hpp"
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -15,20 +16,20 @@ void is_sentinel_for()
 {
     HPX_TEST_MSG((hpx::traits::is_sentinel_for<Sentinel<int64_t>,
                       Iterator<std::int64_t>>::value == true),
-        "sent for iter");
+        "Sentinel value is not proper for given iterator");
 
     HPX_TEST_MSG(
         (hpx::traits::is_sentinel_for<std::int64_t, std::int64_t>::value ==
             false),
-        "incompatible pair int - int");
+        "Integer - integer pair is ncompatible pair");
 
     HPX_TEST_MSG((hpx::traits::is_sentinel_for<std::vector<int>::iterator,
                       std::vector<int>::iterator>::value == true),
-        "iterator begin / end pair");
+        "Incompatible begin - end iterator pair on vector");
 
     HPX_TEST_MSG((hpx::traits::is_sentinel_for<std::string,
                       std::string::iterator>::value == false),
-        "string / iterator pair");
+        "String - string::iterator is ncompatible pair");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
