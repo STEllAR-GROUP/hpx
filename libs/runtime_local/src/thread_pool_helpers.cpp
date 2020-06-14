@@ -83,6 +83,11 @@ namespace hpx { namespace threads {
         return get_thread_manager().get_thread_count(state, priority);
     }
 
+    std::int64_t get_idle_core_count()
+    {
+        return get_thread_manager().get_idle_core_count();
+    }
+
     bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
         thread_state_enum state)
     {

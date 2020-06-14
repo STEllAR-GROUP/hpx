@@ -82,6 +82,10 @@ namespace hpx { namespace threads {
     HPX_EXPORT std::int64_t get_thread_count(
         thread_priority priority, thread_state_enum state = unknown);
 
+    /// The function \a get_idle_core_count returns the number of currently
+    /// idling threads (cores).
+    HPX_EXPORT std::int64_t get_idle_core_count();
+
     /// The function \a enumerate_threads will invoke the given function \a f
     /// for each thread with a matching thread state.
     ///
