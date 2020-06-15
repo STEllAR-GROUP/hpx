@@ -38,6 +38,8 @@ get support for using HPX.
   [here](https://www.mail-archive.com/hpx-devel@stellar-group.org) for past
   conversations. This is the main mailing list for development discussion
   and voting.
+* [hpx-pmc group](mailto:hpx-pmc@stellar-group.org). The project management
+  committee (PMC) can be reached at this address.
 
 ### Latest News
 
