@@ -9,9 +9,11 @@
 #define HPX_SPLITTABLE_EXECUTOR_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/error.hpp>
-#include <hpx/parallel/util/detail/splittable_task.hpp>
-#include <hpx/traits/is_executor.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/executors.hpp>
+#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/timing.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -27,8 +29,11 @@ namespace hpx { namespace parallel { namespace execution {
     /// This executor parameters type makes sure that as many loop iterations
     /// are combined as necessary to run for the amount of time specified.
     ///
-    struct splittable_executor : parallel_executor
+    struct splittable_executor
+      : parallel_policy_executor<hpx::launch::async_policy>
     {
+        using base_type = parallel_policy_executor<hpx::launch::async_policy>;
+
     public:
         /// Construct an \a splittable_executor executor parameters object
         ///
@@ -36,16 +41,9 @@ namespace hpx { namespace parallel { namespace execution {
         ///       types will use 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
-        splittable_executor() {}
-
-	splittable_executor(std::string split_type)
+        splittable_executor()
+          : split_type_(splittable_mode::all)
         {
-            if (split_type != "all" && split_type != "idle")
-            {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter, "throw_hpx_exception",
-                            "unknwn type, type should be either all or idle");
-            }
-            split_type_ = split_type;
         }
 
         /// Construct an \a splittable_executor executor parameters object
@@ -54,13 +52,32 @@ namespace hpx { namespace parallel { namespace execution {
         ///                     to decide how many loop iterations should be
         ///                     combined.
 
+        splittable_executor(splittable_mode split_type)
+          : split_type_(split_type)
+        {
+            if (split_type != splittable_mode::all &&
+                split_type != splittable_mode::idle &&
+                split_type != splittable_mode::idle_mask)
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                    "splittable_executor::splittable_executor",
+                    "unknown type, type should be either all, idle, or "
+                    "idle_mask");
+            }
+        }
+
         /// \cond NOINTERNAL
         // Estimate a chunk size based on number of cores used.
-        template <typename Executor, typename F>
-        std::size_t get_chunk_size(
-            Executor&& exec, F&& f, std::size_t cores, std::size_t count)
+        template <typename Parameters, typename F>
+        static std::size_t get_chunk_size(
+            Parameters&&, F&&, std::size_t, std::size_t count)
         {
             return count;
+        }
+
+        HPX_FORCEINLINE static std::size_t processing_units_count()
+        {
+            return hpx::get_os_thread_count();
         }
         /// \endcond
 
@@ -76,8 +93,9 @@ namespace hpx { namespace parallel { namespace execution {
 
             for (auto const& elem : shape)
             {
-                results.push_back(hpx::async(make_splittable_task(
-                    std::forward<F>(f), elem, split_type_)));
+                results.push_back(hpx::async(
+                    make_splittable_task(static_cast<base_type&>(*this),
+                        std::forward<F>(f), elem, split_type_)));
             }
 
             return results;
@@ -85,29 +103,32 @@ namespace hpx { namespace parallel { namespace execution {
 
     private:
         friend class hpx::serialization::access;
-        std::string split_type_;
-        /// \cond NOINTERNAL
+        splittable_mode split_type_;
     };
 
+    /// \cond NOINTERNAL
     template <>
     struct is_bulk_two_way_executor<splittable_executor> : std::true_type
     {
     };
 
-    template <typename Param, typename Exec, typename F>
-    std::size_t get_chunk_size(
-        Param& param, Exec& exec, F&& f, std::size_t core, std::size_t count)
+#if HPX_VERSION_FULL < 0x010500
+    // workaround for older HPX versions
+    template <typename Param, typename Executor, typename F>
+    std::size_t get_chunk_size(Param&& param, Executor&& exec,
+        F&& f, std::size_t core, std::size_t count)
     {
         return count;
     }
 
-    /// \endcond
-    template <typename AnyParameters, typename Executor>
+    template <typename Param, typename Executor>
     HPX_FORCEINLINE static std::size_t processing_units_count(
-        AnyParameters&& params, Executor&& exec)
+        Param&& params, Executor&& exec)
     {
         return hpx::get_os_thread_count();
     }
+#endif
+    /// \endcond
 }}}    // namespace hpx::parallel::execution
 
 #endif    //HPX_SPLITTABLE_EXECUTOR_HPP

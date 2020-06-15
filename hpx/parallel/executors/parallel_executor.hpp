@@ -30,6 +30,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/one_shot.hpp>
 #include <hpx/util/range.hpp>
+#include <hpx/util/thread_description.hpp>
 #include <hpx/util/unwrap.hpp>
 
 #include <algorithm>
@@ -93,17 +94,27 @@ namespace hpx { namespace parallel { namespace execution
 
         /// Create a new parallel executor
         HPX_CONSTEXPR explicit parallel_policy_executor(
+		threads::thread_priority priority =
+                threads::thread_priority_default,
+                threads::thread_stacksize stacksize =
+                threads::thread_stacksize_default,
+                threads::thread_schedule_hint schedulehint = {},
                 Policy l = detail::get_default_policy<Policy>::call(),
                 std::size_t spread = 4, std::size_t tasks = std::size_t(-1))
-          : policy_(l), num_spread_(spread), num_tasks_(tasks)
+          : priority_(priority)
+          , stacksize_(stacksize)
+          , schedulehint_(schedulehint), policy_(l), num_spread_(spread), num_tasks_(tasks)
         {}
 
         /// \cond NOINTERNAL
         bool operator==(parallel_policy_executor const& rhs) const noexcept
         {
             return policy_ == rhs.policy_ && num_spread_ == rhs.num_spread_ &&
-                num_tasks_ == rhs.num_tasks_;
-        }
+                num_tasks_ == rhs.num_tasks_ && priority_ == rhs.priority_ &&
+                stacksize_ == rhs.stacksize_ &&
+                schedulehint_.mode == rhs.schedulehint_.mode &&
+                schedulehint_.hint == rhs.schedulehint_.hint;
+	}
 
         bool operator!=(parallel_policy_executor const& rhs) const noexcept
         {
@@ -309,7 +320,24 @@ namespace hpx { namespace parallel { namespace execution
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
-            ar & policy_ & num_spread_ & num_tasks_;
+             ar & policy_ & num_spread_ & num_tasks_ & priority_ & stacksize_
+               & schedulehint_.mode & schedulehint_.mode;
+	}
+        /// \endcond
+
+    public:
+        /// \cond NOINTERNAL
+        threads::thread_priority get_priority() const
+        {
+            return priority_;
+        }
+        threads::thread_stacksize get_stacksize() const
+        {
+            return stacksize_;
+        }
+        threads::thread_schedule_hint get_schedulehint() const
+        {
+            return schedulehint_;
         }
         /// \endcond
 

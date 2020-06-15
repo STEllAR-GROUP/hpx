@@ -16,6 +16,7 @@
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/resource/detail/partitioner.hpp>
+#include <hpx/runtime/threads/cpu_mask.hpp>
 #include <hpx/runtime/threads/detail/thread_num_tss.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -188,6 +189,8 @@ namespace hpx { namespace threads
             std::size_t num_thread = std::size_t(-1), bool reset = false);
 
         std::int64_t get_idle_core_count();
+
+	mask_type get_idle_core_mask();
 
         std::int64_t get_background_thread_count();
 

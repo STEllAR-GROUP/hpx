@@ -282,6 +282,10 @@ namespace hpx { namespace threads
 
 	virtual std::int64_t get_idle_core_count() const { return 0; }
 
+	virtual void get_idle_core_mask(mask_type&) const
+        {
+        }
+
         virtual std::int64_t get_background_thread_count() { return 0; }
 
         std::int64_t get_thread_count_unknown(
