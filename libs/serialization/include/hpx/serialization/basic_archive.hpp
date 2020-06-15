@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/serialization/detail/extra_archive_data.hpp>
 

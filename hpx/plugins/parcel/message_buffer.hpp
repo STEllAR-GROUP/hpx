@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>

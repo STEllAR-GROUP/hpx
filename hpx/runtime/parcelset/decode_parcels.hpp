@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>

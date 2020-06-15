@@ -21,7 +21,7 @@
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 
 #include <cstddef>
 #include <cstdint>

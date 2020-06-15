@@ -47,6 +47,8 @@ set(doxygen_definition_list
     "extern="
     "HPX_FORCEINLINE="
     "HPX_CONCEPT_REQUIRES_(...)="
+    "HPX_STATIC_CONSTEXPR=static constexpr"
+    "HPX_HOST_DEVICE="
 )
 
 foreach(doxygen_predef ${doxygen_definition_list})
@@ -195,7 +197,7 @@ file(
 )
 
 # exclude api.rst...
-list(FILTER sphinx_source_files EXCLUDE REGEX ".*api.rst")
+list(FILTER sphinx_source_files EXCLUDE REGEX "sphinx/api.rst")
 
 foreach(sphinx_source_file ${sphinx_source_files})
   add_custom_command(

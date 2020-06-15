@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/thread_support.hpp>

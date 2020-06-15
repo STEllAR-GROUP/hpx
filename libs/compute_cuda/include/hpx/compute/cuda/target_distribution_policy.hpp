@@ -12,7 +12,7 @@
 
 #if defined(HPX_HAVE_CUDA)
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/dataflow.hpp>
 #endif

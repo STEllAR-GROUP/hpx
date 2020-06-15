@@ -8,8 +8,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/debugging/backtrace.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>

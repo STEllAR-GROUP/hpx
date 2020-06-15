@@ -31,6 +31,7 @@ namespace hpx {
     using hpx::parallel::for_loop;
     using hpx::parallel::for_loop_n;
     using hpx::parallel::for_loop_n_strided;
+    using hpx::parallel::for_loop_strided;
     using hpx::parallel::generate;
     using hpx::parallel::generate_n;
     using hpx::parallel::includes;

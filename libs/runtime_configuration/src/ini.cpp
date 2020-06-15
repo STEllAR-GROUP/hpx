@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/serialization/map.hpp>

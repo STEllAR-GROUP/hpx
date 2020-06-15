@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/timing/steady_clock.hpp>

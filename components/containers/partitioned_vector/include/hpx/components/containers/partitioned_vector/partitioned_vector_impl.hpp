@@ -12,7 +12,7 @@
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>

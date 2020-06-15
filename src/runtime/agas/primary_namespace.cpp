@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/apply.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

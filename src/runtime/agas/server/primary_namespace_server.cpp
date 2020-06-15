@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/modules/errors.hpp>

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>

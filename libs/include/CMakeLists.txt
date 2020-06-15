@@ -11,6 +11,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(include_headers
     hpx/distributed/runtime.hpp
     hpx/hpx.hpp
+    hpx/future.hpp
     hpx/include/actions.hpp
     hpx/include/agas.hpp
     hpx/include/applier.hpp

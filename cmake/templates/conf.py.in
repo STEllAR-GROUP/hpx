@@ -70,6 +70,7 @@ for subdir_full, dirs, files in os.walk(hpx_libs_dir):
     if len(subdir) == 0:
         for dir in dirs:
             breathe_projects_source[dir] = (subdir_full + '/' + dir, [])
+            breathe_projects[dir] = '../breathe/doxygen/' + dir + '/xml'
     # We are inside a library and need to add the files
     # to the breathe project
     else:
@@ -98,6 +99,10 @@ for subdir_full, dirs, files in os.walk(hpx_libs_dir):
                     continue
                 breathe_projects_source[lib][1].append(subdir + '/' + f)
 
+# Sort headers for each module
+for lib in breathe_projects_source.keys():
+    breathe_projects_source[lib][1].sort()
+
 # Generate the rst files for the API documentation
 api_refs = ''
 api_ref_header = '''
@@ -112,17 +117,27 @@ api_ref_header = '''
 -------------------------------------------------------------------------------
 {0}
 -------------------------------------------------------------------------------
+
+The contents of this module can be included with the header
+``hpx/modules/{0}.hpp``. These headers may be used by user-code but are not
+guaranteed stable (neither header location nor contents). You are using these at
+your own risk. If you wish to use non-public functionality from a module we
+*strongly* suggest only including the module header ``hpx/modules/{0}.hpp``, not
+the particular header in which the functionality you would like to use is
+defined. See :ref:`public_api` for a list of names that are part of the public
+|hpx| API.
+
 '''
 
 api_ref_file = '''
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-``#include <{0}>``
+Header ``{0}``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. autodoxygenfile:: {0}
    :project: {1}
 '''
-
 
 for lib in sorted(breathe_projects_source.keys()):
     lib_sources = breathe_projects_source[lib]
@@ -147,13 +162,17 @@ for line in open(hpx_source_dir + '/docs/sphinx/api.rst').readlines():
 api_rst.close()
 print('Generated ' + os.path.abspath('.') + '/api.rst')
 
-breathe_default_project = "hpx"
+breathe_default_project = 'hpx'
 
 breathe_doxygen_config_options = {
-    'EXPAND_ONLY_PREDEF': 'YES',
     'EXCLUDE_SYMBOLS': 'detail',
+    'EXPAND_ONLY_PREDEF': 'YES',
+    'EXTRACT_ALL': 'YES',
+    'EXTRACT_PRIVATE': 'NO',
+    'GENERATE_HTML': 'NO',
+    'GENERATE_LATEX': 'NO',
+    'GENERATE_XML': 'YES',
     'MACRO_EXPANSION': 'YES',
-    'DIRECTORY_GRAPH': 'NO',
     'PREDEFINED': '@doxygen_definitions@',
     'STRIP_FROM_PATH': hpx_source_dir
 }

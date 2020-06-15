@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>

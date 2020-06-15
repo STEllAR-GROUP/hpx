@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assert.hpp>
 #include <hpx/basic_execution/agent_ref.hpp>
-#include <hpx/modules/assertion.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/basic_execution/register_locks.hpp>
 #endif

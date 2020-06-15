@@ -9,6 +9,7 @@
 
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>

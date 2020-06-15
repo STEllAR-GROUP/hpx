@@ -4,13 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local_lcos/promise.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>

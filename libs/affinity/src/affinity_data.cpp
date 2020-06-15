@@ -6,7 +6,7 @@
 
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/affinity/parse_affinity_options.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/topology/cpu_mask.hpp>

@@ -32,7 +32,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/timing.hpp>
 

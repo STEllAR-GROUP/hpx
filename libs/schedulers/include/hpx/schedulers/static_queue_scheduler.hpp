@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STATIC_SCHEDULER)
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/traits/extract_action.hpp>

@@ -13,7 +13,7 @@
 #include <hpx/hpx_main.hpp>
 
 #include <hpx/modules/algorithms.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 

@@ -9,7 +9,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 // util
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>

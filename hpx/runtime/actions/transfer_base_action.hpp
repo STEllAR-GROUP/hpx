@@ -15,7 +15,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/runtime/actions_fwd.hpp>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/detail/invocation_count_registry.hpp>

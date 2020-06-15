@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>

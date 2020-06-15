@@ -43,7 +43,7 @@
 #endif
 #endif
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 

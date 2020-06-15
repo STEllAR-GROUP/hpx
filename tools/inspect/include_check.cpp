@@ -239,8 +239,8 @@ namespace boost
         {"(\\bHPX_PP_STRIP_PARENS\\b)", "HPX_PP_STRIP_PARENS",
             "hpx/preprocessor/strip_parens.hpp"},
         //
-        {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", "hpx/modules/assertion.hpp"},
-        {"(\\HPX_ASSERT_MSG\\b)", "HPX_ASSERT_MSG", "hpx/modules/assertion.hpp"},
+        {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", "hpx/assert.hpp"},
+        {"(\\HPX_ASSERT_MSG\\b)", "HPX_ASSERT_MSG", "hpx/assert.hpp"},
         {nullptr, nullptr, nullptr}};
 
     //  include_check constructor  -------------------------------------------//

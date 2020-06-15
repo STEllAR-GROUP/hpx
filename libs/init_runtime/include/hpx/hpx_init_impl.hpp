@@ -8,13 +8,13 @@
 
 #pragma once
 
+#include <hpx/assert.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
