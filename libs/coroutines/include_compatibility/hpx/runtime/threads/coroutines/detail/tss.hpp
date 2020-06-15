@@ -10,7 +10,7 @@
 #include <hpx/coroutines/config/defines.hpp>
 #include <hpx/coroutines/detail/tss.hpp>
 
-#if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/coroutines/detail/tss.hpp is deprecated, \

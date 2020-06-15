@@ -10,7 +10,7 @@
 #include <hpx/execution/config/defines.hpp>
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
 
-#if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/execution_parameters_fwd.hpp is deprecated, \

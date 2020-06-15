@@ -16,7 +16,7 @@
 #include <hpx/assertion/config/defines.hpp>
 #include <hpx/assert.hpp>
 
-#if defined(HPX_ASSERTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ASSERTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/assert.hpp is deprecated,                             \

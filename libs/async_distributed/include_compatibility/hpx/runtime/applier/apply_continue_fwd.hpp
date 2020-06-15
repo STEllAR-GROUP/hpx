@@ -10,7 +10,7 @@
 #include <hpx/async_distributed/config/defines.hpp>
 #include <hpx/async_distributed/applier/apply_continue_fwd.hpp>
 
-#if defined(HPX_ASYNC_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ASYNC_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/applier/apply_continue_fwd.hpp is deprecated, \

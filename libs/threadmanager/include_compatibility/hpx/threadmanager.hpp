@@ -10,7 +10,7 @@
 #include <hpx/threadmanager/config/defines.hpp>
 #include <hpx/modules/threadmanager.hpp>
 
-#if defined(HPX_THREADMANAGER_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREADMANAGER_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/threadmanager.hpp is deprecated, \
     please include hpx/modules/threadmanager.hpp instead")

@@ -10,7 +10,7 @@
 #include <hpx/threading_base/config/defines.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 
-#if defined(HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/detail/create_thread.hpp is deprecated, \

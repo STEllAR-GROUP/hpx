@@ -10,7 +10,7 @@
 #include <hpx/cache/config/defines.hpp>
 #include <hpx/cache/entries/entry.hpp>
 
-#if defined(HPX_CACHE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CACHE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/cache/entries/entry.hpp is deprecated, \
     please include hpx/cache/entries/entry.hpp instead")

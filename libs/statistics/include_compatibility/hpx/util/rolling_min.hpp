@@ -10,7 +10,7 @@
 #include <hpx/statistics/config/defines.hpp>
 #include <hpx/statistics/rolling_min.hpp>
 
-#if defined(HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/rolling_min.hpp is deprecated, \
     please include hpx/statistics/rolling_min.hpp instead")

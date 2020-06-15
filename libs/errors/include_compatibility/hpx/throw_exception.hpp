@@ -10,7 +10,7 @@
 #include <hpx/errors/config/defines.hpp>
 #include <hpx/errors/throw_exception.hpp>
 
-#if defined(HPX_ERRORS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ERRORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/throw_exception.hpp is deprecated, \
     please include hpx/errors/throw_exception.hpp instead")

@@ -10,7 +10,7 @@
 #include <hpx/thread_support/config/defines.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
-#if defined(HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/atomic_count.hpp is deprecated, \
     please include hpx/thread_support/atomic_count.hpp instead")

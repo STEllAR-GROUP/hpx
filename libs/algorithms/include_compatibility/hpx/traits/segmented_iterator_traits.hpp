@@ -10,7 +10,7 @@
 #include <hpx/algorithms/config/defines.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 
-#if defined(HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/traits/segmented_iterator_traits.hpp is deprecated, \

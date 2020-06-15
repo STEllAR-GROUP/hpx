@@ -10,7 +10,7 @@
 #include <hpx/basic_execution/config/defines.hpp>
 #include <hpx/modules/basic_execution.hpp>
 
-#if defined(HPX_BASIC_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_BASIC_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/basic_execution.hpp is deprecated, \
     please include hpx/modules/basic_execution.hpp instead")

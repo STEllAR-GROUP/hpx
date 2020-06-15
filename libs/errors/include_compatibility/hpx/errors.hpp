@@ -10,7 +10,7 @@
 #include <hpx/errors/config/defines.hpp>
 #include <hpx/modules/errors.hpp>
 
-#if defined(HPX_ERRORS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ERRORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/errors.hpp is deprecated, \
     please include hpx/modules/errors.hpp instead")

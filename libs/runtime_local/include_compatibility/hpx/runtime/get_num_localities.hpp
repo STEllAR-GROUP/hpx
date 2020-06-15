@@ -10,7 +10,7 @@
 #include <hpx/runtime_local/config/defines.hpp>
 #include <hpx/runtime_local/get_num_localities.hpp>
 
-#if defined(HPX_RUNTIME_LOCAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_RUNTIME_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/runtime/get_num_localities.hpp \
     is deprecated, please include hpx/runtime_local/get_num_localities.hpp instead")

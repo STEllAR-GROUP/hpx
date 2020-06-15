@@ -10,7 +10,7 @@
 #include <hpx/asio/config/defines.hpp>
 #include <hpx/asio/asio_util.hpp>
 
-#if defined(HPX_ASIO_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ASIO_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/asio_util.hpp is deprecated, \
     please include hpx/asio/asio_util.hpp instead")

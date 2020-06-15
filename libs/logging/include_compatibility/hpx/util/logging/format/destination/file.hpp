@@ -10,7 +10,7 @@
 #include <hpx/logging/config/defines.hpp>
 #include <hpx/logging/format/destinations.hpp>
 
-#if defined(HPX_LOGGING_HAVE_DEPRECATION_WARNINGS)
+#if HPX_LOGGING_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/logging/format/destination/file.hpp is deprecated,    \

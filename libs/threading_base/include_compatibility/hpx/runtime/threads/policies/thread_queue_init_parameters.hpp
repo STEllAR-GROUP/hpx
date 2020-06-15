@@ -10,7 +10,7 @@
 #include <hpx/threading_base/config/defines.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 
-#if defined(HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/thread_queue_init_parameters.hpp \

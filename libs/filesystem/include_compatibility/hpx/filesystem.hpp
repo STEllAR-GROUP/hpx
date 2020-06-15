@@ -10,7 +10,7 @@
 #include <hpx/filesystem/config/defines.hpp>
 #include <hpx/modules/filesystem.hpp>
 
-#if defined(HPX_FILESYSTEM_HAVE_DEPRECATION_WARNINGS)
+#if HPX_FILESYSTEM_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/filesystem.hpp is deprecated, \
     please include hpx/modules/filesystem.hpp instead")

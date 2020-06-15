@@ -10,7 +10,7 @@
 #include <hpx/iterator_support/config/defines.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
 
-#if defined(HPX_ITERATOR_SUPPORT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ITERATOR_SUPPORT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/iterator_adaptor.hpp is deprecated, \
     please include hpx/iterator_support/iterator_adaptor.hpp instead")

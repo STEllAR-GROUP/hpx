@@ -10,7 +10,7 @@
 #include <hpx/thread_support/config/defines.hpp>
 #include <hpx/modules/thread_support.hpp>
 
-#if defined(HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/thread_support.hpp is deprecated, \
     please include hpx/modules/thread_support.hpp instead")

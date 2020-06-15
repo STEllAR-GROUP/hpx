@@ -10,7 +10,7 @@
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/serialization/intrusive_ptr.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/serialization/intrusive_ptr.hpp is deprecated, \

@@ -10,7 +10,7 @@
 #include <hpx/thread_executors/config/defines.hpp>
 #include <hpx/thread_executors/thread_execution.hpp>
 
-#if defined(HPX_THREAD_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/thread_execution.hpp is deprecated, \

@@ -10,7 +10,7 @@
 #include <hpx/type_support/config/defines.hpp>
 #include <hpx/type_support/static.hpp>
 
-#if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/static.hpp is deprecated, \
     please include hpx/type_support/static.hpp instead")

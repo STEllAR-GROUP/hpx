@@ -10,7 +10,7 @@
 #include <hpx/executors/config/defines.hpp>
 #include <hpx/executors/datapar/execution_policy.hpp>
 
-#if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/execution/datapar/execution_policy.hpp is deprecated, \

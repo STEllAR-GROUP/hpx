@@ -10,7 +10,7 @@
 #include <hpx/timing/config/defines.hpp>
 #include <hpx/modules/timing.hpp>
 
-#if defined(HPX_TIMING_HAVE_DEPRECATION_WARNINGS)
+#if HPX_TIMING_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/timing.hpp is deprecated, \
     please include hpx/modules/timing.hpp instead")
