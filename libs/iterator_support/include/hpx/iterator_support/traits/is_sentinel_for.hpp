@@ -35,4 +35,20 @@ namespace hpx { namespace traits {
       : std::true_type
     {
     };
+
+    template <typename Sent, typename Iter, typename Enable = void>
+    struct sized_sentinel_for : std::false_type
+    {
+    };
+
+    template <typename Sent, typename Iter>
+    struct sized_sentinel_for<Sent, Iter,
+        typename util::always_void<
+            typename hpx::traits::is_sentinel_for<Sent, Iter>::type,
+            //disable_sized_sentinel_for goes here,
+            typename detail::subtraction_result<Iter, Sent>::type,
+            typename detail::subtraction_result<Sent, Iter>::type>::type> : std::true_type
+    {
+    };
+
 }}    // namespace hpx::traits
