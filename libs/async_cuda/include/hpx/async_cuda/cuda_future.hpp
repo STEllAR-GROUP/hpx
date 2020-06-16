@@ -13,8 +13,8 @@
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/modules/basic_execution.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
