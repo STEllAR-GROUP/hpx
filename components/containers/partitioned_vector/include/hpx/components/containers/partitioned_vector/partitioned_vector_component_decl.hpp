@@ -333,7 +333,11 @@ namespace hpx
             > base_type;
 
     public:
+#if defined(HPX_CLANG_VERSION) && HPX_CLANG_VERSION < 60000
+        partitioned_vector_partition() {};
+#else
         partitioned_vector_partition() = default;
+#endif
 
         explicit partitioned_vector_partition(id_type const& gid);
 
