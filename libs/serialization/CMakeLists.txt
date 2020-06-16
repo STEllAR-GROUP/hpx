@@ -13,6 +13,7 @@ hpx_option(
   HPX_SERIALIZATION_WITH_BOOST_TYPES BOOL
   "Enable serialization of certain Boost types. (default: ON)" ON ADVANCED
   CATEGORY "Modules"
+  MODULE SERIALIZATION
 )
 
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)

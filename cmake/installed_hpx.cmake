@@ -121,7 +121,9 @@ if(HPX_WITH_TESTS)
       hpx_option(
         HPX_${lib_upper}_WITH_TESTS BOOL
         "Build HPX ${name} module tests. (default: ${HPX_WITH_TESTS})"
-        ${HPX_WITH_TESTS} ADVANCED CATEGORY "Modules"
+        ${HPX_WITH_TESTS} ADVANCED
+        CATEGORY "Modules"
+        MODULE ${lib_upper}
       )
       add_subdirectory(libs/${lib}/tests)
     endif()

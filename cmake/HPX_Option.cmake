@@ -20,7 +20,7 @@ set(HPX_OPTION_CATEGORIES
 
 function(hpx_option option type description default)
   set(options ADVANCED)
-  set(one_value_args CATEGORY)
+  set(one_value_args CATEGORY MODULE)
   set(multi_value_args STRINGS)
   cmake_parse_arguments(
     HPX_OPTION "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
@@ -66,6 +66,13 @@ function(hpx_option option type description default)
         FATAL_ERROR "hpx_option(): STRINGS can only be used if type is STRING !"
       )
     endif()
+  endif()
+
+  if(HPX_OPTION_MODULE)
+    string(TOUPPER HPX_MODULE_CONFIG_${HPX_OPTION_MODULE} varname_uc)
+    set_property(GLOBAL APPEND PROPERTY ${varname_uc} ${option})
+  else()
+    set_property(GLOBAL APPEND PROPERTY HPX_MODULE_CONFIG_HPX ${option})
   endif()
 
   set(_category "Generic")

@@ -41,7 +41,9 @@ function(add_hpx_module name)
   hpx_option(
     HPX_${name_upper}_WITH_TESTS BOOL
     "Build HPX ${name} module tests. (default: ${HPX_WITH_TESTS})"
-    ${HPX_WITH_TESTS} ADVANCED CATEGORY "Modules"
+    ${HPX_WITH_TESTS} ADVANCED
+    CATEGORY "Modules"
+    MODULE ${name_upper}
   )
 
   set(_deprecation_warnings_default OFF)
@@ -55,6 +57,7 @@ function(add_hpx_module name)
     ${_deprecation_warnings_default}
     ADVANCED
     CATEGORY "Modules"
+    MODULE ${name_upper}
   )
   if(${HPX_${name_upper}_WITH_DEPRECATION_WARNINGS})
     hpx_add_config_cond_define_namespace(
@@ -75,6 +78,7 @@ function(add_hpx_module name)
       ${_compatibility_headers_default}
       ADVANCED
       CATEGORY "Modules"
+      MODULE ${name_upper}
     )
   endif()
 
