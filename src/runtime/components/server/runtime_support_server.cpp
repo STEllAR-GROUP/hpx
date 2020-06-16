@@ -261,10 +261,12 @@ namespace hpx { namespace components { namespace server
       , stop_done_(false)
       , terminated_(false)
       , main_thread_id_(std::this_thread::get_id())
-      , dijkstra_color_(false)
       , shutdown_all_invoked_(false)
+#if defined(HPX_HAVE_NETWORKING)
       , dijkstra_mtx_()
       , dijkstra_cond_()
+      , dijkstra_color_(false)
+#endif
       , p_mtx_()
       , plugins_()
       , modules_(cfg.modules())
@@ -330,19 +332,6 @@ HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
         call_shutdown_functions_action,
         hpx::actions::broadcast_call_shutdown_functions_action_id)
 
-#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
-
-///////////////////////////////////////////////////////////////////////////////
-typedef std::logical_or<bool> std_logical_or_type;
-
-typedef hpx::components::server::runtime_support::dijkstra_termination_action
-    dijkstra_termination_action;
-
-HPX_REGISTER_REDUCE_ACTION_DECLARATION(dijkstra_termination_action, std_logical_or_type)
-HPX_REGISTER_REDUCE_ACTION(dijkstra_termination_action, std_logical_or_type)
-
-#endif
-
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -355,6 +344,7 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
     void runtime_support::dijkstra_make_black()
     {
         // Rule 1: A machine sending a message makes itself black.
@@ -362,112 +352,6 @@ namespace hpx { namespace components { namespace server
         dijkstra_color_ = true;
     }
 
-#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
-    // This new code does not work, currently, as the return actions generated
-    // by the futures used by hpx::reduce make the sender black. This causes
-    // an infinite loop while waiting for the Dijkstra termination detection
-    // to return.
-
-    // invoked during termination detection
-    bool runtime_support::dijkstra_termination()
-    {
-        applier::applier& appl = hpx::applier::get_applier();
-        naming::resolver_client& agas_client = appl.get_agas_client();
-
-        agas_client.start_shutdown();
-
-        // First wait for this locality to become passive. We do this by
-        // periodically checking the number of still running threads.
-        //
-        // Rule 0: When active, machine nr.i + 1 keeps the token; when passive,
-        // it hands over the token to machine nr.i.
-        threads::threadmanager& tm = appl.get_thread_manager();
-
-        util::yield_while([&tm]()
-            {
-                tm.cleanup_terminated(true);
-                return tm.get_thread_count() >
-                    std::int64_t(1) + tm.get_background_thread_count();
-            }, "runtime_support::dijkstra_termination", false);
-
-        // Now this locality has become passive, thus we can send the token
-        // to the next locality.
-        //
-        // Rule 2: When machine nr.i + 1 propagates the probe, it hands over a
-        // black token to machine nr.i if it is black itself, whereas while
-        // being white it leaves the color of the token unchanged.
-        std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
-        bool dijkstra_token = dijkstra_color_;
-
-        // Rule 5: Upon transmission of the token to machine nr.i, machine
-        // nr.i + 1 becomes white.
-        dijkstra_color_ = false;
-
-        // The reduce-function (logical_or) will make sure black will be
-        // propagated.
-        return dijkstra_token;
-    }
-
-    // kick off termination detection
-    std::size_t runtime_support::dijkstra_termination_detection(
-        std::vector<naming::id_type> const& locality_ids)
-    {
-        std::uint32_t num_localities =
-            static_cast<std::uint32_t>(locality_ids.size());
-        if (num_localities == 1)
-        {
-            // While no real distributed termination detection has to be
-            // performed, we should still wait for the thread-queues to drain.
-            applier::applier& appl = hpx::applier::get_applier();
-            threads::threadmanager& tm = appl.get_thread_manager();
-
-            util::yield_while([&tm]()
-                {
-                    tm.cleanup_terminated(true);
-                    return tm.get_thread_count() >
-                        std::int64_t(1) + tm.get_background_thread_count();
-                }, "runtime_support::dijkstra_termination", false);
-
-            return 0;
-        }
-
-        std::size_t count = 0;      // keep track of number of trials
-
-        {
-            // Note: we protect the entire loop here since the stopping condition
-            // depends on the shared variable "dijkstra_color_"
-            // Proper unlocking for possible remote actions needs to be taken care of
-            typedef std::unique_lock<dijkstra_mtx_type> dijkstra_scoped_lock;
-            dijkstra_scoped_lock l(dijkstra_mtx_);
-            do {
-                // Rule 4: Machine nr.0 initiates a probe by making itself white
-                // and sending a white token to machine nr.N - 1.
-                dijkstra_color_ = false;        // start off with white
-
-                dijkstra_termination_action act;
-                bool termination_aborted = false;
-                {
-                    util::unlock_guard<dijkstra_scoped_lock> ul(l);
-                    termination_aborted = lcos::reduce(act,
-                        locality_ids, std_logical_or_type()).get()
-                }
-
-                if (termination_aborted)
-                {
-                    dijkstra_color_ = true;     // unsuccessful termination
-                }
-
-                // Rule 3: After the completion of an unsuccessful probe, machine
-                // nr.0 initiates a next probe.
-
-                ++count;
-
-            } while (dijkstra_color_);
-        }
-
-        return count;
-    }
-#else
     void runtime_support::send_dijkstra_termination_token(
         std::uint32_t target_locality_id,
         std::uint32_t initiating_locality_id,
@@ -481,7 +365,7 @@ namespace hpx { namespace components { namespace server
         applier::applier& appl = hpx::applier::get_applier();
         threads::threadmanager& tm = appl.get_thread_manager();
 
-        util::yield_while([&tm]()
+        util::yield_while([&tm]() -> bool
             {
                 tm.cleanup_terminated(true);
                 return tm.get_thread_count() >
@@ -497,7 +381,7 @@ namespace hpx { namespace components { namespace server
         {
             std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
             if (dijkstra_color_)
-                dijkstra_token = dijkstra_color_;
+                dijkstra_token = true;
 
             // Rule 5: Upon transmission of the token to machine nr.i, machine
             // nr.i + 1 becomes white.
@@ -519,10 +403,8 @@ namespace hpx { namespace components { namespace server
 
         agas_client.start_shutdown();
 
-#if defined(HPX_HAVE_NETWORKING)
         parcelset::parcelhandler& ph = appl.get_parcel_handler();
         ph.flush_parcels();
-#endif
 
         std::uint32_t locality_id = get_locality_id();
 
@@ -545,22 +427,26 @@ namespace hpx { namespace components { namespace server
         send_dijkstra_termination_token(locality_id - 1,
             initiating_locality_id, num_localities, dijkstra_token);
     }
+#endif
 
     // Kick off termination detection, this is modeled after Dijkstra's paper:
     // http://www.cs.mcgill.ca/~lli22/575/termination3.pdf.
     std::size_t runtime_support::dijkstra_termination_detection(
         std::vector<naming::id_type> const& locality_ids)
     {
+#if defined(HPX_HAVE_NETWORKING)
         std::uint32_t num_localities =
             static_cast<std::uint32_t>(locality_ids.size());
         if (num_localities == 1)
+#endif
+
         {
             // While no real distributed termination detection has to be
             // performed, we should still wait for the thread-queues to drain.
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager& tm = appl.get_thread_manager();
 
-            util::yield_while([&tm]()
+            util::yield_while([&tm]() -> bool
                 {
                     tm.cleanup_terminated(true);
                     return tm.get_thread_count() >
@@ -570,12 +456,13 @@ namespace hpx { namespace components { namespace server
             return 0;
         }
 
+#if defined(HPX_HAVE_NETWORKING)
         std::uint32_t initiating_locality_id = get_locality_id();
 
         // send token to previous node
         std::uint32_t target_id = initiating_locality_id;
         if (0 == target_id)
-            target_id = static_cast<std::uint32_t>(num_localities);
+            target_id = num_localities;
 
         std::size_t count = 0;      // keep track of number of trials
 
@@ -593,7 +480,7 @@ namespace hpx { namespace components { namespace server
                 {
                     util::unlock_guard<dijkstra_scoped_lock> ul(l);
                     send_dijkstra_termination_token(target_id - 1,
-                        initiating_locality_id, num_localities, false);
+                        initiating_locality_id, num_localities, dijkstra_color_);
                 }
 
                 // wait for token to come back to us
@@ -608,8 +495,8 @@ namespace hpx { namespace components { namespace server
         }
 
         return count;
-    }
 #endif
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::shutdown_all(double timeout)
@@ -658,7 +545,7 @@ namespace hpx { namespace components { namespace server
             "invoked shutdown functions";
 
         // Do a second round of termination detection to synchronize with all
-        // work which was triggered by the invocation of the shutdown
+        // work that was triggered by the invocation of the shutdown
         // functions.
         count = dijkstra_termination_detection(locality_ids);
 
@@ -826,7 +713,7 @@ namespace hpx { namespace components { namespace server
                 util::unlock_guard<std::mutex> ul(mtx_);
 
                 util::yield_while(
-                    [&tm, timeout, &t, start_time, &timed_out]()
+                    [&tm, timeout, &t, start_time, &timed_out]() -> bool
                     {
                         tm.cleanup_terminated(true);
 
@@ -848,7 +735,7 @@ namespace hpx { namespace components { namespace server
                     start_time = t.elapsed();
 
                     util::yield_while(
-                        [&tm, timeout, &t, start_time]()
+                        [&tm, timeout, &t, start_time]() -> bool
                         {
                             tm.abort_all_suspended_threads();
                             tm.cleanup_terminated(true);

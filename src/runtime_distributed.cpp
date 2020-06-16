@@ -293,10 +293,12 @@ namespace hpx {
         }
 
         ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
         void dijkstra_make_black()
         {
             get_runtime_support_ptr()->dijkstra_make_black();
         }
+#endif
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -305,6 +307,8 @@ namespace hpx {
             std::int64_t& background_work_exec_time_receive)
         {
             bool result = false;
+
+#if defined(HPX_HAVE_NETWORKING)
             // count background work duration
             {
                 threads::background_work_duration_counter bg_send_duration(
@@ -331,6 +335,7 @@ namespace hpx {
                     result = true;
                 }
             }
+#endif
 
             if (0 == num_thread)
                 hpx::agas::garbage_collect_non_blocking();
