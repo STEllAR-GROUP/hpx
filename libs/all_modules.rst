@@ -23,7 +23,7 @@ All modules
    /libs/async_base/docs/index.rst
    /libs/async_combinators/docs/index.rst
    /libs/async_local/docs/index.rst
-   /libs/basic_execution/docs/index.rst
+   /libs/execution_base/docs/index.rst
    /libs/batch_environments/docs/index.rst
    /libs/cache/docs/index.rst
    /libs/checkpoint/docs/index.rst
@@ -54,7 +54,7 @@ All modules
    /libs/iterator_support/docs/index.rst
    /libs/itt_notify/docs/index.rst
    /libs/lcos_distributed/docs/index.rst
-   /libs/local_lcos/docs/index.rst
+   /libs/lcos_local/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
    /libs/mpi/docs/index.rst

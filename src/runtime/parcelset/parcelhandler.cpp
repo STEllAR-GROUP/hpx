@@ -20,7 +20,7 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/itt_notify.hpp>
-#include <hpx/local_lcos/promise.hpp>
+#include <hpx/lcos_local/promise.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

@@ -15,9 +15,9 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/local_lcos/and_gate.hpp>
-#include <hpx/modules/basic_execution.hpp>
+#include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/basename_registration.hpp>

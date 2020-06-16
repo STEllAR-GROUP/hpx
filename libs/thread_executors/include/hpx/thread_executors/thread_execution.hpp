@@ -13,10 +13,10 @@
 #if defined(HPX_HAVE_THREAD_EXECUTORS_COMPATIBILITY)
 #include <hpx/assert.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/basic_execution/execution.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
+#include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/current_executor.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>

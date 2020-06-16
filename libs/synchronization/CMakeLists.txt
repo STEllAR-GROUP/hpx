@@ -79,7 +79,7 @@ add_hpx_module(
   DEPENDENCIES
     hpx_config
     hpx_assertion
-    hpx_basic_execution
+    hpx_execution_base
     hpx_concurrency
     hpx_coroutines
     hpx_errors

@@ -7,9 +7,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/debugging/backtrace.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/errors.hpp>

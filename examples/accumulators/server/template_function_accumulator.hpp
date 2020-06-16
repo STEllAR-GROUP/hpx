@@ -9,7 +9,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/local_lcos.hpp>
+#include <hpx/include/lcos_local.hpp>
 
 #include <mutex>
 

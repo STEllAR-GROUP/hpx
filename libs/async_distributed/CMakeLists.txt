@@ -120,7 +120,7 @@ add_hpx_module(
     hpx_functional
     hpx_futures
     hpx_async_local
-    hpx_local_lcos
+    hpx_lcos_local
     hpx_memory
     hpx_runtime_configuration
     hpx_threading_base

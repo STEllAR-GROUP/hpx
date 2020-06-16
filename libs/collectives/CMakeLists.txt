@@ -75,7 +75,7 @@ add_hpx_module(
     hpx_hashing
     hpx_init_runtime
     hpx_iterator_support
-    hpx_local_lcos
+    hpx_lcos_local
     hpx_logging
     hpx_memory
     hpx_pack_traversal

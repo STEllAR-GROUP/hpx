@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>

@@ -6,7 +6,7 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/include/apply.hpp>

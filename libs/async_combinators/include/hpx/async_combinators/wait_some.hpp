@@ -236,7 +236,7 @@ namespace hpx { namespace lcos {
                         shared_state->set_on_completed(util::deferred_call(
                             &wait_some<Sequence>::on_future_ready,
                             wait_.shared_from_this(),
-                            hpx::basic_execution::this_thread::agent()));
+                            hpx::execution_base::this_thread::agent()));
                         return;
                     }
                 }
@@ -292,12 +292,12 @@ namespace hpx { namespace lcos {
           : std::enable_shared_from_this<wait_some<Sequence>>    //-V690
         {
         public:
-            void on_future_ready(hpx::basic_execution::agent_ref ctx)
+            void on_future_ready(hpx::execution_base::agent_ref ctx)
             {
                 if (count_.fetch_add(1) + 1 == needed_count_)
                 {
                     // reactivate waiting thread only if it's not us
-                    if (ctx != hpx::basic_execution::this_thread::agent())
+                    if (ctx != hpx::execution_base::this_thread::agent())
                         ctx.resume();
                     else
                         goal_reached_on_calling_thread_ = true;
@@ -331,7 +331,7 @@ namespace hpx { namespace lcos {
                 if (!goal_reached_on_calling_thread_)
                 {
                     // wait for any of the futures to return to become ready
-                    hpx::basic_execution::this_thread::suspend(
+                    hpx::execution_base::this_thread::suspend(
                         "hpx::detail::wait_some::operator()");
                 }
 

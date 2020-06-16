@@ -21,9 +21,9 @@
 #include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #endif
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>

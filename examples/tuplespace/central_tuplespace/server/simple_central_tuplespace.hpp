@@ -12,7 +12,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/storage/tuple.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/include/local_lcos.hpp>
+#include <hpx/include/lcos_local.hpp>
 
 #include <mutex>
 

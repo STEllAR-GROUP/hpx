@@ -25,7 +25,7 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>

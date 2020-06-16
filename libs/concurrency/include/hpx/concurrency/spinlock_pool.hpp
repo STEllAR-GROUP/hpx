@@ -19,8 +19,8 @@
 #endif
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/hashing/fibhash.hpp>
 #include <hpx/modules/itt_notify.hpp>
 

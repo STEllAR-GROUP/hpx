@@ -10,12 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/debugging/backtrace.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
@@ -533,7 +533,7 @@ namespace hpx { namespace threads {
         ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
         inline coroutine_type::result_type operator()(
-            hpx::basic_execution::this_thread::detail::agent_storage*
+            hpx::execution_base::this_thread::detail::agent_storage*
                 agent_storage);
 
         virtual thread_id_type get_thread_id() const
@@ -718,7 +718,7 @@ namespace hpx { namespace threads {
 namespace hpx { namespace threads {
 
     inline coroutine_type::result_type thread_data::operator()(
-        hpx::basic_execution::this_thread::detail::agent_storage* agent_storage)
+        hpx::execution_base::this_thread::detail::agent_storage* agent_storage)
     {
         if (is_stackless_)
         {

@@ -37,12 +37,12 @@ add_hpx_module(
   HEADERS ${async_mpi_headers}
   DEPENDENCIES
     hpx_assertion
-    hpx_basic_execution
+    hpx_execution_base
     hpx_concurrency
     hpx_config
     hpx_errors
     hpx_execution
-    hpx_local_lcos
+    hpx_lcos_local
     hpx_memory
     hpx_mpi_base
     hpx_runtime_local

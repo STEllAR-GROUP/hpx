@@ -8,7 +8,7 @@
 #include <hpx/synchronization/condition_variable.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
@@ -174,7 +174,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
-        auto this_ctx = hpx::basic_execution::this_thread::agent();
+        auto this_ctx = hpx::execution_base::this_thread::agent();
         queue_entry f(this_ctx, &queue_);
         queue_.push_back(f);
 
@@ -196,7 +196,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         HPX_ASSERT(lock.owns_lock());
 
         // enqueue the request and block this thread
-        auto this_ctx = hpx::basic_execution::this_thread::agent();
+        auto this_ctx = hpx::execution_base::this_thread::agent();
         queue_entry f(this_ctx, &queue_);
         queue_.push_back(f);
 

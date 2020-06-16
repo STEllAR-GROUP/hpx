@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 // Necessary to avoid circular include
-#include <hpx/basic_execution/execution.hpp>
+#include <hpx/execution_base/execution.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>

@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/basic_execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/stop_token.hpp>
@@ -76,7 +76,7 @@ namespace hpx { namespace detail {
         {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
-                hpx::basic_execution::this_thread::yield_k(
+                hpx::execution_base::this_thread::yield_k(
                     k, "stop_state::lock");
                 old_state = state_.load(std::memory_order_relaxed);
             }
@@ -98,7 +98,7 @@ namespace hpx { namespace detail {
         {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
-                hpx::basic_execution::this_thread::yield_k(
+                hpx::execution_base::this_thread::yield_k(
                     k, "stop_state::lock_and_request_stop");
                 old_state = state_.load(std::memory_order_acquire);
 
@@ -130,7 +130,7 @@ namespace hpx { namespace detail {
         {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
-                hpx::basic_execution::this_thread::yield_k(
+                hpx::execution_base::this_thread::yield_k(
                     k, "stop_state::add_callback");
                 old_state = state_.load(std::memory_order_acquire);
 
@@ -214,7 +214,7 @@ namespace hpx { namespace detail {
                      std::memory_order_relaxed);
                  ++k)
             {
-                hpx::basic_execution::this_thread::yield_k(
+                hpx::execution_base::this_thread::yield_k(
                     k, "stop_state::remove_callback");
             }
         }

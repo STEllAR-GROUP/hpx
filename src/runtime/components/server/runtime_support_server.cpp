@@ -45,10 +45,10 @@
 #include <hpx/modules/threadmanager.hpp>
 
 #include <hpx/modules/collectives.hpp>
-#include <hpx/local_lcos/packaged_task.hpp>
+#include <hpx/lcos_local/packaged_task.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
 

@@ -11,7 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/apply.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>

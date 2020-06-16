@@ -10,7 +10,7 @@
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/local_lcos/packaged_task.hpp>
+#include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/modules/timed_execution.hpp>
 #include <hpx/timing/steady_clock.hpp>
 

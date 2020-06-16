@@ -168,7 +168,7 @@ namespace hpx { namespace lcos {
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/modules/basic_execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime_local/get_num_localities.hpp>

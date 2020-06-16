@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/local_lcos/promise.hpp>
+#include <hpx/lcos_local/promise.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

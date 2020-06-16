@@ -27,7 +27,7 @@
 #include <hpx/plugins/parcelport/mpi/sender.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver.hpp>
 
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/util/get_entry_as.hpp>
 

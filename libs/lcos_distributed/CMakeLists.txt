@@ -37,7 +37,7 @@ add_hpx_module(
     hpx_assertion
     hpx_async_distributed
     hpx_config
-    hpx_local_lcos
+    hpx_lcos_local
     hpx_preprocessor
   CMAKE_SUBDIRS examples tests
 )
