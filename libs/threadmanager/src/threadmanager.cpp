@@ -700,6 +700,21 @@ namespace hpx { namespace threads {
         return total_count;
     }
 
+    mask_type threadmanager::get_idle_core_mask()
+    {
+        mask_type mask = mask_type();
+        resize(mask, hardware_concurrency());
+
+        std::lock_guard<mutex_type> lk(mtx_);
+
+        for (auto& pool_iter : pools_)
+        {
+            pool_iter->get_idle_core_mask(mask);
+        }
+
+        return mask;
+    }
+
     std::int64_t threadmanager::get_background_thread_count()
     {
         std::int64_t total_count = 0;

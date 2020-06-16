@@ -1792,6 +1792,21 @@ namespace hpx { namespace threads { namespace detail {
         return count;
     }
 
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::get_idle_core_mask(
+        mask_type& mask) const
+    {
+        std::size_t i = 0;
+        for (auto const& data : counter_data_)
+        {
+            if (!data.tasks_active_ && sched_->Scheduler::is_core_idle(i))
+            {
+                set(mask, i);
+            }
+            ++i;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     void scheduled_thread_pool<Scheduler>::init_perf_counter_data(
