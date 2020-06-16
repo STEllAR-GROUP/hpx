@@ -11,6 +11,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(futures_headers
     hpx/futures/future.hpp
     hpx/futures/futures_factory.hpp
+    hpx/futures/detail/future_data.hpp
+    hpx/futures/detail/future_transforms.hpp
     hpx/futures/packaged_continuation.hpp
     hpx/futures/traits/acquire_future.hpp
     hpx/futures/traits/acquire_shared_state.hpp
@@ -54,6 +56,8 @@ add_hpx_module(
   SOURCES ${futures_sources}
   HEADERS ${futures_headers}
   COMPAT_HEADERS ${futures_compat_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER "hpx/futures/detail/future_data.hpp"
+                             "hpx/futures/detail/future_transforms.hpp"
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion

@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
     public:
         typedef util::unique_function_nonser<void()> completed_callback_type;
-        typedef boost::container::small_vector<completed_callback_type, 3>
+        typedef boost::container::small_vector<completed_callback_type, 1>
             completed_callback_vector_type;
 
         typedef void has_future_data_refcnt_base;
