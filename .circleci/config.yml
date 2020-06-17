@@ -632,6 +632,7 @@ jobs:
                   tests.unit.modules.assertion \
                   tests.unit.modules.async_distributed \
                   tests.unit.modules.async_combinators \
+                  tests.unit.modules.execution \
                   tests.unit.modules.execution_base \
                   tests.unit.modules.batch_environments \
                   tests.unit.modules.cache \
@@ -700,7 +701,6 @@ jobs:
                   -E \
               "tests.unit.modules.algorithms|\
               tests.unit.modules.compute_cuda|\
-              tests.unit.modules.execution|\
               tests.unit.modules.segmented_algorithms|\
               tests.unit.modules.compute.numa_allocator"
 
@@ -740,32 +740,6 @@ jobs:
           path: tests.unit.modules.algorithms
       - store_artifacts:
           path: tests.unit.modules.algorithms
-
-  tests.unit.modules.execution:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.modules.execution
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.execution
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.modules.execution
-      - store_artifacts:
-          path: tests.unit.modules.execution
 
   tests.unit.modules.segmented_algorithms:
     <<: *defaults
@@ -1043,8 +1017,6 @@ workflows:
           <<: *core_dependency
       - tests.unit.modules.algorithms:
           <<: *core_dependency
-      - tests.unit.modules.execution:
-          <<: *core_dependency
       - tests.unit.modules.segmented_algorithms:
           <<: *core_dependency
       - tests.regressions:
@@ -1077,7 +1049,6 @@ workflows:
             - tests.unit.util
             - tests.unit.modules
             - tests.unit.modules.algorithms
-            - tests.unit.modules.execution
             - tests.unit.modules.segmented_algorithms
             - tests.headers
             - tests.headers.modules
