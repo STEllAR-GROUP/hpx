@@ -74,6 +74,8 @@ function(hpx_perform_cxx_feature_tests)
   # C++20 feature tests
   hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
+  hpx_check_for_cxx20_disable_sized_sentinel_for(DEFINITIONS HPX_HAVE_CXX20_DISABLE_SIZED_SENTINEL_FOR)
+
   # Check the availability of certain C++ builtins
   hpx_check_for_builtin_integer_pack(DEFINITIONS HPX_HAVE_BUILTIN_INTEGER_PACK)
 
