@@ -21,7 +21,6 @@ set(collectives_headers
     hpx/collectives/broadcast.hpp
     hpx/collectives/broadcast_direct.hpp
     hpx/collectives/detail/communicator.hpp
-    hpx/collectives/force_linking.hpp
     hpx/collectives/fold.hpp
     hpx/collectives/gather.hpp
     hpx/collectives/latch.hpp
@@ -44,8 +43,8 @@ set(collectives_compat_headers
 )
 
 # Default location is $HPX_ROOT/libs/collectives/src
-set(collectives_sources barrier.cpp force_linking.cpp latch.cpp
-                        detail/barrier_node.cpp detail/communicator.cpp
+set(collectives_sources barrier.cpp latch.cpp detail/barrier_node.cpp
+                        detail/communicator.cpp
 )
 
 include(HPX_AddModule)

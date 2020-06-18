@@ -23,7 +23,7 @@ include(HPX_AddModule)
 add_hpx_module(
   debugging
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${debugging_sources}
   HEADERS ${debugging_headers}

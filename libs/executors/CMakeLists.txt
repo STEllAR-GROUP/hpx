@@ -21,7 +21,6 @@ set(executors_headers
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_fwd.hpp
     hpx/executors/execution_policy.hpp
-    hpx/executors/force_linking.hpp
     hpx/executors/limiting_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
@@ -59,9 +58,7 @@ set(executors_compat_headers
     hpx/parallel/executors/thread_pool_attached_executors.hpp
 )
 
-set(executors_sources current_executor.cpp exception_list_callbacks.cpp
-                      force_linking.cpp
-)
+set(executors_sources current_executor.cpp exception_list_callbacks.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

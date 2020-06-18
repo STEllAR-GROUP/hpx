@@ -42,7 +42,6 @@ set(serialization_headers
     hpx/serialization/deque.hpp
     hpx/serialization/dynamic_bitset.hpp
     hpx/serialization/exception_ptr.hpp
-    hpx/serialization/force_linking.hpp
     hpx/serialization/list.hpp
     hpx/serialization/map.hpp
     hpx/serialization/multi_array.hpp
@@ -148,7 +147,6 @@ set(serialization_sources
     detail/polymorphic_intrusive_factory.cpp
     detail/polymorphic_nonintrusive_factory.cpp
     exception_ptr.cpp
-    force_linking.cpp
     serializable_any.cpp
 )
 

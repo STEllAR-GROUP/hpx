@@ -41,7 +41,7 @@ include(HPX_AddModule)
 add_hpx_module(
   errors
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${errors_sources}
   HEADERS ${errors_headers}

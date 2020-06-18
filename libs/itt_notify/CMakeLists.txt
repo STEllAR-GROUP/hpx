@@ -22,7 +22,7 @@ include(HPX_AddModule)
 add_hpx_module(
   itt_notify
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   SOURCES ${itt_notify_sources}
   HEADERS ${itt_notify_headers}

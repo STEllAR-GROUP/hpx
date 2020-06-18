@@ -24,7 +24,7 @@ include(HPX_AddModule)
 add_hpx_module(
   distributed_executors
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${distributed_executors_headers}
   COMPAT_HEADERS ${distributed_executors_compat_headers}

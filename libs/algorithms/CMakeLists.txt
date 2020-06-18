@@ -146,7 +146,7 @@ include(HPX_AddModule)
 add_hpx_module(
   algorithms
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
   SOURCES ${algorithms_sources}

@@ -15,13 +15,12 @@ set(resiliency_headers
     hpx/resiliency/config.hpp
     hpx/resiliency/dataflow_replay.hpp
     hpx/resiliency/dataflow_replicate.hpp
-    hpx/resiliency/force_linking.hpp
     hpx/resiliency/version.hpp
     hpx/resiliency/resiliency.hpp
 )
 
 # Default location is $HPX_ROOT/libs/resiliency/src
-set(resiliency_sources force_linking.cpp resiliency.cpp)
+set(resiliency_sources resiliency.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

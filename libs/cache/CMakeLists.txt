@@ -45,7 +45,7 @@ include(HPX_AddModule)
 add_hpx_module(
   cache
   COMPATIBILITY_HEADERS ON # Added in 1.4.0
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   SOURCES ${cache_sources}
   HEADERS ${cache_headers}
   COMPAT_HEADERS ${cache_compat_headers}

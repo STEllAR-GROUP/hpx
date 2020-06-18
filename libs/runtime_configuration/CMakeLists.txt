@@ -38,7 +38,7 @@ include(HPX_AddModule)
 add_hpx_module(
   runtime_configuration
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${runtime_configuration_sources}
   HEADERS ${runtime_configuration_headers}

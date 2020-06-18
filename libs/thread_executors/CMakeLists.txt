@@ -18,7 +18,6 @@ set(thread_executors_headers
     hpx/thread_executors/detail/on_self_reset.hpp
     hpx/thread_executors/embedded_thread_pool_executors.hpp
     hpx/thread_executors/executors.hpp
-    hpx/thread_executors/force_linking.hpp
     hpx/thread_executors/guided_pool_executor.hpp
     hpx/thread_executors/limiting_executor.hpp
     hpx/thread_executors/manage_thread_executor.hpp
@@ -54,7 +53,7 @@ set(thread_executors_compat_headers
 )
 
 set(thread_executors_sources
-    embedded_thread_pool_executors.cpp force_linking.cpp resource_manager.cpp
+    embedded_thread_pool_executors.cpp resource_manager.cpp
     this_thread_executors.cpp thread_executor.cpp thread_pool_os_executors.cpp
 )
 

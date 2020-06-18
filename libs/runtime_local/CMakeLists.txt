@@ -12,7 +12,6 @@ set(runtime_local_headers
     hpx/runtime_local/config_entry.hpp
     hpx/runtime_local/custom_exception_info.hpp
     hpx/runtime_local/debugging.hpp
-    hpx/runtime_local/force_linking.hpp
     hpx/runtime_local/get_locality_id.hpp
     hpx/runtime_local/get_num_localities.hpp
     hpx/runtime_local/get_os_thread_count.hpp
@@ -67,7 +66,6 @@ set(runtime_local_compat_headers
 set(runtime_local_sources
     custom_exception_info.cpp
     debugging.cpp
-    force_linking.cpp
     interval_timer.cpp
     os_thread_type.cpp
     runtime_handlers.cpp

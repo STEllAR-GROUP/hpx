@@ -17,7 +17,6 @@ set(program_options_headers
     hpx/program_options/environment_iterator.hpp
     hpx/program_options/eof_iterator.hpp
     hpx/program_options/errors.hpp
-    hpx/program_options/force_linking.hpp
     hpx/program_options/option.hpp
     hpx/program_options/options_description.hpp
     hpx/program_options/parsers.hpp
@@ -40,7 +39,6 @@ set(program_options_sources
     cmdline.cpp
     config_file.cpp
     convert.cpp
-    force_linking.cpp
     options_description.cpp
     parsers.cpp
     positional_options.cpp

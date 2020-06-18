@@ -38,7 +38,7 @@ set(compute_cuda_sources)
 
 include(HPX_AddModule)
 add_hpx_module(
-  compute_cuda FORCE_LINKING_GEN
+  compute_cuda
   GLOBAL_HEADER_GEN OFF
   CUDA
   SOURCES ${compute_cuda_sources}

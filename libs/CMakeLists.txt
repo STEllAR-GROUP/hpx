@@ -133,10 +133,6 @@ hpx_info("Configuring modules:")
 # optional based on the presence of a library or not
 set(MODULE_ENABLED_LIB_DEFINES)
 
-# variables needed for modules.cpp
-set(MODULE_FORCE_LINKING_INCLUDES)
-set(MODULE_FORCE_LINKING_CALLS)
-
 # variables needed for config_strings_modules.hpp
 set(CONFIG_STRINGS_MODULES_INCLUDES)
 set(CONFIG_STRINGS_MODULES_ENTRIES)
@@ -160,14 +156,6 @@ foreach(lib ${HPX_CANDIDATE_LIBS})
         "${MODULE_ENABLED_LIB_DEFINES}#define HPX_HAVE_LIB_${uppercase_lib}\n"
     )
 
-    set(MODULE_FORCE_LINKING_INCLUDES
-        "${MODULE_FORCE_LINKING_INCLUDES}#include <hpx/${lib}/force_linking.hpp>\n"
-    )
-
-    set(MODULE_FORCE_LINKING_CALLS
-        "${MODULE_FORCE_LINKING_CALLS}\n        ${lib}::force_linking();"
-    )
-
     set(CONFIG_STRINGS_MODULES_INCLUDES
         "${CONFIG_STRINGS_MODULES_INCLUDES}#include <hpx/${lib}/config/config_strings.hpp>\n"
     )
@@ -180,9 +168,4 @@ endforeach()
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/libs_enabled.hpp.in"
   "${PROJECT_BINARY_DIR}/libs/config/include/hpx/config/libs_enabled.hpp" @ONLY
-)
-
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/modules.cpp.in"
-  "${PROJECT_BINARY_DIR}/libs/modules.cpp" @ONLY
 )

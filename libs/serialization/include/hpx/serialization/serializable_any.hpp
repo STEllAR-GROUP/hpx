@@ -426,9 +426,6 @@ namespace hpx { namespace util {
         HPX_EXPORT std::size_t
         operator()(const basic_any<serialization::input_archive,
             serialization::output_archive, Char, std::true_type>& elem) const;
-
-        // this is just to force linking with serializable_any.cpp
-        HPX_EXPORT static void dummy();
     };
 }}    // namespace hpx::util
 

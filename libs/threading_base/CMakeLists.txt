@@ -83,7 +83,7 @@ include(HPX_AddModule)
 add_hpx_module(
   threading_base
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/threading_base/thread_data_stackful.hpp"
                              "hpx/threading_base/thread_data_stackless.hpp"

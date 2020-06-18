@@ -21,7 +21,6 @@ include(HPX_AddModule)
 add_hpx_module(
   version
   COMPATIBILITY_HEADERS OFF
-  FORCE_LINKING_GEN
   GLOBAL_HEADER_GEN OFF
   SOURCES ${version_sources}
   HEADERS ${version_headers}

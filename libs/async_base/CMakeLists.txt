@@ -24,7 +24,7 @@ include(HPX_AddModule)
 add_hpx_module(
   async_base
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_base_headers}
   COMPAT_HEADERS ${async_base_compat_headers}

@@ -35,7 +35,7 @@ include(HPX_AddModule)
 add_hpx_module(
   iterator_support
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/iterator_support/traits/is_iterator.hpp"
                              "hpx/iterator_support/traits/is_range.hpp"

@@ -149,9 +149,6 @@ namespace hpx { namespace threads { namespace executors {
             policies::detail::affinity_data const& affinity_data,
             util::optional<policies::callback_notifier> notifier =
                 util::nullopt);
-
-        // this is defined to force linking only
-        static void dummy();
     };
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)

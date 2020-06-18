@@ -25,7 +25,7 @@ include(HPX_AddModule)
 add_hpx_module(
   timed_execution
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${timed_execution_headers}
   COMPAT_HEADERS ${timed_execution_compat_headers}
