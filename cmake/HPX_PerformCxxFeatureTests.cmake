@@ -2,6 +2,7 @@
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
+# Copyright (c)      2020 Giannis Gonidelis
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -74,7 +75,9 @@ function(hpx_perform_cxx_feature_tests)
   # C++20 feature tests
   hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
-  hpx_check_for_cxx20_disable_sized_sentinel_for(DEFINITIONS HPX_HAVE_CXX20_DISABLE_SIZED_SENTINEL_FOR)
+  hpx_check_for_cxx20_std_disable_sized_sentinel_for(
+    DEFINITIONS HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
+  )
 
   # Check the availability of certain C++ builtins
   hpx_check_for_builtin_integer_pack(DEFINITIONS HPX_HAVE_BUILTIN_INTEGER_PACK)

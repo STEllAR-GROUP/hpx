@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <iterator>
 
@@ -14,7 +15,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     // provide implementation of std::distance supporting iterators/sentinels
     template <typename InIterB, typename InIterE>
     constexpr inline typename std::iterator_traits<InIterB>::difference_type
-    distance(InIterB first, InIterE last, std::input_iterator_tag)
+    distance(InIterB first, InIterE last, std::false_type)
     {
         typename std::iterator_traits<InIterB>::difference_type offset = 0;
         for (/**/; first != last; ++first)
@@ -26,7 +27,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename RanIterB, typename RanIterE>
     constexpr inline typename std::iterator_traits<RanIterB>::difference_type
-    distance(RanIterB first, RanIterE last, std::random_access_iterator_tag)
+    distance(RanIterB first, RanIterE last, std::true_type)
     {
         return last - first;
     }
@@ -36,6 +37,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     distance(InIterB first, InIterE last)
     {
         return distance(first, last,
-            typename std::iterator_traits<InIterB>::iterator_category{});
+            typename hpx::traits::is_sized_sentinel_for<InIterE, InIterB>::type{});
     }
 }}}}    // namespace hpx::parallel::v1::detail

@@ -10,7 +10,8 @@
 
 int main()
 {
-    inline constexpr bool b = std::disable_sized_sentinel_for<void, void>;
+    constexpr bool b = std::disable_sized_sentinel_for<void, void>;
+    (void) b;
 
     return 0;
 }
