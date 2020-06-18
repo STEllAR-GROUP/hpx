@@ -11,9 +11,9 @@
 
 #if defined(HPX_HAVE_CUDA)
 #include <hpx/assert.hpp>
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
 #include <hpx/compute/cuda/detail/scoped_active_target.hpp>
-#include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/cuda/target_ptr.hpp>
 #include <hpx/compute/cuda/value_proxy.hpp>
 #include <hpx/modules/errors.hpp>
@@ -58,10 +58,10 @@ namespace hpx { namespace compute { namespace cuda {
         typedef std::true_type is_always_equal;
         typedef std::true_type propagate_on_container_move_assignment;
 
-        typedef cuda::target target_type;
+        typedef hpx::cuda::target target_type;
 
         allocator()
-          : target_(cuda::get_default_target())
+          : target_(hpx::cuda::get_default_target())
         {
         }
 

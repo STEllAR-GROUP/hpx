@@ -486,9 +486,35 @@ hpx_option(
 )
 
 # ##############################################################################
-# HPX Compute configuration
+# HPX CUDA Compute configuration
 # ##############################################################################
-hpx_option(HPX_WITH_CUDA BOOL "Enable CUDA support (default: OFF)" OFF ADVANCED)
+# To avoid writing these strings out in multiple places, use vars to hold them
+set(CUDA_OPTION_STRING "Enable HPX_WITH_ASYNC_CUDA (CUDA futures) and\
+ HPX_WITH_CUDA_COMPUTE (CUDA enabled parallel algorithms) (default: OFF)"
+)
+set(CUDA_COMPUTE_STRING
+    "Enable HPX CUDA compute capability (parallel algorithms) module (default: OFF) -\
+ note: enabling this also enables CUDA futures via HPX_WITH_ASYNC_CUDA"
+)
+set(ASYNC_CUDA_STRING
+    "Enable HPX CUDA compute capability (parallel algorithms) module (default: OFF) -\
+ note: CUDA futures may be used without CUDA Compute"
+)
+hpx_option(HPX_WITH_CUDA BOOL "${CUDA_OPTION_STRING}" OFF ADVANCED)
+hpx_option(HPX_WITH_CUDA_COMPUTE BOOL "${CUDA_COMPUTE_STRING}" OFF ADVANCED)
+hpx_option(HPX_WITH_ASYNC_CUDA BOOL "${ASYNC_CUDA_STRING}" OFF ADVANCED)
+# if HPX_WITH_CUDA is ON, then enable both (sub) options
+if(HPX_WITH_CUDA)
+  set(HPX_WITH_CUDA_COMPUTE
+      ON
+      CACHE BOOL "${CUDA_COMPUTE_STRING}" FORCE
+  )
+  set(HPX_WITH_ASYNC_CUDA
+      ON
+      CACHE BOOL "${ASYNC_CUDA_STRING}" FORCE
+  )
+endif()
+
 hpx_option(
   HPX_WITH_CUDA_CLANG BOOL "Use clang to compile CUDA code (default: OFF)" OFF
   ADVANCED

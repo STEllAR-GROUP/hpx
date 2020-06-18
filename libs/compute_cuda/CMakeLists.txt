@@ -6,35 +6,35 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+if(NOT HPX_WITH_CUDA_COMPUTE)
+  return()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-if(HPX_WITH_CUDA)
-  set(compute_cuda_headers
-      hpx/compute/cuda/allocator.hpp
-      hpx/compute/cuda/concurrent_executor.hpp
-      hpx/compute/cuda/concurrent_executor_parameters.hpp
-      hpx/compute/cuda/default_executor.hpp
-      hpx/compute/cuda/default_executor_parameters.hpp
-      hpx/compute/cuda/detail/launch.hpp
-      hpx/compute/cuda/detail/scoped_active_target.hpp
-      hpx/compute/cuda/get_targets.hpp
-      hpx/compute/cuda.hpp
-      hpx/compute/cuda/serialization/value_proxy.hpp
-      hpx/compute/cuda/target_distribution_policy.hpp
-      hpx/compute/cuda/target.hpp
-      hpx/compute/cuda/target_ptr.hpp
-      hpx/compute/cuda/traits/access_target.hpp
-      hpx/compute/cuda/transfer.hpp
-      hpx/compute/cuda/value_proxy.hpp
-      hpx/compute/detail/get_proxy_type.hpp
-      hpx/compute/detail/iterator.hpp
-      hpx/compute/detail/target_distribution_policy.hpp
-  )
+set(compute_cuda_headers
+    hpx/compute/cuda/allocator.hpp
+    hpx/compute/cuda/concurrent_executor.hpp
+    hpx/compute/cuda/concurrent_executor_parameters.hpp
+    hpx/compute/cuda/default_executor.hpp
+    hpx/compute/cuda/default_executor_parameters.hpp
+    hpx/compute/cuda/detail/launch.hpp
+    hpx/compute/cuda/detail/scoped_active_target.hpp
+    hpx/compute/cuda.hpp
+    hpx/compute/cuda/serialization/value_proxy.hpp
+    hpx/compute/cuda/target_distribution_policy.hpp
+    hpx/compute/cuda/target_ptr.hpp
+    hpx/compute/cuda/traits/access_target.hpp
+    hpx/compute/cuda/transfer.hpp
+    hpx/compute/cuda/value_proxy.hpp
+    hpx/compute/detail/get_proxy_type.hpp
+    hpx/compute/detail/iterator.hpp
+    hpx/compute/detail/target_distribution_policy.hpp
+)
 
-  set(compute_cuda_compat_headers)
+set(compute_cuda_compat_headers)
 
-  set(compute_cuda_sources cuda_target.cpp get_cuda_targets.cpp)
-endif()
+set(compute_cuda_sources)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -47,6 +47,7 @@ add_hpx_module(
     hpx_allocator_support
     hpx_assertion
     hpx_compute
+    hpx_async_cuda
     hpx_config
     hpx_errors
     hpx_execution

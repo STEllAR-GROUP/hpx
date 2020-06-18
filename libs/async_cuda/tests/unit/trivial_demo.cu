@@ -6,6 +6,8 @@
 #include "cuda_runtime.h"
 #include <boost/preprocessor/seq/for_each.hpp>
 
+#include <iostream>
+
 // Here is a trivial kernel that can be invoked on the GPU
 template <typename T>
 __global__ void trivial_kernel(T val) {
@@ -16,7 +18,9 @@ __global__ void trivial_kernel(T val) {
 template <typename T>
 void cuda_trivial_kernel(T t, cudaStream_t stream)
 {
-  trivial_kernel<<<1, 1, 0, stream>>>(t);
+    trivial_kernel<<<1, 1, 0, stream>>>(t);
+    cudaDeviceSynchronize();
+
 }
 
 // -------------------------------------------------------------------------

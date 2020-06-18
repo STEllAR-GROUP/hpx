@@ -21,10 +21,10 @@
 
 #include <hpx/execution/executors/execution.hpp>
 
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/cuda/default_executor_parameters.hpp>
 #include <hpx/compute/cuda/detail/launch.hpp>
-#include <hpx/compute/cuda/target.hpp>
 #include <hpx/compute/vector.hpp>
 
 #include <algorithm>
@@ -41,7 +41,7 @@ namespace hpx { namespace compute { namespace cuda {
         struct bulk_launch_helper
         {
             template <typename F, typename... Ts>
-            static void call(cuda::target const& target, F&& f,
+            static void call(hpx::cuda::target const& target, F&& f,
                 Shape const& shape, Ts&&... ts)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
@@ -89,7 +89,7 @@ namespace hpx { namespace compute { namespace cuda {
                 hpx::traits::is_iterator<Iterator>::value>::type>
         {
             template <typename F, typename Shape, typename... Ts>
-            static void call(cuda::target const& target, F&& f,
+            static void call(hpx::cuda::target const& target, F&& f,
                 Shape const& shape, Ts&&... ts)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
@@ -138,7 +138,7 @@ namespace hpx { namespace compute { namespace cuda {
         // bulk-shape ranges for the accelerator.
         typedef default_executor_parameters executor_parameters_type;
 
-        default_executor(cuda::target const& target)
+        default_executor(hpx::cuda::target const& target)
           : target_(target)
         {
         }
@@ -154,7 +154,7 @@ namespace hpx { namespace compute { namespace cuda {
             return !(*this == rhs);
         }
 
-        cuda::target const& context() const noexcept
+        hpx::cuda::target const& context() const noexcept
         {
             return target_;
         }
@@ -176,7 +176,7 @@ namespace hpx { namespace compute { namespace cuda {
         hpx::future<void> async_execute(F&& f, Ts&&... ts) const
         {
             post(std::forward<F>(f), std::forward<Ts>(ts)...);
-            return target_.get_future();
+            return target_.get_future_with_callback();
         }
 
         template <typename F, typename... Ts>
@@ -200,7 +200,7 @@ namespace hpx { namespace compute { namespace cuda {
             bulk_launch(std::forward<F>(f), shape, std::forward<Ts>(ts)...);
 
             std::vector<hpx::future<void>> result;
-            result.push_back(target_.get_future());
+            result.push_back(target_.get_future_with_callback());
             return result;
         }
 
@@ -211,18 +211,18 @@ namespace hpx { namespace compute { namespace cuda {
             target_.synchronize();
         }
 
-        cuda::target& target()
+        hpx::cuda::target& target()
         {
             return target_;
         }
 
-        cuda::target const& target() const
+        hpx::cuda::target const& target() const
         {
             return target_;
         }
 
     private:
-        cuda::target target_;
+        hpx::cuda::target target_;
     };
 }}}    // namespace hpx::compute::cuda
 

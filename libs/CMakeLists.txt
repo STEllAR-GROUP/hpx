@@ -17,10 +17,10 @@ set(HPX_CANDIDATE_LIBS
     allocator_support
     asio
     assertion
-    async_distributed
     async_base
     async_combinators
-    execution_base
+    async_cuda
+    async_distributed
     batch_environments
     cache
     checkpoint
@@ -38,6 +38,7 @@ set(HPX_CANDIDATE_LIBS
     distributed_executors
     errors
     execution
+    execution_base
     executors
     filesystem
     format

@@ -6,11 +6,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
-
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/compute/cuda/target.hpp>
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
@@ -37,35 +35,7 @@
 
 #include <cuda_runtime.h>
 
-namespace hpx { namespace compute { namespace cuda {
-    namespace detail {
-        runtime_registration_wrapper::runtime_registration_wrapper(
-            hpx::runtime* rt)
-          : rt_(rt)
-        {
-            HPX_ASSERT(rt);
-
-            // Register this thread with HPX, this should be done once for
-            // each external OS-thread intended to invoke HPX functionality.
-            // Calling this function more than once on the same thread will
-            // report an error.
-            hpx::error_code ec(hpx::lightweight);    // ignore errors
-            hpx::register_thread(rt_, "cuda", ec);
-        }
-
-        runtime_registration_wrapper::~runtime_registration_wrapper()
-        {
-            // Unregister the thread from HPX, this should be done once in
-            // the end before the external thread exists.
-            hpx::unregister_thread(rt_);
-        }
-
-        hpx::future<void> get_future(cudaStream_t stream)
-        {
-            return get_future(hpx::util::internal_allocator<>{}, stream);
-        }
-    }    // namespace detail
-
+namespace hpx { namespace cuda {
     void target::native_handle_type::init_processing_units()
     {
         cudaDeviceProp props;
@@ -73,8 +43,7 @@ namespace hpx { namespace compute { namespace cuda {
         if (error != cudaSuccess)
         {
             // report error
-            HPX_THROW_EXCEPTION(kernel_error,
-                "cuda::default_executor::processing_units_count()",
+            HPX_THROW_EXCEPTION(kernel_error, "cuda::init_processing_unit()",
                 std::string("cudaGetDeviceProperties failed: ") +
                     cudaGetErrorString(error));
         }
@@ -228,9 +197,14 @@ namespace hpx { namespace compute { namespace cuda {
         }
     }
 
-    hpx::future<void> target::get_future() const
+    hpx::future<void> target::get_future_with_event() const
     {
-        return detail::get_future(handle_.get_stream());
+        return detail::get_future_with_event(handle_.get_stream());
+    }
+
+    hpx::future<void> target::get_future_with_callback() const
+    {
+        return detail::get_future_with_callback(handle_.get_stream());
     }
 
     target& get_default_target()
@@ -253,6 +227,4 @@ namespace hpx { namespace compute { namespace cuda {
         ar << handle_.device_ << locality_;
     }
 #endif
-}}}    // namespace hpx::compute::cuda
-
-#endif
+}}    // namespace hpx::cuda

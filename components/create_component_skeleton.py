@@ -194,7 +194,7 @@ if(HPX_WITH_TESTS)
   endif()
 
   if (HPX_WITH_TESTS_HEADERS)
-    add_custom_target(tests.headers.components)
+    add_hpx_pseudo_target(tests.headers.components)
     add_hpx_pseudo_dependencies(tests.headers tests.headers.components)
   endif()
 endif()
