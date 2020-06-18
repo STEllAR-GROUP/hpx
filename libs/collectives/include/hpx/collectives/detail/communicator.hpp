@@ -169,9 +169,6 @@ namespace hpx { namespace lcos { namespace detail {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t num_values = std::size_t(-1));
-
-    // force linking only
-    HPX_EXPORT void dummy();
 }}}    // namespace hpx::lcos::detail
 
 #endif    // COMPUTE_HOST_CODE

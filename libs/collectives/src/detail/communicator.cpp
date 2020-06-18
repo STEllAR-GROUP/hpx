@@ -32,10 +32,6 @@ HPX_REGISTER_COMPONENT(collectives_component);
 namespace hpx { namespace lcos { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    // force linking only
-    void dummy() {}
-
-    ///////////////////////////////////////////////////////////////////////////
     hpx::future<hpx::id_type> register_communicator_name(
         hpx::future<hpx::id_type>&& f, std::string basename, std::size_t site)
     {
