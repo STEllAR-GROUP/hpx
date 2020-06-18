@@ -12,6 +12,7 @@ set(subdirs
     async_io
     balancing
     cancelable_action
+    distributed_stencil
     future_reduce
     heartbeat
     jacobi
