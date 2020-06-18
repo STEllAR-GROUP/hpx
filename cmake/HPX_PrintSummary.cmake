@@ -28,7 +28,9 @@ function(create_configuration_summary message module_name)
     list(REMOVE_DUPLICATES DEFINITIONS_VARS)
   endif()
 
-  get_cmake_property(_variableNames CACHE_VARIABLES)
+  get_property(
+    _variableNames GLOBAL PROPERTY HPX_MODULE_CONFIG_${module_name_uc}
+  )
   foreach(_variableName ${_variableNames})
     if(${_variableName}Category)
 

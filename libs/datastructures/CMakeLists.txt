@@ -10,7 +10,9 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 hpx_option(
   HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE BOOL
   "Enable compatibility of hpx::util::tuple with std::tuple. (default: ON)" ON
-  ADVANCED CATEGORY "Modules"
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE DATASTRUCTURES
 )
 
 if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE)
