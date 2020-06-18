@@ -14,7 +14,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 

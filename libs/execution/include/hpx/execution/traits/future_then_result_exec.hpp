@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_then_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>

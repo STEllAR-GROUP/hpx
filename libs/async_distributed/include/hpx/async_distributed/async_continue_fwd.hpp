@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>

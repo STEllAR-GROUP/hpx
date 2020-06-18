@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>

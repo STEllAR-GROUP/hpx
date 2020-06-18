@@ -17,7 +17,7 @@
 #endif
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/type_support/identity.hpp>

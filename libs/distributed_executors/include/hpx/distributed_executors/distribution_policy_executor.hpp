@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/server/invoke_function.hpp>
