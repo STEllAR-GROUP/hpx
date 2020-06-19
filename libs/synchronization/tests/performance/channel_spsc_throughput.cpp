@@ -28,7 +28,11 @@ struct data
     int data_[8];
 };
 
+#if HPX_DEBUG
+constexpr int NUM_TESTS = 1000000;
+#else
 constexpr int NUM_TESTS = 100000000;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 inline data channel_get(hpx::lcos::local::channel_spsc<data> const& c)

@@ -53,7 +53,7 @@ int hpx_main(int argc, char* argv[])
         // Suspend and resume pool with future
         hpx::util::high_resolution_timer t;
 
-        while (t.elapsed() < 2)
+        while (t.elapsed() < 1)
         {
             std::vector<hpx::future<void>> fs;
 
@@ -76,7 +76,7 @@ int hpx_main(int argc, char* argv[])
         hpx::lcos::local::counting_semaphore sem;
         hpx::util::high_resolution_timer t;
 
-        while (t.elapsed() < 2)
+        while (t.elapsed() < 1)
         {
             std::vector<hpx::future<void>> fs;
 
@@ -104,7 +104,7 @@ int hpx_main(int argc, char* argv[])
         // Suspend pool with some threads already suspended
         hpx::util::high_resolution_timer t;
 
-        while (t.elapsed() < 2)
+        while (t.elapsed() < 1)
         {
             for (std::size_t thread_num = 0;
                  thread_num < worker_pool_threads - 1; ++thread_num)
