@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Adrian Serio
 //
-//  SPDX-License-Identifier: BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -11,7 +11,7 @@
 /// instances of the objects.
 //
 
-/// \file hpx/util/checkpoint.hpp
+/// \file hpx/checkpoint/checkpoint.hpp
 
 #pragma once
 
@@ -27,11 +27,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <iosfwd>
 #include <memory>
-#include <sstream>
-#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -69,10 +66,13 @@ namespace hpx { namespace util {
 
         // Serialization Definition
         friend class hpx::serialization::access;
+
         template <typename Archive>
         void serialize(Archive& arch, const unsigned int version)
         {
-            arch& data_;
+            // clang-format off
+            arch & data_;
+            // clang-format on
         }
 
         friend struct detail::save_funct_obj;
@@ -82,43 +82,24 @@ namespace hpx { namespace util {
 
     public:
         checkpoint() = default;
-        checkpoint(checkpoint const& c)
-          : data_(c.data_)
-        {
-        }
-        checkpoint(checkpoint&& c) noexcept
-          : data_(std::move(c.data_))
-        {
-        }
         ~checkpoint() = default;
+
+        checkpoint(checkpoint const& c) = default;
+        checkpoint(checkpoint&& c) noexcept = default;
 
         // Other Constructors
         checkpoint(std::vector<char> const& vec)
           : data_(vec)
         {
         }
-        checkpoint(std::vector<char>&& vec)
+        checkpoint(std::vector<char>&& vec) noexcept
           : data_(std::move(vec))
         {
         }
 
         // Overloads
-        checkpoint& operator=(checkpoint const& c)
-        {
-            if (&c != this)
-            {
-                data_ = c.data_;
-            }
-            return *this;
-        }
-        checkpoint& operator=(checkpoint&& c) noexcept
-        {
-            if (&c != this)
-            {
-                data_ = std::move(c.data_);
-            }
-            return *this;
-        }
+        checkpoint& operator=(checkpoint const& c) = default;
+        checkpoint& operator=(checkpoint&& c) noexcept = default;
 
         friend bool operator==(checkpoint const& lhs, checkpoint const& rhs)
         {
@@ -133,19 +114,28 @@ namespace hpx { namespace util {
         //  expose iterators to access data held by checkpoint
         using const_iterator = std::vector<char>::const_iterator;
 
-        const_iterator begin() const
+        const_iterator begin() const noexcept
         {
             return data_.begin();
         }
-        const_iterator end() const
+        const_iterator end() const noexcept
         {
             return data_.end();
         }
 
         // Functions
-        size_t size() const
+        std::size_t size() const noexcept
         {
             return data_.size();
+        }
+
+        char* data() noexcept
+        {
+            return data_.data();
+        }
+        char const* data() const noexcept
+        {
+            return data_.data();
         }
     };
 
@@ -173,11 +163,11 @@ namespace hpx { namespace util {
     inline std::ostream& operator<<(std::ostream& ost, checkpoint const& ckp)
     {
         // Write the size of the checkpoint to the file
-        std::int64_t size = ckp.size();
+        std::int64_t size = static_cast<std::int64_t>(ckp.size());
         ost.write(reinterpret_cast<char const*>(&size), sizeof(std::int64_t));
 
         // Write the file to the stream
-        ost.write(ckp.data_.data(), ckp.size());
+        ost.write(ckp.data(), ckp.size());
         return ost;
     }
 
@@ -211,7 +201,7 @@ namespace hpx { namespace util {
         ckp.data_.resize(length);
 
         // Read in the next checkpoint
-        ist.read(ckp.data_.data(), length);
+        ist.read(ckp.data(), length);
         return ist;
     }
 
@@ -222,7 +212,7 @@ namespace hpx { namespace util {
         template <typename T,
             typename U = typename std::enable_if<!hpx::traits::is_client<
                 typename std::decay<T>::type>::value>::type>
-        T&& prep(T&& t)
+        T&& prep(T&& t) noexcept
         {
             return std::forward<T>(t);
         }
@@ -253,7 +243,7 @@ namespace hpx { namespace util {
 
                 // Serialize data
 
-                // Trick to expand the variable pack, akes advantage of the
+                // Trick to expand the variable pack, takes advantage of the
                 // comma operator.
                 int const sequencer[] = {0, (ar << ts, 0)...};
                 (void) sequencer;    // Suppress unused param. warnings
