@@ -20,10 +20,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename Result, typename F>
     struct partitioner_iteration
     {
-        typename std::decay<F>::type f_;
+        mutable typename std::decay<F>::type f_;
 
         template <typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t)
+        HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t) const
         {
             return hpx::util::invoke_fused_r<Result>(f_, std::forward<T>(t));
         }

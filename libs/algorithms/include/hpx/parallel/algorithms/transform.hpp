@@ -48,13 +48,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj>
         struct transform_projected
         {
-            typename hpx::util::decay<F>::type& f_;
-            typename hpx::util::decay<Proj>::type& proj_;
+            typename hpx::util::decay<F>::type const& f_;
+            typename hpx::util::decay<Proj>::type const& proj_;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter curr)
                 -> decltype(
-                    hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr)))
+                    hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr))) const
             {
                 return hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr));
             }
@@ -68,8 +68,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef typename hpx::util::decay<F>::type fun_type;
             typedef typename hpx::util::decay<Proj>::type proj_type;
 
-            fun_type f_;
-            proj_type proj_;
+            const fun_type f_;
+            const proj_type proj_;
 
             template <typename F_, typename Proj_>
             HPX_HOST_DEVICE transform_iteration(F_&& f, Proj_&& proj)
@@ -105,7 +105,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               typename Iter::iterator_tuple_type>::type,
                     typename hpx::util::tuple_element<1,
                         typename Iter::iterator_tuple_type>::type>
-                execute(Iter part_begin, std::size_t part_size)
+                execute(Iter part_begin, std::size_t part_size) const
             {
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n<execution_policy_type>(
@@ -121,7 +121,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     typename hpx::util::tuple_element<1,
                         typename Iter::iterator_tuple_type>::type>
                 operator()(Iter part_begin, std::size_t part_size,
-                    std::size_t /*part_index*/)
+                    std::size_t /*part_index*/) const
             {
                 hpx::util::annotate_function annotate(f_);
                 return execute(part_begin, part_size);

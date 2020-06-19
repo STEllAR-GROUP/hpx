@@ -95,9 +95,9 @@ namespace hpx { namespace parallel { inline namespace v2 {
         {
             typedef typename hpx::util::decay<F>::type fun_type;
 
-            fun_type f_;
-            S stride_;
-            hpx::util::tuple<Ts...> args_;
+            const fun_type f_;
+            const S stride_;
+            mutable hpx::util::tuple<Ts...> args_;
 
             template <typename F_, typename S_, typename Args>
             part_iterations(F_&& f, S_&& stride, Args&& args)
@@ -109,7 +109,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
             template <typename B>
             HPX_HOST_DEVICE void execute(
-                B part_begin, std::size_t part_steps, std::size_t part_index)
+                B part_begin, std::size_t part_steps, std::size_t part_index) const
             {
                 auto pack =
                     typename hpx::util::make_index_pack<sizeof...(Ts)>::type();
@@ -135,7 +135,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
             template <typename B>
             HPX_HOST_DEVICE void operator()(
-                B part_begin, std::size_t part_steps, std::size_t part_index)
+                B part_begin, std::size_t part_steps, std::size_t part_index) const
             {
                 hpx::util::annotate_function annotate(f_);
                 execute(part_begin, part_steps, part_index);

@@ -46,8 +46,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj>
         struct invoke_projected
         {
-            typename hpx::util::decay<F>::type& f_;
-            typename hpx::util::decay<Proj>::type& proj_;
+            typename hpx::util::decay<F>::type const& f_;
+            typename hpx::util::decay<Proj>::type const& proj_;
 
             template <typename T>
             HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
@@ -78,18 +78,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct invoke_projected<F, util::projection_identity>
         {
             HPX_HOST_DEVICE invoke_projected(
-                typename hpx::util::decay<F>::type& f,
+                typename hpx::util::decay<F>::type const& f,
                 util::projection_identity)
               : f_(f)
             {
             }
 
-            typename hpx::util::decay<F>::type& f_;
+            typename hpx::util::decay<F>::type const& f_;
 
             template <typename T>
             HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
                 !hpx::traits::is_value_proxy<T>::value>::type
-            call(T&& t)
+            call(T&& t) const
             {
                 T&& tmp = std::forward<T>(t);
                 hpx::util::invoke(f_, tmp);
@@ -98,7 +98,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename T>
             HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
                 hpx::traits::is_value_proxy<T>::value>::type
-            call(T&& t)
+            call(T&& t) const
             {
                 auto tmp = std::forward<T>(t);
                 hpx::util::invoke_r<void>(f_, tmp);
@@ -120,12 +120,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef typename hpx::util::decay<F>::type fun_type;
             typedef typename hpx::util::decay<Proj>::type proj_type;
 
-            fun_type f_;
-            proj_type proj_;
+            const fun_type f_;
+            const proj_type proj_;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE void execute(
-                Iter part_begin, std::size_t part_size)
+                Iter part_begin, std::size_t part_size) const
             {
                 util::loop_n<execution_policy_type>(part_begin, part_size,
                     invoke_projected<fun_type, proj_type>{f_, proj_});
@@ -160,7 +160,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(Iter part_begin,
-                std::size_t part_size, std::size_t /*part_index*/)
+                std::size_t part_size, std::size_t /*part_index*/) const
             {
                 hpx::util::annotate_function annotate(f_);
                 execute(part_begin, part_size);

@@ -237,7 +237,7 @@ namespace hpx { namespace util {
 
         struct advance_iterator
         {
-            explicit advance_iterator(std::ptrdiff_t n)
+            HPX_HOST_DEVICE explicit advance_iterator(std::ptrdiff_t n)
               : n_(n)
             {
             }
