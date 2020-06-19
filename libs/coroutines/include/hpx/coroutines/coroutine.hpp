@@ -96,6 +96,18 @@ namespace hpx { namespace threads { namespace coroutines {
             return impl_.set_thread_data(data);
         }
 
+#ifdef HPX_HAVE_LIBCDS
+        std::size_t get_libcds_data() const
+        {
+            return impl_.get_libcds_data();
+        }
+
+        std::size_t set_libcds_data(std::size_t data)
+        {
+            return impl_.set_libcds_data(data);
+        }
+#endif
+
         void rebind(functor_type&& f, thread_id_type id)
         {
             impl_.rebind(std::move(f), id);

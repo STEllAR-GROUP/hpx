@@ -87,6 +87,18 @@ namespace hpx { namespace threads {
             return coroutine_.set_thread_data(data);
         }
 
+#ifdef HPX_HAVE_LIBCDS
+        std::size_t get_libcds_data() const override
+        {
+            return coroutine_.get_libcds_data();
+        }
+
+        std::size_t set_libcds_data(std::size_t data) override
+        {
+            return coroutine_.set_libcds_data(data);
+        }
+#endif
+
         void rebind(thread_init_data& init_data) override
         {
             this->thread_data::rebind_base(init_data);

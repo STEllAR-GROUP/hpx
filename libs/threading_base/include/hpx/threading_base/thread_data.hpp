@@ -552,6 +552,11 @@ namespace hpx { namespace threads {
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 
+#ifdef HPX_HAVE_LIBCDS
+        virtual std::size_t get_libcds_data() const = 0;
+        virtual std::size_t set_libcds_data(std::size_t data) = 0;
+#endif
+
         virtual void rebind(thread_init_data& init_data) = 0;
 
 #if defined(HPX_HAVE_APEX)
@@ -664,6 +669,12 @@ namespace hpx { namespace threads {
     /// associated with the current thread (or nullptr if the current thread is
     /// not a HPX thread).
     HPX_EXPORT thread_data* get_self_id_data();
+
+#ifdef HPX_HAVE_LIBCDS
+    HPX_EXPORT thread_id_type get_self_id_2();
+
+    HPX_EXPORT thread_data* get_self_id_data_2();
+#endif
 
     /// The function \a get_parent_id returns the HPX thread id of the
     /// current thread's parent (or zero if the current thread is not a

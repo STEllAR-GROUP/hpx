@@ -121,6 +121,20 @@ namespace hpx { namespace threads { namespace coroutines {
 #endif
         }
 
+#ifdef HPX_HAVE_LIBCDS
+        std::size_t get_libcds_data() const
+        {
+            return libcds_data_;
+        }
+
+        std::size_t set_libcds_data(std::size_t data)
+        {
+            std::size_t olddata = libcds_data_;
+            libcds_data_ = data;
+            return olddata;
+        }
+#endif
+
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         detail::tss_storage* get_thread_tss_data(bool create_if_needed) const
         {
@@ -221,6 +235,9 @@ namespace hpx { namespace threads { namespace coroutines {
         mutable detail::tss_storage* thread_data_;
 #else
         mutable std::size_t thread_data_;
+#endif
+#ifdef HPX_HAVE_LIBCDS
+        mutable std::size_t libcds_data_;
 #endif
         std::size_t continuation_recursion_count_;
     };
