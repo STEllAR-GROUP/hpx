@@ -30,6 +30,7 @@
 #include <hpx/type_support/decay.hpp>
 //
 #include <chrono>
+#include <complex>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>

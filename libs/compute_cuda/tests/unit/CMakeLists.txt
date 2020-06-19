@@ -32,5 +32,7 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Compute/CUDA"
   )
 
-  add_hpx_unit_test("modules.compute_cuda" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.compute_cuda" ${test} ${${test}_PARAMETERS} RUN_SERIAL
+  )
 endforeach()
