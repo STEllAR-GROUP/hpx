@@ -202,7 +202,9 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_performance_counter);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, remove_from_connection_cache);
 
+#if defined(HPX_HAVE_NETWORKING)
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, dijkstra_termination);
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Start the runtime_support component
@@ -556,8 +558,10 @@ HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::shutdown_all_action)
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::create_performance_counter_action)
+#if defined(HPX_HAVE_NETWORKING)
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::components::server::runtime_support::dijkstra_termination_action)
+#endif
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::load_components_action,
@@ -592,9 +596,11 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action)
+#if defined(HPX_HAVE_NETWORKING)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::dijkstra_termination_action,
     dijkstra_termination_action)
+#endif
 
 namespace hpx { namespace components { namespace server
 {
@@ -686,7 +692,7 @@ namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
     // Termination detection does not make this locality black
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
     template <>
     struct action_does_termination_detection<
         hpx::components::server::runtime_support::dijkstra_termination_action>

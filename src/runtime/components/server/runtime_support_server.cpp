@@ -120,10 +120,12 @@ HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action,
     hpx::actions::remove_from_connection_cache_action_id)
+#if defined(HPX_HAVE_NETWORKING)
 HPX_REGISTER_ACTION_ID(
     hpx::components::server::runtime_support::dijkstra_termination_action,
     dijkstra_termination_action,
     hpx::actions::dijkstra_termination_action_id)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_COMPONENT_NAME(hpx::components::server::runtime_support,
