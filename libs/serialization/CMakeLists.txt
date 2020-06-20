@@ -32,6 +32,7 @@ set(serialization_headers
     hpx/serialization/detail/polymorphic_intrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
+    hpx/serialization/detail/preprocess_container.hpp
     hpx/serialization/detail/raw_ptr.hpp
     hpx/serialization/detail/serialize_collection.hpp
     hpx/serialization/detail/vc.hpp

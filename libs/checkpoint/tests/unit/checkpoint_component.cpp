@@ -21,8 +21,8 @@
 #include <vector>
 
 using hpx::util::checkpoint;
-using hpx::util::restore_checkpoint;
 using hpx::util::prepare_checkpoint;
+using hpx::util::restore_checkpoint;
 using hpx::util::save_checkpoint;
 
 struct data_server : hpx::components::component_base<data_server>
@@ -126,7 +126,7 @@ int main()
     auto&& data = f.get();
 
     // test prepare_checkpoint API
-    checkpoint c = prepare_checkpoint(a_ptr);
+    checkpoint c = prepare_checkpoint(hpx::launch::sync, a_ptr);
     HPX_TEST(c.size() == data.size());
 
     // Restore Server

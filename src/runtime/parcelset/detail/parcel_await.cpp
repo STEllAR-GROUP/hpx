@@ -12,9 +12,9 @@
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
-#include <hpx/runtime/serialization/detail/preprocess_container.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_futures.hpp>
 #include <hpx/runtime/serialization/detail/preprocess_gid_types.hpp>
+#include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
 

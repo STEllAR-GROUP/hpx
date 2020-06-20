@@ -44,8 +44,8 @@ int main()
     auto&& data = f_archive.get();
 
     // test restore_data_size API
-    checkpoint c =
-        prepare_checkpoint(character, integer, flt, boolean, str, vec);
+    checkpoint c = prepare_checkpoint(
+        hpx::launch::sync, character, integer, flt, boolean, str, vec);
     HPX_TEST(c.size() == data.size());
 
     //[check_test_2
@@ -240,12 +240,12 @@ int main()
         auto&& cn = f.get();
         HPX_TEST(cn.size() == 0);
 
-        cn = prepare_checkpoint(std::move(cn));
+        cn = prepare_checkpoint(hpx::launch::sync, std::move(cn));
         HPX_TEST(cn.size() == 0);
 
         restore_checkpoint(cn);
 
-        cn = prepare_checkpoint();
+        cn = prepare_checkpoint(hpx::launch::sync);
         HPX_TEST(cn.size() == 0);
 
         restore_checkpoint(cn);

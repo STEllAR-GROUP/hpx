@@ -21,7 +21,7 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/runtime/serialization/detail/preprocess_container.hpp>
+#include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_client.hpp>
@@ -45,9 +45,7 @@ namespace hpx { namespace util {
 
     namespace detail {
         struct save_funct_obj;
-
-        template <typename T, typename... Ts>
-        checkpoint prepare(checkpoint&& c, T const& t, Ts const&... ts);
+        struct prepare_checkpoint;
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -81,13 +79,10 @@ namespace hpx { namespace util {
         }
 
         friend struct detail::save_funct_obj;
+        friend struct detail::prepare_checkpoint;
 
         template <typename T, typename... Ts>
         friend void restore_checkpoint(checkpoint const& c, T& t, Ts&... ts);
-
-        template <typename T, typename... Ts>
-        friend checkpoint detail::prepare(
-            checkpoint&& c, T const& t, Ts const&... ts);
 
     public:
         checkpoint() = default;
@@ -221,7 +216,7 @@ namespace hpx { namespace util {
         template <typename T,
             typename U = typename std::enable_if<!hpx::traits::is_client<
                 typename std::decay<T>::type>::value>::type>
-        T&& prep(T&& t) noexcept
+        T&& prepare_client(T&& t) noexcept
         {
             return std::forward<T>(t);
         }
@@ -230,7 +225,7 @@ namespace hpx { namespace util {
         template <typename Client, typename Server>
         hpx::future<std::shared_ptr<typename hpx::components::client_base<
             Client, Server>::server_component_type>>
-        prep(hpx::components::client_base<Client, Server> const& c)
+        prepare_client(hpx::components::client_base<Client, Server> const& c)
         {
             // Use shared pointer to serialize server
             using server_type = typename hpx::components::client_base<Client,
@@ -254,7 +249,7 @@ namespace hpx { namespace util {
 
                 // Trick to expand the variable pack, takes advantage of the
                 // comma operator.
-                int const sequencer[] = {0, (ar << prep(ts), 0)...};
+                int const sequencer[] = {0, (ar << ts, 0)...};
                 (void) sequencer;    // Suppress unused param. warnings
 
                 return std::move(c);
@@ -304,7 +299,8 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> save_checkpoint(T&& t, Ts&&... ts)
     {
         return hpx::dataflow(detail::save_funct_obj{}, checkpoint{},
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+            detail::prepare_client(std::forward<T>(t)),
+            detail::prepare_client(std::forward<Ts>(ts))...);
     }
 
     /// \cond NOINTERNAL
@@ -353,7 +349,8 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> save_checkpoint(checkpoint&& c, T&& t, Ts&&... ts)
     {
         return hpx::dataflow(detail::save_funct_obj{}, std::move(c),
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+            detail::prepare_client(std::forward<T>(t)),
+            detail::prepare_client(std::forward<Ts>(ts))...);
     }
 
     /// \cond NOINTERNAL
@@ -399,11 +396,14 @@ namespace hpx { namespace util {
     ///          argument. In this case save_checkpoint will simply return
     ///          a checkpoint.
     ///
-    template <typename T, typename... Ts>
+    template <typename T, typename... Ts,
+        typename U = typename std::enable_if<!std::is_same<
+            typename std::decay<T>::type, checkpoint>::value>::type>
     hpx::future<checkpoint> save_checkpoint(hpx::launch p, T&& t, Ts&&... ts)
     {
         return hpx::dataflow(p, detail::save_funct_obj{}, checkpoint{},
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+            detail::prepare_client(std::forward<T>(t)),
+            detail::prepare_client(std::forward<Ts>(ts))...);
     }
 
     /// \cond NOINTERNAL
@@ -457,7 +457,8 @@ namespace hpx { namespace util {
         hpx::launch p, checkpoint&& c, T&& t, Ts&&... ts)
     {
         return hpx::dataflow(p, detail::save_funct_obj{}, std::move(c),
-            std::forward<T>(t), std::forward<Ts>(ts)...);
+            detail::prepare_client(std::forward<T>(t)),
+            detail::prepare_client(std::forward<Ts>(ts))...);
     }
 
     /// \cond NOINTERNAL
@@ -513,7 +514,8 @@ namespace hpx { namespace util {
     {
         hpx::future<checkpoint> f_chk =
             hpx::dataflow(sync_p, detail::save_funct_obj{}, checkpoint{},
-                std::forward<T>(t), std::forward<Ts>(ts)...);
+                detail::prepare_client(std::forward<T>(t)),
+                detail::prepare_client(std::forward<Ts>(ts))...);
         return f_chk.get();
     }
 
@@ -566,13 +568,238 @@ namespace hpx { namespace util {
     {
         hpx::future<checkpoint> f_chk =
             hpx::dataflow(sync_p, detail::save_funct_obj{}, std::move(c),
-                std::forward<T>(t), std::forward<Ts>(ts)...);
+                detail::prepare_client(std::forward<T>(t)),
+                detail::prepare_client(std::forward<Ts>(ts))...);
         return f_chk.get();
     }
 
     /// \cond NOINTERNAL
     // Same as above, just nullary
     inline checkpoint save_checkpoint(hpx::launch::sync_policy, checkpoint&& c)
+    {
+        return std::move(c);
+    }
+    /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        struct prepare_checkpoint
+        {
+            template <typename... Ts>
+            checkpoint operator()(checkpoint&& c, Ts const&... ts)
+            {
+                // Create serialization archive from special container that collects
+                // sizes
+                hpx::serialization::detail::preprocess_container data;
+                hpx::serialization::output_archive ar(data);
+
+                // force check-pointing flag to be created in the archive,
+                // the serialization of id_type's checks for it
+                ar.get_extra_data<naming::checkpointing_tag>();
+
+                // Serialize data
+
+                // Trick to expand the variable pack, takes advantage of the
+                // comma operator.
+                int const sequencer[] = {
+                    0, (ar << detail::prepare_client(ts), 0)...};
+                (void) sequencer;    // Suppress unused param. warnings
+
+                c.data_.resize(data.size());
+                return std::move(c);
+            }
+        };
+    }    // namespace detail
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// prepare_checkpoint
+    ///
+    /// prepare_checkpoint takes the containers which have to be filled from
+    /// the byte stream by a subsequent restore_checkpoint invocation.
+    /// prepare_checkpoint will calculate the necessary buffer size
+    /// and will return an appropriately sized checkpoint object.
+    ///
+    /// \tparam T           A container to restore.
+    /// \tparam Ts          Other containers to restore. Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \param t            A container to restore.
+    /// \param ts           Other containers to restore Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \returns prepare_checkpoint returns a properly resized checkpoint object
+    ///          that can be used for a subsequent restore_checkpoint operation.
+    template <typename T, typename... Ts,
+        typename U =
+            typename std::enable_if<!hpx::traits::is_launch_policy<T>::value &&
+                !std::is_same<typename std::decay<T>::type,
+                    checkpoint>::value>::type>
+    hpx::future<checkpoint> prepare_checkpoint(T const& t, Ts const&... ts)
+    {
+        return hpx::dataflow(detail::prepare_checkpoint{}, checkpoint{},
+            detail::prepare_client(t), detail::prepare_client(ts)...);
+    }
+
+    /// \cond NOINTERNAL
+    // Same as above, just nullary
+    inline hpx::future<checkpoint> prepare_checkpoint()
+    {
+        return hpx::make_ready_future(checkpoint{});
+    }
+    /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// prepare_checkpoint
+    ///
+    /// prepare_checkpoint takes the containers which have to be filled from
+    /// the byte stream by a subsequent restore_checkpoint invocation.
+    /// prepare_checkpoint will calculate the necessary buffer size
+    /// and will return an appropriately sized checkpoint object.
+    ///
+    /// \tparam T           A container to restore.
+    /// \tparam Ts          Other containers to restore. Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \param c            Takes a pre-initialized checkpoint to prepare
+    ///
+    /// \param t            A container to restore.
+    /// \param ts           Other containers to restore Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \returns prepare_checkpoint returns a properly resized checkpoint object
+    ///          that can be used for a subsequent restore_checkpoint operation.
+    template <typename T, typename... Ts>
+    hpx::future<checkpoint> prepare_checkpoint(
+        checkpoint&& c, T const& t, Ts const&... ts)
+    {
+        return hpx::dataflow(detail::prepare_checkpoint{}, std::move(c),
+            detail::prepare_client(t), detail::prepare_client(ts)...);
+    }
+
+    /// \cond NOINTERNAL
+    // Same as above, just nullary
+    inline hpx::future<checkpoint> prepare_checkpoint(checkpoint&& c)
+    {
+        return hpx::make_ready_future(std::move(c));
+    }
+    /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// prepare_checkpoint
+    ///
+    /// prepare_checkpoint takes the containers which have to be filled from
+    /// the byte stream by a subsequent restore_checkpoint invocation.
+    /// prepare_checkpoint will calculate the necessary buffer size
+    /// and will return an appropriately sized checkpoint object.
+    ///
+    /// \tparam T           A container to restore.
+    /// \tparam Ts          Other containers to restore. Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \param p             Takes an HPX launch policy. Allows the user
+    ///                      to change the way the function is launched
+    ///                      i.e. async, sync, etc.
+    ///
+    /// \param t            A container to restore.
+    /// \param ts           Other containers to restore Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \returns prepare_checkpoint returns a properly resized checkpoint object
+    ///          that can be used for a subsequent restore_checkpoint operation.
+    template <typename T, typename... Ts,
+        typename U =
+            typename std::enable_if<!std::is_same<T, checkpoint>::value>::type>
+    hpx::future<checkpoint> prepare_checkpoint(
+        hpx::launch p, T const& t, Ts const&... ts)
+    {
+        return hpx::dataflow(p, detail::prepare_checkpoint{}, checkpoint{},
+            detail::prepare_client(t), detail::prepare_client(ts)...);
+    }
+
+    /// \cond NOINTERNAL
+    template <typename T, typename... Ts,
+        typename U =
+            typename std::enable_if<!std::is_same<T, checkpoint>::value>::type>
+    checkpoint prepare_checkpoint(
+        hpx::launch::sync_policy sync_p, T const& t, Ts const&... ts)
+    {
+        return hpx::dataflow(sync_p, detail::prepare_checkpoint{}, checkpoint{},
+            detail::prepare_client(t), detail::prepare_client(ts)...)
+            .get();
+    }
+
+    // Same as above, just nullary
+    inline hpx::future<checkpoint> prepare_checkpoint(hpx::launch p)
+    {
+        return hpx::make_ready_future(checkpoint{});
+    }
+
+    inline checkpoint prepare_checkpoint(hpx::launch::sync_policy)
+    {
+        return checkpoint{};
+    }
+    /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// prepare_checkpoint
+    ///
+    /// prepare_checkpoint takes the containers which have to be filled from
+    /// the byte stream by a subsequent restore_checkpoint invocation.
+    /// prepare_checkpoint will calculate the necessary buffer size
+    /// and will return an appropriately sized checkpoint object.
+    ///
+    /// \tparam T           A container to restore.
+    /// \tparam Ts          Other containers to restore. Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \param p             Takes an HPX launch policy. Allows the user
+    ///                      to change the way the function is launched
+    ///                      i.e. async, sync, etc.
+    ///
+    /// \param c            Takes a pre-initialized checkpoint to prepare
+    ///
+    /// \param t            A container to restore.
+    /// \param ts           Other containers to restore Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \returns prepare_checkpoint returns a properly resized checkpoint object
+    ///          that can be used for a subsequent restore_checkpoint operation.
+    template <typename T, typename... Ts>
+    hpx::future<checkpoint> prepare_checkpoint(
+        hpx::launch p, checkpoint&& c, T const& t, Ts const&... ts)
+    {
+        return hpx::dataflow(p, detail::prepare_checkpoint{}, std::move(c),
+            detail::prepare_client(t), detail::prepare_client(ts)...);
+    }
+
+    /// \cond NOINTERNAL
+    template <typename T, typename... Ts>
+    checkpoint prepare_checkpoint(hpx::launch::sync_policy sync_p,
+        checkpoint&& c, T const& t, Ts const&... ts)
+    {
+        return hpx::dataflow(sync_p, detail::prepare_checkpoint{}, std::move(c),
+            detail::prepare_client(t), detail::prepare_client(ts)...)
+            .get();
+    }
+
+    // Same as above, just nullary
+    inline hpx::future<checkpoint> prepare_checkpoint(
+        hpx::launch p, checkpoint&& c)
+    {
+        return hpx::make_ready_future(std::move(c));
+    }
+
+    inline checkpoint prepare_checkpoint(
+        hpx::launch::sync_policy, checkpoint&& c)
     {
         return std::move(c);
     }
@@ -652,103 +879,4 @@ namespace hpx { namespace util {
     inline void restore_checkpoint(checkpoint const& c) {}
     /// \endcond
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
-        template <typename T, typename... Ts>
-        checkpoint prepare(checkpoint&& c, T const& t, Ts const&... ts)
-        {
-            // Create serialization archive from special container that collects
-            // sizes
-            hpx::serialization::detail::preprocess_container data;
-            hpx::serialization::output_archive ar(data);
-
-            // force check-pointing flag to be created in the archive,
-            // the serialization of id_type's checks for it
-            ar.get_extra_data<naming::checkpointing_tag>();
-
-            // Serialize data
-            ar << detail::prep(t);
-
-            // Trick to expand the variable pack, takes advantage of the
-            // comma operator.
-            int const sequencer[] = {0, (ar << detail::prep(ts), 0)...};
-            (void) sequencer;    // Suppress unused param. warnings
-
-            c.data_.resize(data.size());
-            return std::move(c);
-        }
-    }    // namespace detail
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// prepare_checkpoint
-    ///
-    /// prepare_checkpoint takes the containers which have to be filled from
-    /// the byte stream by a subsequent restore_checkpoint invocation.
-    /// prepare_checkpoint will calculate the necessary buffer size
-    /// and will return an appropriately sized checkpoint object.
-    ///
-    /// \tparam T           A container to restore.
-    /// \tparam Ts          Other containers to restore. Containers
-    ///                     must be in the same order that they were
-    ///                     inserted into the checkpoint.
-    ///
-    /// \param t            A container to restore.
-    /// \param ts           Other containers to restore Containers
-    ///                     must be in the same order that they were
-    ///                     inserted into the checkpoint.
-    ///
-    /// \returns prepare_checkpoint returns a properly resized checkpoint object
-    ///          that can be used for a subsequent restore_checkpoint operation.
-    template <typename T, typename... Ts,
-        typename U =
-            typename std::enable_if<!std::is_same<T, checkpoint>::value>::type>
-    checkpoint prepare_checkpoint(T const& t, Ts const&... ts)
-    {
-        return detail::prepare(checkpoint{}, t, ts...);
-    }
-
-    /// \cond NOINTERNAL
-    // Same as above, just nullary
-    inline checkpoint prepare_checkpoint()
-    {
-        return checkpoint{};
-    }
-    /// \endcond
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// prepare_checkpoint
-    ///
-    /// prepare_checkpoint takes the containers which have to be filled from
-    /// the byte stream by a subsequent restore_checkpoint invocation.
-    /// prepare_checkpoint will calculate the necessary buffer size
-    /// and will return an appropriately sized checkpoint object.
-    ///
-    /// \tparam T           A container to restore.
-    /// \tparam Ts          Other containers to restore. Containers
-    ///                     must be in the same order that they were
-    ///                     inserted into the checkpoint.
-    ///
-    /// \param c            Takes a pre-initialized checkpoint to prepare
-    ///
-    /// \param t            A container to restore.
-    /// \param ts           Other containers to restore Containers
-    ///                     must be in the same order that they were
-    ///                     inserted into the checkpoint.
-    ///
-    /// \returns prepare_checkpoint returns a properly resized checkpoint object
-    ///          that can be used for a subsequent restore_checkpoint operation.
-    template <typename T, typename... Ts>
-    checkpoint prepare_checkpoint(checkpoint&& c, T const& t, Ts const&... ts)
-    {
-        return detail::prepare(std::move(c), t, ts...);
-    }
-
-    /// \cond NOINTERNAL
-    // Same as above, just nullary
-    inline checkpoint prepare_checkpoint(checkpoint&& c)
-    {
-        return std::move(c);
-    }
-    /// \endcond
 }}    // namespace hpx::util

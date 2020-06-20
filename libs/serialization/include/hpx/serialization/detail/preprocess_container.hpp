@@ -47,7 +47,7 @@ namespace hpx { namespace serialization { namespace detail {
     private:
         std::size_t size_;
     };
-}}}
+}}}    // namespace hpx::serialization::detail
 
 namespace hpx { namespace traits {
 
@@ -82,4 +82,3 @@ namespace hpx { namespace traits {
         }
     };
 }}    // namespace hpx::traits
-
