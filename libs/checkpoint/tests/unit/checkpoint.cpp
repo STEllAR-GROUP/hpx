@@ -19,8 +19,8 @@
 #include <vector>
 
 using hpx::util::checkpoint;
-using hpx::util::restore_checkpoint;
 using hpx::util::prepare_checkpoint;
+using hpx::util::restore_checkpoint;
 using hpx::util::save_checkpoint;
 
 // Main
@@ -56,8 +56,7 @@ int main()
     std::string str2;
     std::vector<char> vec2;
 
-    restore_checkpoint(
-        data, character2, integer2, flt2, boolean2, str2, vec2);
+    restore_checkpoint(data, character2, integer2, flt2, boolean2, str2, vec2);
     //]
 
     HPX_TEST_EQ(character, character2);
@@ -233,6 +232,41 @@ int main()
 
     // Cleanup
     std::remove("test_file_10.txt");
+
+    // test nullary versions of the API
+    {
+        hpx::future<checkpoint> f = save_checkpoint();
+
+        auto&& cn = f.get();
+        HPX_TEST(cn.size() == 0);
+
+        cn = prepare_checkpoint(std::move(cn));
+        HPX_TEST(cn.size() == 0);
+
+        restore_checkpoint(cn);
+
+        cn = prepare_checkpoint();
+        HPX_TEST(cn.size() == 0);
+
+        restore_checkpoint(cn);
+    }
+
+    {
+        hpx::future<checkpoint> f = save_checkpoint(checkpoint{});
+
+        auto&& cn = f.get();
+        HPX_TEST(cn.size() == 0);
+    }
+
+    {
+        checkpoint cn = save_checkpoint(hpx::launch::sync);
+        HPX_TEST(cn.size() == 0);
+    }
+
+    {
+        checkpoint cn = save_checkpoint(hpx::launch::sync, checkpoint{});
+        HPX_TEST(cn.size() == 0);
+    }
 
     return hpx::util::report_errors();
 }
