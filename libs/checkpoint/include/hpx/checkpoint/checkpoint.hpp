@@ -21,6 +21,7 @@
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_client.hpp>
@@ -58,6 +59,7 @@ namespace hpx { namespace util {
     /// serialized including components.
     class checkpoint
     {
+    private:
         std::vector<char> data_;
 
         friend std::ostream& operator<<(
@@ -79,6 +81,9 @@ namespace hpx { namespace util {
 
         template <typename T, typename... Ts>
         friend void restore_checkpoint(checkpoint const& c, T& t, Ts&... ts);
+
+        template <typename T, typename... Ts>
+        friend checkpoint prepare_checkpoint(T const& t, Ts const&... ts);
 
     public:
         checkpoint() = default;
@@ -245,7 +250,7 @@ namespace hpx { namespace util {
 
                 // Trick to expand the variable pack, takes advantage of the
                 // comma operator.
-                int const sequencer[] = {0, (ar << ts, 0)...};
+                int const sequencer[] = {0, (ar << prep(ts), 0)...};
                 (void) sequencer;    // Suppress unused param. warnings
 
                 return std::move(c);
@@ -295,8 +300,7 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> save_checkpoint(T&& t, Ts&&... ts)
     {
         return hpx::dataflow(detail::save_funct_obj{}, checkpoint{},
-            detail::prep(std::forward<T>(t)),
-            detail::prep(std::forward<Ts>(ts))...);
+            std::forward<T>(t), std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -337,8 +341,7 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> save_checkpoint(checkpoint&& c, T&& t, Ts&&... ts)
     {
         return hpx::dataflow(detail::save_funct_obj{}, std::move(c),
-            detail::prep(std::forward<T>(t)),
-            detail::prep(std::forward<Ts>(ts))...);
+            std::forward<T>(t), std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -380,8 +383,7 @@ namespace hpx { namespace util {
     hpx::future<checkpoint> save_checkpoint(hpx::launch p, T&& t, Ts&&... ts)
     {
         return hpx::dataflow(p, detail::save_funct_obj{}, checkpoint{},
-            detail::prep(std::forward<T>(t)),
-            detail::prep(std::forward<Ts>(ts))...);
+            std::forward<T>(t), std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -427,8 +429,7 @@ namespace hpx { namespace util {
         hpx::launch p, checkpoint&& c, T&& t, Ts&&... ts)
     {
         return hpx::dataflow(p, detail::save_funct_obj{}, std::move(c),
-            detail::prep(std::forward<T>(t)),
-            detail::prep(std::forward<Ts>(ts))...);
+            std::forward<T>(t), std::forward<Ts>(ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -475,8 +476,7 @@ namespace hpx { namespace util {
     {
         hpx::future<checkpoint> f_chk =
             hpx::dataflow(sync_p, detail::save_funct_obj{}, checkpoint{},
-                detail::prep(std::forward<T>(t)),
-                detail::prep(std::forward<Ts>(ts))...);
+                std::forward<T>(t), std::forward<Ts>(ts)...);
         return f_chk.get();
     }
 
@@ -520,8 +520,7 @@ namespace hpx { namespace util {
     {
         hpx::future<checkpoint> f_chk =
             hpx::dataflow(sync_p, detail::save_funct_obj{}, std::move(c),
-                detail::prep(std::forward<T>(t)),
-                detail::prep(std::forward<Ts>(ts))...);
+                std::forward<T>(t), std::forward<Ts>(ts)...);
         return f_chk.get();
     }
 
@@ -594,4 +593,48 @@ namespace hpx { namespace util {
         (void) sequencer;    // Suppress unused variable warnings
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// prepare_checkpoint
+    ///
+    /// prepare_checkpoint takes the containers which have to be filled from
+    /// the byte stream by a subsequent restore_checkpoint invocation.
+    /// prepare_checkpoint will calculate the necessary buffer size
+    /// and will return an appropriately sized checkpoint object.
+    ///
+    /// \tparam T           A container to restore.
+    /// \tparam Ts          Other containers to restore. Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \param t            A container to restore.
+    /// \param ts           Other containers to restore Containers
+    ///                     must be in the same order that they were
+    ///                     inserted into the checkpoint.
+    ///
+    /// \returns prepare_checkpoint returns a properly resized checkpoint object
+    ///          that can be used for a subsequent restore_checkpoint operation.
+    template <typename T, typename... Ts>
+    checkpoint prepare_checkpoint(T const& t, Ts const&... ts)
+    {
+        // Create serialization archive from special container that collects
+        // sizes
+        hpx::serialization::detail::preprocess_container data;
+        hpx::serialization::output_archive ar(data);
+
+        // force check-pointing flag to be created in the archive,
+        // the serialization of id_type's checks for it
+        ar.get_extra_data<naming::checkpointing_tag>();
+
+        // Serialize data
+        ar << detail::prep(t);
+
+        // Trick to expand the variable pack, takes advantage of the
+        // comma operator.
+        int const sequencer[] = {0, (ar << detail::prep(ts), 0)...};
+        (void) sequencer;    // Suppress unused param. warnings
+
+        checkpoint c;
+        c.data_.resize(data.size());
+        return c;
+    }
 }}    // namespace hpx::util

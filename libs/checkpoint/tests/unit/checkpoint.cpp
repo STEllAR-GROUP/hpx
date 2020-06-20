@@ -20,6 +20,7 @@
 
 using hpx::util::checkpoint;
 using hpx::util::restore_checkpoint;
+using hpx::util::prepare_checkpoint;
 using hpx::util::save_checkpoint;
 
 // Main
@@ -39,6 +40,14 @@ int main()
     hpx::shared_future<checkpoint> f_archive = save_checkpoint(
         std::move(archive), character, integer, flt, boolean, str, vec);
     //]
+
+    auto&& data = f_archive.get();
+
+    // test restore_data_size API
+    checkpoint c =
+        prepare_checkpoint(character, integer, flt, boolean, str, vec);
+    HPX_TEST(c.size() == data.size());
+
     //[check_test_2
     char character2;
     int integer2;
@@ -48,7 +57,7 @@ int main()
     std::vector<char> vec2;
 
     restore_checkpoint(
-        f_archive.get(), character2, integer2, flt2, boolean2, str2, vec2);
+        data, character2, integer2, flt2, boolean2, str2, vec2);
     //]
 
     HPX_TEST_EQ(character, character2);
@@ -59,7 +68,7 @@ int main()
     HPX_TEST(vec == vec2);
 
     // Test 2
-    //  test asignment operator
+    //  test assignment operator
     char character3;
     int integer3;
     float flt3;
@@ -68,7 +77,7 @@ int main()
     std::vector<char> vec3;
     checkpoint archive2;
 
-    archive2 = f_archive.get();
+    archive2 = data;
     restore_checkpoint(
         archive2, character3, integer3, flt3, boolean3, str3, vec3);
 
