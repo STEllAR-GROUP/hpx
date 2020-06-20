@@ -393,11 +393,11 @@ namespace hpx { namespace threads {
         thread_id_type const& id, std::size_t data, error_code& ec = throws);
 
 #ifdef HPX_HAVE_LIBCDS
-    HPX_EXPORT std::size_t get_libcds_data(
+    HPX_EXPORT std::vector<std::size_t> get_libcds_data(
         thread_id_type const& id, error_code& ec = throws);
 
-    HPX_EXPORT std::size_t set_libcds_data(
-        thread_id_type const& id, std::size_t data, error_code& ec = throws);
+    HPX_EXPORT std::vector<std::size_t> set_libcds_data(
+        thread_id_type const& id, std::vector<std::size_t>, error_code& ec = throws);
 #endif
 
     HPX_EXPORT std::size_t& get_continuation_recursion_count();

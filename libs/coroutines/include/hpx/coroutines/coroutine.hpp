@@ -97,12 +97,12 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        std::size_t get_libcds_data() const
+        std::vector<std::size_t> get_libcds_data() const
         {
             return impl_.get_libcds_data();
         }
 
-        std::size_t set_libcds_data(std::size_t data)
+        std::vector<std::size_t> set_libcds_data(std::vector<std::size_t> data)
         {
             return impl_.set_libcds_data(data);
         }

@@ -74,12 +74,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        std::size_t get_libcds_data() const override
+        std::vector<std::size_t> get_libcds_data() const override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->get_libcds_data();
         }
-        std::size_t set_libcds_data(std::size_t data) override
+        std::vector<std::size_t> set_libcds_data(std::vector<std::size_t> data) override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->set_libcds_data(data);

@@ -248,11 +248,11 @@ namespace hpx {
     }
 
 #ifdef HPX_HAVE_LIBCDS
-    std::size_t thread::get_libcds_data() const
+    std::vector<std::size_t> thread::get_libcds_data() const
     {
         return threads::get_libcds_data(native_handle());
     }
-    std::size_t thread::set_libcds_data(std::size_t data)
+    std::vector<std::size_t> thread::set_libcds_data(std::vector<std::size_t> data)
     {
         return threads::set_libcds_data(native_handle(), data);
     }
@@ -409,12 +409,12 @@ namespace hpx {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        std::size_t get_libcds_data()
+        std::vector<std::size_t> get_libcds_data()
         {
             return threads::get_libcds_data(threads::get_self_id());
         }
 
-        std::size_t set_libcds_data(std::size_t data)
+        std::vector<std::size_t> set_libcds_data(std::vector<std::size_t> data)
         {
             return threads::set_libcds_data(threads::get_self_id(), data);
         }

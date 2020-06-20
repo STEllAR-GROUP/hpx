@@ -86,7 +86,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
           , m_thread_data(0)
 #   ifdef HPX_HAVE_LIBCDS
-          , libcds_thread_data(0)
+          , libcds_thread_data(std::vector<std::size_t>{0, 0, 0})
 #   endif
 #endif
           , m_type_info()
@@ -102,7 +102,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
             m_thread_data = 0;
 #   ifdef HPX_HAVE_LIBCDS
-            libcds_thread_data = 0;
+            libcds_thread_data = std::vector<size_t>{0, 0, 0};
 #   endif
 #endif
         }
@@ -211,7 +211,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
             m_thread_data = 0;
 #   ifdef HPX_HAVE_LIBCDS
-            libcds_thread_data = 0;
+            libcds_thread_data = std::vector<std::size_t>{0, 0, 0};
 #   endif
 #endif
         }
@@ -239,14 +239,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        std::size_t get_libcds_data() const
+        std::vector<std::size_t> get_libcds_data() const
         {
             return libcds_thread_data;
         }
 
-        std::size_t set_libcds_data(std::size_t data)
+        std::vector<std::size_t> set_libcds_data(std::vector<std::size_t> data)
         {
-            std::size_t olddata = libcds_thread_data;
+            std::vector<std::size_t> olddata = libcds_thread_data;
             libcds_thread_data = data;
             return olddata;
         }
@@ -309,7 +309,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             HPX_ASSERT(m_thread_data == 0);
 #endif
 #ifdef HPX_HAVE_LIBCDS
-
+            HPX_ASSERT(libcds_thread_data == (std::vector<size_t>{0, 0, 0}));
 #endif
             // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
             m_type_info = std::exception_ptr();
@@ -372,7 +372,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
         mutable std::size_t m_thread_data;
 #   ifdef HPX_HAVE_LIBCDS
-        mutable std::size_t libcds_thread_data;
+        mutable std::vector<std::size_t> libcds_thread_data{0, 0, 0};
 #   endif
 #endif
 
