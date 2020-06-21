@@ -55,8 +55,8 @@ namespace hpx { namespace traits {
         typename util::always_void<
             typename std::enable_if<
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
-                !disable_sized_sentinel_for<typename remove_cv<Sent>::type,
-                    typename remove_cv<Iter>::type>>::type,
+                !disable_sized_sentinel_for<typename std::remove_cv<Sent>::type,
+                    typename std::remove_cv<Iter>::type>>::type,
             typename detail::subtraction_result<Iter, Sent>::type,
             typename detail::subtraction_result<Sent, Iter>::type>::type>
       : std::true_type
