@@ -10,6 +10,7 @@
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <iterator>
+#include <type_traits>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     // provide implementation of std::distance supporting iterators/sentinels
@@ -37,6 +38,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     distance(InIterB first, InIterE last)
     {
         return distance(first, last,
-            typename hpx::traits::is_sized_sentinel_for<InIterE, InIterB>::type{});
+            typename hpx::traits::is_sized_sentinel_for<InIterE,
+                InIterB>::type{});
     }
 }}}}    // namespace hpx::parallel::v1::detail

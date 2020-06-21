@@ -7,6 +7,8 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 
+#include <cstdint>
+
 #include "iter_sent.hpp"
 
 int main(int argc, char* argv[])
