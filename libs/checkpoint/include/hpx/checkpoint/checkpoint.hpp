@@ -1,27 +1,27 @@
 // Copyright (c) 2018 Adrian Serio
+// Copyright (c) 2018-2020 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
+
 /// This header defines the save_checkpoint and restore_checkpoint functions.
 /// These functions are designed to help HPX application developer's checkpoint
 /// their applications. Save_checkpoint serializes one or more objects and saves
 /// them as a byte stream. Restore_checkpoint converts the byte stream back into
 /// instances of the objects.
-//
 
 /// \file hpx/checkpoint/checkpoint.hpp
 
 #pragma once
 
 #include <hpx/async_distributed/dataflow.hpp>
+#include <hpx/checkpoint_base/checkpoint_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/get_ptr.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
-#include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/traits/is_client.hpp>
@@ -238,20 +238,8 @@ namespace hpx { namespace util {
             template <typename... Ts>
             checkpoint operator()(checkpoint&& c, Ts&&... ts) const
             {
-                // Create serialization archive from checkpoint data member
-                hpx::serialization::output_archive ar(c.data_);
-
-                // force check-pointing flag to be created in the archive,
-                // the serialization of id_type's checks for it
-                ar.get_extra_data<naming::checkpointing_tag>();
-
-                // Serialize data
-
-                // Trick to expand the variable pack, takes advantage of the
-                // comma operator.
-                int const sequencer[] = {0, (ar << ts, 0)...};
-                (void) sequencer;    // Suppress unused param. warnings
-
+                hpx::util::save_checkpoint_data(
+                    c.data_, std::forward<Ts>(ts)...);
                 return std::move(c);
             }
         };
@@ -587,26 +575,10 @@ namespace hpx { namespace util {
         struct prepare_checkpoint
         {
             template <typename... Ts>
-            checkpoint operator()(checkpoint&& c, Ts const&... ts)
+            checkpoint operator()(checkpoint&& c, Ts const&... ts) const
             {
-                // Create serialization archive from special container that collects
-                // sizes
-                hpx::serialization::detail::preprocess_container data;
-                hpx::serialization::output_archive ar(data);
-
-                // force check-pointing flag to be created in the archive,
-                // the serialization of id_type's checks for it
-                ar.get_extra_data<naming::checkpointing_tag>();
-
-                // Serialize data
-
-                // Trick to expand the variable pack, takes advantage of the
-                // comma operator.
-                int const sequencer[] = {
-                    0, (ar << detail::prepare_client(ts), 0)...};
-                (void) sequencer;    // Suppress unused param. warnings
-
-                c.data_.resize(data.size());
+                std::size_t size = hpx::util::prepare_checkpoint_data(ts...);
+                c.data_.resize(size);
                 return std::move(c);
             }
         };
@@ -809,29 +781,33 @@ namespace hpx { namespace util {
     namespace detail {
 
         // Properly handle non client/server restoration
-        template <typename T,
-            typename U = typename std::enable_if<
-                !hpx::traits::is_client<T>::value>::type>
-        void restore_impl(hpx::serialization::input_archive& ar, T& t)
+        struct restore_impl
         {
-            ar >> t;
-        }
+            template <typename T,
+                typename U = typename std::enable_if<
+                    !hpx::traits::is_client<T>::value>::type>
+            void operator()(hpx::serialization::input_archive& ar, T& t) const
+            {
+                ar >> t;
+            }
 
-        // Properly handle client/server restoration
-        template <typename Client, typename Server>
-        void restore_impl(hpx::serialization::input_archive& ar,
-            hpx::components::client_base<Client, Server>& c)
-        {
-            // Revive server
-            using server_component_type =
-                typename hpx::components::client_base<Client,
-                    Server>::server_component_type;
+            // Properly handle client/server restoration
+            template <typename Client, typename Server>
+            void operator()(hpx::serialization::input_archive& ar,
+                hpx::components::client_base<Client, Server>& c) const
+            {
+                // Revive server
+                using server_component_type =
+                    typename hpx::components::client_base<Client,
+                        Server>::server_component_type;
 
-            hpx::future<std::shared_ptr<server_component_type>> f_server_ptr;
-            ar >> f_server_ptr;
-            c = hpx::new_<Client>(
-                hpx::find_here(), std::move(*(f_server_ptr.get())));
-        }
+                hpx::future<std::shared_ptr<server_component_type>>
+                    f_server_ptr;
+                ar >> f_server_ptr;
+                c = hpx::new_<Client>(
+                    hpx::find_here(), std::move(*(f_server_ptr.get())));
+            }
+        };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -862,16 +838,8 @@ namespace hpx { namespace util {
     template <typename T, typename... Ts>
     void restore_checkpoint(checkpoint const& c, T& t, Ts&... ts)
     {
-        // Create serialization archive
-        hpx::serialization::input_archive ar(c.data_, c.size());
-
-        // De-serialize data
-        detail::restore_impl(ar, t);
-
-        // Trick to expand the variable pack, takes advantage of the comma
-        // operator
-        int const sequencer[] = {0, (detail::restore_impl(ar, ts), 0)...};
-        (void) sequencer;    // Suppress unused variable warnings
+        hpx::util::restore_checkpoint_data_func(
+            c.data_, detail::restore_impl{}, t, ts...);
     }
 
     /// \cond NOINTERNAL

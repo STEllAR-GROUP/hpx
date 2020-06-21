@@ -24,10 +24,11 @@ All modules
    /libs/async_cuda/docs/index.rst
    /libs/async_distributed/docs/index.rst
    /libs/async_local/docs/index.rst
-   /libs/execution_base/docs/index.rst
+   /libs/async_mpi/docs/index.rst
    /libs/batch_environments/docs/index.rst
    /libs/cache/docs/index.rst
    /libs/checkpoint/docs/index.rst
+   /libs/checkpoint_base/docs/index.rst
    /libs/collectives/docs/index.rst
    /libs/command_line_handling/docs/index.rst
    /libs/compute/docs/index.rst
@@ -42,6 +43,7 @@ All modules
    /libs/distributed_executors/docs/index.rst
    /libs/errors/docs/index.rst
    /libs/execution/docs/index.rst
+   /libs/execution_base/docs/index.rst
    /libs/executors/docs/index.rst
    /libs/filesystem/docs/index.rst
    /libs/format/docs/index.rst
@@ -58,7 +60,6 @@ All modules
    /libs/lcos_local/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
-   /libs/mpi/docs/index.rst
    /libs/mpi_base/docs/index.rst
    /libs/naming_base/docs/index.rst
    /libs/pack_traversal/docs/index.rst
