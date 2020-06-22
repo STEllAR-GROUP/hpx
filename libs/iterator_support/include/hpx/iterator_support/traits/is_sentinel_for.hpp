@@ -35,4 +35,32 @@ namespace hpx { namespace traits {
       : std::true_type
     {
     };
+
+#if defined(HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR)
+    template <typename Sent, typename Iter>
+    inline constexpr bool disable_sized_sentinel_for =
+        std::disable_sized_sentinel_for<Sent, Iter>;
+#else
+    template <typename Sent, typename Iter>
+    HPX_INLINE_CONSTEXPR_VARIABLE bool disable_sized_sentinel_for = false;
+#endif
+
+    template <typename Sent, typename Iter, typename Enable = void>
+    struct is_sized_sentinel_for : std::false_type
+    {
+    };
+
+    template <typename Sent, typename Iter>
+    struct is_sized_sentinel_for<Sent, Iter,
+        typename util::always_void<
+            typename std::enable_if<
+                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                !disable_sized_sentinel_for<typename std::remove_cv<Sent>::type,
+                    typename std::remove_cv<Iter>::type>>::type,
+            typename detail::subtraction_result<Iter, Sent>::type,
+            typename detail::subtraction_result<Sent, Iter>::type>::type>
+      : std::true_type
+    {
+    };
+
 }}    // namespace hpx::traits

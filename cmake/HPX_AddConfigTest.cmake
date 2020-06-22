@@ -3,6 +3,7 @@
 # Copyright (c) 2017 Denis Blank
 # Copyright (c) 2017 Google
 # Copyright (c) 2017 Taeguk Kwon
+# Copyright (c) 2020 Giannis Gonidelis
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -442,6 +443,14 @@ function(hpx_check_for_cxx20_coroutines)
   add_hpx_config_test(
     HPX_WITH_CXX20_COROUTINES SOURCE cmake/tests/cxx20_coroutines.cpp FILE
                                      ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx20_std_disable_sized_sentinel_for)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
+    SOURCE cmake/tests/cxx20_std_disable_sized_sentinel_for.cpp FILE ${ARGN}
   )
 endfunction()
 
