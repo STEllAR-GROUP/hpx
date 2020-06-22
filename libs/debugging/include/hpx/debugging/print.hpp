@@ -11,8 +11,10 @@
 #include <array>
 #include <bitset>
 #include <chrono>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <iterator>
@@ -23,8 +25,9 @@
 #include <vector>
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-#include <linux/unistd.h>
+#include <unistd.h>
 #include <sys/mman.h>
+extern char **environ;
 #define DEBUGGING_PRINT_LINUX
 #endif
 
@@ -223,15 +226,21 @@ namespace hpx { namespace debug {
     {
         ipaddr(const void* a)
           : data_(reinterpret_cast<const uint8_t*>(a))
+          , ipdata_(0)
+        {
+        }
+        ipaddr(const uint32_t a)
+          : data_(reinterpret_cast<const uint8_t*>(&ipdata_))
+          , ipdata_(a)
         {
         }
         const uint8_t* data_;
+        const uint32_t ipdata_;
+
         friend std::ostream& operator<<(std::ostream& os, const ipaddr& p)
         {
-            os << std::dec << int((reinterpret_cast<const uint8_t*>(&p))[0])
-               << "." << int((reinterpret_cast<const uint8_t*>(&p))[1]) << "."
-               << int((reinterpret_cast<const uint8_t*>(&p))[2]) << "."
-               << int((reinterpret_cast<const uint8_t*>(&p))[3]);
+            os << std::dec << int(p.data_[0]) << "." << int(p.data_[1]) << "."
+               << int(p.data_[2]) << "." << int(p.data_[3]);
             return os;
         }
     };
@@ -239,7 +248,7 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     // helper fuction for printing CRC32
     // ------------------------------------------------------------------
-    inline uint32_t crc32(const void* address, size_t length)
+    inline uint32_t crc32(const void* /*address*/, size_t /*length*/)
     {
         //        boost::crc_32_type result;
         //        result.process_bytes(address, length);
@@ -249,7 +258,7 @@ namespace hpx { namespace debug {
 
     // ------------------------------------------------------------------
     // helper fuction for printing short memory dump and crc32
-    // useful for debugging corruptions in buffers during parcelport
+    // useful for debugging corruptions in buffers during
     // rma or other transfers
     // ------------------------------------------------------------------
     struct mem_crc32
@@ -268,9 +277,12 @@ namespace hpx { namespace debug {
             const uint64_t* uintBuf = static_cast<const uint64_t*>(p.addr_);
             os << "Memory:";
             os << " address " << hpx::debug::ptr(p.addr_) << " length "
-               << hpx::debug::hex<8>(p.len_) << " CRC32:\n"
-               << hpx::debug::hex<8>(crc32(p.addr_, p.len_)) << " ";
-            for (size_t i = 0; i < (std::min)(p.len_ / 8, size_t(128)); i++)
+               << hpx::debug::hex<6>(p.len_)
+               << " CRC32:" << hpx::debug::hex<8>(crc32(p.addr_, p.len_))
+               << "\n";
+            for (size_t i = 0;
+                 i < (std::min)(size_t(std::ceil(p.len_ / 8.0)), size_t(128));
+                 i++)
             {
                 os << hpx::debug::hex<16>(*uintBuf++) << " ";
             }
@@ -281,7 +293,7 @@ namespace hpx { namespace debug {
 
     namespace detail {
 
-#ifdef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
+#if defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
         template <typename TupleType, std::size_t... I>
         void tuple_print(
             std::ostream& os, const TupleType& tup, std::index_sequence<I...>)
@@ -290,8 +302,7 @@ namespace hpx { namespace debug {
         }
 
         template <typename... Args>
-        void tuple_print(std::ostream& os,
-            const std::tuple<std::forward<Args>(args)...>& tup)
+        void tuple_print(std::ostream& os, const std::tuple<Args...>& tup)
         {
             tuple_print(os, tup, std::make_index_sequence<sizeof...(Args)>());
         }
@@ -305,7 +316,7 @@ namespace hpx { namespace debug {
             static void print(std::ostream& os, const TupleType& t)
             {
                 tuple_printer<TupleType, N - 1>::print(os, t);
-                os << ", " << std::get<N - 1>(t);
+                os << " " << std::get<N - 1>(t);
             }
         };
 
@@ -325,7 +336,8 @@ namespace hpx { namespace debug {
         }
 
         template <typename Arg, typename... Args>
-        void variadic_print(std::ostream& os, const Arg &arg, const Args&... args)
+        void variadic_print(
+            std::ostream& os, const Arg& arg, const Args&... args)
         {
             os << arg;
             using expander = int[];
@@ -366,6 +378,12 @@ namespace hpx { namespace debug {
         }
 
         template <typename... Args>
+        void scope(const Args&... args)
+        {
+            display("<SCO> ", args...);
+        }
+
+        template <typename... Args>
         void trace(const Args&... args)
         {
             display("<TRC> ", args...);
@@ -398,6 +416,32 @@ namespace hpx { namespace debug {
     {
         var.data_ = val;
     }
+
+    template <typename... Args>
+    struct scoped_var
+    {
+        // capture tuple elements by reference - no temp vars in constructor please
+        const char* prefix_;
+        const std::tuple<const Args&...> message_;
+        std::string buffered_msg;
+        //
+        scoped_var(const char* p, const Args&... args)
+          : prefix_(p)
+          , message_(args...)
+        {
+            std::stringstream tempstream;
+            detail::tuple_print(tempstream, message_);
+            buffered_msg = tempstream.str();
+            detail::display("<SCO> ", prefix_, debug::str<>(">> enter <<"),
+                tempstream.str());
+        }
+
+        ~scoped_var()
+        {
+            detail::display(
+                "<SCO> ", prefix_, debug::str<>("<< leave >>"), buffered_msg);
+        }
+    };
 
     template <typename... Args>
     struct timed_var
@@ -493,6 +537,12 @@ namespace hpx { namespace debug {
         {
         }
 
+        template <typename... Args>
+        constexpr bool scope(const Args&... args)
+        {
+            return true;
+        }
+
         template <typename T, typename... Args>
         constexpr bool declare_variable(const Args&...) const
         {
@@ -515,7 +565,12 @@ namespace hpx { namespace debug {
         const char* prefix_;
 
     public:
-        enable_print(const char* p)
+        constexpr enable_print()
+          : prefix_("")
+        {
+        }
+
+        constexpr enable_print(const char* p)
           : prefix_(p)
         {
         }
@@ -547,6 +602,12 @@ namespace hpx { namespace debug {
         constexpr void error(const Args&... args) const
         {
             detail::error(prefix_, args...);
+        }
+
+        template <typename... Args>
+        scoped_var<Args...> scope(const Args&... args)
+        {
+            return scoped_var<Args...>(prefix_, args...);
         }
 
         template <typename... T, typename... Args>
@@ -604,7 +665,7 @@ namespace hpx { namespace debug {
         }
 
         template <typename... Args>
-        timed_var<Args...> make_timer(const double delay, const Args... args)
+        timed_var<Args...> make_timer(const double delay, const Args... args) const
         {
             return timed_var<Args...>(delay, args...);
         }
