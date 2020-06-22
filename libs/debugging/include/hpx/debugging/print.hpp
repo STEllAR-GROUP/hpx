@@ -25,9 +25,9 @@
 #include <vector>
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-#include <unistd.h>
 #include <sys/mman.h>
-extern char **environ;
+#include <unistd.h>
+extern char** environ;
 #define DEBUGGING_PRINT_LINUX
 #endif
 
@@ -361,10 +361,12 @@ namespace hpx { namespace debug {
         // ------------------------------------------------------------------
         struct hostname_print_helper
         {
-            const char *get_hostname() const {
+            const char* get_hostname() const
+            {
                 static bool initialized = false;
                 static char hostname_[20];
-                if (!initialized) {
+                if (!initialized)
+                {
                     initialized = true;
                     gethostname(hostname_, std::size_t(12));
                     std::string temp = "(" + std::to_string(guess_rank()) + ")";
@@ -373,16 +375,20 @@ namespace hpx { namespace debug {
                 return hostname_;
             }
 
-            int guess_rank() const {
+            int guess_rank() const
+            {
 #ifdef DEBUGGING_PRINT_LINUX
                 std::vector<std::string> env_strings{"_RANK=", "_NODEID="};
-                for(char **current = environ; *current; current++) {
+                for (char** current = environ; *current; current++)
+                {
                     auto e = std::string(*current);
-                    for (auto s : env_strings) {
+                    for (auto s : env_strings)
+                    {
                         auto pos = e.find(s);
-                        if (pos != std::string::npos) {
+                        if (pos != std::string::npos)
+                        {
                             //std::cout << "Got a rank string : " << e << std::endl;
-                            return std::stoi(e.substr(pos+s.size(), 5));
+                            return std::stoi(e.substr(pos + s.size(), 5));
                         }
                     }
                 }
@@ -709,7 +715,8 @@ namespace hpx { namespace debug {
         }
 
         template <typename... Args>
-        timed_var<Args...> make_timer(const double delay, const Args... args) const
+        timed_var<Args...> make_timer(
+            const double delay, const Args... args) const
         {
             return timed_var<Args...>(delay, args...);
         }

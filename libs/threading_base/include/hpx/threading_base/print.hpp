@@ -126,8 +126,7 @@ namespace hpx { namespace debug {
             std::ostream& os, const current_time_print_helper&)
         {
             using namespace std::chrono;
-            static steady_clock::time_point log_t_start =
-                steady_clock::now();
+            static steady_clock::time_point log_t_start = steady_clock::now();
             //
             auto now = steady_clock::now();
             auto nowt = duration_cast<microseconds>(now - log_t_start).count();
@@ -138,7 +137,7 @@ namespace hpx { namespace debug {
 
 #ifdef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
         template <typename... Args>
-        void display(const char* prefix, std::forward<Args>(args)... args)
+        void display(const char* prefix, const Args&... args)
         {
             // using a temp stream object with a single copy to cout at the end
             // prevents multiple threads from injecting overlapping text
@@ -168,5 +167,5 @@ namespace hpx { namespace debug {
 #endif
 
     }    // namespace detail
-}}    // namespace hpx::debug
+}}       // namespace hpx::debug
 /// \endcond
