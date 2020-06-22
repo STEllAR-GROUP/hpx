@@ -106,12 +106,16 @@ Classes
 -------
 
 - :cpp:type:`hpx::util::any`
+- :cpp:type:`hpx::util::any_nonser`
 - :cpp:type:`hpx::util::bad_any_cast`
+- :cpp:type:`hpx::util::unique_any_nonser`
 
 Functions
 ---------
 
 - :cpp:func:`hpx::util::make_any`
+- :cpp:func:`hpx::util::make_any_nonser`
+- :cpp:func:`hpx::util::make_unique_any_nonser`
 
 Header ``hpx/assert.hpp``
 =========================
@@ -213,10 +217,6 @@ Corresponds to the C++ standard library header
 :cppreference-header:`functional`. :cpp:class:`hpx::util::function` is a more
 efficient and serializable replacement for ``std::function``.
 
-.. todo::
-
-    function, invoke, and invoke_fused links do not work.
-
 Constants
 ---------
 
@@ -232,7 +232,10 @@ Classes
 -------
 
 - :cpp:class:`hpx::util::function`
+- :cpp:class:`hpx::util::function_nonser`
 - :cpp:class:`hpx::util::function_ref`
+- :cpp:class:`hpx::util::unique_function`
+- :cpp:class:`hpx::util::unique_function_nonser`
 - :cpp:struct:`hpx::traits::is_bind_expression`
 - :cpp:struct:`hpx::traits::is_placeholder`
 

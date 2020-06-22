@@ -73,8 +73,6 @@ refer to the full documentation below.
    promoting it. In general we prioritize making sure features corresponding to
    C++ standard library features are stable and complete.
 
-|hpx| contains a lot of...
-
 .. toctree::
    :maxdepth: 1
 
