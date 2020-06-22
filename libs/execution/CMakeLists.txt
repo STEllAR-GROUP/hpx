@@ -102,9 +102,6 @@ add_hpx_module(
     hpx_concepts
     hpx_config
     hpx_errors
-    hpx_datastructures
-    hpx_errors
-    hpx_functional
     hpx_iterator_support
     hpx_preprocessor
     hpx_resource_partitioner
