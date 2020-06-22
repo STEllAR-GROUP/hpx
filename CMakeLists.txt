@@ -1382,6 +1382,14 @@ hpx_option(
   CATEGORY "Debugging" ADVANCED
 )
 
+hpx_option(
+  HPX_WITH_PARALLEL_TESTS_BIND_NONE
+  BOOL
+  "Pass --hpx:bind=none to tests that may run in parallel (cmake -j flag) (default: OFF)"
+  OFF
+  CATEGORY "Debugging" ADVANCED
+)
+
 # If APEX is defined, the action timers need thread debug info.
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
