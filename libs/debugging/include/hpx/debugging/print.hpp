@@ -352,9 +352,53 @@ namespace hpx { namespace debug {
 
 #endif
 
-    }
+    }    // namespace detail
 
     namespace detail {
+
+        // ------------------------------------------------------------------
+        // helper class for printing time since start
+        // ------------------------------------------------------------------
+        struct hostname_print_helper
+        {
+            const char *get_hostname() const {
+                static bool initialized = false;
+                static char hostname_[20];
+                if (!initialized) {
+                    initialized = true;
+                    gethostname(hostname_, std::size_t(12));
+                    std::string temp = "(" + std::to_string(guess_rank()) + ")";
+                    std::strcat(hostname_, temp.c_str());
+                }
+                return hostname_;
+            }
+
+            int guess_rank() const {
+#ifdef DEBUGGING_PRINT_LINUX
+                std::vector<std::string> env_strings{"_RANK=", "_NODEID="};
+                for(char **current = environ; *current; current++) {
+                    auto e = std::string(*current);
+                    for (auto s : env_strings) {
+                        auto pos = e.find(s);
+                        if (pos != std::string::npos) {
+                            //std::cout << "Got a rank string : " << e << std::endl;
+                            return std::stoi(e.substr(pos+s.size(), 5));
+                        }
+                    }
+                }
+                return -1;
+#else
+                return 0;
+#endif
+            }
+        };
+
+        inline std::ostream& operator<<(
+            std::ostream& os, const hostname_print_helper& h)
+        {
+            os << debug::str<13>(h.get_hostname()) << " ";
+            return os;
+        }
 
         template <typename... Args>
         void display(const char* prefix, const Args&... args);

@@ -144,7 +144,8 @@ namespace hpx { namespace debug {
             // prevents multiple threads from injecting overlapping text
             std::stringstream tempstream;
             tempstream << prefix << detail::current_time_print_helper()
-                       << detail::current_thread_print_helper();
+                       << detail::current_thread_print_helper()
+                       << detail::hostname_print_helper();
             ((tempstream << args << " "), ...);
             tempstream << std::endl;
             std::cout << tempstream.str();
@@ -158,7 +159,8 @@ namespace hpx { namespace debug {
             // prevents multiple threads from injecting overlapping text
             std::stringstream tempstream;
             tempstream << prefix << detail::current_time_print_helper()
-                       << detail::current_thread_print_helper();
+                       << detail::current_thread_print_helper()
+                       << detail::hostname_print_helper();
             variadic_print(tempstream, args...);
             tempstream << std::endl;
             std::cout << tempstream.str();
