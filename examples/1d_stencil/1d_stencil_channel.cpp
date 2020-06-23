@@ -3,6 +3,12 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// This is the a separate examples demonstrating the development
+// of a fully distributed solver for a simple 1D heat distribution problem.
+//
+// This example makes use of LCOS channels to send and receive
+// elements.
+
 #include "communicator.hpp"
 #include "stencil.hpp"
 
@@ -108,7 +114,6 @@ int hpx_main(boost::program_options::variables_map& vm)
             // Synchronization step. Wait for the left neighbor to arrive.
             double left = comm.get(communicator_type::left, t).get();
 
-            // next[0] = (left + curr[1]) * 0.5f;
             next[0] = curr[0] + ((k*dt)/(dx*dx)) * (left - 2*curr[0] + curr[1]);
 
             // Dispatch the updated value to left neighbor for it to get
@@ -121,7 +126,6 @@ int hpx_main(boost::program_options::variables_map& vm)
             // Synchronization step. Wait for the right neighbor to arrive.
             double right = comm.get(communicator_type::right, t).get();
 
-            // next[Nx-1] = (right + curr[Nx-2]) * 0.5f;
             next[Nx-1] = curr[Nx-1] + ((k*dt)/(dx*dx)) * (curr[Nx-2] - 2*curr[Nx-1] + right);
 
             // Dispatch the updated value to right neighbor for it to get
@@ -131,10 +135,6 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
     double elapsed = t.elapsed();
     double telapsed = t_main.elapsed();
-
-    // for (double elem : U[(steps)%2])
-    //    std::cout << elem << " ";
-    // std::cout << std::endl;
 
     if (rank == 0)
     {

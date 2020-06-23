@@ -48,7 +48,6 @@ void stencil_update(std::array<data_type, 2>& U, const std::size_t& begin
     #pragma unroll
     for (std::size_t i = begin; i < end; ++i)
     {
-        // next[i] = (curr[i-1] + curr[i+1]) * 0.5f;
         next[i] = curr[i] + ((k*dt)/(dx*dx)) * (curr[i-1] - 2*curr[i] + curr[i+1]);
     }
 }
