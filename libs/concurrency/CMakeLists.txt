@@ -26,7 +26,6 @@ set(concurrency_compat_headers
     hpx/concurrency.hpp
     hpx/util/lockfree/concurrentqueue.hpp
     hpx/util/lockfree/deque.hpp
-    hpx/util/lockfree/detail/tagged_ptr_pair.hpp
     hpx/util/lockfree/freelist.hpp
     hpx/util/spinlock.hpp
     hpx/util/spinlock_pool.hpp

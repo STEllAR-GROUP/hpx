@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/timing/config/defines.hpp>
-#include <hpx/timing/tick_counter.hpp>
+#include <hpx/modules/timing.hpp>
 
 #if HPX_TIMING_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/tick_counter.hpp is deprecated, \
-    please include hpx/timing/tick_counter.hpp instead")
+    please include hpx/modules/timing.hpp instead")
 #else
 #warning "The header hpx/util/tick_counter.hpp is deprecated, \
-    please include hpx/timing/tick_counter.hpp instead"
+    please include hpx/modules/timing.hpp instead"
 #endif
 #endif

@@ -8,18 +8,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/executors/config/defines.hpp>
-#include <hpx/executors/parallel_executor_aggregated.hpp>
+#include <hpx/include/parallel_executors.hpp>
 
 #if HPX_EXECUTORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/execution/executors/parallel_executor_aggregated.hpp is \
     deprecated, \
-    please include hpx/executors/parallel_executor_aggregated.hpp instead")
+    please include hpx/include/parallel_executors.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/execution/executors/parallel_executor_aggregated.hpp is \
     deprecated, \
-    please include hpx/executors/parallel_executor_aggregated.hpp instead"
+    please include hpx/include/parallel_executors.hpp instead"
 #endif
 #endif

@@ -68,16 +68,6 @@ set(async_compat_headers
     hpx/lcos/async_fwd.hpp
     hpx/lcos/async.hpp
     hpx/lcos/dataflow.hpp
-    hpx/lcos/detail/async_colocated_callback_fwd.hpp
-    hpx/lcos/detail/async_colocated_callback.hpp
-    hpx/lcos/detail/async_colocated_fwd.hpp
-    hpx/lcos/detail/async_colocated.hpp
-    hpx/lcos/detail/async_implementations_fwd.hpp
-    hpx/lcos/detail/async_implementations.hpp
-    hpx/lcos/detail/async_unwrap_result_implementations_fwd.hpp
-    hpx/lcos/detail/async_unwrap_result_implementations.hpp
-    hpx/lcos/detail/sync_implementations_fwd.hpp
-    hpx/lcos/detail/sync_implementations.hpp
     hpx/lcos/sync_fwd.hpp
     hpx/lcos/sync.hpp
     hpx/runtime/applier/applier.hpp
@@ -88,12 +78,6 @@ set(async_compat_headers
     hpx/runtime/applier/apply_helper.hpp
     hpx/runtime/applier/apply.hpp
     hpx/runtime/applier/bind_naming_wrappers.hpp
-    hpx/runtime/applier/detail/apply_colocated_callback_fwd.hpp
-    hpx/runtime/applier/detail/apply_colocated_callback.hpp
-    hpx/runtime/applier/detail/apply_colocated_fwd.hpp
-    hpx/runtime/applier/detail/apply_colocated.hpp
-    hpx/runtime/applier/detail/apply_implementations_fwd.hpp
-    hpx/runtime/applier/detail/apply_implementations.hpp
     hpx/runtime/applier_fwd.hpp
     hpx/runtime/applier/register_apply_colocated.hpp
     hpx/runtime/applier/trigger.hpp

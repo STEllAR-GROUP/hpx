@@ -28,7 +28,6 @@ set(futures_headers
 )
 
 set(futures_compat_headers
-    hpx/lcos/detail/future_traits.hpp
     hpx/lcos/future.hpp
     hpx/lcos/local/futures_factory.hpp
     hpx/lcos/local/packaged_continuation.hpp

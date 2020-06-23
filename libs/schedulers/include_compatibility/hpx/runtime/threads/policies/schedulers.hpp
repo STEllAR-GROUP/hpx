@@ -14,10 +14,10 @@
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/schedulers.hpp is deprecated, \
-    please include hpx/schedulers.hpp instead")
+    please include hpx/modules/schedulers.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/schedulers.hpp is deprecated, \
-    please include hpx/schedulers.hpp instead"
+    please include hpx/modules/schedulers.hpp instead"
 #endif
 #endif

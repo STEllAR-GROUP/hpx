@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/threadmanager/config/defines.hpp>
-#include <hpx/modules/threadmanager.hpp>
+#include <hpx/include/threadmanager.hpp>
 
 #if HPX_THREADMANAGER_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/threadmanager.hpp is deprecated, \
-    please include hpx/threadmanager.hpp instead")
+    please include hpx/include/threadmanager.hpp instead")
 #else
 #warning "The header hpx/runtime/threads/threadmanager.hpp is deprecated, \
-    please include hpx/threadmanager.hpp instead"
+    please include hpx/include/threadmanager.hpp instead"
 #endif
 #endif

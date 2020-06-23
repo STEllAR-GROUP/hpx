@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/config/defines.hpp>
-#include <hpx/util/traits/await_traits.hpp>
+#include <hpx/include/util.hpp>
 
 #if HPX_UTIL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/await_traits.hpp is deprecated, \
-    please include hpx/util/traits/await_traits.hpp instead")
+    please include hpx/include/util.hpp instead")
 #else
 #warning "The header hpx/util/await_traits.hpp is deprecated, \
-    please include hpx/util/traits/await_traits.hpp instead"
+    please include hpx/include/util.hpp instead"
 #endif
 #endif

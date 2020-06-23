@@ -23,7 +23,6 @@ set(type_support_headers
 
 set(type_support_compat_headers
     hpx/type_support.hpp
-    hpx/traits/detail/wrap_int.hpp
     hpx/util/always_void.hpp
     hpx/util/decay.hpp
     hpx/util/detected.hpp

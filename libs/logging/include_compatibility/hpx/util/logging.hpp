@@ -14,10 +14,10 @@
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/logging.hpp is deprecated,                \
-    please include hpx/logging.hpp instead")
+    please include hpx/modules/logging.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/util/logging.hpp is deprecated,                       \
-    please include hpx/logging.hpp instead"
+    please include hpx/modules/logging.hpp instead"
 #endif
 #endif

@@ -8,18 +8,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/config/defines.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #if HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/thread_queue_init_parameters.hpp \
     is deprecated, \
-    please include hpx/threading_base/thread_queue_init_parameters.hpp instead")
+    please include hpx/modules/threading_base.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/thread_queue_init_parameters.hpp \
     is deprecated, \
-    please include hpx/threading_base/thread_queue_init_parameters.hpp instead"
+    please include hpx/modules/threading_base.hpp instead"
 #endif
 #endif

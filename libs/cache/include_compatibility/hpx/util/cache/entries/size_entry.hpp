@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/cache/config/defines.hpp>
-#include <hpx/cache/entries/size_entry.hpp>
+#include <hpx/modules/cache.hpp>
 
 #if HPX_CACHE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/cache/entries/size_entry.hpp is deprecated, \
-    please include hpx/cache/entries/size_entry.hpp instead")
+    please include hpx/modules/cache.hpp instead")
 #else
 #warning "The header hpx/util/cache/entries/size_entry.hpp is deprecated, \
-    please include hpx/cache/entries/size_entry.hpp instead"
+    please include hpx/modules/cache.hpp instead"
 #endif
 #endif

@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/pack_traversal/config/defines.hpp>
-#include <hpx/pack_traversal/pack_traversal.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 
 #if HPX_PACK_TRAVERSAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/pack_traversal.hpp is deprecated, \
-    please include hpx/pack_traversal/pack_traversal.hpp instead")
+    please include hpx/modules/pack_traversal.hpp instead")
 #else
 #warning "The header hpx/util/pack_traversal.hpp is deprecated, \
-    please include hpx/pack_traversal/pack_traversal.hpp instead"
+    please include hpx/modules/pack_traversal.hpp instead"
 #endif
 #endif

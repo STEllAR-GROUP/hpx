@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/config/defines.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/condition_variable.hpp>
 
 #if HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/lcos/local/condition_variable.hpp is deprecated, \
-    please include hpx/synchronization/condition_variable.hpp instead")
+    please include hpx/condition_variable.hpp instead")
 #else
 #warning "The header hpx/lcos/local/condition_variable.hpp is deprecated, \
-    please include hpx/synchronization/condition_variable.hpp instead"
+    please include hpx/condition_variable.hpp instead"
 #endif
 #endif

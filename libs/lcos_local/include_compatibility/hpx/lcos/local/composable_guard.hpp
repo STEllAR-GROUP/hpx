@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos_local/config/defines.hpp>
-#include <hpx/lcos_local/composable_guard.hpp>
+#include <hpx/include/local_lcos.hpp>
 
 #if HPX_LCOS_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/lcos/local/composable_guard.hpp is deprecated, \
-    please include hpx/lcos_local/composable_guard.hpp instead")
+    please include hpx/include/local_lcos.hpp instead")
 #else
 #warning "The header hpx/lcos/local/composable_guard.hpp is deprecated, \
-    please include hpx/lcos_local/composable_guard.hpp instead"
+    please include hpx/include/local_lcos.hpp instead"
 #endif
 #endif

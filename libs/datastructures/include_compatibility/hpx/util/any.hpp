@@ -8,17 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
-#include <hpx/datastructures/any.hpp>
+#include <hpx/any.hpp>
 
 #if HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/any.hpp is deprecated, \
-    please include hpx/datastructures/any.hpp instead. If you need for any to be\
-    serializable, please include hpx/serialization/serializable_any.hpp instead\
-    ")
+    please include hpx/any.hpp instead")
 #else
 #warning "The header hpx/util/any.hpp is deprecated, \
-    please include hpx/datastructures/any.hpp instead. If you need for any to be\
-    serializable, please include hpx/serialization/serializable_any.hpp instead"
+    please include hpx/any.hpp instead"
 #endif
 #endif

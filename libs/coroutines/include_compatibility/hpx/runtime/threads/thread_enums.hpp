@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/config/defines.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 
 #if HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/thread_enums.hpp is deprecated, \
-    please include hpx/coroutines/thread_enums.hpp instead")
+    please include hpx/modules/coroutines.hpp instead")
 #else
 #warning "The header hpx/runtime/threads/thread_enums.hpp is deprecated, \
-    please include hpx/coroutines/thread_enums.hpp instead"
+    please include hpx/modules/coroutines.hpp instead"
 #endif
 #endif

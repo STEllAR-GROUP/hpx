@@ -15,12 +15,8 @@ set(thread_pools_headers
     hpx/thread_pools/scheduling_loop.hpp
 )
 
-set(thread_pools_compat_headers
-    hpx/runtime/threads/detail/scheduled_thread_pool.hpp
-    hpx/runtime/threads/detail/scheduled_thread_pool_impl.hpp
-    hpx/runtime/threads/detail/scheduling_loop.hpp
-    hpx/runtime/threads/thread_pools.hpp
-    hpx/runtime/threads/scoped_background_timer.hpp
+set(thread_pools_compat_headers hpx/runtime/threads/thread_pools.hpp
+                                hpx/runtime/threads/scoped_background_timer.hpp
 )
 
 set(thread_pools_sources scheduled_thread_pool.cpp)

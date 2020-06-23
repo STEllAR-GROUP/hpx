@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute/config/defines.hpp>
-#include <hpx/compute/detail/new.hpp>
+#include <hpx/include/compute.hpp>
 
 #if HPX_COMPUTE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/functional/new.hpp is deprecated, \
-    please include hpx/compute/detail/new.hpp instead")
+    please include hpx/include/compute.hpp instead")
 #else
 #warning "The header hpx/util/functional/new.hpp is deprecated, \
-    please include hpx/compute/detail/new.hpp instead"
+    please include hpx/include/compute.hpp instead"
 #endif
 #endif
