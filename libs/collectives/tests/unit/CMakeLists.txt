@@ -9,31 +9,19 @@ set(tests
     all_reduce
     all_to_all
     barrier
-    broadcast
     broadcast_direct
     broadcast_apply
     broadcast_component
     fold
     gather
-    global_spmd_block
     reduce
     remote_latch
-    scatter
+    global_spmd_block
 )
 
-set(all_gather_PARAMETERS LOCALITIES 2)
-set(all_reduce_PARAMETERS LOCALITIES 2)
-set(all_to_all_PARAMETERS LOCALITIES 2)
-set(broadcast_PARAMETERS LOCALITIES 2)
-set(broadcast_direct_PARAMETERS LOCALITIES 2)
-set(broadcast_apply_PARAMETERS LOCALITIES 2)
-set(broadcast_component_PARAMETERS LOCALITIES 2)
-set(gather_PARAMETERS LOCALITIES 2)
-set(remote_latch_PARAMETERS LOCALITIES 2)
-set(reduce_PARAMETERS LOCALITIES 2)
-set(scatter_PARAMETERS LOCALITIES 2)
-
-set(global_spmd_block_PARAMETERS LOCALITIES 2)
+if(HPX_HAVE_NETWORKING)
+  set(tests ${tests} broadcast scatter)
+endif()
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -49,5 +37,7 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Collectives"
   )
 
-  add_hpx_unit_test("modules.collectives" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.collectives" ${test} ${${test}_PARAMETERS} LOCALITIES 2
+  )
 endforeach()
