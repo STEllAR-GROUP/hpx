@@ -66,7 +66,7 @@ function check_cmakelists_files() {
 # Enable globbing
 shopt -s globstar
 
-source_dir=$(pwd)/..
+source_dir=/hpx/source
 pushd $source_dir/libs > /dev/null
 
 # Extract the list of the modules
