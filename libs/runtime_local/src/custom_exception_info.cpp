@@ -74,7 +74,7 @@ namespace hpx {
     std::string diagnostic_information(hpx::exception_info const& xi)
     {
         int const verbosity = util::from_string<int>(
-            get_config_entry("hpx.exception_verbosity", ""));
+            get_config_entry("hpx.exception_verbosity", "2"));
 
         std::ostringstream strm;
         strm << "\n";
