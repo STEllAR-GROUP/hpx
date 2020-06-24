@@ -63,9 +63,10 @@ namespace hpx { namespace serialization {
           , size_(size)
           , alloc_(alloc)
         {
-            data_.reset(alloc_.allocate(size), [this](T* p) {
-                serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-            });
+            data_.reset(alloc_.allocate(size),
+                [alloc = this->alloc_, size = this->size_](T* p) {
+                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+                });
         }
 
         // The default mode is 'copy' which is consistent with the constructor
@@ -78,9 +79,11 @@ namespace hpx { namespace serialization {
         {
             if (mode == copy)
             {
-                data_.reset(alloc_.allocate(size), [this](T* p) {
-                    serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-                });
+                data_.reset(alloc_.allocate(size),
+                    [alloc = this->alloc_, size = this->size_](T* p) {
+                        serialize_buffer::deleter<allocator_type>(
+                            p, alloc, size);
+                    });
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
@@ -92,9 +95,11 @@ namespace hpx { namespace serialization {
             else
             {
                 // take ownership
-                data_ = boost::shared_array<T>(data, [this](T* p) {
-                    serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-                });
+                data_ = boost::shared_array<T>(
+                    data, [alloc = this->alloc_, size = this->size_](T* p) {
+                        serialize_buffer::deleter<allocator_type>(
+                            p, alloc, size);
+                    });
             }
         }
 
@@ -180,9 +185,10 @@ namespace hpx { namespace serialization {
           , alloc_(alloc)
         {
             // create from const data implies 'copy' mode
-            data_.reset(alloc_.allocate(size), [this](T* p) {
-                serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-            });
+            data_.reset(alloc_.allocate(size),
+                [alloc = this->alloc_, size = this->size_](T* p) {
+                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+                });
             if (size != 0)
                 std::copy(data, data + size, data_.get());
         }
@@ -209,9 +215,11 @@ namespace hpx { namespace serialization {
         {
             if (mode == copy)
             {
-                data_.reset(alloc_.allocate(size), [this](T* p) {
-                    serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-                });
+                data_.reset(alloc_.allocate(size),
+                    [alloc = this->alloc_, size = this->size_](T* p) {
+                        serialize_buffer::deleter<allocator_type>(
+                            p, alloc, size);
+                    });
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
@@ -291,9 +299,10 @@ namespace hpx { namespace serialization {
             ar >> size_ >> alloc_;
             // -V128
 
-            data_.reset(alloc_.allocate(size_), [this](T* p) {
-                serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-            });
+            data_.reset(alloc_.allocate(size_),
+                [alloc = this->alloc_, size = this->size_](T* p) {
+                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+                });
 
             if (size_ != 0)
             {
