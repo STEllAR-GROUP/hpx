@@ -135,7 +135,7 @@ namespace hpx { namespace debug {
             return os;
         }
 
-#ifdef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
+#if defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
         template <typename... Args>
         void display(const char* prefix, const Args&... args)
         {

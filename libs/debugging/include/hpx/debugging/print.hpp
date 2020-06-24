@@ -296,45 +296,38 @@ namespace hpx { namespace debug {
 #if defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
         template <typename TupleType, std::size_t... I>
         void tuple_print(
-            std::ostream& os, const TupleType& tup, std::index_sequence<I...>)
+            std::ostream& os, const TupleType& t, std::index_sequence<I...>)
         {
-            (..., (os << (I == 0 ? "" : " ") << std::get<I>(tup)));
+            (..., (os << (I == 0 ? "" : " ") << std::get<I>(t)));
         }
 
         template <typename... Args>
-        void tuple_print(std::ostream& os, const std::tuple<Args...>& tup)
+        void tuple_print(std::ostream& os, const std::tuple<Args...>& t)
         {
-            tuple_print(os, tup, std::make_index_sequence<sizeof...(Args)>());
+            tuple_print(os, t, std::make_index_sequence<sizeof...(Args)>());
         }
 
 #else
         // C++14 version
         // helper function to print a tuple of any size
-        template <typename TupleType, std::size_t N>
-        struct tuple_printer
+        template <typename TupleType, std::size_t... I>
+        void tuple_print(
+            std::ostream& os, const TupleType& t, std::index_sequence<I...>)
         {
-            static void print(std::ostream& os, const TupleType& t)
-            {
-                tuple_printer<TupleType, N - 1>::print(os, t);
-                os << " " << std::get<N - 1>(t);
-            }
-        };
-
-        template <typename TupleType>
-        struct tuple_printer<TupleType, 1>
-        {
-            static void print(std::ostream& os, const TupleType& t)
-            {
-                os << std::get<0>(t);
-            }
-        };
-
-        template <class... Args>
-        void tuple_print(std::ostream& os, const std::tuple<Args...>& t)
-        {
-            tuple_printer<decltype(t), sizeof...(Args)>::print(os, t);
+            using expander = int[];
+            (void) expander{
+                0, (void(os << (I == 0 ? "" : " ") << std::get<I>(t)), 0)...};
         }
 
+        // print a tuple of any size - forwards to helper with index
+        template <typename... Args>
+        void tuple_print(std::ostream& os, std::tuple<Args...> const& t)
+        {
+            detail::tuple_print(
+                os, t, std::make_index_sequence<sizeof...(Args)>{});
+        }
+
+        // print variadic list of args
         template <typename Arg, typename... Args>
         void variadic_print(
             std::ostream& os, const Arg& arg, const Args&... args)
@@ -342,12 +335,6 @@ namespace hpx { namespace debug {
             os << arg;
             using expander = int[];
             (void) expander{0, (void(os << ' ' << args), 0)...};
-        }
-
-        template <class... Args>
-        void tuple_print(std::ostream& os, const Args&... args)
-        {
-            variadic_print(os, args...);
         }
 
 #endif
