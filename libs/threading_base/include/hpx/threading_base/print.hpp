@@ -36,7 +36,7 @@ namespace hpx { namespace debug {
         {
         }
         const threads::thread_data* data;
-        friend std::ostream& operator<<(std::ostream& os, const threadinfo& d)
+        friend std::ostream& operator<<(std::ostream& os, threadinfo const& d)
         {
             os << ptr(d.data) << " \""
                << ((d.data != nullptr) ? d.data->get_description() : "nullptr")
@@ -53,7 +53,7 @@ namespace hpx { namespace debug {
         {
         }
         const threads::thread_id_type* data;
-        friend std::ostream& operator<<(std::ostream& os, const threadinfo& d)
+        friend std::ostream& operator<<(std::ostream& os, threadinfo const& d)
         {
             if (d.data == nullptr)
                 os << "nullptr";
@@ -67,12 +67,12 @@ namespace hpx { namespace debug {
     template <>
     struct threadinfo<hpx::threads::thread_init_data>
     {
-        threadinfo(const hpx::threads::thread_init_data& v)
+        threadinfo(hpx::threads::thread_init_data const& v)
           : data(v)
         {
         }
-        const hpx::threads::thread_init_data& data;
-        friend std::ostream& operator<<(std::ostream& os, const threadinfo& d)
+        hpx::threads::thread_init_data const& data;
+        friend std::ostream& operator<<(std::ostream& os, threadinfo const& d)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             os << std::left << " \"" << d.data.description.get_description()
@@ -93,7 +93,7 @@ namespace hpx { namespace debug {
         };
 
         inline std::ostream& operator<<(
-            std::ostream& os, const current_thread_print_helper&)
+            std::ostream& os, current_thread_print_helper const&)
         {
             if (hpx::threads::get_self_id() == hpx::threads::invalid_thread_id)
             {
@@ -123,7 +123,7 @@ namespace hpx { namespace debug {
         };
 
         inline std::ostream& operator<<(
-            std::ostream& os, const current_time_print_helper&)
+            std::ostream& os, current_time_print_helper const&)
         {
             using namespace std::chrono;
             static steady_clock::time_point log_t_start = steady_clock::now();
@@ -137,7 +137,7 @@ namespace hpx { namespace debug {
 
 #if defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
         template <typename... Args>
-        void display(const char* prefix, const Args&... args)
+        void display(const char* prefix, Args const&... args)
         {
             // using a temp stream object with a single copy to cout at the end
             // prevents multiple threads from injecting overlapping text
@@ -152,7 +152,7 @@ namespace hpx { namespace debug {
 
 #else
         template <typename... Args>
-        void display(const char* prefix, const Args&... args)
+        void display(const char* prefix, Args const&... args)
         {
             // using a temp stream object with a single copy to cout at the end
             // prevents multiple threads from injecting overlapping text
