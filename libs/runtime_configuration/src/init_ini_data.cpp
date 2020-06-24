@@ -153,7 +153,7 @@ namespace hpx { namespace util {
             {
                 std::cerr
                     << "hpx::init: command line warning: file specified using "
-                       "--hpx::config does not exist ("
+                       "--hpx:config does not exist ("
                     << hpx_ini_file << ")." << std::endl;
                 hpx_ini_file.clear();
                 result = false;
