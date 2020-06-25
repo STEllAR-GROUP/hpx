@@ -121,8 +121,8 @@ namespace hpx {
         std::size_t set_thread_data(std::size_t);
 
 #ifdef HPX_HAVE_LIBCDS
-        std::vector<std::size_t> get_libcds_data() const;
-        std::vector<std::size_t> set_libcds_data(std::vector<std::size_t>);
+        std::array<std::size_t, 3> get_libcds_data() const;
+        std::array<std::size_t, 3> set_libcds_data(std::array<std::size_t, 3>);
 #endif
 
     private:
@@ -262,8 +262,8 @@ namespace hpx {
         HPX_EXPORT std::size_t set_thread_data(std::size_t);
 
 #ifdef HPX_HAVE_LIBCDS
-        HPX_EXPORT std::vector<std::size_t> get_libcds_data();
-        HPX_EXPORT std::vector<std::size_t> set_libcds_data(std::vector<std::size_t>);
+        HPX_EXPORT std::array<std::size_t, 3> get_libcds_data();
+        HPX_EXPORT std::array<std::size_t, 3> set_libcds_data(std::array<std::size_t, 3>);
 #endif
 
         class HPX_EXPORT disable_interruption

@@ -205,26 +205,26 @@ namespace hpx { namespace threads {
     }
 
 #ifdef HPX_HAVE_LIBCDS
-    std::vector<std::size_t> get_libcds_data(thread_id_type const& id, error_code& ec)
+    std::array<std::size_t, 3> get_libcds_data(thread_id_type const& id, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_libcds_data",
                 "null thread id encountered");
-            return std::vector<size_t>{0, 0, 0};
+            return std::array<size_t, 3>{{0, 0, 0}};
         }
 
         return get_thread_id_data(id)->get_libcds_data();
     }
 
-    std::vector<std::size_t> set_libcds_data(
-        thread_id_type const& id, std::vector<std::size_t> data, error_code& ec)
+    std::array<std::size_t, 3> set_libcds_data(
+        thread_id_type const& id, std::array<std::size_t, 3> data, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::set_libcds_data",
                 "null thread id encountered");
-            return std::vector<size_t>{0, 0, 0};
+            return std::array<size_t, 3>{{0, 0, 0}};
         }
 
         return get_thread_id_data(id)->set_libcds_data(data);
