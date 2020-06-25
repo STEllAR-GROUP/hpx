@@ -132,7 +132,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     *dst++ = val;
 
                     util::loop_n<ExPolicy>(
-                        dst, part_size - 1, [&op, &val](FwdIter2 it) {
+                        dst, part_size - 1, [&op, &val](FwdIter2 it) -> void {
                             *it = hpx::util::invoke(op, *it, val);
                         });
                 };
@@ -154,7 +154,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // step 2 propagates the partition results from left
                     // to right
                     hpx::util::unwrapping(op),
-                    // step 3 runs final_accumulation on each partition
+                    // step 3 runs final accumulation on each partition
                     std::move(f3),
                     // use this return value
                     [final_dest](std::vector<hpx::shared_future<T>>&&,
@@ -290,20 +290,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// The behavior of transform_exclusive_scan may be non-deterministic for
     /// a non-associative predicate.
     ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T, typename Op, typename Conv,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value&&
-                    hpx::traits::is_invocable<Conv,
-                        typename std::iterator_traits<FwdIter1>::value_type>::
-                        value&& hpx::traits::is_invocable<Op,
-                            typename hpx::util::invoke_result<Conv,
-                                typename std::iterator_traits<
-                                    FwdIter1>::value_type>::type,
-                            typename hpx::util::invoke_result<Conv,
-                                typename std::iterator_traits<
-                                    FwdIter1>::value_type>::type>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_invocable<Conv,
+                typename std::iterator_traits<FwdIter1>::value_type>::value &&
+            hpx::traits::is_invocable<Op,
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<FwdIter1>::value_type>::type,
+                typename hpx::util::invoke_result<Conv,
+                    typename std::iterator_traits<FwdIter1>::value_type>::type
+            >::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     transform_exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, T init, Op&& op, Conv&& conv)

@@ -439,6 +439,14 @@ function(hpx_check_for_cxx17_std_variant)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx17_std_transform_scan)
+  add_hpx_config_test(
+    HPX_WITH_CXX17_STD_TRANSFORM_SCAN
+    SOURCE cmake/tests/cxx17_std_transform_scan.cpp FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_coroutines)
   add_hpx_config_test(
     HPX_WITH_CXX20_COROUTINES SOURCE cmake/tests/cxx20_coroutines.cpp FILE

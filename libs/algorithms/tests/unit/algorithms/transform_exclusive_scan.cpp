@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -45,6 +46,14 @@ void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
         std::begin(c), std::end(c), std::begin(e), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+    std::vector<std::size_t> f(c.size());
+    std::transform_exclusive_scan(
+        std::begin(c), std::end(c), std::begin(f), val, op, conv);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -61,10 +70,10 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::future<void> f =
+    hpx::future<void> fut =
         hpx::parallel::transform_exclusive_scan(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), val, op, conv);
-    f.wait();
+    fut.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -72,6 +81,14 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
         std::begin(c), std::end(c), std::begin(e), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+    std::vector<std::size_t> f(c.size());
+    std::transform_exclusive_scan(
+        std::begin(c), std::end(c), std::begin(f), val, op, conv);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename IteratorTag>

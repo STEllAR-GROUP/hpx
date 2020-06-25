@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2016 Hartmut Kaiser
+# Copyright (c) 2014-2020 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@ set(tests
     set_operations_3442
     stable_merge_2964
     static_chunker_2282
+    transform_inclusive_scan_4786
 )
 
 foreach(test ${tests})

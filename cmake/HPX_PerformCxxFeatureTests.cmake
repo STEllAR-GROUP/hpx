@@ -72,6 +72,10 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX17_NOEXCEPT_FUNCTIONS_AS_NONTYPE_TEMPLATE_ARGUMENTS
   )
 
+  hpx_check_for_cxx17_std_transform_scan(
+    DEFINITIONS HPX_HAVE_CXX17_STD_TRANSFORM_SCAN
+  )
+
   # C++20 feature tests
   hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 

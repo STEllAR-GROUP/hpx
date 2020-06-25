@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -45,6 +46,14 @@ void test_transform_inclusive_scan1(ExPolicy policy, IteratorTag)
         std::begin(c), std::end(c), std::begin(e), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+    std::vector<std::size_t> f(c.size());
+    std::transform_inclusive_scan(
+        std::begin(c), std::end(c), std::begin(f), op, conv, val);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -61,10 +70,10 @@ void test_transform_inclusive_scan1_async(ExPolicy p, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::future<void> f =
+    hpx::future<void> fut =
         hpx::parallel::transform_inclusive_scan(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), op, conv, val);
-    f.wait();
+    fut.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -72,6 +81,14 @@ void test_transform_inclusive_scan1_async(ExPolicy p, IteratorTag)
         std::begin(c), std::end(c), std::begin(e), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+    std::vector<std::size_t> f(c.size());
+    std::transform_inclusive_scan(
+        std::begin(c), std::end(c), std::begin(f), op, conv, val);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename IteratorTag>
@@ -118,10 +135,18 @@ void test_transform_inclusive_scan2(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
-        std::begin(c), std::end(c), std::begin(e), conv, std::size_t(), op);
+    hpx::parallel::v1::detail::sequential_transform_inclusive_scan_noinit(
+        std::begin(c), std::end(c), std::begin(e), conv, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+    std::vector<std::size_t> f(c.size());
+    std::transform_inclusive_scan(
+        std::begin(c), std::end(c), std::begin(f), op, conv);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -137,17 +162,25 @@ void test_transform_inclusive_scan2_async(ExPolicy p, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
     auto conv = [](std::size_t val) { return 2 * val; };
 
-    hpx::future<void> f =
+    hpx::future<void> fut =
         hpx::parallel::transform_inclusive_scan(p, iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(d), op, conv);
-    f.wait();
+    fut.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
-        std::begin(c), std::end(c), std::begin(e), conv, std::size_t(), op);
+    hpx::parallel::v1::detail::sequential_transform_inclusive_scan_noinit(
+        std::begin(c), std::end(c), std::begin(e), conv, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+    std::vector<std::size_t> f(c.size());
+    std::transform_inclusive_scan(
+        std::begin(c), std::end(c), std::begin(f), op, conv);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename IteratorTag>
