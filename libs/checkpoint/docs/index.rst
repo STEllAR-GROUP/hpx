@@ -1,5 +1,5 @@
 ..
-    Copyright (c) 2019 The STE||AR-Group
+    Copyright (c) 2019-2020 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,6 +37,23 @@ newly created ``checkpoint`` object. This function returns a ``future`` to a
 
 Once the future is ready, the checkpoint object will contain the ``vector``
 ``vec`` and its five elements.
+
+``prepare_checkpoint`` takes arbitrary data containers (same as for
+``save_checkpoint``), , such as ``int``,
+``double``, ``float``, ``vector``, and ``future``, and calculates the necessary
+buffer space for the checkpoint that would be created if ``save_checkpoint``
+was called with the same arguments. This function returns a ``future`` to a
+``checkpoint`` that is appropriately initialized. Here's an example of a
+simple use case::
+
+    using hpx::util::checkpoint;
+    using hpx::util::prepare_checkpoint;
+
+    std::vector<int> vec{1,2,3,4,5};
+    hpx::future<checkpoint> prepare_checkpoint(vec);
+
+Once the future is ready, the checkpoint object will be initialized with an
+appropriately sized internal buffer.
 
 It is also possible to modify the launch policy used by ``save_checkpoint``.
 This is accomplished by passing a launch policy as the first argument. It is

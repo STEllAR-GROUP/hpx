@@ -21,6 +21,7 @@
 #include <vector>
 
 using hpx::util::checkpoint;
+using hpx::util::prepare_checkpoint;
 using hpx::util::restore_checkpoint;
 using hpx::util::save_checkpoint;
 
@@ -61,7 +62,9 @@ struct data_server : hpx::components::component_base<data_server>
     template <typename Archive>
     void serialize(Archive& arch, const unsigned int version)
     {
-        arch& data_;
+        // clang-format off
+        arch & data_;
+        // clang-format on
     }
 };
 
@@ -120,11 +123,16 @@ int main()
         hpx::get_ptr<data_server>(A.get_id());
     std::shared_ptr<data_server> a_ptr = f_a_ptr.get();
     hpx::future<checkpoint> f = save_checkpoint(a_ptr);
+    auto&& data = f.get();
+
+    // test prepare_checkpoint API
+    checkpoint c = prepare_checkpoint(hpx::launch::sync, a_ptr);
+    HPX_TEST(c.size() == data.size());
 
     // Restore Server
     // Create a new server instance
     std::shared_ptr<data_server> b_server;
-    restore_checkpoint(f.get(), b_server);
+    restore_checkpoint(data, b_server);
     //]
 
     HPX_TEST(A.get_data().get() == b_server->get_data());

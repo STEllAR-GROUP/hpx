@@ -24,6 +24,7 @@ set(HPX_CANDIDATE_LIBS
     batch_environments
     cache
     checkpoint
+    checkpoint_base
     collectives
     command_line_handling
     compute

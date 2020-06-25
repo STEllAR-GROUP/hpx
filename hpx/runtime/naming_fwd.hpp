@@ -28,9 +28,6 @@ namespace hpx
         struct HPX_EXPORT address;
 
         HPX_EXPORT resolver_client& get_agas_client();
-
-        // tag used to mark serialization archive during check-pointing
-        struct checkpointing_tag {};
     }
 
     ///////////////////////////////////////////////////////////////////////////

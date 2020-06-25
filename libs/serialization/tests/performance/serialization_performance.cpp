@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/datastructures.hpp>
-#include <hpx/runtime/serialization/detail/preprocess_container.hpp>
+#include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>

@@ -642,6 +642,7 @@ jobs:
                   tests.unit.modules.batch_environments \
                   tests.unit.modules.cache \
                   tests.unit.modules.checkpoint \
+                  tests.unit.modules.checkpoint_base \
                   tests.unit.modules.collectives \
                   tests.unit.modules.compute \
                   tests.unit.modules.concepts \

@@ -12,8 +12,8 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/array.hpp>
+#include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/serialize_buffer.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>

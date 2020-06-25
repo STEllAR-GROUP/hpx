@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,6 +32,7 @@ set(serialization_headers
     hpx/serialization/detail/polymorphic_intrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
+    hpx/serialization/detail/preprocess_container.hpp
     hpx/serialization/detail/raw_ptr.hpp
     hpx/serialization/detail/serialize_collection.hpp
     hpx/serialization/detail/vc.hpp
