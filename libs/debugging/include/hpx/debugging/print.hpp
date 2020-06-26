@@ -433,29 +433,9 @@ namespace hpx { namespace debug {
         void timed(Args const&... args)
         {
             display("<TIM> ", args...);
-        }
+        }                
     }    // namespace detail
 
-    template <typename T>
-    struct init
-    {
-        T data_;
-        init(T const& t)
-          : data_(t)
-        {
-        }
-        friend std::ostream& operator<<(std::ostream& os, init<T> const& d)
-        {
-            os << d.data_ << " ";
-            return os;
-        }
-    };
-
-    template <typename T>
-    void set(init<T>& var, const T val)
-    {
-        var.data_ = val;
-    }
 
     template <typename... Args>
     struct scoped_var
@@ -589,6 +569,11 @@ namespace hpx { namespace debug {
             return true;
         }
 
+        template <typename T, typename V>
+        void set(T& var, V const& val)
+        {
+        }
+
         // @todo, return void so that timers have zero footprint when disabled
         template <typename... Args>
         constexpr int make_timer(const double, Args const&...) const
@@ -696,16 +681,16 @@ namespace hpx { namespace debug {
             std::cout << std::endl;
         }
 
-        template <typename T>
-        void set(init<T>& var, const T val) const
-        {
-            var.data_ = val;
-        }
-
         template <typename T, typename... Args>
         T declare_variable(Args const&... args) const
         {
             return T(args...);
+        }
+
+        template <typename T>
+        void set(T& var, T const& val)
+        {
+            var = val;
         }
 
         template <typename... Args>

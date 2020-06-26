@@ -88,6 +88,17 @@ int main()
     HPX_TEST_EQ(enabled_counter, 10);
     HPX_TEST_EQ(disabled_counter, 0);
 
+    p_enabled.set(var1, 5);
+    p_disabled.set(var2, 5);
+
+    p_enabled.debug("var 1"
+        , hpx::debug::dec<>(DP_LAZY(enabled_counter+=var1, p_enabled)));
+    p_disabled.debug("var 2"
+        , hpx::debug::dec<>(DP_LAZY(disabled_counter+=var2, p_disabled)));
+
+    HPX_TEST_EQ(enabled_counter, 15);
+    HPX_TEST_EQ(disabled_counter, 0);
+
     // ---------------------------------------------------------
     // Test that timed log messages behave as expected
     static auto t_enabled =
