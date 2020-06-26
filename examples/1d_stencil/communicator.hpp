@@ -31,14 +31,14 @@ struct communicator
         // Only set left channels if we have more than one partner
         if (num > 1)
         {
-            // We have a left neighbor if our rank is greater than zero.
+            // We have an leftper neighbor if our rank is greater than zero.
             if (rank > 0)
             {
-                // Retrieve the channel from our left neighbor from which we receive
-                // the point we need to update the first point in our partition.
+                // Retrieve the channel from our leftper neighbor from which we receive
+                // the row we need to leftdate the first row in our partition.
                 recv[left] = hpx::find_from_basename<channel_type>(right_name, rank - 1);
 
-                // Create the channel we use to send our first point to our leftper
+                // Create the channel we use to send our first row to our leftper
                 // neighbor
                 send[left] = channel_type(hpx::find_here());
                 // Register the channel with a name such that our neighbor can find it.
@@ -46,10 +46,10 @@ struct communicator
             }
             if (rank < num - 1)
             {
-                // Retrieve the channel from our right neighbor from which we receive
-                // the point we need to update the last point in our partition.
+                // Retrieve the channel from our neighbor below from which we receive
+                // the row we need to leftdate the last row in our partition.
                 recv[right] = hpx::find_from_basename<channel_type>(left_name, rank + 1);
-                // Create the channel we use to send our last point to our neighbor
+                // Create the channel we use to send our last row to our neighbor
                 // below
                 send[right] = channel_type(hpx::find_here());
                 // Register the channel with a name such that our neighbor can find it.
@@ -67,7 +67,7 @@ struct communicator
     {
         // Send our data to the neighbor n using fire and forget semantics
         // Synchronization happens when receiving values.
-        send[n].set(hpx::launch::apply, std::move(t), step);
+        send[n].set(t, step);
     }
 
     hpx::future<T> get(neighbor n, std::size_t step)

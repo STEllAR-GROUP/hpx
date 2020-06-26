@@ -95,43 +95,58 @@ int hpx_main(boost::program_options::variables_map& vm)
         data_type& curr = U[t % 2];
         data_type& next = U[(t + 1) % 2];
 
-        hpx::parallel::for_each(
-            policy,
-            std::begin(range), std::end(range),
-            [&U, local_nx, nlp, t] (std::size_t i)
-            {
-                if (i == 0)     stencil_update(U, 1, local_nx, t);
-                else if (i == nlp-1)    stencil_update(U, i * local_nx, (i + 1) * local_nx - 1, t);
-                else    stencil_update(U, i * local_nx, (i + 1) * local_nx, t);
-            }
-        );
-
-        // Left and right neighbor element should be transported
-        // by now.
+        hpx::future<void> l = hpx::make_ready_future();
+        hpx::future<void> r = hpx::make_ready_future();
 
         if (comm.has_neighbor(communicator_type::left))
         {
-            // Synchronization step. Wait for the left neighbor to arrive.
-            double left = comm.get(communicator_type::left, t).get();
+            l = comm.get(communicator_type::left, t)
+                .then(hpx::launch::sync,
+                    [&U, &next, &curr, &comm, t, local_nx](hpx::future<double>&& gg)
+                    {
+                        double left = gg.get();
 
-            next[0] = curr[0] + ((k*dt)/(dx*dx)) * (left - 2*curr[0] + curr[1]);
+                        next[0] = curr[0] + ((k*dt)/(dx*dx)) * (left - 2*curr[0] + curr[1]);
 
-            // Dispatch the updated value to left neighbor for it to get
-            // consumed in the next timestep
-            comm.set(communicator_type::left, next[0], t+1); 
+                        // Dispatch the updated value to left neighbor for it to get
+                        // consumed in the next timestep
+                        comm.set(communicator_type::left, next[0], t+1);
+                    }
+                );
         }
 
         if (comm.has_neighbor(communicator_type::right))
         {
-            // Synchronization step. Wait for the right neighbor to arrive.
-            double right = comm.get(communicator_type::right, t).get();
+            r = comm.get(communicator_type::right, t)
+                .then(hpx::launch::sync,
+                    [&U, &next, &curr, &comm, t, local_nx, Nx, nlp](hpx::future<double>&& gg)
+                    {
+                        double right = gg.get();
 
-            next[Nx-1] = curr[Nx-1] + ((k*dt)/(dx*dx)) * (curr[Nx-2] - 2*curr[Nx-1] + right);
+                        next[Nx-1] = curr[Nx-1] + ((k*dt)/(dx*dx)) * (curr[Nx-2] - 2*curr[Nx-1] + right);
 
-            // Dispatch the updated value to right neighbor for it to get
-            // consumed in the next timestep
-            comm.set(communicator_type::right, next[Nx-1], t+1); 
+                        // Dispatch the updated value to right neighbor for it to get
+                        // consumed in the next timestep
+                        comm.set(communicator_type::right, next[Nx-1], t+1);
+                    }
+                );
         }
+
+        hpx::parallel::for_each(
+            policy,
+            std::begin(range), std::end(range),
+            [&U, local_nx, nlp, t, &comm] (std::size_t i)
+            {
+                if (i == 0) // && !comm.has_neighbor(communicator_type::left))
+                    stencil_update(U, 1, local_nx, t);
+                else if (i == nlp-1) // && !comm.has_neighbor(communicator_type::right))
+                    stencil_update(U, i * local_nx, (i + 1) * local_nx - 1, t);
+                else if (i > 0 && i < nlp-1)
+                    stencil_update(U, i * local_nx, (i + 1) * local_nx, t);
+            }
+        );
+
+        hpx::wait_all(l, r);
     }
     double elapsed = t.elapsed();
     double telapsed = t_main.elapsed();
