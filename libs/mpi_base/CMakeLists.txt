@@ -13,6 +13,8 @@ if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_MPI_WITH_FUTURES)
   include(HPX_SetupMPI)
   setup_mpi()
   set(additional_dependencies Mpi::mpi)
+else()
+  return()
 endif()
 
 # Default location is $HPX_ROOT/libs/mpi_base/include

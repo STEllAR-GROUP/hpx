@@ -9,7 +9,7 @@ if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_dependencies(examples.modules examples.modules.async_mpi)
   if(HPX_WITH_TESTS
      AND HPX_WITH_TESTS_EXAMPLES
-     AND HPX_MPI_WITH_TESTS
+     AND HPX_ASYNC_MPI_WITH_TESTS
   )
     add_hpx_pseudo_target(tests.examples.modules.async_mpi)
     add_hpx_pseudo_dependencies(
