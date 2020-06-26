@@ -402,10 +402,6 @@ namespace hpx {
         // This needs to happen first
         runtime::init();
 
-        counters_ = std::make_shared<performance_counters::registry>();
-
-        LPROGRESS_;
-
         runtime_distributed*& runtime_distributed_ =
             get_runtime_distributed_ptr();
         if (nullptr == runtime_distributed_)
@@ -414,6 +410,10 @@ namespace hpx {
 
             runtime_distributed_ = this;
         }
+
+        LPROGRESS_;
+
+        counters_ = std::make_shared<performance_counters::registry>();
 
 #if defined(HPX_HAVE_NETWORKING)
         agas_client_.bootstrap(parcel_handler_, ini_);
