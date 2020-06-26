@@ -27,8 +27,15 @@
 #if defined(__linux) || defined(linux) || defined(__linux__)
 #include <sys/mman.h>
 #include <unistd.h>
+#endif
+
+#ifdef __APPLE__
+#include <crt_externs.h>
+#define environ (*_NSGetEnviron())
+#elif defined(HPX_WINDOWS)
+#define environ _environ
+#else
 extern char** environ;
-#define DEBUGGING_PRINT_LINUX
 #endif
 
 // ------------------------------------------------------------
@@ -367,7 +374,6 @@ namespace hpx { namespace debug {
 
             int guess_rank() const
             {
-#ifdef DEBUGGING_PRINT_LINUX
                 std::vector<std::string> env_strings{"_RANK=", "_NODEID="};
                 for (char** current = environ; *current; current++)
                 {
@@ -383,9 +389,6 @@ namespace hpx { namespace debug {
                     }
                 }
                 return -1;
-#else
-                return 0;
-#endif
             }
         };
 
