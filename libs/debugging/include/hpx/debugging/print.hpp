@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 John Biddiscombe
+//  Copyright (c) 2019-2020 John Biddiscombe
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,8 +31,6 @@ extern char** environ;
 #define DEBUGGING_PRINT_LINUX
 #endif
 
-#undef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
-
 // ------------------------------------------------------------
 // This file provides a simple to use printf style debugging
 // tool that can be used on a per file basis to enable output.
@@ -40,8 +38,8 @@ extern char** environ;
 // an aid for hpx development.
 // ------------------------------------------------------------
 // Usage: Instantiate a debug print object at the top of a file
-// using a template param of true/false to enable/disable output
-// when the template parameter is false, the optimizer will
+// using a template param of true/false to enable/disable output.
+// When the template parameter is false, the optimizer will
 // not produce code and so the impact is nil.
 //
 // static hpx::debug::enable_print<true> spq_deb("SUBJECT");
@@ -65,6 +63,11 @@ extern char** environ;
 //      spq_deb.timed(getnext, dec<>(thread_num));
 // The output will only be produced every N seconds
 // ------------------------------------------------------------
+
+// Used to wrap function call parameters to prevent evaluation
+// when debugging is disabled
+#define DP_LAZY(Expr, printer) \
+    printer.eval([&] { return Expr; })
 
 // ------------------------------------------------------------
 /// \cond NODETAIL
@@ -592,6 +595,10 @@ namespace hpx { namespace debug {
         {
             return 0;
         }
+
+        template <typename Expr>
+        constexpr bool eval(Expr const &) { return true; }
+
     };
 
     // when true, debug statements produce valid output
@@ -706,6 +713,11 @@ namespace hpx { namespace debug {
             const double delay, const Args... args) const
         {
             return timed_var<Args...>(delay, args...);
+        }
+
+        template <typename Expr>
+        auto eval(Expr const &e) {
+            return e();
         }
     };
 
