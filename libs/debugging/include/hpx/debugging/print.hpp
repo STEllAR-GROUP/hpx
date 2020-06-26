@@ -66,7 +66,7 @@ extern char** environ;
 
 // Used to wrap function call parameters to prevent evaluation
 // when debugging is disabled
-#define DP_LAZY(Expr, printer) \
+#define HPX_DP_LAZY(Expr, printer) \
     printer.eval([&] { return Expr; })
 
 // ------------------------------------------------------------
@@ -433,7 +433,7 @@ namespace hpx { namespace debug {
         void timed(Args const&... args)
         {
             display("<TIM> ", args...);
-        }                
+        }
     }    // namespace detail
 
 
