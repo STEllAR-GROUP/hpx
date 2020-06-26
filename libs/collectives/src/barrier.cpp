@@ -37,9 +37,11 @@ namespace hpx { namespace lcos {
                     static_cast<std::size_t>(hpx::get_locality_id()))))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+        {
             register_with_basename(
                 base_name, node_->get_unmanaged_id(), (*node_)->rank_)
                 .get();
+        }
     }
 
     barrier::barrier(std::string const& base_name, std::size_t num)
@@ -48,9 +50,11 @@ namespace hpx { namespace lcos {
                     static_cast<std::size_t>(hpx::get_locality_id()))))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+        {
             register_with_basename(
                 base_name, node_->get_unmanaged_id(), (*node_)->rank_)
                 .get();
+        }
     }
 
     barrier::barrier(
@@ -59,9 +63,11 @@ namespace hpx { namespace lcos {
                 wrapping_type(new wrapped_type(base_name, num, rank)))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+        {
             register_with_basename(
                 base_name, node_->get_unmanaged_id(), (*node_)->rank_)
                 .get();
+        }
     }
 
     barrier::barrier(std::string const& base_name,
@@ -77,12 +83,14 @@ namespace hpx { namespace lcos {
                     new wrapped_type(base_name, ranks.size(), barrier_rank)));
 
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+        {
             register_with_basename(
                 base_name, node_->get_unmanaged_id(), (*node_)->rank_)
                 .get();
+        }
     }
 
-    barrier::barrier() {}
+    barrier::barrier() = default;
 
     barrier::barrier(barrier&& other)
       : node_(std::move(other.node_))
@@ -162,8 +170,10 @@ namespace hpx { namespace lcos {
             {
                 if ((*node_)->num_ >= (*node_)->cut_off_ ||
                     (*node_)->rank_ == 0)
+                {
                     hpx::unregister_with_basename(
                         (*node_)->base_name_, (*node_)->rank_);
+                }
             }
             intrusive_ptr_release(node_->get());
             node_.reset();

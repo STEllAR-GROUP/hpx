@@ -8,6 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -21,7 +22,9 @@
 void barrier_test(
     std::size_t num, std::size_t rank, std::atomic<std::size_t>& c)
 {
-    hpx::lcos::barrier b("local_barrier_test", num, rank);
+    hpx::lcos::barrier b(
+        hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()), num,
+        rank);
     ++c;
 
     // wait for all threads to enter the barrier
@@ -43,14 +46,17 @@ void local_tests(hpx::program_options::variables_map& vm)
     for (std::size_t i = 0; i < iterations; ++i)
     {
         std::atomic<std::size_t> c(0);
-        for (std::size_t j = 0; j < pxthreads; ++j)
+        for (std::size_t j = 1; j <= pxthreads; ++j)
         {
             hpx::async(
                 hpx::util::bind(&barrier_test, pxthreads + 1, j, std::ref(c)));
         }
 
-        hpx::lcos::barrier b("local_barrier_test", pxthreads + 1, pxthreads);
+        hpx::lcos::barrier b(
+            hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()),
+            pxthreads + 1, 0);
         b.wait();    // wait for all threads to enter the barrier
+
         HPX_TEST_EQ(pxthreads, c.load());
     }
 }

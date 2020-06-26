@@ -87,27 +87,36 @@ namespace hpx { namespace lcos { namespace detail {
 
     hpx::future<void> barrier_node::wait(bool async)
     {
+        hpx::intrusive_ptr<barrier_node> this_(this);
+        future<void> result;
+
         if (num_ < cut_off_)
         {
             if (rank_ != 0)
             {
                 HPX_ASSERT(children_.size() == 1);
                 hpx::lcos::base_lco::set_event_action action;
-                return hpx::async(action, children_[0]);
+                result = hpx::async(action, children_[0]);
             }
             else
             {
                 if (async)
                 {
-                    hpx::intrusive_ptr<barrier_node> this_(this);
-                    return hpx::async(&barrier_node::set_event, this_);
+                    result = hpx::async(&barrier_node::set_event, this_);
                 }
-                set_event();
-                return hpx::make_ready_future();
+                else
+                {
+                    set_event();
+                    result = hpx::make_ready_future();
+                }
             }
-        }
 
-        future<void> result;
+            // keep everything alive until future has become ready
+            traits::detail::get_shared_state(result)->set_on_completed(
+                [this_ = std::move(this_)] {});
+
+            return result;
+        }
 
         if (rank_ == 0)
         {
@@ -133,8 +142,13 @@ namespace hpx { namespace lcos { namespace detail {
             result = broadcast_promise_.get_future();
         }
 
-        hpx::intrusive_ptr<barrier_node> this_(this);
-        return do_wait(this_, std::move(result));
+        // keep everything alive until future has become ready
+        result = do_wait(this_, std::move(result));
+
+        traits::detail::get_shared_state(result)->set_on_completed(
+            [this_ = std::move(this_)] {});
+
+        return result;
     }
 
     template <typename This>
@@ -196,13 +210,20 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         hpx::intrusive_ptr<barrier_node> this_(this);
+
         // Once we know that all our children entered the barrier, we flag ourself
-        return hpx::when_all(futures).then(
-            hpx::launch::sync, [this_ = std::move(this_)](hpx::future<void> f) {
+        auto result = hpx::when_all(futures).then(
+            hpx::launch::sync, [this_](hpx::future<void> f) {
                 // Trigger possible errors...
                 f.get();
                 return this_->gather_promise_.get_future();
             });
+
+        // keep everything alive until future has become ready
+        traits::detail::get_shared_state(result)->set_on_completed(
+            [this_ = std::move(this_)] {});
+
+        return result;
     }
 
     void barrier_node::set_event()
@@ -226,11 +247,13 @@ namespace hpx { namespace lcos { namespace detail {
 
         // Once we notified our children, we mark ourself ready.
         hpx::intrusive_ptr<barrier_node> this_(this);
-        hpx::when_all(futures).then(
-            hpx::launch::sync, [this_ = std::move(this_)](future<void> f) {
-                // Trigger possible errors...
-                f.get();
-                this_->broadcast_promise_.set_value();
-            });
+        hpx::when_all(futures)
+            .then(hpx::launch::sync,
+                [this_ = std::move(this_)](future<void> f) {
+                    // Trigger possible errors...
+                    f.get();
+                    this_->broadcast_promise_.set_value();
+                })
+            .get();
     }
 }}}    // namespace hpx::lcos::detail
