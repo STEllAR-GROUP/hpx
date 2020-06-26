@@ -33,9 +33,9 @@ double dx = 1.;     // grid spacing
 
 inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    if(i == 0 && dir == -1)
-        return size-1;
-    if(i == size-1 && dir == +1)
+    if (i == 0 && dir == -1)
+        return size - 1;
+    if (i == size - 1 && dir == +1)
         return 0;
 
     HPX_ASSERT((i + dir) < size);
@@ -351,10 +351,7 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
         for (std::size_t i = 0; i != np; ++i)
         {
             // we execute the action on the locality of the middle partition
-            using hpx::util::placeholders::_1;
-            using hpx::util::placeholders::_2;
-            using hpx::util::placeholders::_3;
-            auto Op = hpx::util::bind(act, localities[locidx(i, np, nl)], _1, _2, _3);
+            auto Op = hpx::util::bind_front(act, localities[locidx(i, np, nl)]);
             next[i] = dataflow(
                     hpx::launch::async, Op,
                     current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]
@@ -405,13 +402,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
         for (std::size_t i = 0; i != np; ++i)
         {
             std::cout << "U[" << i << "] = "
-                      << solution[i].get_data(partition_server::middle_partition).get()
+                      << solution[i]
+                             .get_data(partition_server::middle_partition)
+                             .get()
                       << std::endl;
         }
     }
     std::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
     hpx::future<std::uint32_t> locs = hpx::get_num_localities();
-    print_time_results(locs.get(),num_worker_threads, elapsed, nx, np, nt, header);
+    print_time_results(
+        locs.get(), num_worker_threads, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
 }
