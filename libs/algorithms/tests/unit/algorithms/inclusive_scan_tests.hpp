@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 #include <utility>
 #include <vector>
 
@@ -26,7 +27,11 @@ void inclusive_scan_benchmark()
 {
     try
     {
+#if defined(HPX_DEBUG)
+        std::vector<double> c(1000000);
+#else
         std::vector<double> c(100000000);
+#endif
         std::vector<double> d(c.size());
         std::fill(std::begin(c), std::end(c), 1.0);
 
@@ -84,6 +89,12 @@ void test_inclusive_scan1(ExPolicy&& policy, IteratorTag)
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::inclusive_scan(std::begin(c), std::end(c), std::begin(f), op, val);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -99,10 +110,10 @@ void test_inclusive_scan1_async(ExPolicy&& p, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::future<void> f = hpx::parallel::inclusive_scan(
+    hpx::future<void> fut = hpx::parallel::inclusive_scan(
         std::forward<ExPolicy>(p), iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), op, val);
-    f.wait();
+    fut.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -110,6 +121,12 @@ void test_inclusive_scan1_async(ExPolicy&& p, IteratorTag)
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::inclusive_scan(std::begin(c), std::end(c), std::begin(f), op, val);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -134,10 +151,16 @@ void test_inclusive_scan2(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan(std::begin(c),
-        std::end(c), std::begin(e), std::size_t(0), std::plus<std::size_t>());
+    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+        std::begin(c), std::end(c), std::begin(e), op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::inclusive_scan(std::begin(c), std::end(c), std::begin(f), op);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -149,6 +172,25 @@ void test_inclusive_scan2_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::fill(std::begin(c), std::end(c), std::size_t(1));
+
+    auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
+
+    hpx::future<void> fut = hpx::parallel::inclusive_scan(
+        p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), op);
+    fut.wait();
+
+    // verify values
+    std::vector<std::size_t> e(c.size());
+    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+        std::begin(c), std::end(c), std::begin(e), op);
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::inclusive_scan(std::begin(c), std::end(c), std::begin(f), op);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,10 +213,16 @@ void test_inclusive_scan3(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan(std::begin(c),
-        std::end(c), std::begin(e), std::size_t(0), std::plus<std::size_t>());
+    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+        std::begin(c), std::end(c), std::begin(e), std::plus<std::size_t>());
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::inclusive_scan(std::begin(c), std::end(c), std::begin(f));
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -187,16 +235,22 @@ void test_inclusive_scan3_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::fill(std::begin(c), std::end(c), std::size_t(1));
 
-    hpx::future<void> f = hpx::parallel::inclusive_scan(
+    hpx::future<void> fut = hpx::parallel::inclusive_scan(
         p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
-    f.wait();
+    fut.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan(std::begin(c),
-        std::end(c), std::begin(e), std::size_t(0), std::plus<std::size_t>());
+    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+        std::begin(c), std::end(c), std::begin(e), std::plus<std::size_t>());
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::inclusive_scan(std::begin(c), std::end(c), std::begin(f));
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

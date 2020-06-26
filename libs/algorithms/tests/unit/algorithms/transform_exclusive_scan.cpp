@@ -47,7 +47,7 @@ void test_transform_exclusive_scan(ExPolicy policy, IteratorTag)
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 
-#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS_ALGORITHMS)
     std::vector<std::size_t> f(c.size());
     std::transform_exclusive_scan(
         std::begin(c), std::end(c), std::begin(f), val, op, conv);
@@ -82,7 +82,7 @@ void test_transform_exclusive_scan_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 
-#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS)
     std::vector<std::size_t> f(c.size());
     std::transform_exclusive_scan(
         std::begin(c), std::end(c), std::begin(f), val, op, conv);

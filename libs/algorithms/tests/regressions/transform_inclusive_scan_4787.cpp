@@ -7,7 +7,6 @@
 // see #4787: `transform_inclusive_scan` gives incorrect results for
 //            non-commutative operator
 
-
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_transform_scan.hpp>
 #include <hpx/modules/testing.hpp>
@@ -16,8 +15,8 @@
 
 struct Elem
 {
-    int value;
-    bool begin;
+    int value = 0;
+    bool begin = false;
 };
 
 bool operator==(Elem lhs, Elem rhs)
@@ -31,7 +30,7 @@ int main(int argc, char* argv[])
         Elem{1, true}, Elem{3, false}, Elem{2, true}, Elem{4, false}};
     std::vector<Elem> output(test.size());
 
-    auto result = hpx::parallel::transform_inclusive_scan(
+    hpx::parallel::transform_inclusive_scan(
         hpx::parallel::execution::par, test.cbegin(), test.cend(),
         output.begin(),
         [](Elem left, Elem right) -> Elem {

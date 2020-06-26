@@ -63,8 +63,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto init = hpx::util::invoke(conv, *first);
 
                 *dest++ = init;
-                return sequential_transform_inclusive_scan(++first,
-                    last, dest, std::forward<Conv>(conv), std::move(init),
+                return sequential_transform_inclusive_scan(++first, last, dest,
+                    std::forward<Conv>(conv), std::move(init),
                     std::forward<Op>(op));
             }
             return dest;
@@ -119,7 +119,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-                FwdIter2 dest, Conv&& conv, T&& init, Op&& op)
+                FwdIter2 dest, Conv&& conv, T init, Op&& op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter2>
                     result;
@@ -212,7 +212,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename Op, typename Conv, typename T>
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
         transform_inclusive_scan_(ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest, Conv&& conv, T init, Op&& op,
+            FwdIter1 last, FwdIter2 dest, Conv&& conv, T&& init, Op&& op,
             std::false_type)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -224,7 +224,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             return detail::transform_inclusive_scan<FwdIter2>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
-                std::forward<Conv>(conv), std::move(init),
+                std::forward<Conv>(conv), std::forward<T>(init),
                 std::forward<Op>(op));
         }
 
@@ -250,8 +250,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename Op, typename Conv, typename T>
         typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
         transform_inclusive_scan_(ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest, Conv&& conv, T init, Op&& op,
+            FwdIter1 last, FwdIter2 dest, Conv&& conv, T&& init, Op&& op,
             std::true_type);
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Op, typename Conv>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        transform_inclusive_scan_(ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest, Conv&& conv, Op&& op, std::true_type);
         /// \endcond
     }    // namespace detail
 

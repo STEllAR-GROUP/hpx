@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +16,7 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
+#include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -128,11 +130,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             Conv&& conv)
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
-            return segmented_scan_seq<
-                exclusive_scan<typename traits_out::local_raw_iterator>>(
-                std::forward<ExPolicy>(policy), first, last, dest, init,
-                std::forward<Op>(op), std::true_type(),
-                std::forward<Conv>(conv));
+            return segmented_scan_seq<transform_exclusive_scan<
+                typename traits_out::local_raw_iterator>>(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::forward<Conv>(conv), init, std::forward<Op>(op),
+                std::true_type());
         }
 
         // sequential non segmented OutIter implementation
@@ -166,11 +168,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             Conv&& conv)
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
-            return segmented_scan_par<
-                exclusive_scan<typename traits_out::local_raw_iterator>>(
-                std::forward<ExPolicy>(policy), first, last, dest, init,
-                std::forward<Op>(op), std::true_type(),
-                std::forward<Conv>(conv));
+            return segmented_scan_par<transform_exclusive_scan<
+                typename traits_out::local_raw_iterator>>(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::forward<Conv>(conv), init, std::forward<Op>(op),
+                std::true_type());
         }
 
         // parallel non-segmented OutIter implementation
@@ -254,7 +256,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         exclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, T const& init, Op&& op, std::true_type, Conv&& conv)
+            OutIter dest, T&& init, Op&& op, std::true_type, Conv&& conv)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
@@ -264,8 +266,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(dest));
 
             return segmented_exclusive_scan(std::forward<ExPolicy>(policy),
-                first, last, dest, init, std::forward<Op>(op), is_seq(),
-                std::forward<Conv>(conv));
+                first, last, dest, std::forward<T>(init), std::forward<Op>(op),
+                is_seq(), std::forward<Conv>(conv));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -274,7 +276,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         exclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, T const& init, Op&& op, std::true_type, Conv&& conv);
+            OutIter dest, T&& init, Op&& op, std::false_type, Conv&& conv);
 
         /// \endcond
     }    // namespace detail

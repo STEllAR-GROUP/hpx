@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,7 +47,7 @@ void test_transform_inclusive_scan1(ExPolicy policy, IteratorTag)
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 
-#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS)
     std::vector<std::size_t> f(c.size());
     std::transform_inclusive_scan(
         std::begin(c), std::end(c), std::begin(f), op, conv, val);
@@ -82,7 +82,7 @@ void test_transform_inclusive_scan1_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 
-#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS)
     std::vector<std::size_t> f(c.size());
     std::transform_inclusive_scan(
         std::begin(c), std::end(c), std::begin(f), op, conv, val);
@@ -140,7 +140,7 @@ void test_transform_inclusive_scan2(ExPolicy policy, IteratorTag)
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 
-#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS)
     std::vector<std::size_t> f(c.size());
     std::transform_inclusive_scan(
         std::begin(c), std::end(c), std::begin(f), op, conv);
@@ -174,7 +174,7 @@ void test_transform_inclusive_scan2_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
 
-#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN)
+#if defined(HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS)
     std::vector<std::size_t> f(c.size());
     std::transform_inclusive_scan(
         std::begin(c), std::end(c), std::begin(f), op, conv);

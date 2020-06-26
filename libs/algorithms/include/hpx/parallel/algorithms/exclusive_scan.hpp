@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2018 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //  Copyright (c) 2016 Minh-Khanh Do
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -41,32 +41,28 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential exclusive_scan.
-        template <typename InIter, typename OutIter, typename T, typename Op,
-            typename Conv = util::projection_identity>
-        OutIter sequential_exclusive_scan(InIter first, InIter last,
-            OutIter dest, T init, Op&& op, Conv&& conv = Conv())
+        template <typename InIter, typename OutIter, typename T, typename Op>
+        OutIter sequential_exclusive_scan(
+            InIter first, InIter last, OutIter dest, T init, Op&& op)
         {
             T temp = init;
             for (/* */; first != last; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(
-                    op, init, hpx::util::invoke(conv, *first));
+                init = hpx::util::invoke(op, init, *first);
                 *dest = temp;
                 temp = init;
             }
             return dest;
         }
 
-        template <typename InIter, typename OutIter, typename T, typename Op,
-            typename Conv = util::projection_identity>
-        T sequential_exclusive_scan_n(InIter first, std::size_t count,
-            OutIter dest, T init, Op&& op, Conv&& conv = Conv())
+        template <typename InIter, typename OutIter, typename T, typename Op>
+        T sequential_exclusive_scan_n(
+            InIter first, std::size_t count, OutIter dest, T init, Op&& op)
         {
             T temp = init;
             for (/* */; count-- != 0; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(
-                    op, init, hpx::util::invoke(conv, *first));
+                init = hpx::util::invoke(op, init, *first);
                 *dest = temp;
                 temp = init;
             }
@@ -84,21 +80,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename InIter, typename OutIter,
-                typename T, typename Op,
-                typename Conv = util::projection_identity>
+                typename T, typename Op>
             static OutIter sequential(ExPolicy, InIter first, InIter last,
-                OutIter dest, T const& init, Op&& op, Conv&& conv = Conv())
+                OutIter dest, T const& init, Op&& op)
             {
-                return sequential_exclusive_scan(first, last, dest, init,
-                    std::forward<Op>(op), std::forward<Conv>(conv));
+                return sequential_exclusive_scan(
+                    first, last, dest, init, std::forward<Op>(op));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename T,
-                typename Op, typename Conv = util::projection_identity>
+                typename Op>
             static typename util::detail::algorithm_result<ExPolicy,
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-                FwdIter2 dest, T const& init, Op&& op, Conv&& conv = Conv())
+                FwdIter2 dest, T init, Op&& op)
             {
                 typedef util::detail::algorithm_result<ExPolicy, FwdIter2>
                     result;
@@ -144,17 +139,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<ExPolicy>(policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op, conv = std::forward<Conv>(conv), last](
+                    [op, last](
                         zip_iterator part_begin, std::size_t part_size) -> T {
-                        T part_init =
-                            hpx::util::invoke(conv, get<0>(*part_begin++));
+                        T part_init = get<0>(*part_begin++);
 
                         auto iters = part_begin.get_iterator_tuple();
                         if (get<0>(iters) != last)
                         {
                             return sequential_exclusive_scan_n(get<0>(iters),
-                                part_size - 1, get<1>(iters), part_init, op,
-                                conv);
+                                part_size - 1, get<1>(iters), part_init, op);
                         }
                         return part_init;
                     },
@@ -172,27 +165,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Op, typename Conv = util::projection_identity>
+            typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
         exclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, T const& init, Op&& op, std::false_type,
-            Conv&& conv = Conv())
+            FwdIter2 dest, T&& init, Op&& op, std::false_type, Conv&& conv)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
 
             return exclusive_scan<FwdIter2>().call(
                 std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
-                init, std::forward<Op>(op));
+                std::forward<T>(init), std::forward<Op>(op));
         }
 
         // forward declare the segmented version of this algorithm
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Op, typename Conv = util::projection_identity>
+            typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
         exclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, T const& init, Op&& op, std::true_type,
-            Conv&& conv = Conv());
+            FwdIter2 dest, T&& init, Op&& op, std::true_type, Conv&& conv);
         /// \endcond
     }    // namespace detail
 
@@ -291,7 +282,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
         return detail::exclusive_scan_(std::forward<ExPolicy>(policy), first,
-            last, dest, init, std::forward<Op>(op), is_segmented());
+            last, dest, std::move(init), std::forward<Op>(op), is_segmented(),
+            util::projection_identity{});
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -369,6 +361,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
         return detail::exclusive_scan_(std::forward<ExPolicy>(policy), first,
-            last, dest, init, std::plus<T>(), is_segmented());
+            last, dest, std::move(init), std::plus<T>(), is_segmented(),
+            util::projection_identity{});
     }
 }}}    // namespace hpx::parallel::v1

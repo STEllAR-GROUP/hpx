@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +16,7 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
+#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -127,11 +129,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
 
-            return segmented_scan_seq<
-                inclusive_scan<typename traits_out::local_raw_iterator>>(
-                std::forward<ExPolicy>(policy), first, last, dest, init,
-                std::forward<Op>(op), std::true_type(),
-                std::forward<Conv>(conv));
+            return segmented_scan_seq<transform_inclusive_scan<
+                typename traits_out::local_raw_iterator>>(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::forward<Conv>(conv), init, std::forward<Op>(op),
+                std::true_type());
         }
 
         // sequential non-segmented OutIter implementation
@@ -149,7 +151,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<ExPolicy>(policy), first, last, dest, init,
                 std::forward<Op>(op), merge_inclusive_scan(),
                 // new init value is last element from
-                // segmented_incluisve_scan_vector + last init value
+                // segmented_inclusive_scan_vector + last init value
                 [op](vector_type v, T val) { return op(v.back(), val); });
         }
 
@@ -166,11 +168,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
 
-            return segmented_scan_par<
-                inclusive_scan<typename traits_out::local_raw_iterator>>(
-                std::forward<ExPolicy>(policy), first, last, dest, init,
-                std::forward<Op>(op), std::true_type(),
-                std::forward<Conv>(conv));
+            return segmented_scan_par<transform_inclusive_scan<
+                typename traits_out::local_raw_iterator>>(
+                std::forward<ExPolicy>(policy), first, last, dest,
+                std::forward<Conv>(conv), init, std::forward<Op>(op),
+                std::true_type());
         }
 
         // parallel non-segmented OutIter implementation
@@ -255,17 +257,41 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, T const& init, Op&& op, std::true_type, Conv&& conv)
+            OutIter dest, T&& init, Op&& op, std::true_type, Conv&& conv)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
 
             if (first == last)
+            {
                 return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::move(dest));
+            }
 
             return segmented_inclusive_scan(std::forward<ExPolicy>(policy),
-                first, last, dest, init, std::forward<Op>(op), is_seq(),
+                first, last, dest, std::forward<T>(init), std::forward<Op>(op),
+                is_seq(), std::forward<Conv>(conv));
+        }
+
+        template <typename ExPolicy, typename InIter, typename OutIter,
+            typename Op, typename Conv>
+        static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
+            OutIter dest, Op&& op, std::true_type, Conv&& conv)
+        {
+            typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
+                is_seq;
+            typedef
+                typename std::iterator_traits<InIter>::value_type value_type;
+
+            if (first == last)
+            {
+                return util::detail::algorithm_result<ExPolicy, OutIter>::get(
+                    std::move(dest));
+            }
+
+            return segmented_inclusive_scan(std::forward<ExPolicy>(policy),
+                first, last, dest, value_type{}, std::forward<Op>(op), is_seq(),
                 std::forward<Conv>(conv));
         }
 
@@ -274,7 +300,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, T const& init, Op&& op, std::true_type, Conv&& conv);
+            OutIter dest, T&& init, Op&& op, std::false_type, Conv&& conv);
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Op, typename Conv>
+        static typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        inclusive_scan_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, Op&& op, std::false_type, Conv&& conv);
 
         /// \endcond
     }    // namespace detail
