@@ -18,6 +18,7 @@ set(tests
     stable_merge_2964
     static_chunker_2282
     transform_inclusive_scan_4786
+    transform_inclusive_scan_4787
 )
 
 foreach(test ${tests})

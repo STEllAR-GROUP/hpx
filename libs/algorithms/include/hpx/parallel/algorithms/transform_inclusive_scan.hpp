@@ -154,7 +154,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     util::loop_n<ExPolicy>(
                         dst, part_size, [&op, &val](FwdIter2 it) -> void {
-                            *it = hpx::util::invoke(op, *it, val);
+                            *it = hpx::util::invoke(op, val, *it);
                         });
                 };
 
