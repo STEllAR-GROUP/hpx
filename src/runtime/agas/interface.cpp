@@ -387,8 +387,8 @@ naming::id_type get_console_locality(
     error_code& ec
     )
 {
-    runtime* rt = get_runtime_ptr();
-    if (rt == nullptr || rt->get_state() == state_invalid)
+    runtime_distributed* rtd = get_runtime_distributed_ptr();
+    if (rtd == nullptr || rtd->get_state() == state_invalid)
         return naming::invalid_id;
 
     naming::gid_type console;
@@ -400,8 +400,8 @@ naming::id_type get_console_locality(
 
 std::uint32_t get_locality_id(error_code& ec)
 {
-    runtime* rt = get_runtime_ptr();
-    if (rt == nullptr || rt->get_state() == state_invalid)
+    runtime_distributed* rtd = get_runtime_distributed_ptr();
+    if (rtd == nullptr || rtd->get_state() == state_invalid)
         return naming::invalid_locality_id;
 
     naming::gid_type l = naming::get_agas_client().get_local_locality(ec);
