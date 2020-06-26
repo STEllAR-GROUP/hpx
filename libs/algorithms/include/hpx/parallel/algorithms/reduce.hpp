@@ -9,8 +9,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
@@ -83,11 +84,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
         // Non Segmented Reduce
         template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-            typename T, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, T>::type>::type
-        reduce_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f,
+            typename T, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                execution::is_execution_policy<ExPolicy>::value&&
+                    hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value)>
+        typename util::detail::algorithm_result<ExPolicy, T>::type reduce_(
+            ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f,
             std::false_type)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIterB>::value),
@@ -183,11 +185,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename T, typename F>
-    inline
-        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, T>::type>::type
-        reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f)
+        typename T, typename F,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type reduce(
+        ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f)
     {
         typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
@@ -252,11 +254,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// non-associative or non-commutative binary predicate.
     ///
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename T>
-    inline
-        typename std::enable_if<execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, T>::type>::type
-        reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init)
+        typename T,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value)>
+    typename util::detail::algorithm_result<ExPolicy, T>::type reduce(
+        ExPolicy&& policy, FwdIterB first, FwdIterE last, T init)
     {
         typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
 
@@ -321,11 +323,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE>
-    inline typename std::enable_if<
-        execution::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::value_type>::type>::type
+    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value)>
+    typename util::detail::algorithm_result<ExPolicy,
+        typename std::iterator_traits<FwdIterB>::value_type>::type
     reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last)
     {
         typedef typename std::iterator_traits<FwdIterB>::value_type value_type;
