@@ -12,7 +12,9 @@
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
+#if defined (HPX_HAVE_LIB_MPI_BASE)
 #include <hpx/modules/mpi_base.hpp>
+#endif
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
