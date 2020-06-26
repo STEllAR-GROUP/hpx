@@ -180,12 +180,6 @@ function will be invoked as the first |hpx| thread of your application). All
 
 The thread executing the function :cpp:func:`hpx::start` will *not* block
 waiting for the runtime system to exit, but will return immediately.
-
-.. important::
-
-   You cannot use any of the |hpx| API functions other that
-   :cpp:func:`hpx::stop` from inside your ``main()`` function.
-
 The function :cpp:func:`hpx::finalize` has to be called on one of the |hpx|
 localities in order to signal that all work has been scheduled and the runtime
 system should be stopped after the scheduled work has been executed.
