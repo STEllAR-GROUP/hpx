@@ -26,12 +26,19 @@ namespace hpx { namespace traits { namespace detail {
     struct HPX_DEPRECATED(HPX_DEPRECATED_MSG
         " Use is_deferred_invocable instead.") is_deferred_callable;
 
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     template <typename F, typename... Ts>
     struct is_deferred_callable<F(Ts...)>
       : is_invocable<typename util::decay_unwrap<F>::type,
             typename util::decay_unwrap<Ts>::type...>
     {
     };
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic pop
+#endif
 
     template <typename F, typename... Ts>
     struct is_deferred_invocable
@@ -49,12 +56,19 @@ namespace hpx { namespace util {
         struct HPX_DEPRECATED(HPX_DEPRECATED_MSG
             " Use invoke_deferred_result instead.") deferred_result_of;
 
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         template <typename F, typename... Ts>
         struct deferred_result_of<F(Ts...)>
           : util::invoke_result<typename util::decay_unwrap<F>::type,
                 typename util::decay_unwrap<Ts>::type...>
         {
         };
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic pop
+#endif
 
         template <typename F, typename... Ts>
         struct invoke_deferred_result
