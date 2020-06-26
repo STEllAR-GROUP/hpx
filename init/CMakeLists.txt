@@ -47,7 +47,7 @@ add_hpx_source_group(
 
 add_library(hpx_init STATIC ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 set_target_properties(hpx_init PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(hpx_init PRIVATE hpx_core)
+target_link_libraries(hpx_init PRIVATE hpx_full)
 target_link_libraries(hpx_init PRIVATE hpx_private_flags)
 target_compile_definitions(hpx_init PRIVATE HPX_APPLICATION_EXPORTS)
 target_include_directories(

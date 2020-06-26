@@ -18,7 +18,6 @@
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
-#include <hpx/util/serialize_exception.hpp>
 
 #include <exception>
 

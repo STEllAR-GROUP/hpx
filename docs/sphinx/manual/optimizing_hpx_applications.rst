@@ -705,7 +705,7 @@ performance counters which support:
 
 Every full performance counter will implement a predefined interface:
 
-.. literalinclude:: ../../libs/performance_counters/include/hpx/performance_counters/performance_counter.hpp
+.. literalinclude:: ../../libs/full/performance_counters/include/hpx/performance_counters/performance_counter.hpp
    :language: c++
 
 In order to implement a full performance counter, you have to create an |hpx|
@@ -719,7 +719,7 @@ The base class is defined in the header file [hpx_link
 hpx/performance_counters/base_performance_counter.hpp..hpx/performance_counters/base_performance_counter.hpp]
 as:
 
-.. literalinclude:: ../../libs/performance_counters/include/hpx/performance_counters/base_performance_counter.hpp
+.. literalinclude:: ../../libs/full/performance_counters/include/hpx/performance_counters/base_performance_counter.hpp
    :language: c++
 
 The single template parameter is expected to receive the type of the

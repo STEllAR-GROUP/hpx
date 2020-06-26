@@ -27,7 +27,7 @@ compilers. Because of this you may see linker errors similar to this:
 
 if you are not linking to a compatible version of Boost.ProgramOptions. We
 recommend that you use ``hpx::program_options``, which is part of |hpx|, as a
-replacement for ``boost::program_options`` (see :ref:`libs_program_options`).
+replacement for ``boost::program_options`` (see :ref:`modules_program_options`).
 Until you have migrated to use ``hpx::program_options`` we recommend that you
 always build |boost|_ libraries and |hpx| with the same compiler and C++
 standard.

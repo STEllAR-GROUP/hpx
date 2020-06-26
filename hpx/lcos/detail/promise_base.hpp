@@ -14,7 +14,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/lcos/detail/promise_lco.hpp>
-#include <hpx/lcos_local/promise.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/runtime/components/server/component_heap.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>

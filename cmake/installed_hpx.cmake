@@ -116,17 +116,18 @@ if(HPX_WITH_TESTS)
 
   # add actual tests, first iterate through all modules
   foreach(lib ${HPX_LIBS})
-    if(EXISTS ${PROJECT_SOURCE_DIR}/libs/${lib}/tests)
-      string(TOUPPER ${lib} lib_upper)
-      hpx_option(
-        HPX_${lib_upper}_WITH_TESTS BOOL
-        "Build HPX ${name} module tests. (default: ${HPX_WITH_TESTS})"
-        ${HPX_WITH_TESTS} ADVANCED
-        CATEGORY "Modules"
-        MODULE ${lib_upper}
-      )
-      add_subdirectory(libs/${lib}/tests)
-    endif()
+    string(TOUPPER ${lib} lib_upper)
+    foreach(module ${HPX_${lib_upper}_ENABLED_MODULES})
+      if(EXISTS ${PROJECT_SOURCE_DIR}/libs/${lib}/${module}/tests)
+        string(TOUPPER ${module} module_upper)
+        hpx_option(
+          HPX_${module_upper}_WITH_TESTS BOOL
+          "Build HPX ${name} module tests. (default: ${HPX_WITH_TESTS})"
+          ${HPX_WITH_TESTS} ADVANCED CATEGORY "Modules"
+        )
+        add_subdirectory(libs/${lib}/${module}/tests)
+      endif()
+    endforeach()
   endforeach()
 
   # then main tests directory
@@ -140,10 +141,13 @@ if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_dependencies(examples examples.modules)
 
   # add actual examples, iterate through all modules
-  foreach(lib ${HPX_LIBS})
-    if(EXISTS ${PROJECT_SOURCE_DIR}/libs/${lib}/examples)
-      add_subdirectory(libs/${lib}/examples)
-    endif()
+  foreach(lib core full parallelism)
+    string(TOUPPER ${lib} lib_upper)
+    foreach(module ${HPX_${lib_upper}_ENABLED_MODULES})
+      if(EXISTS ${PROJECT_SOURCE_DIR}/libs/${lib}/${module}/examples)
+        add_subdirectory(libs/${libs}/${module}/examples)
+      endif()
+    endforeach()
   endforeach()
 
   add_subdirectory(examples)
