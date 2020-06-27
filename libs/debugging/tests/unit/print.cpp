@@ -63,6 +63,7 @@ int main()
     {
         auto s_enabled  = p_enabled.scope("scoped block", HPX_DP_LAZY(increment(enabled_counter), p_enabled));
         auto s_disabled = p_disabled.scope("scoped block", HPX_DP_LAZY(increment(disabled_counter), p_disabled));
+        (void)s_disabled; // silence warning about unused var
     }
     HPX_TEST_EQ(enabled_counter, 3);
     HPX_TEST_EQ(disabled_counter, 0);

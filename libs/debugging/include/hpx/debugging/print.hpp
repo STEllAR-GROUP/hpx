@@ -30,9 +30,11 @@
 #endif
 
 #ifdef __APPLE__
+#include <unistd.h>
 #include <crt_externs.h>
 #define environ (*_NSGetEnviron())
 #elif defined(HPX_WINDOWS)
+#include <winsock.h>
 #define environ _environ
 #else
 extern char** environ;
@@ -690,8 +692,8 @@ namespace hpx { namespace debug {
             return T(args...);
         }
 
-        template <typename T>
-        void set(T& var, T const& val)
+        template <typename T, typename V>
+        void set(T& var, V const& val)
         {
             var = val;
         }
