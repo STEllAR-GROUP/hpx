@@ -83,11 +83,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
         // Non Segmented Reduce
+        //
+        // clang-format off
         template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
             typename T, typename F,
             HPX_CONCEPT_REQUIRES_(
-                execution::is_execution_policy<ExPolicy>::value&&
-                    hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value)>
+                execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
+            )>
+        // clang-format on
         typename util::detail::algorithm_result<ExPolicy, T>::type reduce_(
             ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f,
             std::false_type)
@@ -184,10 +188,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
         typename T, typename F,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy, T>::type reduce(
         ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f)
     {
@@ -253,10 +261,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
         typename T,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy, T>::type reduce(
         ExPolicy&& policy, FwdIterB first, FwdIterE last, T init)
     {
@@ -323,9 +335,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<FwdIterB>::value_type>::type
     reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last)
