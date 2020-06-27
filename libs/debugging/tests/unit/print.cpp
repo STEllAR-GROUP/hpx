@@ -9,21 +9,24 @@
 // are completely elided
 
 #include <hpx/debugging/print.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/threading_base/print.hpp>
+#include <hpx/chrono.hpp>
 
-#include <string>
+#include <atomic>
 #include <chrono>
+#include <iostream>
+#include <string>
 
 namespace hpx {
     // this is an enabled debug object that should output messages
-    static hpx::debug::enable_print<true>  p_enabled("PRINT  ");
+    static hpx::debug::enable_print<true> p_enabled("PRINT  ");
     // this is disabled and we want it to have zero footprint
     static hpx::debug::enable_print<false> p_disabled("PRINT  ");
-}   // namespace hpx
+}    // namespace hpx
 
-int increment(std::atomic<int> &counter) {
+int increment(std::atomic<int>& counter)
+{
     return ++counter;
 }
 
@@ -44,44 +47,49 @@ int main()
     HPX_TEST_EQ(enabled_counter, 1);
 
     // we expect the counter to increment as LAZY will be evaluated
-    p_enabled.debug("Increment", HPX_DP_LAZY(increment(enabled_counter), p_enabled));
+    p_enabled.debug(
+        "Increment", HPX_DP_LAZY(increment(enabled_counter), p_enabled));
     HPX_TEST_EQ(enabled_counter, 2);
 
     // we do not expect the counter to increment
-    if (p_disabled.is_enabled()) {
+    if (p_disabled.is_enabled())
+    {
         p_disabled.debug("Increment", increment(disabled_counter));
     }
     HPX_TEST_EQ(disabled_counter, 0);
 
     // we do not expect the counter to increment: HPX_DP_LAZY will not be evaluated
-    p_disabled.debug("Increment", HPX_DP_LAZY(increment(disabled_counter), p_disabled));
+    p_disabled.debug(
+        "Increment", HPX_DP_LAZY(increment(disabled_counter), p_disabled));
     HPX_TEST_EQ(disabled_counter, 0);
-
 
     // ---------------------------------------------------------
     // Test that scoped log messages behave as expected
     {
-        auto s_enabled  = p_enabled.scope("scoped block", HPX_DP_LAZY(increment(enabled_counter), p_enabled));
-        auto s_disabled = p_disabled.scope("scoped block", HPX_DP_LAZY(increment(disabled_counter), p_disabled));
-        (void)s_disabled; // silence warning about unused var
+        auto s_enabled = p_enabled.scope(
+            "scoped block", HPX_DP_LAZY(increment(enabled_counter), p_enabled));
+        auto s_disabled = p_disabled.scope("scoped block",
+            HPX_DP_LAZY(increment(disabled_counter), p_disabled));
+        (void) s_disabled;    // silence warning about unused var
     }
     HPX_TEST_EQ(enabled_counter, 3);
     HPX_TEST_EQ(disabled_counter, 0);
 
-
     // ---------------------------------------------------------
     // Test that debug only variables behave as expected
     // create high resolution timers to see if they count
-    auto var1 = p_enabled.declare_variable<int>(HPX_DP_LAZY(enabled_counter+4, p_enabled));
-    (void)var1; // silenced unused var when optimized out
+    auto var1 = p_enabled.declare_variable<int>(
+        HPX_DP_LAZY(enabled_counter + 4, p_enabled));
+    (void) var1;    // silenced unused var when optimized out
 
-    auto var2 = p_disabled.declare_variable<int>(HPX_DP_LAZY(disabled_counter+10, p_disabled));
-    (void)var2; // silenced unused var when optimized out
+    auto var2 = p_disabled.declare_variable<int>(
+        HPX_DP_LAZY(disabled_counter + 10, p_disabled));
+    (void) var2;    // silenced unused var when optimized out
 
-    p_enabled.debug("var 1"
-        , hpx::debug::dec<>(HPX_DP_LAZY(enabled_counter+=var1, p_enabled)));
-    p_disabled.debug("var 2"
-        , hpx::debug::dec<>(HPX_DP_LAZY(disabled_counter+=var2, p_disabled)));
+    p_enabled.debug("var 1",
+        hpx::debug::dec<>(HPX_DP_LAZY(enabled_counter += var1, p_enabled)));
+    p_disabled.debug("var 2",
+        hpx::debug::dec<>(HPX_DP_LAZY(disabled_counter += var2, p_disabled)));
 
     HPX_TEST_EQ(enabled_counter, 10);
     HPX_TEST_EQ(disabled_counter, 0);
@@ -89,10 +97,10 @@ int main()
     p_enabled.set(var1, 5);
     p_disabled.set(var2, 5);
 
-    p_enabled.debug("var 1"
-        , hpx::debug::dec<>(HPX_DP_LAZY(enabled_counter+=var1, p_enabled)));
-    p_disabled.debug("var 2"
-        , hpx::debug::dec<>(HPX_DP_LAZY(disabled_counter+=var2, p_disabled)));
+    p_enabled.debug("var 1",
+        hpx::debug::dec<>(HPX_DP_LAZY(enabled_counter += var1, p_enabled)));
+    p_disabled.debug("var 2",
+        hpx::debug::dec<>(HPX_DP_LAZY(disabled_counter += var2, p_disabled)));
 
     HPX_TEST_EQ(enabled_counter, 15);
     HPX_TEST_EQ(disabled_counter, 0);
@@ -107,16 +115,18 @@ int main()
     // run a loop for 2 seconds with a timed print every 1 sec
     auto start = std::chrono::system_clock::now();
     auto end = std::chrono::system_clock::now();
-    while (std::chrono::duration_cast<std::chrono::seconds>(end - start).count() < 2)
+    while (
+        std::chrono::duration_cast<std::chrono::seconds>(end - start).count() <
+        2)
     {
-        p_enabled.timed(t_enabled,
-            "enabled", debug::dec<3>(HPX_DP_LAZY(++enabled_counter, p_enabled)));
+        p_enabled.timed(t_enabled, "enabled",
+            debug::dec<3>(HPX_DP_LAZY(++enabled_counter, p_enabled)));
 
-        p_disabled.timed(t_disabled,
-            "disabled", debug::dec<3>(HPX_DP_LAZY(++disabled_counter, p_disabled)));
+        p_disabled.timed(t_disabled, "disabled",
+            debug::dec<3>(HPX_DP_LAZY(++disabled_counter, p_disabled)));
         end = std::chrono::system_clock::now();
     }
-    HPX_TEST_EQ(enabled_counter>10, true);
+    HPX_TEST_EQ(enabled_counter > 10, true);
     HPX_TEST_EQ(disabled_counter, 0);
 
     std::cout << "enabled  counter " << enabled_counter << std::endl;
@@ -124,4 +134,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-
