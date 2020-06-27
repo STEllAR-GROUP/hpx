@@ -8,9 +8,9 @@
 |circleci_status| |zenodo_doi| |codacy| |coveralls|
 
 Documentation: `latest
-<https://stellar-group.github.io/hpx-docs/latest/html/index.html>`_,
+<https://hpx-docs.stellar-group.org/latest/html/index.html>`_,
 `development (master)
-<https://stellar-group.github.io/hpx-docs/branches/master/html/index.html>`_
+<https://hpx-docs.stellar-group.org/branches/master/html/index.html>`_
 
 ===
 HPX
@@ -79,16 +79,16 @@ which can be downloaded `here <https://stellar.cct.lsu.edu/downloads/>`_.
 
 To quickly get started with HPX on most Linux distributions you can read the
 quick start guide `here
-<https://stellar-group.github.io/hpx-docs/latest/html/quickstart.html>`_.
+<https://hpx-docs.stellar-group.org/latest/html/quickstart.html>`_.
 Detailed instructions on building and installing HPX on various platforms can be
 found `here
-<https://stellar-group.github.io/hpx-docs/latest/html/manual/building_hpx.html>`_.
+<https://hpx-docs.stellar-group.org/latest/html/manual/building_hpx.html>`_.
 The full documentation for the latest release of HPX can always be found `here
-<https://stellar-group.github.io/hpx-docs/latest/html/index.html>`_.
+<https://hpx-docs.stellar-group.org/latest/html/index.html>`_.
 
 If you would like to work with the cutting edge version of this repository
 (``master`` branch) the documentation can be found `here
-<https://stellar-group.github.io/hpx-docs/branches/master/html/index.html>`_.
+<https://hpx-docs.stellar-group.org/branches/master/html/index.html>`_.
 We strongly recommend that you follow the current health status of the master
 branch by looking at our `continuous integration results website
 <https://cdash.cscs.ch//index.php?project=HPX>`_. While we try to keep the
@@ -98,7 +98,8 @@ continuous integration service additionally tracks the current build status for
 the master branch: |circleci_status|.
 
 We use `Codacy <https://www.codacy.com/>`_ to assess the code quality of this
-project: |codacy|.
+project: |codacy|. For our coverage analysis we rely on 
+`Coveralls <https://coveralls.io/>`_ to present the results: |coveralls|.
 
 If you can't find what you are looking for in the documentation or you suspect
 you've found a bug in HPX we very much encourage and appreciate any issue
