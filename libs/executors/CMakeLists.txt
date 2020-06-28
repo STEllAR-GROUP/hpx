@@ -14,7 +14,6 @@ set(executors_headers
     hpx/executors/datapar/execution_policy_fwd.hpp
     hpx/executors/datapar/execution_policy.hpp
     hpx/executors/guided_pool_executor.hpp
-    hpx/modules/executors.hpp
     hpx/executors/apply.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
@@ -65,7 +64,7 @@ add_hpx_module(
   executors
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}
   COMPAT_HEADERS ${executors_compat_headers}

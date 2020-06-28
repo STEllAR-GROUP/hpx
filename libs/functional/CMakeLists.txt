@@ -46,6 +46,7 @@ set(functional_headers
     hpx/functional/traits/is_bind_expression.hpp
     hpx/functional/traits/is_invocable.hpp
     hpx/functional/traits/is_placeholder.hpp
+    hpx/type_traits.hpp
 )
 
 # Default location is $HPX_ROOT/libs/functional/include_compatibility
