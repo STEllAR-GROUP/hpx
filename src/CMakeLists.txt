@@ -80,8 +80,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     util/activate_counters.cpp
     util/generate_unique_ids.cpp
     util/init_logging.cpp
-    util/integer/int128.cpp
-    util/integer/uint128.cpp
     util/one_size_heap_list.cpp
     util/pool_timer.cpp
     util/query_counters.cpp
@@ -354,8 +352,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/init_logging.hpp
     hpx/util/integer/cover_operators.hpp
     hpx/util/integer/endian.hpp
-    hpx/util/integer/int128.hpp
-    hpx/util/integer/uint128.hpp
     hpx/util/one_size_heap_list.hpp
     hpx/util/pool_timer.hpp
     hpx/util/query_counters.hpp

@@ -1696,9 +1696,6 @@ if(NOT WIN32)
   # Macro definitions for system headers
   # ############################################################################
   add_definitions(-D_GNU_SOURCE)
-  if(APPLE)
-    hpx_add_config_define(BOOST_HAS_INT128)
-  endif()
 
   # ############################################################################
   # System libraries
