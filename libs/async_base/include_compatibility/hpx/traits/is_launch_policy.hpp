@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/config/defines.hpp>
-#include <hpx/future.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 
 #if HPX_ASYNC_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/traits/is_launch_policy.hpp is deprecated, \
-    please include hpx/future.hpp instead")
+    please include hpx/async_base/traits/is_launch_policy.hpp instead")
 #else
 #warning "The header hpx/traits/is_launch_policy.hpp is deprecated, \
-    please include hpx/future.hpp instead"
+    please include hpx/async_base/traits/is_launch_policy.hpp instead"
 #endif
 #endif

@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/futures/config/defines.hpp>
-#include <hpx/future.hpp>
+#include <hpx/futures/traits/is_future_range.hpp>
 
 #if HPX_FUTURES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/traits/is_future_range.hpp is deprecated, \
-    please include hpx/future.hpp instead")
+    please include hpx/futures/traits/is_future_range.hpp instead")
 #else
 #warning "The header hpx/traits/is_future_range.hpp is deprecated, \
-    please include hpx/future.hpp instead"
+    please include hpx/futures/traits/is_future_range.hpp instead"
 #endif
 #endif
