@@ -20,6 +20,7 @@ if((HPX_WITH_CUDA_COMPUTE OR HPX_WITH_ASYNC_CUDA) AND NOT TARGET Cuda::cuda)
   endif()
 
   add_library(Cuda::cuda INTERFACE IMPORTED)
+  target_include_directories(Cuda::cuda INTERFACE ${CUDA_INCLUDE_DIRS})
 
   if(NOT HPX_WITH_CUDA_CLANG)
     if(NOT MSVC)

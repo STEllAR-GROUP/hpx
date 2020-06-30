@@ -40,7 +40,6 @@ set(async_cuda_sources cuda_future.cpp cuda_target.cpp get_targets.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   async_cuda
-  CUDA
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
