@@ -8,4 +8,5 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/async.hpp>
+#include <hpx/async_local/async_fwd.hpp>
 #include <hpx/executors/async.hpp>

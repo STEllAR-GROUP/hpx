@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/components/pinned_ptr.hpp>
+#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 

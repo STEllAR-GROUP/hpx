@@ -8,12 +8,12 @@
 
 #pragma once
 
+#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_distributed/applier/apply_callback.hpp>
 #include <hpx/async_distributed/async_callback_fwd.hpp>
 #include <hpx/async_distributed/async_continue.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/futures/traits/promise_remote_result.hpp>
-#include <hpx/traits/extract_action.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
 #include <type_traits>

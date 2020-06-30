@@ -6,12 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/traits/action_priority.hpp>
-#include <hpx/traits/extract_action.hpp>
-#include <hpx/runtime/trigger_lco.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/trigger_lco.hpp>
 
 #include <exception>
 #include <utility>

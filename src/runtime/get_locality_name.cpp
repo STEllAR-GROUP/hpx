@@ -12,7 +12,7 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/runtime_distributed.hpp>
 #endif
 

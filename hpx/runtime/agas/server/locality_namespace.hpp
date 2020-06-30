@@ -11,11 +11,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions_base/component_action.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstdint>

@@ -19,6 +19,7 @@ if(HPX_WITH_PARCELPORT_TCP)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/receiver.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/tcp/sender.hpp"
     DEPENDENCIES
+      hpx_actions
       hpx_allocator_support
       hpx_asio
       hpx_assertion

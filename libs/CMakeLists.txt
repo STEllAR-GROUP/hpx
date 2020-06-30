@@ -12,6 +12,8 @@ include(HPX_AddPseudoTarget)
 
 # cmake-format: off
 set(HPX_CANDIDATE_LIBS
+    actions
+    actions_base
     affinity
     algorithms
     allocator_support
@@ -21,12 +23,15 @@ set(HPX_CANDIDATE_LIBS
     async_combinators
     async_cuda
     async_distributed
+    async_local
+    async_mpi
     batch_environments
     cache
     checkpoint
     checkpoint_base
     collectives
     command_line_handling
+    components_base
     compute
     compute_cuda
     concepts
@@ -53,11 +58,9 @@ set(HPX_CANDIDATE_LIBS
     iterator_support
     itt_notify
     lcos_distributed
-    async_local
     lcos_local
     logging
     memory
-    async_mpi
     mpi_base
     naming_base
     pack_traversal

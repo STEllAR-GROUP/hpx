@@ -238,7 +238,7 @@ set(HPX_CANDIDATE_LIBS
 '''
 for lib in libs:
     if not lib.startswith('_'):
-        libs_cmakelists += f'  {lib}\n'
+        libs_cmakelists += f'    {lib}\n'
 libs_cmakelists += ')\n# cmake-format: on\n'
 
 libs_cmakelists += '''
@@ -275,7 +275,6 @@ if(HPX_WITH_TESTS)
     add_hpx_pseudo_dependencies(tests.headers tests.headers.modules)
   endif()
 endif()
-
 '''
 
 libs_cmakelists += '''
@@ -306,14 +305,14 @@ foreach(lib ${HPX_CANDIDATE_LIBS})
     string(TOUPPER ${lib} uppercase_lib)
 
     set(MODULE_ENABLED_LIB_DEFINES
-        "${MODULE_ENABLED_LIB_DEFINES}#define HPX_HAVE_LIB_${uppercase_lib}\n"
+        "${MODULE_ENABLED_LIB_DEFINES}#define HPX_HAVE_LIB_${uppercase_lib}\\n"
     )
 
     set(CONFIG_STRINGS_MODULES_INCLUDES
-        "${CONFIG_STRINGS_MODULES_INCLUDES}#include <hpx/${lib}/config/config_strings.hpp>\n"
+        "${CONFIG_STRINGS_MODULES_INCLUDES}#include <hpx/${lib}/config/config_strings.hpp>\\n"
     )
     set(CONFIG_STRINGS_MODULES_ENTRIES
-        "${CONFIG_STRINGS_MODULES_ENTRIES}\n        { \"${lib}\", ${lib}::config_strings },"
+        "${CONFIG_STRINGS_MODULES_ENTRIES}\\n        { \\"${lib}\\", ${lib}::config_strings },"
     )
   endif()
 endforeach()
@@ -321,16 +320,6 @@ endforeach()
 configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/libs_enabled.hpp.in"
   "${PROJECT_BINARY_DIR}/libs/config/include/hpx/config/libs_enabled.hpp" @ONLY
-)
-
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}/hpx/config/config_defines_strings_modules.hpp" @ONLY
-)
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/config_defines_strings_modules.hpp.in"
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpx/config/config_defines_strings_modules.hpp"
-  @ONLY
 )
 '''
 

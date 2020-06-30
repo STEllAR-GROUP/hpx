@@ -39,7 +39,6 @@ set(async_headers
     hpx/async_distributed/async_continue_callback.hpp
     hpx/async_distributed/async_continue_fwd.hpp
     hpx/async_distributed/async_continue.hpp
-    hpx/async_distributed/async_fwd.hpp
     hpx/async_distributed/async.hpp
     hpx/async_distributed/dataflow.hpp
     hpx/async_distributed/detail/async_colocated_callback_fwd.hpp
@@ -52,7 +51,6 @@ set(async_headers
     hpx/async_distributed/detail/async_unwrap_result_implementations.hpp
     hpx/async_distributed/detail/sync_implementations_fwd.hpp
     hpx/async_distributed/detail/sync_implementations.hpp
-    hpx/async_distributed/sync_fwd.hpp
     hpx/async_distributed/sync.hpp
 )
 
@@ -93,6 +91,8 @@ add_hpx_module(
   HEADERS ${async_headers}
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES
+    hpx_actions_base
+    hpx_actions
     hpx_allocator_support
     hpx_assertion
     hpx_config

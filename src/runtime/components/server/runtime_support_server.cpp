@@ -22,27 +22,27 @@
 #include <hpx/runtime_configuration/ini.hpp>
 #include <hpx/string_util/case_conv.hpp>
 
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/modules/threadmanager.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/server/component_database.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/modules/threadmanager.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/vector.hpp>
 
 #include <hpx/modules/collectives.hpp>
 #include <hpx/lcos_local/packaged_task.hpp>

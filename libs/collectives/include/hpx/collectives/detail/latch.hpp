@@ -7,8 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions_base/component_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>

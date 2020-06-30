@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/async_continue_callback.hpp>
 #include <hpx/async_distributed/detail/async_colocated.hpp>
@@ -13,7 +14,6 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/traits/extract_action.hpp>
 
 #include <utility>
 

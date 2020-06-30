@@ -105,6 +105,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_headers}
   DEPENDENCIES
+    hpx_actions_base
     hpx_algorithms
     hpx_assertion
     hpx_async_base

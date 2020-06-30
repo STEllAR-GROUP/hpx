@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/modules/errors.hpp>

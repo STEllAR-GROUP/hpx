@@ -7,8 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions_base/component_action.hpp>
+#include <hpx/components_base/get_lva.hpp>
+#include <hpx/lcos_fwd.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components_fwd.hpp>
@@ -18,12 +22,13 @@
 
 #include <cstddef>
 #include <exception>
+#include <type_traits>
 
 namespace hpx { namespace lcos
 {
     /// The \a base_lco class is the common base class for all LCO's
     /// implementing a simple set_event action
-    class HPX_EXPORT base_lco
+    class base_lco
     {
     public:
         virtual void set_event() = 0;
@@ -113,6 +118,30 @@ namespace hpx { namespace lcos
             disconnect_action);
     };
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx {
+    template <>
+    struct get_lva<lcos::base_lco>
+    {
+        static lcos::base_lco* call(naming::address_type lva)
+        {
+            typedef typename lcos::base_lco::wrapping_type wrapping_type;
+            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
+        }
+    };
+
+    template <>
+    struct get_lva<lcos::base_lco const>
+    {
+        static lcos::base_lco const* call(naming::address_type lva)
+        {
+            typedef typename std::add_const<
+                typename lcos::base_lco::wrapping_type>::type wrapping_type;
+            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
+        }
+    };
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the base LCO actions

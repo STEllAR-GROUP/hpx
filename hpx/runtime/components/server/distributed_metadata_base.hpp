@@ -7,13 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 

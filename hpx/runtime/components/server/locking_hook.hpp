@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/get_lva.hpp>
+#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/runtime/get_lva.hpp>
-#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/traits/action_decorate_function.hpp>

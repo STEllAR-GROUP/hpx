@@ -8,7 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/traits/is_component.hpp>
+#include <hpx/components_base/traits/is_component.hpp>
+#include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/futures/traits/promise_remote_result.hpp>
 
@@ -19,14 +20,6 @@ namespace hpx
     /// \namespace lcos
     namespace lcos
     {
-        namespace detail
-        {
-            template <typename Result>
-            struct future_data;
-
-            struct future_data_refcnt_base;
-        }
-
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         class HPX_EXPORT base_lco;
 
@@ -58,12 +51,6 @@ namespace hpx
         }
 #endif
 
-        template <typename R>
-        class future;
-
-        template <typename R>
-        class shared_future;
-
         namespace local
         {
             class barrier;
@@ -71,14 +58,8 @@ namespace hpx
             template <typename R>
             class promise;
         }
-
-        // forward declare wait_all()
-        template <typename Future>
-        void wait_all(std::vector<Future>&& values);
     }
 
-    using lcos::future;
-    using lcos::shared_future;
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) &&                                   \
     defined(HPX_HAVE_PROMISE_ALIAS_COMPATIBLILITY)
     template <typename Result,

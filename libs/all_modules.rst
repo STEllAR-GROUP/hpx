@@ -14,6 +14,8 @@ All modules
 .. toctree::
    :maxdepth: 2
 
+   /libs/actions/docs/index.rst
+   /libs/actions_base/docs/index.rst
    /libs/affinity/docs/index.rst
    /libs/algorithms/docs/index.rst
    /libs/allocator_support/docs/index.rst
@@ -31,6 +33,7 @@ All modules
    /libs/checkpoint_base/docs/index.rst
    /libs/collectives/docs/index.rst
    /libs/command_line_handling/docs/index.rst
+   /libs/components_base/docs/index.rst
    /libs/compute/docs/index.rst
    /libs/compute_cuda/docs/index.rst
    /libs/concepts/docs/index.rst
@@ -58,6 +61,7 @@ All modules
    /libs/itt_notify/docs/index.rst
    /libs/lcos_distributed/docs/index.rst
    /libs/lcos_local/docs/index.rst
+   /libs/local_lcos/docs/index.rst
    /libs/logging/docs/index.rst
    /libs/memory/docs/index.rst
    /libs/mpi_base/docs/index.rst

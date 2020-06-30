@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/action_support.hpp>
+#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/applier/apply_continue_fwd.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/actions/make_continuation.hpp>
-#include <hpx/traits/extract_action.hpp>
 
 #include <utility>
 
