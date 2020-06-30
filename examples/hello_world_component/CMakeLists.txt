@@ -19,7 +19,8 @@ if(EXISTS "${HPX_DIR}")
 
   if("${SETUP_TYPE}" STREQUAL "TARGETS")
     target_link_libraries(
-      hello_world_component PUBLIC HPX::hpx HPX::iostreams_component
+      hello_world_component PUBLIC HPX::hpx HPX::wrap_main
+                                   HPX::iostreams_component
     )
     target_link_libraries(hello_world_component PRIVATE HPX::component)
 
@@ -28,6 +29,7 @@ if(EXISTS "${HPX_DIR}")
     hpx_setup_target(
       hello_world_component
       COMPONENT_DEPENDENCIES iostreams
+      DEPENDENCIES HPX::wrap_main
       TYPE COMPONENT
     )
 
