@@ -316,7 +316,7 @@ namespace hpx { namespace threads { namespace policies {
                     std::size_t domain_num;
                     std::size_t q_index;
 
-                    debug::init<const char*> msg(nullptr);
+                    auto msg = spq_deb.declare_variable<const char*>(nullptr);
 
                     std::unique_lock<pu_mutex_type> l;
 
@@ -326,7 +326,7 @@ namespace hpx { namespace threads { namespace policies {
                     case thread_schedule_hint_mode::
                         thread_schedule_hint_mode_none:
                     {
-                        debug::set(msg, "HINT_NONE  ");
+                        spq_deb.set(msg, "HINT_NONE  ");
                         // Create thread on this worker thread if possible
                         if (local_num == std::size_t(-1))
                         {
@@ -387,7 +387,7 @@ namespace hpx { namespace threads { namespace policies {
                     case thread_schedule_hint_mode::
                         thread_schedule_hint_mode_thread:
                     {
-                        debug::set(msg, "HINT_THREAD");
+                        spq_deb.set(msg, "HINT_THREAD");
                         // @TODO. We should check that the thread num is valid
                         // Create thread on requested worker thread
                         thread_num =
@@ -400,7 +400,7 @@ namespace hpx { namespace threads { namespace policies {
                         thread_schedule_hint_mode_numa:
                     {
                         // Create thread on requested NUMA domain
-                        debug::set(msg, "HINT_NUMA  ");
+                        spq_deb.set(msg, "HINT_NUMA  ");
                         // TODO: This case does not handle suspended PUs.
                         domain_num =
                             fast_mod(data.schedulehint.hint, num_domains_);
@@ -750,7 +750,7 @@ namespace hpx { namespace threads { namespace policies {
                     std::size_t domain_num = 0;
                     std::size_t q_index = std::size_t(-1);
 
-                    debug::init<const char*> msg(nullptr);
+                    auto msg = spq_deb.declare_variable<const char*>(nullptr);
 
                     std::unique_lock<pu_mutex_type> l;
 
@@ -762,7 +762,7 @@ namespace hpx { namespace threads { namespace policies {
                         thread_schedule_hint_mode_none:
                     {
                         // Create thread on this worker thread if possible
-                        debug::set(msg, "HINT_NONE  ");
+                        spq_deb.set(msg, "HINT_NONE  ");
                         if (local_num == std::size_t(-1))
                         {
                             // This is a task being injected from a thread on another
@@ -815,7 +815,7 @@ namespace hpx { namespace threads { namespace policies {
                     {
                         // @TODO. We should check that the thread num is valid
                         // Create thread on requested worker thread
-                        debug::set(msg, "HINT_THREAD");
+                        spq_deb.set(msg, "HINT_THREAD");
                         spq_deb.debug(debug::str<>("schedule_thread"),
                             "received HINT_THREAD",
                             debug::dec<3>(schedulehint.hint));
@@ -829,7 +829,7 @@ namespace hpx { namespace threads { namespace policies {
                         thread_schedule_hint_mode_numa:
                     {
                         // Create thread on requested NUMA domain
-                        debug::set(msg, "HINT_NUMA  ");
+                        spq_deb.set(msg, "HINT_NUMA  ");
                         // TODO: This case does not handle suspended PUs.
                         domain_num = fast_mod(schedulehint.mode, num_domains_);
                         // if the thread creating the new task is on the domain
