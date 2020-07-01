@@ -225,12 +225,36 @@ namespace hpx { namespace lcos { namespace local {
         }
     };
 
+    namespace detail {
+        struct empty_helper
+        {
+            static guard_task*& get_empty_guard_task()
+            {
+                static guard_task* empty = new guard_task;
+                return empty;
+            }
+
+            empty_helper() = default;
+            ~empty_helper()
+            {
+                auto& empty = get_empty_guard_task();
+                delete empty;
+                empty = nullptr;
+            }
+        };
+
+        empty_helper empty_helper_{};
+    }    // namespace detail
+
     using hpx::lcos::local::detail::guard_task;
-    guard_task* empty = new guard_task;
+    static guard_task* get_empty_guard_task()
+    {
+        return detail::empty_helper::get_empty_guard_task();
+    }
 
     static void run_composable(detail::guard_task* task)
     {
-        if (task == empty)
+        if (task == get_empty_guard_task())
             return;
         HPX_ASSERT(task != nullptr);
         task->check_();
@@ -254,7 +278,8 @@ namespace hpx { namespace lcos { namespace local {
         guard_task* current = task.load();
         if (current == nullptr)
             return;
-        if (!current->next.compare_exchange_strong(zero, empty))
+        if (!current->next.compare_exchange_strong(
+                zero, get_empty_guard_task()))
         {
             free(zero);
         }
