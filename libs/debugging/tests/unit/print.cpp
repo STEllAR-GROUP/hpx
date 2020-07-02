@@ -8,10 +8,10 @@
 // that function arguments and other parameters used in the print statements
 // are completely elided
 
+#include <hpx/chrono.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/threading_base/print.hpp>
-#include <hpx/chrono.hpp>
 
 #include <atomic>
 #include <chrono>
