@@ -25,8 +25,8 @@
 // would not be executed by the runtime system.
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/command_line_handling/parse_command_line.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/include/util.hpp>
 
 #include <hpx/modules/program_options.hpp>
 

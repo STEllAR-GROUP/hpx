@@ -31,6 +31,7 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/type_support/decay.hpp>
+#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/thread_aware_timer.hpp>
@@ -39,4 +40,8 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
 #include <hpx/util/activate_counters.hpp>
+#endif
+
+#if defined(HPX_HAVE_LIB_STRING_UTIL)
+#include <hpx/modules/string_util.hpp>
 #endif

@@ -12,8 +12,8 @@
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/numeric.hpp>
 #include <hpx/serialization.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/include/util.hpp>
 
 #include <hpx/compute/host/numa_allocator.hpp>
 

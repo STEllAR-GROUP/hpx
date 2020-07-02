@@ -9,7 +9,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/include/util.hpp>
 
 #include <boost/range/iterator.hpp>
 #include <boost/range/mutable_iterator.hpp>

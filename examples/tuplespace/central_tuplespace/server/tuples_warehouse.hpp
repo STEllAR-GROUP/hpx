@@ -8,10 +8,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
-#include <hpx/modules/timing.hpp>
 #include <hpx/util/storage/tuple.hpp>
 
 #include <algorithm>
@@ -21,8 +21,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-#include <hpx/util/storage/tuple.hpp>
 
 // #define TS_DEBUG
 

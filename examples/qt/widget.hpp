@@ -10,7 +10,7 @@
 
 #if !defined(Q_MOC_RUN)
 #include <hpx/include/threads.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/include/lcos_local.hpp>
 #include <cstddef>
 #include <functional>
 #endif

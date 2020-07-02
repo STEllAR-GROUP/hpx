@@ -8,8 +8,9 @@
 //  This example is documented in the Manual under the title "Error Handling"
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+
 #include <hpx/distributed/iostream.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 //[error_handling_raise_exception
 void raise_exception()

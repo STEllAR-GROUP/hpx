@@ -7,10 +7,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/string_util/split.hpp>
-#include <hpx/string_util/trim.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/include/util.hpp>
 
 #include "template_function_accumulator.hpp"
 
