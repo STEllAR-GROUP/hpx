@@ -8,10 +8,10 @@
 #include <hpx/hpx.hpp>
 
 #include <hpx/modules/format.hpp>
-#include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/algorithm.hpp>
 #include <hpx/include/parallel_executors.hpp>
-#include <hpx/include/parallel_numeric.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/numeric.hpp>
+#include <hpx/serialization.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
 

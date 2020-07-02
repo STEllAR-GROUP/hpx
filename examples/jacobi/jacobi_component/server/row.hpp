@@ -11,7 +11,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 
 #include <boost/smart_ptr/shared_array.hpp>
 

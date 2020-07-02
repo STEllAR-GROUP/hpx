@@ -11,7 +11,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>

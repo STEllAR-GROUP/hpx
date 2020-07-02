@@ -14,7 +14,7 @@
 
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/execution.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/functional.hpp>
 
 #include <algorithm>

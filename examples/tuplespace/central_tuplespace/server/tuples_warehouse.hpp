@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/modules/timing.hpp>

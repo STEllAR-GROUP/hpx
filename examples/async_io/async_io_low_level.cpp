@@ -10,8 +10,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 
 #include <iostream>

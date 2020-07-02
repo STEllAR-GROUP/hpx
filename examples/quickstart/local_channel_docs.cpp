@@ -10,7 +10,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/include/apply.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/lcos.hpp>
 
 #include <numeric>

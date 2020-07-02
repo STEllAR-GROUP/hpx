@@ -7,7 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 #include <cstddef>
 #include <vector>

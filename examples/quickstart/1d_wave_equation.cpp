@@ -24,7 +24,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/modules/timing.hpp>

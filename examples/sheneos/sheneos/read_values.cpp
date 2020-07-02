@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/errors/exception.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/hpx.hpp>
 
 #include <cstddef>

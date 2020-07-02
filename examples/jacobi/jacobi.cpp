@@ -9,7 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/timing.hpp>
 
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 #include "jacobi_component/grid.hpp"
 #include "jacobi_component/solver.hpp"

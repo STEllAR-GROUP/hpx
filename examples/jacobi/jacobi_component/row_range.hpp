@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
 #include <boost/range/iterator.hpp>

@@ -10,7 +10,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/threads.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <boost/thread/locks.hpp>

@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 #include <functional>
 

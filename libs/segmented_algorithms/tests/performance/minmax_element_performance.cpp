@@ -6,10 +6,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_generate.hpp>
 #include <hpx/include/parallel_minmax.hpp>
 #include <hpx/include/partitioned_vector.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/modules/program_options.hpp>

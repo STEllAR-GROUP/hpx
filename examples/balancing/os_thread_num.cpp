@@ -6,8 +6,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/iostreams.hpp>
-#include <hpx/synchronization/barrier.hpp>
+#include <hpx/distributed/iostream.hpp>
+#include <hpx/barrier.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/format.hpp>
 #include <boost/lockfree/queue.hpp>
