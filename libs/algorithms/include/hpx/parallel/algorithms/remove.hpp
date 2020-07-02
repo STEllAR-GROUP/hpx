@@ -31,6 +31,10 @@
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#endif
+
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
@@ -39,8 +43,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { inline namespace v1 {
     /////////////////////////////////////////////////////////////////////////////
@@ -91,7 +93,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (count == 0)
                     return algorithm_result::get(std::move(last));
 
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+                std::shared_ptr<bool[]> flags(new bool[count]);
+#else
                 boost::shared_array<bool> flags(new bool[count]);
+#endif
                 std::size_t init = 0u;
 
                 using hpx::util::get;

@@ -33,6 +33,10 @@
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#endif
+
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
@@ -395,7 +399,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 difference_type count = std::distance(first, last);
 
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+                std::shared_ptr<bool[]> flags(new bool[count]);
+#else
                 boost::shared_array<bool> flags(new bool[count]);
+#endif
                 std::size_t init = 0;
 
                 using hpx::util::get;

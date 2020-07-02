@@ -15,7 +15,11 @@
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
 
 #include <cstddef>
 #include <type_traits>
@@ -92,14 +96,22 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         difference_type2 len2 = std::distance(first2, last2);
 
         typedef typename set_operations_buffer<FwdIter>::type buffer_type;
-        boost::shared_array<buffer_type> buffer(
-            new buffer_type[combiner(len1, len2)]);
 
         std::size_t cores = execution::processing_units_count(
             policy.parameters(), policy.executor());
 
         std::size_t step = (len1 + cores - 1) / cores;
+
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+        std::shared_ptr<buffer_type[]> buffer(
+            new buffer_type[combiner(len1, len2)]);
+        std::shared_ptr<set_chunk_data[]> chunks(new set_chunk_data[cores]);
+#else
+        boost::shared_array<buffer_type> buffer(
+            new buffer_type[combiner(len1, len2)]);
         boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
+#endif
+
         // first step, is applied to all partitions
         auto f1 = [=](set_chunk_data* curr_chunk,
                       std::size_t part_size) -> void {

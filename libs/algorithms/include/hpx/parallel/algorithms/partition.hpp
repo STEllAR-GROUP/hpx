@@ -36,6 +36,12 @@
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -45,8 +51,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
@@ -1143,7 +1147,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 difference_type count = std::distance(first, last);
 
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+                std::shared_ptr<bool[]> flags(new bool[count]);
+#else
                 boost::shared_array<bool> flags(new bool[count]);
+#endif
                 output_iterator_offset init = {0, 0};
 
                 using hpx::util::get;

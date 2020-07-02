@@ -19,6 +19,12 @@
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
+
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -59,7 +65,11 @@ struct partition_data
     std::size_t size() const { return size_; }
 
 private:
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+    std::shared_ptr<double[]> data_;
+#else
     boost::shared_array<double> data_;
+#endif
     std::size_t size_;
 };
 
