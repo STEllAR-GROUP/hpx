@@ -22,8 +22,8 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/futures/traits/future_access.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/decay.hpp>

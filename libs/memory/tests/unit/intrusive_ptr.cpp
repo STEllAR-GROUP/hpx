@@ -26,7 +26,7 @@
 
 #endif
 
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 

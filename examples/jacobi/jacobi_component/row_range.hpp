@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2012 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0

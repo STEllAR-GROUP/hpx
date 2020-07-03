@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/serialization/serialize.hpp>
 
 namespace hpx { namespace serialization {

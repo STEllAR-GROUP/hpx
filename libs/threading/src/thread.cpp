@@ -11,8 +11,8 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
