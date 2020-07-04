@@ -13,6 +13,7 @@ set(tests
     countif_range
     find_end_range
     find_first_of_range
+    foreach_adapt
     foreach_range
     foreach_range_projection
     generate_range
