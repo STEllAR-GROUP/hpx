@@ -31,6 +31,7 @@ struct op
         return in1 + in2;
     }
 };
+
 template <typename ExPolicy, typename T>
 void test_transform_inclusive_scan(ExPolicy&& policy,
     hpx::partitioned_vector<T>& xvalues, hpx::partitioned_vector<T>& out)

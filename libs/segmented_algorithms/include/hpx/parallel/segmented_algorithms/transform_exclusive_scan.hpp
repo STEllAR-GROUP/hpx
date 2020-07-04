@@ -35,15 +35,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename T, typename Op, typename Conv>
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         transform_exclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, Conv&& conv, T init, Op&& op, std::true_type)
+            OutIter dest, Conv&& conv, T&& init, Op&& op, std::true_type)
         {
             if (first == last)
                 return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::move(dest));
 
             return exclusive_scan_(std::forward<ExPolicy>(policy), first, last,
-                dest, init, std::forward<Op>(op), std::true_type(),
-                std::forward<Conv>(conv));
+                dest, std::forward<T>(init), std::forward<Op>(op),
+                std::true_type(), std::forward<Conv>(conv));
         }
 
         // forward declare the non-segmented version of this algorithm
@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename T, typename Op, typename Conv>
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         transform_exclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, Conv&& conv, T init, Op&& op, std::false_type);
+            OutIter dest, Conv&& conv, T&& init, Op&& op, std::false_type);
 
         /// \endcond
     }    // namespace detail
