@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,4 +8,5 @@
 
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/algorithms/sort_by_key.hpp>
+#include <hpx/parallel/algorithms/stable_sort.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
