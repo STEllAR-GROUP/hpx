@@ -521,19 +521,19 @@ void test_wait_callback_with_timed_wait()
     hpx::lcos::shared_future<void> fv =
         fi.then(hpx::util::bind(&do_nothing_callback, std::ref(pi)));
 
-    int state = int(fv.wait_for(std::chrono::milliseconds(10)));
+    int state = int(fv.wait_for(std::chrono::milliseconds(100)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
     HPX_TEST_EQ(callback_called, 0U);
 
-    state = int(fv.wait_for(std::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(100)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
-    state = int(fv.wait_for(std::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(100)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
     HPX_TEST_EQ(callback_called, 0U);
 
     pi.set_value(42);
 
-    state = int(fv.wait_for(std::chrono::milliseconds(10)));
+    state = int(fv.wait_for(std::chrono::milliseconds(100)));
     HPX_TEST_EQ(state, int(hpx::lcos::future_status::ready));
 
     HPX_TEST_EQ(callback_called, 1U);
@@ -1590,7 +1590,7 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
+    std::vector<std::string> const cfg = {"hpx.os_threads=4"};
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
