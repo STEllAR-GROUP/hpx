@@ -97,6 +97,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_debugging
     hpx_errors
+    hpx_itt_notify
     hpx_serialization
     hpx_type_support
   CMAKE_SUBDIRS examples tests

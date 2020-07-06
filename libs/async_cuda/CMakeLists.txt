@@ -37,6 +37,10 @@ set(async_cuda_compat_headers hpx/compute/cuda/get_targets.hpp
 
 set(async_cuda_sources cuda_future.cpp cuda_target.cpp get_targets.cpp)
 
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(async_cuda_extra_module_dependencies hpx_async_distributed)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   async_cuda
@@ -50,18 +54,23 @@ add_hpx_module(
     hpx_affinity
     hpx_allocator_support
     hpx_assertion
-    hpx_coroutines
+    hpx_concurrency
     hpx_config
+    hpx_coroutines
     hpx_errors
     hpx_execution
+    hpx_execution_base
     hpx_functional
+    hpx_futures
     hpx_memory
     hpx_performance_counters
     hpx_program_options
     hpx_runtime_configuration
     hpx_synchronization
     hpx_static_reinit
+    hpx_threading_base
     hpx_type_support
+    ${async_cuda_extra_module_dependencies}
     Cuda::cuda
   CMAKE_SUBDIRS examples tests
 )

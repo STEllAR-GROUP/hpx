@@ -21,7 +21,7 @@ function check_module_dependencies() {
     non_module_files_list=$2
 
     # Find the dependencies through the includes and remove hpx/hpx_* like
-    includes=($(grep -Erho 'hpx/[_a-z]*\.hpp\>' --include=*.{hpp,cpp}\
+    includes=($(grep -Erho 'hpx/modules/[_a-z]*\.hpp\>' --include=*.{hpp,cpp}\
         include src 2> /dev/null | sort | uniq | grep -v hpx/hpx))
 
     # Check if the dependency is inside the CMakeLists.txt

@@ -106,6 +106,7 @@ add_hpx_module(
   DEPENDENCIES
     hpx_algorithms
     hpx_assertion
+    hpx_async_base
     hpx_async_combinators
     hpx_config
     hpx_errors

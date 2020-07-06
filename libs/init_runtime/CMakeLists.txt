@@ -13,6 +13,7 @@ set(init_runtime_headers
     hpx/hpx_finalize.hpp
     hpx/hpx_init.hpp
     hpx/hpx_init_impl.hpp
+    hpx/hpx_init_params.hpp
     hpx/hpx_main_winsocket.hpp
     hpx/hpx_start.hpp
     hpx/hpx_start_impl.hpp
@@ -29,12 +30,22 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   SOURCES ${init_runtime_sources}
   HEADERS ${init_runtime_headers}
-  DEPENDENCIES hpx_algorithms hpx_runtime_local hpx_testing
+  DEPENDENCIES hpx_algorithms hpx_config hpx_runtime_local hpx_testing
   CMAKE_SUBDIRS examples tests
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   target_link_libraries(
-    hpx_init_runtime PUBLIC hpx_async_distributed hpx_performance_counters
+    hpx_init_runtime
+    PUBLIC hpx_async_distributed
+           hpx_errors
+           hpx_filesystem
+           hpx_format
+           hpx_logging
+           hpx_mpi_base
+           hpx_performance_counters
+           hpx_program_options
+           hpx_schedulers
+           hpx_timing
   )
 endif()

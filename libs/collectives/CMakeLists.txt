@@ -68,8 +68,10 @@ add_hpx_module(
     hpx_datastructures
     hpx_errors
     hpx_execution
+    hpx_execution_base
     hpx_format
     hpx_functional
+    hpx_futures
     hpx_hardware
     hpx_hashing
     hpx_init_runtime
