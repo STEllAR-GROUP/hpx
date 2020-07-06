@@ -22,12 +22,11 @@ function(create_cmake_test name hpx_dir setup_type test_dir)
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}"
     VERBATIM
   )
-  set(ADDITIONAL_CMAKE_OPTIONS)
-  set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
-                               -DSETUP_TYPE=${setup_type}
-  )
+  set(ADDITIONAL_CMAKE_OPTIONS -DSETUP_TYPE=${setup_type})
   if(CMAKE_TOOLCHAIN_FILE)
-    set(ADDITIONAL_CMAKE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
+                                 -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+    )
   endif()
   if(CMAKE_MAKE_COMMAND)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
@@ -52,13 +51,13 @@ function(create_cmake_test name hpx_dir setup_type test_dir)
                                  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
     )
   endif()
+  set(test_dir "${PROJECT_SOURCE_DIR}/${test_dir}")
   add_custom_target(
     ${name}.make_configure
     COMMAND
-      "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
-      "${PROJECT_SOURCE_DIR}/${test_dir}" -DHPX_DIR=${hpx_dir}
-      -DBOOST_ROOT=${BOOST_ROOT} ${ADDITIONAL_CMAKE_OPTIONS}
-      -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
+      "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}" ${test_dir}
+      -DHPX_DIR=${hpx_dir} -DBOOST_ROOT=${BOOST_ROOT}
+      ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
     VERBATIM
   )
