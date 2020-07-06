@@ -141,18 +141,20 @@ create_cmake_test(
   "examples/hello_world_component"
 )
 
-# Google test emulation
-create_cmake_test(
-  cmake_build_dir_gtest_emulation_test
-  "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
-  "examples/gtest_emulation"
-)
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+  # Google test emulation
+  create_cmake_test(
+    cmake_build_dir_gtest_emulation_test
+    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
+    "examples/gtest_emulation"
+  )
 
-create_cmake_test(
-  cmake_install_dir_gtest_emulation_test
-  "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
-  "examples/gtest_emulation"
-)
+  create_cmake_test(
+    cmake_install_dir_gtest_emulation_test
+    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
+    "examples/gtest_emulation"
+  )
+endif()
 
 # PkgConfig
 if(NOT MSVC)
