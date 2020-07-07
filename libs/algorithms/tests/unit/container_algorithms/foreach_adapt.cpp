@@ -27,5 +27,10 @@ int main()
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
 
+    iter = hpx::parallel::for_each(hpx::parallel::execution::par,
+        Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, &myfunction);
+
+    HPX_TEST_EQ(*iter, std::int64_t(100));
+
     return hpx::util::report_errors();
 }

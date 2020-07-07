@@ -385,12 +385,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     invoke_projected<F, Proj>{f, proj});
             }
 
-            template <typename ExPolicy, typename FwdIter, typename F,
-                typename Proj>
-            static
-                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-                    Proj&& proj)
+            template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+                typename F, typename Proj>
+            static typename util::detail::algorithm_result<ExPolicy,
+                FwdIterB>::type
+            parallel(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
+                Proj&& proj)
             {
                 if (first != last)
                 {
@@ -403,7 +403,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::projection_identity());
                 }
 
-                return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
+                return util::detail::algorithm_result<ExPolicy, FwdIterB>::get(
                     std::move(first));
             }
         };
