@@ -360,8 +360,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
             }
 
-            template <typename ExPolicy, typename InIterB,typename InIterE, typename F,
-                typename Proj>
+            template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename F, typename Proj>
             static typename std::enable_if<
                 hpx::traits::is_random_access_iterator<InIterB>::value,
                 InIterB>::type
@@ -373,8 +373,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     invoke_projected<F, Proj>{f, proj});
             }
 
-            template <typename ExPolicy, typename InIterB, typename InIterE, typename F,
-                typename Proj>
+            template <typename ExPolicy, typename InIterB, typename InIterE,
+                typename F, typename Proj>
             static typename std::enable_if<
                 !hpx::traits::is_random_access_iterator<InIterB>::value,
                 InIterB>::type
@@ -410,8 +410,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         // non-segmented implementation
-        template <typename ExPolicy, typename FwdIterB, typename FwdIterE, typename F,
-            typename Proj>
+        template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+            typename F, typename Proj>
         inline typename util::detail::algorithm_result<ExPolicy, FwdIterB>::type
         for_each_(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
             Proj&& proj, std::false_type)
@@ -509,8 +509,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // FIXME : is_indirect_callable does not work properly when compiling
     //         Cuda host code
 
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE, typename F,
-        typename Proj = util::projection_identity,
+    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+        typename F, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIterB>::value&&
                     parallel::traits::is_projected<Proj, FwdIterB>::value)
