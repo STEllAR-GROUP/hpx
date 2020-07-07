@@ -453,8 +453,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    /// \tparam FwdIterB    The type of the source iterator used (deduced).
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
