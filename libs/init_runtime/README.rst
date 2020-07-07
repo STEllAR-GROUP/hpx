@@ -13,4 +13,4 @@ init_runtime
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx-docs/latest/html/libs/init_runtime/docs/index.html>`__.
+<https://hpx-docs.stellar-group.org/latest/html/libs/init_runtime/docs/index.html>`__.

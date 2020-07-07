@@ -12,4 +12,4 @@ allocator_support
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx-docs/latest/html/libs/allocator_support/docs/index.html>`__.
+<https://hpx-docs.stellar-group.org/latest/html/libs/allocator_support/docs/index.html>`__.

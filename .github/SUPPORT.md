@@ -12,7 +12,7 @@ get support for using HPX.
 
 ### Documentation
 
-* [User Documentation](https://stellar-group.github.io/hpx-docs/latest/html/index.html)
+* [User Documentation](https://hpx-docs.stellar-group.org/latest/html/index.html)
 
 
 ### Real-time Chat
