@@ -60,7 +60,9 @@ add_hpx_module(
     hpx_errors
     hpx_functional
     hpx_futures
+    hpx_itt_notify
     hpx_logging
+    hpx_naming_base
     hpx_preprocessor
     hpx_threading_base
     hpx_type_support

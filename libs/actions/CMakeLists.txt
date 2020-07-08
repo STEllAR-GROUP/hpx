@@ -40,6 +40,7 @@ add_hpx_module(
     hpx_coroutines
     hpx_datastructures
     hpx_debugging
+    hpx_itt_notify
     hpx_serialization
   CMAKE_SUBDIRS examples tests
 )
