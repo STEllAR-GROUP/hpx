@@ -513,7 +513,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename F, typename Proj = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_iterator<FwdIterB>::value&&
-                    parallel::traits::is_projected<Proj, FwdIterB>::value)
+                    hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value&&
+                        parallel::traits::is_projected<Proj, FwdIterB>::value)
 #if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
             ,
         HPX_CONCEPT_REQUIRES_(parallel::traits::is_indirect_callable<ExPolicy,

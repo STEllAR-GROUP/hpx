@@ -13,13 +13,14 @@
 #include <cstdint>
 #include <iostream>
 #include <iterator>
+#include <vector>
 
 void myfunction(int i)
 {
     std::cout << ' ' << i;
 }
 
-int main()
+void test_begin_end_iterator()
 {
     Iterator<std::int64_t> iter =
         hpx::parallel::for_each(hpx::parallel::execution::seq,
@@ -31,6 +32,11 @@ int main()
         Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, &myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
+}
+
+int main()
+{
+    test_begin_end_iterator();
 
     return hpx::util::report_errors();
 }
