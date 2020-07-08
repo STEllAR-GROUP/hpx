@@ -224,10 +224,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<Proj>(proj));
         }
         // forward declare the segmented version of for_each_ algorithm
-        template <typename ExPolicy, typename SegIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
-        for_each_(ExPolicy&& policy, SegIter first, SegIter last, F&& f,
+        template <typename ExPolicy, typename SegIterB, typename SegIterE,
+            typename F, typename Proj>
+        inline typename util::detail::algorithm_result<ExPolicy, SegIterB>::type
+        for_each_(ExPolicy&& policy, SegIterB first, SegIterE last, F&& f,
             Proj&& proj, std::true_type);
 
         /// Segmented implementation using for_each.
