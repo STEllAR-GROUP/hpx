@@ -19,7 +19,11 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -52,7 +56,11 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 struct partition_data
 {
 private:
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+    typedef std::shared_ptr<double[]> buffer_type;
+#else
     typedef boost::shared_array<double> buffer_type;
+#endif
 
 public:
     partition_data()

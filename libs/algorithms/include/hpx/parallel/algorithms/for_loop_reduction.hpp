@@ -17,7 +17,11 @@
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
 
 #include <cstddef>
 #include <cstdlib>
@@ -67,7 +71,11 @@ namespace hpx { namespace parallel { inline namespace v2 {
         private:
             T& var_;
             Op op_;
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+            std::shared_ptr<hpx::util::cache_line_data<T>[]> data_;
+#else
             boost::shared_array<hpx::util::cache_line_data<T>> data_;
+#endif
         };
 
         /// \endcond
