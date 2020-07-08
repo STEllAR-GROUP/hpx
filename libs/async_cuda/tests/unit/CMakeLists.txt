@@ -39,6 +39,7 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/async_cuda"
   )
 
-  add_hpx_unit_test("modules.async_cuda" ${test} ${${test}_PARAMETERS})
-
+  add_hpx_unit_test(
+    "modules.async_cuda" ${test} ${${test}_PARAMETERS} RUN_SERIAL
+  )
 endforeach()
