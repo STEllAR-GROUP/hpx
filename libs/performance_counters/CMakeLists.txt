@@ -71,6 +71,7 @@ add_hpx_module(
     hpx_executors
     hpx_format
     hpx_functional
+    hpx_futures
     hpx_logging
     hpx_pack_traversal
     hpx_runtime_local

@@ -88,13 +88,24 @@ add_hpx_module(
   COMPAT_HEADERS ${runtime_local_compat_headers}
   DEPENDENCIES
     hpx_assertion
+    hpx_command_line_handling
     hpx_config
     hpx_errors
+    hpx_execution
+    hpx_format
+    hpx_functional
+    hpx_io_service
     hpx_lcos_local
     hpx_logging
+    hpx_naming_base
     hpx_program_options
+    hpx_resource_partitioner
+    hpx_runtime_configuration
     hpx_threadmanager
     hpx_thread_executors
+    hpx_threading
+    hpx_threading_base
     hpx_topology
+    hpx_version
   CMAKE_SUBDIRS examples tests
 )

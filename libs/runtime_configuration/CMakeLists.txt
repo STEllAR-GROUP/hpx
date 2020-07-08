@@ -51,6 +51,7 @@ add_hpx_module(
     hpx_errors
     hpx_filesystem
     hpx_functional
+    hpx_itt_notify
     hpx_logging
     hpx_plugin
     hpx_prefix

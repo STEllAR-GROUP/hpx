@@ -24,7 +24,8 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   SOURCES ${version_sources}
   HEADERS ${version_headers}
-  DEPENDENCIES hpx_config hpx_format hpx_prefix Hwloc::hwloc ${mpi_dependencies}
+  DEPENDENCIES hpx_config hpx_config_registry hpx_format hpx_prefix Hwloc::hwloc
+               ${mpi_dependencies}
   CMAKE_SUBDIRS
 )
 
