@@ -47,10 +47,17 @@ namespace hpx { namespace traits {
     struct HPX_DEPRECATED(
         HPX_DEPRECATED_MSG " Use is_invocable instead.") is_callable;
 
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     template <typename F, typename... Ts, typename R>
     struct is_callable<F(Ts...), R> : detail::is_invocable_impl<F(Ts...), R>
     {
     };
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic pop
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>

@@ -70,7 +70,7 @@ namespace hpx {
         if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
         {
             int const verbosity = util::from_string<int>(
-                get_config_entry("hpx.exception_verbosity", ""));
+                get_config_entry("hpx.exception_verbosity", "2"));
 
             if (verbosity >= 2)
             {
@@ -143,7 +143,7 @@ namespace hpx {
         if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
         {
             int const verbosity = util::from_string<int>(
-                get_config_entry("hpx.exception_verbosity", ""));
+                get_config_entry("hpx.exception_verbosity", "2"));
 
             char* reason = strsignal(signum);
 

@@ -59,6 +59,10 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx17_std_variant(DEFINITIONS HPX_HAVE_CXX17_STD_VARIANT)
 
+  hpx_check_for_cxx17_shared_ptr_array(
+    DEFINITIONS HPX_HAVE_CXX17_SHARED_PTR_ARRAY
+  )
+
   hpx_check_for_cxx17_maybe_unused(DEFINITIONS HPX_HAVE_CXX17_MAYBE_UNUSED)
 
   hpx_check_for_cxx17_deduction_guides(

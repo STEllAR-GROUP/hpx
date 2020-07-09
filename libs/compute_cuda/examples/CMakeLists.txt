@@ -73,7 +73,7 @@ foreach(example_program ${example_programs})
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_example_test(
       "modules.compute_cuda" ${example_program}
-      ${${example_program}_PARAMETERS}
+      ${${example_program}_PARAMETERS} RUN_SERIAL
     )
   endif()
 endforeach()

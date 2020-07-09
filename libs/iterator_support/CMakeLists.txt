@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 set(iterator_support_headers
     hpx/iterator_support/traits/is_iterator.hpp
     hpx/iterator_support/traits/is_range.hpp
+    hpx/iterator_support/traits/is_sentinel_for.hpp
     hpx/iterator_support/counting_iterator.hpp
     hpx/iterator_support/iterator_adaptor.hpp
     hpx/iterator_support/iterator_facade.hpp

@@ -24,7 +24,12 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/accumulate.hpp
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp
+    hpx/parallel/algorithms/detail/insertion_sort.hpp
+    hpx/parallel/algorithms/detail/is_sorted.hpp
+    hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
+    hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/set_operation.hpp
+    hpx/parallel/algorithms/detail/spin_sort.hpp
     hpx/parallel/algorithms/detail/transfer.hpp
     hpx/parallel/algorithms/equal.hpp
     hpx/parallel/algorithms/exclusive_scan.hpp
@@ -58,6 +63,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/set_intersection.hpp
     hpx/parallel/algorithms/set_symmetric_difference.hpp
     hpx/parallel/algorithms/set_union.hpp
+    hpx/parallel/algorithms/stable_sort.hpp
     hpx/parallel/algorithms/sort_by_key.hpp
     hpx/parallel/algorithms/sort.hpp
     hpx/parallel/algorithms/swap_ranges.hpp
@@ -118,10 +124,15 @@ set(algorithms_headers
     hpx/parallel/util/foreach_partitioner.hpp
     hpx/parallel/util/invoke_projected.hpp
     hpx/parallel/util/loop.hpp
+    hpx/parallel/util/low_level.hpp
+    hpx/parallel/util/merge_four.hpp
+    hpx/parallel/util/merge_vector.hpp
+    hpx/parallel/util/nbits.hpp
     hpx/parallel/util/partitioner.hpp
     hpx/parallel/util/partitioner_with_cleanup.hpp
     hpx/parallel/util/prefetching.hpp
     hpx/parallel/util/projection_identity.hpp
+    hpx/parallel/util/range.hpp
     hpx/parallel/util/scan_partitioner.hpp
     hpx/parallel/util/tagged_pair.hpp
     hpx/parallel/util/tagged_tuple.hpp

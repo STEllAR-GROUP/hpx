@@ -497,7 +497,7 @@ void condition_test_waits(condition_test_data* data)
 
     // Test wait_until.
     std::chrono::system_clock::time_point xt =
-        std::chrono::system_clock::now() + std::chrono::milliseconds(10);
+        std::chrono::system_clock::now() + std::chrono::milliseconds(100);
     while (data->notified != 3)
         data->condition.wait_until(lock, xt);
     HPX_TEST(lock ? true : false);
@@ -506,7 +506,7 @@ void condition_test_waits(condition_test_data* data)
     data->condition.notify_one();
 
     // Test predicate wait_until.
-    xt = std::chrono::system_clock::now() + std::chrono::milliseconds(10);
+    xt = std::chrono::system_clock::now() + std::chrono::milliseconds(100);
     cond_predicate pred(data->notified, 4);
     HPX_TEST(data->condition.wait_until(lock, xt, pred));
     HPX_TEST(lock ? true : false);
@@ -518,7 +518,7 @@ void condition_test_waits(condition_test_data* data)
     // Test predicate wait_for
     cond_predicate pred_rel(data->notified, 5);
     HPX_TEST(data->condition.wait_for(
-        lock, std::chrono::milliseconds(10), pred_rel));
+        lock, std::chrono::milliseconds(100), pred_rel));
     HPX_TEST(lock ? true : false);
     HPX_TEST(pred_rel());
     HPX_TEST_EQ(data->notified, 5);

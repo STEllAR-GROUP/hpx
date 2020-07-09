@@ -16,4 +16,4 @@ The :ref:`libs_async` module extends the functionality in this module to work
 with :term:`action`\ s.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx-docs/latest/html/libs/async_local/docs/index.html>`__.
+<https://hpx-docs.stellar-group.org/latest/html/libs/async_local/docs/index.html>`__.

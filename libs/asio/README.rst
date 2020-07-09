@@ -13,4 +13,4 @@ asio
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx-docs/latest/html/libs/asio/docs/index.html>`__.
+<https://hpx-docs.stellar-group.org/latest/html/libs/asio/docs/index.html>`__.

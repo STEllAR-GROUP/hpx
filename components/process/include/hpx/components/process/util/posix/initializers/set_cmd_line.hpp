@@ -17,7 +17,12 @@
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
+
 #include <boost/tokenizer.hpp>
 
 #include <cstddef>
@@ -79,7 +84,11 @@ private:
     HPX_SERIALIZATION_SPLIT_MEMBER()
 
     std::vector<std::string> args_;
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+    std::shared_ptr<char*[]> cmd_line_;
+#else
     boost::shared_array<char*> cmd_line_;
+#endif
 };
 
 }

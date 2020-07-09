@@ -11,6 +11,10 @@
 #include <hpx/serialization/serialize_buffer.hpp>
 #include <hpx/modules/testing.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#endif
+
 #include <algorithm>
 #include <cstddef>
 #include <memory>
@@ -88,7 +92,11 @@ void receive(hpx::naming::id_type dest, char* send_buffer,
 int hpx_main(int argc, char* argv[])
 {
     // alloc buffer to send
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+    std::shared_ptr<char[]> send_buffer(new char[MEMORY_BLOCK_SIZE]);
+#else
     boost::shared_array<char> send_buffer(new char[MEMORY_BLOCK_SIZE]);
+#endif
 
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {

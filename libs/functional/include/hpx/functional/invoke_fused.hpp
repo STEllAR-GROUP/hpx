@@ -49,12 +49,19 @@ namespace hpx { namespace util {
         struct HPX_DEPRECATED(HPX_DEPRECATED_MSG
             " Use invoke_fused_result instead.") fused_result_of;
 
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         template <typename F, typename Tuple>
         struct fused_result_of<F(Tuple)>
           : invoke_fused_result_impl<F, Tuple&&,
                 typename fused_index_pack<Tuple>::type>
         {
         };
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic pop
+#endif
 
         template <typename F, typename Tuple>
         struct invoke_fused_result
