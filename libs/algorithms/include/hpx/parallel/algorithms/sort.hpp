@@ -25,6 +25,7 @@
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
@@ -45,24 +46,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
         static const std::size_t sort_limit_per_task = 65536ul;
-
-        ///////////////////////////////////////////////////////////////////////
-        // std::is_sorted is not available on all supported platforms yet
-        template <typename Iter, typename Compare>
-        inline bool is_sorted_sequential(
-            Iter first, Iter last, Compare const& comp)
-        {
-            bool sorted = true;
-            if (first != last)
-            {
-                for (Iter it1 = first, it2 = first + 1;
-                     it2 != last && (sorted = !comp(*it2, *it1)); it1 = it2++)
-                {
-                    /**/
-                }
-            }
-            return sorted;
-        }
 
         //------------------------------------------------------------------------
         //  function : sort_thread
