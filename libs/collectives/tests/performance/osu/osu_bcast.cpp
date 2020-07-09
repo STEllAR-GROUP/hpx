@@ -8,9 +8,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/distributed/iostream.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/serialization/serializable_any.hpp>
 
