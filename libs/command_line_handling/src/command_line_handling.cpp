@@ -792,7 +792,11 @@ namespace hpx { namespace util {
         }
 #endif
 
+#ifdef HPX_HAVE_LIB_MPI_BASE
         bool have_mpi = util::mpi_environment::check_mpi_environment(rtcfg_);
+#else
+        bool have_mpi = false;
+#endif
 
         util::batch_environment env(
             nodelist, have_mpi, debug_clp, enable_batch_env);

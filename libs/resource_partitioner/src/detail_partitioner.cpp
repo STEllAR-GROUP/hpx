@@ -10,7 +10,9 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
+#endif
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
