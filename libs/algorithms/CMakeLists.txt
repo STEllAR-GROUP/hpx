@@ -98,6 +98,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/rotate.hpp
     hpx/parallel/container_algorithms/search.hpp
     hpx/parallel/container_algorithms/sort.hpp
+    hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/unique.hpp
     hpx/parallel/datapar.hpp

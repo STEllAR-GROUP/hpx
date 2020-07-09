@@ -313,16 +313,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           otherwise.
     ///           The algorithm returns an iterator pointing to the first
     ///           element after the last element in the input sequence.
-    //-----------------------------------------------------------------------------
+    // clang-format off
     template <typename ExPolicy, typename RandomIt,
-        typename Proj = util::projection_identity,
         typename Compare = detail::less,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<RandomIt>::value&&
-                    traits::is_projected<Proj, RandomIt>::value&&
-                        traits::is_indirect_callable<ExPolicy, Compare,
-                            traits::projected<Proj, RandomIt>,
-                            traits::projected<Proj, RandomIt>>::value)>
+        typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<RandomIt>::value &&
+            traits::is_projected<Proj, RandomIt>::value &&
+            traits::is_indirect_callable<ExPolicy, Compare,
+                traits::projected<Proj, RandomIt>,
+                traits::projected<Proj, RandomIt>
+            >::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy, RandomIt>::type sort(
         ExPolicy&& policy, RandomIt first, RandomIt last,
         Compare&& comp = Compare(), Proj&& proj = Proj())

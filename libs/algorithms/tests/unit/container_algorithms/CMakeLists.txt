@@ -42,6 +42,7 @@ set(tests
     search_range
     searchn_range
     sort_range
+    stable_sort_range
     transform_range
     transform_range_binary
     transform_range_binary2
