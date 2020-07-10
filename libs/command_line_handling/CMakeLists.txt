@@ -21,7 +21,7 @@ set(command_line_handling_sources command_line_handling.cpp
                                   parse_command_line.cpp
 )
 
-if (HPX_WITH_NETWORKING OR HPX_WITH_ASYNC_MPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
     set(MPI_DEPS hpx_mpi_base)
 endif()
 

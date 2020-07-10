@@ -12,7 +12,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
+#endif
 #include <hpx/modules/logging.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
