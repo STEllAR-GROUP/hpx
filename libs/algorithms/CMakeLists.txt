@@ -98,6 +98,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/rotate.hpp
     hpx/parallel/container_algorithms/search.hpp
     hpx/parallel/container_algorithms/sort.hpp
+    hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/unique.hpp
     hpx/parallel/datapar.hpp
@@ -165,6 +166,7 @@ add_hpx_module(
   SOURCES ${algorithms_sources}
   DEPENDENCIES
     hpx_assertion
+    hpx_async_combinators
     hpx_concepts
     hpx_concurrency
     hpx_config

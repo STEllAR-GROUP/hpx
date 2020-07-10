@@ -94,6 +94,7 @@ set(tests
     mismatch_binary
     move
     none_of
+    parallel_sort
     partition
     partition_copy
     reduce_

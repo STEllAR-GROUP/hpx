@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2016 Hartmut Kaiser
+//  Copyright (c) 2015-2020 Hartmut Kaiser
 //  Copyright (c)      2017 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,5 +28,6 @@
 #include <hpx/parallel/container_algorithms/rotate.hpp>
 #include <hpx/parallel/container_algorithms/search.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
+#include <hpx/parallel/container_algorithms/stable_sort.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
 #include <hpx/parallel/container_algorithms/unique.hpp>
