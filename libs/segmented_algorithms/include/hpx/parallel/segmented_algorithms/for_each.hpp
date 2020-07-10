@@ -180,10 +180,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
-        template <typename ExPolicy, typename SegIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
-        for_each_(ExPolicy&& policy, SegIter first, SegIter last, F&& f,
+        template <typename ExPolicy, typename SegIterB, typename SegIterE,
+            typename F, typename Proj>
+        inline typename util::detail::algorithm_result<ExPolicy, SegIterB>::type
+        for_each_(ExPolicy&& policy, SegIterB first, SegIterE last, F&& f,
             Proj&& proj, std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
@@ -191,12 +191,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             if (first == last)
             {
-                typedef util::detail::algorithm_result<ExPolicy, SegIter>
+                typedef util::detail::algorithm_result<ExPolicy, SegIterB>
                     result;
                 return result::get(std::move(last));
             }
 
-            typedef hpx::traits::segmented_iterator_traits<SegIter>
+            typedef hpx::traits::segmented_iterator_traits<SegIterB>
                 iterator_traits;
 
             return segmented_for_each(
@@ -206,9 +206,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename F, typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, InIter>::type
-        for_each_(ExPolicy&& policy, InIter first, InIter last, F&& f,
+        template <typename ExPolicy, typename InIterB, typename InIterE,
+            typename F, typename Proj>
+        inline typename util::detail::algorithm_result<ExPolicy, InIterB>::type
+        for_each_(ExPolicy&& policy, InIterB first, InIterE last, F&& f,
             Proj&& proj, std::false_type);
 
         /// \endcond
