@@ -165,6 +165,7 @@ add_hpx_module(
   SOURCES ${algorithms_sources}
   DEPENDENCIES
     hpx_assertion
+    hpx_async_combinators
     hpx_concepts
     hpx_concurrency
     hpx_config
