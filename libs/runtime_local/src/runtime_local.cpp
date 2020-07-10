@@ -313,7 +313,7 @@ namespace hpx {
         ,
         notification_policy_type&& io_pool_notifier
 #endif
-#ifdef HPX_HAVE_IO_POOL
+#ifdef HPX_HAVE_TIMER_POOL
         ,
         notification_policy_type&& timer_pool_notifier
 #endif
