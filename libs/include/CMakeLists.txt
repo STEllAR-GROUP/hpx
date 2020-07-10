@@ -121,6 +121,7 @@ add_hpx_module(
     hpx_pack_traversal
     hpx_resource_partitioner
     hpx_serialization
+    hpx_string_util
     hpx_synchronization
     hpx_thread_executors
     hpx_thread_pools

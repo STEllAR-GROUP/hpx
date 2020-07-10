@@ -100,6 +100,7 @@ add_hpx_module(
     hpx_errors
     hpx_functional
     hpx_iterator_support
+    hpx_memory
     hpx_preprocessor
     hpx_resource_partitioner
     hpx_synchronization
