@@ -171,7 +171,7 @@ void test_reduce_by_key1(ExPolicy&& policy, Tkey, Tval, bool benchmark,
     double elapsed = t.elapsed();
 
     bool is_equal = std::equal(
-        values.begin(), result.second, check_values.begin(), almost_equal());
+        values.begin(), result.out, check_values.begin(), almost_equal());
     HPX_TEST(is_equal);
     if (is_equal)
     {
@@ -185,8 +185,8 @@ void test_reduce_by_key1(ExPolicy&& policy, Tkey, Tval, bool benchmark,
     {
 //         debug::output("keys     ", o_keys);
 //         debug::output("values   ", o_values);
-//         debug::output("key range", keys.begin(), result.first);
-//         debug::output("val range", values.begin(), result.second);
+//         debug::output("key range", keys.begin(), result.in);
+//         debug::output("val range", values.begin(), result.out);
 //         debug::output("expected ", check_values);
 //         throw std::string("Problem");
 #if defined(EXTRA_DEBUG)
@@ -273,7 +273,7 @@ void test_reduce_by_key_const(ExPolicy&& policy, Tkey, Tval, bool benchmark,
     double elapsed = t.elapsed();
 
     bool is_equal = std::equal(
-        values.begin(), result.second, check_values.begin(), almost_equal());
+        values.begin(), result.out, check_values.begin(), almost_equal());
     HPX_TEST(is_equal);
     if (is_equal)
     {
@@ -287,8 +287,8 @@ void test_reduce_by_key_const(ExPolicy&& policy, Tkey, Tval, bool benchmark,
     {
 //         debug::output("keys     ", o_keys);
 //         debug::output("values   ", o_values);
-//         debug::output("key range", keys.begin(), result.first);
-//         debug::output("val range", values.begin(), result.second);
+//         debug::output("key range", keys.begin(), result.in);
+//         debug::output("val range", values.begin(), result.out);
 //         debug::output("expected ", check_values);
 //         throw std::string("Problem");
 #if defined(EXTRA_DEBUG)
@@ -376,7 +376,7 @@ void test_reduce_by_key_async(
     std::cout << "Async time " << async_seconds << " Sync time " << sync_seconds
               << "\n";
     bool is_equal = std::equal(
-        values.begin(), result.second, check_values.begin(), almost_equal());
+        values.begin(), result.out, check_values.begin(), almost_equal());
     HPX_TEST(is_equal);
     if (is_equal)
     {
@@ -386,8 +386,8 @@ void test_reduce_by_key_async(
     {
 //         debug::output("keys     ", o_keys);
 //         debug::output("values   ", o_values);
-//         debug::output("key range", keys.begin(), result.first);
-//         debug::output("val range", values.begin(), result.second);
+//         debug::output("key range", keys.begin(), result.in);
+//         debug::output("val range", values.begin(), result.out);
 //         debug::output("expected ", check_values);
 //         throw std::string("Problem");
 #if defined(EXTRA_DEBUG)

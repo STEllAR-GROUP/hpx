@@ -19,6 +19,7 @@
 #include <hpx/parallel/algorithms/rotate.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -73,9 +74,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
                 hpx::traits::is_range<Rng>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<
-            tag::begin(typename hpx::traits::range_iterator<Rng>::type),
-            tag::end(typename hpx::traits::range_iterator<Rng>::type)>>::type
+        util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
+            typename hpx::traits::range_iterator<Rng>::type>>::type
     rotate(ExPolicy&& policy, Rng&& rng,
         typename hpx::traits::range_iterator<Rng>::type middle)
     {
@@ -135,9 +135,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 hpx::traits::is_range<Rng>::value&&
                     hpx::traits::is_iterator<OutIter>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<
-            tag::in(typename hpx::traits::range_iterator<Rng>::type),
-            tag::out(OutIter)>>::type
+        util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
+            OutIter>>::type
     rotate_copy(ExPolicy&& policy, Rng&& rng,
         typename hpx::traits::range_iterator<Rng>::type middle,
         OutIter dest_first)

@@ -466,7 +466,8 @@ endfunction()
 function(hpx_check_for_cxx17_std_nontype_template_parameter_auto)
   add_hpx_config_test(
     HPX_WITH_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO
-    SOURCE cmake/tests/cxx17_std_nontype_template_parameter_auto.cpp FILE ${ARGN}
+    SOURCE cmake/tests/cxx17_std_nontype_template_parameter_auto.cpp FILE
+           ${ARGN}
   )
 endfunction()
 

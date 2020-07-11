@@ -20,6 +20,7 @@
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
@@ -136,7 +137,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         // sequential reverse_copy
         template <typename BidirIt, typename OutIter>
-        inline std::pair<BidirIt, OutIter> sequential_reverse_copy(
+        inline util::in_out_result<BidirIt, OutIter> sequential_reverse_copy(
             BidirIt first, BidirIt last, OutIter dest)
         {
             BidirIt iter = last;
@@ -144,7 +145,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 *dest++ = *--iter;
             }
-            return std::make_pair(last, dest);
+            return util::in_out_result<BidirIt, OutIter>{last, dest};
         }
 
         template <typename IterPair>
@@ -157,7 +158,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename BidirIter, typename OutIter>
-            static std::pair<BidirIter, OutIter> sequential(
+            static util::in_out_result<BidirIter, OutIter> sequential(
                 ExPolicy, BidirIter first, BidirIter last, OutIter dest_first)
             {
                 return sequential_reverse_copy(first, last, dest_first);
@@ -165,19 +166,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename BidirIter, typename FwdIter>
             static typename util::detail::algorithm_result<ExPolicy,
-                std::pair<BidirIter, FwdIter>>::type
+                util::in_out_result<BidirIter, FwdIter>>::type
             parallel(ExPolicy&& policy, BidirIter first, BidirIter last,
                 FwdIter dest_first)
             {
                 typedef std::reverse_iterator<BidirIter> iterator;
 
                 return util::detail::convert_to_result(
-                    detail::copy<std::pair<iterator, FwdIter>>().call(
+                    detail::copy<util::in_out_result<iterator, FwdIter>>().call(
                         std::forward<ExPolicy>(policy), std::false_type(),
                         iterator(last), iterator(first), dest_first),
-                    [](std::pair<iterator, FwdIter> const& p)
-                        -> std::pair<BidirIter, FwdIter> {
-                        return std::make_pair(p.first.base(), p.second);
+                    [](util::in_out_result<iterator, FwdIter> const& p)
+                        -> util::in_out_result<BidirIter, FwdIter> {
+                        return util::in_out_result<BidirIter, FwdIter>{
+                            p.in.base(), p.out};
                     });
             }
         };
@@ -244,7 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 execution::is_execution_policy<ExPolicy>::value&&
                     hpx::traits::is_iterator<FwdIter>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in(BidirIter), tag::out(FwdIter)>>::type
+        util::in_out_result<BidirIter, FwdIter>>::type
     reverse_copy(
         ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest_first)
     {
@@ -256,9 +258,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return hpx::util::make_tagged_pair<tag::in, tag::out>(
-            detail::reverse_copy<std::pair<BidirIter, FwdIter>>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last,
-                dest_first));
+        return detail::reverse_copy<util::in_out_result<BidirIter, FwdIter>>()
+            .call(std::forward<ExPolicy>(policy), is_seq(), first, last,
+                dest_first);
     }
 }}}    // namespace hpx::parallel::v1

@@ -40,8 +40,8 @@ void test_copy_if(ExPolicy policy)
     std::iota(std::begin(c), middle, dis(gen));
     std::fill(middle, std::end(c), -1);
 
-    hpx::parallel::copy_if(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(d), [](int i) { return !(i < 0); });
+    hpx::copy_if(policy, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), [](int i) { return !(i < 0); });
 
     std::size_t count = 0;
     HPX_TEST(std::equal(
@@ -74,8 +74,8 @@ void test_copy_if_async(ExPolicy p)
     std::iota(std::begin(c), middle, dis(gen));
     std::fill(middle, std::end(c), -1);
 
-    auto f = hpx::parallel::copy_if(p, iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(d), [](int i) { return !(i < 0); });
+    auto f = hpx::copy_if(p, iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(d), [](int i) { return !(i < 0); });
     f.wait();
 
     std::size_t count = 0;

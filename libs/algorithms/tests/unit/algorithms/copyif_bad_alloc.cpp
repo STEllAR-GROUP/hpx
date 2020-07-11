@@ -40,8 +40,8 @@ void test_copy_if_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::copy_if(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(d),
+        hpx::copy_if(policy, iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d),
             [](std::size_t v) { return throw std::bad_alloc(), v != 0; });
 
         HPX_TEST(false);
@@ -72,8 +72,8 @@ void test_copy_if_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::copy_if(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(d),
+        auto f = hpx::copy_if(p, iterator(std::begin(c)), iterator(std::end(c)),
+            std::begin(d),
             [](std::size_t v) { return throw std::bad_alloc(), v != 0; });
 
         returned_from_algorithm = true;

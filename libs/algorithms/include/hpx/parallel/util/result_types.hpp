@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/future.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/tuple.hpp>
 
 #include <type_traits>
