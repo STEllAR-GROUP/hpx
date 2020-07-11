@@ -321,13 +321,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           It returns \a first + \a count for non-negative values of
     ///           \a count and \a first for negative values.
     ///
+    //
+    // clang-format off
     template <typename ExPolicy, typename FwdIter, typename Size, typename F,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value&&
-                    parallel::traits::is_projected<Proj, FwdIter>::value&&
-                        parallel::traits::is_indirect_callable<ExPolicy, F,
-                            traits::projected<Proj, FwdIter>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter>::value &&
+            parallel::traits::is_projected<Proj, FwdIter>::value &&
+            parallel::traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj, FwdIter>>::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type for_each_n(
         ExPolicy&& policy, FwdIter first, Size count, F&& f,
         Proj&& proj = Proj())
@@ -453,8 +458,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam FwdIterB    The type of the source iterator used (deduced).
+    /// \tparam FwdIterB    The type of the source begin iterator used (deduced).
     ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam FwdIterE    The type of the source end iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -509,18 +517,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // FIXME : is_indirect_callable does not work properly when compiling
     //         Cuda host code
 
+    // clang-format off
     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
         typename F, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIterB>::value&&
-                    hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value&&
-                        parallel::traits::is_projected<Proj, FwdIterB>::value)
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIterB>::value &&
+            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value &&
+            parallel::traits::is_projected<Proj, FwdIterB>::value
+        )
+    
 #if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
             ,
         HPX_CONCEPT_REQUIRES_(parallel::traits::is_indirect_callable<ExPolicy,
             F, traits::projected<Proj, FwdIterB>>::value)
 #endif
         >
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy, FwdIterB>::type for_each(
         ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
         Proj&& proj = Proj())
