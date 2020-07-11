@@ -87,9 +87,19 @@ function(add_hpx_test category name)
   )
   # cmake-format: on
 
-  # if runwrapper is set, networking is off, so set localities here and set parcelport to "none"
+  # if runwrapper is set, networking is off, so set localities here and set
+  # parcelport to "none"
   if(${name}_RUNWRAPPER)
-    list(APPEND cmd "-r" "${${name}_RUNWRAPPER}" "-l" "${${name}_LOCALITIES}" "-p" "none")
+    list(
+      APPEND
+      cmd
+      "-r"
+      "${${name}_RUNWRAPPER}"
+      "-l"
+      "${${name}_LOCALITIES}"
+      "-p"
+      "none"
+    )
   endif()
 
   if(HPX_WITH_NETWORKING)

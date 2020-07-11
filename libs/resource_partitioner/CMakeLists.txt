@@ -23,7 +23,7 @@ set(resource_partitioner_compat_headers
 set(resource_partitioner_sources detail_partitioner.cpp partitioner.cpp)
 
 if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
-    set(MPI_DEPS hpx_mpi_base)
+  set(MPI_DEPS hpx_mpi_base)
 endif()
 
 include(HPX_AddModule)

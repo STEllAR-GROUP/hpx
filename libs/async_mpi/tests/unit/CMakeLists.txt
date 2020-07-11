@@ -6,7 +6,9 @@
 
 set(tests mpi_ring_async_executor)
 
-set(mpi_ring_async_executor_PARAMETERS THREADS_PER_LOCALITY 4 LOCALITIES 2 RUNWRAPPER mpi)
+set(mpi_ring_async_executor_PARAMETERS THREADS_PER_LOCALITY 4 LOCALITIES 2
+                                       RUNWRAPPER mpi
+)
 
 foreach(test ${tests})
 

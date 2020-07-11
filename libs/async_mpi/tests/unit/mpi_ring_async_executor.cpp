@@ -38,7 +38,8 @@ void msg_recv(int rank, int size, int /*to*/, int from, int token, unsigned tag)
 {
     // to reduce string corruption on stdout from multiple threads
     // writing simultaneously, we use a stringstream as a buffer
-    if (output) {
+    if (output)
+    {
         std::ostringstream temp;
         temp << "Rank " << std::setfill(' ') << std::setw(3) << rank << " of "
              << std::setfill(' ') << std::setw(3) << size << " Recv token "
@@ -51,7 +52,8 @@ void msg_recv(int rank, int size, int /*to*/, int from, int token, unsigned tag)
 
 void msg_send(int rank, int size, int to, int /*from*/, int token, unsigned tag)
 {
-    if (output) {
+    if (output)
+    {
         std::ostringstream temp;
         temp << "Rank " << std::setfill(' ') << std::setw(3) << rank << " of "
              << std::setfill(' ') << std::setw(3) << size << " Sent token "
@@ -72,7 +74,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // if comm size < 2 this test should fail
     // it needs to run on N>2 ranks to be useful
-    HPX_TEST_MSG(size>1, "This test requires N>1 mpi ranks");
+    HPX_TEST_MSG(size > 1, "This test requires N>1 mpi ranks");
 
     const std::uint64_t iterations = vm["iterations"].as<std::uint64_t>();
     //
@@ -99,17 +101,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
         // so do iterations in batches of 1000
         // using an inner and outer loop
         const std::uint64_t max_tokens = 1000;
-        std::uint64_t subloops  = 1 + iterations/max_tokens;
+        std::uint64_t subloops = 1 + iterations / max_tokens;
         std::uint64_t remainder = iterations;
 
         std::vector<int> tokens(max_tokens, -1);
 
         hpx::util::high_resolution_timer t;
 
-        for (std::uint64_t j = 0; (j!=subloops) && (remainder>0); ++j)
+        for (std::uint64_t j = 0; (j != subloops) && (remainder > 0); ++j)
         {
-            std::atomic<int> counter((std::min)(std::uint64_t(max_tokens), remainder));
-            for (std::uint64_t i = 0; (i!=max_tokens) && (remainder>0); ++i)
+            std::atomic<int> counter(
+                (std::min)(std::uint64_t(max_tokens), remainder));
+            for (std::uint64_t i = 0; (i != max_tokens) && (remainder > 0); ++i)
             {
                 tokens[i] = (rank == 0) ? 1 : -1;
                 int rank_from = (size + rank - 1) % size;
@@ -126,11 +129,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     {
                         // send the incremented token to the next rank
                         ++tokens[i];
-                        hpx::future<int> f_send = hpx::async(
-                            exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
+                        hpx::future<int> f_send = hpx::async(exec, MPI_Isend,
+                            &tokens[i], 1, MPI_INT, rank_to, i);
                         // when the send completes
                         f_send.then([=, &tokens, &counter](auto&&) {
-                            msg_send(rank, size, rank_to, rank_from, tokens[i], i);
+                            msg_send(
+                                rank, size, rank_to, rank_from, tokens[i], i);
                             // ranks > 0 are done when they have sent their token
                             --counter;
                         });
@@ -158,7 +162,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             hpx::mpi::experimental::wait([&]() { return counter != 0; });
             if (rank == 0 && output)
             {
-                std::cout << "remainder " << remainder << " j " << j << std::endl;
+                std::cout << "remainder " << remainder << " j " << j
+                          << std::endl;
             }
         }
 
@@ -171,7 +176,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::cout << "time " << t.elapsed() << std::endl;
         }
 
-    // let the user polling go out of scope
+        // let the user polling go out of scope
     }
     return hpx::finalize();
 }
@@ -209,5 +214,4 @@ int main(int argc, char* argv[])
     MPI_Finalize();
 
     return result || hpx::util::report_errors();
-
 }

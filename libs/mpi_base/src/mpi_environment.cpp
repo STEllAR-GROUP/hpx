@@ -90,21 +90,23 @@ namespace hpx { namespace util {
     int mpi_environment::is_initialized_ = -1;
 
     ///////////////////////////////////////////////////////////////////////////
-    int mpi_environment::init(
-        int* argc, char*** argv, const int required, const int minimal, int &provided)
+    int mpi_environment::init(int* argc, char*** argv, const int required,
+        const int minimal, int& provided)
     {
         has_called_init_ = false;
 
         // Check if MPI_Init has been called previously
         int is_initialized = 0;
         int retval = MPI_Initialized(&is_initialized);
-        if (MPI_SUCCESS != retval) {
+        if (MPI_SUCCESS != retval)
+        {
             return retval;
         }
         if (!is_initialized)
         {
             retval = MPI_Init_thread(nullptr, nullptr, required, &provided);
-            if (MPI_SUCCESS != retval) {
+            if (MPI_SUCCESS != retval)
+            {
                 return retval;
             }
 
@@ -148,13 +150,14 @@ namespace hpx { namespace util {
             MPI_THREAD_SINGLE;
 
 #if defined(MVAPICH2_VERSION) && defined(_POSIX_SOURCE)
-            // This enables multi threading support in MVAPICH2 if requested.
-            if (required == MPI_THREAD_MULTIPLE)
-                setenv("MV2_ENABLE_AFFINITY", "0", 1);
+        // This enables multi threading support in MVAPICH2 if requested.
+        if (required == MPI_THREAD_MULTIPLE)
+            setenv("MV2_ENABLE_AFFINITY", "0", 1);
 #endif
 #endif
 
-        int retval = init(argc, argv, required, minimal, provided_threading_flag_);
+        int retval =
+            init(argc, argv, required, minimal, provided_threading_flag_);
         if (MPI_SUCCESS != retval && MPI_ERR_OTHER != retval)
         {
             // explicitly disable mpi if not run by mpirun
@@ -167,8 +170,7 @@ namespace hpx { namespace util {
             MPI_Error_string(retval, message, &msglen);
             message[msglen] = '\0';
 
-            std::string msg(
-                "mpi_environment::init: MPI_Init_thread failed: ");
+            std::string msg("mpi_environment::init: MPI_Init_thread failed: ");
             msg = msg + message + ".";
             throw std::runtime_error(msg.c_str());
         }
