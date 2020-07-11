@@ -47,8 +47,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj>
         struct invoke_projected
         {
-            typename hpx::util::decay<F>::type& f_;
-            typename hpx::util::decay<Proj>::type& proj_;
+            F& f_;
+            Proj& proj_;
 
             template <typename T>
             HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
@@ -78,14 +78,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F>
         struct invoke_projected<F, util::projection_identity>
         {
-            HPX_HOST_DEVICE invoke_projected(
-                typename hpx::util::decay<F>::type& f,
-                util::projection_identity)
+            HPX_HOST_DEVICE invoke_projected(F& f, util::projection_identity)
               : f_(f)
             {
             }
 
-            typename hpx::util::decay<F>::type& f_;
+            F& f_;
 
             template <typename T>
             HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
@@ -526,7 +524,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value &&
             parallel::traits::is_projected<Proj, FwdIterB>::value
         )
-    
 #if (!defined(__NVCC__) && !defined(__CUDACC__)) || defined(__CUDA_ARCH__)
             ,
         HPX_CONCEPT_REQUIRES_(parallel::traits::is_indirect_callable<ExPolicy,

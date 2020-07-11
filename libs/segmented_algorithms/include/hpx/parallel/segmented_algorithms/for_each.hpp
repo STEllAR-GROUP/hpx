@@ -193,7 +193,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 typedef util::detail::algorithm_result<ExPolicy, SegIterB>
                     result;
-                return result::get(std::move(last));
+                return result::get(std::move(first));
             }
 
             typedef hpx::traits::segmented_iterator_traits<SegIterB>

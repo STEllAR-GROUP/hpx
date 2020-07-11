@@ -20,6 +20,20 @@ void myfunction(int i)
     std::cout << ' ' << i;
 }
 
+void test_invoke_projected()
+{
+    Iterator<std::int64_t> iter =
+        hpx::parallel::for_each(hpx::parallel::execution::seq,
+            Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, myfunction);
+
+    HPX_TEST_EQ(*iter, std::int64_t(100));
+
+    iter = hpx::parallel::for_each(hpx::parallel::execution::par,
+        Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, myfunction);
+
+    HPX_TEST_EQ(*iter, std::int64_t(100));
+}
+
 void test_begin_end_iterator()
 {
     Iterator<std::int64_t> iter =
@@ -37,6 +51,7 @@ void test_begin_end_iterator()
 int main()
 {
     test_begin_end_iterator();
+    test_invoke_projected();
 
     return hpx::util::report_errors();
 }
