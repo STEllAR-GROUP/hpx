@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2016-2018 Hartmut Kaiser
+//  Copyright (c) 2016-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,21 +14,24 @@
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -48,104 +51,9 @@
 
 #include <boost/shared_array.hpp>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-    ///////////////////////////////////////////////////////////////////////////
-    // copy
-    namespace detail {
-        /// \cond NOINTERNAL
-
-        struct copy_iteration
-        {
-            template <typename Iter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(
-                Iter part_begin, std::size_t part_size, std::size_t)
-            {
-                using hpx::util::get;
-                auto iters = part_begin.get_iterator_tuple();
-                util::copy_n(get<0>(iters), part_size, get<1>(iters));
-            }
-        };
-
-        template <typename IterPair>
-        struct copy : public detail::algorithm<copy<IterPair>, IterPair>
-        {
-            copy()
-              : copy::algorithm("copy")
-            {
-            }
-
-            template <typename ExPolicy, typename InIter, typename OutIter>
-            static std::pair<InIter, OutIter> sequential(
-                ExPolicy, InIter first, InIter last, OutIter dest)
-            {
-                std::pair<InIter, OutIter> result =
-                    util::copy(first, last, dest);
-                util::copy_synchronize(first, dest);
-                return result;
-            }
-
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                std::pair<FwdIter1, FwdIter2>>::type
-            parallel(
-                ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
-            {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-                HPX_ASSERT(false);
-                typename util::detail::algorithm_result<ExPolicy,
-                    std::pair<FwdIter1, FwdIter2>>::type* dummy = nullptr;
-                return std::move(*dummy);
-#else
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
-
-                return get_iter_pair(util::foreach_partitioner<ExPolicy>::call(
-                    std::forward<ExPolicy>(policy),
-                    hpx::util::make_zip_iterator(first, dest),
-                    std::distance(first, last), copy_iteration(),
-                    [](zip_iterator&& last) -> zip_iterator {
-                        using hpx::util::get;
-                        auto iters = last.get_iterator_tuple();
-                        util::copy_synchronize(get<0>(iters), get<1>(iters));
-                        return std::move(last);
-                    }));
-#endif
-            }
-        };
-
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-        template <typename FwdIter1, typename FwdIter2, typename Enable = void>
-        struct copy_iter : public copy<std::pair<FwdIter1, FwdIter2>>
-        {
-        };
-#else
-        ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter1, typename FwdIter2, typename Enable = void>
-        struct copy_iter;
-
-        template <typename FwdIter1, typename FwdIter2>
-        struct copy_iter<FwdIter1, FwdIter2,
-            typename std::enable_if<
-                iterators_are_segmented<FwdIter1, FwdIter2>::value>::type>
-          : public copy<
-                std::pair<typename hpx::traits::segmented_iterator_traits<
-                              FwdIter1>::local_iterator,
-                    typename hpx::traits::segmented_iterator_traits<
-                        FwdIter2>::local_iterator>>
-        {
-        };
-
-        template <typename FwdIter1, typename FwdIter2>
-        struct copy_iter<FwdIter1, FwdIter2,
-            typename std::enable_if<
-                iterators_are_not_segmented<FwdIter1, FwdIter2>::value>::type>
-          : public copy<std::pair<FwdIter1, FwdIter2>>
-        {
-        };
-#endif
-
-        /// \endcond
-    }    // namespace detail
+#if defined(DOXYGEN)
+namespace hpx {
+    // clang-format off
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest.
@@ -183,79 +91,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// within each thread.
     ///
     /// \returns  The \a copy algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
+    ///           \a hpx::future<FwdIter2> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    ///           otherwise.
+    ///           returns \a FwdIter2> otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-    copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
-    {
-        return detail::transfer<detail::copy_iter<FwdIter1, FwdIter2>>(
-            std::forward<ExPolicy>(policy), first, last, dest);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////
-    // copy_n
-    namespace detail {
-        /// \cond NOINTERNAL
-
-        // sequential copy_n
-        template <typename IterPair>
-        struct copy_n : public detail::algorithm<copy_n<IterPair>, IterPair>
-        {
-            copy_n()
-              : copy_n::algorithm("copy_n")
-            {
-            }
-
-            template <typename ExPolicy, typename InIter, typename OutIter>
-            static std::pair<InIter, OutIter> sequential(
-                ExPolicy, InIter first, std::size_t count, OutIter dest)
-            {
-                return util::copy_n(first, count, dest);
-            }
-
-            template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                std::pair<FwdIter1, FwdIter2>>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, std::size_t count,
-                FwdIter2 dest)
-            {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
-
-                return get_iter_pair(util::foreach_partitioner<ExPolicy>::call(
-                    std::forward<ExPolicy>(policy),
-                    hpx::util::make_zip_iterator(first, dest), count,
-                    [](zip_iterator part_begin, std::size_t part_size,
-                        std::size_t) {
-                        using hpx::util::get;
-
-                        auto iters = part_begin.get_iterator_tuple();
-                        util::copy_n(get<0>(iters), part_size, get<1>(iters));
-                    },
-                    [](zip_iterator&& last) -> zip_iterator {
-                        using hpx::util::get;
-                        auto iters = last.get_iterator_tuple();
-                        util::copy_synchronize(get<0>(iters), get<1>(iters));
-                        return std::move(last);
-                    }));
-            }
-        };
-        /// \endcond
-    }    // namespace detail
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
 
     /// Copies the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
@@ -310,10 +158,342 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
+        typename FwdIter2>
+    typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+    copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
+
+    /// Copies the elements in the range, defined by [first, last), to another
+    /// range beginning at \a dest. Copies only the elements for which the
+    /// predicate \a f returns true. The order of the elements that are not
+    /// removed is preserved.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of the
+    ///         predicate \a f.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a copy_if requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     required elements. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a copy_if algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a copy_if algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a copy_if algorithm returns a
+    ///           \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
+    ///           otherwise.
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           forwarded to the first element after the last in the input
+    ///           sequence and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename F, typename Proj = util::projection_identity>
+        typename util::detail::algorithm_result<ExPolicy,
+        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+        copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+            F&& f, Proj&& proj = Proj());
+
+    // clang-format on
+}    // namespace hpx
+
+#else    // DOXYGEN
+
+namespace hpx { namespace parallel { inline namespace v1 {
+    ///////////////////////////////////////////////////////////////////////////
+    // copy
+
+    namespace detail {
+
+        struct copy_iteration
+        {
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE void operator()(
+                Iter part_begin, std::size_t part_size, std::size_t)
+            {
+                using hpx::util::get;
+                auto iters = part_begin.get_iterator_tuple();
+                util::copy_n(get<0>(iters), part_size, get<1>(iters));
+            }
+        };
+
+        template <typename IterPair>
+        struct copy : public detail::algorithm<copy<IterPair>, IterPair>
+        {
+            copy()
+              : copy::algorithm("copy")
+            {
+            }
+
+            template <typename ExPolicy, typename InIter, typename Sent,
+                typename OutIter>
+            static util::in_out_result<InIter, OutIter> sequential(
+                ExPolicy, InIter first, Sent last, OutIter dest)
+            {
+                util::in_out_result<InIter, OutIter> result =
+                    util::copy(first, last, dest);
+                util::copy_synchronize(first, dest);
+                return result;
+            }
+
+            template <typename ExPolicy, typename FwdIter1, typename Sent1,
+                typename FwdIter2>
+            static typename util::detail::algorithm_result<ExPolicy,
+                util::in_out_result<FwdIter1, FwdIter2>>::type
+            parallel(
+                ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)
+            {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_ASSERT(false);
+                typename util::detail::algorithm_result<ExPolicy,
+                    std::pair<FwdIter1, FwdIter2>>::type* dummy = nullptr;
+                return std::move(*dummy);
+#else
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
+                    zip_iterator;
+
+                return util::get_in_out_result(
+                    util::foreach_partitioner<ExPolicy>::call(
+                        std::forward<ExPolicy>(policy),
+                        hpx::util::make_zip_iterator(first, dest),
+                        detail::distance(first, last), copy_iteration(),
+                        [](zip_iterator&& last) -> zip_iterator {
+                            using hpx::util::get;
+                            auto iters = last.get_iterator_tuple();
+                            util::copy_synchronize(
+                                get<0>(iters), get<1>(iters));
+                            return std::move(last);
+                        }));
+#endif
+            }
+        };
+
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+        template <typename FwdIter1, typename FwdIter2, typename Enable = void>
+        struct copy_iter : public copy<std::pair<FwdIter1, FwdIter2>>
+        {
+        };
+#else
+        ///////////////////////////////////////////////////////////////////////
+        template <typename FwdIter1, typename FwdIter2, typename Enable = void>
+        struct copy_iter;
+
+        template <typename FwdIter1, typename FwdIter2>
+        struct copy_iter<FwdIter1, FwdIter2,
+            typename std::enable_if<
+                iterators_are_segmented<FwdIter1, FwdIter2>::value>::type>
+          : public copy<util::in_out_result<
+                typename hpx::traits::segmented_iterator_traits<
+                    FwdIter1>::local_iterator,
+                typename hpx::traits::segmented_iterator_traits<
+                    FwdIter2>::local_iterator>>
+        {
+        };
+
+        template <typename FwdIter1, typename FwdIter2>
+        struct copy_iter<FwdIter1, FwdIter2,
+            typename std::enable_if<
+                iterators_are_not_segmented<FwdIter1, FwdIter2>::value>::type>
+          : public copy<util::in_out_result<FwdIter1, FwdIter2>>
+        {
+        };
+#endif
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename I, typename O>
+        O get_second_element(util::in_out_result<I, O>&& p)
+        {
+            return p.out;
+        }
+
+        template <typename I, typename O>
+        hpx::future<O> get_second_element(
+            hpx::future<util::in_out_result<I, O>>&& f)
+        {
+            return lcos::make_future<O>(std::move(f),
+                [](util::in_out_result<I, O>&& p) { return p.out; });
+        }
+
+    }    // namespace detail
+
+    // clang-format off
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_iterator<FwdIter1>::value&&
+            hpx::traits::is_iterator<FwdIter2>::value)>
+    // clang-format on
+    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type copy(
+        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+    {
+        return detail::get_second_element(
+            detail::transfer<detail::copy_iter<FwdIter1, FwdIter2>>(
+                std::forward<ExPolicy>(policy), first, last, dest));
+    }
+}}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::copy
+    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t
+    {
+        template <typename... Ts>
+        constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
+            noexcept(noexcept(hpx::functional::tag_invoke(
+                std::declval<copy_t>(), std::forward<Ts>(ts)...)))
+                -> decltype(hpx::functional::tag_invoke(
+                    std::declval<copy_t>(), std::forward<Ts>(ts)...))
+        {
+            return hpx::functional::tag_invoke(*this, std::forward<Ts>(ts)...);
+        }
+
+    private:
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type
+        tag_invoke(hpx::copy_t, ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest)
+        {
+            return parallel::v1::detail::get_second_element(
+                parallel::v1::detail::transfer<
+                    parallel::v1::detail::copy_iter<FwdIter1, FwdIter2>>(
+                    std::forward<ExPolicy>(policy), first, last, dest));
+        }
+
+        // clang-format off
+        template <typename FwdIter1, typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend FwdIter2 tag_invoke(
+            hpx::copy_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        {
+            return std::copy(first, last, dest);
+        }
+    } copy{};
+}    // namespace hpx
+
+namespace hpx { namespace parallel { inline namespace v1 {
+
+    /////////////////////////////////////////////////////////////////////////////
+    // copy_n
+    namespace detail {
+
+        // sequential copy_n
+        template <typename IterPair>
+        struct copy_n : public detail::algorithm<copy_n<IterPair>, IterPair>
+        {
+            copy_n()
+              : copy_n::algorithm("copy_n")
+            {
+            }
+
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            static std::pair<InIter, OutIter> sequential(
+                ExPolicy, InIter first, std::size_t count, OutIter dest)
+            {
+                return util::copy_n(first, count, dest);
+            }
+
+            template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+            static typename util::detail::algorithm_result<ExPolicy,
+                std::pair<FwdIter1, FwdIter2>>::type
+            parallel(ExPolicy&& policy, FwdIter1 first, std::size_t count,
+                FwdIter2 dest)
+            {
+                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
+                    zip_iterator;
+
+                return get_iter_pair(util::foreach_partitioner<ExPolicy>::call(
+                    std::forward<ExPolicy>(policy),
+                    hpx::util::make_zip_iterator(first, dest), count,
+                    [](zip_iterator part_begin, std::size_t part_size,
+                        std::size_t) {
+                        using hpx::util::get;
+
+                        auto iters = part_begin.get_iterator_tuple();
+                        util::copy_n(get<0>(iters), part_size, get<1>(iters));
+                    },
+                    [](zip_iterator&& last) -> zip_iterator {
+                        using hpx::util::get;
+                        auto iters = last.get_iterator_tuple();
+                        util::copy_synchronize(get<0>(iters), get<1>(iters));
+                        return std::move(last);
+                    }));
+            }
+        };
+    }    // namespace detail
+
+    // clang-format off
+    template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value)>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
     copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
@@ -345,7 +525,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /////////////////////////////////////////////////////////////////////////////
     // copy_if
     namespace detail {
-        /// \cond NOINTERNAL
 
         // sequential copy_if with projection function
         template <typename InIter, typename OutIter, typename Pred,
@@ -471,93 +650,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::move(f4));
             }
         };
-        /// \endcond
     }    // namespace detail
 
-    /// Copies the elements in the range, defined by [first, last), to another
-    /// range beginning at \a dest. Copies only the elements for which the
-    /// predicate \a f returns true. The order of the elements that are not
-    /// removed is preserved.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     required elements. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a copy_if algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a copy_if algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a copy_if algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    ///           otherwise.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           forwarded to the first element after the last in the input
-    ///           sequence and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename F, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value&&
-                        traits::is_projected<Proj, FwdIter1>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected<Proj, FwdIter1>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            traits::is_projected<Proj, FwdIter1>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj, FwdIter1>
+            >::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
     copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
@@ -576,3 +683,5 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::forward<F>(f), std::forward<Proj>(proj)));
     }
 }}}    // namespace hpx::parallel::v1
+
+#endif    // DOXYGEN

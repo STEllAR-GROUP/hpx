@@ -82,11 +82,19 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx17_std_scan(DEFINITIONS HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
 
+  hpx_check_for_cxx17_std_nontype_template_parameter_auto(
+    DEFINITIONS HPX_HAVE_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO
+  )
+
   # C++20 feature tests
   hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
   hpx_check_for_cxx20_std_disable_sized_sentinel_for(
     DEFINITIONS HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
+  )
+
+  hpx_check_for_cxx20_no_unique_address_attribute(
+    DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
   )
 
   # Check the availability of certain C++ builtins

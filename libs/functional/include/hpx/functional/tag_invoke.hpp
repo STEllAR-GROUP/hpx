@@ -9,10 +9,11 @@
 #if defined(DOXYGEN)
 namespace hpx { namespace functional {
     inline namespace unspecified {
-        /// The `hpx::functional::tag_invoke` name defines a constexpr opbject that is
-        /// invocable with one or more arguments. The first argument is a 'tag' (typically
-        /// a CPO). It is only invocable if an overload of tag_invoke() that accepts
-        /// the same arguments could be found via ADL.
+        /// The `hpx::functional::tag_invoke` name defines a constexpr object
+        /// that is invocable with one or more arguments. The first argument
+        /// is a 'tag' (typically a CPO). It is only invocable if an overload
+        /// of tag_invoke() that accepts the same arguments could be found via
+        /// ADL.
         ///
         /// The evaluation of the expression `hpx::tag_invoke(tag, args...)` is
         /// equivalent to evaluating the unqualified call to
@@ -28,7 +29,7 @@ namespace hpx { namespace functional {
         ///         template <typename T>
         ///         constexpr auto operator()(T&& x) const
         ///         noexcept(hpx::functional::tag_invoke(*this, std::forward<T>(x)))
-        ///             -> decltype(hpx::functional::tag_invoke(*this,  std::forward<T>(x)))
+        ///         -> decltype(hpx::functional::tag_invoke(*this,  std::forward<T>(x)))
         ///         {
         ///             return hpx::functional::tag_invoke(*this,  std::forward<T>(x));
         ///         }
@@ -56,8 +57,8 @@ namespace hpx { namespace functional {
         inline constexpr unspecified tag_invoke = unspecified;
     }    // namespace unspecified
 
-    /// `hpx::functional::is_tag_invocable<Tag, Args...>` is std::true_type if an overload
-    /// of `tag_invoke(tag, args...)` can be found via ADL.
+    /// `hpx::functional::is_tag_invocable<Tag, Args...>` is std::true_type if
+    /// an overload of `tag_invoke(tag, args...)` can be found via ADL.
     template <typename Tag, typename... Args>
     struct is_tag_invocable;
 
@@ -66,8 +67,9 @@ namespace hpx { namespace functional {
     template <typename Tag, typename... Args>
     constexpr bool is_tag_invocable_v = is_tag_invocable<Tag, Args...>::value;
 
-    /// `hpx::functional::is_nothrow_tag_invocable<Tag, Args...>` is std::true_type if an
-    /// overload of `tag_invoke(tag, args...)` can be found via ADL and is noexcept.
+    /// `hpx::functional::is_nothrow_tag_invocable<Tag, Args...>` is
+    /// std::true_type if an overload of `tag_invoke(tag, args...)` can be
+    /// found via ADL and is noexcept.
     template <typename Tag, typename... Args>
     struct is_nothrow_tag_invocable;
 
@@ -77,9 +79,9 @@ namespace hpx { namespace functional {
     constexpr bool is_nothrow_tag_invocable_v =
         is_nothrow_tag_invocable<Tag, Args...>::value;
 
-    /// `hpx::functional::tag_invoke_result<Tag, Args...>` is the trait returning the
-    /// result type of the call hpx::functioanl::tag_invoke. This can be used in a SFINAE
-    /// context.
+    /// `hpx::functional::tag_invoke_result<Tag, Args...>` is the trait
+    /// returning the result type of the call hpx::functioanl::tag_invoke. This
+    /// can be used in a SFINAE context.
     template <typename Tag, typename... Args>
     using tag_invoke_result = invoke_result<decltype(tag_invoke), Tag, Args...>;
 
@@ -98,21 +100,28 @@ namespace hpx { namespace functional {
 #include <utility>
 
 namespace hpx { namespace functional {
+
+#if defined(HPX_HAVE_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO)
+    template <auto& Tag>
+    using tag_t = typename std::decay<decltype(Tag)>::type;
+#endif
+
     namespace tag_invoke_t_ns {
+
+        // MSVC needs this, don't ask
+        void tag_invoke();
+
         struct tag_invoke_t
         {
-#define HPX_FUNCTIONAL_TAG_INVOKE_EXPRESSION                                   \
-    tag_invoke(tag, std::forward<Args>(args)...) /**/
-
-            template <typename Tag, typename... Args>
-            constexpr HPX_FORCEINLINE auto operator()(
-                Tag tag, Args&&... args) const
-                noexcept(noexcept(HPX_FUNCTIONAL_TAG_INVOKE_EXPRESSION))
-                    -> decltype(HPX_FUNCTIONAL_TAG_INVOKE_EXPRESSION)
+            template <typename Tag, typename... Ts>
+            constexpr HPX_FORCEINLINE auto operator()(Tag tag, Ts&&... ts) const
+                noexcept(noexcept(
+                    tag_invoke(std::declval<Tag>(), std::forward<Ts>(ts)...)))
+                    -> decltype(tag_invoke(
+                        std::declval<Tag>(), std::forward<Ts>(ts)...))
             {
-                return HPX_FUNCTIONAL_TAG_INVOKE_EXPRESSION;
+                return tag_invoke(tag, std::forward<Ts>(ts)...);
             }
-#undef HPX_FUNCTIONAL_TAG_INVOKE_EXPRESSION
 
             friend constexpr bool operator==(tag_invoke_t, tag_invoke_t)
             {
@@ -176,6 +185,7 @@ namespace hpx { namespace functional {
 
     template <typename Tag, typename... Args>
     using tag_invoke_result_t = typename tag_invoke_result<Tag, Args...>::type;
+
 }}    // namespace hpx::functional
 
 #endif

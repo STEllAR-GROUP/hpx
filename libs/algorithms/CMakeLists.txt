@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -134,6 +134,7 @@ set(algorithms_headers
     hpx/parallel/util/prefetching.hpp
     hpx/parallel/util/projection_identity.hpp
     hpx/parallel/util/range.hpp
+    hpx/parallel/util/result_types.hpp
     hpx/parallel/util/scan_partitioner.hpp
     hpx/parallel/util/tagged_pair.hpp
     hpx/parallel/util/tagged_tuple.hpp

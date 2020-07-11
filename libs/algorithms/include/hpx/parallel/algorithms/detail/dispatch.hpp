@@ -19,6 +19,7 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <string>
 #include <type_traits>
@@ -42,6 +43,17 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             Result2>::local_raw_iterator type2;
 
         typedef std::pair<type1, type2> type;
+    };
+
+    template <typename Result1, typename Result2>
+    struct local_algorithm_result<util::in_out_result<Result1, Result2>>
+    {
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+            Result1>::local_raw_iterator type1;
+        typedef typename hpx::traits::segmented_local_iterator_traits<
+            Result2>::local_raw_iterator type2;
+
+        typedef util::in_out_result<type1, type2> type;
     };
 
     template <typename Result1, typename Result2, typename Result3>

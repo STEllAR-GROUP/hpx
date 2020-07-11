@@ -10,6 +10,9 @@
 #include <hpx/traits/pointer_category.hpp>
 #include <hpx/type_support/decay.hpp>
 
+#include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/util/result_types.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <cstring>    // for std::memmove
@@ -19,6 +22,7 @@
 #include <utility>
 
 namespace hpx { namespace parallel { namespace util {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename Category, typename Enable = void>
@@ -36,7 +40,7 @@ namespace hpx { namespace parallel { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static std::pair<InIter, OutIter> copy_memmove(
+        HPX_FORCEINLINE static in_out_result<InIter, OutIter> copy_memmove(
             InIter first, std::size_t count, OutIter dest)
         {
             static_assert(std::is_pointer<InIter>::value &&
@@ -52,7 +56,7 @@ namespace hpx { namespace parallel { namespace util {
 
             std::advance(first, count);
             std::advance(dest, count);
-            return std::make_pair(first, dest);
+            return in_out_result<InIter, OutIter>{first, dest};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -60,31 +64,33 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Category, typename Enable>
         struct copy_helper
         {
-            template <typename InIter, typename OutIter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
-            call(InIter first, InIter last, OutIter dest)
+            template <typename InIter, typename Sent, typename OutIter>
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static in_out_result<InIter, OutIter>
+                call(InIter first, Sent last, OutIter dest)
             {
                 while (first != last)
                     *dest++ = *first++;
-                return std::make_pair(first, dest);
+                return in_out_result<InIter, OutIter>{first, dest};
             }
         };
 
         template <typename Dummy>
         struct copy_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
-            template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-                InIter first, InIter last, OutIter dest)
+            template <typename InIter, typename Sent, typename OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                InIter first, Sent last, OutIter dest)
             {
-                return copy_memmove(first, std::distance(first, last), dest);
+                return copy_memmove(
+                    first, parallel::v1::detail::distance(first, last), dest);
             }
         };
     }    // namespace detail
 
-    template <typename InIter, typename OutIter>
-    HPX_FORCEINLINE std::pair<InIter, OutIter> copy(
-        InIter first, InIter last, OutIter dest)
+    template <typename InIter, typename Sent, typename OutIter>
+    HPX_FORCEINLINE in_out_result<InIter, OutIter> copy(
+        InIter first, Sent last, OutIter dest)
     {
         typedef typename hpx::traits::pointer_category<
             typename hpx::util::decay<typename hpx::traits::
@@ -100,12 +106,13 @@ namespace hpx { namespace parallel { namespace util {
         struct copy_n_helper
         {
             template <typename InIter, typename OutIter>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
-            call(InIter first, std::size_t count, OutIter dest)
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static in_out_result<InIter, OutIter>
+                call(InIter first, std::size_t count, OutIter dest)
             {
                 for (std::size_t i = 0; i != count; ++i)
                     *dest++ = *first++;
-                return std::make_pair(first, dest);
+                return in_out_result<InIter, OutIter>{first, dest};
             }
         };
 
@@ -113,7 +120,7 @@ namespace hpx { namespace parallel { namespace util {
         struct copy_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
                 InIter first, std::size_t count, OutIter dest)
             {
                 return copy_memmove(first, count, dest);
@@ -122,7 +129,7 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename InIter, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<InIter, OutIter> copy_n(
+    HPX_HOST_DEVICE HPX_FORCEINLINE in_out_result<InIter, OutIter> copy_n(
         InIter first, std::size_t count, OutIter dest)
     {
         typedef typename hpx::traits::pointer_category<
@@ -162,31 +169,32 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Category, typename Enable>
         struct move_helper
         {
-            template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-                InIter first, InIter last, OutIter dest)
+            template <typename InIter, typename Sent, typename OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                InIter first, Sent last, OutIter dest)
             {
                 while (first != last)
                     *dest++ = std::move(*first++);
-                return std::make_pair(first, dest);
+                return in_out_result<InIter, OutIter>{first, dest};
             }
         };
 
         template <typename Dummy>
         struct move_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
-            template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-                InIter first, InIter last, OutIter dest)
+            template <typename InIter, typename Sent, typename OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                InIter first, Sent last, OutIter dest)
             {
-                return copy_memmove(first, std::distance(first, last), dest);
+                return copy_memmove(
+                    first, parallel::v1::detail::distance(first, last), dest);
             }
         };
     }    // namespace detail
 
-    template <typename InIter, typename OutIter>
-    HPX_FORCEINLINE std::pair<InIter, OutIter> move(
-        InIter first, InIter last, OutIter dest)
+    template <typename InIter, typename Sent, typename OutIter>
+    HPX_FORCEINLINE in_out_result<InIter, OutIter> move(
+        InIter first, Sent last, OutIter dest)
     {
         typedef typename hpx::traits::pointer_category<
             typename hpx::util::decay<InIter>::type,
@@ -201,12 +209,12 @@ namespace hpx { namespace parallel { namespace util {
         struct move_n_helper
         {
             template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
                 InIter first, std::size_t count, OutIter dest)
             {
                 for (std::size_t i = 0; i != count; ++i)
                     *dest++ = std::move(*first++);
-                return std::make_pair(first, dest);
+                return in_out_result<InIter, OutIter>{first, dest};
             }
         };
 
@@ -214,7 +222,7 @@ namespace hpx { namespace parallel { namespace util {
         struct move_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename OutIter>
-            HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
                 InIter first, std::size_t count, OutIter dest)
             {
                 return copy_memmove(first, count, dest);
@@ -223,7 +231,7 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename InIter, typename OutIter>
-    HPX_FORCEINLINE std::pair<InIter, OutIter> move_n(
+    HPX_FORCEINLINE in_out_result<InIter, OutIter> move_n(
         InIter first, std::size_t count, OutIter dest)
     {
         typedef typename hpx::traits::pointer_category<
