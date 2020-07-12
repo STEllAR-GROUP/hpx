@@ -10,9 +10,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/tagged.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <cstddef>

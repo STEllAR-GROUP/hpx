@@ -15,7 +15,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/lcos/packaged_action.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>

@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
@@ -433,7 +433,7 @@ namespace hpx { namespace threads { namespace detail {
                             idle_loop_count = callbacks.max_idle_loop_count_;
                     }
                     // Force yield...
-                    hpx::basic_execution::this_thread::yield("background_work");
+                    hpx::execution_base::this_thread::yield("background_work");
                 }
 
                 return thread_result_type(terminated, invalid_thread_id);
@@ -465,13 +465,13 @@ namespace hpx { namespace threads { namespace detail {
         thread_data*& next_thrd, SchedulingPolicy& scheduler,
         std::size_t num_thread, bool running,
         std::int64_t& background_work_exec_time_init,
-        hpx::basic_execution::this_thread::detail::agent_storage*
+        hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
 #else
     bool call_background_thread(thread_id_type& background_thread,
         thread_data*& next_thrd, SchedulingPolicy& scheduler,
         std::size_t num_thread, bool running,
-        hpx::basic_execution::this_thread::detail::agent_storage*
+        hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
 #endif
     {
@@ -601,9 +601,9 @@ namespace hpx { namespace threads { namespace detail {
         }
 #endif
 
-        hpx::basic_execution::this_thread::detail::agent_storage*
+        hpx::execution_base::this_thread::detail::agent_storage*
             context_storage =
-                hpx::basic_execution::this_thread::detail::get_agent_storage();
+                hpx::execution_base::this_thread::detail::get_agent_storage();
 
         std::size_t added = std::size_t(-1);
         thread_data* next_thrd = nullptr;
@@ -970,8 +970,8 @@ namespace hpx { namespace threads { namespace detail {
                 if (!params.inner_.empty())
                 {
                     params.inner_();
-                    context_storage = hpx::basic_execution::this_thread::
-                        detail::get_agent_storage();
+                    context_storage = hpx::execution_base::this_thread::detail::
+                        get_agent_storage();
                 }
             }
 
@@ -1030,8 +1030,8 @@ namespace hpx { namespace threads { namespace detail {
                 if (!params.outer_.empty())
                 {
                     params.outer_();
-                    context_storage = hpx::basic_execution::this_thread::
-                        detail::get_agent_storage();
+                    context_storage = hpx::execution_base::this_thread::detail::
+                        get_agent_storage();
                 }
 
                 // break if we were idling after 'may_exit'

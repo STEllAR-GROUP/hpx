@@ -9,7 +9,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime/serialization/detail/preprocess_container.hpp>
+#include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <boost/predef/other/endian.h>

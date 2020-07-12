@@ -10,7 +10,7 @@
 #include <hpx/coroutines/config/defines.hpp>
 #include <hpx/modules/coroutines.hpp>
 
-#if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/coroutines.hpp is deprecated, \
     please include hpx/modules/coroutines.hpp instead")

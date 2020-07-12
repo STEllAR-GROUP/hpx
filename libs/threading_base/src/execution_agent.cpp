@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/throw_exception.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -216,7 +216,7 @@ namespace hpx { namespace threads {
             // and retry..
             case active:
             {
-                hpx::basic_execution::this_thread::yield_k(
+                hpx::execution_base::this_thread::yield_k(
                     k, "hpx::threads::execution_agent::resume");
                 ++k;
                 LTM_(warning)

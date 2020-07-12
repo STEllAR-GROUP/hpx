@@ -17,7 +17,6 @@ include(HPX_AddModule)
 add_hpx_module(
   string_util
   GLOBAL_HEADER_GEN ON
-  FORCE_LINKING_GEN
   HEADERS ${string_util_headers}
   DEPENDENCIES
   CMAKE_SUBDIRS examples tests

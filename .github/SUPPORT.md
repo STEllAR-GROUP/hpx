@@ -12,7 +12,7 @@ get support for using HPX.
 
 ### Documentation
 
-* [User Documentation](https://stellar-group.github.io/hpx/docs/sphinx/branches/master/html/index.html)
+* [User Documentation](https://hpx-docs.stellar-group.org/latest/html/index.html)
 
 
 ### Real-time Chat
@@ -21,7 +21,8 @@ get support for using HPX.
   to get in contact with us as most of the developers are available on this
   channel. Check out the [channel archives](http://irclog.cct.lsu.edu/ste~b~~b~ar)
   for past conversations.
-
+* #hpx on [matrix.org](https://riot.im/app/#/room/#hpx:matrix.org): this channel
+  is bridged to the IRC channel.
 * Slack ([registration](https://cpplang.now.sh/)): The
   [`#hpx`](https://cpplang.slack.com/messages/C68QLPZB3) channel is another
   place where people usually offer support.
@@ -30,13 +31,20 @@ get support for using HPX.
 ### Mailing Lists/Groups
 
 * [hpx-users group](mailto:hpx-users@stellar-group.org), see
-  [here](https://www.mail-archive.com/hpx-users@stellar.cct.lsu.edu) for past
-  conversations.
+  [here](https://www.mail-archive.com/hpx-users@stellar-group.org) for past
+  conversations. This is the main mailing list for user questions and HPX
+  announcements.
+* [hpx-devel group](mailto:hpx-devel@stellar-group.org), see
+  [here](https://www.mail-archive.com/hpx-devel@stellar-group.org) for past
+  conversations. This is the main mailing list for development discussion
+  and voting.
+* [hpx-pmc group](mailto:hpx-pmc@stellar-group.org). The project management
+  committee (PMC) can be reached at this address.
 
 ### Latest News
 
-* For latest news and announcements please see our regularily updated
-  [blog](http://stellar-group.org/blog/).
+* For latest news and announcements please see our
+  [blog](http://hpx.stellar-group.org/blog/).
 
 ### Stack Overflow
 

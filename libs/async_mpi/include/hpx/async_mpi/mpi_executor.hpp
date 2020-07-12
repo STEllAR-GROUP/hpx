@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
-#include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/traits/is_executor.hpp>
+#include <hpx/execution_base/execution.hpp>
 #include <hpx/modules/mpi_base.hpp>
 
 #include <type_traits>

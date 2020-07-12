@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/static_reinit/config/defines.hpp>
-#include <hpx/static_reinit/reinitializable_static.hpp>
+#include <hpx/modules/static_reinit.hpp>
 
-#if defined(HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/reinitializable_static.hpp is deprecated, \
-    please include hpx/static_reinit/reinitializable_static.hpp instead")
+    please include hpx/modules/static_reinit.hpp instead")
 #else
 #warning "The header hpx/util/reinitializable_static.hpp is deprecated, \
-    please include hpx/static_reinit/reinitializable_static.hpp instead"
+    please include hpx/modules/static_reinit.hpp instead"
 #endif
 #endif

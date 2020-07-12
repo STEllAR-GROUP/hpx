@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -57,13 +57,13 @@ namespace hpx { namespace threads {
 
     public:
         coroutine_type::result_type call(
-            hpx::basic_execution::this_thread::detail::agent_storage*
+            hpx::execution_base::this_thread::detail::agent_storage*
                 agent_storage)
         {
             HPX_ASSERT(get_state().state() == active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
 
-            hpx::basic_execution::this_thread::reset_agent ctx(
+            hpx::execution_base::this_thread::reset_agent ctx(
                 agent_storage, agent_);
             return coroutine_(set_state_ex(wait_signaled));
         }

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@ hpx_option(
   HPX_SERIALIZATION_WITH_BOOST_TYPES BOOL
   "Enable serialization of certain Boost types. (default: ON)" ON ADVANCED
   CATEGORY "Modules"
+  MODULE SERIALIZATION
 )
 
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
@@ -23,6 +24,7 @@ endif()
 
 # Default location is $HPX_ROOT/libs/serialization/include
 set(serialization_headers
+    hpx/any.hpp
     hpx/serialization.hpp
     hpx/serialization/detail/extra_archive_data.hpp
     hpx/serialization/detail/non_default_constructible.hpp
@@ -31,6 +33,7 @@ set(serialization_headers
     hpx/serialization/detail/polymorphic_intrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
+    hpx/serialization/detail/preprocess_container.hpp
     hpx/serialization/detail/raw_ptr.hpp
     hpx/serialization/detail/serialize_collection.hpp
     hpx/serialization/detail/vc.hpp
@@ -41,7 +44,6 @@ set(serialization_headers
     hpx/serialization/deque.hpp
     hpx/serialization/dynamic_bitset.hpp
     hpx/serialization/exception_ptr.hpp
-    hpx/serialization/force_linking.hpp
     hpx/serialization/list.hpp
     hpx/serialization/map.hpp
     hpx/serialization/multi_array.hpp
@@ -88,15 +90,6 @@ endif()
 
 # Default location is $HPX_ROOT/libs/serialization/include_compatibility
 set(serialization_compat_headers
-    hpx/runtime/serialization/detail/non_default_constructible.hpp
-    hpx/runtime/serialization/detail/pointer.hpp
-    hpx/runtime/serialization/detail/polymorphic_id_factory.hpp
-    hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp
-    hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory.hpp
-    hpx/runtime/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
-    hpx/runtime/serialization/detail/raw_ptr.hpp
-    hpx/runtime/serialization/detail/serialize_collection.hpp
-    hpx/runtime/serialization/detail/vc.hpp
     hpx/runtime/serialization/array.hpp
     hpx/runtime/serialization/bitset.hpp
     hpx/runtime/serialization/complex.hpp
@@ -147,7 +140,6 @@ set(serialization_sources
     detail/polymorphic_intrusive_factory.cpp
     detail/polymorphic_nonintrusive_factory.cpp
     exception_ptr.cpp
-    force_linking.cpp
     serializable_any.cpp
 )
 
@@ -167,6 +159,7 @@ add_hpx_module(
     hpx_debugging
     hpx_errors
     hpx_format
+    hpx_functional
     hpx_hashing
     hpx_preprocessor
     hpx_type_support

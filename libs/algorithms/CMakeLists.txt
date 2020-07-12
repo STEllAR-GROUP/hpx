@@ -13,6 +13,7 @@ set(algorithms_headers
     hpx/algorithms/traits/projected_range.hpp
     hpx/algorithms/traits/segmented_iterator_traits.hpp
     hpx/numeric.hpp
+    hpx/memory.hpp
     hpx/parallel/algorithm.hpp
     hpx/parallel/algorithms/adjacent_difference.hpp
     hpx/parallel/algorithms/adjacent_find.hpp
@@ -23,7 +24,12 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/accumulate.hpp
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp
+    hpx/parallel/algorithms/detail/insertion_sort.hpp
+    hpx/parallel/algorithms/detail/is_sorted.hpp
+    hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
+    hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/set_operation.hpp
+    hpx/parallel/algorithms/detail/spin_sort.hpp
     hpx/parallel/algorithms/detail/transfer.hpp
     hpx/parallel/algorithms/equal.hpp
     hpx/parallel/algorithms/exclusive_scan.hpp
@@ -57,6 +63,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/set_intersection.hpp
     hpx/parallel/algorithms/set_symmetric_difference.hpp
     hpx/parallel/algorithms/set_union.hpp
+    hpx/parallel/algorithms/stable_sort.hpp
     hpx/parallel/algorithms/sort_by_key.hpp
     hpx/parallel/algorithms/sort.hpp
     hpx/parallel/algorithms/swap_ranges.hpp
@@ -91,6 +98,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/rotate.hpp
     hpx/parallel/container_algorithms/search.hpp
     hpx/parallel/container_algorithms/sort.hpp
+    hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/unique.hpp
     hpx/parallel/datapar.hpp
@@ -117,16 +125,22 @@ set(algorithms_headers
     hpx/parallel/util/foreach_partitioner.hpp
     hpx/parallel/util/invoke_projected.hpp
     hpx/parallel/util/loop.hpp
+    hpx/parallel/util/low_level.hpp
+    hpx/parallel/util/merge_four.hpp
+    hpx/parallel/util/merge_vector.hpp
+    hpx/parallel/util/nbits.hpp
     hpx/parallel/util/partitioner.hpp
     hpx/parallel/util/partitioner_with_cleanup.hpp
     hpx/parallel/util/prefetching.hpp
     hpx/parallel/util/projection_identity.hpp
+    hpx/parallel/util/range.hpp
     hpx/parallel/util/scan_partitioner.hpp
     hpx/parallel/util/tagged_pair.hpp
     hpx/parallel/util/tagged_tuple.hpp
     hpx/parallel/util/transfer.hpp
     hpx/parallel/util/transform_loop.hpp
     hpx/parallel/util/zip_iterator.hpp
+    hpx/task_block.hpp
 )
 
 # cmake-format: off
@@ -146,12 +160,13 @@ include(HPX_AddModule)
 add_hpx_module(
   algorithms
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
   SOURCES ${algorithms_sources}
   DEPENDENCIES
     hpx_assertion
+    hpx_async_combinators
     hpx_concepts
     hpx_concurrency
     hpx_config

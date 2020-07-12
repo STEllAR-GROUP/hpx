@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/config/defines.hpp>
-#include <hpx/threading_base/register_thread.hpp>
+#include <hpx/modules/threading_base.hpp>
 
-#if defined(HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/register_thread.hpp is deprecated, \
-    please include hpx/threading_base/register_thread.hpp instead")
+    please include hpx/modules/threading_base.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/register_thread.hpp is deprecated, \
-    please include hpx/threading_base/register_thread.hpp instead"
+    please include hpx/modules/threading_base.hpp instead"
 #endif
 #endif

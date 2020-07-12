@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SERIALIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/serialization/serialization_fwd.hpp is deprecated, \
-    please include hpx/serialization/serialization_fwd.hpp instead")
+    please include hpx/serialization.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/serialization/serialization_fwd.hpp is deprecated, \
-    please include hpx/serialization/serialization_fwd.hpp instead"
+    please include hpx/serialization.hpp instead"
 #endif
 #endif

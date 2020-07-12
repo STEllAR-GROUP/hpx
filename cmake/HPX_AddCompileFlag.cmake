@@ -44,8 +44,6 @@ function(hpx_add_target_compile_option FLAG)
       target_compile_options(${_dest} INTERFACE "${_conf}")
     endforeach()
   endforeach()
-
-  # if(HPX_WITH_CUDA AND (NOT MSVC)) hpx_add_compile_flag(${FLAG}) endif()
 endfunction()
 
 function(hpx_add_target_compile_option_if_available FLAG)
@@ -177,8 +175,6 @@ function(hpx_add_target_compile_definition FLAG)
     endif()
     target_compile_definitions(${_dest} INTERFACE "${_conf}")
   endforeach()
-
-  # if(HPX_WITH_CUDA AND (NOT MSVC)) hpx_add_compile_flag(-D${FLAG}) endif()
 endfunction()
 
 function(hpx_add_compile_flag)

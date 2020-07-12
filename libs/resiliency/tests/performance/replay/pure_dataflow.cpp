@@ -21,7 +21,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/include/local_lcos.hpp>
+#include <hpx/include/lcos_local.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <boost/range/irange.hpp>

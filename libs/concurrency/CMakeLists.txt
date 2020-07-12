@@ -26,7 +26,6 @@ set(concurrency_compat_headers
     hpx/concurrency.hpp
     hpx/util/lockfree/concurrentqueue.hpp
     hpx/util/lockfree/deque.hpp
-    hpx/util/lockfree/detail/tagged_ptr_pair.hpp
     hpx/util/lockfree/freelist.hpp
     hpx/util/spinlock.hpp
     hpx/util/spinlock_pool.hpp
@@ -39,7 +38,7 @@ include(HPX_AddModule)
 add_hpx_module(
   concurrency
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${concurrency_sources}
   HEADERS ${concurrency_headers}
@@ -48,7 +47,7 @@ add_hpx_module(
     hpx_assertion
     hpx_concepts
     hpx_config
-    hpx_basic_execution
+    hpx_execution_base
     hpx_errors
     hpx_hashing
     hpx_itt_notify

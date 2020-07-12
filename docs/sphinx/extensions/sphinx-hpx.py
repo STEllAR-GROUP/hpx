@@ -9,6 +9,7 @@ from docutils import nodes
 def setup(app):
     app.add_role('hpx-issue', autolink('https://github.com/STEllAR-GROUP/hpx/issues/%s', "Issue #"))
     app.add_role('hpx-pr', autolink('https://github.com/STEllAR-GROUP/hpx/pull/%s', "PR #"))
+    app.add_role('cppreference-header', autolink('http://en.cppreference.com/w/cpp/header/%s'))
     app.add_role('cppreference-algorithm', autolink('http://en.cppreference.com/w/cpp/algorithm/%s'))
     app.add_role('cppreference-memory', autolink('http://en.cppreference.com/w/cpp/memory/%s'))
     app.add_role('cppreference-container', autolink('http://en.cppreference.com/w/cpp/container/%s'))

@@ -107,7 +107,12 @@ jobs:
       - run:
           name: Check circular dependencies with cpp-dependencies
           command: |
-              cpp-dependencies --dir /hpx/source/libs --graph-cycles /tmp/circular_deps.dot
+              # Ignore compatibility headers (the last cut -c3- is to remove a
+              # leading ./ in path names)
+              cpp-dependencies \
+                  --dir /hpx/source/libs \
+                  --ignore $(find /hpx/source/libs -type d -wholename '*/include_compatibility' | cut -d'/' -f5-) \
+                  --graph-cycles /tmp/circular_deps.dot
               dot /tmp/circular_deps.dot -Tsvg -o /tmp/circular_deps.svg
               if [[ $(wc -l /tmp/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
       - store_artifacts:
@@ -356,7 +361,11 @@ jobs:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Running Unit Tests
+          name: Building Examples
+          command: |
+              ninja -j2 -k 0 examples
+      - run:
+          name: Running Example Tests
           when: always
           command: |
               ulimit -c unlimited
@@ -376,413 +385,27 @@ jobs:
           path: tests.examples
       - store_artifacts:
           path: tests.examples
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
 
-  tests.unit.actions:
+  tests.unit:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
           name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.actions
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.actions
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.actions
-      - store_artifacts:
-          path: tests.unit.actions
-
-  tests.unit.agas:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.agas
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.agas
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.agas
-      - store_artifacts:
-          path: tests.unit.agas
-
-  tests.unit.build:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Installing HPX for build unit tests
-          command: |
-              # Disable documentation just for this step
-              cmake \
-              -DHPX_WITH_DOCUMENTATION=Off .
-              ninja -j1 install
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.build
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.build
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.build
-      - store_artifacts:
-          path: tests.unit.build
-
-  tests.unit.component:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.component tests.unit.components
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.component
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.component
-      - store_artifacts:
-          path: tests.unit.component
-
-  tests.unit.lcos:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.lcos
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.lcos
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.lcos
-      - store_artifacts:
-          path: tests.unit.lcos
-
-  tests.unit.parcelset:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.parcelset
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.parcelset
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.parcelset
-      - store_artifacts:
-          path: tests.unit.parcelset
-
-  tests.unit.resource:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.resource
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 120 -T test --no-compress-output --output-on-failure -R tests.unit.resource
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.resource
-      - store_artifacts:
-          path: tests.unit.resource
-
-  tests.unit.traits:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.traits
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.traits
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.traits
-      - store_artifacts:
-          path: tests.unit.traits
-
-  tests.unit.util:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.util
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.util
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.util
-      - store_artifacts:
-          path: tests.unit.util
-
-  tests.unit.modules:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Module Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.modules.affinity \
-                  tests.unit.modules.allocator_support \
-                  tests.unit.modules.asio \
-                  tests.unit.modules.assertion \
-                  tests.unit.modules.async_distributed \
-                  tests.unit.modules.async_combinators \
-                  tests.unit.modules.basic_execution \
-                  tests.unit.modules.batch_environments \
-                  tests.unit.modules.cache \
-                  tests.unit.modules.checkpoint \
-                  tests.unit.modules.collectives \
-                  tests.unit.modules.compute \
-                  tests.unit.modules.concepts \
-                  tests.unit.modules.concurrency \
-                  tests.unit.modules.config \
-                  tests.unit.modules.config_registry \
-                  tests.unit.modules.coroutines \
-                  tests.unit.modules.datastructures \
-                  tests.unit.modules.debugging \
-                  tests.unit.modules.distributed_executors \
-                  tests.unit.modules.errors \
-                  tests.unit.modules.executors \
-                  tests.unit.modules.filesystem \
-                  tests.unit.modules.format \
-                  tests.unit.modules.functional \
-                  tests.unit.modules.futures \
-                  tests.unit.modules.hardware \
-                  tests.unit.modules.hashing \
-                  tests.unit.modules.init_runtime \
-                  tests.unit.modules.iterator_support \
-                  tests.unit.modules.lcos_distributed \
-                  tests.unit.modules.async_local \
-                  tests.unit.modules.local_lcos \
-                  tests.unit.modules.logging \
-                  tests.unit.modules.memory \
-                  tests.unit.modules.naming_base \
-                  tests.unit.modules.pack_traversal \
-                  tests.unit.modules.performance_counters \
-                  tests.unit.modules.preprocessor \
-                  tests.unit.modules.program_options \
-                  tests.unit.modules.resiliency \
-                  tests.unit.modules.resource_partitioner \
-                  tests.unit.modules.runtime_configuration \
-                  tests.unit.modules.runtime_local \
-                  tests.unit.modules.schedulers \
-                  tests.unit.modules.serialization \
-                  tests.unit.modules.static_reinit \
-                  tests.unit.modules.statistics \
-                  tests.unit.modules.string_util \
-                  tests.unit.modules.synchronization \
-                  tests.unit.modules.testing \
-                  tests.unit.modules.thread_executors \
-                  tests.unit.modules.thread_support \
-                  tests.unit.modules.threading \
-                  tests.unit.modules.threading_base \
-                  tests.unit.modules.threadmanager \
-                  tests.unit.modules.timed_execution \
-                  tests.unit.modules.timing \
-                  tests.unit.modules.type_support \
-                  tests.unit.modules.util
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 \
-                  -T test \
-                  --no-compress-output \
-                  --output-on-failure \
-                  -R tests.unit.modules \
-                  -E \
-              "tests.unit.modules.algorithms|\
-              tests.unit.modules.compute_cuda|\
-              tests.unit.modules.execution|\
-              tests.unit.modules.segmented_algorithms|\
-              tests.unit.modules.compute.numa_allocator"
-
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.modules
-      - store_artifacts:
-          path: tests.unit.modules
-
-  tests.unit.modules.algorithms:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.modules.algorithms
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.algorithms
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.modules.algorithms
-      - store_artifacts:
-          path: tests.unit.modules.algorithms
-
-  tests.unit.modules.execution:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          command: |
-              ninja -j2 -k 0 tests.unit.modules.execution
-      - run:
-          name: Running Unit Tests
-          when: always
-          command: |
-              ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.execution
-      - run:
-          <<: *convert_xml
-      - run:
-          <<: *move_core_dump
-      - run:
-          <<: *move_debug_log
-      - store_test_results:
-          path: tests.unit.modules.execution
-      - store_artifacts:
-          path: tests.unit.modules.execution
-
-  tests.unit.modules.segmented_algorithms:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Unit Tests
-          # We need to compile some tests serially because they eat too much
-          # memory
           command: |
               ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
+              ninja -j2 -k 0 tests.unit
       - run:
           name: Running Unit Tests
           when: always
           command: |
               ulimit -c unlimited
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.modules.segmented_algorithms
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit -E tests.unit.modules.compute.numa_allocator
       - run:
           <<: *convert_xml
       - run:
@@ -790,9 +413,9 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.modules.segmented_algorithms
+          path: tests.unit
       - store_artifacts:
-          path: tests.unit.modules.segmented_algorithms
+          path: tests.unit
 
   tests.regressions:
     <<: *defaults
@@ -827,29 +450,13 @@ jobs:
       - run:
           name: Building Header Tests
           command: |
-              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure -R tests.headers -E tests.headers.modules
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure -R tests.headers
       - run:
           <<: *convert_xml
       - store_test_results:
           path: tests.headers
       - store_artifacts:
           path: tests.headers
-
-  tests.headers.modules:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Header Tests
-          command: |
-              ctest --timeout 60 -j2 -T test --no-compress-output --output-on-failure -R tests.headers.modules
-      - run:
-          <<: *convert_xml
-      - store_test_results:
-          path: tests.headers.modules
-      - store_artifacts:
-          path: tests.headers.modules
 
   tests.performance:
     <<: *defaults
@@ -860,20 +467,6 @@ jobs:
           name: Building Performance Tests
           command: |
               ninja -j2 -k 0 tests.performance
-
-  examples:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Examples
-          command: |
-              ninja -j2 -k 0 examples
-      - persist_to_workspace:
-          root: /hpx
-          paths:
-            - ./build
 
   install:
     docker:
@@ -889,6 +482,14 @@ jobs:
           command: |
               ./bin/hello_world_distributed --hpx:bind=none
               ninja -j2 install
+          working_directory: /hpx/build
+          when: always
+      - run:
+          name: Testing build unit tests
+          command: |
+              ninja -j2 tests.unit.build
+              ulimit -c unlimited
+              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.unit.build
           working_directory: /hpx/build
           when: always
       - run:
@@ -1003,48 +604,13 @@ workflows:
           <<: *gh_pages_filter
       - spellcheck:
           <<: *gh_pages_filter
-      - docs:
-          requires:
-            - configure
-            # Force docs to be built after examples so that workspace doesn't
-            # have conflicts
-            - examples
-          <<: *gh_pages_filter
-      - docs_push:
-          requires:
-            - docs
-          <<: *docs_push_filter
       - core:
           requires:
             - configure
           <<: *gh_pages_filter
       - tests.examples:
-          requires:
-            - examples
-          <<: *gh_pages_filter
-      - tests.unit.actions:
           <<: *core_dependency
-      - tests.unit.agas:
-          <<: *core_dependency
-      - tests.unit.component:
-          <<: *core_dependency
-      - tests.unit.lcos:
-          <<: *core_dependency
-      - tests.unit.parcelset:
-          <<: *core_dependency
-      - tests.unit.resource:
-          <<: *core_dependency
-      - tests.unit.traits:
-          <<: *core_dependency
-      - tests.unit.util:
-          <<: *core_dependency
-      - tests.unit.modules:
-          <<: *core_dependency
-      - tests.unit.modules.algorithms:
-          <<: *core_dependency
-      - tests.unit.modules.execution:
-          <<: *core_dependency
-      - tests.unit.modules.segmented_algorithms:
+      - tests.unit:
           <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
@@ -1052,37 +618,25 @@ workflows:
           <<: *core_dependency
       - tests.headers:
           <<: *core_dependency
-      - tests.headers.modules:
-          <<: *core_dependency
-      - examples:
-          <<: *core_dependency
-      - tests.unit.build:
+      - docs:
           requires:
-            - examples
-            - core
+            - configure
+            # Force docs to be built after examples so that workspace doesn't
+            # have conflicts
+            - tests.examples
           <<: *gh_pages_filter
+      - docs_push:
+          requires:
+            - docs
+          <<: *docs_push_filter
       - install:
           requires:
             - core
             - tests.examples
-            - tests.unit.actions
-            - tests.unit.agas
-            - tests.unit.build
-            - tests.unit.component
-            - tests.unit.lcos
-            - tests.unit.parcelset
-            - tests.unit.resource
-            - tests.unit.traits
-            - tests.unit.util
-            - tests.unit.modules
-            - tests.unit.modules.algorithms
-            - tests.unit.modules.execution
-            - tests.unit.modules.segmented_algorithms
-            - tests.headers
-            - tests.headers.modules
-            - tests.performance
+            - tests.unit
             - tests.regressions
-            - examples
+            - tests.performance
+            - tests.headers
           <<: *gh_pages_filter
       - push_stable_tag:
           requires:

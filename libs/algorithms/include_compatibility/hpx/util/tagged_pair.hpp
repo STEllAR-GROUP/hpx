@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/config/defines.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
+#include <hpx/algorithm.hpp>
 
-#if defined(HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ALGORITHMS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/tagged_pair.hpp is deprecated, \
     please include hpx/datastructures/tagged_pair.hpp or \
-    hpx/parallel/util/tagged_pair.hpp instead")
+    hpx/algorithm.hpp instead")
 #else
 #warning "The header hpx/util/tagged_pair.hpp is deprecated, \
     please include hpx/datastructures/tagged_pair.hpp or \
-    hpx/parallel/util/tagged_pair.hpp instead"
+    hpx/algorithm.hpp instead"
 #endif
 #endif

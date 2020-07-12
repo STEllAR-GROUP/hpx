@@ -8,18 +8,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/executors/distribution_policy_executor.hpp>
+#include <hpx/modules/distributed_executors.hpp>
 
-#if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/distribution_policy_executor.hpp is \
     deprecated, please include \
-    hpx/execution/executors/distribution_policy_executor.hpp instead")
+    hpx/modules/distributed_executors.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/parallel/executors/distribution_policy_executor.hpp is \
     deprecated, please include \
-    hpx/execution/executors/distribution_policy_executor.hpp instead"
+    hpx/modules/distributed_executors.hpp instead"
 #endif
 #endif

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2020 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,11 +24,12 @@ include(HPX_AddModule)
 add_hpx_module(
   checkpoint
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${checkpoint_sources}
   HEADERS ${checkpoint_headers}
   COMPAT_HEADERS ${checkpoint_compat_headers}
-  DEPENDENCIES hpx_config hpx_format hpx_serialization
+  DEPENDENCIES hpx_async_distributed hpx_checkpoint_base hpx_config hpx_futures
+               hpx_serialization
   CMAKE_SUBDIRS examples tests
 )

@@ -19,12 +19,12 @@
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #endif
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/thread_executors/detail/on_self_reset.hpp>
 #include <hpx/thread_executors/manage_thread_executor.hpp>
@@ -278,7 +278,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail {
         {
             {
                 on_self_reset on_exit(self_[virt_core]);
-                hpx::basic_execution::this_thread::yield();
+                hpx::execution_base::this_thread::yield();
             }
 
             // reset state to running if current state is still suspended
@@ -515,9 +515,6 @@ namespace hpx { namespace threads { namespace executors {
             max_punits, min_punits, "local_priority_queue_executor"))
     {
     }
-
-    // this is only needed to force linking of the corresponding cpp file
-    void local_priority_queue_executor::dummy() {}
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////

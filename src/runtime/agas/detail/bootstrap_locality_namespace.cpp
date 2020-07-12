@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/runtime/agas/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/runtime/agas/server/locality_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>

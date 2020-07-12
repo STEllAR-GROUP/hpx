@@ -10,14 +10,14 @@
 #include <hpx/schedulers/config/defines.hpp>
 #include <hpx/modules/schedulers.hpp>
 
-#if defined(HPX_SCHEDULERS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SCHEDULERS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/schedulers.hpp is deprecated, \
-    please include hpx/schedulers.hpp instead")
+    please include hpx/modules/schedulers.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/schedulers.hpp is deprecated, \
-    please include hpx/schedulers.hpp instead"
+    please include hpx/modules/schedulers.hpp instead"
 #endif
 #endif

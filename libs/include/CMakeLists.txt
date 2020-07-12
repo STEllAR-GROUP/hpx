@@ -10,7 +10,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
     hpx/distributed/runtime.hpp
+    hpx/execution.hpp
     hpx/hpx.hpp
+    hpx/future.hpp
     hpx/include/actions.hpp
     hpx/include/agas.hpp
     hpx/include/applier.hpp
@@ -26,7 +28,7 @@ set(include_headers
     hpx/include/datapar.hpp
     hpx/include/future.hpp
     hpx/include/lcos.hpp
-    hpx/include/local_lcos.hpp
+    hpx/include/lcos_local.hpp
     hpx/include/naming.hpp
     hpx/include/parallel_adjacent_difference.hpp
     hpx/include/parallel_adjacent_find.hpp
@@ -99,12 +101,13 @@ set(include_headers
 
 include(HPX_AddModule)
 add_hpx_module(
-  include FORCE_LINKING_GEN
+  include
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_headers}
   DEPENDENCIES
     hpx_algorithms
     hpx_assertion
+    hpx_async_base
     hpx_async_combinators
     hpx_config
     hpx_errors
@@ -113,7 +116,7 @@ add_hpx_module(
     hpx_format
     hpx_futures
     hpx_async_local
-    hpx_local_lcos
+    hpx_lcos_local
     hpx_naming_base
     hpx_pack_traversal
     hpx_resource_partitioner

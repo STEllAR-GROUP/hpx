@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_configuration/config/defines.hpp>
-#include <hpx/prefix/find_prefix.hpp>
+#include <hpx/modules/prefix.hpp>
 
-#if defined(HPX_RUNTIME_CONFIGURATION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_RUNTIME_CONFIGURATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/find_prefix.hpp is deprecated, \
-    please include hpx/prefix/find_prefix.hpp instead")
+    please include hpx/modules/prefix.hpp instead")
 #else
 #warning "The header hpx/util/find_prefix.hpp is deprecated, \
-    please include hpx/prefix/find_prefix.hpp instead"
+    please include hpx/modules/prefix.hpp instead"
 #endif
 #endif

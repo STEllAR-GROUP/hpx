@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_LOCAL_SCHEDULER)
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>

@@ -29,6 +29,10 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
+#if defined(HPX_HAVE_CUDA)
+#include <hpx/async_cuda/cuda_future.hpp>
+#include <hpx/async_cuda/target.hpp>
+#endif
 
 #include <cstddef>
 #include <iostream>
@@ -445,7 +449,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         using allocator_type = hpx::compute::cuda::allocator<STREAM_TYPE>;
 
         // Get the cuda targets we want to run on
-        hpx::compute::cuda::target target;
+        hpx::cuda::target target;
 
         // Get the host targets we want to run on
         auto host_targets = hpx::compute::host::get_local_targets();

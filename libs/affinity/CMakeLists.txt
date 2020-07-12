@@ -14,8 +14,7 @@ set(affinity_headers
 )
 
 set(affinity_compat_headers
-    hpx/affinity.hpp hpx/runtime/threads/detail/partlit.hpp
-    hpx/runtime/threads/policies/affinity_data.hpp
+    hpx/affinity.hpp hpx/runtime/threads/policies/affinity_data.hpp
     hpx/runtime/threads/policies/parse_affinity_options.hpp
 )
 
@@ -25,7 +24,7 @@ include(HPX_AddModule)
 add_hpx_module(
   affinity
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${affinity_sources}
   HEADERS ${affinity_headers}

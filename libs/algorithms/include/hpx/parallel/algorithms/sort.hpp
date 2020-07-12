@@ -1,6 +1,6 @@
 //  Copyright (c) 2015 John Biddiscombe
-//  Copyright (c) 2015-2017 Hartmut Kaiser
-//  Copyright (c) 2015 Francisco Jose Tapia
+//  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2015-2019 Francisco Jose Tapia
 //  Copyright (c) 2018 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,11 +10,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -25,6 +25,7 @@
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
@@ -40,6 +41,7 @@
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
     ///////////////////////////////////////////////////////////////////////////
     // sort
     namespace detail {
@@ -64,19 +66,76 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return sorted;
         }
 
-        //------------------------------------------------------------------------
-        //  function : sort_thread
+        /// Return the iterator to the mid value of the three values
+        /// passed as parameters
+        ///
+        /// \param iter_1 : iterator to the first value
+        /// \param iter_2 : iterator to the second value
+        /// \param iter_3 : iterator to the third value
+        /// \param comp : object for to compare two values
+        /// \return iterator to mid value
+        template <typename Iter, typename Compare>
+        inline Iter mid3(Iter iter_1, Iter iter_2, Iter iter_3, Compare comp)
+        {
+            return comp(*iter_1, *iter_2) ?
+                (comp(*iter_2, *iter_3) ?
+                        iter_2 :
+                        (comp(*iter_1, *iter_3) ? iter_3 : iter_1)) :
+                (comp(*iter_3, *iter_2) ?
+                        iter_2 :
+                        (comp(*iter_3, *iter_1) ? iter_3 : iter_1));
+        }
+
+        /// Return the iterator to the mid value of the nine values
+        /// passed as parameters
+        //
+        /// \param iter_1   iterator to the first value
+        /// \param iter_2   iterator to the second value
+        /// \param iter_3   iterator to the third value
+        /// \param iter_4   iterator to the fourth value
+        /// \param iter_5   iterator to the fifth value
+        /// \param iter_6   iterator to the sixth value
+        /// \param iter_7   iterator to the seventh value
+        /// \param iter_8   iterator to the eighth value
+        /// \param iter_9   iterator to the ninth value
+        /// \return iterator to the mid value
+        template <typename Iter, typename Compare>
+        inline Iter mid9(Iter iter_1, Iter iter_2, Iter iter_3, Iter iter_4,
+            Iter iter_5, Iter iter_6, Iter iter_7, Iter iter_8, Iter iter_9,
+            Compare const& comp)
+        {
+            return mid3(mid3(iter_1, iter_2, iter_3, comp),
+                mid3(iter_4, iter_5, iter_6, comp),
+                mid3(iter_7, iter_8, iter_9, comp), comp);
+        }
+
+        /// Receive a range between first and last, obtain 9 values
+        /// between the elements  including the first and the previous
+        /// to the last. Obtain the iterator to the mid value and swap
+        /// with the first position
+        //
+        /// \param first    iterator to the first element
+        /// \param last     iterator to the last element
+        /// \param comp     object for to compare two elements
+        template <typename Iter, typename Compare>
+        inline void pivot9(Iter first, Iter last, Compare const& comp)
+        {
+            std::size_t chunk = (last - first) >> 3;
+            Iter itaux = mid9(first + 1, first + chunk, first + 2 * chunk,
+                first + 3 * chunk, first + 4 * chunk, first + 5 * chunk,
+                first + 6 * chunk, first + 7 * chunk, last - 1, comp);
+            std::iter_swap(first, itaux);
+        }
+
         /// \brief this function is the work assigned to each thread in the
         ///        parallel process
         /// \exception
         /// \return
         /// \remarks
-        //------------------------------------------------------------------------
         template <typename ExPolicy, typename RandomIt, typename Compare>
         hpx::future<RandomIt> sort_thread(ExPolicy policy, RandomIt first,
             RandomIt last, Compare comp, std::size_t chunk_size)
         {
-            //------------------------- begin ----------------------
             std::ptrdiff_t N = last - first;
             if (std::size_t(N) <= chunk_size)
             {
@@ -87,51 +146,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     });
             }
 
-            //----------------------------------------------------------------
-            //                     split
-            //----------------------------------------------------------------
-
-            //------------------- check if sorted ----------------------------
+            // check if sorted
             if (detail::is_sorted_sequential(first, last, comp))
                 return hpx::make_ready_future(last);
 
-            //---------------------- pivot select ----------------------------
-            std::size_t nx = std::size_t(N) >> 1;
-
-            RandomIt it_a = first + 1;
-            RandomIt it_b = first + nx;
-            RandomIt it_c = last - 1;
-
-            if (comp(*it_b, *it_a))
-                std::iter_swap(it_a, it_b);
-
-            if (comp(*it_c, *it_b))
-            {
-                std::iter_swap(it_c, it_b);
-                if (comp(*it_b, *it_a))
-                    std::iter_swap(it_a, it_b);
-            }
-
-            std::iter_swap(first, it_b);
+            // pivot select
+            pivot9(first, last, comp);
 
             using reference =
                 typename std::iterator_traits<RandomIt>::reference;
 
             reference val = *first;
-            RandomIt c_first = first + 2, c_last = last - 2;
+            RandomIt c_first = first + 1, c_last = last - 1;
 
-            while (c_first != last && comp(*c_first, val))
+            while (comp(*c_first, val))
                 ++c_first;
             while (comp(val, *c_last))
                 --c_last;
-            while (!(c_first > c_last))
+            while (c_first < c_last)
             {
                 std::iter_swap(c_first++, c_last--);
                 while (comp(*c_first, val))
                     ++c_first;
                 while (comp(val, *c_last))
                     --c_last;
-            }    // End while
+            }
 
             std::iter_swap(first, c_last);
 
@@ -162,15 +201,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::move(left), std::move(right));
         }
 
-        //------------------------------------------------------------------------
-        //  function : parallel_sort_async
-        //------------------------------------------------------------------------
-        /// @param [in] first : iterator to the first element to sort
-        /// @param [in] last : iterator to the next element after the last
-        /// @param [in] comp : object for to compare
-        /// @exception
-        /// @return
-        /// @remarks
+        /// \param [in] first   iterator to the first element to sort
+        /// \param [in] last    iterator to the next element after the last
+        /// \param [in] comp    object for to compare
+        /// \exception
+        /// \return
+        /// \remarks
         template <typename ExPolicy, typename RandomIt, typename Compare>
         hpx::future<RandomIt> parallel_sort_async(
             ExPolicy&& policy, RandomIt first, RandomIt last, Compare comp)
@@ -330,16 +366,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           otherwise.
     ///           The algorithm returns an iterator pointing to the first
     ///           element after the last element in the input sequence.
-    //-----------------------------------------------------------------------------
+    // clang-format off
     template <typename ExPolicy, typename RandomIt,
-        typename Proj = util::projection_identity,
         typename Compare = detail::less,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<RandomIt>::value&&
-                    traits::is_projected<Proj, RandomIt>::value&&
-                        traits::is_indirect_callable<ExPolicy, Compare,
-                            traits::projected<Proj, RandomIt>,
-                            traits::projected<Proj, RandomIt>>::value)>
+        typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<RandomIt>::value &&
+            traits::is_projected<Proj, RandomIt>::value &&
+            traits::is_indirect_callable<ExPolicy, Compare,
+                traits::projected<Proj, RandomIt>,
+                traits::projected<Proj, RandomIt>
+            >::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy, RandomIt>::type sort(
         ExPolicy&& policy, RandomIt first, RandomIt last,
         Compare&& comp = Compare(), Proj&& proj = Proj())

@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/modules/assertion.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>

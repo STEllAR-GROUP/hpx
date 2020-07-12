@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CUDA)
-#include <hpx/compute/cuda/target.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/async_cuda/target.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <cuda_runtime.h>
@@ -22,7 +22,7 @@
 namespace hpx { namespace compute { namespace cuda { namespace detail {
     struct scoped_active_target
     {
-        scoped_active_target(target const& t)
+        scoped_active_target(hpx::cuda::target const& t)
           : previous_device_(-1)
           , target_(t)
         {
@@ -85,7 +85,7 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
 
     private:
         int previous_device_;
-        target const& target_;
+        hpx::cuda::target const& target_;
     };
 }}}}    // namespace hpx::compute::cuda::detail
 

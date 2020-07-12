@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/config/defines.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/modules/type_support.hpp>
 
-#if defined(HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_TYPE_SUPPORT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/lazy_conditional.hpp is deprecated, \
-    please include hpx/type_support/lazy_conditional.hpp instead")
+    please include hpx/modules/type_support.hpp instead")
 #else
 #warning "The header hpx/util/lazy_conditional.hpp is deprecated, \
-    please include hpx/type_support/lazy_conditional.hpp instead"
+    please include hpx/modules/type_support.hpp instead"
 #endif
 #endif

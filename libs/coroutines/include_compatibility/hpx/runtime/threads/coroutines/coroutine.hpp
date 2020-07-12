@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/config/defines.hpp>
-#include <hpx/coroutines/coroutine.hpp>
+#include <hpx/modules/coroutines.hpp>
 
-#if defined(HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_COROUTINES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/coroutines/coroutine.hpp is deprecated, \
-    please include hpx/coroutines/coroutine.hpp instead")
+    please include hpx/modules/coroutines.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/coroutines/coroutine.hpp is deprecated, \
-    please include hpx/coroutines/coroutine.hpp instead"
+    please include hpx/modules/coroutines.hpp instead"
 #endif
 #endif

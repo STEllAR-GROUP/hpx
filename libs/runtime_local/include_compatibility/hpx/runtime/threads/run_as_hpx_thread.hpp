@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/config/defines.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
+#include <hpx/include/run_as.hpp>
 
-#if defined(HPX_RUNTIME_LOCAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_RUNTIME_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/runtime/threads/run_as_hpx_thread.hpp \
-    is deprecated, please include hpx/runtime_local/run_as_hpx_thread.hpp instead")
+    is deprecated, please include hpx/include/run_as.hpp instead")
 #else
 #warning "The header hpx/runtime/threads/run_as_hpx_thread.hpp \
-    is deprecated, please include hpx/runtime_local/run_as_hpx_thread.hpp instead"
+    is deprecated, please include hpx/include/run_as.hpp instead"
 #endif
 #endif

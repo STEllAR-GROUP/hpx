@@ -10,8 +10,8 @@
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/basic_execution/execution.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/execution_base/execution.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>

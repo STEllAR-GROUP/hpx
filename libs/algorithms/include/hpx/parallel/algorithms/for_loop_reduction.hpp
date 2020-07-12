@@ -9,15 +9,19 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
 
 #include <cstddef>
 #include <cstdlib>
@@ -67,7 +71,11 @@ namespace hpx { namespace parallel { inline namespace v2 {
         private:
             T& var_;
             Op op_;
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+            std::shared_ptr<hpx::util::cache_line_data<T>[]> data_;
+#else
             boost::shared_array<hpx::util::cache_line_data<T>> data_;
+#endif
         };
 
         /// \endcond

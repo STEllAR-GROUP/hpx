@@ -8,12 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -36,6 +36,12 @@
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -45,8 +51,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
@@ -1143,7 +1147,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 difference_type count = std::distance(first, last);
 
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+                std::shared_ptr<bool[]> flags(new bool[count]);
+#else
                 boost::shared_array<bool> flags(new bool[count]);
+#endif
                 output_iterator_offset init = {0, 0};
 
                 using hpx::util::get;

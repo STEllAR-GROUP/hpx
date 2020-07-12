@@ -15,7 +15,11 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
+#else
+#include <memory>
+#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -29,6 +33,11 @@ namespace hpx { namespace serialization {
     {
     private:
         using allocator_type = Allocator;
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+        using buffer_type = std::shared_ptr<T[]>;
+#else
+        using buffer_type = boost::shared_array<T>;
+#endif
 
         static void no_deleter(T*) {}
 
@@ -63,9 +72,10 @@ namespace hpx { namespace serialization {
           , size_(size)
           , alloc_(alloc)
         {
-            data_.reset(alloc_.allocate(size), [this](T* p) {
-                serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-            });
+            data_.reset(alloc_.allocate(size),
+                [alloc = this->alloc_, size = this->size_](T* p) {
+                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+                });
         }
 
         // The default mode is 'copy' which is consistent with the constructor
@@ -78,23 +88,26 @@ namespace hpx { namespace serialization {
         {
             if (mode == copy)
             {
-                data_.reset(alloc_.allocate(size), [this](T* p) {
-                    serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-                });
+                data_.reset(alloc_.allocate(size),
+                    [alloc = this->alloc_, size = this->size_](T* p) {
+                        serialize_buffer::deleter<allocator_type>(
+                            p, alloc, size);
+                    });
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
             else if (mode == reference)
             {
-                data_ =
-                    boost::shared_array<T>(data, &serialize_buffer::no_deleter);
+                data_ = buffer_type(data, &serialize_buffer::no_deleter);
             }
             else
             {
                 // take ownership
-                data_ = boost::shared_array<T>(data, [this](T* p) {
-                    serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-                });
+                data_ = buffer_type(
+                    data, [alloc = this->alloc_, size = this->size_](T* p) {
+                        serialize_buffer::deleter<allocator_type>(
+                            p, alloc, size);
+                    });
             }
         }
 
@@ -106,7 +119,7 @@ namespace hpx { namespace serialization {
           , alloc_(alloc)
         {
             // if 2 allocators are specified we assume mode 'take'
-            data_ = boost::shared_array<T>(data, [this, dealloc](T* p) {
+            data_ = buffer_type(data, [this, dealloc](T* p) {
                 serialize_buffer::deleter<Deallocator>(p, dealloc, size_);
             });
         }
@@ -128,7 +141,7 @@ namespace hpx { namespace serialization {
             else
             {
                 // reference or take ownership, behavior is defined by deleter
-                data_ = boost::shared_array<T>(data, deleter);
+                data_ = buffer_type(data, deleter);
             }
         }
 
@@ -149,7 +162,7 @@ namespace hpx { namespace serialization {
             }
             else if (mode == reference)
             {
-                data_ = boost::shared_array<T>(const_cast<T*>(data), deleter);
+                data_ = buffer_type(const_cast<T*>(data), deleter);
             }
             else
             {
@@ -169,7 +182,7 @@ namespace hpx { namespace serialization {
           , alloc_(alloc)
         {
             // if 2 allocators are specified we assume mode 'take'
-            data_ = boost::shared_array<T>(data, deleter);
+            data_ = buffer_type(data, deleter);
         }
 
         // same set of constructors, but taking const data
@@ -180,9 +193,10 @@ namespace hpx { namespace serialization {
           , alloc_(alloc)
         {
             // create from const data implies 'copy' mode
-            data_.reset(alloc_.allocate(size), [this](T* p) {
-                serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-            });
+            data_.reset(alloc_.allocate(size),
+                [alloc = this->alloc_, size = this->size_](T* p) {
+                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+                });
             if (size != 0)
                 std::copy(data, data + size, data_.get());
         }
@@ -209,15 +223,17 @@ namespace hpx { namespace serialization {
         {
             if (mode == copy)
             {
-                data_.reset(alloc_.allocate(size), [this](T* p) {
-                    serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-                });
+                data_.reset(alloc_.allocate(size),
+                    [alloc = this->alloc_, size = this->size_](T* p) {
+                        serialize_buffer::deleter<allocator_type>(
+                            p, alloc, size);
+                    });
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
             else if (mode == reference)
             {
-                data_ = boost::shared_array<T>(
+                data_ = buffer_type(
                     const_cast<T*>(data), &serialize_buffer::no_deleter);
             }
             else
@@ -257,7 +273,7 @@ namespace hpx { namespace serialization {
             return data_[idx];
         }
 
-        boost::shared_array<T> data_array() const
+        buffer_type data_array() const
         {
             return data_;
         }
@@ -291,9 +307,10 @@ namespace hpx { namespace serialization {
             ar >> size_ >> alloc_;
             // -V128
 
-            data_.reset(alloc_.allocate(size_), [this](T* p) {
-                serialize_buffer::deleter<allocator_type>(p, alloc_, size_);
-            });
+            data_.reset(alloc_.allocate(size_),
+                [alloc = this->alloc_, size = this->size_](T* p) {
+                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+                });
 
             if (size_ != 0)
             {
@@ -311,7 +328,7 @@ namespace hpx { namespace serialization {
         }
 
     private:
-        boost::shared_array<T> data_;
+        buffer_type data_;
         std::size_t size_;
         Allocator alloc_;
     };

@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/statistics/config/defines.hpp>
-#include <hpx/statistics/rolling_min.hpp>
+#include <hpx/modules/statistics.hpp>
 
-#if defined(HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_STATISTICS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/rolling_min.hpp is deprecated, \
-    please include hpx/statistics/rolling_min.hpp instead")
+    please include hpx/modules/statistics.hpp instead")
 #else
 #warning "The header hpx/util/rolling_min.hpp is deprecated, \
-    please include hpx/statistics/rolling_min.hpp instead"
+    please include hpx/modules/statistics.hpp instead"
 #endif
 #endif

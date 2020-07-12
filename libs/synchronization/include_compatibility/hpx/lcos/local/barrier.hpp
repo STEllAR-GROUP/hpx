@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/synchronization/config/defines.hpp>
-#include <hpx/synchronization/barrier.hpp>
+#include <hpx/barrier.hpp>
 
-#if defined(HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SYNCHRONIZATION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/local/barrier.hpp is deprecated, \
-    please include hpx/synchronization/barrier.hpp instead")
+    please include hpx/barrier.hpp instead")
 #else
 #warning "The header hpx/lcos/local/barrier.hpp is deprecated, \
-    please include hpx/synchronization/barrier.hpp instead"
+    please include hpx/barrier.hpp instead"
 #endif
 #endif

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>

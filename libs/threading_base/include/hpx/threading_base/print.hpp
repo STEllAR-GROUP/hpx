@@ -36,7 +36,7 @@ namespace hpx { namespace debug {
         {
         }
         const threads::thread_data* data;
-        friend std::ostream& operator<<(std::ostream& os, const threadinfo& d)
+        friend std::ostream& operator<<(std::ostream& os, threadinfo const& d)
         {
             os << ptr(d.data) << " \""
                << ((d.data != nullptr) ? d.data->get_description() : "nullptr")
@@ -53,7 +53,7 @@ namespace hpx { namespace debug {
         {
         }
         const threads::thread_id_type* data;
-        friend std::ostream& operator<<(std::ostream& os, const threadinfo& d)
+        friend std::ostream& operator<<(std::ostream& os, threadinfo const& d)
         {
             if (d.data == nullptr)
                 os << "nullptr";
@@ -67,12 +67,12 @@ namespace hpx { namespace debug {
     template <>
     struct threadinfo<hpx::threads::thread_init_data>
     {
-        threadinfo(const hpx::threads::thread_init_data& v)
+        threadinfo(hpx::threads::thread_init_data const& v)
           : data(v)
         {
         }
-        const hpx::threads::thread_init_data& data;
-        friend std::ostream& operator<<(std::ostream& os, const threadinfo& d)
+        hpx::threads::thread_init_data const& data;
+        friend std::ostream& operator<<(std::ostream& os, threadinfo const& d)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             os << std::left << " \"" << d.data.description.get_description()
@@ -84,7 +84,6 @@ namespace hpx { namespace debug {
         }
     };
 
-#ifdef HPX_HAVE_CXX17_FOLD_EXPRESSIONS
     namespace detail {
         // ------------------------------------------------------------------
         // helper class for printing thread ID, either std:: or hpx::
@@ -94,7 +93,7 @@ namespace hpx { namespace debug {
         };
 
         inline std::ostream& operator<<(
-            std::ostream& os, const current_thread_print_helper&)
+            std::ostream& os, current_thread_print_helper const&)
         {
             if (hpx::threads::get_self_id() == hpx::threads::invalid_thread_id)
             {
@@ -124,33 +123,49 @@ namespace hpx { namespace debug {
         };
 
         inline std::ostream& operator<<(
-            std::ostream& os, const current_time_print_helper&)
+            std::ostream& os, current_time_print_helper const&)
         {
-            static std::chrono::high_resolution_clock::time_point log_t_start =
-                std::chrono::high_resolution_clock::now();
+            using namespace std::chrono;
+            static steady_clock::time_point log_t_start = steady_clock::now();
             //
-            auto now = std::chrono::high_resolution_clock::now();
-            auto nowt = std::chrono::duration_cast<std::chrono::microseconds>(
-                now - log_t_start)
-                            .count();
+            auto now = steady_clock::now();
+            auto nowt = duration_cast<microseconds>(now - log_t_start).count();
             //
             os << debug::dec<10>(nowt) << " ";
             return os;
         }
 
+#if defined(HPX_HAVE_CXX17_FOLD_EXPRESSIONS)
         template <typename... Args>
-        void display(const char* prefix, Args... args)
+        void display(const char* prefix, Args const&... args)
         {
             // using a temp stream object with a single copy to cout at the end
             // prevents multiple threads from injecting overlapping text
             std::stringstream tempstream;
             tempstream << prefix << detail::current_time_print_helper()
-                       << detail::current_thread_print_helper();
+                       << detail::current_thread_print_helper()
+                       << detail::hostname_print_helper();
             ((tempstream << args << " "), ...);
             tempstream << std::endl;
             std::cout << tempstream.str();
         }
-    }    // namespace detail
+
+#else
+        template <typename... Args>
+        void display(const char* prefix, Args const&... args)
+        {
+            // using a temp stream object with a single copy to cout at the end
+            // prevents multiple threads from injecting overlapping text
+            std::stringstream tempstream;
+            tempstream << prefix << detail::current_time_print_helper()
+                       << detail::current_thread_print_helper()
+                       << detail::hostname_print_helper();
+            variadic_print(tempstream, args...);
+            tempstream << std::endl;
+            std::cout << tempstream.str();
+        }
 #endif
-}}    // namespace hpx::debug
+
+    }    // namespace detail
+}}       // namespace hpx::debug
 /// \endcond

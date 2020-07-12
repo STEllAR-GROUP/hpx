@@ -44,7 +44,7 @@ set(tests
 )
 
 # add dependencies to partitioned_vector_target when Cuda is enabled
-if(HPX_WITH_CUDA)
+if(HPX_WITH_CUDA_COMPUTE)
   set(partitioned_vector_target_LIBRARIES ${CUDA_LIBRARIES}
                                           ${CUDA_CUBLAS_LIBRARIES}
   )
@@ -69,7 +69,7 @@ foreach(test ${tests})
     FOLDER ${folder_name}
   )
 
-  if(HPX_WITH_CUDA)
+  if(HPX_WITH_CUDA_COMPUTE)
     target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
     target_link_libraries(${test}_test PRIVATE ${${${test}}_LIBRARIES})
   endif()

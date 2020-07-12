@@ -10,7 +10,9 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 hpx_option(
   HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE BOOL
   "Enable compatibility of hpx::util::tuple with std::tuple. (default: ON)" ON
-  ADVANCED CATEGORY "Modules"
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE DATASTRUCTURES
 )
 
 if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE)
@@ -36,10 +38,8 @@ set(datastructures_headers
 
 set(datastructures_compat_headers
     hpx/datastructures.hpp
-    hpx/datastructures/detail/pack.hpp
     hpx/traits/supports_streaming_with_any.hpp
     hpx/traits/is_tuple_like.hpp
-    hpx/util/detail/pack.hpp
     hpx/util/any.hpp
     hpx/util/optional.hpp
     hpx/util/tagged.hpp
@@ -52,7 +52,7 @@ include(HPX_AddModule)
 add_hpx_module(
   datastructures
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}

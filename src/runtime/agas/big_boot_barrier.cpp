@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
@@ -37,7 +37,7 @@
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>

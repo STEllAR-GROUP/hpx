@@ -80,8 +80,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     util/activate_counters.cpp
     util/generate_unique_ids.cpp
     util/init_logging.cpp
-    util/integer/int128.cpp
-    util/integer/uint128.cpp
     util/one_size_heap_list.cpp
     util/pool_timer.cpp
     util/query_counters.cpp
@@ -90,8 +88,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 list(TRANSFORM hpx_SOURCES PREPEND ${PROJECT_SOURCE_DIR}/src/)
-
-set(hpx_generated_SOURCES ${PROJECT_BINARY_DIR}/libs/modules.cpp)
 
 set(hpx_external_objects_SOURCES)
 if(MSVC)
@@ -143,7 +139,6 @@ endif()
 # List all headers (local and distributed)
 set(hpx_HEADERS
     hpx/lcos_fwd.hpp
-    hpx/runtime/serialization/detail/preprocess_container.hpp
     hpx/runtime/serialization/detail/preprocess_futures.hpp
     hpx/runtime/serialization/detail/preprocess_gid_types.hpp
     hpx/traits/managed_component_policies.hpp
@@ -357,8 +352,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/init_logging.hpp
     hpx/util/integer/cover_operators.hpp
     hpx/util/integer/endian.hpp
-    hpx/util/integer/int128.hpp
-    hpx/util/integer/uint128.hpp
     hpx/util/one_size_heap_list.hpp
     hpx/util/pool_timer.hpp
     hpx/util/query_counters.hpp
@@ -516,7 +509,9 @@ foreach(_module ${HPX_LIBS})
                          "-Wl,--no-whole-archive"
       )
     endif(APPLE)
-  endif(UNIX)
+  elseif(MSVC)
+    set(_module_target -WHOLEARCHIVE:$<TARGET_FILE:${_module_target}>)
+  endif()
 
   # add module binaries as PRIVATE dependencies to the core hpx library to avoid
   # dependent applications have to link against those

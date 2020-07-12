@@ -36,8 +36,6 @@ set(plugin_compat_headers
     hpx/util/plugin/plugin_factory.hpp
     hpx/util/plugin/plugin_wrapper.hpp
     hpx/util/plugin/virtual_constructor.hpp
-    hpx/util/plugin/detail/dll_dlopen.hpp
-    hpx/util/plugin/detail/dll_windows.hpp
     hpx/traits/plugin_config_data.hpp
 )
 
@@ -45,7 +43,7 @@ include(HPX_AddModule)
 add_hpx_module(
   plugin
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   HEADERS ${plugin_headers}
   COMPAT_HEADERS ${plugin_compat_headers}

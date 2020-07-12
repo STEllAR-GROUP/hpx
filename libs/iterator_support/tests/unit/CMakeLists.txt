@@ -15,6 +15,8 @@ set(tests
     transform_iterator
     transform_iterator2
     zip_iterator
+    is_sentinel_for
+    is_sized_sentinel_for
 )
 
 # Set the dependencies of each test

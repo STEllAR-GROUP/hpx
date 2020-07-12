@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
-#include <hpx/datastructures/traits/is_tuple_like.hpp>
+#include <hpx/modules/datastructures.hpp>
 
-#if defined(HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_DATASTRUCTURES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/traits/is_tuple_like.hpp is deprecated, \
-    please include datastructures/traits/is_tuple_like.hpp instead.")
+    please include hpx/modules/datastructures.hpp instead.")
 #else
 #warning "The header hpx/traits/is_tuple_like.hpp is deprecated, \
-    please include datastructures/traits/is_tuple_like.hpp instead."
+    please include hpx/modules/datastructures.hpp instead."
 #endif
 #endif

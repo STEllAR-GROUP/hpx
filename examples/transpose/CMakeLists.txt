@@ -26,6 +26,7 @@ set(transpose_smp_block_PARAMETERS THREADS_PER_LOCALITY 4)
 set(transpose_block_PARAMETERS THREADS_PER_LOCALITY 4)
 set(transpose_block_numa_PARAMETERS
     THREADS_PER_LOCALITY 4 "--transpose-threads=4" "--transpose-numa-domains=1"
+    RUN_SERIAL
 )
 
 foreach(example_program ${example_programs})

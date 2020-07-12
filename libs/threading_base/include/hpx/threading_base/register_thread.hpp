@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>

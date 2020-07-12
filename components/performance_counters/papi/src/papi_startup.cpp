@@ -12,14 +12,13 @@
 #include <hpx/components/performance_counters/papi/server/papi.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime/components/component_commandline.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 

@@ -10,10 +10,10 @@
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/detail/tss.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <cstddef>

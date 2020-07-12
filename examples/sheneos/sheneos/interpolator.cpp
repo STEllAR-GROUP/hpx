@@ -6,9 +6,9 @@
 
 #include <hpx/hpx.hpp>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/local_lcos/packaged_task.hpp>
+#include <hpx/lcos_local/packaged_task.hpp>
 
 #include <cstddef>
 #include <cstdint>

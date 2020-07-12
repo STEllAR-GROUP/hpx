@@ -493,7 +493,7 @@ with section("parse"):
     'hpx_include': {'pargs': {'nargs': 0}},
     'hpx_info': {'pargs': {'nargs': 0}},
     'hpx_message': {'pargs': {'nargs': 1}},
-    'hpx_option': { 'kwargs': {'CATEGORY': 1, 'STRINGS': '+'},
+    'hpx_option': { 'kwargs': {'CATEGORY': 1, 'MODULE': 1, 'STRINGS': '+'},
                     'pargs': {'flags': ['ADVANCED'], 'nargs': '4+'}},
     'hpx_perform_cxx_feature_tests': {'pargs': {'nargs': 0}},
     'hpx_print_list': {'pargs': {'nargs': 3}},

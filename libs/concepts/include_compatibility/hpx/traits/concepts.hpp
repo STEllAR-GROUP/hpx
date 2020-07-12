@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/config/defines.hpp>
-#include <hpx/concepts/concepts.hpp>
+#include <hpx/modules/concepts.hpp>
 
-#if defined(HPX_CONCEPTS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CONCEPTS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/traits/concepts.hpp is deprecated, \
-    please include hpx/concepts/concepts.hpp instead")
+    please include hpx/modules/concepts.hpp instead")
 #else
 #warning "The header hpx/traits/concepts.hpp is deprecated, \
-    please include hpx/concepts/concepts.hpp instead"
+    please include hpx/modules/concepts.hpp instead"
 #endif
 #endif

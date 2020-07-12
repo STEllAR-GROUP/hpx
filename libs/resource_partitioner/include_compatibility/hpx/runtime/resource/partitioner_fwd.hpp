@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/resource_partitioner/config/defines.hpp>
-#include <hpx/resource_partitioner/partitioner_fwd.hpp>
+#include <hpx/include/resource_partitioner.hpp>
 
-#if defined(HPX_RESOURCE_PARTITIONER_HAVE_DEPRECATION_WARNINGS)
+#if HPX_RESOURCE_PARTITIONER_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/resource/partitioner_fwd.hpp is deprecated, \
-    please include hpx/resource_partitioner/partitioner_fwd.hpp instead")
+    please include hpx/include/resource_partitioner.hpp instead")
 #else
 #warning "The header hpx/runtime/resource/partitioner_fwd.hpp is deprecated, \
-    please include hpx/resource_partitioner/partitioner_fwd.hpp instead"
+    please include hpx/include/resource_partitioner.hpp instead"
 #endif
 #endif

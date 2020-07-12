@@ -35,23 +35,48 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename Op, typename Conv, typename T>
         typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         transform_inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, Conv&& conv, T init, Op&& op, std::true_type)
+            OutIter dest, Conv&& conv, T&& init, Op&& op, std::true_type)
         {
             if (first == last)
+            {
                 return util::detail::algorithm_result<ExPolicy, OutIter>::get(
                     std::move(dest));
-
+            }
             return inclusive_scan_(std::forward<ExPolicy>(policy), first, last,
-                dest, init, std::forward<Op>(op), std::true_type(),
+                dest, std::forward<T>(init), std::forward<Op>(op),
+                std::true_type(), std::forward<Conv>(conv));
+        }
+
+        template <typename ExPolicy, typename InIter, typename OutIter,
+            typename Op, typename Conv>
+        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
+        transform_inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
+            OutIter dest, Conv&& conv, Op&& op, std::true_type)
+        {
+            if (first == last)
+            {
+                return util::detail::algorithm_result<ExPolicy, OutIter>::get(
+                    std::move(dest));
+            }
+            return inclusive_scan_(std::forward<ExPolicy>(policy), first, last,
+                dest, std::forward<Op>(op), std::true_type(),
                 std::forward<Conv>(conv));
         }
 
         // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename InIter, typename OutIter,
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Op, typename Conv, typename T>
-        typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-        transform_inclusive_scan_(ExPolicy&& policy, InIter first, InIter last,
-            OutIter dest, Conv&& conv, T init, Op&& op, std::false_type);
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        transform_inclusive_scan_(ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest, Conv&& conv, T&& init, Op&& op,
+            std::false_type);
+
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Op, typename Conv>
+        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        transform_inclusive_scan_(ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest, Conv&& conv, Op&& op,
+            std::false_type);
 
         /// \endcond
     }    // namespace detail

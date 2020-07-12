@@ -12,7 +12,6 @@ set(runtime_local_headers
     hpx/runtime_local/config_entry.hpp
     hpx/runtime_local/custom_exception_info.hpp
     hpx/runtime_local/debugging.hpp
-    hpx/runtime_local/force_linking.hpp
     hpx/runtime_local/get_locality_id.hpp
     hpx/runtime_local/get_num_localities.hpp
     hpx/runtime_local/get_os_thread_count.hpp
@@ -67,7 +66,6 @@ set(runtime_local_compat_headers
 set(runtime_local_sources
     custom_exception_info.cpp
     debugging.cpp
-    force_linking.cpp
     interval_timer.cpp
     os_thread_type.cpp
     runtime_handlers.cpp
@@ -90,13 +88,24 @@ add_hpx_module(
   COMPAT_HEADERS ${runtime_local_compat_headers}
   DEPENDENCIES
     hpx_assertion
+    hpx_command_line_handling
     hpx_config
     hpx_errors
-    hpx_local_lcos
+    hpx_execution
+    hpx_format
+    hpx_functional
+    hpx_io_service
+    hpx_lcos_local
     hpx_logging
+    hpx_naming_base
     hpx_program_options
+    hpx_resource_partitioner
+    hpx_runtime_configuration
     hpx_threadmanager
     hpx_thread_executors
+    hpx_threading
+    hpx_threading_base
     hpx_topology
+    hpx_version
   CMAKE_SUBDIRS examples tests
 )

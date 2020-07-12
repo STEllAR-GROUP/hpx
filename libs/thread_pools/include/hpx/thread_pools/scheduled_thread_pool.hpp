@@ -9,15 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -105,6 +106,8 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         std::int64_t get_idle_core_count() const override;
+
+        void get_idle_core_mask(mask_type&) const override;
 
         std::int64_t get_background_thread_count() override
         {

@@ -38,11 +38,6 @@ set(threading_base_headers
 )
 
 set(threading_base_compat_headers
-    hpx/runtime/threads/detail/create_thread.hpp
-    hpx/runtime/threads/detail/create_work.hpp
-    hpx/runtime/threads/detail/network_background_callback.hpp
-    hpx/runtime/threads/detail/set_thread_state.hpp
-    hpx/runtime/threads/detail/thread_num_tss.hpp
     hpx/runtime/threads/execution_agent.hpp
     hpx/runtime/threads/policies/callback_notifier.hpp
     hpx/runtime/threads/policies/scheduler_base.hpp
@@ -83,7 +78,7 @@ include(HPX_AddModule)
 add_hpx_module(
   threading_base
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/threading_base/thread_data_stackful.hpp"
                              "hpx/threading_base/thread_data_stackless.hpp"
@@ -94,13 +89,14 @@ add_hpx_module(
     hpx_affinity
     hpx_allocator_support
     hpx_assertion
-    hpx_basic_execution
+    hpx_execution_base
     hpx_config
     hpx_coroutines
     hpx_errors
     hpx_format
     hpx_functional
     hpx_hardware
+    hpx_itt_notify
     hpx_logging
     hpx_memory
     hpx_naming_base

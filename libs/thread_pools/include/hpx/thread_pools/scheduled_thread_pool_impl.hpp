@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/concurrency/barrier.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
@@ -1790,6 +1790,21 @@ namespace hpx { namespace threads { namespace detail {
             ++i;
         }
         return count;
+    }
+
+    template <typename Scheduler>
+    void scheduled_thread_pool<Scheduler>::get_idle_core_mask(
+        mask_type& mask) const
+    {
+        std::size_t i = 0;
+        for (auto const& data : counter_data_)
+        {
+            if (!data.tasks_active_ && sched_->Scheduler::is_core_idle(i))
+            {
+                set(mask, i);
+            }
+            ++i;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

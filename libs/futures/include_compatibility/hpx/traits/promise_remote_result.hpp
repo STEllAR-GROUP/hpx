@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/futures/config/defines.hpp>
-#include <hpx/futures/traits/promise_remote_result.hpp>
+#include <hpx/future.hpp>
 
-#if defined(HPX_FUTURES_HAVE_DEPRECATION_WARNINGS)
+#if HPX_FUTURES_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/traits/promise_remote_result.hpp is deprecated, \
-    please include hpx/futures/traits/promise_remote_result.hpp instead")
+    please include hpx/future.hpp instead")
 #else
 #warning "The header hpx/traits/promise_remote_result.hpp is deprecated, \
-    please include hpx/futures/traits/promise_remote_result.hpp instead"
+    please include hpx/future.hpp instead"
 #endif
 #endif

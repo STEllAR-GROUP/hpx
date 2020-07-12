@@ -29,7 +29,7 @@ include(HPX_AddModule)
 add_hpx_module(
   mpi_base
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${mpi_base_sources}
   HEADERS ${mpi_base_headers}

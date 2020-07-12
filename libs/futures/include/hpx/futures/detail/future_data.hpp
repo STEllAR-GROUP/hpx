@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
     public:
         typedef util::unique_function_nonser<void()> completed_callback_type;
-        typedef boost::container::small_vector<completed_callback_type, 3>
+        typedef boost::container::small_vector<completed_callback_type, 1>
             completed_callback_vector_type;
 
         typedef void has_future_data_refcnt_base;

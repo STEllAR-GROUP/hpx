@@ -16,6 +16,15 @@
 #include <type_traits>
 
 namespace hpx { namespace traits {
+#if defined(DOXYGEN)
+    /// If \p T is a standard, Boost, or HPX placeholder (_1, _2, _3, ...) then
+    /// this template is derived from ``std::integral_constant<int, 1>``,
+    /// ``std::integral_constant<int, 2>``, ``std::integral_constant<int, 3>``,
+    /// respectively. Otherwise it is derived from ,
+    /// ``std::integral_constant<int, 0>``.
+    template <typename T>
+    struct is_placeholder;
+#else
     template <typename T>
     struct is_placeholder
       : std::integral_constant<int,
@@ -29,4 +38,5 @@ namespace hpx { namespace traits {
     struct is_placeholder<T const> : is_placeholder<T>
     {
     };
+#endif
 }}    // namespace hpx::traits

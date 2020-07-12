@@ -10,14 +10,14 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/local_lcos/and_gate.hpp>
-#include <hpx/modules/assertion.hpp>
-#include <hpx/modules/basic_execution.hpp>
+#include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/basename_registration.hpp>
@@ -169,9 +169,6 @@ namespace hpx { namespace lcos { namespace detail {
         std::size_t generation = std::size_t(-1),
         std::size_t this_site = std::size_t(-1),
         std::size_t num_values = std::size_t(-1));
-
-    // force linking only
-    HPX_EXPORT void dummy();
 }}}    // namespace hpx::lcos::detail
 
 #endif    // COMPUTE_HOST_CODE

@@ -13,4 +13,4 @@ runtime_configuration
 This library is part of HPX.
 
 Documentation can be found `here
-<https://stellar-group.github.io/hpx-docs/latest/html/libs/runtime_configuration/docs/index.html>`__.
+<https://hpx-docs.stellar-group.org/latest/html/libs/runtime_configuration/docs/index.html>`__.

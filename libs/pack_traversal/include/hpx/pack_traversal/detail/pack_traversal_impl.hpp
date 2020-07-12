@@ -10,8 +10,8 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/result_of.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
+#include <hpx/functional/invoke_result.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp>
 #include <hpx/type_support/always_void.hpp>

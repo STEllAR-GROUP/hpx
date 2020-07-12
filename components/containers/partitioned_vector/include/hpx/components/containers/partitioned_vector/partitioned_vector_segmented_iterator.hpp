@@ -14,7 +14,7 @@
  // http://lafstern.org/matt/segmented.pdf.
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>

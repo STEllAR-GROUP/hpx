@@ -6,11 +6,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/debugging/backtrace.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/futures/futures_factory.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
@@ -74,7 +74,7 @@ namespace hpx {
     std::string diagnostic_information(hpx::exception_info const& xi)
     {
         int const verbosity = util::from_string<int>(
-            get_config_entry("hpx.exception_verbosity", ""));
+            get_config_entry("hpx.exception_verbosity", "2"));
 
         std::ostringstream strm;
         strm << "\n";

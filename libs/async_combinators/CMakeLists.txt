@@ -36,7 +36,7 @@ include(HPX_AddModule)
 add_hpx_module(
   async_combinators
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}
@@ -44,7 +44,7 @@ add_hpx_module(
     hpx_allocator_support
     hpx_assertion
     hpx_async_base
-    hpx_basic_execution
+    hpx_execution_base
     hpx_config
     hpx_datastructures
     hpx_errors

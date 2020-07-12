@@ -9,9 +9,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/functional/bind_back.hpp>

@@ -10,7 +10,7 @@
 #include <hpx/segmented_algorithms/config/defines.hpp>
 #include <hpx/modules/segmented_algorithms.hpp>
 
-#if defined(HPX_SEGMENTED_ALGORITHMS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SEGMENTED_ALGORITHMS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/segmented_algorithms.hpp is deprecated, \
     please include hpx/modules/segmented_algorithms.hpp instead")

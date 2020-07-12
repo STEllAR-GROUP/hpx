@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/config/defines.hpp>
-#include <hpx/async_distributed/applier/apply_callback.hpp>
+#include <hpx/include/async.hpp>
 
-#if defined(HPX_ASYNC_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ASYNC_DISTRIBUTED_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/applier/apply_callback.hpp is deprecated, \
-    please include hpx/async_distributed/applier/apply_callback.hpp instead")
+    please include hpx/include/async.hpp instead")
 #else
 #warning "The header hpx/runtime/applier/apply_callback.hpp is deprecated, \
-    please include hpx/async_distributed/applier/apply_callback.hpp instead"
+    please include hpx/include/async.hpp instead"
 #endif
 #endif

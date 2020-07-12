@@ -224,6 +224,7 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
@@ -234,7 +235,6 @@ namespace hpx {
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -347,7 +347,7 @@ namespace hpx { namespace lcos {
                             shared_state->set_on_completed(util::deferred_call(
                                 &when_some<Sequence>::on_future_ready,
                                 when_.shared_from_this(), idx_,
-                                hpx::basic_execution::this_thread::agent()));
+                                hpx::execution_base::this_thread::agent()));
                             ++idx_;
                             return;
                         }
@@ -413,7 +413,7 @@ namespace hpx { namespace lcos {
 
         public:
             void on_future_ready(
-                std::size_t idx, hpx::basic_execution::agent_ref ctx)
+                std::size_t idx, hpx::execution_base::agent_ref ctx)
             {
                 std::size_t const new_count = count_.fetch_add(1) + 1;
                 if (new_count <= needed_count_)
@@ -424,7 +424,7 @@ namespace hpx { namespace lcos {
                     }
                     if (new_count == needed_count_)
                     {
-                        if (ctx != hpx::basic_execution::this_thread::agent())
+                        if (ctx != hpx::execution_base::this_thread::agent())
                         {
                             ctx.resume();
                         }
@@ -463,7 +463,7 @@ namespace hpx { namespace lcos {
                 if (!goal_reached_on_calling_thread_)
                 {
                     // wait for any of the futures to return to become ready
-                    hpx::basic_execution::this_thread::suspend(
+                    hpx::execution_base::this_thread::suspend(
                         "hpx::lcos::detail::when_some::operator()");
                 }
 

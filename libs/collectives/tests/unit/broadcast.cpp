@@ -22,7 +22,7 @@ constexpr char const* broadcast_direct_basename = "/test/broadcast_direct/";
 int hpx_main(int argc, char* argv[])
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    HPX_TEST(num_localities >= 2);
+    HPX_TEST_LTE(2, num_localities);
 
     // test functionality based on future<> of local result
     for (std::uint32_t i = 0; i != 10; ++i)

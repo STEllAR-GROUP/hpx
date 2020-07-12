@@ -16,8 +16,8 @@
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
 //
-#include <hpx/modules/assertion.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 //
 #include <cstddef>
 #include <cstdint>

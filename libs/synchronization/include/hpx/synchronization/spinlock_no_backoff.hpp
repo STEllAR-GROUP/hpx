@@ -11,8 +11,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/itt_notify.hpp>
 
 #include <atomic>

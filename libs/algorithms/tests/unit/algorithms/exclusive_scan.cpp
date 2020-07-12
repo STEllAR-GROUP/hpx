@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -22,7 +23,11 @@ void exclusive_scan_benchmark()
 {
     try
     {
+#if defined(HPX_DEBUG)
+        std::vector<double> c(1000000);
+#else
         std::vector<double> c(100000000);
+#endif
         std::vector<double> d(c.size());
         std::fill(std::begin(c), std::end(c), 1.0);
 
@@ -80,6 +85,12 @@ void test_exclusive_scan1(ExPolicy policy, IteratorTag)
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::exclusive_scan(std::begin(c), std::end(c), std::begin(f), val, op);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -95,9 +106,9 @@ void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
     std::size_t const val(0);
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
-    hpx::future<void> f = hpx::parallel::exclusive_scan(p,
+    hpx::future<void> fut = hpx::parallel::exclusive_scan(p,
         iterator(std::begin(c)), iterator(std::end(c)), std::begin(d), val, op);
-    f.wait();
+    fut.wait();
 
     // verify values
     std::vector<std::size_t> e(c.size());
@@ -105,6 +116,12 @@ void test_exclusive_scan1_async(ExPolicy p, IteratorTag)
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
+
+#if defined(HPX_HAVE_CXX17_STD_SCAN_ALGORITHMS)
+    std::vector<std::size_t> f(c.size());
+    std::exclusive_scan(std::begin(c), std::end(c), std::begin(f), val, op);
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
+#endif
 }
 
 template <typename IteratorTag>

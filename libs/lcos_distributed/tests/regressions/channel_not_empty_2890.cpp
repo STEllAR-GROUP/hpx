@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/local_lcos/channel.hpp>
+#include <hpx/lcos_local/channel.hpp>
 #include <hpx/modules/testing.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)

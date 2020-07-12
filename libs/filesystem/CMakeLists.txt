@@ -17,7 +17,7 @@ set(filesystem_compat_headers hpx/filesystem.hpp)
 
 include(HPX_AddModule)
 add_hpx_module(
-  filesystem FORCE_LINKING_GEN
+  filesystem
   GLOBAL_HEADER_GEN OFF
   COMPATIBILITY_HEADERS ON
   DEPRECATION_WARNINGS

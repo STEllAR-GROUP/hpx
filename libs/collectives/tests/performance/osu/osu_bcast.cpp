@@ -11,7 +11,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/local_lcos/and_gate.hpp>
+#include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/serialization/serializable_any.hpp>
 
 #include <cstddef>

@@ -9,7 +9,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/local_lcos/spmd_block.hpp>
+#include <hpx/lcos_local/spmd_block.hpp>
 
 #include <cstddef>
 #include <type_traits>

@@ -10,7 +10,7 @@
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/result_of.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/pack_traversal/pack_traversal.hpp>

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 

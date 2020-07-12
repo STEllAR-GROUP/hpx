@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/debugging/print.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/threading_base/print.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>

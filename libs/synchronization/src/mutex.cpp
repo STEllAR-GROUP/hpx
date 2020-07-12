@@ -7,9 +7,9 @@
 
 #include <hpx/synchronization/mutex.hpp>
 
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>

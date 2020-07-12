@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/executors/config/defines.hpp>
-#include <hpx/executors/sequenced_executor.hpp>
+#include <hpx/execution.hpp>
 
-#if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/parallel/executors/sequenced_executor.hpp is deprecated, \
-    please include hpx/executors/sequenced_executor.hpp instead")
+    please include hpx/execution.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/parallel/executors/sequenced_executor.hpp is deprecated, \
-    please include hpx/executors/sequenced_executor.hpp instead"
+    please include hpx/execution.hpp instead"
 #endif
 #endif

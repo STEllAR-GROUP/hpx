@@ -31,7 +31,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 
 // include unist.d conditionally to check for POSIX version. Not all OSs have the
 // unistd header...

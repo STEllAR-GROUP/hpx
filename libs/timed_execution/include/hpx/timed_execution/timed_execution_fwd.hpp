@@ -10,8 +10,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/execution.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution_base/execution.hpp>
 #include <hpx/timed_execution/timed_executors.hpp>
 
 #include <type_traits>

@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/config/defines.hpp>
-#include <hpx/concurrency/spinlock.hpp>
+#include <hpx/modules/concurrency.hpp>
 
-#if defined(HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CONCURRENCY_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/spinlock.hpp is deprecated, \
-    please include hpx/concurrency/spinlock.hpp instead")
+    please include hpx/modules/concurrency.hpp instead")
 #else
 #warning "The header hpx/util/spinlock.hpp is deprecated, \
-    please include hpx/concurrency/spinlock.hpp instead"
+    please include hpx/modules/concurrency.hpp instead"
 #endif
 #endif

@@ -7,7 +7,7 @@
 #include <hpx/program_options/config.hpp>
 
 #if !defined(HPX_PROGRAM_OPTIONS_HAVE_BOOST_PROGRAM_OPTIONS_COMPATIBILITY)
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/program_options/detail/config_file.hpp>
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/errors.hpp>

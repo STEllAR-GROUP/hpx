@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/condition_variable.hpp>

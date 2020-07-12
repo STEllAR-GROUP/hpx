@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/format/config/defines.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/format.hpp>
 
-#if defined(HPX_FORMAT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_FORMAT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/format.hpp is deprecated,                             \

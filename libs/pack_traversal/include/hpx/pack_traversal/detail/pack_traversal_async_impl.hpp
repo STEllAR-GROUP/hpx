@@ -8,12 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>

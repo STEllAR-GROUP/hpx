@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/cache/config/defines.hpp>
-#include <hpx/cache/lru_cache.hpp>
+#include <hpx/modules/cache.hpp>
 
-#if defined(HPX_CACHE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_CACHE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/cache/lru_cache.hpp is deprecated, \
-    please include hpx/cache/lru_cache.hpp instead")
+    please include hpx/modules/cache.hpp instead")
 #else
 #warning "The header hpx/util/cache/lru_cache.hpp is deprecated, \
-    please include hpx/cache/lru_cache.hpp instead"
+    please include hpx/modules/cache.hpp instead"
 #endif
 #endif

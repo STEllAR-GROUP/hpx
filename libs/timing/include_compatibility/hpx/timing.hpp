@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/timing/config/defines.hpp>
-#include <hpx/modules/timing.hpp>
+#include <hpx/chrono.hpp>
 
-#if defined(HPX_TIMING_HAVE_DEPRECATION_WARNINGS)
+#if HPX_TIMING_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/timing.hpp is deprecated, \
-    please include hpx/modules/timing.hpp instead")
+    please include hpx/chrono.hpp instead")
 #else
 #warning "The header hpx/timing.hpp is deprecated, \
-    please include hpx/modules/timing.hpp instead"
+    please include hpx/chrono.hpp instead"
 #endif
 #endif

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/components/component_type.hpp>

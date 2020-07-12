@@ -41,7 +41,7 @@ include(HPX_AddModule)
 add_hpx_module(
   compute
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${compute_sources}
   HEADERS ${compute_headers}
@@ -80,4 +80,4 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 # Temporary since the module still depends on some runtime files
-target_link_libraries(hpx_compute PUBLIC hpx_static_reinit hpx_local_lcos)
+target_link_libraries(hpx_compute PUBLIC hpx_static_reinit hpx_lcos_local)

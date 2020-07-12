@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors/config/defines.hpp>
-#include <hpx/errors/throw_exception.hpp>
+#include <hpx/exception.hpp>
 
-#if defined(HPX_ERRORS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ERRORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/throw_exception.hpp is deprecated, \
-    please include hpx/errors/throw_exception.hpp instead")
+    please include hpx/exception.hpp instead")
 #else
 #warning "The header hpx/throw_exception.hpp is deprecated, \
-    please include hpx/errors/throw_exception.hpp instead"
+    please include hpx/exception.hpp instead"
 #endif
 #endif

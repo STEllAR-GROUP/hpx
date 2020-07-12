@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
@@ -153,7 +153,7 @@ namespace hpx { namespace util {
             {
                 std::cerr
                     << "hpx::init: command line warning: file specified using "
-                       "--hpx::config does not exist ("
+                       "--hpx:config does not exist ("
                     << hpx_ini_file << ")." << std::endl;
                 hpx_ini_file.clear();
                 result = false;

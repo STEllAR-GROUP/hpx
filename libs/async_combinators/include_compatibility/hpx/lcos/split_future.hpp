@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/config/defines.hpp>
-#include <hpx/async_combinators/split_future.hpp>
+#include <hpx/future.hpp>
 
-#if defined(HPX_ASYNC_COMBINATORS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ASYNC_COMBINATORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/split_future.hpp is deprecated, \
-    please include hpx/async_combinators/split_future.hpp instead")
+    please include hpx/future.hpp instead")
 #else
 #warning "The header hpx/lcos/split_future.hpp is deprecated, \
-    please include hpx/async_combinators/split_future.hpp instead"
+    please include hpx/future.hpp instead"
 #endif
 #endif

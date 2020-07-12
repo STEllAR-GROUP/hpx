@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/basic_execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/synchronization/mutex.hpp>

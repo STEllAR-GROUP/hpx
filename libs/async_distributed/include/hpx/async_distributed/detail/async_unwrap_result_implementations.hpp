@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp>
@@ -14,7 +15,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/lcos/packaged_action.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/runtime/naming/address.hpp>

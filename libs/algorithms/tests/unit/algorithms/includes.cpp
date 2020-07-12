@@ -9,6 +9,9 @@
 #include <hpx/include/parallel_set_operations.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <boost/next_prior.hpp>
+#include <boost/utility.hpp>
+
 #include <cstddef>
 #include <iostream>
 #include <iterator>

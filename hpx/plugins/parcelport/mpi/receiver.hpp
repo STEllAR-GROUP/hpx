@@ -12,7 +12,7 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/plugins/parcelport/mpi/receiver_connection.hpp>
 

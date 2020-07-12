@@ -22,7 +22,6 @@ constexpr char const* all_gather_direct_basename = "/test/all_gather_direct/";
 int hpx_main(int argc, char* argv[])
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    HPX_TEST(num_localities >= 2);
 
     // test functionality based on future<> of local result
     for (int i = 0; i != 10; ++i)

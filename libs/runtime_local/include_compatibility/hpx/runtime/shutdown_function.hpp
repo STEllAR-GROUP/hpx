@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime_local/config/defines.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime.hpp>
 
-#if defined(HPX_RUNTIME_LOCAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_RUNTIME_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/runtime/shutdown_function.hpp \
-    is deprecated, please include hpx/runtime_local/shutdown_function.hpp instead")
+    is deprecated, please include hpx/runtime.hpp instead")
 #else
 #warning "The header hpx/runtime/shutdown_function.hpp \
-    is deprecated, please include hpx/runtime_local/shutdown_function.hpp instead"
+    is deprecated, please include hpx/runtime.hpp instead"
 #endif
 #endif

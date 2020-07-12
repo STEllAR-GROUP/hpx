@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(add_hpx_test category name)
-  set(options FAILURE_EXPECTED)
+  set(options FAILURE_EXPECTED RUN_SERIAL)
   set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY)
   set(multi_value_args ARGS PARCELPORTS)
   cmake_parse_arguments(
@@ -43,6 +43,15 @@ function(add_hpx_test category name)
     set(expected "1")
   endif()
 
+  if(${name}_RUN_SERIAL)
+    set(run_serial TRUE)
+  endif()
+
+  # If --hpx:threads=cores or all
+  if(${name}_THREADS_PER_LOCALITY LESS_EQUAL 0)
+    set(run_serial TRUE)
+  endif()
+
   set(args)
 
   foreach(arg ${${name}_UNPARSED_ARGUMENTS})
@@ -53,6 +62,13 @@ function(add_hpx_test category name)
     set(args ${args}
              "--hpx:debug-hpx-log=${HPX_WITH_TESTS_DEBUG_LOG_DESTINATION}"
     )
+  endif()
+
+  if(${HPX_WITH_PARALLEL_TESTS_BIND_NONE}
+     AND NOT run_serial
+     AND ${name}_LOCALITIES STREQUAL "1"
+  )
+    set(args ${args} "--hpx:bind=none")
   endif()
 
   if(HPX_WITH_INSTALLED_VERSION)
@@ -78,7 +94,11 @@ function(add_hpx_test category name)
   endif()
 
   if(${name}_LOCALITIES STREQUAL "1")
+    set(_full_name "${category}.${name}")
     add_test(NAME "${category}.${name}" COMMAND ${cmd} ${args})
+    if(${run_serial})
+      set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+    endif()
   else()
     if(HPX_WITH_PARCELPORT_VERBS)
       set(_add_test FALSE)
@@ -92,26 +112,9 @@ function(add_hpx_test category name)
         set(_add_test TRUE)
       endif()
       if(_add_test)
-        add_test(NAME "${category}.distributed.verbs.${name}"
-                 COMMAND ${cmd} "-p" "verbs" ${args}
-        )
-      endif()
-    endif()
-    if(HPX_WITH_PARCELPORT_IPC)
-      set(_add_test FALSE)
-      if(DEFINED ${name}_PARCELPORTS)
-        set(PP_FOUND -1)
-        list(FIND ${name}_PARCELPORTS "ipc" PP_FOUND)
-        if(NOT PP_FOUND EQUAL -1)
-          set(_add_test TRUE)
-        endif()
-      else()
-        set(_add_test TRUE)
-      endif()
-      if(_add_test)
-        add_test(NAME "${category}.distributed.ipc.${name}"
-                 COMMAND ${cmd} "-p" "ipc" ${args}
-        )
+        set(_full_name "${category}.distributed.verbs.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "verbs" ${args})
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
       endif()
     endif()
     if(HPX_WITH_PARCELPORT_MPI)
@@ -126,9 +129,11 @@ function(add_hpx_test category name)
         set(_add_test TRUE)
       endif()
       if(_add_test)
-        add_test(NAME "${category}.distributed.mpi.${name}"
-                 COMMAND ${cmd} "-p" "mpi" "-r" "mpi" ${args}
+        set(_full_name "${category}.distributed.mpi.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "mpi" "-r" "mpi"
+                                              ${args}
         )
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
       endif()
     endif()
     if(HPX_WITH_PARCELPORT_TCP)
@@ -143,9 +148,9 @@ function(add_hpx_test category name)
         set(_add_test TRUE)
       endif()
       if(_add_test)
-        add_test(NAME "${category}.distributed.tcp.${name}"
-                 COMMAND ${cmd} "-p" "tcp" ${args}
-        )
+        set(_full_name "${category}.distributed.tcp.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "tcp" ${args})
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
       endif()
     endif()
   endif()
@@ -199,7 +204,9 @@ function(add_hpx_regression_test subcategory name)
 endfunction(add_hpx_regression_test)
 
 function(add_hpx_performance_test subcategory name)
-  add_test_and_deps_test("performance" "${subcategory}" ${name} ${ARGN})
+  add_test_and_deps_test(
+    "performance" "${subcategory}" ${name} ${ARGN} RUN_SERIAL
+  )
 endfunction(add_hpx_performance_test)
 
 function(add_hpx_example_test subcategory name)

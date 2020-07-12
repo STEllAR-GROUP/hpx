@@ -7,14 +7,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assert.hpp>
 #include <hpx/functional/detail/basic_function.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/modules/itt_notify.hpp>
 
 #include <cstddef>

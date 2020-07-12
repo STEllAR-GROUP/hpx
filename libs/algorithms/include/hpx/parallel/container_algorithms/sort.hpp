@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel { inline namespace rangev1 {
     /// Sorts the elements in the range \a rng  in ascending order. The
     /// order of equal elements is not guaranteed to be preserved. The function
     /// uses the given comparison function object comp (defaults to using
@@ -83,21 +83,27 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           \a parallel_task_policy and returns \a Iter
     ///           otherwise.
     ///           It returns \a last.
+    // clang-format off
     template <typename ExPolicy, typename Rng,
+        typename Compare = v1::detail::less,
         typename Proj = util::projection_identity,
-        typename Compare = detail::less,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&& traits::is_projected_range<
-                    Proj, Rng>::value&& traits::is_indirect_callable<ExPolicy,
-                    Compare, traits::projected_range<Proj, Rng>,
-                    traits::projected_range<Proj, Rng>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_range<Rng>::value &&
+            traits::is_projected_range<Proj, Rng>::value &&
+            traits::is_indirect_callable<ExPolicy, Compare,
+                traits::projected_range<Proj, Rng>,
+                traits::projected_range<Proj, Rng>
+            >::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     sort(ExPolicy&& policy, Rng&& rng, Compare&& comp = Compare(),
         Proj&& proj = Proj())
     {
-        return sort(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+        return v1::sort(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
             hpx::util::end(rng), std::forward<Compare>(comp),
             std::forward<Proj>(proj));
     }
-}}}    // namespace hpx::parallel::v1
+}}}    // namespace hpx::parallel::rangev1

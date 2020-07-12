@@ -15,10 +15,10 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #endif
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -578,10 +578,9 @@ namespace hpx { namespace parallel { inline namespace v2 {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename S, typename... Args,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value &&
-            (hpx::traits::is_iterator<I>::value ||
-                std::is_integral<I>::value) &&
-            std::is_integral<S>::value)>
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                                  std::is_integral<S>::value &&
+            (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
     typename util::detail::algorithm_result<ExPolicy>::type for_loop_strided(
         ExPolicy&& policy, typename std::decay<I>::type first, I last, S stride,
         Args&&... args)
@@ -679,9 +678,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
     /// Remarks: If \a f returns a result, the result is ignored.
     ///
     template <typename I, typename S, typename... Args,
-        HPX_CONCEPT_REQUIRES_((hpx::traits::is_iterator<I>::value ||
-                                  std::is_integral<I>::value) &&
-            std::is_integral<S>::value)>
+        HPX_CONCEPT_REQUIRES_(std::is_integral<S>::value &&
+            (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
     void for_loop_strided(
         typename std::decay<I>::type first, I last, S stride, Args&&... args)
     {
@@ -781,10 +779,9 @@ namespace hpx { namespace parallel { inline namespace v2 {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename... Args,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value &&
-            (hpx::traits::is_iterator<I>::value ||
-                std::is_integral<I>::value) &&
-            std::is_integral<Size>::value)>
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                                  std::is_integral<Size>::value &&
+            (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
     typename util::detail::algorithm_result<ExPolicy>::type for_loop_n(
         ExPolicy&& policy, I first, Size size, Args&&... args)
     {
@@ -877,9 +874,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
     /// Remarks: If \a f returns a result, the result is ignored.
     ///
     template <typename I, typename Size, typename... Args,
-        HPX_CONCEPT_REQUIRES_((hpx::traits::is_iterator<I>::value ||
-                                  std::is_integral<I>::value) &&
-            std::is_integral<Size>::value)>
+        HPX_CONCEPT_REQUIRES_(std::is_integral<Size>::value &&
+            (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
     void for_loop_n(I first, Size size, Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,
@@ -985,10 +981,10 @@ namespace hpx { namespace parallel { inline namespace v2 {
     ///
     template <typename ExPolicy, typename I, typename Size, typename S,
         typename... Args,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value &&
-            (hpx::traits::is_iterator<I>::value ||
-                std::is_integral<I>::value) &&
-            std::is_integral<Size>::value && std::is_integral<S>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value&&
+                std::is_integral<Size>::value&& std::is_integral<S>::value &&
+            (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
     typename util::detail::algorithm_result<ExPolicy>::type for_loop_n_strided(
         ExPolicy&& policy, I first, Size size, S stride, Args&&... args)
     {
@@ -1088,9 +1084,9 @@ namespace hpx { namespace parallel { inline namespace v2 {
     /// Remarks: If \a f returns a result, the result is ignored.
     ///
     template <typename I, typename Size, typename S, typename... Args,
-        HPX_CONCEPT_REQUIRES_((hpx::traits::is_iterator<I>::value ||
-                                  std::is_integral<I>::value) &&
-            std::is_integral<Size>::value && std::is_integral<S>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            std::is_integral<Size>::value&& std::is_integral<S>::value &&
+            (hpx::traits::is_iterator<I>::value || std::is_integral<I>::value))>
     void for_loop_n_strided(I first, Size size, S stride, Args&&... args)
     {
         static_assert(sizeof...(Args) >= 1,

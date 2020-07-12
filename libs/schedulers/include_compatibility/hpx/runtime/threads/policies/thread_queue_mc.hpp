@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/schedulers/config/defines.hpp>
-#include <hpx/schedulers/thread_queue_mc.hpp>
+#include <hpx/modules/schedulers.hpp>
 
-#if defined(HPX_SCHEDULERS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_SCHEDULERS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/policies/thread_queue_mc.hpp is deprecated, \
-    please include hpx/schedulers/thread_queue_mc.hpp instead")
+    please include hpx/modules/schedulers.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/policies/thread_queue_mc.hpp is deprecated, \
-    please include hpx/schedulers/thread_queue_mc.hpp instead"
+    please include hpx/modules/schedulers.hpp instead"
 #endif
 #endif

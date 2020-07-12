@@ -24,8 +24,8 @@ include(HPX_AddModule)
 add_hpx_module(
   static_reinit
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
-  GLOBAL_HEADER_GEN OFF
+  DEPRECATION_WARNINGS
+  GLOBAL_HEADER_GEN ON
   SOURCES ${static_reinit_sources}
   HEADERS ${static_reinit_headers}
   COMPAT_HEADERS ${static_reinit_compat_headers}

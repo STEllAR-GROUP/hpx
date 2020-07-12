@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/debugging/config/defines.hpp>
-#include <hpx/debugging/demangle_helper.hpp>
+#include <hpx/modules/debugging.hpp>
 
-#if defined(HPX_DEBUGGING_HAVE_DEPRECATION_WARNINGS)
+#if HPX_DEBUGGING_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/debug/demangle_helper.hpp is deprecated, \
-    please include hpx/debugging/demangle_helper.hpp instead")
+    please include hpx/modules/debugging.hpp instead")
 #else
 #warning "The header hpx/util/debug/demangle_helper.hpp is deprecated, \
-    please include hpx/debugging/demangle_helper.hpp instead"
+    please include hpx/modules/debugging.hpp instead"
 #endif
 #endif

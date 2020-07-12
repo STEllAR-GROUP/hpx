@@ -86,7 +86,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         [](int a, int b) { return a + 3.0 * b; });
 
     // define execution targets (here device 0), allows overlapping operations
-    hpx::compute::cuda::target targetA, targetB;
+    hpx::cuda::target targetA, targetB;
 
     // allocate data on the device
     target_allocator allocA(targetA);

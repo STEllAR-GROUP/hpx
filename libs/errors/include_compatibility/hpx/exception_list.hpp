@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors/config/defines.hpp>
-#include <hpx/errors/exception_list.hpp>
+#include <hpx/modules/errors.hpp>
 
-#if defined(HPX_ERRORS_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ERRORS_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/exception_list.hpp is deprecated, \
-    please include hpx/errors/exception_list.hpp instead")
+    please include hpx/modules/errors.hpp instead")
 #else
 #warning "The header hpx/exception_list.hpp is deprecated, \
-    please include hpx/errors/exception_list.hpp instead"
+    please include hpx/modules/errors.hpp instead"
 #endif
 #endif

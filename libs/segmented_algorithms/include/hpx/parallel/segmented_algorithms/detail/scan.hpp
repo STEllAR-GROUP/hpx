@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -311,7 +312,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename OutIter, typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_scan_seq(ExPolicy const& policy, SegIter first, SegIter last,
-            OutIter dest, T const& init, Op&& op, std::true_type, Conv&& conv)
+            OutIter dest, Conv&& conv, T const& init, Op&& op, std::true_type)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -409,8 +410,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // segment
                 dispatch(traits_out::get_id(out_iters[i]),
                     segmented_scan_void<Algo>(), policy, std::true_type(),
-                    get<0>(in_iters[i]), get<1>(in_iters[i]), out, last_value,
-                    std::forward<Op>(op), std::forward<Conv>(conv));
+                    get<0>(in_iters[i]), get<1>(in_iters[i]), out,
+                    std::forward<Conv>(conv), last_value, std::forward<Op>(op));
 
                 // 3. Step: compute new init values for the next segment
                 last_value = op(results[i], last_value);
@@ -511,7 +512,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typename OutIter, typename T, typename Op, typename Conv>
         static typename util::detail::algorithm_result<ExPolicy, OutIter>::type
         segmented_scan_par(ExPolicy const& policy, SegIter first, SegIter last,
-            OutIter dest, T const& init, Op&& op, std::true_type, Conv&& conv)
+            OutIter dest, Conv&& conv, T const& init, Op&& op, std::true_type)
         {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
@@ -639,8 +640,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             dispatch(traits_out::get_id(out_it),
                                 segmented_scan_void<Algo>(),
                                 hpx::parallel::execution::seq, std::true_type(),
-                                get<0>(in_tuple), get<1>(in_tuple), out,
-                                last_value, op, conv);
+                                get<0>(in_tuple), get<1>(in_tuple), out, conv,
+                                last_value, op);
                         }),
                     workitems.back(), res));
 

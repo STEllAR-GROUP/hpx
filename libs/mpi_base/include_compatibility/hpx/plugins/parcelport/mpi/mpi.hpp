@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/mpi_base/config/defines.hpp>
-#include <hpx/mpi_base/mpi.hpp>
+#include <hpx/modules/mpi_base.hpp>
 
-#if defined(HPX_MPI_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_MPI_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/plugins/parcelport/mpi/mpi.hpp is deprecated, \
-    please include hpx/mpi_base/mpi.hpp instead")
+    please include hpx/modules/mpi_base.hpp instead")
 #else
 #warning "The header hpx/plugins/parcelport/mpi/mpi.hpp is deprecated, \
-    please include hpx/mpi_base/mpi.hpp instead"
+    please include hpx/modules/mpi_base.hpp instead"
 #endif
 #endif

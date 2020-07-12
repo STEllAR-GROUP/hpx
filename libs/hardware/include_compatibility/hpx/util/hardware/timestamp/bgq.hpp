@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hardware/config/defines.hpp>
-#include <hpx/hardware/timestamp/bgq.hpp>
+#include <hpx/modules/hardware.hpp>
 
-#if defined(HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_HARDWARE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/util/hardware/timestamp/bgq.hpp is deprecated,             \
-    please include hpx/hardware/timestamp/bgq.hpp instead")
+    please include hpx/modules/hardware.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/util/hardware/timestamp/bgq.hpp is deprecated,             \
-    please include hpx/hardware/timestamp/bgq.hpp instead"
+    please include hpx/modules/hardware.hpp instead"
 #endif
 #endif

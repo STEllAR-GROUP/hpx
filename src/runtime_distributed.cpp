@@ -7,27 +7,28 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/async_distributed/apply.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -36,7 +37,6 @@
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime/find_localities.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -44,24 +44,24 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/threads/threadmanager_counters.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/runtime_local/debugging.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/runtime_local/thread_hooks.hpp>
+#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/state.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
-#include <hpx/modules/threadmanager.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/modules/topology.hpp>
-#include <hpx/runtime_local/debugging.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/query_counters.hpp>
-#include <hpx/util/static_reinit.hpp>
-#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -293,10 +293,12 @@ namespace hpx {
         }
 
         ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
         void dijkstra_make_black()
         {
             get_runtime_support_ptr()->dijkstra_make_black();
         }
+#endif
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
@@ -305,6 +307,8 @@ namespace hpx {
             std::int64_t& background_work_exec_time_receive)
         {
             bool result = false;
+
+#if defined(HPX_HAVE_NETWORKING)
             // count background work duration
             {
                 threads::background_work_duration_counter bg_send_duration(
@@ -331,6 +335,7 @@ namespace hpx {
                     result = true;
                 }
             }
+#endif
 
             if (0 == num_thread)
                 hpx::agas::garbage_collect_non_blocking();
@@ -397,10 +402,6 @@ namespace hpx {
         // This needs to happen first
         runtime::init();
 
-        counters_ = std::make_shared<performance_counters::registry>();
-
-        LPROGRESS_;
-
         runtime_distributed*& runtime_distributed_ =
             get_runtime_distributed_ptr();
         if (nullptr == runtime_distributed_)
@@ -409,6 +410,10 @@ namespace hpx {
 
             runtime_distributed_ = this;
         }
+
+        LPROGRESS_;
+
+        counters_ = std::make_shared<performance_counters::registry>();
 
 #if defined(HPX_HAVE_NETWORKING)
         agas_client_.bootstrap(parcel_handler_, ini_);

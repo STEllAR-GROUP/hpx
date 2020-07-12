@@ -4,10 +4,11 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests for_each_value_proxy parallel_fill_4132)
+set(tests for_each_value_proxy)
+set(tests ${tests} parallel_fill_4132)
 
 set(for_each_value_proxy_PARAMETERS THREADS_PER_LOCALITY 4)
-set(parallel_fill_4132_PARAMETERS THREADS_PER_LOCALITY 4)
+set(parallel_fill_4132_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

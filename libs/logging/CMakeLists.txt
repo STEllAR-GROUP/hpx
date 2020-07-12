@@ -28,10 +28,6 @@ set(logging_compat_headers
     hpx/util/logging.hpp
     hpx/util/logging/writer/format_write.hpp
     hpx/util/logging/writer/named_write.hpp
-    hpx/util/logging/detail/macros.hpp
-    hpx/util/logging/detail/level.hpp
-    hpx/util/logging/detail/manipulator.hpp
-    hpx/util/logging/detail/logger.hpp
     hpx/util/logging/logging.hpp
     hpx/util/logging/format/formatter/high_precision_time.hpp
     hpx/util/logging/format/formatter/defaults.hpp
@@ -48,19 +44,18 @@ set(logging_sources
     logging.cpp
     manipulator.cpp
     format/named_write.cpp
-    format/destination/defaults.cpp
+    format/destination/defaults_destination.cpp
     format/destination/file.cpp
     format/formatter/high_precision_time.cpp
-    format/formatter/defaults.cpp
+    format/formatter/defaults_formatter.cpp
     format/formatter/thread_id.cpp
-    format/named_write.cpp
 )
 
 include(HPX_AddModule)
 add_hpx_module(
   logging
   COMPATIBILITY_HEADERS ON
-  DEPRECATION_WARNINGS FORCE_LINKING_GEN
+  DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   SOURCES ${logging_sources}
   HEADERS ${logging_headers}

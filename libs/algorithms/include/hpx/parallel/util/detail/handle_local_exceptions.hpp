@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>

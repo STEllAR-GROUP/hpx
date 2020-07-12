@@ -27,7 +27,6 @@ set(synchronization_headers
     hpx/synchronization/channel_mpmc.hpp
     hpx/synchronization/channel_mpsc.hpp
     hpx/synchronization/channel_spsc.hpp
-    hpx/synchronization/force_linking.hpp
     hpx/synchronization/latch.hpp
     hpx/synchronization/mutex.hpp
     hpx/synchronization/no_mutex.hpp
@@ -46,9 +45,6 @@ set(synchronization_compat_headers
     hpx/lcos/local/barrier.hpp
     hpx/lcos/local/condition_variable.hpp
     hpx/lcos/local/counting_semaphore.hpp
-    hpx/lcos/local/detail/condition_variable.hpp
-    hpx/lcos/local/detail/counting_semaphore.hpp
-    hpx/lcos/local/detail/sliding_semaphore.hpp
     hpx/lcos/local/event.hpp
     hpx/lcos/local/latch.hpp
     hpx/lcos/local/mutex.hpp
@@ -63,8 +59,8 @@ set(synchronization_compat_headers
     hpx/synchronization.hpp
 )
 
-set(synchronization_sources detail/condition_variable.cpp force_linking.cpp
-                            local_barrier.cpp mutex.cpp stop_token.cpp
+set(synchronization_sources detail/condition_variable.cpp local_barrier.cpp
+                            mutex.cpp stop_token.cpp
 )
 
 include(HPX_AddModule)
@@ -79,12 +75,13 @@ add_hpx_module(
   DEPENDENCIES
     hpx_config
     hpx_assertion
-    hpx_basic_execution
+    hpx_execution_base
     hpx_concurrency
     hpx_coroutines
     hpx_errors
     hpx_functional
     hpx_hashing
+    hpx_itt_notify
     hpx_memory
     hpx_logging
     hpx_memory

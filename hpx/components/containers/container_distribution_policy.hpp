@@ -11,7 +11,7 @@
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/shared_ptr.hpp>
 #include <hpx/serialization/vector.hpp>

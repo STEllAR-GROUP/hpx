@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/config/defines.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
+#include <hpx/execution.hpp>
 
-#if defined(HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS)
+#if HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/traits/executor_traits.hpp is deprecated, \
-    please include hpx/execution/traits/executor_traits.hpp instead")
+    please include hpx/execution.hpp instead")
 #else
 #warning "The header hpx/traits/executor_traits.hpp is deprecated, \
-    please include hpx/execution/traits/executor_traits.hpp instead"
+    please include hpx/execution.hpp instead"
 #endif
 #endif

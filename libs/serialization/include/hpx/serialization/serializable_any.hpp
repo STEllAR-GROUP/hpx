@@ -16,9 +16,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/detail/raw_ptr.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -426,9 +426,6 @@ namespace hpx { namespace util {
         HPX_EXPORT std::size_t
         operator()(const basic_any<serialization::input_archive,
             serialization::output_archive, Char, std::true_type>& elem) const;
-
-        // this is just to force linking with serializable_any.cpp
-        HPX_EXPORT static void dummy();
     };
 }}    // namespace hpx::util
 

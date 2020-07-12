@@ -8,16 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/threading_base/config/defines.hpp>
-#include <hpx/threading_base/thread_data_stackful.hpp>
+#include <hpx/modules/threading_base.hpp>
 
-#if defined(HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_DATA_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/runtime/threads/thread_data_stackful.hpp is deprecated, \
-    please include hpx/threading_base/thread_data_stackful.hpp instead")
+    please include hpx/modules/threading_base.hpp instead")
 #else
 #warning                                                                       \
     "The header hpx/runtime/threads/thread_data_stackful.hpp is deprecated, \
-    please include hpx/threading_base/thread_data_stackful.hpp instead"
+    please include hpx/modules/threading_base.hpp instead"
 #endif
 #endif

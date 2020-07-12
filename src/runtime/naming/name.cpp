@@ -8,7 +8,8 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/modules/checkpoint_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/functional/bind.hpp>
@@ -264,7 +265,7 @@ namespace hpx { namespace naming
             }
 
             // we should not call this function during check-pointing operations
-            if (ar.try_get_extra_data<checkpointing_tag>() != nullptr)
+            if (ar.try_get_extra_data<util::checkpointing_tag>() != nullptr)
             {
                 // this is a check-pointing operation, we do not support this
                 HPX_THROW_EXCEPTION(invalid_status,
@@ -552,7 +553,7 @@ namespace hpx { namespace naming
             id_type_management type = type_;
 
             if (unmanaged != type_ &&
-                ar.try_get_extra_data<checkpointing_tag>() != nullptr)
+                ar.try_get_extra_data<util::checkpointing_tag>() != nullptr)
             {
                 // this is a check-pointing operation, we do not support this
                 HPX_THROW_EXCEPTION(invalid_status,

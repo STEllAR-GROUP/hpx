@@ -1,9 +1,21 @@
-# Copyright (c) 2014-2015 Hartmut Kaiser
+# Copyright (c) 2014-2020 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# add subdirectories
+set(subdirs detail util)
+
+foreach(subdir ${subdirs})
+  add_hpx_pseudo_target(tests.unit.modules.algorithms.${subdir})
+  add_subdirectory(${subdir})
+  add_hpx_pseudo_dependencies(
+    tests.unit.modules.algorithms tests.unit.modules.algorithms.${subdir}
+  )
+endforeach()
+
+# add tests
 set(tests
     adjacentdifference
     adjacentdifference_exception
@@ -26,6 +38,7 @@ set(tests
     countif
     destroy
     destroyn
+    distance
     equal
     equal_binary
     exclusive_scan
@@ -81,6 +94,7 @@ set(tests
     mismatch_binary
     move
     none_of
+    parallel_sort
     partition
     partition_copy
     reduce_
@@ -110,6 +124,8 @@ set(tests
     sort_by_key
     sort_exceptions
     stable_partition
+    stable_sort
+    stable_sort_exceptions
     swapranges
     transform
     transform_binary

@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/asio/config/defines.hpp>
-#include <hpx/asio/map_hostnames.hpp>
+#include <hpx/modules/asio.hpp>
 
-#if defined(HPX_ASIO_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ASIO_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/map_hostnames.hpp is deprecated, \
-    please include hpx/asio/map_hostnames.hpp instead")
+    please include hpx/modules/asio.hpp instead")
 #else
 #warning "The header hpx/util/map_hostnames.hpp is deprecated, \
-    please include hpx/asio/map_hostnames.hpp instead"
+    please include hpx/modules/asio.hpp instead"
 #endif
 #endif

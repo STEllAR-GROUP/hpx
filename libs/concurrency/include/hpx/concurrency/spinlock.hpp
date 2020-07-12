@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/itt_notify.hpp>
 
 #include <boost/smart_ptr/detail/spinlock.hpp>

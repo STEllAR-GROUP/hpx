@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/modules/assertion.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

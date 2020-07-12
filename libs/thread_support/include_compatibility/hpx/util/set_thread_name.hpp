@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/thread_support/config/defines.hpp>
-#include <hpx/thread_support/set_thread_name.hpp>
+#include <hpx/modules/thread_support.hpp>
 
-#if defined(HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS)
+#if HPX_THREAD_SUPPORT_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/util/set_thread_name.hpp is deprecated, \
-    please include hpx/thread_support/set_thread_name.hpp instead")
+    please include hpx/modules/thread_support.hpp instead")
 #else
 #warning "The header hpx/util/set_thread_name.hpp is deprecated, \
-    please include hpx/thread_support/set_thread_name.hpp instead"
+    please include hpx/modules/thread_support.hpp instead"
 #endif
 #endif

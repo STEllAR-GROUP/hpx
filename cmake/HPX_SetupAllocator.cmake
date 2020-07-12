@@ -52,7 +52,9 @@ if(NOT TARGET hpx_dependencies_allocator)
       )
 
       if(MSVC)
-        hpx_add_link_flag_if_available(/INCLUDE:__tcmalloc)
+        target_compile_options(
+          hpx_dependencies_allocator INTERFACE /INCLUDE:__tcmalloc
+        )
       endif()
       set(_use_custom_allocator TRUE)
     endif()
@@ -83,7 +85,9 @@ if(NOT TARGET hpx_dependencies_allocator)
       target_link_libraries(hpx_dependencies_allocator INTERFACE mimalloc)
       set(hpx_MALLOC_LIBRARY mimalloc)
       if(MSVC)
-        hpx_add_link_flag_if_available(/INCLUDE:mi_version)
+        target_compile_options(
+          hpx_dependencies_allocator INTERFACE /INCLUDE:mi_version
+        )
       endif()
       set(_use_custom_allocator TRUE)
     endif()
@@ -96,7 +100,9 @@ if(NOT TARGET hpx_dependencies_allocator)
         hpx_error(${allocator_error})
       endif()
       if(MSVC)
-        hpx_add_link_flag_if_available(/INCLUDE:__TBB_malloc_proxy)
+        target_compile_options(
+          hpx_dependencies_allocator INTERFACE /INCLUDE:__TBB_malloc_proxy
+        )
       endif()
       target_link_libraries(
         hpx_dependencies_allocator INTERFACE ${TBBMALLOC_LIBRARY}

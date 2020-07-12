@@ -121,9 +121,10 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_combinators/when_any.hpp>
-#include <hpx/basic_execution/this_thread.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
@@ -132,7 +133,6 @@ namespace hpx {
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/reserve.hpp>
@@ -249,7 +249,7 @@ namespace hpx { namespace lcos {
                             shared_state->set_on_completed(util::deferred_call(
                                 &when_any<Sequence>::on_future_ready,
                                 when_.shared_from_this(), idx_,
-                                hpx::basic_execution::this_thread::agent()));
+                                hpx::execution_base::this_thread::agent()));
                             ++idx_;
                             return;
                         }
@@ -312,14 +312,14 @@ namespace hpx { namespace lcos {
         {
         public:
             void on_future_ready(
-                std::size_t idx, hpx::basic_execution::agent_ref ctx)
+                std::size_t idx, hpx::execution_base::agent_ref ctx)
             {
                 std::size_t index_not_initialized =
                     when_any_result<Sequence>::index_error();
                 if (index_.compare_exchange_strong(index_not_initialized, idx))
                 {
                     // reactivate waiting thread only if it's not us
-                    if (ctx != hpx::basic_execution::this_thread::agent())
+                    if (ctx != hpx::execution_base::this_thread::agent())
                         ctx.resume();
                     else
                         goal_reached_on_calling_thread_ = true;
@@ -352,7 +352,7 @@ namespace hpx { namespace lcos {
                 if (!goal_reached_on_calling_thread_)
                 {
                     // wait for any of the futures to return to become ready
-                    hpx::basic_execution::this_thread::suspend(
+                    hpx::execution_base::this_thread::suspend(
                         "hpx::lcos::detail::when_any::operator()");
                 }
 

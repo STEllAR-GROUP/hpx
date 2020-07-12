@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
+if((HPX_WITH_CUDA_COMPUTE OR HPX_WITH_ASYNC_CUDA) AND NOT TARGET Cuda::cuda)
 
   find_package(CUDA REQUIRED)
   set(HPX_WITH_COMPUTE ON)
@@ -20,18 +20,11 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
   endif()
 
   add_library(Cuda::cuda INTERFACE IMPORTED)
+  target_include_directories(Cuda::cuda INTERFACE ${CUDA_INCLUDE_DIRS})
 
   if(NOT HPX_WITH_CUDA_CLANG)
     if(NOT MSVC)
-      target_link_directories(
-        Cuda::cuda INTERFACE ${CUDA_TOOLKIT_ROOT_DIR}/lib64
-      )
-      # set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG};-D_DEBUG;-O0;-g;-G)
-      # set(CUDA_NVCC_FLAGS_RELWITHDEBINFO
-      # ${CUDA_NVCC_FLAGS_RELWITHDEBINFO};-DNDEBUG;-O3;-g)
-      # set(CUDA_NVCC_FLAGS_MINSIZEREL
-      # ${CUDA_NVCC_FLAGS_MINSIZEREL};-DNDEBUG;-O1) set(CUDA_NVCC_FLAGS_RELEASE
-      # ${CUDA_NVCC_FLAGS_RELEASE};-DNDEBUG;-O3)
+      target_link_libraries(Cuda::cuda INTERFACE ${CUDA_LIBRARIES})
       set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-w)
     else()
       set(CUDA_PROPAGATE_HOST_FLAGS OFF)

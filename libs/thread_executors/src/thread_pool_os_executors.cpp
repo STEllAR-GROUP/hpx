@@ -20,12 +20,12 @@
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
 #include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #endif
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/unique_function.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
@@ -295,9 +295,6 @@ namespace hpx { namespace threads { namespace executors {
             num_threads, affinity_data, notifier))
     {
     }
-
-    // this is defined to force linking only
-    void local_priority_queue_os_executor::dummy() {}
 
 #if defined(HPX_HAVE_STATIC_PRIORITY_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////

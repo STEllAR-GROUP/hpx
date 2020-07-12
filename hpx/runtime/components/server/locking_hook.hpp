@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/basic_execution/register_locks.hpp>
+#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/get_lva.hpp>

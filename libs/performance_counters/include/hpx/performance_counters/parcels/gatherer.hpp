@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/modules/assertion.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>

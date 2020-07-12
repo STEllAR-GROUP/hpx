@@ -11,7 +11,7 @@
 // runtime*. This test fails if thread pools, schedulers etc. assume that the
 // global runtime (configuration, thread manager, etc.) always exists.
 
-#include <hpx/basic_execution/this_thread.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>

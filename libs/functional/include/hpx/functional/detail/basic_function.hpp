@@ -10,13 +10,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/functional/traits/is_callable.hpp>
-#include <hpx/modules/assertion.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 
 #include <cstddef>
 #include <cstring>
