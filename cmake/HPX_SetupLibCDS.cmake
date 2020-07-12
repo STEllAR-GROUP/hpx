@@ -21,7 +21,6 @@ if(HPX_WITH_LIBCDS AND NOT TARGET LibCDS::cds)
 
     set(LIBCDS_WITH_HPX ON CACHE INTERNAL "")
     set(LIBCDS_INSIDE_HPX ON CACHE INTERNAL "")
-#    set(WITH_TESTS ON CACHE INTERNAL "")
 
     FetchContent_Declare(libcds
 #            GIT_REPOSITORY https://github.com/khizmax/libcds
