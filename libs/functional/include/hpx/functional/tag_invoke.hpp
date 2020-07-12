@@ -25,15 +25,10 @@ namespace hpx { namespace functional {
         /// Defining a new customization point `foo`:
         /// ```
         /// namespace mylib {
-        ///     inline constexpr struct foo_fn {
-        ///         template <typename T>
-        ///         constexpr auto operator()(T&& x) const
-        ///         noexcept(hpx::functional::tag_invoke(*this, std::forward<T>(x)))
-        ///         -> decltype(hpx::functional::tag_invoke(*this,  std::forward<T>(x)))
+        ///     inline constexpr
+        ///         struct foo_fn final : hpx::functional::tag<foo_fn>
         ///         {
-        ///             return hpx::functional::tag_invoke(*this,  std::forward<T>(x));
-        ///         }
-        ///     } foo{};
+        ///         } foo{};
         /// }
         /// ```
         ///
@@ -89,6 +84,11 @@ namespace hpx { namespace functional {
     /// `hpx::functional::tag_invoke_result_t<Tag, Args...>::type`
     template <typename Tag, typename... Args>
     using tag_invoke_result_t = typename tag_invoke_result<Tag, Args...>::type;
+
+    /// `hpx::functional::tag<Tag>` defines a base class that implements
+    /// the necessary tag dispatching functionality for a given type `Tag`
+    template <typename Tag>
+    struct tag;
 }}    // namespace hpx::functional
 #else
 
@@ -185,6 +185,20 @@ namespace hpx { namespace functional {
 
     template <typename Tag, typename... Args>
     using tag_invoke_result_t = typename tag_invoke_result<Tag, Args...>::type;
+
+    // helper base class implementing the tag_invoke logic for CPOs
+    template <typename Tag>
+    struct tag
+    {
+        template <typename... Args>
+        constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const
+            noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
+                -> tag_invoke_result_t<Tag, decltype(args)...>
+        {
+            return hpx::functional::tag_invoke(
+                static_cast<Tag const&>(*this), std::forward<Args>(args)...);
+        }
+    };
 
 }}    // namespace hpx::functional
 

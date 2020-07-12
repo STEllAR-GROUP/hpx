@@ -629,18 +629,9 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t
+    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t final
+      : hpx::functional::tag<copy_t>
     {
-        template <typename... Ts>
-        constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
-            noexcept(noexcept(hpx::functional::tag_invoke(
-                std::declval<copy_t>(), std::forward<Ts>(ts)...)))
-                -> decltype(hpx::functional::tag_invoke(
-                    std::declval<copy_t>(), std::forward<Ts>(ts)...))
-        {
-            return hpx::functional::tag_invoke(*this, std::forward<Ts>(ts)...);
-        }
-
     private:
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -677,18 +668,9 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy_if
-    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_if_t
+    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_if_t final
+      : hpx::functional::tag<copy_if_t>
     {
-        template <typename... Ts>
-        constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
-            noexcept(noexcept(hpx::functional::tag_invoke(
-                std::declval<copy_if_t>(), std::forward<Ts>(ts)...)))
-                -> decltype(hpx::functional::tag_invoke(
-                    std::declval<copy_if_t>(), std::forward<Ts>(ts)...))
-        {
-            return hpx::functional::tag_invoke(*this, std::forward<Ts>(ts)...);
-        }
-
     private:
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
