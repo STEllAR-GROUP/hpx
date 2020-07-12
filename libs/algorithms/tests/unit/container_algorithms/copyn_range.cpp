@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,7 +38,8 @@ void test_copy_n(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::copy_n(policy, iterator(std::begin(c)), c.size(), std::begin(d));
+    hpx::ranges::copy_n(
+        policy, iterator(std::begin(c)), c.size(), std::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
@@ -59,7 +61,8 @@ void test_copy_n_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
-    auto f = hpx::copy_n(p, iterator(std::begin(c)), c.size(), std::begin(d));
+    auto f = hpx::ranges::copy_n(
+        p, iterator(std::begin(c)), c.size(), std::begin(d));
     f.wait();
 
     std::size_t count = 0;
@@ -110,7 +113,7 @@ void test_copy_n_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::copy_n(policy,
+        hpx::ranges::copy_n(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             c.size(), std::begin(d));
@@ -144,7 +147,7 @@ void test_copy_n_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::copy_n(p,
+        auto f = hpx::ranges::copy_n(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             c.size(), std::begin(d));
@@ -208,7 +211,7 @@ void test_copy_n_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::copy_n(policy,
+        hpx::ranges::copy_n(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             c.size(), std::begin(d));
 
@@ -241,7 +244,7 @@ void test_copy_n_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::copy_n(p,
+        auto f = hpx::ranges::copy_n(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             c.size(), std::begin(d));
 

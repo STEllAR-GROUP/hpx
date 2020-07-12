@@ -145,11 +145,11 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a copy_n algorithm returns a
-    ///           \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
+    ///           \a hpx::future<FwdIter2>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
+    ///           returns \a FwdIter2
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
@@ -157,10 +157,8 @@ namespace hpx {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Size,
-        typename FwdIter2>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
+    template <typename ExPolicy, typename FwdIter1, typename Size, typename FwdIter2>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
 
     /// Copies the elements in the range, defined by [first, last), to another
@@ -243,9 +241,9 @@ namespace hpx {
 #else    // DOXYGEN
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
     ///////////////////////////////////////////////////////////////////////////
     // copy
-
     namespace detail {
 
         struct copy_iteration
@@ -289,7 +287,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
                 HPX_ASSERT(false);
                 typename util::detail::algorithm_result<ExPolicy,
-                    std::pair<FwdIter1, FwdIter2>>::type* dummy = nullptr;
+                    util::in_out_result<FwdIter1, FwdIter2>>::type* dummy =
+                    nullptr;
                 return std::move(*dummy);
 #else
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
@@ -313,7 +312,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
         template <typename FwdIter1, typename FwdIter2, typename Enable = void>
-        struct copy_iter : public copy<std::pair<FwdIter1, FwdIter2>>
+        struct copy_iter : public copy<util::in_out_result<FwdIter1, FwdIter2>>
         {
         };
 #else
@@ -434,9 +433,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
-    typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<FwdIter1, FwdIter2>>::type
-    copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
+    HPX_DEPRECATED(
+        "hpx::parallel::copy_n is deprecated, use hpx::copy_n instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+        copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
     {
         static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
             "Required at least forward iterator.");
@@ -474,7 +475,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     *dest++ = *first;
                 first++;
             }
-            return util::in_out_result<InIter1, OutIter>{first, dest};
+            return util::in_out_result<InIter1, OutIter>{
+                std::move(first), std::move(dest)};
         }
 
         template <typename IterPair>
@@ -513,8 +515,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 if (first == last)
                 {
-                    return result::get(
-                        util::in_out_result<FwdIter1, FwdIter3>{last, dest});
+                    return result::get(util::in_out_result<FwdIter1, FwdIter3>{
+                        std::move(first), std::move(dest)});
                 }
 
                 difference_type count = detail::distance(first, last);
@@ -567,14 +569,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 auto f4 =
-                    [last, dest, flags](
+                    [first, dest, flags](
                         std::vector<hpx::shared_future<std::size_t>>&& items,
                         std::vector<hpx::future<void>>&&) mutable
                     -> util::in_out_result<FwdIter1, FwdIter3> {
                     HPX_UNUSED(flags);
 
                     std::advance(dest, items.back().get());
-                    return util::in_out_result<FwdIter1, FwdIter3>{last, dest};
+                    std::advance(first, items.back().get());
+                    return util::in_out_result<FwdIter1, FwdIter3>{
+                        std::move(first), std::move(dest)};
                 };
 
                 return scan_partitioner_type::call(
@@ -665,6 +669,63 @@ namespace hpx {
             return std::copy(first, last, dest);
         }
     } copy{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::copy_n
+    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_n_t final
+      : hpx::functional::tag<copy_n_t>
+    {
+    private:
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename Size,
+            typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type
+        tag_invoke(hpx::copy_n_t, ExPolicy&& policy, FwdIter1 first, Size count,
+            FwdIter2 dest)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Requires at least forward iterator.");
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::v1::detail::is_negative(count))
+            {
+                return hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    FwdIter2>::get(std::move(dest));
+            }
+
+            using is_seq =
+                hpx::parallel::execution::is_sequenced_execution_policy<
+                    ExPolicy>;
+
+            return hpx::parallel::v1::detail::get_second_element(
+                hpx::parallel::v1::detail::copy_n<
+                    hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+                    .call(std::forward<ExPolicy>(policy), is_seq(), first,
+                        std::size_t(count), dest));
+        }
+
+        // clang-format off
+        template <typename FwdIter1, typename Size, typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+        // clang-format on
+        friend FwdIter2 tag_invoke(
+            hpx::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
+        {
+            return std::copy_n(first, count, dest);
+        }
+    } copy_n{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy_if

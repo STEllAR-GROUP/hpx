@@ -21,6 +21,7 @@
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
@@ -131,6 +132,64 @@ namespace hpx { namespace ranges {
             FwdIter>
         >::type
     copy(ExPolicy&& policy, Rng&& rng, FwdIter dest);
+
+    /// Copies the elements in the range [first, first + count), starting from
+    /// first and proceeding to first + count - 1., to another range beginning
+    /// at dest.
+    ///
+    /// \note   Complexity: Performs exactly \a count assignments, if
+    ///         count > 0, no assignments otherwise.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a copy_n algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a copy_n algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a copy_n algorithm returns a
+    ///           \a hpx::future<ranges::copy_n_result<FwdIter1, FwdIter2> >
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a ranges::copy_n_result<FwdIter1, FwdIter2>
+    ///           otherwise.
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           forwarded to the first element after the last in the input
+    ///           sequence and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Size,
+        typename FwdIter2>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        hpx::ranges::copy_n_result<FwdIter1, FwdIter2>>::type
+    copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
 
     /// Copies the elements in the range, defined by [first, last) to another
     /// range beginning at \a dest. Copies only the elements for which the
@@ -311,6 +370,9 @@ namespace hpx { namespace ranges {
     using copy_result = parallel::util::in_out_result<I, O>;
 
     template <typename I, typename O>
+    using copy_n_result = parallel::util::in_out_result<I, O>;
+
+    template <typename I, typename O>
     using copy_if_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -403,6 +465,77 @@ namespace hpx { namespace ranges {
                 hpx::util::end(rng), dest);
         }
     } copy{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::ranges::copy_n
+    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_n_t final
+      : hpx::functional::tag<copy_n_t>
+    {
+    private:
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename Size,
+            typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value)>
+        // clang-format on
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            ranges::copy_n_result<FwdIter1, FwdIter2>>::type
+        tag_invoke(hpx::ranges::copy_n_t, ExPolicy&& policy, FwdIter1 first,
+            Size count, FwdIter2 dest)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Requires at least forward iterator.");
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::v1::detail::is_negative(count))
+            {
+                return hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    ranges::copy_n_result<FwdIter1, FwdIter2>>::
+                    get(ranges::copy_n_result<FwdIter1, FwdIter2>{
+                        std::move(first), std::move(dest)});
+            }
+
+            using is_seq =
+                hpx::parallel::execution::is_sequenced_execution_policy<
+                    ExPolicy>;
+
+            return hpx::parallel::v1::detail::copy_n<
+                ranges::copy_n_result<FwdIter1, FwdIter2>>()
+                .call(std::forward<ExPolicy>(policy), is_seq{}, first,
+                    std::size_t(count), dest);
+        }
+
+        // clang-format off
+        template <typename FwdIter1, typename Size, typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value)>
+        // clang-format on
+        friend ranges::copy_n_result<FwdIter1, FwdIter2> tag_invoke(
+            hpx::ranges::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
+        {
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Requires at least forward iterator.");
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::v1::detail::is_negative(count))
+            {
+                return ranges::copy_n_result<FwdIter1, FwdIter2>{
+                    std::move(first), std::move(dest)};
+            }
+
+            return hpx::parallel::v1::detail::copy_n<
+                ranges::copy_n_result<FwdIter1, FwdIter2>>()
+                .call(hpx::parallel::execution::seq, std::true_type{}, first,
+                    std::size_t(count), dest);
+        }
+    } copy_n{};
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::copy_if

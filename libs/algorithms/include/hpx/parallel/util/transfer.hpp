@@ -56,7 +56,8 @@ namespace hpx { namespace parallel { namespace util {
 
             std::advance(first, count);
             std::advance(dest, count);
-            return in_out_result<InIter, OutIter>{first, dest};
+            return in_out_result<InIter, OutIter>{
+                std::move(first), std::move(dest)};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -71,7 +72,8 @@ namespace hpx { namespace parallel { namespace util {
             {
                 while (first != last)
                     *dest++ = *first++;
-                return in_out_result<InIter, OutIter>{first, dest};
+                return in_out_result<InIter, OutIter>{
+                    std::move(first), std::move(dest)};
             }
         };
 
@@ -112,7 +114,8 @@ namespace hpx { namespace parallel { namespace util {
             {
                 for (std::size_t i = 0; i != count; ++i)
                     *dest++ = *first++;
-                return in_out_result<InIter, OutIter>{first, dest};
+                return in_out_result<InIter, OutIter>{
+                    std::move(first), std::move(dest)};
             }
         };
 
@@ -175,7 +178,8 @@ namespace hpx { namespace parallel { namespace util {
             {
                 while (first != last)
                     *dest++ = std::move(*first++);
-                return in_out_result<InIter, OutIter>{first, dest};
+                return in_out_result<InIter, OutIter>{
+                    std::move(first), std::move(dest)};
             }
         };
 
@@ -214,7 +218,8 @@ namespace hpx { namespace parallel { namespace util {
             {
                 for (std::size_t i = 0; i != count; ++i)
                     *dest++ = std::move(*first++);
-                return in_out_result<InIter, OutIter>{first, dest};
+                return in_out_result<InIter, OutIter>{
+                    std::move(first), std::move(dest)};
             }
         };
 
