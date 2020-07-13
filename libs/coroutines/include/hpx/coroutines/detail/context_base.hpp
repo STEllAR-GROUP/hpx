@@ -72,7 +72,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     public:
         using deleter_type = void(context_base const*);
         using thread_id_type = hpx::threads::thread_id;
-
+#ifdef HPX_HAVE_LIBCDS
+        typedef std::array<std::size_t, 3> cds_type;
+#endif
         context_base(std::ptrdiff_t stack_size, thread_id_type id)
           : default_context_impl<CoroutineImpl>(stack_size)
           , m_caller()
@@ -88,7 +90,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
           , m_thread_data(0)
 #endif
 #ifdef HPX_HAVE_LIBCDS
-          , libcds_thread_data(std::array<std::size_t, 3>{
+          , libcds_thread_data(cds_type{
                 { 0,
                     0,
                     0 }})
@@ -107,7 +109,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             m_thread_data = 0;
 #endif
 #ifdef HPX_HAVE_LIBCDS
-            libcds_thread_data = std::array<size_t, 3>{{ 0, 0, 0 }};
+            libcds_thread_data = cds_type{{ 0, 0, 0 }};
 #endif
         }
 
@@ -215,7 +217,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
             m_thread_data = 0;
 #ifdef HPX_HAVE_LIBCDS
-            libcds_thread_data = std::array<std::size_t, 3>{{0, 0, 0}};
+            libcds_thread_data = cds_type{{0, 0, 0}};
 #endif
 #endif
         }
@@ -243,15 +245,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        std::array<std::size_t, 3> get_libcds_data() const
+        cds_type get_libcds_data() const
         {
             return libcds_thread_data;
         }
 
-        std::array<std::size_t, 3> set_libcds_data(
-            std::array<std::size_t, 3> data)
+        cds_type set_libcds_data(cds_type data)
         {
-            std::array<std::size_t, 3> olddata = libcds_thread_data;
+            cds_type olddata = libcds_thread_data;
             libcds_thread_data = data;
             return olddata;
         }
@@ -314,11 +315,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             HPX_ASSERT(m_thread_data == 0);
 #endif
 #ifdef HPX_HAVE_LIBCDS
-            HPX_ASSERT(libcds_thread_data ==
-                (std::array<size_t, 3>{
-                    { 0,
-                        0,
-                        0 }}));
+            HPX_ASSERT(libcds_thread_data == (cds_type{{ 0, 0, 0 }}));
 #endif
             // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
             m_type_info = std::exception_ptr();
@@ -381,7 +378,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #else
         mutable std::size_t m_thread_data;
 #ifdef HPX_HAVE_LIBCDS
-        mutable std::array<std::size_t, 3> libcds_thread_data{{0, 0, 0}};
+        mutable cds_type libcds_thread_data{{0, 0, 0}};
 #endif
 #endif
 

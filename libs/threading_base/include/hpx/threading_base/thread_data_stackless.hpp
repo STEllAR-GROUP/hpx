@@ -89,13 +89,13 @@ namespace hpx { namespace threads {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        std::array<std::size_t, 3> get_libcds_data() const override
+        typedef std::array<std::size_t, 3> cds_type;
+        cds_type get_libcds_data() const override
         {
             return coroutine_.get_libcds_data();
         }
 
-        std::array<std::size_t, 3> set_libcds_data(
-            std::array<std::size_t, 3> data) override
+        cds_type set_libcds_data(cds_type data) override
         {
             return coroutine_.set_libcds_data(data);
         }

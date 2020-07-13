@@ -275,7 +275,6 @@ int hpx_main(variables_map& vm)
         else
             numa_sensitive = 0;
 
-        bool test_all = (vm.count("test-all") > 0);
         const int repetitions = vm["repetitions"].as<int>();
 
         if (vm.count("info"))
