@@ -38,6 +38,7 @@ if(HPX_WITH_LIBCDS AND NOT TARGET LibCDS::cds)
 
   if(NOT libcds_POPULATED)
     fetchcontent_populate(libcds)
+    set(LIBCDS_CXX_STANDARD ${HPX_CXX_STANDARD})
     add_subdirectory(${libcds_SOURCE_DIR} ${libcds_BINARY_DIR})
   endif()
 
