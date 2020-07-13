@@ -6,9 +6,6 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <cds/gc/hp.h>    // for cds::HP (Hazard Pointer) SMR
-#include <cds/init.h>     // for cds::Initialize and cds::Terminate
-
 #include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
@@ -27,6 +24,9 @@
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/thread_executors/limiting_executor.hpp>
+
+#include <cds/gc/hp.h>    // for cds::HP (Hazard Pointer) SMR
+#include <cds/init.h>     // for cds::Initialize and cds::Terminate
 
 #include <array>
 #include <atomic>

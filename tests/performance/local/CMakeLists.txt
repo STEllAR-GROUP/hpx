@@ -27,7 +27,7 @@ endif()
 
 if(HPX_WITH_LIBCDS)
   set(benchmarks ${benchmarks} libcds_hp_overhead)
-  set(libcds_hp_overhead_FLAGS DEPENDENCIES iostreams_component hpx_timing)
+  set(libcds_hp_overhead_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME AND (HPX_WITH_DATAPAR_VC
@@ -222,8 +222,7 @@ foreach(benchmark ${benchmarks})
 endforeach()
 
 if(HPX_WITH_LIBCDS)
-  target_compile_definitions(cds PUBLIC CDS_THREADING_HPX)
-  target_link_libraries(libcds_hp_overhead_test PRIVATE cds hpx_core)
+  target_link_libraries(libcds_hp_overhead_test PRIVATE cds)
 endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
