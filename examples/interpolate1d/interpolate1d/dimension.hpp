@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/include/serialization.hpp>
+#include <hpx/serialization.hpp>
 
 #include <cstddef>
 

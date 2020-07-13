@@ -10,7 +10,7 @@
 
 //[hello_world_2_getting_started
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 int hpx_main(int, char**)
 {

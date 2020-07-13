@@ -11,7 +11,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/include/util.hpp>
 
 #include <cstddef>
 #include <iostream>

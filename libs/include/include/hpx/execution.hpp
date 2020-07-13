@@ -8,6 +8,7 @@
 
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
+#include <hpx/modules/thread_executors.hpp>
 
 namespace hpx { namespace execution {
     using hpx::parallel::execution::par;

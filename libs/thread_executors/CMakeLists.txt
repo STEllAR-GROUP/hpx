@@ -77,6 +77,7 @@ add_hpx_module(
     hpx_execution
     hpx_functional
     hpx_io_service
+    hpx_memory
     hpx_threading_base
     hpx_timing
     hpx_resource_partitioner

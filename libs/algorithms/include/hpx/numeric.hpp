@@ -13,6 +13,7 @@
 #include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
+#include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
 
 namespace hpx {
     using hpx::parallel::adjacent_difference;

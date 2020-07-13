@@ -8,8 +8,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/future.hpp>
+#include <hpx/mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
 #include <boost/dynamic_bitset.hpp>

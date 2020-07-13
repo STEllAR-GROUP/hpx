@@ -12,7 +12,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/serialization.hpp>
 
 #include <cstddef>
 #include <memory>

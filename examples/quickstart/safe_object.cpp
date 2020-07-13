@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/algorithm.hpp>
 
 #include <cstddef>
 #include <cstdlib>

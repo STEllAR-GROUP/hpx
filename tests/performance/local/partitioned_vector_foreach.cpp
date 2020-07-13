@@ -8,7 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/parallel_for_each.hpp>
 

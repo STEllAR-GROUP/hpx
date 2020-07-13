@@ -6,7 +6,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/iostreams.hpp>
+
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/parallel_task_block.hpp>
 #include <hpx/modules/testing.hpp>

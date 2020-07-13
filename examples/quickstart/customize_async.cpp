@@ -11,8 +11,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/iostreams.hpp>
-#include <hpx/include/parallel_execution.hpp>
+#include <hpx/distributed/iostream.hpp>
+#include <hpx/execution.hpp>
 
 #include <algorithm>
 

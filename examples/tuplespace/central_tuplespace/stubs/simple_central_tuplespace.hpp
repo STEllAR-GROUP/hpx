@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/include/applier.hpp>
 #include <hpx/include/async.hpp>
 
 #include "../server/simple_central_tuplespace.hpp"

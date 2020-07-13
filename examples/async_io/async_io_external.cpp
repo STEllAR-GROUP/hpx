@@ -10,7 +10,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 #include <iostream>
 #include <memory>

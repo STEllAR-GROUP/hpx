@@ -35,7 +35,7 @@ namespace boost
       { "boost/detail/atomic_count\\.hpp", "hpx/thread_support/atomic_count.hpp" },
       { "boost/function\\.hpp", "hpx/util/function.hpp" },
       { "boost/shared_ptr\\.hpp", "memory" },
-      { "boost/intrusive_ptr\\.hpp", "hpx/memory/intrusive_ptr.hpp" },
+      { "boost/intrusive_ptr\\.hpp", "hpx/modules/memory.hpp" },
       { "boost/make_shared\\.hpp", "memory" },
       { "boost/enable_shared_from_this\\.hpp", "memory" },
       { "boost/bind\\.hpp", "hpx/util/bind.hpp" },

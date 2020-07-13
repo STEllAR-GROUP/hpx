@@ -7,7 +7,7 @@
 
 #include <hpx/hpx_start.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/futures/future.hpp>
 #include <utility>
 

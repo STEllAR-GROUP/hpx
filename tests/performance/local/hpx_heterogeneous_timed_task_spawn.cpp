@@ -8,7 +8,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 

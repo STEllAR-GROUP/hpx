@@ -11,8 +11,8 @@
 #if defined(HPX_HAVE_AWAIT) || defined(HPX_HAVE_CXX20_COROUTINES)
 
 #include <hpx/futures/detail/future_data.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/traits/future_access.hpp>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)

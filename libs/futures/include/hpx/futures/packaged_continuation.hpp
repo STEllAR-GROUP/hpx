@@ -15,8 +15,8 @@
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 

@@ -10,9 +10,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 #include <functional>
 #include <iostream>

@@ -8,9 +8,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/parallel_execution.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/include/util.hpp>
 
 #include <vector>

@@ -7,6 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
+
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
@@ -14,7 +16,6 @@
 #ifdef HPX_HAVE_COMPRESSION_ZLIB
 #include <hpx/include/compression_zlib.hpp>
 #endif
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parcel_coalescing.hpp>
 #include <hpx/modules/testing.hpp>
 

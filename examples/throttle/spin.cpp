@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/include/util.hpp>
 
 #include <iostream>
 #include <string>

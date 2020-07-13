@@ -14,7 +14,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>

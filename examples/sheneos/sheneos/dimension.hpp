@@ -8,7 +8,7 @@
 
 #include <hpx/hpx.hpp>
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization.hpp>
 
 #include <cstddef>
 

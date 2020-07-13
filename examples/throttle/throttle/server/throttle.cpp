@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/include/util.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <thread>
 #include <chrono>

@@ -20,8 +20,8 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/include/iostreams.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/distributed/iostream.hpp>
+#include <hpx/serialization.hpp>
 
 #include <cstdint>
 #include <iostream>
