@@ -792,7 +792,7 @@ namespace hpx { namespace util {
         }
 #endif
 
-#ifdef HPX_HAVE_LIB_MPI_BASE
+#if defined(HPX_HAVE_LIB_MPI_BASE)
         bool have_mpi = util::mpi_environment::check_mpi_environment(rtcfg_);
 #else
         bool have_mpi = false;

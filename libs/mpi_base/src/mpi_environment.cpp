@@ -197,10 +197,7 @@ namespace hpx { namespace util {
 
         this_rank = rank();
 
-#if !defined(HPX_HAVE_NETWORKING)
-        // all ranks are just local nodes when networking is off
-        rtcfg.mode_ = hpx::runtime_mode::local;
-#else
+#if defined(HPX_HAVE_NETWORKING)
         if (this_rank == 0)
         {
             rtcfg.mode_ = hpx::runtime_mode::console;
@@ -209,6 +206,10 @@ namespace hpx { namespace util {
         {
             rtcfg.mode_ = hpx::runtime_mode::worker;
         }
+#elif defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+        rtcfg.mode_ = hpx::runtime_mode::console;
+#else
+        rtcfg.mode_ = hpx::runtime_mode::local;
 #endif
 
         rtcfg.add_entry("hpx.parcel.mpi.rank", std::to_string(this_rank));
