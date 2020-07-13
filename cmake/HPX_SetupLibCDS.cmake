@@ -16,23 +16,29 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_LIBCDS AND NOT TARGET LibCDS::cds)
+  include(FetchContent)
 
-    include(FetchContent)
+  set(LIBCDS_WITH_HPX
+      ON
+      CACHE INTERNAL ""
+  )
+  set(LIBCDS_INSIDE_HPX
+      ON
+      CACHE INTERNAL ""
+  )
 
-    set(LIBCDS_WITH_HPX ON CACHE INTERNAL "")
-    set(LIBCDS_INSIDE_HPX ON CACHE INTERNAL "")
+  fetchcontent_declare(
+    libcds
+    # GIT_REPOSITORY https://github.com/khizmax/libcds
+    GIT_REPOSITORY https://github.com/weilewei/libcds
+    GIT_TAG hpx-thread
+    GIT_SHALLOW TRUE
+  )
+  fetchcontent_getproperties(libcds)
 
-    FetchContent_Declare(libcds
-#            GIT_REPOSITORY https://github.com/khizmax/libcds
-            GIT_REPOSITORY https://github.com/weilewei/libcds
-            GIT_TAG hpx-thread
-            GIT_SHALLOW TRUE
-            )
-    FetchContent_GetProperties(libcds)
-
-    if(NOT libcds_POPULATED)
-        FetchContent_Populate(libcds)
-        add_subdirectory(${libcds_SOURCE_DIR} ${libcds_BINARY_DIR})
-    endif()
+  if(NOT libcds_POPULATED)
+    fetchcontent_populate(libcds)
+    add_subdirectory(${libcds_SOURCE_DIR} ${libcds_BINARY_DIR})
+  endif()
 
 endif()

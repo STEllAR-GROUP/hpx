@@ -20,6 +20,7 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
@@ -397,7 +398,8 @@ namespace hpx { namespace threads {
         thread_id_type const& id, error_code& ec = throws);
 
     HPX_EXPORT std::array<std::size_t, 3> set_libcds_data(
-        thread_id_type const& id, std::array<std::size_t, 3>, error_code& ec = throws);
+        thread_id_type const& id, std::array<std::size_t, 3>,
+        error_code& ec = throws);
 #endif
 
     HPX_EXPORT std::size_t& get_continuation_recursion_count();

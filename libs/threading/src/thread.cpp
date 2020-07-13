@@ -20,6 +20,7 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
+#include <array>
 #include <cstddef>
 #include <exception>
 #include <functional>
@@ -252,7 +253,8 @@ namespace hpx {
     {
         return threads::get_libcds_data(native_handle());
     }
-    std::array<std::size_t, 3> thread::set_libcds_data(std::array<std::size_t, 3> data)
+    std::array<std::size_t, 3> thread::set_libcds_data(
+        std::array<std::size_t, 3> data)
     {
         return threads::set_libcds_data(native_handle(), data);
     }
@@ -414,7 +416,8 @@ namespace hpx {
             return threads::get_libcds_data(threads::get_self_id());
         }
 
-        std::array<std::size_t, 3> set_libcds_data(std::array<std::size_t, 3> data)
+        std::array<std::size_t, 3> set_libcds_data(
+            std::array<std::size_t, 3> data)
         {
             return threads::set_libcds_data(threads::get_self_id(), data);
         }

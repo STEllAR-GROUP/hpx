@@ -25,7 +25,7 @@ if(NOT HPX_WITH_SANITIZERS)
   set(start_stop_FLAGS DEPENDENCIES hpx_timing)
 endif()
 
-if(NOT HPX_WITH_SANITIZERS)
+if(HPX_WITH_LIBCDS)
   set(benchmarks ${benchmarks} libcds_hp_overhead)
   set(libcds_hp_overhead_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 endif()

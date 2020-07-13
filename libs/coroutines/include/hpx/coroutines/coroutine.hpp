@@ -40,6 +40,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -102,7 +103,8 @@ namespace hpx { namespace threads { namespace coroutines {
             return impl_.get_libcds_data();
         }
 
-        std::array<std::size_t, 3> set_libcds_data(std::array<std::size_t, 3> data)
+        std::array<std::size_t, 3> set_libcds_data(
+            std::array<std::size_t, 3> data)
         {
             return impl_.set_libcds_data(data);
         }

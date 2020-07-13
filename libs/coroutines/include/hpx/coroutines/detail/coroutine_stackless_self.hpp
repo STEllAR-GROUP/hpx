@@ -13,6 +13,7 @@
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/function.hpp>
 
+#include <array>
 #include <cstddef>
 #include <exception>
 #include <limits>
@@ -79,7 +80,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             HPX_ASSERT(pimpl_);
             return pimpl_->get_libcds_data();
         }
-        std::array<std::size_t, 3> set_libcds_data(std::array<std::size_t, 3> data) override
+        std::array<std::size_t, 3> set_libcds_data(
+            std::array<std::size_t, 3> data) override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->set_libcds_data(data);

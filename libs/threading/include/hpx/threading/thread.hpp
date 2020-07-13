@@ -17,6 +17,7 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
+#include <array>
 #include <cstddef>
 #include <exception>
 #include <iosfwd>
@@ -263,7 +264,8 @@ namespace hpx {
 
 #ifdef HPX_HAVE_LIBCDS
         HPX_EXPORT std::array<std::size_t, 3> get_libcds_data();
-        HPX_EXPORT std::array<std::size_t, 3> set_libcds_data(std::array<std::size_t, 3>);
+        HPX_EXPORT std::array<std::size_t, 3> set_libcds_data(
+            std::array<std::size_t, 3>);
 #endif
 
         class HPX_EXPORT disable_interruption

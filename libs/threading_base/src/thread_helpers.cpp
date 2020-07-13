@@ -27,6 +27,7 @@
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
 
+#include <array>
 #include <atomic>
 #include <cstddef>
 #include <limits>
@@ -205,7 +206,8 @@ namespace hpx { namespace threads {
     }
 
 #ifdef HPX_HAVE_LIBCDS
-    std::array<std::size_t, 3> get_libcds_data(thread_id_type const& id, error_code& ec)
+    std::array<std::size_t, 3> get_libcds_data(
+        thread_id_type const& id, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
@@ -217,8 +219,8 @@ namespace hpx { namespace threads {
         return get_thread_id_data(id)->get_libcds_data();
     }
 
-    std::array<std::size_t, 3> set_libcds_data(
-        thread_id_type const& id, std::array<std::size_t, 3> data, error_code& ec)
+    std::array<std::size_t, 3> set_libcds_data(thread_id_type const& id,
+        std::array<std::size_t, 3> data, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {

@@ -37,6 +37,7 @@
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/function.hpp>
 
+#include <array>
 #include <cstddef>
 #include <exception>
 #include <limits>
@@ -131,7 +132,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
 #ifdef HPX_HAVE_LIBCDS
         virtual std::array<std::size_t, 3> get_libcds_data() const = 0;
-        virtual std::array<std::size_t, 3> set_libcds_data(std::array<std::size_t, 3> data) = 0;
+        virtual std::array<std::size_t, 3> set_libcds_data(
+            std::array<std::size_t, 3> data) = 0;
 #endif
 
         virtual tss_storage* get_thread_tss_data() = 0;

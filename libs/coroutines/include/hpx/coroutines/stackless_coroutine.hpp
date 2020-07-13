@@ -18,6 +18,7 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <array>
 #include <cstddef>
 #include <utility>
 
@@ -127,7 +128,8 @@ namespace hpx { namespace threads { namespace coroutines {
             return libcds_data_;
         }
 
-        std::array<std::size_t, 3> set_libcds_data(std::array<std::size_t, 3> data)
+        std::array<std::size_t, 3> set_libcds_data(
+            std::array<std::size_t, 3> data)
         {
             std::array<std::size_t, 3> olddata = libcds_data_;
             libcds_data_ = data;
