@@ -41,7 +41,10 @@ else
     github_commit_status="failure"
 fi
 
+set +e
 if [[ -n "${ghprbPullId}" ]]; then
+    set-e
+
     # Extract just the organization and repo names "org/repo" from the full URL
     github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
 
@@ -61,4 +64,5 @@ if [[ -n "${ghprbPullId}" ]]; then
         "${cdash_build_id}"
 fi
 
+set -e
 exit $(cat jenkins-hpx-${configuration_name}-ctest-status.txt)
