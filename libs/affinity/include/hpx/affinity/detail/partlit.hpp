@@ -194,7 +194,7 @@ namespace hpx { namespace threads { namespace detail {
 
     private:
         // silence MSVC warning C4512: assignment operator could not be generated
-        partial_literal_string& operator=(partial_literal_string const&);
+        partial_literal_string& operator=(partial_literal_string const&) = default;
     };
 
     template <typename String, bool no_attribute>

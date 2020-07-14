@@ -8,10 +8,10 @@ source $SPACK_ROOT/share/spack/setup-env.sh
 
 export CRAYPE_LINK_TYPE=dynamic
 export APPS_ROOT="/apps/daint/SSL/HPX/packages"
-export CLANG_VER="9.0"
+export CLANG_VER="10.0.0"
 export CXX_STD="17"
-export BOOST_VER="1.72.0"
-export HWLOC_VER="2.1.0"
+export BOOST_VER="1.73.0"
+export HWLOC_VER="2.2.0"
 export CLANG_ROOT="${APPS_ROOT}/llvm-${CLANG_VER}"
 export BOOST_ROOT="${APPS_ROOT}/boost-${BOOST_VER}-clang-${CLANG_VER}-c++${CXX_STD}-debug"
 export HWLOC_ROOT="${APPS_ROOT}/hwloc-${HWLOC_VER}-clang-${CLANG_VER}"
