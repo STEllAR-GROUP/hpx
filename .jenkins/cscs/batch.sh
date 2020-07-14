@@ -29,7 +29,7 @@ ctest \
 set -e
 
 # Copy the testing directory for saving as an artifact
-cp -r ${build_dir}/Testing ${orig_src_dir}/
+cp -r ${build_dir}/Testing ${orig_src_dir}/${configuration_name}-Testing
 
 # Things went wrong by default
 ctest_exit_code=$?
