@@ -31,12 +31,14 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     /// A target_distribution_policy used for CPU bound localities.
     struct target_distribution_policy
-      : compute::detail::target_distribution_policy<hpx::cuda::target>
+      : compute::detail::target_distribution_policy<
+            hpx::cuda::experimental::target>
     {
-        typedef compute::detail::target_distribution_policy<hpx::cuda::target>
+        typedef compute::detail::target_distribution_policy<
+            hpx::cuda::experimental::target>
             base_type;
 
         /// Default-construct a new instance of a \a target_distribution_policy.
@@ -219,21 +221,22 @@ namespace hpx { namespace compute { namespace cuda {
     /// It will represent all local CUDA devices and will place all items to
     /// create here.
     static target_distribution_policy const target_layout;
-}}}    // namespace hpx::compute::cuda
+}}}    // namespace hpx::cuda::experimental
 
 /// \cond NOINTERNAL
 namespace hpx { namespace traits {
     template <>
-    struct is_distribution_policy<compute::cuda::target_distribution_policy>
-      : std::true_type
+    struct is_distribution_policy<
+        cuda::experimental::target_distribution_policy> : std::true_type
     {
     };
 
     template <>
-    struct num_container_partitions<compute::cuda::target_distribution_policy>
+    struct num_container_partitions<
+        cuda::experimental::target_distribution_policy>
     {
         static std::size_t call(
-            compute::cuda::target_distribution_policy const& policy)
+            cuda::experimental::target_distribution_policy const& policy)
         {
             return policy.get_num_partitions();
         }

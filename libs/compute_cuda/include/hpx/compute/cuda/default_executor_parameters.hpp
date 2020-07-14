@@ -15,7 +15,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     struct default_executor_parameters
     {
         template <typename Executor, typename F>
@@ -25,12 +25,12 @@ namespace hpx { namespace compute { namespace cuda {
             return std::size_t(-1);
         }
     };
-}}}    // namespace hpx::compute::cuda
+}}}    // namespace hpx::cuda::experimental
 
 namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct is_executor_parameters<compute::cuda::default_executor_parameters>
-      : std::true_type
+    struct is_executor_parameters<
+        cuda::experimental::default_executor_parameters> : std::true_type
     {
     };
 }}}    // namespace hpx::parallel::execution

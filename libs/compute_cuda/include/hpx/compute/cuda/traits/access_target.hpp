@@ -18,12 +18,13 @@
 
 namespace hpx { namespace compute { namespace traits {
     template <>
-    struct access_target<hpx::cuda::target>
+    struct access_target<hpx::cuda::experimental::target>
     {
-        typedef hpx::cuda::target target_type;
+        typedef hpx::cuda::experimental::target target_type;
 
         template <typename T>
-        HPX_HOST_DEVICE static T read(hpx::cuda::target const& tgt, T const* t)
+        HPX_HOST_DEVICE static T read(
+            hpx::cuda::experimental::target const& tgt, T const* t)
         {
 #if defined(__CUDA_ARCH__)
             return *t;
@@ -38,7 +39,7 @@ namespace hpx { namespace compute { namespace traits {
 
         template <typename T>
         HPX_HOST_DEVICE static void write(
-            hpx::cuda::target const& tgt, T* dst, T const* src)
+            hpx::cuda::experimental::target const& tgt, T* dst, T const* src)
         {
 #if defined(__CUDA_ARCH__)
             *dst = *src;

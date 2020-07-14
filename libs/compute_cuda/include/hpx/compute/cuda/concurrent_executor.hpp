@@ -24,14 +24,14 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     template <typename Executor =
                   hpx::parallel::execution::restricted_thread_pool_executor>
     struct concurrent_executor
     {
     private:
-        typedef host::block_executor<Executor> host_executor_type;
-        typedef cuda::default_executor cuda_executor_type;
+        typedef hpx::compute::host::block_executor<Executor> host_executor_type;
+        typedef cuda::experimental::default_executor cuda_executor_type;
 
     public:
         // By default, this executor relies on a special executor parameters
@@ -39,8 +39,8 @@ namespace hpx { namespace compute { namespace cuda {
         // bulk-shape ranges for the accelerator.
         typedef concurrent_executor_parameters executor_parameters_type;
 
-        concurrent_executor(hpx::cuda::target const& cuda_target,
-            std::vector<host::target> const& host_targets)
+        concurrent_executor(hpx::cuda::experimental::target const& cuda_target,
+            std::vector<hpx::compute::host::target> const& host_targets)
           : host_executor_(host_targets)
           , current_(0)
         {
@@ -48,7 +48,8 @@ namespace hpx { namespace compute { namespace cuda {
             cuda_executors_.reserve(num_targets);
             for (std::size_t i = 0; i != num_targets; ++i)
             {
-                hpx::cuda::target t(cuda_target.native_handle().get_device());
+                hpx::cuda::experimental::target t(
+                    cuda_target.native_handle().get_device());
                 t.native_handle().get_stream();
                 cuda_executors_.emplace_back(std::move(t));
             }
@@ -105,7 +106,7 @@ namespace hpx { namespace compute { namespace cuda {
             return !(*this == rhs);
         }
 
-        host::target const& context() const noexcept
+        hpx::compute::host::target const& context() const noexcept
         {
             return host_executor_.context();
         }
@@ -187,37 +188,37 @@ namespace hpx { namespace compute { namespace cuda {
         std::vector<cuda_executor_type> cuda_executors_;
         std::atomic<std::size_t> current_;
     };
-}}}    // namespace hpx::compute::cuda
+}}}    // namespace hpx::cuda::experimental
 
 namespace hpx { namespace parallel { namespace execution {
     template <typename Executor>
     struct executor_execution_category<
-        compute::cuda::concurrent_executor<Executor>>
+        cuda::experimental::concurrent_executor<Executor>>
     {
         typedef parallel::execution::parallel_execution_tag type;
     };
 
     template <typename Executor>
-    struct is_one_way_executor<compute::cuda::concurrent_executor<Executor>>
-      : std::true_type
+    struct is_one_way_executor<
+        cuda::experimental::concurrent_executor<Executor>> : std::true_type
     {
     };
 
     template <typename Executor>
-    struct is_two_way_executor<compute::cuda::concurrent_executor<Executor>>
-      : std::true_type
+    struct is_two_way_executor<
+        cuda::experimental::concurrent_executor<Executor>> : std::true_type
     {
     };
 
     template <typename Executor>
     struct is_bulk_one_way_executor<
-        compute::cuda::concurrent_executor<Executor>> : std::true_type
+        cuda::experimental::concurrent_executor<Executor>> : std::true_type
     {
     };
 
     template <typename Executor>
     struct is_bulk_two_way_executor<
-        compute::cuda::concurrent_executor<Executor>> : std::true_type
+        cuda::experimental::concurrent_executor<Executor>> : std::true_type
     {
     };
 }}}    // namespace hpx::parallel::execution

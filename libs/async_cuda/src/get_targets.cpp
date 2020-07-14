@@ -30,14 +30,15 @@
 
 #include <cuda_runtime.h>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     std::vector<target> get_local_targets()
     {
         int device_count = 0;
         cudaError_t error = cudaGetDeviceCount(&device_count);
         if (error != cudaSuccess)
         {
-            HPX_THROW_EXCEPTION(kernel_error, "cuda::get_local_targets()",
+            HPX_THROW_EXCEPTION(kernel_error,
+                "cuda::experimental::get_local_targets()",
                 std::string("cudaGetDeviceCount failed: ") +
                     cudaGetErrorString(error));
         }
@@ -66,12 +67,13 @@ namespace hpx { namespace cuda {
         }
     }
 
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-HPX_PLAIN_ACTION(hpx::cuda::get_local_targets, cuda_get_targets_action);
+HPX_PLAIN_ACTION(
+    hpx::cuda::experimental::get_local_targets, cuda_get_targets_action);
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     hpx::future<std::vector<target>> get_targets(hpx::id_type const& locality)
     {
         if (locality == hpx::find_here())
@@ -79,5 +81,5 @@ namespace hpx { namespace cuda {
 
         return hpx::async(cuda_get_targets_action(), locality);
     }
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental
 #endif

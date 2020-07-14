@@ -16,7 +16,7 @@
 namespace hpx { namespace serialization {
     template <typename T>
     void serialize(
-        input_archive& ar, compute::cuda::value_proxy<T>& v, unsigned)
+        input_archive& ar, cuda::experimental::value_proxy<T>& v, unsigned)
     {
         T t;
         ar >> t;
@@ -24,8 +24,8 @@ namespace hpx { namespace serialization {
     }
 
     template <typename T>
-    void serialize(
-        output_archive& ar, compute::cuda::value_proxy<T> const& v, unsigned)
+    void serialize(output_archive& ar,
+        cuda::experimental::value_proxy<T> const& v, unsigned)
     {
         ar << T(v);
     }

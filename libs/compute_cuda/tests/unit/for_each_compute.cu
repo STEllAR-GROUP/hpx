@@ -22,8 +22,8 @@
 
 #include <boost/program_options.hpp>
 
-typedef hpx::compute::cuda::default_executor executor_type;
-typedef hpx::compute::cuda::allocator<int> target_allocator;
+typedef hpx::cuda::experimental::default_executor executor_type;
+typedef hpx::cuda::experimental::allocator<int> target_allocator;
 typedef hpx::compute::vector<int, target_allocator> target_vector;
 
 void test_for_each(executor_type& exec, target_vector& d_A)
@@ -68,7 +68,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::iota(h_A.begin(), h_A.end(), dis(gen));
 
     // define execution target (here device 0)
-    hpx::cuda::target target;
+    hpx::cuda::experimental::target target;
 
     // allocate data on the device
     target_allocator alloc(target);

@@ -29,7 +29,7 @@
 
 #include <cuda_runtime.h>
 
-namespace hpx { namespace cuda { namespace detail {
+namespace hpx { namespace cuda { namespace experimental { namespace detail {
 
     HPX_EXPORT void register_polling(hpx::threads::thread_pool_base&);
     HPX_EXPORT void unregister_polling(hpx::threads::thread_pool_base&);
@@ -130,7 +130,7 @@ namespace hpx { namespace cuda { namespace detail {
     void poll()
     {
         // don't poll if another thread is already polling
-        std::unique_lock<hpx::cuda::detail::mutex_type> lk(
+        std::unique_lock<hpx::cuda::experimental::detail::mutex_type> lk(
             detail::get_list_mtx(), std::try_to_lock);
         if (!lk.owns_lock())
         {
@@ -161,7 +161,8 @@ namespace hpx { namespace cuda { namespace detail {
         }
 
         // grab the handle to the event pool so we can return completed events
-        cuda_event_pool& pool = hpx::cuda::cuda_event_pool::get_event_pool();
+        cuda_event_pool& pool =
+            hpx::cuda::experimental::cuda_event_pool::get_event_pool();
 
         // iterate over our list of events and see if any have completed
         detail::future_data_ptr fdp;
@@ -248,7 +249,8 @@ namespace hpx { namespace cuda { namespace detail {
         cud_debug.debug(debug::str<>("Setting mode"), "enable_user_polling");
 
         // always set polling function before enabling polling
-        sched->set_user_polling_function(&hpx::cuda::detail::poll);
+        sched->set_user_polling_function(
+            &hpx::cuda::experimental::detail::poll);
         sched->add_remove_scheduler_mode(threads::policies::enable_user_polling,
             threads::policies::do_background_work);
     }
@@ -261,4 +263,4 @@ namespace hpx { namespace cuda { namespace detail {
         sched->remove_scheduler_mode(threads::policies::enable_user_polling);
     }
 
-}}}    // namespace hpx::cuda::detail
+}}}}    // namespace hpx::cuda::experimental::detail

@@ -28,18 +28,18 @@ struct test
 
 void test_sync()
 {
-    typedef hpx::compute::cuda::default_executor executor;
+    typedef hpx::cuda::experimental::default_executor executor;
 
-    hpx::cuda::target target;
+    hpx::cuda::experimental::target target;
     executor exec(target);
     hpx::parallel::execution::sync_execute(exec, test());
 }
 
 void test_async()
 {
-    typedef hpx::compute::cuda::default_executor executor;
+    typedef hpx::cuda::experimental::default_executor executor;
 
-    hpx::cuda::target target;
+    hpx::cuda::experimental::target target;
     executor exec(target);
     hpx::parallel::execution::async_execute(exec, test()).get();
 }
@@ -57,7 +57,7 @@ struct bulk_test
 
 void test_bulk_sync()
 {
-    typedef hpx::compute::cuda::default_executor executor;
+    typedef hpx::cuda::experimental::default_executor executor;
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), gen());
@@ -65,7 +65,7 @@ void test_bulk_sync()
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    hpx::cuda::target target;
+    hpx::cuda::experimental::target target;
     executor exec(target);
 //    traits::bulk_execute(exec, hpx::util::bind(&bulk_test, _1), v);
     hpx::parallel::execution::bulk_sync_execute(exec, bulk_test(), v);
@@ -73,7 +73,7 @@ void test_bulk_sync()
 
 void test_bulk_async()
 {
-    typedef hpx::compute::cuda::default_executor executor;
+    typedef hpx::cuda::experimental::default_executor executor;
 
     std::vector<int> v(107);
     std::iota(boost::begin(v), boost::end(v), gen());
@@ -81,7 +81,7 @@ void test_bulk_async()
     using hpx::util::placeholders::_1;
     using hpx::util::placeholders::_2;
 
-    hpx::cuda::target target;
+    hpx::cuda::experimental::target target;
     executor exec(target);
 //    hpx::when_all(traits::bulk_async_execute(
 //        exec, hpx::util::bind(&bulk_test, _1), v)

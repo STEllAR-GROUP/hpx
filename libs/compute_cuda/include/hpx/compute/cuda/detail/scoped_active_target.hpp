@@ -19,10 +19,10 @@
 
 #include <string>
 
-namespace hpx { namespace compute { namespace cuda { namespace detail {
+namespace hpx { namespace cuda { namespace experimental { namespace detail {
     struct scoped_active_target
     {
-        scoped_active_target(hpx::cuda::target const& t)
+        scoped_active_target(hpx::cuda::experimental::target const& t)
           : previous_device_(-1)
           , target_(t)
         {
@@ -85,8 +85,8 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
 
     private:
         int previous_device_;
-        hpx::cuda::target const& target_;
+        hpx::cuda::experimental::target const& target_;
     };
-}}}}    // namespace hpx::compute::cuda::detail
+}}}}    // namespace hpx::cuda::experimental::detail
 
 #endif

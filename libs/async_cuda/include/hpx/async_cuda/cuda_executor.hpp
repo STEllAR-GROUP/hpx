@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
 
     namespace detail {
         // -------------------------------------------------------------------------
@@ -84,7 +84,7 @@ namespace hpx { namespace cuda {
           : device_(device)
           , event_mode_(event_mode)
         {
-            target_ = std::make_shared<hpx::cuda::target>(device);
+            target_ = std::make_shared<hpx::cuda::experimental::target>(device);
             stream_ = target_->native_handle().get_stream();
         }
 
@@ -101,7 +101,7 @@ namespace hpx { namespace cuda {
         int device_;
         bool event_mode_;
         cudaStream_t stream_;
-        std::shared_ptr<hpx::cuda::target> target_;
+        std::shared_ptr<hpx::cuda::experimental::target> target_;
     };
 
     // -------------------------------------------------------------------------
@@ -181,19 +181,21 @@ namespace hpx { namespace cuda {
         }
     };
 
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental
 
 namespace hpx { namespace parallel { namespace execution {
 
     /// \cond NOINTERNAL
     template <>
-    struct is_one_way_executor<hpx::cuda::cuda_executor> : std::true_type
+    struct is_one_way_executor<hpx::cuda::experimental::cuda_executor>
+      : std::true_type
     {
         // we support fire and forget without returning a waitable/future
     };
 
     template <>
-    struct is_two_way_executor<hpx::cuda::cuda_executor> : std::true_type
+    struct is_two_way_executor<hpx::cuda::experimental::cuda_executor>
+      : std::true_type
     {
         // we support returning a waitable/future
     };

@@ -14,7 +14,7 @@
 //
 #include <string>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of cuda functions
@@ -46,4 +46,4 @@ namespace hpx { namespace cuda {
         }
         return err;
     }
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental

@@ -18,14 +18,16 @@
 
 #include <type_traits>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     template <typename T>
     class value_proxy
     {
-        typedef traits::access_target<hpx::cuda::target> access_target;
+        typedef hpx::compute::traits::access_target<
+            hpx::cuda::experimental::target>
+            access_target;
 
     public:
-        value_proxy(T* p, hpx::cuda::target& tgt) noexcept
+        value_proxy(T* p, hpx::cuda::experimental::target& tgt) noexcept
           : p_(p)
           , target_(&tgt)
         {
@@ -73,25 +75,27 @@ namespace hpx { namespace compute { namespace cuda {
             return p_;
         }
 
-        hpx::cuda::target& target() const noexcept
+        hpx::cuda::experimental::target& target() const noexcept
         {
             return *target_;
         }
 
     private:
         T* p_;
-        hpx::cuda::target* target_;
+        hpx::cuda::experimental::target* target_;
     };
 
     template <typename T>
     class value_proxy<T const>
     {
-        typedef traits::access_target<hpx::cuda::target> access_target;
+        typedef hpx::compute::traits::access_target<
+            hpx::cuda::experimental::target>
+            access_target;
 
     public:
         typedef T const proxy_type;
 
-        value_proxy(T* p, hpx::cuda::target& tgt) noexcept
+        value_proxy(T* p, hpx::cuda::experimental::target& tgt) noexcept
           : p_(p)
           , target_(tgt)
         {
@@ -113,20 +117,21 @@ namespace hpx { namespace compute { namespace cuda {
             return p_;
         }
 
-        hpx::cuda::target& target() const noexcept
+        hpx::cuda::experimental::target& target() const noexcept
         {
             return target_;
         }
 
     private:
         T* p_;
-        hpx::cuda::target& target_;
+        hpx::cuda::experimental::target& target_;
     };
-}}}    // namespace hpx::compute::cuda
+}}}    // namespace hpx::cuda::experimental
 
 namespace hpx { namespace traits {
     template <typename T>
-    struct is_value_proxy<hpx::compute::cuda::value_proxy<T>> : std::true_type
+    struct is_value_proxy<hpx::cuda::experimental::value_proxy<T>>
+      : std::true_type
     {
     };
 }}    // namespace hpx::traits
