@@ -41,14 +41,14 @@ set(CTEST_CONFIGURE_COMMAND
 
 ctest_start(Experimental TRACK "Pull_Requests")
 ctest_update()
-ctest_submit(PARTS Update BUILD_ID CTEST_BUILD_ID)
-file(WRITE "jenkins-hpx-$ENV{configuration_name}-cdash-build-id.txt"
-     "${CTEST_BUILD_ID}"
-)
+ctest_submit(PARTS Update)
 ctest_configure()
 ctest_submit(PARTS Configure)
 ctest_build(TARGET all FLAGS "-k0 -j ${CTEST_BUILD_PARALLELISM}")
 ctest_build(TARGET tests FLAGS "-k0 -j ${CTEST_BUILD_PARALLELISM}")
 ctest_submit(PARTS Build)
 ctest_test(PARALLEL_LEVEL "${CTEST_TEST_PARALLELISM}")
-ctest_submit(PARTS Test)
+ctest_submit(PARTS Test BUILD_ID CTEST_BUILD_ID)
+file(WRITE "jenkins-hpx-$ENV{configuration_name}-cdash-build-id.txt"
+     "${CTEST_BUILD_ID}"
+)
