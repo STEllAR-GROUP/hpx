@@ -27,7 +27,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace compute { namespace cuda { namespace detail {
+namespace hpx { namespace cuda { namespace experimental { namespace detail {
     template <typename Closure>
     __global__ void launch_function(Closure closure)
     {
@@ -84,8 +84,9 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
         }
 
         template <typename DimType>
-        HPX_HOST_DEVICE static void call(hpx::cuda::target const& tgt,
-            DimType grid_dim, DimType block_dim, fun_type f, args_type args)
+        HPX_HOST_DEVICE static void call(
+            hpx::cuda::experimental::target const& tgt, DimType grid_dim,
+            DimType block_dim, fun_type f, args_type args)
         {
             // This is needed for the device code to make sure the kernel
             // is instantiated correctly.
@@ -126,14 +127,14 @@ namespace hpx { namespace compute { namespace cuda { namespace detail {
     // Launch any given function F with the given parameters. This function
     // does not involve any device synchronization.
     template <typename DimType, typename F, typename... Ts>
-    HPX_HOST_DEVICE void launch(hpx::cuda::target const& t, DimType grid_dim,
-        DimType block_dim, F&& f, Ts&&... vs)
+    HPX_HOST_DEVICE void launch(hpx::cuda::experimental::target const& t,
+        DimType grid_dim, DimType block_dim, F&& f, Ts&&... vs)
     {
         typedef closure<F, Ts...> closure_type;
         launch_helper<closure_type>::call(t, grid_dim, block_dim,
             std::forward<F>(f),
             util::forward_as_tuple(std::forward<Ts>(vs)...));
     }
-}}}}    // namespace hpx::compute::cuda::detail
+}}}}    // namespace hpx::cuda::experimental::detail
 
 #endif

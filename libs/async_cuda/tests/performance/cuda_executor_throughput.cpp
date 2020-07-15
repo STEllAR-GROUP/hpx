@@ -17,7 +17,7 @@
 // NB. The hpx::threads param only controls how many parallel tasks to use for the CPU
 // comparison/checks and makes no difference to the GPU execution.
 //
-// Note: The hpx::compute::cuda::allocator makes use of device code and if used
+// Note: The hpx::cuda::experimental::allocator makes use of device code and if used
 // this example must be compiled with nvcc instead of c++ which requires the following
 // cmake setting
 // set_source_files_properties(cublas_matmul.cpp
@@ -86,14 +86,18 @@ void matrixMultiply(
     hpx::parallel::for_each(par, h_B.begin(), h_B.end(), zerofunc);
 
     // create a cublas executor we'll use to futurize cuda events
-    hpx::cuda::cublas_executor cublas(
-        device, CUBLAS_POINTER_MODE_HOST, hpx::cuda::callback_mode{});
-    using cublas_future = typename hpx::cuda::cublas_executor::future_type;
+    hpx::cuda::experimental::cublas_executor cublas(device,
+        CUBLAS_POINTER_MODE_HOST, hpx::cuda::experimental::callback_mode{});
+    using cublas_future =
+        typename hpx::cuda::experimental::cublas_executor::future_type;
 
     T *d_A, *d_B, *d_C;
-    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_A, size_A * sizeof(T)));
-    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_B, size_B * sizeof(T)));
-    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_C, size_C * sizeof(T)));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_A, size_A * sizeof(T)));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_B, size_B * sizeof(T)));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_C, size_C * sizeof(T)));
 
     // copy A to device, no future
     hpx::apply(cublas, cudaMemcpyAsync, d_A, h_A.data(), size_A * sizeof(T),
@@ -116,7 +120,7 @@ void matrixMultiply(
     const T alpha = 1.0f;
     const T beta = 0.0f;
 
-    auto test_function = [&](hpx::cuda::cublas_executor& exec,
+    auto test_function = [&](hpx::cuda::experimental::cublas_executor& exec,
                              const std::string& msg, std::size_t n_iters) {
         // time many cuda kernels spawned one after each other when they complete
         hpx::future<void> f;
@@ -136,8 +140,8 @@ void matrixMultiply(
     };
 
     // call our test function using a callback style executor
-    hpx::cuda::cublas_executor exec_callback(
-        0, CUBLAS_POINTER_MODE_HOST, hpx::cuda::callback_mode{});
+    hpx::cuda::experimental::cublas_executor exec_callback(
+        0, CUBLAS_POINTER_MODE_HOST, hpx::cuda::experimental::callback_mode{});
     test_function(exec_callback, "Warmup", 100);
     test_function(exec_callback, "Callback based executor", iterations);
 
@@ -145,16 +149,16 @@ void matrixMultiply(
     // the polling handler as well
     {
         // install cuda future polling handler for this scope block
-        hpx::cuda::enable_user_polling poll("default");
+        hpx::cuda::experimental::enable_user_polling poll("default");
 
-        hpx::cuda::cublas_executor exec_event(
-            0, CUBLAS_POINTER_MODE_HOST, hpx::cuda::event_mode{});
+        hpx::cuda::experimental::cublas_executor exec_event(
+            0, CUBLAS_POINTER_MODE_HOST, hpx::cuda::experimental::event_mode{});
         test_function(exec_event, "Event polling based executor", iterations);
     }
 
-    hpx::cuda::check_cuda_error(cudaFree(d_A));
-    hpx::cuda::check_cuda_error(cudaFree(d_B));
-    hpx::cuda::check_cuda_error(cudaFree(d_C));
+    hpx::cuda::experimental::check_cuda_error(cudaFree(d_A));
+    hpx::cuda::experimental::check_cuda_error(cudaFree(d_B));
+    hpx::cuda::experimental::check_cuda_error(cudaFree(d_C));
 }
 
 // -------------------------------------------------------------------------
@@ -165,7 +169,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     //
     int sizeMult = 1;
 
-    hpx::cuda::target target(device);
+    hpx::cuda::experimental::target target(device);
     std::cout << "GPU Device " << target.native_handle().get_device() << ": \""
               << target.native_handle().processor_name() << "\" "
               << "with compute capability "

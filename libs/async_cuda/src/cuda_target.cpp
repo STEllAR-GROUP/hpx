@@ -35,7 +35,7 @@
 
 #include <cuda_runtime.h>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     void target::native_handle_type::init_processing_units()
     {
         cudaDeviceProp props;
@@ -158,7 +158,7 @@ namespace hpx { namespace cuda {
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::target::native_handle::get_stream()",
+                    "cuda::experimental::target::native_handle::get_stream()",
                     std::string("cudaSetDevice failed: ") +
                         cudaGetErrorString(error));
             }
@@ -166,7 +166,7 @@ namespace hpx { namespace cuda {
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::target::native_handle::get_stream()",
+                    "cuda::experimental::target::native_handle::get_stream()",
                     std::string("cudaStreamCreate failed: ") +
                         cudaGetErrorString(error));
             }
@@ -184,14 +184,16 @@ namespace hpx { namespace cuda {
 
         if (stream == 0)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "cuda::target::synchronize",
+            HPX_THROW_EXCEPTION(invalid_status,
+                "cuda::experimental::target::synchronize",
                 "no stream available");
         }
 
         cudaError_t error = cudaStreamSynchronize(stream);
         if (error != cudaSuccess)
         {
-            HPX_THROW_EXCEPTION(kernel_error, "cuda::target::synchronize",
+            HPX_THROW_EXCEPTION(kernel_error,
+                "cuda::experimental::target::synchronize",
                 std::string("cudaStreamSynchronize failed: ") +
                     cudaGetErrorString(error));
         }
@@ -227,4 +229,4 @@ namespace hpx { namespace cuda {
         ar << handle_.device_ << locality_;
     }
 #endif
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental

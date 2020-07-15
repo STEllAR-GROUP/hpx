@@ -445,11 +445,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (use_accel)
     {
 #if defined(HPX_HAVE_CUDA)
-        using executor_type = hpx::compute::cuda::concurrent_executor<>;
-        using allocator_type = hpx::compute::cuda::allocator<STREAM_TYPE>;
+        using executor_type = hpx::cuda::experimental::concurrent_executor<>;
+        using allocator_type = hpx::cuda::experimental::allocator<STREAM_TYPE>;
 
         // Get the cuda targets we want to run on
-        hpx::cuda::target target;
+        hpx::cuda::experimental::target target;
 
         // Get the host targets we want to run on
         auto host_targets = hpx::compute::host::get_local_targets();

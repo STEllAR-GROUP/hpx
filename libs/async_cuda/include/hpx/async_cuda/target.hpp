@@ -34,7 +34,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     struct target
@@ -196,12 +196,12 @@ namespace hpx { namespace cuda {
 
         static std::vector<target> get_local_targets()
         {
-            return cuda::get_local_targets();
+            return cuda::experimental::get_local_targets();
         }
         static hpx::future<std::vector<target>> get_targets(
             hpx::id_type const& locality)
         {
-            return cuda::get_targets(locality);
+            return cuda::experimental::get_targets(locality);
         }
 
         friend bool operator==(target const& lhs, target const& rhs)
@@ -224,6 +224,6 @@ namespace hpx { namespace cuda {
 
     using detail::get_future_with_callback;
     HPX_EXPORT target& get_default_target();
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental
 
 #include <hpx/config/warnings_suffix.hpp>

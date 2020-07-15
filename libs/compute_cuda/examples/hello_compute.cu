@@ -39,9 +39,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::transform(h_A.begin(), h_A.end(), h_B.begin(), h_C_ref.begin(),
         [](int a, int b) { return a + b; });
 
-    typedef hpx::compute::cuda::allocator<int> allocator_type;
+    typedef hpx::cuda::experimental::allocator<int> allocator_type;
 
-    hpx::cuda::target target;
+    hpx::cuda::experimental::target target;
     allocator_type alloc(target);
     hpx::compute::vector<int, allocator_type> d_A(N, alloc);
     hpx::compute::vector<int, allocator_type> d_B(N, alloc);
@@ -57,7 +57,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     int threadsPerBlock = 256;
     int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
-    hpx::compute::cuda::detail::launch(target, blocksPerGrid, threadsPerBlock,
+    hpx::cuda::experimental::detail::launch(target, blocksPerGrid, threadsPerBlock,
         [=] __device__ (int* A, int* B, int* C) mutable
         {
             int i = blockDim.x * blockIdx.x + threadIdx.x;

@@ -26,9 +26,10 @@ namespace hpx { namespace traits {
     // pointer category.
     template <typename T>
     struct remove_const_iterator_value_type<
-        compute::detail::iterator<T const, compute::cuda::allocator<T>>>
+        compute::detail::iterator<T const, cuda::experimental::allocator<T>>>
     {
-        typedef compute::detail::iterator<T, compute::cuda::allocator<T>> type;
+        typedef compute::detail::iterator<T, cuda::experimental::allocator<T>>
+            type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -49,8 +50,8 @@ namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct pointer_category<
-        compute::detail::iterator<T, compute::cuda::allocator<T>>,
-        compute::detail::iterator<T, compute::cuda::allocator<T>>,
+        compute::detail::iterator<T, cuda::experimental::allocator<T>>,
+        compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         typename std::enable_if<!std::is_trivially_copyable<
             typename hpx::util::decay<T>::type>::value>::type>
     {
@@ -59,12 +60,12 @@ namespace hpx { namespace traits {
 
     template <typename Source, typename T>
     struct pointer_category<Source,
-        compute::detail::iterator<T, compute::cuda::allocator<T>>,
+        compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         typename std::enable_if<!std::is_trivially_copyable<typename hpx::util::
                                         decay<T>::type>::value &&
             !std::is_same<Source,
                 compute::detail::iterator<T,
-                    compute::cuda::allocator<T>>>::value>::type>
+                    cuda::experimental::allocator<T>>>::value>::type>
     {
         // FIXME: turn into proper pointer category
         static_assert(
@@ -77,12 +78,12 @@ namespace hpx { namespace traits {
 
     template <typename T, typename U, typename Dest>
     struct pointer_category<
-        compute::detail::iterator<T, compute::cuda::allocator<U>>, Dest,
+        compute::detail::iterator<T, cuda::experimental::allocator<U>>, Dest,
         typename std::enable_if<!std::is_trivially_copyable<typename hpx::util::
                                         decay<T>::type>::value &&
             !std::is_same<Dest,
                 compute::detail::iterator<T,
-                    compute::cuda::allocator<U>>>::value>::type>
+                    cuda::experimental::allocator<U>>>::value>::type>
     {
         // FIXME: turn into proper pointer category
         static_assert(
@@ -107,8 +108,8 @@ namespace hpx { namespace traits {
 
     template <typename T>
     struct pointer_category<
-        compute::detail::iterator<T, compute::cuda::allocator<T>>,
-        compute::detail::iterator<T, compute::cuda::allocator<T>>,
+        compute::detail::iterator<T, cuda::experimental::allocator<T>>,
+        compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         typename std::enable_if<std::is_trivially_copyable<
             typename hpx::util::decay<T>::type>::value>::type>
     {
@@ -117,12 +118,12 @@ namespace hpx { namespace traits {
 
     template <typename Source, typename T>
     struct pointer_category<Source,
-        compute::detail::iterator<T, compute::cuda::allocator<T>>,
+        compute::detail::iterator<T, cuda::experimental::allocator<T>>,
         typename std::enable_if<std::is_trivially_copyable<typename hpx::util::
                                         decay<T>::type>::value &&
             !std::is_same<Source,
                 compute::detail::iterator<T,
-                    compute::cuda::allocator<T>>>::value>::type>
+                    cuda::experimental::allocator<T>>>::value>::type>
     {
         // FIXME: turn into proper pointer category
         static_assert(
@@ -135,12 +136,12 @@ namespace hpx { namespace traits {
 
     template <typename T, typename U, typename Dest>
     struct pointer_category<
-        compute::detail::iterator<T, compute::cuda::allocator<U>>, Dest,
+        compute::detail::iterator<T, cuda::experimental::allocator<U>>, Dest,
         typename std::enable_if<std::is_trivially_copyable<typename hpx::util::
                                         decay<T>::type>::value &&
             !std::is_same<Dest,
                 compute::detail::iterator<T,
-                    compute::cuda::allocator<U>>>::value>::type>
+                    cuda::experimental::allocator<U>>>::value>::type>
     {
         // FIXME: turn into proper pointer category
         static_assert(

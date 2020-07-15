@@ -27,7 +27,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
 
     namespace detail {
         using print_on = debug::enable_print<false>;
@@ -138,7 +138,7 @@ namespace hpx { namespace cuda {
         cublas_executor(std::size_t device,
             cublasPointerMode_t pointer_mode = CUBLAS_POINTER_MODE_HOST,
             bool event_mode = false)
-          : hpx::cuda::cuda_executor(device, event_mode)
+          : hpx::cuda::experimental::cuda_executor(device, event_mode)
           , pointer_mode_(pointer_mode)
         {
             detail::cub_debug.debug(
@@ -254,18 +254,20 @@ namespace hpx { namespace cuda {
         cublasPointerMode_t pointer_mode_;
     };
 
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL
     template <>
-    struct is_one_way_executor<hpx::cuda::cublas_executor> : std::true_type
+    struct is_one_way_executor<hpx::cuda::experimental::cublas_executor>
+      : std::true_type
     {
         // we support fire and forget without returning a waitable/future
     };
 
     template <>
-    struct is_two_way_executor<hpx::cuda::cublas_executor> : std::true_type
+    struct is_two_way_executor<hpx::cuda::experimental::cublas_executor>
+      : std::true_type
     {
         // we support returning a waitable/future
     };

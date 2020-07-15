@@ -21,5 +21,5 @@
 #endif
 
 namespace hpx { namespace compute { namespace cuda {
-    using hpx::cuda::target;
+    using hpx::cuda::experimental::target;
 }}}    // namespace hpx::compute::cuda

@@ -17,7 +17,7 @@
 // NB. The hpx::threads param only controls how many parallel tasks to use for the CPU
 // comparison/checks and makes no difference to the GPU execution.
 //
-// Note: The hpx::compute::cuda::allocator makes use of device code and if used
+// Note: The hpx::cuda::experimental::allocator makes use of device code and if used
 // this example must be compiled with nvcc instead of c++ which requires the following
 // cmake setting
 // set_source_files_properties(cublas_matmul.cpp
@@ -121,7 +121,7 @@ inline bool compare_L2_err(const float* reference, const float* data,
 // Run a simple test matrix multiply using CUBLAS
 // -------------------------------------------------------------------------
 template <typename T>
-void matrixMultiply(hpx::cuda::cublas_executor& cublas,
+void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
     sMatrixSize& matrix_size, std::size_t device, std::size_t iterations)
 {
     using hpx::parallel::execution::par;
@@ -142,15 +142,18 @@ void matrixMultiply(hpx::cuda::cublas_executor& cublas,
     hpx::parallel::for_each(par, h_B.begin(), h_B.end(), randfunc);
 
     // create a cublas executor we'll use to futurize cuda events
-    using namespace hpx::cuda;
+    using namespace hpx::cuda::experimental;
     using cublas_future = typename cuda_executor::future_type;
 
     T *d_A, *d_B, *d_C;
-    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_A, size_A * sizeof(T)));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_A, size_A * sizeof(T)));
 
-    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_B, size_B * sizeof(T)));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_B, size_B * sizeof(T)));
 
-    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_C, size_C * sizeof(T)));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_C, size_C * sizeof(T)));
 
     // adding async copy operations into the stream before cublas calls puts
     // the copies in the queue before the matrix operations.
@@ -264,7 +267,7 @@ void matrixMultiply(hpx::cuda::cublas_executor& cublas,
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     // install cuda future polling handler
-    hpx::cuda::enable_user_polling poll("default");
+    hpx::cuda::experimental::enable_user_polling poll("default");
     //
     std::size_t device = vm["device"].as<std::size_t>();
     std::size_t sizeMult = vm["sizemult"].as<std::size_t>();
@@ -282,7 +285,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     sizeMult = (std::max)(sizeMult, std::size_t(1));
     //
     // use a larger block size for Fermi and above, query default cuda target properties
-    hpx::cuda::target target(device);
+    hpx::cuda::experimental::target target(device);
 
     std::cout << "GPU Device " << target.native_handle().get_device() << ": \""
               << target.native_handle().processor_name() << "\" "
@@ -305,22 +308,22 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // --------------------------------
     // test matrix multiply using cublas executor
-    hpx::cuda::cublas_executor cublas(
-        device, CUBLAS_POINTER_MODE_HOST, hpx::cuda::event_mode{});
+    hpx::cuda::experimental::cublas_executor cublas(device,
+        CUBLAS_POINTER_MODE_HOST, hpx::cuda::experimental::event_mode{});
     matrixMultiply<float>(cublas, matrix_size, device, iterations);
 
     // --------------------------------
     // sanity check : test again using a copy of the cublas executor
     std::cout << "\n\n\n------------" << std::endl;
     std::cout << "Checking copy semantics of cublas executor" << std::endl;
-    hpx::cuda::cublas_executor cublas2 = cublas;
+    hpx::cuda::experimental::cublas_executor cublas2 = cublas;
     matrixMultiply<float>(cublas2, matrix_size, device, 1);
 
     // --------------------------------
     // sanity check : test again using a moved copy of the cublas executor
     std::cout << "\n\n\n------------" << std::endl;
     std::cout << "Checking move semantics of cublas executor" << std::endl;
-    hpx::cuda::cublas_executor cublas3(std::move(cublas));
+    hpx::cuda::experimental::cublas_executor cublas3(std::move(cublas));
     matrixMultiply<float>(cublas3, matrix_size, device, 1);
 
     return hpx::finalize();

@@ -14,7 +14,7 @@
 
 #include <vector>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     struct HPX_EXPORT target;
 
     HPX_EXPORT std::vector<target> get_local_targets();
@@ -22,4 +22,4 @@ namespace hpx { namespace cuda {
         hpx::id_type const& locality);
     HPX_EXPORT void print_local_targets();
 
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental

@@ -34,15 +34,15 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     namespace detail {
         // generic implementation which simply passes through the shape elements
         template <typename Shape, typename Enable = void>
         struct bulk_launch_helper
         {
             template <typename F, typename... Ts>
-            static void call(hpx::cuda::target const& target, F&& f,
-                Shape const& shape, Ts&&... ts)
+            static void call(hpx::cuda::experimental::target const& target,
+                F&& f, Shape const& shape, Ts&&... ts)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 std::size_t count = util::size(shape);
@@ -54,7 +54,7 @@ namespace hpx { namespace compute { namespace cuda {
 
                 typedef typename hpx::traits::range_traits<Shape>::value_type
                     value_type;
-                typedef cuda::allocator<value_type> alloc_type;
+                typedef cuda::experimental::allocator<value_type> alloc_type;
 
                 // transfer shape to the GPU
                 compute::vector<value_type, alloc_type> shape_container(
@@ -74,7 +74,7 @@ namespace hpx { namespace compute { namespace cuda {
                     std::forward<Ts>(ts)...);
 #else
                 HPX_THROW_EXCEPTION(hpx::not_implemented,
-                    "hpx::compute::cuda::detail::bulk_launch_helper",
+                    "hpx::cuda::experimental::detail::bulk_launch_helper",
                     "Trying to launch a CUDA kernel, but did not compile in "
                     "CUDA mode");
 #endif
@@ -89,8 +89,8 @@ namespace hpx { namespace compute { namespace cuda {
                 hpx::traits::is_iterator<Iterator>::value>::type>
         {
             template <typename F, typename Shape, typename... Ts>
-            static void call(hpx::cuda::target const& target, F&& f,
-                Shape const& shape, Ts&&... ts)
+            static void call(hpx::cuda::experimental::target const& target,
+                F&& f, Shape const& shape, Ts&&... ts)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_COMPUTE_HOST_CODE)
                 typedef typename hpx::traits::range_traits<Shape>::value_type
@@ -123,7 +123,7 @@ namespace hpx { namespace compute { namespace cuda {
                 }
 #else
                 HPX_THROW_EXCEPTION(hpx::not_implemented,
-                    "hpx::compute::cuda::detail::bulk_launch_helper",
+                    "hpx::cuda::experimental::detail::bulk_launch_helper",
                     "Trying to launch a CUDA kernel, but did not compile in "
                     "CUDA mode");
 #endif
@@ -138,7 +138,7 @@ namespace hpx { namespace compute { namespace cuda {
         // bulk-shape ranges for the accelerator.
         typedef default_executor_parameters executor_parameters_type;
 
-        default_executor(hpx::cuda::target const& target)
+        default_executor(hpx::cuda::experimental::target const& target)
           : target_(target)
         {
         }
@@ -154,7 +154,7 @@ namespace hpx { namespace compute { namespace cuda {
             return !(*this == rhs);
         }
 
-        hpx::cuda::target const& context() const noexcept
+        hpx::cuda::experimental::target const& context() const noexcept
         {
             return target_;
         }
@@ -211,46 +211,48 @@ namespace hpx { namespace compute { namespace cuda {
             target_.synchronize();
         }
 
-        hpx::cuda::target& target()
+        hpx::cuda::experimental::target& target()
         {
             return target_;
         }
 
-        hpx::cuda::target const& target() const
+        hpx::cuda::experimental::target const& target() const
         {
             return target_;
         }
 
     private:
-        hpx::cuda::target target_;
+        hpx::cuda::experimental::target target_;
     };
-}}}    // namespace hpx::compute::cuda
+}}}    // namespace hpx::cuda::experimental
 
 namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct executor_execution_category<compute::cuda::default_executor>
+    struct executor_execution_category<cuda::experimental::default_executor>
     {
         typedef parallel::execution::parallel_execution_tag type;
     };
 
     template <>
-    struct is_one_way_executor<compute::cuda::default_executor> : std::true_type
-    {
-    };
-
-    template <>
-    struct is_two_way_executor<compute::cuda::default_executor> : std::true_type
-    {
-    };
-
-    template <>
-    struct is_bulk_one_way_executor<compute::cuda::default_executor>
+    struct is_one_way_executor<cuda::experimental::default_executor>
       : std::true_type
     {
     };
 
     template <>
-    struct is_bulk_two_way_executor<compute::cuda::default_executor>
+    struct is_two_way_executor<cuda::experimental::default_executor>
+      : std::true_type
+    {
+    };
+
+    template <>
+    struct is_bulk_one_way_executor<cuda::experimental::default_executor>
+      : std::true_type
+    {
+    };
+
+    template <>
+    struct is_bulk_two_way_executor<cuda::experimental::default_executor>
       : std::true_type
     {
     };

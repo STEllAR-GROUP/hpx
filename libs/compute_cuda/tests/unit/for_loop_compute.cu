@@ -22,8 +22,8 @@
 
 #include <boost/program_options.hpp>
 
-typedef hpx::compute::cuda::default_executor executor_type;
-typedef hpx::compute::cuda::allocator<int> target_allocator;
+typedef hpx::cuda::experimental::default_executor executor_type;
+typedef hpx::cuda::experimental::allocator<int> target_allocator;
 typedef hpx::compute::vector<int, target_allocator> target_vector;
 
 void test_for_loop(executor_type& exec,
@@ -82,7 +82,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         [](int a, int b) { return a + 3.0 * b; });
 
     // define execution targets (here device 0), allows overlapping operations
-    hpx::cuda::target targetA, targetB;
+    hpx::cuda::experimental::target targetA, targetB;
 
     // allocate data on the device
     target_allocator allocA(targetA);

@@ -13,7 +13,7 @@
 //
 #include <cuda_runtime.h>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
 
     // a pool of cudaEvent_t objects.
     // Since allocation of a cuda event passes into the cuda runtime
@@ -74,4 +74,4 @@ namespace hpx { namespace cuda {
             boost::lockfree::capacity<max_events_in_pool>>
             free_list_;
     };
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental
