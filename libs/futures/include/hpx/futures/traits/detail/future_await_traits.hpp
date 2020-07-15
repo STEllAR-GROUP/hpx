@@ -14,7 +14,6 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/modules/allocator_support.hpp>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 #include <coroutine>

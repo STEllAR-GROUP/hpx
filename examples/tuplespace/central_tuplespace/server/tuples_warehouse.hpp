@@ -6,12 +6,11 @@
 
 #pragma once
 
-#include <hpx/hpx.hpp>
 #include <hpx/chrono.hpp>
+#include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/mutex.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/util/storage/tuple.hpp>
 
@@ -322,4 +321,3 @@ namespace examples { namespace server {
 }}    // namespace examples::server
 
 #undef TS_DEBUG
-
