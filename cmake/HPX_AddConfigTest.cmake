@@ -463,6 +463,15 @@ function(hpx_check_for_cxx17_shared_ptr_array)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx17_std_nontype_template_parameter_auto)
+  add_hpx_config_test(
+    HPX_WITH_CXX17_NONTYPE_TEMPLATE_PARAMETER_AUTO
+    SOURCE cmake/tests/cxx17_std_nontype_template_parameter_auto.cpp FILE
+           ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_coroutines)
   add_hpx_config_test(
     HPX_WITH_CXX20_COROUTINES SOURCE cmake/tests/cxx20_coroutines.cpp FILE
@@ -475,6 +484,14 @@ function(hpx_check_for_cxx20_std_disable_sized_sentinel_for)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
     SOURCE cmake/tests/cxx20_std_disable_sized_sentinel_for.cpp FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx20_no_unique_address_attribute)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
+    SOURCE cmake/tests/cxx20_no_unique_address_attribute.cpp FILE ${ARGN}
   )
 endfunction()
 

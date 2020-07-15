@@ -34,6 +34,12 @@
 /// For more details see
 /// `https://en.cppreference.com/w/cpp/language/attributes/nodiscard`__.
 #define HPX_NODISCARD
+
+/// Indicates that this data member need not have an address distinct from all
+/// other non-static data members of its class.
+/// For more details see
+/// `https://en.cppreference.com/w/cpp/language/attributes/no_unique_address`__.
+#define HPX_NO_UNIQUE_ADDRESS
 #else
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,6 +112,14 @@
 #else
 #   define HPX_NODISCARD
 #   define HPX_NODISCARD_MSG(x)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// handle [[no_unique_address]]
+#if defined(HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE)
+#   define HPX_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#else
+#   define HPX_NO_UNIQUE_ADDRESS
 #endif
 
 // clang-format on

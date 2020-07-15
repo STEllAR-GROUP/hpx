@@ -442,15 +442,15 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::copy`
+   * * :cpp:func:`hpx::copy`
      * Copies a range of elements to a new location.
      * ``<hpx/include/parallel_copy.hpp>``
      * :cppreference-algorithm:`exclusive_scan`
-   * * :cpp:func:`hpx::parallel::v1::copy_n`
+   * * :cpp:func:`hpx::copy_n`
      * Copies a number of elements to a new location.
      * ``<hpx/include/parallel_copy.hpp>``
      * :cppreference-algorithm:`copy_n`
-   * * :cpp:func:`hpx::parallel::v1::copy_if`
+   * * :cpp:func:`hpx::copy_if`
      * Copies the elements from a range to a new location for which the given predicate is ``true``
      * ``<hpx/include/parallel_copy.hpp>``
      * :cppreference-algorithm:`copy`
@@ -649,6 +649,10 @@ Parallel algorithms
      * Sorts the elements in a range.
      * ``<hpx/include/parallel_sort.hpp>``
      * :cppreference-algorithm:`sort`
+   * * :cpp:func:`hpx::parallel::v1::stable_sort`
+     * Sorts the elements in a range, maintain sequence of equal elements.
+     * ``<hpx/include/parallel_sort.hpp>``
+     * :cppreference-algorithm:`stable_sort`
    * * :cpp:func:`hpx::parallel::v1::sort_by_key`
      * Sorts one range of data using keys supplied in another range.
      * ``<hpx/include/parallel_sort.hpp>``

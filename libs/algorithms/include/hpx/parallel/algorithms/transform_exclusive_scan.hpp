@@ -269,7 +269,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a copy_n algorithm returns a \a hpx::future<FwdIter2> if
+    /// \returns  The \a transform_exclusive_scan algorithm returns a
+    ///           \a hpx::future<FwdIter2> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and

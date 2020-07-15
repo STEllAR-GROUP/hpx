@@ -20,6 +20,7 @@
 #include <hpx/parallel/algorithms/remove_copy.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -97,9 +98,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::equal_to<T>, traits::projected_range<Proj, Rng>,
                     traits::projected<Proj, T const*>>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<
-            tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)>>::type
+        util::in_out_result<
+            typename hpx::traits::range_traits<Rng>::iterator_type,
+            OutIter>>::type
     remove_copy(ExPolicy&& policy, Rng&& rng, OutIter dest, T const& val,
         Proj&& proj = Proj())
     {
@@ -196,9 +197,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
                     traits::projected_range<Proj, Rng>>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<
-            tag::in(typename hpx::traits::range_traits<Rng>::iterator_type),
-            tag::out(OutIter)>>::type
+        util::in_out_result<
+            typename hpx::traits::range_traits<Rng>::iterator_type,
+            OutIter>>::type
     remove_copy_if(
         ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj())
     {

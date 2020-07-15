@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
+//  Copyright (c) 2016-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +16,7 @@
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -49,11 +51,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         ///////////////////////////////////////////////////////////////////////
         // parallel version
         template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename FwdIter2>
+            typename Sent1, typename FwdIter2>
         typename util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
-        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, std::false_type)
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+        transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
+            std::false_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
                 is_seq;
@@ -65,11 +67,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // forward declare segmented version
         template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename FwdIter2>
+            typename Sent1, typename FwdIter2>
         typename util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
-        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, std::true_type);
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+        transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
+            std::true_type);
 #endif
 
         // Executes transfer algorithm on the elements in the range [first, last),
@@ -110,15 +112,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
         //           element in the destination range, one past the last element
         //           transferred.
         //
+        // clang-format off
         template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(hpx::parallel::execution::is_execution_policy<
-                ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value)>
+            typename Sent1, typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value
+            )>
+        // clang-format on
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-        transfer(
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+        transfer(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
                 "Required at least forward iterator.");
@@ -126,15 +132,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 "Requires at least forward iterator.");
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            return hpx::util::make_tagged_pair<tag::in, tag::out>(
-                transfer_<Algo>(std::forward<ExPolicy>(policy), first, last,
-                    dest, std::false_type()));
+            return transfer_<Algo>(std::forward<ExPolicy>(policy), first, last,
+                dest, std::false_type());
 #else
             typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
-            return hpx::util::make_tagged_pair<tag::in, tag::out>(
-                transfer_<Algo>(std::forward<ExPolicy>(policy), first, last,
-                    dest, is_segmented()));
+            return transfer_<Algo>(std::forward<ExPolicy>(policy), first, last,
+                dest, is_segmented());
 #endif
         }
     }    // namespace detail

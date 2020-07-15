@@ -11,8 +11,10 @@
 
 #if defined(HPX_HAVE_CUDA) && defined(__CUDACC__)
 
-#include <hpx/parallel/util/transfer.hpp>
 #include <hpx/traits/pointer_category.hpp>
+
+#include <hpx/parallel/util/result_types.hpp>
+#include <hpx/parallel/util/transfer.hpp>
 
 #include <hpx/compute/cuda/allocator.hpp>
 #include <hpx/compute/detail/iterator.hpp>
@@ -158,8 +160,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct copy_helper<hpx::traits::trivially_cuda_copyable_pointer_tag, Dummy>
     {
         template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, InIter last, OutIter dest)
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
+            call(InIter first, InIter last, OutIter dest)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
@@ -174,7 +177,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 dest.target().native_handle().get_stream());
 
             std::advance(dest, count);
-            return std::make_pair(last, dest);
+            return util::in_out_result<InIter, OutIter>{last, dest};
 #endif
         }
     };
@@ -184,8 +187,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         Dummy>
     {
         template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, InIter last, OutIter dest)
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
+            call(InIter first, InIter last, OutIter dest)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
@@ -200,7 +204,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 first.target().native_handle().get_stream());
 
             std::advance(dest, count);
-            return std::make_pair(last, dest);
+            return util::in_out_result<InIter, OutIter>{last, dest};
 #endif
         }
     };
@@ -210,8 +214,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         hpx::traits::trivially_cuda_copyable_pointer_tag_to_device, Dummy>
     {
         template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, InIter last, OutIter dest)
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
+            call(InIter first, InIter last, OutIter dest)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_helper<hpx::traits::general_pointer_tag>::call(
@@ -226,7 +231,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 dest.target().native_handle().get_stream());
 
             std::advance(dest, count);
-            return std::make_pair(last, dest);
+            return util::in_out_result<InIter, OutIter>{last, dest};
 #endif
         }
     };
@@ -237,8 +242,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         Dummy>
     {
         template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, std::size_t count, OutIter dest)
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
+            call(InIter first, std::size_t count, OutIter dest)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
@@ -253,7 +259,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(first, count);
             std::advance(dest, count);
-            return std::make_pair(first, dest);
+            return util::in_out_result<InIter, OutIter>{first, dest};
 #endif
         }
     };
@@ -263,8 +269,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         hpx::traits::trivially_cuda_copyable_pointer_tag_to_host, Dummy>
     {
         template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, std::size_t count, OutIter dest)
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
+            call(InIter first, std::size_t count, OutIter dest)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
@@ -279,7 +286,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(first, count);
             std::advance(dest, count);
-            return std::make_pair(first, dest);
+            return util::in_out_result<InIter, OutIter>{first, dest};
 #endif
         }
     };
@@ -289,8 +296,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         hpx::traits::trivially_cuda_copyable_pointer_tag_to_device, Dummy>
     {
         template <typename InIter, typename OutIter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter> call(
-            InIter first, std::size_t count, OutIter dest)
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
+            call(InIter first, std::size_t count, OutIter dest)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             return copy_n_helper<hpx::traits::general_pointer_tag>::call(
@@ -305,7 +313,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             std::advance(first, count);
             std::advance(dest, count);
-            return std::make_pair(first, dest);
+            return util::in_out_result<InIter, OutIter>{first, dest};
 #endif
         }
     };

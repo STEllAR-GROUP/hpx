@@ -96,8 +96,7 @@ double run_remove_benchmark_std(int test_count, OrgIter org_first,
     for (int i = 0; i < test_count; ++i)
     {
         // Restore [first, last) with original data.
-        hpx::parallel::copy(
-            hpx::parallel::execution::par, org_first, org_last, first);
+        hpx::copy(hpx::parallel::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         (void) std::remove(first, last, value);
@@ -119,8 +118,7 @@ double run_remove_benchmark_hpx(int test_count, ExPolicy policy,
     for (int i = 0; i < test_count; ++i)
     {
         // Restore [first, last) with original data.
-        hpx::parallel::copy(
-            hpx::parallel::execution::par, org_first, org_last, first);
+        hpx::copy(hpx::parallel::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::util::high_resolution_clock::now();
         hpx::parallel::remove(policy, first, last, value);
