@@ -9,94 +9,117 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/datastructures.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstddef>
 #include <map>
 #include <mutex>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx { namespace serialization { namespace detail {
 
-    namespace detail {
+    // This class allows to handle credit splitting for gid_types during
+    // serialization.
+    class preprocess_gid_types
+    {
+        using mutex_type = hpx::lcos::local::spinlock;
 
-        // This class allows to handle credit splitting fr gid_types during
-        // serialization.
-        class preprocess_gid_types
+    public:
+        using split_gids_map =
+            std::map<naming::gid_type const*, naming::gid_type>;
+
+        preprocess_gid_types() = default;
+
+        ~preprocess_gid_types()
         {
-            using mutex_type = hpx::lcos::local::spinlock;
+            std::unique_lock<mutex_type> l(mtx_);
+            reset_locked(l);
+        }
 
-        public:
-            using split_gids_map =
-                std::map<naming::gid_type const*, naming::gid_type>;
+        preprocess_gid_types(preprocess_gid_types&& rhs) noexcept = delete;
+        preprocess_gid_types& operator=(
+            preprocess_gid_types&& rhs) noexcept = delete;
 
-            preprocess_gid_types() = default;
+        template <typename Lock>
+        void reset_locked(Lock& l)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
 
-            preprocess_gid_types(preprocess_gid_types&& rhs) noexcept
-              : mtx_()
-              , split_gids_(std::move(rhs.split_gids_))
-            {}
-
-            ~preprocess_gid_types()
+            // If there are gids left in the map then several parcels got
+            // preprocessed separately, but serialized into the same archive.
+            // In this case we must explicitly return the credits for those
+            // gids before clearing the map.
+            if (!split_gids_.empty())
             {
-                HPX_ASSERT(split_gids_.empty());
-            }
+                std::vector<naming::gid_type> gids;
+                gids.reserve(split_gids_.size());
 
-            preprocess_gid_types& operator=(preprocess_gid_types&& rhs) noexcept
-            {
-                split_gids_ = std::move(rhs.split_gids_);
-                return *this;
-            }
+                for (auto&& e : split_gids_)
+                {
+                    gids.push_back(e.second);
+                }
 
-            void reset()
-            {
                 split_gids_.clear();
+
+                // now return credits to AGAS
+                util::unlock_guard<Lock> ul(l);
+
+                for (auto const& gid : gids)
+                {
+                    naming::decrement_refcnt(gid);
+                }
             }
+        }
 
-            void add_gid(
-                naming::gid_type const& gid, naming::gid_type const& split_gid)
-            {
-                std::lock_guard<mutex_type> l(mtx_);
-                HPX_ASSERT(split_gids_[&gid] == naming::invalid_gid);
-                split_gids_[&gid] = split_gid;
-            }
+        void add_gid(
+            naming::gid_type const& gid, naming::gid_type const& split_gid)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
 
-            bool has_gid(naming::gid_type const& gid)
-            {
-                std::lock_guard<mutex_type> l(mtx_);
-                return split_gids_.find(&gid) != split_gids_.end();
-            }
+            HPX_ASSERT(split_gids_.find(&gid) == split_gids_.end());
+            split_gids_.insert(split_gids_map::value_type(&gid, split_gid));
+        }
 
-            naming::gid_type get_new_gid(naming::gid_type const& gid)
-            {
-                auto it = split_gids_.find(&gid);
-                HPX_ASSERT(it != split_gids_.end());
-                HPX_ASSERT(it->second != naming::invalid_gid);
+        bool has_gid(naming::gid_type const& gid) const
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return split_gids_.find(&gid) != split_gids_.end();
+        }
 
-                naming::gid_type new_gid = it->second;
-#if defined(HPX_DEBUG)
-                split_gids_.erase(it);
-#endif
-                return new_gid;
-            }
+        naming::gid_type get_new_gid(naming::gid_type const& gid)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            auto it = split_gids_.find(&gid);
 
-            split_gids_map move_split_gids()
-            {
-                return std::move(split_gids_);
-            }
-            void set_split_gids(split_gids_map&& gids)
-            {
-                split_gids_ = std::move(gids);
-            }
+            HPX_ASSERT(it != split_gids_.end());
+            HPX_ASSERT(it->second != naming::invalid_gid);
 
-        private:
-            mutex_type mtx_;
-            split_gids_map split_gids_;
-        };
-    }    // namespace detail
-}}    // namespace hpx::serialization
+            naming::gid_type new_gid = it->second;
+            split_gids_.erase(it);
+            return new_gid;
+        }
 
+        split_gids_map move_split_gids()
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            return std::move(split_gids_);
+        }
+        void set_split_gids(split_gids_map&& gids)
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+
+            reset_locked(l);
+            split_gids_ = std::move(gids);
+        }
+
+    private:
+        mutable mutex_type mtx_;
+        split_gids_map split_gids_;
+    };
+}}}    // namespace hpx::serialization::detail
