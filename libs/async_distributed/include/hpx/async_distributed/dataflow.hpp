@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/basic_action_fwd.hpp>
+#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
@@ -25,12 +27,10 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/traits/extract_action.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <hpx/execution/executors/execution.hpp>

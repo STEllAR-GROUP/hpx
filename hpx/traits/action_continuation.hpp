@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/traits/extract_action.hpp>
+#include <hpx/actions_base/traits/extract_action.hpp>
 
 namespace hpx { namespace traits
 {

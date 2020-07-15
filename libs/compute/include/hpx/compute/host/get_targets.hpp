@@ -7,8 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#include <hpx/lcos_fwd.hpp>
+#include <hpx/futures/future_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 
 #include <vector>

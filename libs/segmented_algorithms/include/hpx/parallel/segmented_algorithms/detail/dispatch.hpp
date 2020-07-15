@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/type_support/decay.hpp>

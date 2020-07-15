@@ -7,8 +7,9 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
+#include <hpx/chrono.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/util.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>

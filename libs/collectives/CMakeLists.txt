@@ -56,6 +56,8 @@ add_hpx_module(
   HEADERS ${collectives_headers}
   COMPAT_HEADERS ${collectives_compat_headers}
   DEPENDENCIES
+    hpx_actions
+    hpx_actions_base
     hpx_affinity
     hpx_algorithms
     hpx_allocator_support

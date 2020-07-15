@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>

@@ -8,19 +8,19 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/action_support.hpp>
+#include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/actions_base/traits/action_select_direct_execution.hpp>
+#include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/traits/action_continuation.hpp>
 #include <hpx/traits/action_decorate_continuation.hpp>
-#include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
-#include <hpx/traits/action_select_direct_execution.hpp>
-#include <hpx/traits/action_stacksize.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <chrono>

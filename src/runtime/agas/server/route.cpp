@@ -8,16 +8,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 
 #include <atomic>

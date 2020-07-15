@@ -8,7 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions_base/component_action.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/serialization/vector.hpp>
 

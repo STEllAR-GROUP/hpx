@@ -17,21 +17,24 @@
 /// classes are asynchronous API which return the futures.
 
 #include <hpx/config.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions_base/basic_action.hpp>
+#include <hpx/actions_base/component_action.hpp>
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/modules/collectives.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/get_ptr.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <iostream>

@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
 
 #include <cstddef>
 

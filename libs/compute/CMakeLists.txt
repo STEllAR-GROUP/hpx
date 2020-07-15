@@ -47,6 +47,7 @@ add_hpx_module(
   HEADERS ${compute_headers}
   COMPAT_HEADERS ${compute_compat_headers}
   DEPENDENCIES
+    hpx_actions_base
     hpx_affinity
     hpx_algorithms
     hpx_assertion

@@ -11,6 +11,8 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/detail/action_factory.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/components/new.hpp>

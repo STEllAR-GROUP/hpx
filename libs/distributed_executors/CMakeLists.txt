@@ -28,6 +28,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   HEADERS ${distributed_executors_headers}
   COMPAT_HEADERS ${distributed_executors_compat_headers}
-  DEPENDENCIES hpx_async_distributed hpx_config hpx_functional hpx_type_support
+  DEPENDENCIES hpx_async_distributed hpx_config hpx_execution hpx_functional
+               hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

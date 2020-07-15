@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/basic_action_fwd.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_distributed/async_fwd.hpp>
+#include <hpx/async_local/async_fwd.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <utility>

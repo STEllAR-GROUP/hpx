@@ -25,6 +25,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/sender_connection.hpp"
       "${PROJECT_SOURCE_DIR}/hpx/plugins/parcelport/mpi/tag_provider.hpp"
     DEPENDENCIES
+      hpx_actions
       hpx_asio
       hpx_allocator_support
       hpx_cache

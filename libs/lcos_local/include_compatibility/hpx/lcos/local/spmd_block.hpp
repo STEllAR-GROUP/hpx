@@ -8,14 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos_local/config/defines.hpp>
-#include <hpx/include/local_lcos.hpp>
+#include <hpx/algorithms/parallel/spmd_block.hpp>
 
 #if HPX_LCOS_LOCAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/lcos/local/spmd_block.hpp is deprecated, \
-    please include hpx/include/local_lcos.hpp instead")
+    please include hpx/algorithms/parallel/spmd_block.hpp instead")
 #else
 #warning "The header hpx/lcos/local/spmd_block.hpp is deprecated, \
-    please include hpx/include/local_lcos.hpp instead"
+    please include hpx/algorithms/parallel/spmd_block.hpp instead"
 #endif
 #endif

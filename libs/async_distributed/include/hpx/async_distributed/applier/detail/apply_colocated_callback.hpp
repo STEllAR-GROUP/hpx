@@ -10,13 +10,13 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/actions/action_support.hpp>
+#include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/async_distributed/applier/apply_continue_callback.hpp>
 #include <hpx/async_distributed/applier/detail/apply_colocated_callback_fwd.hpp>
 #include <hpx/async_distributed/applier/register_apply_colocated.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
-#include <hpx/traits/action_priority.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
 

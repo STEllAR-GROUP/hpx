@@ -12,6 +12,7 @@
 #include "stencil_iterator.hpp"
 
 #include <hpx/assert.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/modules/timing.hpp>

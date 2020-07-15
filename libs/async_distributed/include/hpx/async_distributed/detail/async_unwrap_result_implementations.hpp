@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/traits/action_select_direct_execution.hpp>
+#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
@@ -21,11 +23,9 @@
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
-#include <hpx/traits/action_select_direct_execution.hpp>
 #include <hpx/traits/action_was_object_migrated.hpp>
 #include <hpx/traits/component_supports_migration.hpp>
 #include <hpx/traits/component_type_is_compatible.hpp>
-#include <hpx/traits/extract_action.hpp>
 
 #include <cstddef>
 #include <utility>

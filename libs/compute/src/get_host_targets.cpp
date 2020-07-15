@@ -15,8 +15,8 @@
 #include <hpx/topology/topology.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #endif
 

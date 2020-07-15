@@ -8,6 +8,7 @@
 // async(launch::..., action(), ...) always invokes locally
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>

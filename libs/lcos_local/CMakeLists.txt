@@ -17,7 +17,6 @@ set(lcos_local_headers
     hpx/lcos_local/packaged_task.hpp
     hpx/lcos_local/promise.hpp
     hpx/lcos_local/receive_buffer.hpp
-    hpx/lcos_local/spmd_block.hpp
     hpx/lcos_local/trigger.hpp
 )
 

@@ -9,10 +9,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/traits/is_component.hpp>
 
 #include <hpx/components/component_storage/component_storage.hpp>
 #include <hpx/components/component_storage/server/migrate_to_storage.hpp>

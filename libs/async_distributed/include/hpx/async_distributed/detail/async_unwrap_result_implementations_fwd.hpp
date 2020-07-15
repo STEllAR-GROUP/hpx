@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_distributed/async_fwd.hpp>
+#include <hpx/async_local/async_fwd.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/traits/extract_action.hpp>
 
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////

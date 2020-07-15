@@ -99,8 +99,6 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/lcos_fwd.hpp>    // forward declare wait_all()
-
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -124,6 +122,11 @@ namespace hpx {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos {
+
+    // forward declare wait_all()
+    template <typename Future>
+    void wait_all(std::vector<Future>&& values);
+
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
