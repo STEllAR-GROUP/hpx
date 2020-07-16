@@ -158,7 +158,7 @@ namespace hpx { namespace traits {
                 auto& data = communicator.template access_data<arg_type>(l);
 
                 auto it = data.begin();
-                return hpx::parallel::reduce(hpx::parallel::execution::par,
+                return hpx::reduce(hpx::parallel::execution::par,
                     ++it, data.end(), *data.begin(), op);
             };
 

@@ -49,7 +49,7 @@ void measure_transform_reduce_old(std::size_t size)
         size, Point{double(gen()), double(gen())});
 
     //invoke old reduce
-    Point result = hpx::parallel::reduce(hpx::parallel::execution::par,
+    Point result = hpx::ranges::reduce(hpx::parallel::execution::par,
         std::begin(data_representation), std::end(data_representation),
         Point{0.0, 0.0}, [](Point res, Point curr) {
             return Point{res.x * res.y + curr.x * curr.y, 1.0};

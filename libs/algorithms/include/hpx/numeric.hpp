@@ -6,20 +6,13 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/adjacent_difference.hpp>
-#include <hpx/parallel/algorithms/exclusive_scan.hpp>
-#include <hpx/parallel/algorithms/inclusive_scan.hpp>
-#include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
-#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
-#include <hpx/parallel/algorithms/transform_reduce.hpp>
-#include <hpx/parallel/algorithms/transform_reduce_binary.hpp>
+#include <hpx/parallel/numeric.hpp>
+#include <hpx/parallel/container_numeric.hpp>
 
 namespace hpx {
     using hpx::parallel::adjacent_difference;
     using hpx::parallel::exclusive_scan;
     using hpx::parallel::inclusive_scan;
-    using hpx::parallel::reduce;
     using hpx::parallel::transform_exclusive_scan;
     using hpx::parallel::transform_inclusive_scan;
     using hpx::parallel::transform_reduce;

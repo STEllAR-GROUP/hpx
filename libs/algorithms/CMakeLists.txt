@@ -91,6 +91,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/minmax.hpp
     hpx/parallel/container_algorithms/move.hpp
     hpx/parallel/container_algorithms/partition.hpp
+    hpx/parallel/container_algorithms/reduce.hpp
     hpx/parallel/container_algorithms/remove_copy.hpp
     hpx/parallel/container_algorithms/remove.hpp
     hpx/parallel/container_algorithms/replace.hpp
@@ -101,6 +102,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/unique.hpp
+    hpx/parallel/container_numeric.hpp
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/iterator_helpers.hpp
     hpx/parallel/datapar/loop.hpp

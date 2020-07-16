@@ -39,8 +39,7 @@ void test_reduce1(ExPolicy policy, IteratorTag)
     std::size_t val(42);
     auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
 
-    std::size_t r1 = hpx::reduce(
-        policy, iterator(std::begin(c)), iterator(std::end(c)), val, op);
+    std::size_t r1 = hpx::ranges::reduce(policy, c, val, op);
 
     // verify values
     std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val, op);
@@ -59,8 +58,7 @@ void test_reduce1_async(ExPolicy p, IteratorTag)
     std::size_t val(42);
     auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
 
-    hpx::future<std::size_t> f = hpx::reduce(
-        p, iterator(std::begin(c)), iterator(std::end(c)), val, op);
+    hpx::future<std::size_t> f = hpx::ranges::reduce(p, c, val, op);
     f.wait();
 
     // verify values
@@ -102,8 +100,7 @@ void test_reduce2(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t const val(42);
-    std::size_t r1 = hpx::reduce(
-        policy, iterator(std::begin(c)), iterator(std::end(c)), val);
+    std::size_t r1 = hpx::ranges::reduce(policy, c, val);
 
     // verify values
     std::size_t r2 = std::accumulate(std::begin(c), std::end(c), val);
@@ -120,8 +117,7 @@ void test_reduce2_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     std::size_t const val(42);
-    hpx::future<std::size_t> f = hpx::reduce(
-        p, iterator(std::begin(c)), iterator(std::end(c)), val);
+    hpx::future<std::size_t> f = hpx::ranges::reduce(p, c, val);
     f.wait();
 
     // verify values
@@ -162,8 +158,7 @@ void test_reduce3(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    std::size_t r1 = hpx::reduce(
-        policy, iterator(std::begin(c)), iterator(std::end(c)));
+    std::size_t r1 = hpx::ranges::reduce(policy, c);
 
     // verify values
     std::size_t r2 =
@@ -180,8 +175,7 @@ void test_reduce3_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::future<std::size_t> f = hpx::reduce(
-        p, iterator(std::begin(c)), iterator(std::end(c)));
+    hpx::future<std::size_t> f = hpx::ranges::reduce(p, c);
     f.wait();
 
     // verify values
@@ -226,9 +220,8 @@ void test_reduce_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::reduce(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), std::size_t(42),
-            [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::reduce(
+            policy, c, std::size_t(42), [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
             });
 
@@ -260,9 +253,8 @@ void test_reduce_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::reduce(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::size_t(42),
-            [](std::size_t v1, std::size_t v2) {
+        hpx::future<void> f = hpx::ranges::reduce(
+            p, c, std::size_t(42), [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), v1 + v2;
             });
         returned_from_algorithm = true;
@@ -322,9 +314,8 @@ void test_reduce_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::reduce(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), std::size_t(42),
-            [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::reduce(
+            policy, c, std::size_t(42), [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
             });
 
@@ -355,9 +346,8 @@ void test_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<void> f = hpx::reduce(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::size_t(42),
-            [](std::size_t v1, std::size_t v2) {
+        hpx::future<void> f = hpx::ranges::reduce(
+            p, c, std::size_t(42), [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), v1 + v2;
             });
         returned_from_algorithm = true;
