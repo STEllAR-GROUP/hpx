@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2019 Hartmut Kaiser
+//  Copyright (c) 2015-2020 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/modules/datastructures.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/lcos_local/promise.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/lcos_local/promise.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -80,6 +80,9 @@ namespace hpx { namespace serialization { namespace detail {
             {
                 std::lock_guard<mutex_type> l(mtx_);
                 ++triggered_futures_;
+
+                // trigger the promise only after the whole serialization
+                // operation is done and all futures have become ready
                 set_value = (done_ && num_futures_ == triggered_futures_);
             }
 
@@ -89,32 +92,58 @@ namespace hpx { namespace serialization { namespace detail {
             }
         }
 
+        // This is called during serialization of futures. It keeps track of
+        // the number of futures encountered. It also attaches a continuation to
+        // all futures which triggers this object and eventually invokes the
+        // parcel send operation.
         void await_future(
-            hpx::lcos::detail::future_data_refcnt_base& future_data)
+            hpx::lcos::detail::future_data_refcnt_base& future_data,
+            bool increment_count = true)
         {
             {
                 std::lock_guard<mutex_type> l(mtx_);
                 if (num_futures_ == 0)
+                {
                     done_ = false;
-                ++num_futures_;
+                }
+                if (increment_count)
+                {
+                    ++num_futures_;
+                }
             }
 
             future_data.set_on_completed([this]() { this->trigger(); });
         }
 
+        void increment_future_count()
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            if (num_futures_ == 0)
+            {
+                done_ = false;
+            }
+            ++num_futures_;
+        }
+
         void reset()
         {
+            std::lock_guard<mutex_type> l(mtx_);
+
             done_ = true;
             num_futures_ = 0;
             triggered_futures_ = 0;
             promise_ = hpx::lcos::local::promise<void>();
         }
 
-        bool has_futures()
+        bool has_futures() const
         {
+            std::lock_guard<mutex_type> l(mtx_);
             return num_futures_ > 0;
         }
 
+        // This is called after the full serialization of a parcel. It attaches
+        // the supplied function to be invoked as soon as all encountered
+        // futures have become ready.
         template <typename F>
         void operator()(F f)
         {
@@ -123,13 +152,20 @@ namespace hpx { namespace serialization { namespace detail {
 
             {
                 std::lock_guard<mutex_type> l(mtx_);
+
+                // trigger promise if all futures seen during serialization
+                // have been made ready by now
                 done_ = true;
                 if (num_futures_ == triggered_futures_)
+                {
                     set_promise = true;
+                }
             }
 
             if (set_promise)
+            {
                 promise_.set_value();
+            }
 
             // we don't call f directly to avoid possible stack overflow.
             auto& shared_state_ =
@@ -137,12 +173,13 @@ namespace hpx { namespace serialization { namespace detail {
                     fut);
             shared_state_->set_on_completed([this, f = std::move(f)]() {
                 reset();
-                f();
+                f();    // this invokes the next round of the fixed-point
+                        // iteration
             });
         }
 
     private:
-        mutex_type mtx_;
+        mutable mutex_type mtx_;
         bool done_;
         std::size_t num_futures_;
         std::size_t triggered_futures_;

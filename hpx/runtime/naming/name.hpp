@@ -415,6 +415,8 @@ namespace hpx { namespace naming
         std::uint64_t id_msb_;
         std::uint64_t id_lsb_;
     };
+
+    HPX_EXPORT void decrement_refcnt(gid_type const& gid);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

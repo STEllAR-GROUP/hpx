@@ -246,20 +246,28 @@ namespace hpx { namespace naming
             auto& handle_futures =
                 ar.get_extra_data<serialization::detail::preprocess_futures>();
 
+            // avoid races between the split-handling and the future
+            // preprocessing
+            handle_futures.increment_future_count();
+
             auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
-                [&split_gids, &gid](hpx::future<gid_type>&& gid_future) {
+                [&split_gids, &handle_futures, &gid](
+                    hpx::future<gid_type>&& gid_future) {
+                    HPX_UNUSED(handle_futures);
+                    HPX_ASSERT(handle_futures.has_futures());
                     split_gids.add_gid(gid, gid_future.get());
                 });
 
             handle_futures.await_future(
-                *traits::future_access<decltype(f)>::get_shared_state(f));
+                *traits::future_access<decltype(f)>::get_shared_state(f),
+                false);
         }
 
         void id_type_impl::preprocess_gid(serialization::output_archive& ar) const
         {
             // unmanaged gids do not require any special handling
             // check-pointing does not require any special handling here neither
-            if (unmanaged == type_)
+            if (unmanaged == type_ || managed_move_credit == type_)
             {
                 return;
             }
@@ -288,11 +296,10 @@ namespace hpx { namespace naming
 
             // Request new credits from AGAS if needed (i.e. the remainder
             // of the credit splitting is equal to one).
-            if (managed == type_)
-            {
-                handle_credit_splitting(
-                    ar, const_cast<id_type_impl&>(*this), split_gids);
-            }
+            HPX_ASSERT(managed == type_);
+
+            handle_credit_splitting(
+                ar, const_cast<id_type_impl&>(*this), split_gids);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -332,6 +339,7 @@ namespace hpx { namespace naming
             std::int64_t new_credit = src_credit + split_credit;
             std::int64_t overflow_credit = new_credit -
                 static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL);
+            HPX_ASSERT(overflow_credit >= 0);
 
             new_credit
                 = (std::min)(
@@ -582,6 +590,12 @@ namespace hpx { namespace naming
                 HPX_ASSERT(new_gid != invalid_gid);
             }
 
+#if defined(HPX_DEBUG)
+            auto* split_gids = ar.try_get_extra_data<
+                serialization::detail::preprocess_gid_types>();
+            HPX_ASSERT(!split_gids || !split_gids->has_gid(*this));
+#endif
+
             gid_serialization_data data{new_gid, type};
             ar << data;
         }
@@ -681,6 +695,20 @@ namespace hpx { namespace naming
             << std::right << std::setfill('0') << std::setw(16) << id_msb_
             << std::right << std::setfill('0') << std::setw(16) << id_lsb_;
         return out.str();
+    }
+
+    void decrement_refcnt(gid_type const& gid)
+    {
+        // We assume that the gid was split in the past
+        HPX_ASSERT(detail::gid_was_split(gid));
+
+        // decrement global reference count for the given gid,
+        std::int64_t credits = detail::get_credit_from_gid(gid);
+        HPX_ASSERT(0 != credits);
+
+        // Fire-and-forget semantics.
+        error_code ec(lightweight);
+        agas::decref(gid, credits, ec);
     }
 
     std::ostream& operator<<(std::ostream& os, gid_type const& id)

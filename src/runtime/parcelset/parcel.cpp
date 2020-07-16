@@ -330,6 +330,7 @@ namespace hpx { namespace parcelset
 
     void parcel::set_split_gids(parcel::split_gids_type&& split_gids)
     {
+        HPX_ASSERT(split_gids_.empty());
         split_gids_ = std::move(split_gids);
     }
 
