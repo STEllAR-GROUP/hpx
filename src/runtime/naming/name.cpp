@@ -253,6 +253,7 @@ namespace hpx { namespace naming
             auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
                 [&split_gids, &handle_futures, &gid](
                     hpx::future<gid_type>&& gid_future) {
+                    HPX_UNUSED(handle_futures);
                     HPX_ASSERT(handle_futures.has_futures());
                     split_gids.add_gid(gid, gid_future.get());
                 });
