@@ -14,7 +14,6 @@
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/function.hpp>
 
-#include <array>
 #include <cstddef>
 #include <exception>
 #include <limits>
@@ -83,15 +82,37 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        cds_type get_libcds_data() const override
+        std::size_t& get_libcds_data() const override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->get_libcds_data();
         }
-        cds_type set_libcds_data(cds_type data) override
+        std::size_t& set_libcds_data(std::size_t& data) override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->set_libcds_data(data);
+        }
+
+        std::size_t& get_libcds_hp_data() const override
+        {
+            HPX_ASSERT(pimpl_);
+            return pimpl_->get_libcds_hp_data();
+        }
+        std::size_t& set_libcds_hp_data(std::size_t& data) override
+        {
+            HPX_ASSERT(pimpl_);
+            return pimpl_->set_libcds_hp_data(data);
+        }
+
+        std::size_t& get_libcds_dhp_data() const override
+        {
+            HPX_ASSERT(pimpl_);
+            return pimpl_->get_libcds_dhp_data();
+        }
+        std::size_t& set_libcds_dhp_data(std::size_t& data) override
+        {
+            HPX_ASSERT(pimpl_);
+            return pimpl_->set_libcds_dhp_data(data);
         }
 #endif
 

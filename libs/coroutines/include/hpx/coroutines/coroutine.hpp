@@ -40,7 +40,6 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -98,15 +97,34 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        typedef std::array<std::size_t, 3> cds_type;
-        cds_type get_libcds_data() const
+        std::size_t& get_libcds_data() const
         {
             return impl_.get_libcds_data();
         }
 
-        cds_type set_libcds_data(cds_type data)
+        std::size_t& set_libcds_data(std::size_t& data)
         {
             return impl_.set_libcds_data(data);
+        }
+
+        std::size_t& get_libcds_hp_data() const
+        {
+            return impl_.get_libcds_hp_data();
+        }
+
+        std::size_t& set_libcds_hp_data(std::size_t& data)
+        {
+            return impl_.set_libcds_hp_data(data);
+        }
+
+        std::size_t& get_libcds_dhp_data() const
+        {
+            return impl_.get_libcds_dhp_data();
+        }
+
+        std::size_t& set_libcds_dhp_data(std::size_t& data)
+        {
+            return impl_.set_libcds_dhp_data(data);
         }
 #endif
 

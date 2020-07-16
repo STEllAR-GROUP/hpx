@@ -123,16 +123,39 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        typedef std::array<std::size_t, 3> cds_type;
-        cds_type get_libcds_data() const
+        std::size_t& get_libcds_data() const
         {
             return libcds_data_;
         }
 
-        cds_type set_libcds_data(cds_type data)
+        std::size_t& set_libcds_data(std::size_t& data)
         {
-            cds_type olddata = libcds_data_;
+            static std::size_t olddata = libcds_data_;
             libcds_data_ = data;
+            return olddata;
+        }
+
+        std::size_t& get_libcds_hp_data() const
+        {
+            return libcds_hp_data_;
+        }
+
+        std::size_t& set_libcds_hp_data(std::size_t& data)
+        {
+            static std::size_t olddata = libcds_hp_data_;
+            libcds_hp_data_ = data;
+            return olddata;
+        }
+
+        std::size_t& get_libcds_dhp_data() const
+        {
+            return libcds_dhp_data_;
+        }
+
+        std::size_t& set_libcds_dhp_data(std::size_t& data)
+        {
+            static std::size_t olddata = libcds_dhp_data_;
+            libcds_dhp_data_ = data;
             return olddata;
         }
 #endif
@@ -239,7 +262,9 @@ namespace hpx { namespace threads { namespace coroutines {
         mutable std::size_t thread_data_;
 #endif
 #ifdef HPX_HAVE_LIBCDS
-        mutable cds_type libcds_data_;
+        mutable std::size_t libcds_data_;
+        mutable std::size_t libcds_hp_data_;
+        mutable std::size_t libcds_dhp_data_;
 #endif
         std::size_t continuation_recursion_count_;
     };

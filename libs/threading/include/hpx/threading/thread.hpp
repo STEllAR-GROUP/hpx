@@ -17,7 +17,6 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
-#include <array>
 #include <cstddef>
 #include <exception>
 #include <iosfwd>
@@ -122,9 +121,12 @@ namespace hpx {
         std::size_t set_thread_data(std::size_t);
 
 #ifdef HPX_HAVE_LIBCDS
-        typedef std::array<std::size_t, 3> cds_type;
-        cds_type get_libcds_data() const;
-        cds_type set_libcds_data(cds_type);
+        std::size_t& get_libcds_data() const;
+        std::size_t& set_libcds_data(std::size_t&);
+        std::size_t& get_libcds_hp_data() const;
+        std::size_t& set_libcds_hp_data(std::size_t&);
+        std::size_t& get_libcds_dhp_data() const;
+        std::size_t& set_libcds_dhp_data(std::size_t&);
 #endif
 
     private:
@@ -264,9 +266,12 @@ namespace hpx {
         HPX_EXPORT std::size_t set_thread_data(std::size_t);
 
 #ifdef HPX_HAVE_LIBCDS
-        typedef std::array<std::size_t, 3> cds_type;
-        HPX_EXPORT cds_type get_libcds_data();
-        HPX_EXPORT cds_type set_libcds_data(cds_type);
+        HPX_EXPORT std::size_t& get_libcds_data();
+        HPX_EXPORT std::size_t& set_libcds_data(std::size_t&);
+        HPX_EXPORT std::size_t& get_libcds_hp_data();
+        HPX_EXPORT std::size_t& set_libcds_hp_data(std::size_t&);
+        HPX_EXPORT std::size_t& get_libcds_dhp_data();
+        HPX_EXPORT std::size_t& set_libcds_dhp_data(std::size_t&);
 #endif
 
         class HPX_EXPORT disable_interruption

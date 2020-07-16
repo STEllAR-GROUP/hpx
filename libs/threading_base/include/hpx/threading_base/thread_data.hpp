@@ -28,7 +28,6 @@
 #include <hpx/threading_base/external_timer.hpp>
 #endif
 
-#include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -554,9 +553,12 @@ namespace hpx { namespace threads {
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 
 #ifdef HPX_HAVE_LIBCDS
-        typedef std::array<std::size_t, 3> cds_type;
-        virtual cds_type get_libcds_data() const = 0;
-        virtual cds_type set_libcds_data(cds_type data) = 0;
+        virtual std::size_t& get_libcds_data() const = 0;
+        virtual std::size_t& set_libcds_data(std::size_t& data) = 0;
+        virtual std::size_t& get_libcds_hp_data() const = 0;
+        virtual std::size_t& set_libcds_hp_data(std::size_t& data) = 0;
+        virtual std::size_t& get_libcds_dhp_data() const = 0;
+        virtual std::size_t& set_libcds_dhp_data(std::size_t& data) = 0;
 #endif
 
         virtual void rebind(thread_init_data& init_data) = 0;

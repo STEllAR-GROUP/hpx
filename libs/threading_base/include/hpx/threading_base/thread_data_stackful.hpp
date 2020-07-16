@@ -18,7 +18,6 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
@@ -94,14 +93,34 @@ namespace hpx { namespace threads {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        cds_type get_libcds_data() const override
+        std::size_t& get_libcds_data() const override
         {
             return coroutine_.get_libcds_data();
         }
 
-        cds_type set_libcds_data(cds_type data) override
+        std::size_t& set_libcds_data(std::size_t& data) override
         {
             return coroutine_.set_libcds_data(data);
+        }
+
+        std::size_t& get_libcds_hp_data() const override
+        {
+            return coroutine_.get_libcds_hp_data();
+        }
+
+        std::size_t& set_libcds_hp_data(std::size_t& data) override
+        {
+            return coroutine_.set_libcds_hp_data(data);
+        }
+
+        std::size_t& get_libcds_dhp_data() const override
+        {
+            return coroutine_.get_libcds_dhp_data();
+        }
+
+        std::size_t& set_libcds_dhp_data(std::size_t& data) override
+        {
+            return coroutine_.set_libcds_dhp_data(data);
         }
 #endif
 

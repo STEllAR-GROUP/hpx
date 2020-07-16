@@ -206,30 +206,87 @@ namespace hpx { namespace threads {
     }
 
 #ifdef HPX_HAVE_LIBCDS
-    cds_type get_libcds_data(thread_id_type const& id, error_code& ec)
+    std::size_t& get_libcds_data(thread_id_type const& id, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_libcds_data",
                 "null thread id encountered");
-            return cds_type{{0, 0, 0}};
+            static std::size_t data(0);
+            return data;
         }
 
         return get_thread_id_data(id)->get_libcds_data();
     }
 
-    cds_type set_libcds_data(
-        thread_id_type const& id, cds_type data, error_code& ec)
+    std::size_t& set_libcds_data(
+        thread_id_type const& id, std::size_t& data, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::set_libcds_data",
                 "null thread id encountered");
-            return cds_type{{0, 0, 0}};
+            static std::size_t data(0);
+            return data;
         }
 
         return get_thread_id_data(id)->set_libcds_data(data);
     }
+
+    std::size_t& get_libcds_hp_data(thread_id_type const& id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_libcds_hp_data",
+                "null thread id encountered");
+            static std::size_t data(0);
+            return data;
+        }
+
+        return get_thread_id_data(id)->get_libcds_hp_data();
+    }
+
+    std::size_t& set_libcds_hp_data(
+        thread_id_type const& id, std::size_t& data, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::set_libcds_hp_data",
+                "null thread id encountered");
+            static std::size_t data(0);
+            return data;
+        }
+
+        return get_thread_id_data(id)->set_libcds_hp_data(data);
+    }
+
+    std::size_t& get_libcds_dhp_data(thread_id_type const& id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_libcds_dhp_data",
+                "null thread id encountered");
+            static std::size_t data(0);
+            return data;
+        }
+
+        return get_thread_id_data(id)->get_libcds_dhp_data();
+    }
+
+    std::size_t& set_libcds_dhp_data(
+        thread_id_type const& id, std::size_t& data, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id))
+        {
+            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::set_libcds_dhp_data",
+                "null thread id encountered");
+            static std::size_t data(0);
+            return data;
+        }
+
+        return get_thread_id_data(id)->set_libcds_dhp_data(data);
+    }
+
 #endif
 
     ////////////////////////////////////////////////////////////////////////////

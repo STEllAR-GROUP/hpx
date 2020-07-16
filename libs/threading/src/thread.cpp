@@ -20,7 +20,6 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
-#include <array>
 #include <cstddef>
 #include <exception>
 #include <functional>
@@ -249,14 +248,31 @@ namespace hpx {
     }
 
 #ifdef HPX_HAVE_LIBCDS
-    typedef std::array<std::size_t, 3> cds_type;
-    cds_type thread::get_libcds_data() const
+    std::size_t& thread::get_libcds_data() const
     {
         return threads::get_libcds_data(native_handle());
     }
-    cds_type thread::set_libcds_data(cds_type data)
+    std::size_t& thread::set_libcds_data(std::size_t& data)
     {
         return threads::set_libcds_data(native_handle(), data);
+    }
+
+    std::size_t& thread::get_libcds_hp_data() const
+    {
+        return threads::get_libcds_hp_data(native_handle());
+    }
+    std::size_t& thread::set_libcds_hp_data(std::size_t& data)
+    {
+        return threads::set_libcds_hp_data(native_handle(), data);
+    }
+
+    std::size_t& thread::get_libcds_dhp_data() const
+    {
+        return threads::get_libcds_dhp_data(native_handle());
+    }
+    std::size_t& thread::set_libcds_dhp_data(std::size_t& data)
+    {
+        return threads::set_libcds_dhp_data(native_handle(), data);
     }
 #endif
 
@@ -411,14 +427,34 @@ namespace hpx {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        cds_type get_libcds_data()
+        std::size_t& get_libcds_data()
         {
             return threads::get_libcds_data(threads::get_self_id());
         }
 
-        cds_type set_libcds_data(cds_type data)
+        std::size_t& set_libcds_data(std::size_t& data)
         {
             return threads::set_libcds_data(threads::get_self_id(), data);
+        }
+
+        std::size_t& get_libcds_hp_data()
+        {
+            return threads::get_libcds_hp_data(threads::get_self_id());
+        }
+
+        std::size_t& set_libcds_hp_data(std::size_t& data)
+        {
+            return threads::set_libcds_hp_data(threads::get_self_id(), data);
+        }
+
+        std::size_t& get_libcds_dhp_data()
+        {
+            return threads::get_libcds_dhp_data(threads::get_self_id());
+        }
+
+        std::size_t& set_libcds_dhp_data(std::size_t& data)
+        {
+            return threads::set_libcds_dhp_data(threads::get_self_id(), data);
         }
 #endif
         ///////////////////////////////////////////////////////////////////////
