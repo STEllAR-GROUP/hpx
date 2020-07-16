@@ -114,11 +114,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         void reset()
         {
-            this->reset_stack();
-            m_result = result_type(terminated, invalid_thread_id);
+            // First reset the function and arguments
             m_arg = nullptr;
-            m_fun.reset();    // just reset the bound function
+            m_fun.reset();
+
+            // Then reset the id and stack as they may be used by the
+            // destructors of the thread function above
             this->super_type::reset();
+            this->reset_stack();
         }
 
         void rebind(functor_type&& f, thread_id_type id)

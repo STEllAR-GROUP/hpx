@@ -74,6 +74,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(
                         result_last.first == thread_state_enum::terminated);
+
+                    // Reset early as the destructors may still yield.
+                    this->reset();
                 }
                 catch (...)
                 {
@@ -87,7 +90,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 this->bind_result(result_last);
             }
 
-            this->reset();
             this->do_return(status, std::move(tinfo));
         } while (this->m_state == super_type::ctx_running);
 
