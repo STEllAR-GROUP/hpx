@@ -12,5 +12,4 @@
 
 namespace hpx {
     using hpx::util::invoke_result;
-    using hpx::util::result_of;
 }    // namespace hpx
