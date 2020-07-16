@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2012 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,8 +9,9 @@
 #include "../row_range.hpp"
 
 #include <hpx/assert.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 
 #include <boost/smart_ptr/shared_array.hpp>
 

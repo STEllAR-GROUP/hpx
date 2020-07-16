@@ -16,7 +16,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the partitioned vector types to be used.
-typedef hpx::compute::cuda::allocator<int> target_allocator;
+typedef hpx::cuda::experimental::allocator<int> target_allocator;
 typedef hpx::compute::vector<int, target_allocator> target_vector;
 
 HPX_REGISTER_PARTITIONED_VECTOR(int, target_vector);
@@ -35,8 +35,8 @@ struct pfo
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    hpx::compute::cuda::target_distribution_policy policy =
-        hpx::compute::cuda::target_layout(hpx::compute::cuda::get_local_targets());
+    hpx::cuda::experimental::target_distribution_policy policy =
+        hpx::cuda::experimental::target_layout(hpx::cuda::experimental::get_local_targets());
 
     {
         using namespace hpx::parallel;

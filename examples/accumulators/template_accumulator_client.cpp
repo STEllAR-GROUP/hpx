@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// hpxinspect:noinclude:hpx::util::from_string
+
 #include <hpx/hpx_init.hpp>
-#include <hpx/string_util/split.hpp>
-#include <hpx/string_util/trim.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/include/util.hpp>
 
 #include "template_accumulator.hpp"
 

@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/actions/action_support.hpp>
 #include <hpx/async_distributed/applier/apply_continue.hpp>
 #include <hpx/async_distributed/applier/detail/apply_colocated_fwd.hpp>
 #include <hpx/async_distributed/applier/register_apply_colocated.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/traits/is_continuation.hpp>

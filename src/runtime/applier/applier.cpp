@@ -16,15 +16,15 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/util/thread_description.hpp>
 
-#include <hpx/runtime_distributed.hpp>
+#include <hpx/async_distributed/applier/applier.hpp>
+#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/async_distributed/applier/applier.hpp>
-#include <hpx/runtime/components/pinned_ptr.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/runtime_fwd.hpp>
+#include <hpx/runtime_distributed.hpp>
 
 #include <cstddef>
 #include <cstdint>

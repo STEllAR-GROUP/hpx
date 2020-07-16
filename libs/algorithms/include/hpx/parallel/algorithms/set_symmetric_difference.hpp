@@ -18,6 +18,7 @@
 #include <hpx/parallel/algorithms/detail/set_operation.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -62,23 +63,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first1 == last1)
                 {
                     return util::detail::convert_to_result(
-                        detail::copy<std::pair<RanIter2, FwdIter>>().call(
-                            std::forward<ExPolicy>(policy), std::false_type(),
-                            first2, last2, dest),
-                        [](std::pair<RanIter2, FwdIter> const& p) -> FwdIter {
-                            return p.second;
-                        });
+                        detail::copy<util::in_out_result<RanIter2, FwdIter>>()
+                            .call(std::forward<ExPolicy>(policy),
+                                std::false_type(), first2, last2, dest),
+                        [](util::in_out_result<RanIter2, FwdIter> const& p)
+                            -> FwdIter { return p.out; });
                 }
 
                 if (first2 == last2)
                 {
                     return util::detail::convert_to_result(
-                        detail::copy<std::pair<RanIter1, FwdIter>>().call(
-                            std::forward<ExPolicy>(policy), std::false_type(),
-                            first1, last1, dest),
-                        [](std::pair<RanIter1, FwdIter> const& p) -> FwdIter {
-                            return p.second;
-                        });
+                        detail::copy<util::in_out_result<RanIter1, FwdIter>>()
+                            .call(std::forward<ExPolicy>(policy),
+                                std::false_type(), first1, last1, dest),
+                        [](util::in_out_result<RanIter1, FwdIter> const& p)
+                            -> FwdIter { return p.out; });
                 }
 
                 typedef

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/modules/format.hpp>
+#include <hpx/include/util.hpp>
 
 #include <cstdint>
 #include <iostream>

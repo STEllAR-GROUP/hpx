@@ -30,7 +30,8 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   SOURCES ${init_runtime_sources}
   HEADERS ${init_runtime_headers}
-  DEPENDENCIES hpx_algorithms hpx_config hpx_runtime_local hpx_testing
+  DEPENDENCIES hpx_actions_base hpx_algorithms hpx_config hpx_runtime_local
+               hpx_testing
   CMAKE_SUBDIRS examples tests
 )
 

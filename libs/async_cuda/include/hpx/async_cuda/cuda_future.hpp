@@ -30,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
 
     using print_on = debug::enable_print<false>;
     static constexpr print_on cud_debug("CUDAFUT");
@@ -343,4 +343,4 @@ namespace hpx { namespace cuda {
         std::string pool_name_;
     };
 
-}}    // namespace hpx::cuda
+}}}    // namespace hpx::cuda::experimental

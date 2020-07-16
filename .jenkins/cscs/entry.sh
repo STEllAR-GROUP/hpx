@@ -16,17 +16,6 @@ rm -f jenkins-hpx*
 source .jenkins/cscs/slurm-constraint-${configuration_name}.sh
 
 set +e
-echo "${ghprbActualCommit}"
-echo "${ghprbActualCommitAuthor}"
-echo "${ghprbActualCommitAuthorEmail}"
-echo "${ghprbPullDescription}"
-echo "${ghprbPullId}"
-echo "${ghprbPullLink}"
-echo "${ghprbPullTitle}"
-echo "${ghprbSourceBranch}"
-echo "${ghprbTargetBranch}"
-echo "${ghprbCommentBody}"
-echo "${sha1}"
 sbatch \
     --job-name="jenkins-hpx-${configuration_name}" \
     --nodes="1" \
@@ -52,22 +41,28 @@ else
     github_commit_status="failure"
 fi
 
-# Extract just the organization and repo names "org/repo" from the full URL
-github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
+set +e
+if [[ -n "${ghprbPullId}" ]]; then
+    set-e
 
-# Get the CDash dashboard build id
-cdash_build_id="$(cat jenkins-hpx-${configuration_name}-cdash-build-id.txt)"
+    # Extract just the organization and repo names "org/repo" from the full URL
+    github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
 
-# Extract actual token from GITHUB_TOKEN (in the form "username:token")
-github_token=$(echo ${GITHUB_TOKEN} | cut -f2 -d':')
+    # Get the CDash dashboard build id
+    cdash_build_id="$(cat jenkins-hpx-${configuration_name}-cdash-build-id.txt)"
 
-# Set GitHub status with CDash url
-.jenkins/cscs/set_github_status.sh \
-    "${github_token}" \
-    "${github_commit_repo}" \
-    "${ghprbActualCommit}" \
-    "${github_commit_status}" \
-    "${configuration_name}" \
-    "${cdash_build_id}"
+    # Extract actual token from GITHUB_TOKEN (in the form "username:token")
+    github_token=$(echo ${GITHUB_TOKEN} | cut -f2 -d':')
 
+    # Set GitHub status with CDash url
+    .jenkins/cscs/set_github_status.sh \
+        "${github_token}" \
+        "${github_commit_repo}" \
+        "${ghprbActualCommit}" \
+        "${github_commit_status}" \
+        "${configuration_name}" \
+        "${cdash_build_id}"
+fi
+
+set -e
 exit $(cat jenkins-hpx-${configuration_name}-ctest-status.txt)

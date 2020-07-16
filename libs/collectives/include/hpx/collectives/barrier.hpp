@@ -12,7 +12,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
 #include <cstddef>

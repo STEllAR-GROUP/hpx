@@ -9,7 +9,7 @@
 
 #include <hpx/modules/timing.hpp>
 #include <hpx/include/parallel_transform_reduce.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 #include <cstddef>
 #include <cstdint>

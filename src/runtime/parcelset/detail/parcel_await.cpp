@@ -7,8 +7,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/actions/actions_fwd.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/runtime/actions_fwd.hpp>
 #include <hpx/runtime/parcelset/detail/parcel_await.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset_fwd.hpp>
@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset { namespace detail {
                 serialization::detail::preprocess_gid_types>();
             if (split_gids)
             {
-                p.set_split_gids(std::move(split_gids->move_split_gids()));
+                p.set_split_gids(split_gids->move_split_gids());
             }
 
             return true;

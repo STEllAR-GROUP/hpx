@@ -18,8 +18,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
+
 #include <hpx/async_local/dataflow.hpp>
+#include <hpx/modules/actions_base.hpp>
 
 #include <iostream>
 

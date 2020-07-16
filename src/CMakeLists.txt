@@ -186,27 +186,18 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/plugins/plugin_registry.hpp
     hpx/plugins/unique_plugin_name.hpp
     hpx/runtime_fwd.hpp
-    hpx/runtime/actions/action_priority.hpp
-    hpx/runtime/actions/action_support.hpp
-    hpx/runtime/actions/base_action.hpp
-    hpx/runtime/actions/basic_action_fwd.hpp
-    hpx/runtime/actions/basic_action.hpp
-    hpx/runtime/actions/component_action.hpp
     hpx/runtime/actions/continuation2_impl.hpp
     hpx/runtime/actions/continuation_fwd.hpp
     hpx/runtime/actions/continuation.hpp
     hpx/runtime/actions/continuation_impl.hpp
     hpx/runtime/actions/detail/action_factory.hpp
     hpx/runtime/actions/detail/invocation_count_registry.hpp
-    hpx/runtime/actions_fwd.hpp
     hpx/runtime/actions/lambda_to_action.hpp
     hpx/runtime/actions/make_continuation.hpp
     hpx/runtime/actions/manage_object_action.hpp
-    hpx/runtime/actions/plain_action.hpp
     hpx/runtime/actions/preassigned_action_id.hpp
     hpx/runtime/actions/set_lco_value_continuation.hpp
     hpx/runtime/actions/transfer_action.hpp
-    hpx/runtime/actions/transfer_base_action.hpp
     hpx/runtime/actions/transfer_continuation_action.hpp
     hpx/runtime/actions/trigger.hpp
     hpx/runtime/agas/addressing_service.hpp
@@ -249,7 +240,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/components_fwd.hpp
     hpx/runtime/components/make_client.hpp
     hpx/runtime/components/migrate_component.hpp
-    hpx/runtime/components/pinned_ptr.hpp
     hpx/runtime/components/runtime_support.hpp
     hpx/runtime/components/server/abstract_component_base.hpp
     hpx/runtime/components/server/abstract_migration_support.hpp
@@ -285,7 +275,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/runtime/find_localities.hpp
     hpx/runtime/get_colocation_id.hpp
     hpx/runtime/get_locality_name.hpp
-    hpx/runtime/get_lva.hpp
     hpx/runtime/get_ptr.hpp
     hpx/runtime/message_handler_fwd.hpp
     hpx/runtime/naming/address.hpp
@@ -324,22 +313,15 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/traits/action_does_termination_detection.hpp
     hpx/traits/action_is_target_valid.hpp
     hpx/traits/action_message_handler.hpp
-    hpx/traits/action_priority.hpp
-    hpx/traits/action_remote_result.hpp
     hpx/traits/action_schedule_thread.hpp
-    hpx/traits/action_select_direct_execution.hpp
     hpx/traits/action_serialization_filter.hpp
-    hpx/traits/action_stacksize.hpp
     hpx/traits/action_was_object_migrated.hpp
     hpx/traits/component_config_data.hpp
     hpx/traits/component_heap_type.hpp
-    hpx/traits/component_pin_support.hpp
     hpx/traits/component_supports_migration.hpp
     hpx/traits/component_type_database.hpp
     hpx/traits/component_type_is_compatible.hpp
-    hpx/traits/extract_action.hpp
     hpx/traits/is_client.hpp
-    hpx/traits/is_component.hpp
     hpx/traits/is_continuation.hpp
     hpx/traits/is_distribution_policy.hpp
     hpx/traits/is_valid_action.hpp
@@ -554,54 +536,51 @@ set(_library_types
 set(_is_executable "$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>")
 set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 
-add_library(hpx_no_wrap_main INTERFACE)
 add_library(hpx INTERFACE)
+add_library(wrap_main INTERFACE)
 
-target_link_libraries(hpx_no_wrap_main INTERFACE hpx_core)
 target_link_libraries(hpx INTERFACE hpx_core)
 
-# hpx_interface and hpx_interface_no_wrap_main contain additional interface
-# options to be passed to dependent targets. We create these as separate targets
-# to easily filter out the generator expressions that can't be handled by the
+# hpx_interface and hpx_interface_wrap_main contain additional interface options
+# to be passed to dependent targets. We create these as separate targets to
+# easily filter out the generator expressions that can't be handled by the
 # pkgconfig file generation.
-add_library(hpx_interface_no_wrap_main INTERFACE)
+add_library(hpx_interface INTERFACE)
 target_link_libraries(
-  hpx_interface_no_wrap_main
+  hpx_interface
   INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_init>>
 )
 target_link_libraries(
-  hpx_interface_no_wrap_main
+  hpx_interface
   INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_init>>
 )
 target_compile_definitions(
-  hpx_interface_no_wrap_main
+  hpx_interface
   INTERFACE
     "$<${_is_executable}:HPX_APPLICATION_NAME_DEFAULT=$<TARGET_PROPERTY:NAME>>"
 )
 target_compile_definitions(
-  hpx_interface_no_wrap_main
+  hpx_interface
   INTERFACE "$<${_is_executable}:HPX_PREFIX_DEFAULT=\"${HPX_PREFIX}\">"
 )
 target_compile_definitions(
-  hpx_interface_no_wrap_main
-  INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>"
+  hpx_interface INTERFACE "$<${_is_executable}:HPX_APPLICATION_EXPORTS>"
 )
 target_compile_definitions(
-  hpx_interface_no_wrap_main INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>"
+  hpx_interface INTERFACE "$<${_is_library}:HPX_LIBRARY_EXPORTS>"
 )
 
-add_library(hpx_interface INTERFACE)
-target_link_libraries(hpx_interface INTERFACE hpx_interface_no_wrap_main)
+add_library(hpx_interface_wrap_main INTERFACE)
 target_link_libraries(
-  hpx_interface
+  hpx_interface_wrap_main
   INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:hpx_wrap>>
 )
 target_link_libraries(
-  hpx_interface
+  hpx_interface_wrap_main
   INTERFACE $<${_is_executable}:$<TARGET_NAME_IF_EXISTS:HPXInternal::hpx_wrap>>
 )
 
-target_link_libraries(hpx_no_wrap_main INTERFACE hpx_interface_no_wrap_main)
+target_link_libraries(wrap_main INTERFACE hpx_interface_wrap_main)
 target_link_libraries(hpx INTERFACE hpx_interface)
 
 # HPX::component is to be linked privately to all HPX components NOTE: The
@@ -628,8 +607,13 @@ target_compile_definitions(
     "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>"
 )
 
-set(hpx_targets hpx hpx_no_wrap_main plugin component)
-set(hpx_internal_targets hpx_core hpx_interface hpx_interface_no_wrap_main)
+set(hpx_targets hpx wrap_main plugin component)
+set(hpx_internal_targets hpx_core hpx_interface hpx_interface_wrap_main)
+
+# Temporary for compatibility with projects like gridtools
+add_library(hpx_no_wrap_main INTERFACE)
+target_link_libraries(hpx_no_wrap_main INTERFACE hpx)
+list(APPEND hpx_targets hpx_no_wrap_main)
 
 install(
   TARGETS ${hpx_targets}

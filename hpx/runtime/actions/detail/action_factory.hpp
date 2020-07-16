@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/actions/action_support.hpp>
+#include <hpx/actions/actions_fwd.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/actions_fwd.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
 
 #include <cstdint>
 #include <string>

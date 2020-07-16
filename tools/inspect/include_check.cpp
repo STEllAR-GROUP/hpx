@@ -224,7 +224,7 @@ namespace boost
         {"(\\bstd\\s*::\\s*(memory_order_*)\\b)", "std::\\2", "atomic"},
         // boost
         {"(\\bhpx\\s*::\\s*intrusive_ptr\\b)", "hpx::intrusive_ptr",
-            "hpx/memory/intrusive_ptr.hpp"},
+            "hpx/modules/memory.hpp"},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*from_string\\b)",
             "hpx::util::from_string", "hpx/util/from_string.hpp"},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*to_string\\b)",

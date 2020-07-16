@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,7 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 #include <exception>
@@ -36,7 +37,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename SegOutIter>
         static typename util::detail::algorithm_result<ExPolicy,
-            std::pair<SegIter, SegOutIter>>::type
+            util::in_out_result<SegIter, SegOutIter>>::type
         segmented_transfer(Algo&& algo, ExPolicy const& policy, std::true_type,
             SegIter first, SegIter last, SegOutIter dest)
         {
@@ -51,7 +52,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef typename output_traits::local_iterator
                 local_output_iterator_type;
 
-            typedef std::pair<local_iterator_type, local_output_iterator_type>
+            typedef util::in_out_result<local_iterator_type,
+                local_output_iterator_type>
                 local_iterator_pair;
 
             segment_iterator sit = traits::segment(first);
@@ -71,7 +73,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, traits::local(dest));
 
-                    dest = output_traits::compose(sdest, p.second);
+                    dest = output_traits::compose(sdest, p.out);
                 }
             }
             else
@@ -85,7 +87,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     local_iterator_pair p = dispatch(traits::get_id(sit), algo,
                         policy, std::true_type(), beg, end, out);
-                    out = p.second;
+                    out = p.out;
                 }
 
                 // handle all of the full partitions
@@ -99,7 +101,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         local_iterator_pair p = dispatch(traits::get_id(sit),
                             algo, policy, std::true_type(), beg, end, out);
-                        out = p.second;
+                        out = p.out;
                     }
                 }
 
@@ -111,22 +113,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair p =
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, traits::begin(sdest));
-                    out = p.second;
+                    out = p.out;
                 }
 
                 dest = output_traits::compose(sdest, out);
             }
 
-            return util::detail::algorithm_result<ExPolicy,
-                std::pair<SegIter, SegOutIter>>::get(std::make_pair(last,
-                dest));
+            using result_type = util::in_out_result<SegIter, SegOutIter>;
+
+            return util::detail::algorithm_result<ExPolicy, result_type>::get(
+                result_type{last, dest});
         }
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename SegOutIter>
         static typename util::detail::algorithm_result<ExPolicy,
-            std::pair<SegIter, SegOutIter>>::type
+            util::in_out_result<SegIter, SegOutIter>>::type
         segmented_transfer(Algo&& algo, ExPolicy const& policy, std::false_type,
             SegIter first, SegIter last, SegOutIter dest)
         {
@@ -141,7 +144,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef typename output_traits::local_iterator
                 local_output_iterator_type;
 
-            typedef std::pair<local_iterator_type, local_output_iterator_type>
+            typedef util::in_out_result<local_iterator_type,
+                local_output_iterator_type>
                 local_iterator_pair;
 
             typedef std::integral_constant<bool,
@@ -205,41 +209,45 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         policy, forced_seq(), beg, end, traits::begin(sdest)));
                 }
             }
+
             // NOLINTNEXTLINE(bugprone-use-after-move)
             HPX_ASSERT(!segments.empty());
 
-            return util::detail::
-                algorithm_result<ExPolicy, std::pair<SegIter, SegOutIter>>::get(
-                    hpx::dataflow(
-                        [=](std::vector<shared_future<local_iterator_pair>>&& r)
-                            -> std::pair<SegIter, SegOutIter> {
-                            // handle any remote exceptions, will throw on error
-                            std::list<std::exception_ptr> errors;
-                            parallel::util::detail::handle_remote_exceptions<
-                                ExPolicy>::call(r, errors);
+            return util::detail::algorithm_result<ExPolicy,
+                util::in_out_result<SegIter, SegOutIter>>::
+                get(hpx::dataflow(
+                    [=](std::vector<shared_future<local_iterator_pair>>&& r)
+                        -> util::in_out_result<SegIter, SegOutIter> {
+                        // handle any remote exceptions, will throw on error
+                        std::list<std::exception_ptr> errors;
+                        parallel::util::detail::handle_remote_exceptions<
+                            ExPolicy>::call(r, errors);
 
-                            local_iterator_pair p = r.back().get();
-                            return std::make_pair(
-                                output_traits::compose(sdest, p.first),
-                                output_traits::compose(sdest, p.second));
-                        },
-                        std::move(segments)));
+                        local_iterator_pair p = r.back().get();
+                        using result_type =
+                            util::in_out_result<SegIter, SegOutIter>;
+
+                        return result_type{output_traits::compose(sdest, p.in),
+                            output_traits::compose(sdest, p.out)};
+                    },
+                    std::move(segments)));
         }
 
         ///////////////////////////////////////////////////////////////////////
         // segmented implementation
         template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename FwdIter2>
+            typename Sent1, typename FwdIter2>
         typename util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
-        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, std::true_type)
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+        transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
+            std::true_type)
         {
             if (first == last)
             {
+                using result_type = util::in_out_result<FwdIter1, FwdIter2>;
+
                 return util::detail::algorithm_result<ExPolicy,
-                    std::pair<FwdIter1, FwdIter2>>::get(std::make_pair(last,
-                    dest));
+                    result_type>::get(result_type{last, dest});
             }
 
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
@@ -250,11 +258,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         // forward declare the non-segmented version of this algorithm
         template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename FwdIter2>
+            typename Sent1, typename FwdIter2>
         typename util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
-        transfer_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, std::false_type);
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+        transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
+            std::false_type);
 
         /// \endcond
     }    // namespace detail

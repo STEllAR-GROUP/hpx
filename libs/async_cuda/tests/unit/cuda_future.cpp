@@ -38,7 +38,7 @@ extern void cuda_trivial_kernel(T, cudaStream_t stream);
 
 extern __global__ void saxpy(int n, float a, float* x, float* y);
 // -------------------------------------------------------------------------
-int test_saxpy(hpx::cuda::cuda_executor& cudaexec)
+int test_saxpy(hpx::cuda::experimental::cuda_executor& cudaexec)
 {
     int N = 1 << 20;
 
@@ -47,9 +47,11 @@ int test_saxpy(hpx::cuda::cuda_executor& cudaexec)
     std::vector<float> h_B(N);
 
     float *d_A, *d_B;
-    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_A, N * sizeof(float)));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_A, N * sizeof(float)));
 
-    hpx::cuda::check_cuda_error(cudaMalloc((void**) &d_B, N * sizeof(float)));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaMalloc((void**) &d_B, N * sizeof(float)));
 
     // init host data
     for (int idx = 0; idx < N; idx++)
@@ -107,7 +109,7 @@ int test_saxpy(hpx::cuda::cuda_executor& cudaexec)
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     // install cuda future polling handler
-    hpx::cuda::enable_user_polling poll("default");
+    hpx::cuda::experimental::enable_user_polling poll("default");
     //
     std::size_t device = vm["device"].as<std::size_t>();
     //
@@ -119,13 +121,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::srand(seed);
 
     // create a cuda target using device number 0,1,2...
-    hpx::cuda::target target(device);
+    hpx::cuda::experimental::target target(device);
 
     // for debug purposes, print out available targets
-    hpx::cuda::print_local_targets();
+    hpx::cuda::experimental::print_local_targets();
 
     // create a stream helper object
-    hpx::cuda::cuda_executor cudaexec(device, hpx::cuda::event_mode{});
+    hpx::cuda::experimental::cuda_executor cudaexec(
+        device, hpx::cuda::experimental::event_mode{});
 
     // --------------------
     // test kernel launch<float> using apply and async

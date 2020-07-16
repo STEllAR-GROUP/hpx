@@ -8,15 +8,15 @@
 // #define HPX_USE_WINDOWS_PERFORMANCE_COUNTERS 1
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/errors/exception.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/future.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/state.hpp>
+#include <hpx/include/performance_counters.hpp>
+#include <hpx/include/threadmanager.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/modules/timing.hpp>
+#include <hpx/state.hpp>
 
 #include <cstdint>
 #include <iostream>

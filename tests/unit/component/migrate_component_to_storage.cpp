@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/naming.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/component_storage.hpp>
+#include <hpx/include/components.hpp>
+#include <hpx/include/naming.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 

@@ -32,7 +32,8 @@ void test_move(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
@@ -58,7 +59,8 @@ void test_move_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    typedef test::test_container<std::vector<int>, IteratorTag> test_vector;
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
 
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());

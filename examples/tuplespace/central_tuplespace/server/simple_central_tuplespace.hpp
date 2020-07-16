@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/runtime/components/server/locking_hook.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/util/storage/tuple.hpp>
-#include <hpx/modules/timing.hpp>
 #include <hpx/include/lcos_local.hpp>
+#include <hpx/runtime/components/server/locking_hook.hpp>
+#include <hpx/util/storage/tuple.hpp>
 
 #include <mutex>
 

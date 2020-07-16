@@ -51,6 +51,7 @@ add_hpx_module(
   HEADERS ${async_cuda_headers}
   COMPAT_HEADERS ${async_cuda_compat_headers}
   DEPENDENCIES
+    hpx_actions_base
     hpx_affinity
     hpx_allocator_support
     hpx_assertion

@@ -6,9 +6,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/include/parallel_numeric.hpp>
-#include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/numeric.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 #include <iterator>
 #include <string>

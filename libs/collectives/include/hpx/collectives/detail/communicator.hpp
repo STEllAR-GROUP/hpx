@@ -10,6 +10,7 @@
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
+#include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/any.hpp>
@@ -19,7 +20,6 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/basename_registration.hpp>
 #include <hpx/runtime/components/server/component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>

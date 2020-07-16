@@ -6,12 +6,12 @@
 
 #pragma once
 
+#include <hpx/chrono.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/synchronization/mutex.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/mutex.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
-#include <hpx/modules/timing.hpp>
 #include <hpx/util/storage/tuple.hpp>
 
 #include <algorithm>
@@ -21,8 +21,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-#include <hpx/util/storage/tuple.hpp>
 
 // #define TS_DEBUG
 
@@ -323,4 +321,3 @@ namespace examples { namespace server {
 }}    // namespace examples::server
 
 #undef TS_DEBUG
-

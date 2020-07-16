@@ -31,10 +31,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::vector<int> h_B(N);
     std::iota(h_A.begin(), h_A.end(), dis(gen));
 
-    hpx::cuda::target target;
+    hpx::cuda::experimental::target target;
 
     // create data vector on device
-    typedef hpx::compute::cuda::allocator<int> allocator_type;
+    typedef hpx::cuda::experimental::allocator<int> allocator_type;
     allocator_type alloc(target);
 
     hpx::compute::vector<int, allocator_type> d_A(N, alloc);

@@ -77,6 +77,7 @@ add_hpx_module(
     hpx_execution
     hpx_functional
     hpx_iterator_support
+    hpx_memory
     hpx_serialization
     hpx_synchronization
     hpx_threading_base

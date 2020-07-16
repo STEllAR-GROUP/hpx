@@ -14,8 +14,8 @@
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/lcos_local/receive_buffer.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>

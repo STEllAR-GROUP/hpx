@@ -14,10 +14,11 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/transform_iterator.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
+#include <hpx/parallel/container_algorithms/copy.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 //
 #include <cstdint>
@@ -168,30 +169,30 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // Zip iterator has 3 iterators inside
         // Iter1, key type : Iter2, value type : Iter3, state type
         template <typename ZIter, typename iKey, typename iVal>
-        std::pair<iKey, iVal> make_pair_result(
+        util::in_out_result<iKey, iVal> make_pair_result(
             ZIter zipiter, iKey key_start, iVal val_start)
         {
             // the iterator we want is 'second' part of tagged_pair type (from copy_if)
-            auto t = zipiter.second.get_iterator_tuple();
+            auto t = zipiter.out.get_iterator_tuple();
             iKey key_end = hpx::util::get<0>(t);
-            return std::make_pair(key_end,
-                std::next(val_start, std::distance(key_start, key_end)));
+            return util::in_out_result<iKey, iVal>{key_end,
+                std::next(val_start, std::distance(key_start, key_end))};
         }
 
         // async version that returns future<pair> from future<zip_iterator<blah>>
         template <typename ZIter, typename iKey, typename iVal>
-        hpx::future<std::pair<iKey, iVal>> make_pair_result(
+        hpx::future<util::in_out_result<iKey, iVal>> make_pair_result(
             hpx::future<ZIter>&& ziter, iKey key_start, iVal val_start)
         {
-            typedef std::pair<iKey, iVal> result_type;
+            typedef util::in_out_result<iKey, iVal> result_type;
 
             return lcos::make_future<result_type>(
                 std::move(ziter), [=](ZIter zipiter) {
                     auto t = zipiter.second.get_iterator_tuple();
                     iKey key_end = hpx::util::get<0>(t);
-                    return std::make_pair(key_end,
+                    return result_type{key_end,
                         std::next(
-                            val_start, std::distance(key_start, key_end)));
+                            val_start, std::distance(key_start, key_end))};
                 });
         }
 
@@ -251,7 +252,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename RanIter, typename RanIter2,
             typename FwdIter1, typename FwdIter2, typename Compare,
             typename Func>
-        static std::pair<FwdIter1, FwdIter2> reduce_by_key_impl(
+        static util::in_out_result<FwdIter1, FwdIter2> reduce_by_key_impl(
             ExPolicy&& policy, RanIter key_first, RanIter key_last,
             RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
             Compare&& comp, Func&& func)
@@ -397,7 +398,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     zip2_ref;
 
                 return make_pair_result(
-                    hpx::parallel::copy_if(sync_policy,
+                    hpx::ranges::copy_if(sync_policy,
                         make_zip_iterator(key_first, values_output,
                             hpx::util::begin(key_state)),
                         make_zip_iterator(key_last,
@@ -416,7 +417,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename FwdIter1, typename FwdIter2>
         struct reduce_by_key
           : public detail::algorithm<reduce_by_key<FwdIter1, FwdIter2>,
-                std::pair<FwdIter1, FwdIter2>>
+                util::in_out_result<FwdIter1, FwdIter2>>
         {
             reduce_by_key()
               : reduce_by_key::algorithm("reduce_by_key")
@@ -425,10 +426,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename RanIter, typename RanIter2,
                 typename Compare, typename Func>
-            static std::pair<FwdIter1, FwdIter2> sequential(ExPolicy&& policy,
-                RanIter key_first, RanIter key_last, RanIter2 values_first,
-                FwdIter1 keys_output, FwdIter2 values_output, Compare&& comp,
-                Func&& func)
+            static util::in_out_result<FwdIter1, FwdIter2> sequential(
+                ExPolicy&& policy, RanIter key_first, RanIter key_last,
+                RanIter2 values_first, FwdIter1 keys_output,
+                FwdIter2 values_output, Compare&& comp, Func&& func)
             {
                 return reduce_by_key_impl(std::forward<ExPolicy>(policy),
                     key_first, key_last, values_first, keys_output,
@@ -439,13 +440,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename RanIter, typename RanIter2,
                 typename Compare, typename Func>
             static typename util::detail::algorithm_result<ExPolicy,
-                std::pair<FwdIter1, FwdIter2>>::type
+                util::in_out_result<FwdIter1, FwdIter2>>::type
             parallel(ExPolicy&& policy, RanIter key_first, RanIter key_last,
                 RanIter2 values_first, FwdIter1 keys_output,
                 FwdIter2 values_output, Compare&& comp, Func&& func)
             {
                 return util::detail::algorithm_result<ExPolicy,
-                    std::pair<FwdIter1, FwdIter2>>::
+                    util::in_out_result<FwdIter1, FwdIter2>>::
                     get(execution::async_execute(policy.executor(),
                         hpx::util::deferred_call(
                             &hpx::parallel::v1::detail::reduce_by_key_impl<
@@ -572,13 +573,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         hpx::traits::is_iterator<FwdIter1>::value&&
                             hpx::traits::is_iterator<FwdIter2>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        std::pair<FwdIter1, FwdIter2>>::type
+        util::in_out_result<FwdIter1, FwdIter2>>::type
     reduce_by_key(ExPolicy&& policy, RanIter key_first, RanIter key_last,
         RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
         Compare&& comp = Compare(), Func&& func = Func())
     {
         typedef util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>
+            util::in_out_result<FwdIter1, FwdIter2>>
             result;
 
         static_assert(
@@ -594,7 +595,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {    // we only have a single key/value so that is our output
             *keys_output = *key_first;
             *values_output = *values_first;
-            return result::get(std::make_pair(keys_output, values_output));
+            return result::get(util::in_out_result<FwdIter1, FwdIter2>{
+                keys_output, values_output});
         }
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;

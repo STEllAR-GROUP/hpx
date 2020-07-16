@@ -31,7 +31,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     template <typename T>
     class allocator
     {
@@ -58,10 +58,10 @@ namespace hpx { namespace compute { namespace cuda {
         typedef std::true_type is_always_equal;
         typedef std::true_type propagate_on_container_move_assignment;
 
-        typedef hpx::cuda::target target_type;
+        typedef hpx::cuda::experimental::target target_type;
 
         allocator()
-          : target_(hpx::cuda::get_default_target())
+          : target_(hpx::cuda::experimental::get_default_target())
         {
         }
 
@@ -121,7 +121,7 @@ namespace hpx { namespace compute { namespace cuda {
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(out_of_memory,
-                    "cuda::allocator<T>::allocate()",
+                    "cuda::experimental::allocator<T>::allocate()",
                     std::string("cudaMalloc failed: ") +
                         cudaGetErrorString(error));
             }
@@ -142,7 +142,7 @@ namespace hpx { namespace compute { namespace cuda {
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::allocator<T>::deallocate()",
+                    "cuda::experimental::allocator<T>::deallocate()",
                     std::string("cudaFree failed: ") +
                         cudaGetErrorString(error));
             }
@@ -161,7 +161,7 @@ namespace hpx { namespace compute { namespace cuda {
             if (error != cudaSuccess)
             {
                 HPX_THROW_EXCEPTION(kernel_error,
-                    "cuda::allocator<T>::max_size()",
+                    "cuda::experimental::allocator<T>::max_size()",
                     std::string("cudaMemGetInfo failed: ") +
                         cudaGetErrorString(error));
             }
@@ -252,6 +252,6 @@ namespace hpx { namespace compute { namespace cuda {
     private:
         target_type target_;
     };
-}}}    // namespace hpx::compute::cuda
+}}}    // namespace hpx::cuda::experimental
 
 #endif

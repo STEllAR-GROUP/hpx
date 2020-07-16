@@ -36,7 +36,7 @@ void test_copy(ExPolicy policy, IteratorTag)
     test_vector c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
-    hpx::parallel::copy(policy, c, std::begin(d));
+    hpx::ranges::copy(policy, c, std::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
@@ -60,7 +60,7 @@ void test_copy_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto f = hpx::parallel::copy(p, c, std::begin(d));
+    auto f = hpx::ranges::copy(p, c, std::begin(d));
     f.wait();
 
     std::size_t count = 0;
@@ -110,7 +110,7 @@ void test_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::copy(policy,
+        hpx::ranges::copy(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -146,7 +146,7 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::copy(p,
+        auto f = hpx::ranges::copy(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
@@ -211,7 +211,7 @@ void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::copy(policy,
+        hpx::ranges::copy(policy,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
@@ -246,7 +246,7 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::copy(p,
+        auto f = hpx::ranges::copy(p,
             hpx::util::make_iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),

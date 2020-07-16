@@ -25,13 +25,11 @@
 #include <hpx/futures/traits/acquire_future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/traits/extract_action.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <cstddef>

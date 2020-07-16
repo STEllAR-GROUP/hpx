@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/serialization.hpp>
+#include <hpx/serialization.hpp>
 
 #include "server/cancelable_action.hpp"
 

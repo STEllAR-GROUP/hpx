@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/string_util/trim.hpp>
+#include <hpx/include/util.hpp>
 
 #include <iostream>
 #include <iterator>

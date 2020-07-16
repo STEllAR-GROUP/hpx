@@ -20,7 +20,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/compute.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/parallel_copy.hpp>
 #include <hpx/include/parallel_executor_parameters.hpp>
 #include <hpx/include/parallel_executors.hpp>
@@ -94,11 +94,11 @@ void check_results(std::size_t iterations, Vector const& a_res,
     std::vector<STREAM_TYPE> b(b_res.size());
     std::vector<STREAM_TYPE> c(c_res.size());
 
-    hpx::parallel::copy(
+    hpx::copy(
         hpx::parallel::execution::par, a_res.begin(), a_res.end(), a.begin());
-    hpx::parallel::copy(
+    hpx::copy(
         hpx::parallel::execution::par, b_res.begin(), b_res.end(), b.begin());
-    hpx::parallel::copy(
+    hpx::copy(
         hpx::parallel::execution::par, c_res.begin(), c_res.end(), c.begin());
 
     STREAM_TYPE aj, bj, cj, scalar;
@@ -362,7 +362,7 @@ std::vector<std::vector<double>> run_benchmark(std::size_t iterations,
     {
         // Copy
         timing[0][iteration] = mysecond();
-        hpx::parallel::copy(policy, a.begin(), a.end(), c.begin());
+        hpx::copy(policy, a.begin(), a.end(), c.begin());
         timing[0][iteration] = mysecond() - timing[0][iteration];
 
         // Scale
@@ -445,11 +445,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (use_accel)
     {
 #if defined(HPX_HAVE_CUDA)
-        using executor_type = hpx::compute::cuda::concurrent_executor<>;
-        using allocator_type = hpx::compute::cuda::allocator<STREAM_TYPE>;
+        using executor_type = hpx::cuda::experimental::concurrent_executor<>;
+        using allocator_type = hpx::cuda::experimental::allocator<STREAM_TYPE>;
 
         // Get the cuda targets we want to run on
-        hpx::cuda::target target;
+        hpx::cuda::experimental::target target;
 
         // Get the host targets we want to run on
         auto host_targets = hpx::compute::host::get_local_targets();

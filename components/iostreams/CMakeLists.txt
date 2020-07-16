@@ -27,6 +27,7 @@ set(iostreams_headers
     hpx/components/iostreams/ostream.hpp
     hpx/components/iostreams/standard_streams.hpp
     hpx/components/iostreams/write_functions.hpp
+    hpx/distributed/iostream.hpp
     hpx/include/iostreams.hpp
 )
 

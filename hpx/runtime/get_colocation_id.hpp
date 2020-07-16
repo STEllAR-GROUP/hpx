@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include <hpx/modules/errors.hpp>
-#include <hpx/lcos_fwd.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/futures/future_fwd.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 namespace hpx

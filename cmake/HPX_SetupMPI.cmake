@@ -35,14 +35,11 @@ macro(setup_mpi)
     if(MPI_EXTRA_LIBRARY)
       target_link_libraries(Mpi::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
     endif()
+    separate_arguments(MPI_CXX_COMPILE_FLAGS)
     target_compile_options(Mpi::mpi INTERFACE ${MPI_CXX_COMPILE_FLAGS})
     target_compile_definitions(
       Mpi::mpi INTERFACE ${MPI_CXX_COMPILE_DEFINITIONS}
     )
-
-    if(MPI_CXX_LINK_FLAGS)
-      # hpx_add_link_flag_if_available(${MPI_CXX_LINK_FLAGS})
-    endif()
 
     hpx_info("MPI version: " ${MPI_C_VERSION})
   endif()

@@ -5,12 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
-#include <hpx/string_util/trim.hpp>
+#include <hpx/include/util.hpp>
 
 #include <string>
 #include <vector>

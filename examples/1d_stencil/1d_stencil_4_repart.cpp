@@ -19,7 +19,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
-#include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/algorithm.hpp>
 #include <hpx/include/performance_counters.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)

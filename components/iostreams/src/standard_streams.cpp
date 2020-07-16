@@ -9,7 +9,7 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>

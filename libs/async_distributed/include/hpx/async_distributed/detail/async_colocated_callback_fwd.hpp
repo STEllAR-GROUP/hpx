@@ -6,9 +6,9 @@
 
 #pragma once
 
+#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_distributed/detail/async_colocated_fwd.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/traits/extract_action.hpp>
 
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////

@@ -7,11 +7,10 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 

@@ -30,6 +30,7 @@ add_hpx_module(
     hpx_assertion
     hpx_command_line_handling
     hpx_concurrency
+    hpx_concurrency
     hpx_config
     hpx_coroutines
     hpx_errors

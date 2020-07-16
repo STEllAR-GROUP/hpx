@@ -36,7 +36,7 @@ void test_copy(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
-    hpx::parallel::copy(
+    hpx::copy(
         policy, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
     std::size_t count = 0;
@@ -59,7 +59,7 @@ void test_copy_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
-    auto f = hpx::parallel::copy(
+    auto f = hpx::copy(
         p, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
     f.wait();
 
@@ -110,7 +110,7 @@ void test_copy_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::copy(policy,
+        hpx::copy(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d));
@@ -144,7 +144,7 @@ void test_copy_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::copy(p,
+        auto f = hpx::copy(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(d));
@@ -207,7 +207,7 @@ void test_copy_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::copy(policy,
+        hpx::copy(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d));
         HPX_TEST(false);
@@ -239,7 +239,7 @@ void test_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::copy(p,
+        auto f = hpx::copy(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(d));
         returned_from_algorithm = true;

@@ -11,6 +11,10 @@
 cmake_minimum_required(VERSION 3.13)
 project(HPXFetchContent LANGUAGES CXX)
 
+# Test that HPX correctly handles having Boost Filesystem and ProgramOptions
+# found before setting up HPX, if they are available (do not REQUIRE these)
+find_package(Boost COMPONENTS filesystem program_options)
+
 include(FetchContent)
 
 fetchcontent_declare(

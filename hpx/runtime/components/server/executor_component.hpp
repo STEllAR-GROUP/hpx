@@ -7,14 +7,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/components_base/get_lva.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/runtime/naming/address.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_init_data.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 

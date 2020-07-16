@@ -11,8 +11,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/serialization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <boost/shared_array.hpp>
 
@@ -301,7 +301,7 @@ struct stepper
 
                     // The new partition_data will be allocated on the same locality
                     // as 'middle'.
-                    return partition(middle.get_id(), next);
+                    return partition(middle.get_id(), std::move(next));
                 }
             ),
             std::move(next_middle),
@@ -342,6 +342,10 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
     for (std::size_t i = 0; i != np; ++i)
         U[0][i] = partition(localities[locidx(i, np, nl)], nx, double(i));
 
+    // limit depth of dependency tree
+    std::size_t nd = 3;
+    hpx::lcos::local::sliding_semaphore sem(nd);
+
     heat_part_action act;
     for (std::size_t t = 0; t != nt; ++t)
     {
@@ -357,6 +361,20 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
                     current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]
                 );
         }
+
+        if ((t % nd) == 0)
+        {
+            next[0].then(
+                [&sem, t](partition&&)
+                {
+                    // inform semaphore about new lower limit
+                    sem.signal(t);
+                });
+        }
+
+        // suspend if the tree has become too deep, the continuation above
+        // will resume this thread once the computation has caught up
+        sem.wait(t);
     }
 
     // Return the solution at time-step 'nt'.

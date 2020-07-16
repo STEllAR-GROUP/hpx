@@ -8,7 +8,7 @@
 // use a performance counter for HPX.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/performance_counters.hpp>
 
 #include <hpx/modules/program_options.hpp>

@@ -15,19 +15,18 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 # Try building an external cmake based project ...
-function(create_cmake_test name hpx_dir setup_type)
+function(create_cmake_test name hpx_dir setup_type test_dir)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
   add_custom_target(
     ${name}.make_build_dir
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}"
     VERBATIM
   )
-  set(ADDITIONAL_CMAKE_OPTIONS)
-  set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
-                               -DSETUP_TYPE=${setup_type}
-  )
+  set(ADDITIONAL_CMAKE_OPTIONS -DSETUP_TYPE=${setup_type})
   if(CMAKE_TOOLCHAIN_FILE)
-    set(ADDITIONAL_CMAKE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
+                                 -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+    )
   endif()
   if(CMAKE_MAKE_COMMAND)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
@@ -52,11 +51,11 @@ function(create_cmake_test name hpx_dir setup_type)
                                  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
     )
   endif()
+  set(test_dir "${PROJECT_SOURCE_DIR}/${test_dir}")
   add_custom_target(
     ${name}.make_configure
     COMMAND
-      "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}"
-      "${PROJECT_SOURCE_DIR}/examples/hello_world_component"
+      "${CMAKE_COMMAND}" -E chdir "${build_dir}" "${CMAKE_COMMAND}" ${test_dir}
       -DHPX_DIR=${hpx_dir} -DBOOST_ROOT=${BOOST_ROOT}
       ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
@@ -120,23 +119,43 @@ endfunction()
 create_cmake_test(
   cmake_build_dir_targets_test
   "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
+  "examples/hello_world_component"
 )
 
 create_cmake_test(
   cmake_build_dir_macros_test
   "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" MACROS
+  "examples/hello_world_component"
 )
 
 create_cmake_test(
   cmake_install_dir_targets_test
   "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
+  "examples/hello_world_component"
 )
 
 create_cmake_test(
   cmake_install_dir_macros_test
   "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" MACROS
+  "examples/hello_world_component"
 )
 
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+  # Google test emulation
+  create_cmake_test(
+    cmake_build_dir_gtest_emulation_test
+    "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
+    "examples/gtest_emulation"
+  )
+
+  create_cmake_test(
+    cmake_install_dir_gtest_emulation_test
+    "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
+    "examples/gtest_emulation"
+  )
+endif()
+
+# PkgConfig
 if(NOT MSVC)
   find_package(PkgConfig)
   if(PKGCONFIG_FOUND)
@@ -151,8 +170,9 @@ if(NOT MSVC)
 endif()
 
 set(build_systems cmake)
-set(cmake_tests build_dir_targets build_dir_macros install_dir_targets
-                install_dir_macros
+set(cmake_tests
+    build_dir_targets install_dir_targets build_dir_macros install_dir_macros
+    build_dir_gtest_emulation install_dir_gtest_emulation
 )
 if(NOT CMAKE_TOOLCHAIN_FILE
    AND PKGCONFIG_FOUND

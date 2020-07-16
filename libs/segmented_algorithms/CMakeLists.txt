@@ -45,6 +45,7 @@ add_hpx_module(
   HEADERS ${segmented_algorithms_headers}
   COMPAT_HEADERS ${segmented_algorithms_compat_headers}
   DEPENDENCIES
+    hpx_actions_base
     hpx_algorithms
     hpx_assertion
     hpx_config

@@ -21,7 +21,7 @@
 
 #include <cstddef>
 
-namespace hpx { namespace compute { namespace cuda {
+namespace hpx { namespace cuda { namespace experimental {
     template <typename T>
     class target_ptr
       : public hpx::util::iterator_adaptor<target_ptr<T>, T*,
@@ -44,7 +44,8 @@ namespace hpx { namespace compute { namespace cuda {
             base_type;
 
     public:
-        typedef typename compute::detail::get_proxy_type<T>::type* proxy_type;
+        typedef
+            typename hpx::compute::detail::get_proxy_type<T>::type* proxy_type;
 
         HPX_HOST_DEVICE HPX_FORCEINLINE target_ptr()
           : base_type(nullptr)
@@ -58,7 +59,7 @@ namespace hpx { namespace compute { namespace cuda {
         {
         }
 
-        target_ptr(T* p, hpx::cuda::target& tgt)
+        target_ptr(T* p, hpx::cuda::experimental::target& tgt)
           : base_type(p)
           , tgt_(&tgt)
         {
@@ -139,8 +140,8 @@ namespace hpx { namespace compute { namespace cuda {
         }
 
     private:
-        hpx::cuda::target* tgt_;
+        hpx::cuda::experimental::target* tgt_;
     };
-}}}    // namespace hpx::compute::cuda
+}}}    // namespace hpx::cuda::experimental
 
 #endif

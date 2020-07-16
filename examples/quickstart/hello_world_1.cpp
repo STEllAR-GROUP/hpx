@@ -12,7 +12,7 @@
 // Including 'hpx/hpx_main.hpp' instead of the usual 'hpx/hpx_init.hpp' enables
 // to use the plain C-main below as the direct main HPX entry point.
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 int main()
 {

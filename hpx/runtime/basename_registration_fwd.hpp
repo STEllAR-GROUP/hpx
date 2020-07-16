@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_fwd.hpp>
+#include <hpx/futures/future_fwd.hpp>
 
-#include <hpx/lcos_fwd.hpp>
 #include <hpx/runtime/components/make_client.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 

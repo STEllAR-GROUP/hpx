@@ -9,7 +9,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <functional>

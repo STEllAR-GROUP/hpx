@@ -8,9 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/runtime/agas/interface.hpp>
-#include <hpx/modules/format.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
+#include <hpx/include/util.hpp>
 
 #include "throttle/throttle.hpp"
 

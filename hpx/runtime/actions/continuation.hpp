@@ -8,24 +8,24 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/action_priority.hpp>
+#include <hpx/actions_base/basic_action_fwd.hpp>
+#include <hpx/actions_base/traits/action_remote_result.hpp>
+#include <hpx/functional/serialization/serializable_unique_function.hpp>
+#include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/preprocessor/stringize.hpp>
-#include <hpx/runtime/actions/action_priority.hpp>
-#include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/actions/trigger.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/runtime/trigger_lco.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/traits/action_remote_result.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/functional/serialization/serializable_unique_function.hpp>
 
 #include <exception>
 #include <type_traits>

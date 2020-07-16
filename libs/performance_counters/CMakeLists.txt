@@ -63,6 +63,7 @@ add_hpx_module(
   SOURCES ${performance_counters_sources}
   HEADERS ${performance_counters_headers}
   DEPENDENCIES
+    hpx_actions
     hpx_assertion
     hpx_async_distributed
     hpx_config

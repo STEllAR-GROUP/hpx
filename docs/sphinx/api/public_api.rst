@@ -34,9 +34,9 @@ Functions
 - :cpp:func:`hpx::parallel::v1::adjacent_find`
 - :cpp:func:`hpx::parallel::v1::all_of`
 - :cpp:func:`hpx::parallel::v1::any_of`
-- :cpp:func:`hpx::parallel::v1::copy`
-- :cpp:func:`hpx::parallel::v1::copy_if`
-- :cpp:func:`hpx::parallel::v1::copy_n`
+- :cpp:func:`hpx::copy`
+- :cpp:func:`hpx::copy_if`
+- :cpp:func:`hpx::copy_n`
 - :cpp:func:`hpx::parallel::v1::count`
 - :cpp:func:`hpx::parallel::v1::count_if`
 - :cpp:func:`hpx::parallel::v1::equal`
@@ -88,6 +88,7 @@ Functions
 - :cpp:func:`hpx::parallel::v1::set_union`
 - :cpp:func:`hpx::parallel::v1::sort`
 - :cpp:func:`hpx::parallel::v1::stable_partition`
+- :cpp:func:`hpx::parallel::v1::stable_sort`
 - :cpp:func:`hpx::parallel::v1::swap_ranges`
 - :cpp:func:`hpx::parallel::v1::unique`
 - :cpp:func:`hpx::parallel::v1::unique_copy`
@@ -95,6 +96,10 @@ Functions
 - :cpp:func:`hpx::parallel::v2::for_loop_strided`
 - :cpp:func:`hpx::parallel::v2::for_loop_n`
 - :cpp:func:`hpx::parallel::v2::for_loop_n_strided`
+
+- :cpp:func:`hpx::ranges::copy`
+- :cpp:func:`hpx::ranges::copy_if`
+- :cpp:func:`hpx::ranges::copy_n`
 
 Header ``hpx/any.hpp``
 ======================

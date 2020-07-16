@@ -12,8 +12,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/modules/collectives.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/serialization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <boost/shared_array.hpp>
 

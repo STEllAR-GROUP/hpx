@@ -14,7 +14,7 @@
 #include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <algorithm>

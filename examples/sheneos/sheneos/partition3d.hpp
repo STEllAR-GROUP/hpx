@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/hpx.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/future.hpp>
 #include <hpx/include/client.hpp>
 
 #include <cstdint>

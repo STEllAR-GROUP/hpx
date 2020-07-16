@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
+
 #include <string>
 
 namespace startup_shutdown { namespace server

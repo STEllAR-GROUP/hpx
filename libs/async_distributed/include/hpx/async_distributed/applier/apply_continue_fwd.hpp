@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-///////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <hpx/runtime/actions_fwd.hpp>
+#include <hpx/actions/actions_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
     template <typename Action, typename Cont, typename... Ts>
     bool apply_continue(Cont&& cont, naming::id_type const& gid, Ts&&... vs);

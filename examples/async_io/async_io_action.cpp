@@ -12,9 +12,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/distributed/iostream.hpp>
 
 #include <iostream>
 #include <memory>

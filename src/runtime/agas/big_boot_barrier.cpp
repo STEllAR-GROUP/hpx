@@ -11,13 +11,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/actions/action_support.hpp>
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_distributed.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/detail/hosted_component_namespace.hpp>
@@ -34,17 +33,15 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/put_parcel.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/modules/format.hpp>
-#include <hpx/static_reinit/reinitializable_static.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 
 #include <cstddef>
 #include <cstdint>

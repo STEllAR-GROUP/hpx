@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(futures_headers
     hpx/futures/future.hpp
+    hpx/futures/future_fwd.hpp
     hpx/futures/futures_factory.hpp
     hpx/futures/detail/future_data.hpp
     hpx/futures/detail/future_transforms.hpp

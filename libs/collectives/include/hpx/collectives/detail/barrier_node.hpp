@@ -7,10 +7,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions/base_action.hpp>
+#include <hpx/actions_base/component_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos_local/promise.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
+#include <hpx/runtime/actions/transfer_continuation_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/synchronization/barrier.hpp>

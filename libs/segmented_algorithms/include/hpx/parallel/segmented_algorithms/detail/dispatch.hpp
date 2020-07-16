@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/type_support/decay.hpp>
@@ -20,6 +20,7 @@
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <exception>
 #include <list>
@@ -77,6 +78,27 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             return std::make_pair(traits1::remote(std::move(p.first)),
                 traits2::remote(std::move(p.second)));
+        }
+    };
+
+    template <typename Iterator1, typename Iterator2>
+    struct algorithm_result_helper<util::in_out_result<Iterator1, Iterator2>,
+        typename std::enable_if<
+            hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
+            hpx::traits::is_segmented_local_iterator<Iterator2>::value>::type>
+    {
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
+
+        static HPX_FORCEINLINE util::in_out_result<
+            typename traits1::local_iterator, typename traits2::local_iterator>
+        call(util::in_out_result<typename traits1::local_raw_iterator,
+            typename traits2::local_raw_iterator>&& p)
+        {
+            return util::in_out_result<typename traits1::local_iterator,
+                typename traits2::local_iterator>{
+                traits1::remote(std::move(p.in)),
+                traits2::remote(std::move(p.out))};
         }
     };
 
@@ -140,15 +162,50 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename traits1::local_iterator, typename traits2::local_iterator>>
         call(future<arg_type>&& f)
         {
-            return f.then(
-                hpx::launch::sync,
-                [](future<arg_type> &&
-                    f) -> std::pair<typename traits1::local_iterator,
-                           typename traits2::local_iterator> {
+            // different versions of clang-format produce different results
+            // clang-format off
+            return f.then(hpx::launch::sync,
+                [](future<arg_type>&& f)
+                    -> std::pair<typename traits1::local_iterator,
+                        typename traits2::local_iterator> {
                     auto&& p = f.get();
                     return std::make_pair(
                         traits1::remote(p.first), traits2::remote(p.second));
                 });
+            // clang-format on
+        }
+    };
+
+    template <typename Iterator1, typename Iterator2>
+    struct algorithm_result_helper<
+        future<util::in_out_result<Iterator1, Iterator2>>,
+        typename std::enable_if<
+            hpx::traits::is_segmented_local_iterator<Iterator1>::value ||
+            hpx::traits::is_segmented_local_iterator<Iterator2>::value>::type>
+    {
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator1> traits1;
+        typedef hpx::traits::segmented_local_iterator_traits<Iterator2> traits2;
+
+        typedef util::in_out_result<typename traits1::local_raw_iterator,
+            typename traits2::local_raw_iterator>
+            arg_type;
+
+        static HPX_FORCEINLINE future<util::in_out_result<
+            typename traits1::local_iterator, typename traits2::local_iterator>>
+        call(future<arg_type>&& f)
+        {
+            // different versions of clang-format produce different results
+            // clang-format off
+            return f.then(hpx::launch::sync,
+                [](future<arg_type>&& f)
+                    -> util::in_out_result<typename traits1::local_iterator,
+                        typename traits2::local_iterator> {
+                    auto&& p = f.get();
+                    return util::in_out_result<typename traits1::local_iterator,
+                        typename traits2::local_iterator>{traits1::remote(p.in),
+                            traits2::remote(p.out)};
+                });
+            // clang-format on
         }
     };
 
@@ -174,18 +231,20 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename traits3::local_iterator>>
         call(future<arg_type>&& f)
         {
-            return f.then(
-                hpx::launch::sync,
-                [](future<arg_type> &&
-                    f) -> hpx::util::tuple<typename traits1::local_iterator,
-                           typename traits2::local_iterator,
-                           typename traits3::local_iterator> {
+            // different versions of clang-format produce different results
+            // clang-format off
+            return f.then(hpx::launch::sync,
+                [](future<arg_type>&& f)
+                    -> hpx::util::tuple<typename traits1::local_iterator,
+                        typename traits2::local_iterator,
+                        typename traits3::local_iterator> {
                     auto&& p = f.get();
                     return hpx::util::make_tuple(
                         traits1::remote(std::move(hpx::util::get<0>(p))),
                         traits2::remote(std::move(hpx::util::get<1>(p))),
                         traits3::remote(std::move(hpx::util::get<2>(p))));
                 });
+            // clang-format on
         }
     };
 

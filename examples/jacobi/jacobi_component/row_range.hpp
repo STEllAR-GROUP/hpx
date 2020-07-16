@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2012 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,8 +7,8 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/modules/memory.hpp>
+#include <hpx/include/util.hpp>
 
 #include <boost/range/iterator.hpp>
 #include <boost/range/mutable_iterator.hpp>

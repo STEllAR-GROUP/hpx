@@ -8,14 +8,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/component_action.hpp>
+#include <hpx/hashing/jenkins_hash.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
-#include <hpx/lcos/base_lco_with_value.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
+#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
 #include <cstdint>

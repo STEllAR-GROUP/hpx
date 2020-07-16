@@ -8,11 +8,13 @@ set(tests
     all_of_range
     any_of_range
     copy_range
+    copyn_range
     copyif_range
     count_range
     countif_range
     find_end_range
     find_first_of_range
+    foreach_adapt
     foreach_range
     foreach_range_projection
     generate_range
