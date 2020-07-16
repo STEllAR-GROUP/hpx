@@ -365,12 +365,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
     HPX_DEPRECATED("hpx::parallel::copy is deprecated, use hpx::copy instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<FwdIter1, FwdIter2>>::type
         copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
-        return detail::get_second_element(
-            detail::transfer<detail::copy_iter<FwdIter1, FwdIter2>>(
-                std::forward<ExPolicy>(policy), first, last, dest));
+        return detail::transfer<detail::copy_iter<FwdIter1, FwdIter2>>(
+            std::forward<ExPolicy>(policy), first, last, dest);
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -611,7 +611,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format on
     HPX_DEPRECATED(
         "hpx::parallel::copy_if is deprecated, use hpx::copy_if instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<FwdIter1, FwdIter2>>::type
         copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
             Pred&& pred)
     {
@@ -622,10 +623,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return hpx::parallel::v1::detail::get_second_element(
-            detail::copy_if<util::in_out_result<FwdIter1, FwdIter2>>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
-                std::forward<Pred>(pred), util::projection_identity{}));
+        return detail::copy_if<util::in_out_result<FwdIter1, FwdIter2>>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+            std::forward<Pred>(pred), util::projection_identity{});
     }
 }}}    // namespace hpx::parallel::v1
 
