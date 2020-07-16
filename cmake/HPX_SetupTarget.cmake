@@ -172,9 +172,15 @@ function(hpx_setup_target target)
   endif()
 
   if(NOT target_NOLIBS)
+    set(_wrap_main_deps)
+    if("${_type}" STREQUAL "EXECUTABLE")
+      set(_wrap_main_deps $<TARGET_NAME_IF_EXISTS:wrap_main>
+                          $<TARGET_NAME_IF_EXISTS:HPX::wrap_main>
+      )
+    endif()
     target_link_libraries(
       ${target} ${__tll_public} $<TARGET_NAME_IF_EXISTS:hpx>
-      $<TARGET_NAME_IF_EXISTS:HPX::hpx>
+      $<TARGET_NAME_IF_EXISTS:HPX::hpx> ${_wrap_main_deps}
     )
     hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)
     target_link_libraries(

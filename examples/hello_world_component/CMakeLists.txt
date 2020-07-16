@@ -19,7 +19,8 @@ if(EXISTS "${HPX_DIR}")
 
   if("${SETUP_TYPE}" STREQUAL "TARGETS")
     target_link_libraries(
-      hello_world_component PUBLIC HPX::hpx HPX::iostreams_component
+      hello_world_component PUBLIC HPX::hpx HPX::wrap_main
+                                   HPX::iostreams_component
     )
     target_link_libraries(hello_world_component PRIVATE HPX::component)
 
@@ -28,6 +29,7 @@ if(EXISTS "${HPX_DIR}")
     hpx_setup_target(
       hello_world_component
       COMPONENT_DEPENDENCIES iostreams
+      DEPENDENCIES HPX::wrap_main
       TYPE COMPONENT
     )
 
@@ -38,6 +40,8 @@ if(EXISTS "${HPX_DIR}")
 else()
   message(
     WARNING
-      "HPX_DIR=${HPX_DIR} does not exist. Did you forget to run the install rule?"
+      "Skipping build test because HPX_DIR=${HPX_DIR} does not exist. This \
+      last test requires HPX to be installed.  Did you forget to run the \
+      install rule?"
   )
 endif()
