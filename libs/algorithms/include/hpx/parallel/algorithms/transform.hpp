@@ -275,14 +275,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
+    //clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename F, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value&&
-                        traits::is_projected<Proj, FwdIter1>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected<Proj, FwdIter1>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            traits::is_projected<Proj, FwdIter1>::value &&
+                traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected<Proj, FwdIter1>>::value
+        )>
+    //clang-format on
+    HPX_DEPRECATED("hpx::parallel::transform is deprecated, use hpx::transform instead")
     typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
     transform(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
@@ -564,19 +569,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
+    //clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value&&
-                    hpx::traits::is_iterator<FwdIter3>::value&&
-                        traits::is_projected<Proj1, FwdIter1>::value&&
-                            traits::is_projected<Proj2, FwdIter2>::value&&
-                                traits::is_indirect_callable<ExPolicy, F,
-                                    traits::projected<Proj1, FwdIter1>,
-                                    traits::projected<Proj2, FwdIter2>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<
+                ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_iterator<FwdIter3>::value &&
+            traits::is_projected<Proj1, FwdIter1>::value &&
+            traits::is_projected<Proj2, FwdIter2>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj1, FwdIter1>, 
+                    traits::projected<Proj2, FwdIter2>>::value
+        )>
+    //clang-format on
+    HPX_DEPRECATED("hpx::parallel::transform is deprecated, use hpx::transform instead")
     typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
             tag::out(FwdIter3)>>::type
@@ -780,19 +790,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
+    //clang-format on
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value&&
-                    hpx::traits::is_iterator<FwdIter3>::value&&
-                        traits::is_projected<Proj1, FwdIter1>::value&&
-                            traits::is_projected<Proj2, FwdIter2>::value&&
-                                traits::is_indirect_callable<ExPolicy, F,
-                                    traits::projected<Proj1, FwdIter1>,
-                                    traits::projected<Proj2, FwdIter2>>::value)>
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<
+                ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_iterator<FwdIter3>::value &&
+            traits::is_projected<Proj1, FwdIter1>::value &&
+            traits::is_projected<Proj2, FwdIter2>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj1, FwdIter1>,
+                    traits::projected<Proj2, FwdIter2>>::value
+        )>
+    //clang-format on
+    HPX_DEPRECATED("hpx::parallel::transform is deprecated, use hpx::transform instead")
     typename util::detail::algorithm_result<ExPolicy,
         hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
             tag::out(FwdIter3)>>::type
