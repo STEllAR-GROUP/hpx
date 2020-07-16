@@ -11,9 +11,10 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/memory.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
+#endif
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
@@ -177,9 +178,10 @@ namespace hpx { namespace cuda { namespace experimental {
     ///////////////////////////////////////////////////////////////////////////
     void target::synchronize() const
     {
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         // FIXME: implement remote targets
         HPX_ASSERT(hpx::find_here() == locality_);
-
+#endif
         cudaStream_t stream = handle_.get_stream();
 
         if (stream == 0)
@@ -215,7 +217,7 @@ namespace hpx { namespace cuda { namespace experimental {
         return target_;
     }
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
     ///////////////////////////////////////////////////////////////////////////
     void target::serialize(
         serialization::input_archive& ar, const unsigned int version)
