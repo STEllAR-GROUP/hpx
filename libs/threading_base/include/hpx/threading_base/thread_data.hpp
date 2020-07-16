@@ -553,12 +553,14 @@ namespace hpx { namespace threads {
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 
 #ifdef HPX_HAVE_LIBCDS
-        virtual std::size_t& get_libcds_data() const = 0;
-        virtual std::size_t& set_libcds_data(std::size_t& data) = 0;
-        virtual std::size_t& get_libcds_hp_data() const = 0;
-        virtual std::size_t& set_libcds_hp_data(std::size_t& data) = 0;
-        virtual std::size_t& get_libcds_dhp_data() const = 0;
-        virtual std::size_t& set_libcds_dhp_data(std::size_t& data) = 0;
+        virtual std::size_t get_libcds_data() const = 0;
+        virtual std::size_t set_libcds_data(std::size_t data) = 0;
+        virtual std::size_t get_libcds_hazard_pointer_data() const = 0;
+        virtual std::size_t set_libcds_hazard_pointer_data(
+            std::size_t data) = 0;
+        virtual std::size_t get_libcds_dynamic_hazard_pointer_data() const = 0;
+        virtual std::size_t set_libcds_dynamic_hazard_pointer_data(
+            std::size_t data) = 0;
 #endif
 
         virtual void rebind(thread_init_data& init_data) = 0;

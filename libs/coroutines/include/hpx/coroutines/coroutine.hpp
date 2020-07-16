@@ -97,34 +97,34 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 
 #ifdef HPX_HAVE_LIBCDS
-        std::size_t& get_libcds_data() const
+        std::size_t get_libcds_data() const
         {
             return impl_.get_libcds_data();
         }
 
-        std::size_t& set_libcds_data(std::size_t& data)
+        std::size_t set_libcds_data(std::size_t data)
         {
             return impl_.set_libcds_data(data);
         }
 
-        std::size_t& get_libcds_hp_data() const
+        std::size_t get_libcds_hazard_pointer_data() const
         {
-            return impl_.get_libcds_hp_data();
+            return impl_.get_libcds_hazard_pointer_data();
         }
 
-        std::size_t& set_libcds_hp_data(std::size_t& data)
+        std::size_t set_libcds_hazard_pointer_data(std::size_t data)
         {
-            return impl_.set_libcds_hp_data(data);
+            return impl_.set_libcds_hazard_pointer_data(data);
         }
 
-        std::size_t& get_libcds_dhp_data() const
+        std::size_t get_libcds_dynamic_hazard_pointer_data() const
         {
-            return impl_.get_libcds_dhp_data();
+            return impl_.get_libcds_dynamic_hazard_pointer_data();
         }
 
-        std::size_t& set_libcds_dhp_data(std::size_t& data)
+        std::size_t set_libcds_dynamic_hazard_pointer_data(std::size_t data)
         {
-            return impl_.set_libcds_dhp_data(data);
+            return impl_.set_libcds_dynamic_hazard_pointer_data(data);
         }
 #endif
 
