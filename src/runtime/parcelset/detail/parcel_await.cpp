@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset { namespace detail {
                 serialization::detail::preprocess_gid_types>();
             if (split_gids)
             {
-                p.set_split_gids(std::move(split_gids->move_split_gids()));
+                p.set_split_gids(split_gids->move_split_gids());
             }
 
             return true;

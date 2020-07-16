@@ -828,11 +828,8 @@ namespace hpx { namespace util {
     std::string
     reconstruct_command_line(hpx::program_options::variables_map const &vm)
     {
-        using value_type =
-            std::pair<std::string, hpx::program_options::variable_value>;
-
         std::string command_line;
-        for (value_type const& v : vm)
+        for (auto const& v : vm)
         {
             hpx::program_options::any const& value = v.second.value();
             if (hpx::program_options::any_cast<std::string>(&value)) {
