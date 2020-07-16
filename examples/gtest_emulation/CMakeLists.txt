@@ -28,6 +28,8 @@ if(EXISTS "${HPX_DIR}")
 else()
   message(
     WARNING
-      "HPX_DIR=${HPX_DIR} does not exist. Did you forget to run the install rule?"
+      "Skipping build test because HPX_DIR=${HPX_DIR} does not exist. This \
+      last test requires HPX to be installed.  Did you forget to run the \
+      install rule?"
   )
 endif()
