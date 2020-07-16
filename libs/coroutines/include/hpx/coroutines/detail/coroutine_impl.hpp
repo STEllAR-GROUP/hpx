@@ -86,6 +86,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     public:
         void bind_result(result_type res)
         {
+            HPX_ASSERT(m_result.first != terminated);
             m_result = res;
         }
 
@@ -122,6 +123,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         void rebind(functor_type&& f, thread_id_type id)
         {
+            HPX_ASSERT(
+                m_result.first == unknown || m_result.first == terminated);
             this->rebind_stack();    // count how often a coroutines object was reused
             m_result = result_type(unknown, invalid_thread_id);
             m_arg = nullptr;
