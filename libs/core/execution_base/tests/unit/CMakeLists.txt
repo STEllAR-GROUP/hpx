@@ -4,10 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests
-    basic_receiver
-    execution_context
-)
+set(tests basic_receiver execution_context)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -22,7 +19,7 @@ foreach(test ${tests})
     DEPENDENCIES hpx_execution_base hpx_testing
                  ${BOOST_UNDERLYING_THREAD_LIBRARY}
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/BasicExecution"
+    FOLDER "Tests/Unit/Modules/ExecutionBase"
   )
 
   add_hpx_unit_test("modules.execution_base" ${test} ${${test}_PARAMETERS})
