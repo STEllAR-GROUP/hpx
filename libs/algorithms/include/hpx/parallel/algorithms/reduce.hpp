@@ -377,7 +377,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::copy_n
+    // CPO for hpx::reduce
     HPX_INLINE_CONSTEXPR_VARIABLE struct reduce_t final
       : hpx::functional::tag<reduce_t>
     {
