@@ -9,6 +9,9 @@
 # Make undefined variables errors, print each command
 set -eux
 
+# TODO: Temporary. Remove when unneeded.
+env
+
 # Clean up directory
 rm -f jenkins-hpx*
 
@@ -41,9 +44,7 @@ else
     github_commit_status="failure"
 fi
 
-set +e
-if [[ -n "${ghprbPullId}" ]]; then
-    set-e
+if [[ -n "${ghprbPullId:-}" ]]; then
 
     # Extract just the organization and repo names "org/repo" from the full URL
     github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
