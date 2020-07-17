@@ -8,8 +8,8 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/distributed/iostream.hpp>
-#include <hpx/include/parallel_numeric.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/numeric.hpp>
+#include <hpx/chrono.hpp>
 #include "worker_timed.hpp"
 
 #include <cstddef>
