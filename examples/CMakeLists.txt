@@ -38,6 +38,10 @@ if(HPX_WITH_APEX)
   set(subdirs ${subdirs} apex)
 endif()
 
+if(HPX_WITH_LIBCDS)
+  set(subdirs ${subdirs} libcds)
+endif()
+
 foreach(subdir ${subdirs})
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.${subdir})
