@@ -20,8 +20,12 @@ pipeline {
         stage('checkout') {
             steps {
                 dir('hpx') {
-                    checkout scm
                     echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                    sh '''
+                    #!/bin/bash -l
+                    rm -rf *
+                    '''
+                    checkout scm
                 }
             }
         }
