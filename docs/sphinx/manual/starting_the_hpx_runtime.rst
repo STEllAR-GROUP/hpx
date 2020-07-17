@@ -49,15 +49,19 @@ The only change to your code you have to make is to include the file
 ``hpx/hpx_main.hpp``. In this case the function ``main()`` will be invoked as
 the first |hpx| thread of the application. The runtime system will be
 initialized behind the scenes before the function ``main()`` is executed and
-will automatically stop after ``main()`` has returned. All |hpx| API functions
-can be used from within this function now.
+will automatically stop after ``main()`` has returned. For this method to work
+you must link your application to ``HPX::wrap_main``. This is done automatically
+if you are using the provided macros (:ref:`using_hpx_cmake_macros`) to set up
+your application, but must be done explicitly if you are using targets directly
+(:ref:`using_hpx_cmake_targets`). All |hpx| API functions can be used from
+within the ``main`` function now.
 
 .. note::
 
-   The function ``main()`` does not need to expect receiving ``argc`` ``argv``
-   as shown above, but could expose the signature ``int main()``. This is
-   consistent with the usually allowed prototypes for the function ``main()`` in
-   C++ applications.
+   The function ``main()`` does not need to expect receiving ``argc`` and
+   ``argv`` as shown above, but could expose the signature ``int main()``. This
+   is consistent with the usually allowed prototypes for the function ``main()``
+   in C++ applications.
 
 All command line arguments specific to |hpx| will still be processed by the
 |hpx| runtime system as usual. However, those command line options will be
@@ -90,10 +94,10 @@ to the operating system as usual.
 .. important::
 
    To achieve this seamless integration, we use different implementations for
-   different Operating Systems. In case of Linux or Mac OSX, the code present in
+   different operating systems. In case of Linux or macOS, the code present in
    ``hpx_wrap.cpp`` is put into action. We hook into the system function in case
-   of Linux and provide alternate entry point in case of Mac OSX. For other
-   Operating Systems we rely on a macro::
+   of Linux and provide alternate entry point in case of macOS. For other
+   operating systems we rely on a macro::
 
        #define main hpx_startup::user_main
 
