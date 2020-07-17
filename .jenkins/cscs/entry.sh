@@ -9,8 +9,10 @@
 # Make undefined variables errors, print each command
 set -eux
 
-# TODO: Temporary. Remove when unneeded.
-env
+# Set name of branch if not building a pull request
+if [[ -z "${ghprbPullId:-}" ]]; then
+    export git_local_branch=$(echo ${GIT_BRANCH} | cut -f2 -d'/')
+fi
 
 # Clean up directory
 rm -f jenkins-hpx*
