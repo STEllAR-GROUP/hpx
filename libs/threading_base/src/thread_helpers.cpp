@@ -27,7 +27,6 @@
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
 
-#include <array>
 #include <atomic>
 #include <cstddef>
 #include <limits>

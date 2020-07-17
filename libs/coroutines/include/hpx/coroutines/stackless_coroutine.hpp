@@ -18,7 +18,6 @@
 #include <hpx/functional/unique_function.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <array>
 #include <cstddef>
 #include <utility>
 
@@ -130,9 +129,8 @@ namespace hpx { namespace threads { namespace coroutines {
 
         std::size_t set_libcds_data(std::size_t data)
         {
-            static std::size_t olddata = libcds_data_;
-            libcds_data_ = data;
-            return olddata;
+            std::swap(data, libcds_data_);
+            return data;
         }
 
         std::size_t get_libcds_hazard_pointer_data() const
@@ -142,9 +140,8 @@ namespace hpx { namespace threads { namespace coroutines {
 
         std::size_t set_libcds_hazard_pointer_data(std::size_t data)
         {
-            static std::size_t olddata = libcds_hazard_pointer_data_;
-            libcds_hazard_pointer_data_ = data;
-            return olddata;
+            std::swap(data, libcds_hazard_pointer_data_);
+            return data;
         }
 
         std::size_t get_libcds_dynamic_hazard_pointer_data() const
@@ -154,9 +151,8 @@ namespace hpx { namespace threads { namespace coroutines {
 
         std::size_t set_libcds_dynamic_hazard_pointer_data(std::size_t data)
         {
-            static std::size_t olddata = libcds_dynamic_hazard_pointer_data_;
-            libcds_dynamic_hazard_pointer_data_ = data;
-            return olddata;
+            std::swap(data, libcds_dynamic_hazard_pointer_data_);
+            return data;
         }
 #endif
 
@@ -261,12 +257,12 @@ namespace hpx { namespace threads { namespace coroutines {
 #else
         mutable std::size_t thread_data_;
 #endif
+        std::size_t continuation_recursion_count_;
 #ifdef HPX_HAVE_LIBCDS
         mutable std::size_t libcds_data_;
         mutable std::size_t libcds_hazard_pointer_data_;
         mutable std::size_t libcds_dynamic_hazard_pointer_data_;
 #endif
-        std::size_t continuation_recursion_count_;
     };
 
 }}}    // namespace hpx::threads::coroutines

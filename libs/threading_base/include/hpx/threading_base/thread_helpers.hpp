@@ -20,7 +20,6 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
-#include <array>
 #include <atomic>
 #include <chrono>
 #include <cstddef>

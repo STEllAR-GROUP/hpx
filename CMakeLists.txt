@@ -936,9 +936,7 @@ hpx_option(HPX_WITH_LIBCDS BOOL "Enable LibCDS support." OFF)
 if(HPX_WITH_LIBCDS)
   include(HPX_SetupLibCDS)
   if(NOT libcds_POPULATED)
-    hpx_error(
-      "HPX_WITH_LIBCDS was set to ON, but HPX failed to fetch LibCDS"
-    )
+    hpx_error("HPX_WITH_LIBCDS was set to ON, but HPX failed to fetch LibCDS")
   endif()
   hpx_add_config_define(HPX_HAVE_LIBCDS) # tell HPX that we use LibCDS
 endif()
@@ -967,7 +965,6 @@ hpx_option(
   HPX_WITH_ITTNOTIFY BOOL "Enable Amplifier (ITT) instrumentation support." OFF
   CATEGORY "Profiling"
 )
-
 # ##############################################################################
 # enable OpenMP emulation
 # ##############################################################################

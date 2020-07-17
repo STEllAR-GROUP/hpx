@@ -48,7 +48,6 @@
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 
-#include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -72,6 +71,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     public:
         using deleter_type = void(context_base const*);
         using thread_id_type = hpx::threads::thread_id;
+
         context_base(std::ptrdiff_t stack_size, thread_id_type id)
           : default_context_impl<CoroutineImpl>(stack_size)
           , m_caller()
@@ -214,11 +214,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             delete_tss_storage(m_thread_data);
 #else
             m_thread_data = 0;
+#endif
 #ifdef HPX_HAVE_LIBCDS
             libcds_data_ = 0;
             libcds_hazard_pointer_data_ = 0;
             libcds_dynamic_hazard_pointer_data_ = 0;
-#endif
 #endif
         }
 
@@ -252,9 +252,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         std::size_t set_libcds_data(std::size_t data)
         {
-            static std::size_t olddata = libcds_data_;
-            libcds_data_ = data;
-            return olddata;
+            std::swap(data, libcds_data_);
+            return data;
         }
 
         std::size_t get_libcds_hazard_pointer_data() const
@@ -264,9 +263,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         std::size_t set_libcds_hazard_pointer_data(std::size_t data)
         {
-            static std::size_t olddata = libcds_hazard_pointer_data_;
-            libcds_hazard_pointer_data_ = data;
-            return olddata;
+            std::swap(data, libcds_hazard_pointer_data_);
+            return data;
         }
 
         std::size_t get_libcds_dynamic_hazard_pointer_data() const
@@ -276,9 +274,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         std::size_t set_libcds_dynamic_hazard_pointer_data(std::size_t data)
         {
-            static std::size_t olddata = libcds_dynamic_hazard_pointer_data_;
-            libcds_dynamic_hazard_pointer_data_ = data;
-            return olddata;
+            std::swap(data, libcds_dynamic_hazard_pointer_data_);
+            return data;
         }
 #endif
 
@@ -403,11 +400,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         mutable detail::tss_storage* m_thread_data;
 #else
         mutable std::size_t m_thread_data;
+#endif
 #ifdef HPX_HAVE_LIBCDS
         mutable std::size_t libcds_data_;
         mutable std::size_t libcds_hazard_pointer_data_;
         mutable std::size_t libcds_dynamic_hazard_pointer_data_;
-#endif
 #endif
 
         // This is used to generate a meaningful exception trace.

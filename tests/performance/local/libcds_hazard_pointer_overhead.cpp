@@ -23,7 +23,6 @@
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/thread_executors/limiting_executor.hpp>
 
 #include <cds/gc/hp.h>    // for cds::HP (Hazard Pointer) SMR
 #include <cds/init.h>     // for cds::Initialize and cds::Terminate
@@ -118,10 +117,8 @@ std::uint64_t num_iterations = 0;
 ///////////////////////////////////////////////////////////////////////////////
 double null_function(bool uselibcds) noexcept
 {
-#ifdef CDS_THREADING_HPX
     if (uselibcds)
         cds::threading::Manager::attachThread();
-#endif
     if (num_iterations > 0)
     {
         const int array_size = 4096;
@@ -135,10 +132,8 @@ double null_function(bool uselibcds) noexcept
         }
         return dummy[0];
     }
-#ifdef CDS_THREADING_HPX
     if (uselibcds)
         cds::threading::Manager::detachThread();
-#endif
     return 0.0;
 }
 
