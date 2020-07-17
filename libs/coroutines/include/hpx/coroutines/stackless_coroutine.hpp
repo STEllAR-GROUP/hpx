@@ -121,7 +121,7 @@ namespace hpx { namespace threads { namespace coroutines {
 #endif
         }
 
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
         std::size_t get_libcds_data() const
         {
             return libcds_data_;
@@ -258,7 +258,7 @@ namespace hpx { namespace threads { namespace coroutines {
         mutable std::size_t thread_data_;
 #endif
         std::size_t continuation_recursion_count_;
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
         mutable std::size_t libcds_data_;
         mutable std::size_t libcds_hazard_pointer_data_;
         mutable std::size_t libcds_dynamic_hazard_pointer_data_;

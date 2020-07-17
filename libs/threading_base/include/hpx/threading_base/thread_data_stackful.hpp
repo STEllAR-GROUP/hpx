@@ -92,7 +92,7 @@ namespace hpx { namespace threads {
             return coroutine_.set_thread_data(data);
         }
 
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
         std::size_t get_libcds_data() const override
         {
             return coroutine_.get_libcds_data();

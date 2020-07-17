@@ -81,7 +81,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             return pimpl_->set_thread_data(data);
         }
 
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
         std::size_t get_libcds_data() const override
         {
             HPX_ASSERT(pimpl_);

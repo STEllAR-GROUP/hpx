@@ -247,7 +247,7 @@ namespace hpx {
         return threads::set_thread_data(native_handle(), data);
     }
 
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
     std::size_t thread::get_libcds_data() const
     {
         return threads::get_libcds_data(native_handle());
@@ -427,7 +427,7 @@ namespace hpx {
             return threads::set_thread_data(threads::get_self_id(), data);
         }
 
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
         std::size_t get_libcds_data()
         {
             return threads::get_libcds_data(threads::get_self_id());

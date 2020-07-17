@@ -392,7 +392,7 @@ namespace hpx { namespace threads {
     HPX_EXPORT std::size_t set_thread_data(
         thread_id_type const& id, std::size_t data, error_code& ec = throws);
 
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
     HPX_EXPORT std::size_t get_libcds_data(
         thread_id_type const& id, error_code& ec = throws);
 

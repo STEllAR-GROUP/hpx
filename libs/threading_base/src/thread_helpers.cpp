@@ -204,7 +204,7 @@ namespace hpx { namespace threads {
         return get_thread_id_data(id)->set_thread_data(data);
     }
 
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
     std::size_t get_libcds_data(thread_id_type const& id, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))

@@ -129,7 +129,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 
-#ifdef HPX_HAVE_LIBCDS
+#if defined(HPX_HAVE_LIBCDS)
         virtual std::size_t get_libcds_data() const = 0;
         virtual std::size_t set_libcds_data(std::size_t data) = 0;
 
