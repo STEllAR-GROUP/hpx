@@ -4,32 +4,32 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// hpxinspect:nodeprecatedname:hpx::traits::is_callable
-
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/basic_execution/operation_state.hpp>
-#include <hpx/basic_execution/receiver.hpp>
+#include <hpx/execution_base/operation_state.hpp>
+#include <hpx/execution_base/receiver.hpp>
+#include <hpx/functional/tag_fallback_invoke.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 
 #include <exception>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace basic_execution {
+namespace hpx { namespace execution_base {
 #if defined(DOXYGEN)
     /// connect is a customization point object.
     /// From some subexpression `s` and `r`, let `S` be the type such that `decltype((s))`
     /// is `S` and let `R` be the type such that `decltype((r))` is `R`. The result of
-    /// the expression `hpx::basic_execution::connect(s, r)` is then equivalent to:
+    /// the expression `hpx::execution_base::connect(s, r)` is then equivalent to:
     ///     * `s.connect(r)`, if that expression is valid and returns a type
     ///       satisfying the `operation_state`
-    ///       (\see hpx::basic_execution::traits::is_operation_state)
+    ///       (\see hpx::execution_base::traits::is_operation_state)
     ///       and if `S` satifies the `sender` concept.
     ///     * `s.connect(r)`, if that expression is valid and returns a type
     ///       satisfying the `operation_state`
-    ///       (\see hpx::basic_execution::traits::is_operation_state)
+    ///       (\see hpx::execution_base::traits::is_operation_state)
     ///       and if `S` satifies the `sender` concept.
     ///       Overload resolution is performed in a context that include the declaration
     ///       `void connect();`
@@ -46,9 +46,9 @@ namespace hpx { namespace basic_execution {
         /// operation itself might not have started yet. In order to get the result
         /// of this asynchronous operation, a sender needs to be connected to a
         /// receiver with the corresponding value, error and done channels:
-        ///     * `hpx::basic_execution::connect`
+        ///     * `hpx::execution_base::connect`
         ///
-        /// In addition, `hpx::basic_execution::traits::sender_traits ` needs to
+        /// In addition, `hpx::execution_base::traits::sender_traits ` needs to
         /// be specialized in some form.
         ///
         /// A sender's destructor shall not block pending completion of submitted
@@ -86,77 +86,23 @@ namespace hpx { namespace basic_execution {
     }    // namespace traits
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct connect_t
+      : hpx::functional::tag_fallback<connect_t>
     {
-#define HPX_BASIC_EXECUTION_CONNECT_EXPRESSION                                 \
-    hpx::functional::tag_invoke(                                               \
-        *this, std::forward<Sender>(sender), std::forward<Receiver>(rcv))
-        template <typename Sender, typename Receiver>
-        constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::true_type /* is tag invocable */, Sender&& sender,
-            Receiver&& rcv) const
-            noexcept(noexcept(HPX_BASIC_EXECUTION_CONNECT_EXPRESSION))
-                -> decltype(HPX_BASIC_EXECUTION_CONNECT_EXPRESSION)
-        {
-            return HPX_BASIC_EXECUTION_CONNECT_EXPRESSION;
-        }
-#undef HPX_BASIC_EXECUTION_CONNECT_EXPRESSION
-
-#define HPX_BASIC_EXECUTION_CONNECT_EXPRESSION                                 \
-    std::forward<Sender>(sender).connect(std::forward<Receiver>(rcv))
-        template <typename Sender, typename Receiver>
-        constexpr HPX_FORCEINLINE auto tag_invoke_impl(
-            std::false_type /* is not tag invocable */, Sender&& sender,
-            Receiver&& rcv) const
-            noexcept(noexcept(HPX_BASIC_EXECUTION_CONNECT_EXPRESSION))
-                -> decltype(HPX_BASIC_EXECUTION_CONNECT_EXPRESSION)
-        {
-            return HPX_BASIC_EXECUTION_CONNECT_EXPRESSION;
-        }
-#undef HPX_BASIC_EXECUTION_CONNECT_EXPRESSION
-
-#define HPX_BASIC_EXECUTION_CONNECT_EXPRESSION                                 \
-    tag_invoke_impl(IsTagInvocable{}, std::forward<Sender>(sender),            \
-        std::forward<Receiver>(rcv))
-        template <typename Sender, typename Receiver,
-            typename IsTagInvocable = hpx::functional::is_tag_invocable<
-                connect_t, Sender&&, Receiver&&>>
-        constexpr HPX_FORCEINLINE auto operation_select(
-            std::true_type /* is sender */, Sender&& sender,
-            Receiver&& rcv) const
-            noexcept(noexcept(HPX_BASIC_EXECUTION_CONNECT_EXPRESSION))
-                -> decltype(HPX_BASIC_EXECUTION_CONNECT_EXPRESSION)
-        {
-            return HPX_BASIC_EXECUTION_CONNECT_EXPRESSION;
-        }
-#undef HPX_BASIC_EXECUTION_CONNECT_EXPRESSION
-
-        //         template <typename Sender, typename Receiver>
-        //         constexpr HPX_FORCEINLINE auto operation_select(
-        //             std::false_type /* is not sender */, Sender&& sender,
-        //             Receiver&& rcv) const -> void
-        //         {
-        //             static_assert(traits::is_sender<Sender>::value, "Implement me...");
-        //         }
-
-#define HPX_BASIC_EXECUTION_CONNECT_EXPRESSION                                 \
-    operation_select(                                                          \
-        IsSender{}, std::forward<Sender>(sender), std::forward<Receiver>(rcv))
-        template <typename Sender, typename Receiver,
-            typename IsSender = traits::is_sender<Sender>>
-        constexpr HPX_FORCEINLINE auto operator()(
-            Sender&& sender, Receiver&& rcv) const
-            noexcept(noexcept(HPX_BASIC_EXECUTION_CONNECT_EXPRESSION))
-                -> decltype(HPX_BASIC_EXECUTION_CONNECT_EXPRESSION)
+        template <typename S, typename R>
+        friend constexpr HPX_FORCEINLINE auto
+        tag_fallback_invoke(connect_t, S&& s, R&& r) noexcept(
+            noexcept(std::declval<S&&>().connect(std::forward<R>(r))))
+            -> decltype(std::declval<S&&>().connect(std::forward<R>(r)))
         {
             static_assert(
-                hpx::basic_execution::traits::is_operation_state_v<decltype(
-                    HPX_BASIC_EXECUTION_CONNECT_EXPRESSION)>,
-                "hpx::basic_execution::connect needs to return a type "
-                "saisfying the operation_state concept");
-            return HPX_BASIC_EXECUTION_CONNECT_EXPRESSION;
+                hpx::execution_base::traits::is_operation_state_v<decltype(
+                    std::declval<S&&>().connect(std::forward<R>(r)))>,
+                "hpx::execution_base::connect needs to return a type "
+                "satisfying the operation_state concept");
+
+            return std::forward<S>(s).connect(std::forward<R>(r));
         }
-#undef HPX_BASIC_EXECUTION_CONNECT_EXPRESSION
-    } connect;
+    } connect{};
 
     namespace traits {
         namespace detail {
@@ -168,7 +114,7 @@ namespace hpx { namespace basic_execution {
 
             template <typename Sender>
             constexpr bool specialized(
-                typename hpx::basic_execution::traits::sender_traits<
+                typename hpx::execution_base::traits::sender_traits<
                     Sender>::__unspecialized*)
             {
                 return false;
@@ -196,30 +142,31 @@ namespace hpx { namespace basic_execution {
             {
             };
 
+            // clang-format off
             template <typename Sender, typename Receiver>
             struct is_sender_to_impl<true, Sender, Receiver>
               : std::integral_constant<bool,
-                    hpx::traits::is_callable<hpx::basic_execution::connect_t(
-                        Sender&&, Receiver&&)>::value ||
-                        hpx::traits::is_callable<hpx::basic_execution::
-                                connect_t(Sender&&, Receiver&)>::value ||
-                        hpx::traits::is_callable<hpx::basic_execution::
-                                connect_t(Sender&&, Receiver const&)>::value ||
-                        hpx::traits::is_callable<hpx::basic_execution::
-                                connect_t(Sender&, Receiver&&)>::value ||
-                        hpx::traits::is_callable<hpx::basic_execution::
-                                connect_t(Sender&, Receiver&)>::value ||
-                        hpx::traits::is_callable<hpx::basic_execution::
-                                connect_t(Sender&, Receiver const&)>::value ||
-                        hpx::traits::is_callable<hpx::basic_execution::
-                                connect_t(Sender const&, Receiver&&)>::value ||
-                        hpx::traits::is_callable<hpx::basic_execution::
-                                connect_t(Sender const&, Receiver&)>::value ||
-                        hpx::traits::is_callable<
-                            hpx::basic_execution::connect_t(
-                                Sender const&, Receiver const&)>::value>
+                    hpx::traits::is_invocable<hpx::execution_base::connect_t,
+                        Sender&&, Receiver&&>::value ||
+                    hpx::traits::is_invocable<hpx::execution_base::connect_t,
+                        Sender&&, Receiver&>::value ||
+                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
+                        Sender&&, Receiver const&>::value ||
+                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
+                        Sender&, Receiver&&>::value ||
+                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
+                        Sender&, Receiver&>::value ||
+                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
+                        Sender&, Receiver const&>::value ||
+                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
+                        Sender const&, Receiver&&>::value ||
+                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
+                        Sender const&, Receiver&>::value ||
+                    hpx::traits::is_invocable <hpx::execution_base::connect_t,
+                        Sender const&, Receiver const&>::value>
             {
             };
+            // clang-format on
         }    // namespace detail
 
         template <typename Sender, typename Receiver>
@@ -318,4 +265,4 @@ namespace hpx { namespace basic_execution {
         };
     }    // namespace traits
 
-}}    // namespace hpx::basic_execution
+}}    // namespace hpx::execution_base

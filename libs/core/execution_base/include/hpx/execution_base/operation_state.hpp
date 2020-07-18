@@ -60,7 +60,7 @@ namespace hpx { namespace execution_base {
         {
             return std::forward<OperationState>(o).start();
         }
-    } start;
+    } start{};
 
     namespace traits {
         namespace detail {

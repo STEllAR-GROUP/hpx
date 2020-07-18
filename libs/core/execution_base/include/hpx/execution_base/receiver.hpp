@@ -120,7 +120,7 @@ namespace hpx { namespace execution_base { namespace experimental {
         {
             return std::forward<R>(r).set_value(std::forward<Args>(args)...);
         }
-    } set_value;
+    } set_value{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_error_t
       : hpx::functional::tag_fallback_noexcept<set_error_t>
@@ -134,7 +134,7 @@ namespace hpx { namespace execution_base { namespace experimental {
         {
             return std::forward<R>(r).set_error(std::forward<E>(e));
         }
-    } set_error;
+    } set_error{};
 
     HPX_INLINE_CONSTEXPR_VARIABLE struct set_done_t
       : hpx::functional::tag_fallback_noexcept<set_done_t>
@@ -147,7 +147,7 @@ namespace hpx { namespace execution_base { namespace experimental {
         {
             return std::forward<R>(r).set_done();
         }
-    } set_done;
+    } set_done{};
 
     namespace traits {
         ///////////////////////////////////////////////////////////////////////
