@@ -25,6 +25,11 @@ if(NOT HPX_WITH_SANITIZERS)
   set(start_stop_FLAGS DEPENDENCIES hpx_timing)
 endif()
 
+if(HPX_WITH_LIBCDS)
+  set(benchmarks ${benchmarks} libcds_hazard_pointer_overhead)
+  set(libcds_hazard_pointer_overhead_FLAGS DEPENDENCIES iostreams_component)
+endif()
+
 if(HPX_WITH_DISTRIBUTED_RUNTIME AND (HPX_WITH_DATAPAR_VC
                                      OR HPX_WITH_DATAPAR_BOOST_SIMD)
 )
@@ -215,6 +220,10 @@ foreach(benchmark ${benchmarks})
   endif()
 
 endforeach()
+
+if(HPX_WITH_LIBCDS)
+  target_link_libraries(libcds_hazard_pointer_overhead_test PRIVATE cds)
+endif()
 
 if(HPX_WITH_EXAMPLES_OPENMP)
   set_target_properties(

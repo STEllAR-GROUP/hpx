@@ -247,6 +247,36 @@ namespace hpx {
         return threads::set_thread_data(native_handle(), data);
     }
 
+#if defined(HPX_HAVE_LIBCDS)
+    std::size_t thread::get_libcds_data() const
+    {
+        return threads::get_libcds_data(native_handle());
+    }
+    std::size_t thread::set_libcds_data(std::size_t data)
+    {
+        return threads::set_libcds_data(native_handle(), data);
+    }
+
+    std::size_t thread::get_libcds_hazard_pointer_data() const
+    {
+        return threads::get_libcds_hazard_pointer_data(native_handle());
+    }
+    std::size_t thread::set_libcds_hazard_pointer_data(std::size_t data)
+    {
+        return threads::set_libcds_hazard_pointer_data(native_handle(), data);
+    }
+
+    std::size_t thread::get_libcds_dynamic_hazard_pointer_data() const
+    {
+        return threads::get_libcds_dynamic_hazard_pointer_data(native_handle());
+    }
+    std::size_t thread::set_libcds_dynamic_hazard_pointer_data(std::size_t data)
+    {
+        return threads::set_libcds_dynamic_hazard_pointer_data(
+            native_handle(), data);
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         struct thread_task_base : lcos::detail::future_data<void>
@@ -397,6 +427,41 @@ namespace hpx {
             return threads::set_thread_data(threads::get_self_id(), data);
         }
 
+#if defined(HPX_HAVE_LIBCDS)
+        std::size_t get_libcds_data()
+        {
+            return threads::get_libcds_data(threads::get_self_id());
+        }
+
+        std::size_t set_libcds_data(std::size_t data)
+        {
+            return threads::set_libcds_data(threads::get_self_id(), data);
+        }
+
+        std::size_t get_libcds_hazard_pointer_data()
+        {
+            return threads::get_libcds_hazard_pointer_data(
+                threads::get_self_id());
+        }
+
+        std::size_t set_libcds_hazard_pointer_data(std::size_t data)
+        {
+            return threads::set_libcds_hazard_pointer_data(
+                threads::get_self_id(), data);
+        }
+
+        std::size_t get_libcds_dynamic_hazard_pointer_data()
+        {
+            return threads::get_libcds_dynamic_hazard_pointer_data(
+                threads::get_self_id());
+        }
+
+        std::size_t set_libcds_dynamic_hazard_pointer_data(std::size_t data)
+        {
+            return threads::set_libcds_dynamic_hazard_pointer_data(
+                threads::get_self_id(), data);
+        }
+#endif
         ///////////////////////////////////////////////////////////////////////
         disable_interruption::disable_interruption()
           : interruption_was_enabled_(interruption_enabled())
