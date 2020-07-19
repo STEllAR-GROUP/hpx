@@ -7,9 +7,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/chrono.hpp>
 #include <hpx/distributed/iostream.hpp>
 #include <hpx/numeric.hpp>
-#include <hpx/chrono.hpp>
 #include "worker_timed.hpp"
 
 #include <cstddef>

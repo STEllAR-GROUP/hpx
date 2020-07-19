@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/parallel/numeric.hpp>
+
 #include <hpx/parallel/container_numeric.hpp>
 
 namespace hpx {

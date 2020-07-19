@@ -309,8 +309,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // Forward Declaration of Segmented Reduce
         template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
             typename T, typename F>
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        reduce_(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f,
+        typename util::detail::algorithm_result<ExPolicy, T>::type reduce_(
+            ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f,
             std::true_type);
     }    // namespace detail
 
