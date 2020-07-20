@@ -6,8 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(example_programs libcds_deque)
-set(libcds_deque DEPENDENCIES iostreams_component)
+set(example_programs libcds_flat_combining_priority_queue)
+set(libcds_flat_combining_priority_queue DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(${example_program}_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -34,4 +34,4 @@ foreach(example_program ${example_programs})
 
 endforeach()
 
-target_link_libraries(libcds_deque PRIVATE cds)
+target_link_libraries(libcds_flat_combining_priority_queue PRIVATE cds)
