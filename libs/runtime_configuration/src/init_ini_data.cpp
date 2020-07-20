@@ -18,7 +18,6 @@
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/assign/std/vector.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -255,17 +254,16 @@ namespace hpx { namespace util {
             // This HPX module does not export any factories, but
             // might export startup/shutdown functions. Create some
             // default configuration data.
-            using namespace boost::assign;
 #if defined(HPX_DEBUG)
             // demangle the name in debug mode
             if (name[name.size() - 1] == 'd')
                 name.resize(name.size() - 1);
 #endif
-            ini_data += std::string("[hpx.components.") + name + "]";
-            ini_data += "name = " + name;
-            ini_data += "no_factory = 1";
-            ini_data += "enabled = 1";
-            ini_data += "static = 1";
+            ini_data.push_back(std::string("[hpx.components.") + name + "]");
+            ini_data.push_back("name = " + name);
+            ini_data.push_back("no_factory = 1");
+            ini_data.push_back("enabled = 1");
+            ini_data.push_back("static = 1");
         }
         else
         {
@@ -311,17 +309,16 @@ namespace hpx { namespace util {
             // This HPX module does not export any factories, but
             // might export startup/shutdown functions. Create some
             // default configuration data.
-            using namespace boost::assign;
 #if defined(HPX_DEBUG)
             // demangle the name in debug mode
             if (name[name.size() - 1] == 'd')
                 name.resize(name.size() - 1);
 #endif
-            ini_data += std::string("[hpx.components.") + name + "]";
-            ini_data += "name = " + name;
-            ini_data += "path = " + curr;
-            ini_data += "no_factory = 1";
-            ini_data += "enabled = 1";
+            ini_data.push_back(std::string("[hpx.components.") + name + "]");
+            ini_data.push_back("name = " + name);
+            ini_data.push_back("path = " + curr);
+            ini_data.push_back("no_factory = 1");
+            ini_data.push_back("enabled = 1");
         }
         else
         {

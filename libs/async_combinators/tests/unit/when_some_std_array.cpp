@@ -13,8 +13,6 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <boost/assign/std/vector.hpp>
-
 #include <array>
 #include <string>
 #include <utility>
