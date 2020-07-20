@@ -17,13 +17,13 @@ set(CTEST_UPDATE_VERSION_ONLY "ON")
 
 if(NOT "$ENV{ghprbPullId}" STREQUAL "")
   set(CTEST_BUILD_NAME "$ENV{ghprbPullId}-${CTEST_BUILD_CONFIGURATION_NAME}")
+  set(CTEST_TRACK "Pull_Requests")
 else()
   set(CTEST_BUILD_NAME
-      "$ENV{GIT_LOCAL_BRANCH}-${CTEST_BUILD_CONFIGURATION_NAME}"
+      "$ENV{git_local_branch}-${CTEST_BUILD_CONFIGURATION_NAME}"
   )
+  set(CTEST_TRACK "$ENV{git_local_branch}")
 endif()
-
-message("CTEST_BUILD_NAME=${CTEST_BUILD_NAME}")
 
 set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} ${CTEST_SOURCE_DIRECTORY}")
 set(CTEST_CONFIGURE_COMMAND
@@ -39,7 +39,7 @@ set(CTEST_CONFIGURE_COMMAND
     "${CTEST_CONFIGURE_COMMAND} ${CTEST_CONFIGURE_EXTRA_OPTIONS}"
 )
 
-ctest_start(Experimental TRACK "Pull_Requests")
+ctest_start(Experimental TRACK "${CTEST_TRACK}")
 ctest_update()
 ctest_submit(PARTS Update)
 ctest_configure()

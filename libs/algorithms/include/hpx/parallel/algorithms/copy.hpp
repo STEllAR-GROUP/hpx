@@ -10,47 +10,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/algorithms/detail/is_negative.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/algorithms/detail/transfer.hpp>
-#include <hpx/parallel/tagspec.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/foreach_partitioner.hpp>
-#include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/scan_partitioner.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
-#include <hpx/parallel/util/transfer.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/unused.hpp>
-
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#endif
-
-#include <algorithm>
-#include <cstddef>
-#include <cstring>
-#include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-
-#include <boost/shared_array.hpp>
-
 #if defined(DOXYGEN)
 namespace hpx {
     // clang-format off
@@ -240,6 +199,45 @@ namespace hpx {
 
 #else    // DOXYGEN
 
+#include <hpx/config.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+
+#include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/execution/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/transfer.hpp>
+#include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/foreach_partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
+#include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
+#include <hpx/parallel/util/transfer.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/type_support/unused.hpp>
+
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#endif
+
+#include <algorithm>
+#include <cstddef>
+#include <cstring>
+#include <iterator>
+#include <memory>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 namespace hpx { namespace parallel { inline namespace v1 {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -365,12 +363,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
     HPX_DEPRECATED("hpx::parallel::copy is deprecated, use hpx::copy instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<FwdIter1, FwdIter2>>::type
         copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
-        return detail::get_second_element(
-            detail::transfer<detail::copy_iter<FwdIter1, FwdIter2>>(
-                std::forward<ExPolicy>(policy), first, last, dest));
+        return detail::transfer<detail::copy_iter<FwdIter1, FwdIter2>>(
+            std::forward<ExPolicy>(policy), first, last, dest);
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -611,7 +609,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format on
     HPX_DEPRECATED(
         "hpx::parallel::copy_if is deprecated, use hpx::copy_if instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<FwdIter1, FwdIter2>>::type
         copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
             Pred&& pred)
     {
@@ -622,10 +621,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
-        return hpx::parallel::v1::detail::get_second_element(
-            detail::copy_if<util::in_out_result<FwdIter1, FwdIter2>>().call(
-                std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
-                std::forward<Pred>(pred), util::projection_identity{}));
+        return detail::copy_if<util::in_out_result<FwdIter1, FwdIter2>>().call(
+            std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
+            std::forward<Pred>(pred), util::projection_identity{});
     }
 }}}    // namespace hpx::parallel::v1
 

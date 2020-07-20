@@ -81,13 +81,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                     tinfo = std::current_exception();
                 }
 
+                // Reset early as the destructors may still yield.
                 this->reset_tss();
+                this->reset();
 
                 // return value to other side of the fence
                 this->bind_result(result_last);
             }
 
-            this->reset();
             this->do_return(status, std::move(tinfo));
         } while (this->m_state == super_type::ctx_running);
 

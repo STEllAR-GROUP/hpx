@@ -18,8 +18,10 @@ namespace hpx { namespace cuda { namespace experimental {
     struct HPX_EXPORT target;
 
     HPX_EXPORT std::vector<target> get_local_targets();
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
     HPX_EXPORT hpx::future<std::vector<target>> get_targets(
         hpx::id_type const& locality);
+#endif
     HPX_EXPORT void print_local_targets();
 
 }}}    // namespace hpx::cuda::experimental

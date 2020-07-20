@@ -17,11 +17,13 @@
 #include <hpx/async_cuda/get_targets.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
-#include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/runtime/find_here.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
+#endif
 
 #include <cuda_runtime.h>
 
@@ -97,7 +99,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // Constructs default target
         HPX_HOST_DEVICE target()
           : handle_()
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(hpx::find_here())
 #endif
         {
@@ -106,12 +108,13 @@ namespace hpx { namespace cuda { namespace experimental {
         // Constructs target from a given device ID
         explicit HPX_HOST_DEVICE target(int device)
           : handle_(device)
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(hpx::find_here())
 #endif
         {
         }
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         HPX_HOST_DEVICE target(hpx::id_type const& locality, int device)
           : handle_(device)
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -119,10 +122,11 @@ namespace hpx { namespace cuda { namespace experimental {
 #endif
         {
         }
+#endif
 
         HPX_HOST_DEVICE target(target const& rhs) noexcept
           : handle_(rhs.handle_)
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(rhs.locality_)
 #endif
         {
@@ -130,7 +134,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
         HPX_HOST_DEVICE target(target&& rhs) noexcept
           : handle_(std::move(rhs.handle_))
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
           , locality_(std::move(rhs.locality_))
 #endif
         {
@@ -141,7 +145,7 @@ namespace hpx { namespace cuda { namespace experimental {
             if (&rhs != this)
             {
                 handle_ = rhs.handle_;
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
                 locality_ = rhs.locality_;
 #endif
             }
@@ -153,7 +157,7 @@ namespace hpx { namespace cuda { namespace experimental {
             if (&rhs != this)
             {
                 handle_ = std::move(rhs.handle_);
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
                 locality_ = std::move(rhs.locality_);
 #endif
             }
@@ -173,10 +177,12 @@ namespace hpx { namespace cuda { namespace experimental {
 
         HPX_HOST_DEVICE void synchronize() const;
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         HPX_HOST_DEVICE hpx::id_type const& get_locality() const noexcept
         {
             return locality_;
         }
+#endif
 
         hpx::future<void> get_future_with_event() const;
         hpx::future<void> get_future_with_callback() const;
@@ -198,20 +204,26 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             return cuda::experimental::get_local_targets();
         }
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
         static hpx::future<std::vector<target>> get_targets(
             hpx::id_type const& locality)
         {
             return cuda::experimental::get_targets(locality);
         }
+#endif
 
         friend bool operator==(target const& lhs, target const& rhs)
         {
-            return lhs.handle_.get_device() == rhs.handle_.get_device() &&
-                lhs.locality_ == rhs.locality_;
+            return lhs.handle_.get_device() == rhs.handle_.get_device()
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+                && lhs.locality_ == rhs.locality_
+#endif
+                ;
         }
 
     private:
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
         friend class hpx::serialization::access;
 
         void serialize(serialization::input_archive& ar, const unsigned int);
@@ -219,7 +231,9 @@ namespace hpx { namespace cuda { namespace experimental {
 #endif
 
         native_handle_type handle_;
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         hpx::id_type locality_;
+#endif
     };
 
     using detail::get_future_with_callback;

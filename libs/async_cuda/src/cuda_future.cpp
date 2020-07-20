@@ -14,9 +14,10 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/memory.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
+#endif
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 

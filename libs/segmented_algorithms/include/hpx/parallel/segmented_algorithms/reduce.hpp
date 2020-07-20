@@ -191,10 +191,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // segmented implementation
         template <typename ExPolicy, typename InIterB, typename InIterE,
             typename T, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, T>::type>::type
-        reduce_(ExPolicy&& policy, InIterB first, InIterE last, T init, F&& f,
+        typename util::detail::algorithm_result<ExPolicy, T>::type reduce_(
+            ExPolicy&& policy, InIterB first, InIterE last, T init, F&& f,
             std::true_type)
         {
             typedef parallel::execution::is_sequenced_execution_policy<ExPolicy>
@@ -215,10 +213,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // forward declare the non-segmented version of this algorithm
         template <typename ExPolicy, typename InIterB, typename InIterE,
             typename T, typename F>
-        inline typename std::enable_if<
-            execution::is_execution_policy<ExPolicy>::value,
-            typename util::detail::algorithm_result<ExPolicy, T>::type>::type
-        reduce_(ExPolicy&& policy, InIterB first, InIterE last, T init, F&& f,
+        typename util::detail::algorithm_result<ExPolicy, T>::type reduce_(
+            ExPolicy&& policy, InIterB first, InIterE last, T init, F&& f,
             std::false_type);
 
         /// \endcond

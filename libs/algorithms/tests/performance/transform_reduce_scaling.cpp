@@ -7,9 +7,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/chrono.hpp>
 #include <hpx/distributed/iostream.hpp>
-#include <hpx/include/parallel_numeric.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/numeric.hpp>
 #include "worker_timed.hpp"
 
 #include <cstddef>
@@ -49,7 +49,7 @@ void measure_transform_reduce_old(std::size_t size)
         size, Point{double(gen()), double(gen())});
 
     //invoke old reduce
-    Point result = hpx::parallel::reduce(hpx::parallel::execution::par,
+    Point result = hpx::ranges::reduce(hpx::parallel::execution::par,
         std::begin(data_representation), std::end(data_representation),
         Point{0.0, 0.0}, [](Point res, Point curr) {
             return Point{res.x * res.y + curr.x * curr.y, 1.0};
