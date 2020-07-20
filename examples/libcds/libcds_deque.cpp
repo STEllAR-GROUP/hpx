@@ -101,43 +101,37 @@ void run(Deque& dq)
     hpx::cout << "Hello World!\n" << hpx::flush;
 }
 
+template <typename T1, typename... T2>
+using deque_type = cds::container::FCDeque<int, std::deque<int>,
+    typename cds::container::fcdeque::make_traits<T1, T2...>::type>;
+
 int hpx_main(int, char**)
 {
-    typedef cds::container::FCDeque<int> std_deque_type;
+    using std_deque_type = cds::container::FCDeque<int>;
 
-    typedef cds::container::FCDeque<int, std::deque<int>,
-        cds::container::fcdeque::make_traits<cds::opt::wait_strategy<
-            cds::algo::flat_combining::wait_strategy::empty>>::type>
-        std_empty_wait_strategy_deque_type;
+    using std_empty_wait_strategy_deque_type =
+        deque_type<cds::opt::wait_strategy<
+            cds::algo::flat_combining::wait_strategy::empty>>;
 
-    typedef cds::container::FCDeque<int, std::deque<int>,
-        cds::container::fcdeque::make_traits<
+    using std_multi_mutex_multi_condvar_deque_type =
+        deque_type<cds::opt::wait_strategy<cds::algo::flat_combining::
+                wait_strategy::multi_mutex_multi_condvar<>>>;
+
+    using std_elimination_deque_type =
+        deque_type<cds::opt::enable_elimination<true>>;
+
+    using std_statistics_deque_type =
+        deque_type<cds::opt::stat<cds::container::fcdeque::stat<>>>;
+
+    using std_elimination_single_mutex_single_condvar_deque_type =
+        deque_type<cds::opt::enable_elimination<true>,
             cds::opt::wait_strategy<cds::algo::flat_combining::wait_strategy::
-                    multi_mutex_multi_condvar<>>>::type>
-        std_multi_mutex_multi_condvar_deque_type;
+                    single_mutex_single_condvar<3>>>;
 
-    typedef cds::container::FCDeque<int, std::deque<int>,
-        cds::container::fcdeque::make_traits<
-            cds::opt::enable_elimination<true>>::type>
-        std_elimination_deque_type;
-
-    typedef cds::container::FCDeque<int, std::deque<int>,
-        cds::container::fcdeque::make_traits<cds::opt::enable_elimination<true>,
+    using std_stat_single_mutex_multi_condvar_deque_type =
+        deque_type<cds::opt::stat<cds::container::fcdeque::stat<>>,
             cds::opt::wait_strategy<cds::algo::flat_combining::wait_strategy::
-                    single_mutex_single_condvar<3>>>::type>
-        std_elimination_single_mutex_single_condvar_deque_type;
-
-    typedef cds::container::FCDeque<int, std::deque<int>,
-        cds::container::fcdeque::make_traits<
-            cds::opt::stat<cds::container::fcdeque::stat<>>>::type>
-        std_statistics_deque_type;
-
-    typedef cds::container::FCDeque<int, std::deque<int>,
-        cds::container::fcdeque::make_traits<
-            cds::opt::stat<cds::container::fcdeque::stat<>>,
-            cds::opt::wait_strategy<cds::algo::flat_combining::wait_strategy::
-                    single_mutex_multi_condvar<2>>>::type>
-        std_stat_single_mutex_multi_condvar_deque_type;
+                    single_mutex_multi_condvar<2>>>;
 
     struct deque_traits
       : public cds::container::fcdeque::make_traits<
