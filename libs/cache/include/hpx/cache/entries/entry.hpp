@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/operators.hpp>
-
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,8 +42,6 @@ namespace hpx { namespace util { namespace cache { namespace entries {
     ///
     template <typename Value, typename Derived>
     class entry
-      : boost::less_than_comparable<
-            typename detail::derived<Value, Derived>::type>
     {
     public:
         typedef Value value_type;
@@ -116,11 +112,36 @@ namespace hpx { namespace util { namespace cache { namespace entries {
             return 1;
         }
 
-        /// \brief    Forwarding operator< allowing to compare entries in stead
+        /// \brief    Forwarding operator< allowing to compare entries instead
         ///           of the values.
         friend bool operator<(entry const& lhs, entry const& rhs)
         {
             return lhs.value_ < rhs.value_;
+        }
+
+        friend bool operator>(entry const& lhs, entry const& rhs)
+        {
+            return lhs.value_ > rhs.value_;
+        }
+
+        friend bool operator<=(entry const& lhs, entry const& rhs)
+        {
+            return lhs.value_ <= rhs.value_;
+        }
+
+        friend bool operator>=(entry const& lhs, entry const& rhs)
+        {
+            return lhs.value_ >= rhs.value_;
+        }
+
+        friend bool operator==(entry const& lhs, entry const& rhs)
+        {
+            return lhs.value_ == rhs.value_;
+        }
+
+        friend bool operator!=(entry const& lhs, entry const& rhs)
+        {
+            return lhs.value_ != rhs.value_;
         }
 
         /// \brief Get a reference to the stored data value

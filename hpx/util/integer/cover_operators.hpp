@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <boost/operators.hpp>
 #include <iosfwd>
 
 namespace hpx { namespace util
@@ -21,7 +20,7 @@ namespace hpx { namespace util
   // A class that adds integer operators to an integer cover class
 
     template <typename T, typename IntegerType>
-    class cover_operators : boost::operators<T>
+    class cover_operators
     {
       // The other operations take advantage of the type conversion that's
       // built into unary +.
@@ -34,7 +33,11 @@ namespace hpx { namespace util
 
       // The basic ordering operations.
       friend bool operator==(const T& x, IntegerType y) { return +x == y; }
+      friend bool operator!=(const T& x, IntegerType y) { return +x != y; }
       friend bool operator<(const T& x, IntegerType y) { return +x < y; }
+      friend bool operator>(const T& x, IntegerType y) { return +x > y; }
+      friend bool operator<=(const T& x, IntegerType y) { return +x <= y; }
+      friend bool operator>=(const T& x, IntegerType y) { return +x >= y; }
 
       // The basic arithmetic operations.
       friend T& operator+=(T& x, IntegerType y) { return x = +x + y; }
@@ -48,6 +51,15 @@ namespace hpx { namespace util
       friend T& operator<<=(T& x, IntegerType y) { return x = +x << y; }
       friend T& operator>>=(T& x, IntegerType y) { return x = +x >> y; }
 
+      friend IntegerType operator+(T const& x, IntegerType y) { return +x + y; }
+      friend IntegerType operator-(T const& x, IntegerType y) { return +x - y; }
+      friend IntegerType operator*(T const& x, IntegerType y) { return +x * y; }
+      friend IntegerType operator/(T const& x, IntegerType y) { return +x / y; }
+      friend IntegerType operator%(T const& x, IntegerType y) { return +x % y; }
+      friend IntegerType operator&(T const& x, IntegerType y) { return +x & y; }
+      friend IntegerType operator|(T const& x, IntegerType y) { return +x | y; }
+      friend IntegerType operator^(T const& x, IntegerType y) { return +x ^ y; }
+
       // A few binary arithmetic operations not covered by operators base class.
       friend IntegerType operator<<(const T& x, IntegerType y) { return +x << y; }
       friend IntegerType operator>>(const T& x, IntegerType y) { return +x >> y; }
@@ -55,7 +67,20 @@ namespace hpx { namespace util
       // Auto-increment and auto-decrement can be defined in terms of the
       // arithmetic operations.
       friend T& operator++(T& x) { return x += 1; }
+      friend T operator++(T& x, int)
+      {
+          T tmp(x);
+          ++x;
+          return tmp;
+      }
+
       friend T& operator--(T& x) { return x -= 1; }
+      friend T operator--(T& x, int)
+      {
+          T tmp(x);
+          --x;
+          return tmp;
+      }
 
   /// TODO: stream I/O needs to be templatized on the stream type, so will
   /// work with wide streams, etc.
