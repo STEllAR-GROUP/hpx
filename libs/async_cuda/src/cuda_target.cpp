@@ -11,13 +11,12 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/runtime/find_here.hpp>
-#include <hpx/runtime/naming/id_type_impl.hpp>
-#endif
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/runtime/find_here.hpp>
+#include <hpx/runtime/naming/id_type_impl.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS)
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
@@ -27,6 +26,7 @@
 #endif
 #endif
 #include <hpx/serialization/serialize.hpp>
+#endif
 #endif
 
 #include <cstddef>

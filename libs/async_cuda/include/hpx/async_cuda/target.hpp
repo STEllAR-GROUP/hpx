@@ -19,10 +19,10 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/find_here.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 #endif
 
 #include <cuda_runtime.h>
@@ -223,7 +223,7 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
     private:
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
         friend class hpx::serialization::access;
 
         void serialize(serialization::input_archive& ar, const unsigned int);
