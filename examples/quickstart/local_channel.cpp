@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/apply.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/include/lcos.hpp>
 
 #include <numeric>

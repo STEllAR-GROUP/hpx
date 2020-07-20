@@ -8,7 +8,7 @@
 
 #include <hpx/future.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/include/util.hpp>

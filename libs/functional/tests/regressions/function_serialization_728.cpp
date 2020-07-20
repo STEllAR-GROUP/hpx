@@ -8,11 +8,11 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/iostream.hpp>
 #ifdef HPX_HAVE_COMPRESSION_ZLIB
 #include <hpx/include/compression_zlib.hpp>
 #endif

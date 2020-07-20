@@ -19,7 +19,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 
 #include <cstdint>
 #include <vector>

@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <type_traits>
 #include <utility>

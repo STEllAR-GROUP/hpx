@@ -9,10 +9,15 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
+    hpx/algorithm.hpp
+    hpx/any.hpp
+    hpx/chrono.hpp
+    hpx/distributed/future.hpp
     hpx/distributed/runtime.hpp
     hpx/execution.hpp
-    hpx/hpx.hpp
+    hpx/functional.hpp
     hpx/future.hpp
+    hpx/hpx.hpp
     hpx/include/actions.hpp
     hpx/include/agas.hpp
     hpx/include/applier.hpp
@@ -62,8 +67,8 @@ set(include_headers
     hpx/include/parallel_numeric.hpp
     hpx/include/parallel_partition.hpp
     hpx/include/parallel_reduce.hpp
-    hpx/include/parallel_remove_copy.hpp
     hpx/include/parallel_remove.hpp
+    hpx/include/parallel_remove_copy.hpp
     hpx/include/parallel_replace.hpp
     hpx/include/parallel_reverse.hpp
     hpx/include/parallel_rotate.hpp
@@ -96,7 +101,16 @@ set(include_headers
     hpx/include/threads.hpp
     hpx/include/traits.hpp
     hpx/include/util.hpp
+    hpx/local/execution.hpp
+    hpx/local/future.hpp
+    hpx/local/runtime.hpp
+    hpx/memory.hpp
+    hpx/numeric.hpp
+    hpx/optional.hpp
     hpx/runtime.hpp
+    hpx/task_block.hpp
+    hpx/tuple.hpp
+    hpx/type_traits.hpp
 )
 
 include(HPX_AddModule)

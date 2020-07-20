@@ -6,13 +6,8 @@
 
 #pragma once
 
-#include <hpx/modules/async_base.hpp>
-#include <hpx/modules/async_combinators.hpp>
-#include <hpx/modules/async_local.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/futures.hpp>
-#include <hpx/modules/lcos_local.hpp>
-
-namespace hpx {
-    using hpx::lcos::local::packaged_task;
-}
+#include <hpx/config.hpp>
+#include <hpx/local/future.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/distributed/future.hpp>
+#endif
