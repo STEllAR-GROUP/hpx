@@ -10,47 +10,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/algorithms/detail/is_negative.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/algorithms/detail/transfer.hpp>
-#include <hpx/parallel/tagspec.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/foreach_partitioner.hpp>
-#include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/scan_partitioner.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
-#include <hpx/parallel/util/transfer.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/unused.hpp>
-
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#endif
-
-#include <algorithm>
-#include <cstddef>
-#include <cstring>
-#include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-
-#include <boost/shared_array.hpp>
-
 #if defined(DOXYGEN)
 namespace hpx {
     // clang-format off
@@ -239,6 +198,45 @@ namespace hpx {
 }    // namespace hpx
 
 #else    // DOXYGEN
+
+#include <hpx/config.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+
+#include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/execution/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/transfer.hpp>
+#include <hpx/parallel/tagspec.hpp>
+#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/foreach_partitioner.hpp>
+#include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
+#include <hpx/parallel/util/scan_partitioner.hpp>
+#include <hpx/parallel/util/tagged_pair.hpp>
+#include <hpx/parallel/util/transfer.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/type_support/unused.hpp>
+
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#endif
+
+#include <algorithm>
+#include <cstddef>
+#include <cstring>
+#include <iterator>
+#include <memory>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
 

@@ -29,6 +29,7 @@ set(tests
     none_of_range
     partition_range
     partition_copy_range
+    reduce_range
     remove_range
     remove_if_range
     remove_copy_range
