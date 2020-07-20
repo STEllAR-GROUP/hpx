@@ -13,13 +13,12 @@
 #include <hpx/distributed/iostream.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <boost/thread/locks.hpp>
-
 #include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <mutex>
+#include <shared_mutex>
 #include <random>
 #include <vector>
 
@@ -76,7 +75,7 @@ int main()
 
                 for (int j = 0; j < cycles; ++j)
                 {
-                    boost::shared_lock<hpx::lcos::local::shared_mutex> sl(stm);
+                    std::shared_lock<hpx::lcos::local::shared_mutex> sl(stm);
 
                     hpx::cout << "Reader " << i << " starting..." << std::endl;
                     hpx::this_thread::sleep_for(milliseconds(dist(urng)));
