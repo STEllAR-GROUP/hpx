@@ -23,7 +23,12 @@
 // clang-format on
 
 // native implementation
-#if defined(HPX_HAVE_NATIVE_TLS)
+#if !defined(HPX_HAVE_NATIVE_TLS)
+
+#error                                                                         \
+    "platforms without support for native thread local storage are not supported"
+
+#else
 
 #if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
 
@@ -134,45 +139,4 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 #endif
-
-// fallback implementation
-#else
-
-#include <boost/thread/tss.hpp>
-
-namespace hpx { namespace util {
-    template <typename T, typename Tag>
-    struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
-    {
-        typedef
-            typename boost::thread_specific_ptr<T>::element_type element_type;
-
-        T* get() const
-        {
-            return ptr_.get();
-        }
-
-        T* operator->() const
-        {
-            return ptr_.operator->();
-        }
-
-        T& operator*() const
-        {
-            return ptr_.operator*();
-        }
-
-        void reset(T* new_value = nullptr)
-        {
-            ptr_.reset(new_value);
-        }
-
-    private:
-        static boost::thread_specific_ptr<T> ptr_;
-    };
-
-    template <typename T, typename Tag>
-    boost::thread_specific_ptr<T> thread_specific_ptr<T, Tag>::ptr_;
-}}    // namespace hpx::util
-
 #endif
