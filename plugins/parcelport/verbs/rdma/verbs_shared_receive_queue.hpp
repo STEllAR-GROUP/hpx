@@ -75,8 +75,11 @@ namespace verbs
         ~verbs_shared_receive_queue()
         {
             if (ibv_destroy_srq(srq_)) {
-                rdma_error e(errno, "ibv_destroy_srq() failed");
-                throw e;
+                // can't throw exception in destructor
+                // rdma_error e(errno, "ibv_destroy_srq() failed");
+                // throw e;
+                LOG_ERROR_MSG("ibv_destroy_srq() failed");
+                std::terminate();
             }
         }
 

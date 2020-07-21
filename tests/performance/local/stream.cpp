@@ -171,7 +171,8 @@ void check_results(std::size_t iterations, Vector const& a_res,
                 {
                     printf("         array a: index: %ld, expected: %e, "
                            "observed: %e, relative error: %e\n",
-                        j, aj, a[j], std::abs((aj - a[j]) / aAvgErr));
+                        (unsigned long) j, aj, a[j],
+                        (double) std::abs((aj - a[j]) / aAvgErr));
                 }
 #endif
             }
@@ -197,7 +198,8 @@ void check_results(std::size_t iterations, Vector const& a_res,
                 {
                     printf("         array b: index: %ld, expected: %e, "
                            "observed: %e, relative error: %e\n",
-                        j, bj, b[j], std::abs((bj - b[j]) / bAvgErr));
+                        (unsigned long) j, bj, b[j],
+                        (double) std::abs((bj - b[j]) / bAvgErr));
                 }
 #endif
             }
@@ -223,7 +225,8 @@ void check_results(std::size_t iterations, Vector const& a_res,
                 {
                     printf("         array c: index: %ld, expected: %e, "
                            "observed: %e, relative error: %e\n",
-                        j, cj, c[j], std::abs((cj - c[j]) / cAvgErr));
+                        (unsigned long) j, cj, c[j],
+                        (double) std::abs((cj - c[j]) / cAvgErr));
                 }
 #endif
             }
@@ -240,8 +243,9 @@ void check_results(std::size_t iterations, Vector const& a_res,
     printf("Results Validation Verbose Results: \n");
     printf("    Expected a(1), b(1), c(1): %f %f %f \n", aj, bj, cj);
     printf("    Observed a(1), b(1), c(1): %f %f %f \n", a[1], b[1], c[1]);
-    printf("    Rel Errors on a, b, c:     %e %e %e \n", std::abs(aAvgErr / aj),
-        std::abs(bAvgErr / bj), std::abs(cAvgErr / cj));
+    printf("    Rel Errors on a, b, c:     %e %e %e \n",
+        (double) std::abs(aAvgErr / aj), (double) std::abs(bAvgErr / bj),
+        (double) std::abs(cAvgErr / cj));
 #endif
 }
 
