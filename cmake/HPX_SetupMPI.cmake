@@ -48,6 +48,6 @@ endmacro()
 # FIXME : not sure if this comment is still up-to-date If we compile with the
 # MPI parcelport enabled, we need to additionally add the MPI include path here,
 # because for the main library, it's only added for the plugin.
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_MPI_WITH_FUTURES)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
   setup_mpi()
 endif()
