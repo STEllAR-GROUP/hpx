@@ -1,21 +1,15 @@
+#!/usr/bin/python
+
 # Copyright (c) 2014-2017 John Biddiscombe
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#!/usr/bin/python
-import optparse
-import itertools
 from io import StringIO
 import csv
 import os
-import re
-import glob
-import math
 import numpy
-from numpy import array
-import matplotlib
 from plot_utils import *
 
 workdir = os.getcwd()
