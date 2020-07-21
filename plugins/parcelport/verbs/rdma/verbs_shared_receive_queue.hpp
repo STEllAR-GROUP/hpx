@@ -47,10 +47,9 @@ namespace verbs
 
         // Default constructor.
         verbs_shared_receive_queue(verbs_protection_domain_ptr domain)
+          : domain_(domain)
+          , sqr_(nullptr)
         {
-            srq_    = nullptr;
-            domain_ = domain;
-            //
             struct ibv_srq_init_attr srq_attr;
             memset(&srq_attr, 0, sizeof(ibv_srq_init_attr));
             // @todo : need to query max before setting sge
