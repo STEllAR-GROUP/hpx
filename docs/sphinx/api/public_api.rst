@@ -138,12 +138,66 @@ Macros
 Header ``hpx/barrier.hpp``
 ==========================
 
+This header includes :ref:`public_api_header_hpx_local_barrier` and
+ref:`public_api_header_hpx_distributed_barrier`.
+
+.. _public_api_header_hpx_local_barrier:
+
+Header ``hpx/local/barrier.hpp``
+================================
+
 Corresponds to the C++ standard library header :cppreference-header:`barrier`.
 
 Classes
 -------
 
 - :cpp:class:`hpx::lcos::local::cpp20_barrier`
+
+.. _public_api_header_hpx_distributed_barrier:
+
+Header ``hpx/distributed/barrier.hpp``
+======================================
+
+Contains a distributed barrier implementation. This functionality is also
+exposed through the ``hpx::distributed`` namespace. The name in
+``hpx::distributed`` should be preferred.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::barrier`
+
+Header ``hpx/channel.hpp``
+==========================
+
+This header includes :ref:`public_api_header_hpx_local_channel` and
+ref:`public_api_header_hpx_distributed_channel`.
+
+.. _public_api_header_hpx_local_channel:
+
+Header ``hpx/local/channel.hpp``
+================================
+
+Contains a local channel implementation.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::local::channel`
+
+.. _public_api_header_hpx_distributed_channel:
+
+Header ``hpx/distributed/channel.hpp``
+======================================
+
+Contains a distributed channel implementation. This functionality is also
+exposed through the ``hpx::distributed`` namespace. The name in
+``hpx::distributed`` should be preferred.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::channel`
 
 Header ``hpx/chrono.hpp``
 =========================
@@ -266,7 +320,7 @@ Header ``hpx/future.hpp``
 =========================
 
 This header includes :ref:`public_api_header_hpx_local_future` and
-ref:`public_api_header_hpx_future_runtime`.
+ref:`public_api_header_hpx_distributed_future`.
 
 .. _public_api_header_hpx_local_future:
 
@@ -370,6 +424,38 @@ Functions
 - :cpp:func:`hpx::disconnect`
 - :cpp:func:`hpx::suspend`
 - :cpp:func:`hpx::resume`
+
+Header ``hpx/latch.hpp``
+==========================
+
+This header includes :ref:`public_api_header_hpx_local_latch` and
+ref:`public_api_header_hpx_distributed_latch`.
+
+.. _public_api_header_hpx_local_latch:
+
+Header ``hpx/local/latch.hpp``
+================================
+
+Corresponds to the C++ standard library header :cppreference-header:`latch`.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::local::cpp20_latch`
+
+.. _public_api_header_hpx_distributed_latch:
+
+Header ``hpx/distributed/latch.hpp``
+======================================
+
+Contains a distributed latch implementation. This functionality is also exposed
+through the ``hpx::distributed`` namespace. The name in ``hpx::distributed``
+should be preferred.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::latch`
 
 Header ``hpx/mutex.hpp``
 ========================

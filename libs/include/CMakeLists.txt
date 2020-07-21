@@ -11,6 +11,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(include_headers
     hpx/algorithm.hpp
     hpx/any.hpp
+    hpx/barrier.hpp
+    hpx/channel.hpp
     hpx/chrono.hpp
     hpx/distributed/future.hpp
     hpx/distributed/runtime.hpp
@@ -101,6 +103,7 @@ set(include_headers
     hpx/include/threads.hpp
     hpx/include/traits.hpp
     hpx/include/util.hpp
+    hpx/latch.hpp
     hpx/local/execution.hpp
     hpx/local/future.hpp
     hpx/local/runtime.hpp
@@ -124,13 +127,13 @@ add_hpx_module(
     hpx_assertion
     hpx_async_base
     hpx_async_combinators
+    hpx_async_local
     hpx_config
     hpx_errors
-    hpx_executors
     hpx_execution
+    hpx_executors
     hpx_format
     hpx_futures
-    hpx_async_local
     hpx_lcos_local
     hpx_naming_base
     hpx_pack_traversal
@@ -140,8 +143,8 @@ add_hpx_module(
     hpx_synchronization
     hpx_thread_executors
     hpx_thread_pools
-    hpx_threadmanager
     hpx_threading
+    hpx_threadmanager
     hpx_timed_execution
     hpx_util
   CMAKE_SUBDIRS tests
