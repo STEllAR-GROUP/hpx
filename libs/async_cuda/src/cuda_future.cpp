@@ -246,7 +246,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     {
         cud_debug.debug(debug::str<>("enable polling"));
         auto* sched = pool.get_scheduler();
-        sched->set_cuda_polling_function(&hpx::cuda::experimental::detail::poll);
+        sched->set_cuda_polling_function(
+            &hpx::cuda::experimental::detail::poll);
     }
 
     // -------------------------------------------------------------

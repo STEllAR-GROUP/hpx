@@ -276,11 +276,11 @@ namespace hpx { namespace threads { namespace policies {
             return thread_queue_init_.small_stacksize_;
         }
 
-        using PollingFunctionPtr = void (*)();
+        using polling_function_ptr = void (*)();
 
         static void null_polling_function() {}
 
-        void set_mpi_polling_function(PollingFunctionPtr mpi_func)
+        void set_mpi_polling_function(polling_function_ptr mpi_func)
         {
             polling_function_mpi_ = mpi_func;
         }
@@ -290,7 +290,7 @@ namespace hpx { namespace threads { namespace policies {
             polling_function_mpi_ = &null_polling_function;
         }
 
-        void set_cuda_polling_function(PollingFunctionPtr cuda_func)
+        void set_cuda_polling_function(polling_function_ptr cuda_func)
         {
             polling_function_cuda_ = cuda_func;
         }
@@ -342,9 +342,8 @@ namespace hpx { namespace threads { namespace policies {
 
         std::atomic<std::int64_t> background_thread_count_;
 
-        // the scheduler mode, protected from false sharing
-        PollingFunctionPtr polling_function_mpi_;
-        PollingFunctionPtr polling_function_cuda_;
+        polling_function_ptr polling_function_mpi_;
+        polling_function_ptr polling_function_cuda_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:
