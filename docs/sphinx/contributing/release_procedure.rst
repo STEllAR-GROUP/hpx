@@ -21,17 +21,6 @@ are completed to avoid confusion.
 
 #. Notify developers that a release is imminent.
 
-#. Make a list of examples and benchmarks that should not go into the release.
-   Build all examples and benchmarks that will go in the release and make sure
-   they build and run as expected.
-
-    * Make sure all examples and benchmarks have example input files, and usage
-      documentation, either in the form of comments or a readme.
-
-#. Send the list of examples and benchmarks that will be included in the release
-   to hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu, and ask for
-   feedback. Update the list as necessary.
-
 #. Write release notes in ``docs/sphinx/releases/whats_new_$VERSION.rst``. Keep
    adding merged PRs and closed issues to this until just before the release is
    made. Use ``tools/generate_pr_issue_list.sh`` to generate the lists. Add the
@@ -50,34 +39,32 @@ are completed to avoid confusion.
      *   Update collaborators
      *   Update grant information
 
-#. This step does not apply to patch releases. For both APEX and hpxMP:
+#. This step does not apply to patch releases. For both APEX and libCDS:
 
    * Change the release branch to be the most current release tag available in
-     the APEX/hpxMP ``git_external`` section in the main ``CMakeLists.txt``.
+     the APEX/libCDS ``git_external`` section in the main ``CMakeLists.txt``.
      Please contact the maintainers of the respective packages to generate a new
      release to synchronize with the |hpx| release (`APEX
-     <http://github.com/khuck/xpress-apex>`_, `hpxMP
-     <https://github.com/STEllAR-GROUP/hpxMP>`_).
+     <http://github.com/khuck/xpress-apex>`_, `libCDS
+     <https://github.com/STEllAR-GROUP/libcds>`_).
 
 #. If there have been any commits to the release branch since the last release,
    create a tag from the old release branch before deleting the old release
    branch in the next step.
 
 #. Unprotect the release branch in the github repository settings so that it can
-   be deleted and recreated.
+   be deleted and recreated (tick "Allow force pushes" in the release branch
+   settings of the repository).
 
-#. Delete the old release branch, and create a new one by branching a stable
-   point from master. If you are creating a patch release, branch from the
+#. Reset the release branch to the latest stable state on master and force push
+   to origin/release. If you are creating a patch release, branch from the
    release tag for which you want to create a patch release.
 
-   * ``git push origin --delete release``
-   * ``git branch -D release``
-   * ``git checkout [stable point in master]``
-   * ``git branch release``
-   * ``git push origin release``
-   * ``git branch --set-upstream-to=origin/release release``
+   * ``git checkout -b release`` (or just ``checkout`` in case the it exists)
+   * ``git reset --hard stable``
+   * ``git push --force origin release``
 
-#. Protect the release branch again to disable deleting and force pushes.
+#. Protect the release branch again to disable force pushes.
 
 #. Check out the release branch.
 
@@ -99,23 +86,23 @@ are completed to avoid confusion.
 
    The main CMakeLists.txt contains a comment indicating for which version
    the breaking change was introduced first.
+   In the case of deprecated features which don't have a replacement yet, we
+   keep them around in case (like Vc for example).
 
 #. Update the minimum required versions if necessary (compilers, dependencies,
-   etc.).
+   etc.) in ``building_hpx.rst``.
 
-#. Switch Buildbot over to test the release branch.
-
-   * ``https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg``
-   * ``branch`` field in ``c['change_source'] =  GitPoller``
+#. Verify that the jenkins setup for the release branch on rostam is running
+   and does not display any errors.
 
 #. Repeat the following steps until satisfied with the release.
 
    #. Change ``HPX_VERSION_TAG`` in ``CMakeLists.txt`` to ``-rcN``, where ``N``
       is the current iteration of this step. Start with ``-rc1``.
 
-   #. Tag and create a pre-release on GitHub using the script
-      ``tools/roll_release.sh``. The script requires that you have the |stellar|
-      Group signing key.
+   #. Create a pre-release on GitHub using the script ``tools/roll_release.sh``.
+      This script automatically tag with the corresponding release number.
+      The script requires that you have the |stellar| Group signing key.
 
    #. This step is not necessary for patch releases. Notify
       ``hpx-users@stellar.cct.lsu.edu`` and ``stellar@cct.lsu.edu`` of the
@@ -144,9 +131,9 @@ are completed to avoid confusion.
    the docs, and change the value of ``HPX_VERSION_DATE`` in
    ``CMakeLists.txt``.
 
-#. Tag and create a release on GitHub using the script
-   ``tools/roll_release.sh``. The script requires that you have the |stellar|
-   Group signing key.
+#. Create a release on GitHub using the script ``tools/roll_release.sh``. This
+   script automatically tag the with the corresponding release number. The
+   script requires that you have the |stellar| Group signing key.
 
 #. Update the websites (`stellar-group.org <https://stellar-group.org>`_ and
    `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_) with the following:
@@ -167,11 +154,6 @@ are completed to avoid confusion.
 
    #. Change ``HPX_VERSION_TAG`` in ``CMakeLists.txt`` back to ``-trunk``.
 
-#. Switch Buildbot back to test the main branch
-
-   * ``https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg``
-   * ``branch`` field in ``c['change_source'] =  GitPoller``
-
 #. Update Vcpkg (``https://github.com/Microsoft/vcpkg``) to pull from latest release.
 
    * Update version number in CONTROL
@@ -184,4 +166,3 @@ are completed to avoid confusion.
    HPC, Heise Online, and a CCT press release.
 
 #. Beer and pizza.
-
