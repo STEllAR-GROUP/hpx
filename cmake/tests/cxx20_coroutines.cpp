@@ -46,6 +46,7 @@ struct resumable
 resumable test()
 {
     int result = co_await resumable{42};
+    (void) result;
     co_return result;
 }
 

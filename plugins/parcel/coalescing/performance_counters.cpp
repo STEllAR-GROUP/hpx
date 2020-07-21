@@ -39,8 +39,6 @@ namespace hpx { namespace plugins { namespace parcel
         hpx::performance_counters::discover_counters_mode mode,
         hpx::error_code& ec)
     {
-        performance_counters::counter_info i = info;
-
         // compose the counter name templates
         performance_counters::counter_path_elements p;
         performance_counters::counter_status status =

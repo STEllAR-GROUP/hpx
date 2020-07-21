@@ -39,6 +39,7 @@ void test_leak()
         }
 
         test t = f.get();
+        (void) t;
     }
 
     hpx::agas::garbage_collect();

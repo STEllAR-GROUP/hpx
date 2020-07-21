@@ -357,8 +357,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     std::size_t const num_partitions = vm["num-partitions"].as<std::size_t>();
 
-    std::size_t num_workers = vm["num-workers"].as<std::size_t>();
-
     std::size_t seed = vm["seed"].as<std::size_t>();
     if (!seed)
         seed = std::size_t(std::time(nullptr));
@@ -392,6 +390,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         test_sheneos(num_ye_points,num_temp_points,num_rho_points,seed);
         std::cout << "Control case: " << t.elapsed() << " [s]" << std::endl;
 #if 0
+        std::size_t num_workers = vm["num-workers"].as<std::size_t>();
+
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::lcos::future<void> > tests;

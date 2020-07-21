@@ -46,10 +46,14 @@ int hpx_main(int, char*[])
 {
     {
         auto result1 = get_foo_action()(hpx::find_here());
+        (void) result1;
         auto result2 = get_future_id_action()(hpx::find_here());
+        (void) result2;
 
         auto result3 = hpx::async<get_foo_action>(hpx::find_here()).get();
+        (void) result3;
         auto result4 = hpx::async<get_future_id_action>(hpx::find_here()).get();
+        (void) result4;
     }
 
     return hpx::finalize();

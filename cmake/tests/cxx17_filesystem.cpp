@@ -11,6 +11,6 @@
 int main()
 {
     std::filesystem::path p = std::filesystem::current_path();
-
+    (void) p;
     return 0;
 }

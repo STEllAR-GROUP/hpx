@@ -7,8 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/format.hpp>
-
 #include <hpx/modules/program_options.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -40,6 +40,7 @@ int hpx_main(hpx::program_options::variables_map&)
     volatile size_t i;
     volatile double a = 0.0, b = 0.0, c = 0.0;
     for (i = 0; i < n; i++) a=b+c;
+    (void) a;
 
     counter_value value1 = counter.get_counter_value(hpx::launch::sync);
 
@@ -48,12 +49,15 @@ int hpx_main(hpx::program_options::variables_map&)
 
     // perform n ops (should be uncounted)
     for (i = 0; i < n; i++) a=b+c;
+    (void) a;
+
     // get value and reset, and start again
     counter_value value2 = counter.get_counter_value(hpx::launch::sync, true);
     counter.start(hpx::launch::sync);
 
     // perform 2*n ops, counted from 0 (or close to it)
     for (i = 0; i < 2*n; i++) a=b+c;
+    (void) a;
     counter_value value3 = counter.get_counter_value(hpx::launch::sync);
 
     // reset counter using reset-only interface
@@ -61,6 +65,8 @@ int hpx_main(hpx::program_options::variables_map&)
 
     // perform n ops, counted from 0 (or close to it)
     for (i = 0; i < n; i++) a=b+c;
+    (void) a;
+
     counter_value value4 = counter.get_counter_value(hpx::launch::sync);
 
     bool pass = status_is_valid(value1.status_) &&
@@ -85,10 +91,11 @@ int hpx_main(hpx::program_options::variables_map&)
            close_enough(cnt3, 2.0*cnt1, 1.0) &&
            close_enough(cnt4, cnt1, 1.0);
     }
+    HPX_TEST(pass);
     std::cout << (pass? "PASSED": "FAILED") << ".\n";
 
     hpx::finalize();
-    return pass? 0: 1;
+    return hpx::util::report_errors();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
