@@ -202,7 +202,10 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // create entry for the thread associated with the counter if it doesn't exist
         ttable_type::iterator it = thread_state_.find(tix);
         if (it == thread_state_.end())
+        {
+            hpx::util::ignore_all_while_checking i;
             return thread_state_[tix] = new thread_counters(tix);
+        }
         else
             return it->second;
     }
