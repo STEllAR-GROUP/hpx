@@ -2261,6 +2261,18 @@ else()
   set(HPX_BUILD_PREFIX "${PROJECT_BINARY_DIR}")
 endif()
 
+if(MSVC)
+  hpx_add_config_cond_define(
+    HPX_DEFAULT_COMPONENT_PATH_SUFFIXES
+    "\"/${CMAKE_INSTALL_BINDIR}/hpx;/bin/hpx\""
+  )
+else()
+  hpx_add_config_cond_define(
+    HPX_DEFAULT_COMPONENT_PATH_SUFFIXES
+    "\"/${CMAKE_INSTALL_LIBDIR}/hpx:/lib/hpx\""
+  )
+endif()
+
 # ##############################################################################
 # search path configuration
 # ##############################################################################

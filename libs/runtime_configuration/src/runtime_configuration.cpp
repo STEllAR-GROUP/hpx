@@ -99,8 +99,7 @@ namespace hpx { namespace util {
             "component_paths = ${HPX_COMPONENT_PATHS}",
             "component_base_paths = $[hpx.location]"    // NOLINT
             HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
-            "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER
-            "/bin/hpx",
+            "component_path_suffixes = " HPX_DEFAULT_COMPONENT_PATH_SUFFIXES,
             "master_ini_path = $[hpx.location]" HPX_INI_PATH_DELIMITER
             "$[system.executable_prefix]/",
             "master_ini_path_suffixes = /share/" HPX_BASE_DIR_NAME
