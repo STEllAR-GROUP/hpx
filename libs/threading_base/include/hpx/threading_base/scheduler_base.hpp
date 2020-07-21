@@ -346,8 +346,6 @@ namespace hpx { namespace threads { namespace policies {
         PollingFunctionPtr polling_function_mpi_;
         PollingFunctionPtr polling_function_cuda_;
 
-        std::vector<util::function_nonser<void()>> user_callback_functions_;
-
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:
         // manage scheduler-local data
