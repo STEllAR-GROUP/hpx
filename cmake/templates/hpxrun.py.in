@@ -237,7 +237,7 @@ def build_cmd(options, args):
         cmd += ['--hpx:threads=' + str(options.threads)]
 
     # set number of localities
-    if options.localities > 1:
+    if options.localities > 1 and (options.parcelport != "none"):
         cmd += ['--hpx:localities=' + str(options.localities)]
 
     return cmd
@@ -261,7 +261,7 @@ def check_options(parser, options, args):
         sys.exit(1)
 
     check_valid_parcelport = (lambda x:
-            x == 'verbs' or x == 'ipc' or x == 'mpi' or x == 'tcp');
+            x == 'verbs' or x == 'ipc' or x == 'mpi' or x == 'tcp' or x == 'none');
     if not check_valid_parcelport(options.parcelport):
         print('Error: Parcelport option not valid\n', sys.stderr)
         parser.print_help()

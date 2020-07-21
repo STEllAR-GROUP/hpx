@@ -975,7 +975,7 @@ namespace hpx { namespace threads { namespace policies {
                     std::size_t q_index = q_lookup_[num_thread];
                     return numa_holder_[domain_num]
                                .thread_queue(q_index)
-                               ->get_thread_count(unknown) == 0;
+                               ->get_queue_length() == 0;
                 }
 
                 //---------------------------------------------------------------------

@@ -19,7 +19,7 @@ set(tests
     global_spmd_block
 )
 
-if(HPX_HAVE_NETWORKING)
+if(HPX_WITH_NETWORKING)
   set(tests ${tests} broadcast scatter)
 endif()
 

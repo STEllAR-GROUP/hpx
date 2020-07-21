@@ -12,7 +12,9 @@
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
+#if defined(HPX_HAVE_LIB_MPI_BASE)
 #include <hpx/modules/mpi_base.hpp>
+#endif
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
@@ -790,7 +792,11 @@ namespace hpx { namespace util {
         }
 #endif
 
+#if defined(HPX_HAVE_LIB_MPI_BASE)
         bool have_mpi = util::mpi_environment::check_mpi_environment(rtcfg_);
+#else
+        bool have_mpi = false;
+#endif
 
         util::batch_environment env(
             nodelist, have_mpi, debug_clp, enable_batch_env);

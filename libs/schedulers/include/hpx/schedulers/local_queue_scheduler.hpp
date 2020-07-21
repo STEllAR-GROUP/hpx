@@ -609,7 +609,7 @@ namespace hpx { namespace threads { namespace policies {
         // Queries whether a given core is idle
         bool is_core_idle(std::size_t num_thread) const override
         {
-            return queues_[num_thread]->get_thread_count(unknown) == 0;
+            return queues_[num_thread]->get_queue_length() == 0;
         }
 
         ///////////////////////////////////////////////////////////////////////

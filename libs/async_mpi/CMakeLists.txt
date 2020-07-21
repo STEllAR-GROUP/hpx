@@ -6,11 +6,11 @@
 
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-# Note: HPX_MPI_WITH_FUTURES is handled in the main CMakeLists.txt
+# Note: HPX_WITH_ASYNC_MPI is handled in the main CMakeLists.txt
 
 # if the user does not want mpi async futures, quit - the module will not be
 # enabled
-if(NOT ${HPX_MPI_WITH_FUTURES})
+if(NOT ${HPX_WITH_ASYNC_MPI})
   return()
 endif()
 
