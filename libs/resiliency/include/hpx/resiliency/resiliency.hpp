@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include <hpx/resiliency/config.hpp>
 #include <hpx/resiliency/async_replay.hpp>
+#include <hpx/resiliency/async_replay_executor.hpp>
 #include <hpx/resiliency/async_replicate.hpp>
+#include <hpx/resiliency/async_replicate_executor.hpp>
 #include <hpx/resiliency/dataflow_replay.hpp>
 #include <hpx/resiliency/dataflow_replicate.hpp>
 #include <hpx/resiliency/version.hpp>

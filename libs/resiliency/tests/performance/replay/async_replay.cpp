@@ -108,7 +108,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                          "past the injected error levels"
                       << std::endl;
         }
-        catch (hpx::resiliency::abort_replay_exception const&)
+        catch (hpx::experimental::abort_replay_exception const&)
         {
             std::cout << "Number of repeat launches were not enough to get "
                          "past the injected error levels"

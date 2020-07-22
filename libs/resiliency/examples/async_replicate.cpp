@@ -35,7 +35,7 @@ bool validate(int result)
 
 int no_answer()
 {
-    throw hpx::resiliency::abort_replicate_exception();
+    throw hpx::experimental::abort_replicate_exception();
 }
 
 int deep_thought()
@@ -88,7 +88,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             f.get();
         }
-        catch (hpx::resiliency::abort_replicate_exception const&)
+        catch (hpx::experimental::abort_replicate_exception const&)
         {
             std::cout << "no universal answer!\n";
         }
@@ -99,7 +99,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             f.get();
         }
-        catch (hpx::resiliency::abort_replicate_exception const&)
+        catch (hpx::experimental::abort_replicate_exception const&)
         {
             std::cout << "aborted universal answer calculation!\n";
         }
@@ -110,7 +110,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             f.get();
         }
-        catch (hpx::resiliency::abort_replicate_exception const&)
+        catch (hpx::experimental::abort_replicate_exception const&)
         {
             std::cout << "aborted universal answer calculation!\n";
         }

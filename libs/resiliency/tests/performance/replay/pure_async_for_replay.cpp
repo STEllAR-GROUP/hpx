@@ -105,7 +105,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             std::cout << "Exceptions thrown" << std::endl;
         }
-        catch (hpx::resiliency::abort_replay_exception const&)
+        catch (hpx::experimental::abort_replay_exception const&)
         {
             std::cout << "Exceptions thrown" << std::endl;
         }

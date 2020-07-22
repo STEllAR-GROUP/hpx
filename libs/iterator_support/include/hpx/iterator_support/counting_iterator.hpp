@@ -84,7 +84,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    // specialization for Iterators (non-itengral types)
+    // specialization for Iterators (non-intengral types)
     template <typename Incrementable, typename CategoryOrTraversal,
         typename Difference, typename Enable>
     class counting_iterator

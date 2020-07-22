@@ -33,7 +33,7 @@ The following API functions are exposed:
 
 - :cpp:func:`hpx::experimental::async_replay`: This version of task replay will
   catch user-defined exceptions and automatically reschedule the task N times
-  before throwing an :cpp:func:`hpx::resiliency::abort_replay_exception` if no
+  before throwing an :cpp:func:`hpx::experimental::abort_replay_exception` if no
   task is able to complete execution without an exception.
 
 - :cpp:func:`hpx::experimental::async_replay_validate`: This version of replay
@@ -68,7 +68,7 @@ The following API functions are exposed:
 
 - :cpp:func:`hpx::experimental::dataflow_replay`: This version of dataflow replay
   will catch user-defined exceptions and automatically reschedules the task N
-  times before throwing an :cpp:func:`hpx::resiliency::abort_replay_exception`
+  times before throwing an :cpp:func:`hpx::experimental::abort_replay_exception`
   if no task is able to complete execution without an exception. Any arguments
   for the executed task that are futures will cause the task invocation to be
   delayed until all of those futures have become ready.
