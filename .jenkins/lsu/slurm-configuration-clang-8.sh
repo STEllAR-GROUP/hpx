@@ -5,4 +5,4 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 configuration_slurm_partition="marvin"
-configuration_slurm_num_nodes="2"
+configuration_slurm_num_nodes="1"
