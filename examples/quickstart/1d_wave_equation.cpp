@@ -23,7 +23,7 @@
 // Include statements.
 #include <hpx/hpx_init.hpp>
 #include <hpx/chrono.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/modules/actions_base.hpp>

@@ -135,6 +135,70 @@ Macros
 - :c:macro:`HPX_ASSERT`
 - :c:macro:`HPX_ASSERT_MSG`
 
+Header ``hpx/barrier.hpp``
+==========================
+
+This header includes :ref:`public_api_header_hpx_local_barrier` and
+ref:`public_api_header_hpx_distributed_barrier`.
+
+.. _public_api_header_hpx_local_barrier:
+
+Header ``hpx/local/barrier.hpp``
+================================
+
+Corresponds to the C++ standard library header :cppreference-header:`barrier`.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::local::cpp20_barrier`
+
+.. _public_api_header_hpx_distributed_barrier:
+
+Header ``hpx/distributed/barrier.hpp``
+======================================
+
+Contains a distributed barrier implementation. This functionality is also
+exposed through the ``hpx::distributed`` namespace. The name in
+``hpx::distributed`` should be preferred.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::barrier`
+
+Header ``hpx/channel.hpp``
+==========================
+
+This header includes :ref:`public_api_header_hpx_local_channel` and
+ref:`public_api_header_hpx_distributed_channel`.
+
+.. _public_api_header_hpx_local_channel:
+
+Header ``hpx/local/channel.hpp``
+================================
+
+Contains a local channel implementation.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::local::channel`
+
+.. _public_api_header_hpx_distributed_channel:
+
+Header ``hpx/distributed/channel.hpp``
+======================================
+
+Contains a distributed channel implementation. This functionality is also
+exposed through the ``hpx::distributed`` namespace. The name in
+``hpx::distributed`` should be preferred.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::channel`
+
 Header ``hpx/chrono.hpp``
 =========================
 
@@ -148,20 +212,18 @@ Classes
 - :cpp:class:`hpx::util::high_resolution_clock`
 - :cpp:class:`hpx::util::high_resolution_timer`
 
-Header ``hpx/distributed/runtime.hpp``
-======================================
+Header ``hpx/condition_variable.hpp``
+=====================================
 
-This header functions for accessing distributed runtime information.
+Corresponds to the C++ standard library header
+:cppreference-header:`condition_variable`.
 
-Functions
----------
+Classes
+-------
 
-- :cpp:func:`hpx::find_root_locality`
-- :cpp:func:`hpx::find_all_localities`
-- :cpp:func:`hpx::find_remote_localities`
-- :cpp:func:`hpx::find_locality`
-- :cpp:func:`hpx::get_colocation_id`
-- :cpp:func:`hpx::get_locality_id`
+- :cpp:class:`hpx::lcos::local::condition_variable`
+- :cpp:class:`hpx::lcos::local::condition_variable_any`
+- :cpp:class:`hpx::lcos::local::cv_status`
 
 Header ``hpx/exception.hpp``
 ============================
@@ -190,8 +252,8 @@ for more information about execution policies and executor parameters.
 
 .. note::
 
-   These names are also available in the ``hpx::execution`` namespace, not in
-   the top-level ``hpx`` namespace.
+   These names are also available in the ``hpx::execution`` namespace, but not
+   in the top-level ``hpx`` namespace.
 
 Constants
 ---------
@@ -257,9 +319,17 @@ Functions
 Header ``hpx/future.hpp``
 =========================
 
+This header includes :ref:`public_api_header_hpx_local_future` and
+ref:`public_api_header_hpx_distributed_future`.
+
+.. _public_api_header_hpx_local_future:
+
+Header ``hpx/local/future.hpp``
+===============================
+
 Corresponds to the C++ standard library header :cppreference-header:`future`.
-See :ref:`parallel`, :ref:`parallel_algorithms` and :ref:`executor_parameters`
-for more information about execution policies and executor parameters.
+See :ref:`extend_futures` for more information about extensions to futures
+compared to the C++ standard library.
 
 .. note::
 
@@ -299,17 +369,45 @@ Functions
 Examples
 --------
 
-.. literalinclude:: ../libs/tests/unit/api_future.hpp
+.. literalinclude:: ../libs/include/tests/unit/api_future.hpp
    :language: c++
    :lines: 7-
+
+.. _public_api_header_hpx_distributed_future:
+
+Header ``hpx/distributed/future.hpp``
+=====================================
+
+Contains overloads of :cpp:func:`hpx::async`, :cpp:func:`hpx::apply`,
+:cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with
+actions. See :ref:`action_invocation` for more information about invoking
+actions.
+
+.. note::
+
+   The alias from ``hpx::promise`` to :cpp:class:`hpx::lcos::promise` is
+   deprecated and will be removed in a future release. The alias
+   ``hpx::distributed::promise`` should be used in new applications.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::promise`
+
+Functions
+---------
+
+- :cpp:func:`hpx::async`
+- :cpp:func:`hpx::apply`
+- :cpp:func:`hpx::sync`
+- :cpp:func:`hpx::dataflow`
 
 Header ``hpx/init.hpp``
 =======================
 
 This header contains functionality for starting, stopping, suspending, and
-resuming the |hpx| runtime. This is the main way to explicitly starting the
-|hpx| runtime. See :ref:`starting_hpx` for more details on starting the |hpx|
-runtime.
+resuming the |hpx| runtime. This is the main way to explicitly start the |hpx|
+runtime. See :ref:`starting_hpx` for more details on starting the |hpx| runtime.
 
 Classes
 -------
@@ -326,6 +424,59 @@ Functions
 - :cpp:func:`hpx::disconnect`
 - :cpp:func:`hpx::suspend`
 - :cpp:func:`hpx::resume`
+
+Header ``hpx/latch.hpp``
+==========================
+
+This header includes :ref:`public_api_header_hpx_local_latch` and
+ref:`public_api_header_hpx_distributed_latch`.
+
+.. _public_api_header_hpx_local_latch:
+
+Header ``hpx/local/latch.hpp``
+================================
+
+Corresponds to the C++ standard library header :cppreference-header:`latch`.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::local::cpp20_latch`
+
+.. _public_api_header_hpx_distributed_latch:
+
+Header ``hpx/distributed/latch.hpp``
+======================================
+
+Contains a distributed latch implementation. This functionality is also exposed
+through the ``hpx::distributed`` namespace. The name in ``hpx::distributed``
+should be preferred.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::latch`
+
+Header ``hpx/mutex.hpp``
+========================
+
+Corresponds to the C++ standard library header :cppreference-header:`mutex`.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::local::mutex`
+- :cpp:class:`hpx::lcos::local::no_mutex`
+- :cpp:class:`hpx::lcos::local::once_flag`
+- :cpp:class:`hpx::lcos::local::recursive_mutex`
+- :cpp:class:`hpx::lcos::local::spinlock`
+- :cpp:class:`hpx::lcos::local::timed_mutex`
+- :cpp:class:`hpx::lcos::local::unlock_guard`
+
+Functions
+---------
+
+- :cpp:func:`hpx::lcos::local::call_once`
 
 Header ``hpx/memory.hpp``
 =========================
@@ -375,7 +526,15 @@ Functions
 Header ``hpx/runtime.hpp``
 ==========================
 
-This header functions for accessing runtime information.
+This header includes :ref:`public_api_header_hpx_local_runtime` and
+ref:`public_api_header_hpx_distributed_runtime`.
+
+.. _public_api_header_hpx_local_runtime:
+
+Header ``hpx/local/runtime.hpp``
+================================
+
+This header contains functions for accessing local runtime information.
 
 Typedefs
 --------
@@ -396,6 +555,23 @@ Functions
 - :cpp:func:`hpx::get_num_localities`
 - :cpp:func:`hpx::get_locality_name`
 
+.. _public_api_header_hpx_distributed_runtime:
+
+Header ``hpx/distributed/runtime.hpp``
+======================================
+
+This header contains functions for accessing distributed runtime information.
+
+Functions
+---------
+
+- :cpp:func:`hpx::find_root_locality`
+- :cpp:func:`hpx::find_all_localities`
+- :cpp:func:`hpx::find_remote_localities`
+- :cpp:func:`hpx::find_locality`
+- :cpp:func:`hpx::get_colocation_id`
+- :cpp:func:`hpx::get_locality_id`
+
 Header ``hpx/system_error.hpp``
 ===============================
 
@@ -408,7 +584,7 @@ Classes
 - :cpp:class:`hpx::error_code`
 
 Header ``hpx/task_block.hpp``
-=========================
+=============================
 
 Corresponds to the ``task_block`` feature in |cpp11_n4088|_. See
 :ref:`using_task_block` for more details on using task blocks.
@@ -447,6 +623,48 @@ Functions
 - :cpp:func:`hpx::this_thread::sleep_for`
 - :cpp:func:`hpx::this_thread::sleep_until`
 
+Header ``hpx/semaphore.hpp``
+============================
+
+Corresponds to the C++ standard library header
+:cppreference-header:`semaphore`.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::local::cpp20_binary_semaphore`
+- :cpp:class:`hpx::lcos::local::cpp20_counting_semaphore`
+
+Header ``hpx/shared_mutex.hpp``
+===============================
+
+Corresponds to the C++ standard library header
+:cppreference-header:`shared_mutex`.
+
+Classes
+-------
+
+- :cpp:class:`hpx::lcos::local::shared_mutex`
+
+Header ``hpx/stop_token.hpp``
+=============================
+
+Corresponds to the C++ standard library header
+:cppreference-header:`stop_token`.
+
+Constants
+---------
+
+- :cpp:var:`hpx::nostopstate`
+
+Classes
+-------
+
+- :cpp:class:`hpx::stop_callback`
+- :cpp:class:`hpx::stop_source`
+- :cpp:class:`hpx::stop_token`
+- :cpp:struct:`hpx::nostopstate_t`
+
 Header ``hpx/tuple.hpp``
 ========================
 
@@ -476,19 +694,20 @@ Functions
 - :cpp:func:`hpx::util::get`
 
 Header ``hpx/type_traits.hpp``
-=============================
+==============================
 
 Corresponds to the C++ standard library header
-:cppreference-header:`type_traits`. Provides :cpp:class:`hpx::util::result_of`
-as a replacement for ``std::result_of``.
+:cppreference-header:`type_traits`. Provides
+:cpp:class:`hpx::util::invoke_result` as a replacement for
+``std::invoke_result``.
 
 Classes
 -------
 
-- :cpp:struct:`hpx::util::result_of`
+- :cpp:struct:`hpx::util::invoke_result`
 
 Header ``hpx/version.hpp``
-============================
+==========================
 
 This header provides version information about |hpx|.
 
@@ -515,12 +734,6 @@ Functions
 - :cpp:func:`hpx::agas_version`
 - :cpp:func:`hpx::build_type`
 - :cpp:func:`hpx::build_date_time`
-
-Classes
--------
-
-- :cpp:struct:`hpx::util::invoke_result`
-- :cpp:struct:`hpx::util::result_of`
 
 Header ``hpx/wrap_main.hpp``
 ============================

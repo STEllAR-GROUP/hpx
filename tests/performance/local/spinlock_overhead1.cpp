@@ -12,7 +12,7 @@
 #include <hpx/execution_base/register_locks.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>

@@ -9,7 +9,7 @@
 // to hpx_main.
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 
 #include <string>
 #include <vector>

@@ -7,7 +7,7 @@
 
 #include <hpx/hpx.hpp>
 
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/modules/async_combinators.hpp>
 
 #include <cstddef>

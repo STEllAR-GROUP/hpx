@@ -12,7 +12,7 @@
 
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/include/lcos.hpp>
 
 #include <cstddef>
