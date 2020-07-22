@@ -10,7 +10,7 @@
 #include <hpx/synchronization/shared_mutex.hpp>
 
 namespace hpx {
+    using hpx::lcos::local::shared_mutex;
     using hpx::lcos::local::upgrade_lock;
     using hpx::lcos::local::upgrade_to_unique_lock;
-    using hpx::lcos::local::shared_mutex;
 }    // namespace hpx

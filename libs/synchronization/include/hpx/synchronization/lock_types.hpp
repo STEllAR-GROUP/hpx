@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace local {
         Mutex* m;
         bool is_locked;
 
-        template <typename Mutex>
+        template <typename Mutex_>
         friend class upgrade_to_unique_lock;
 
     public:
@@ -194,11 +194,16 @@ namespace hpx { namespace lcos { namespace local {
 
         explicit upgrade_to_unique_lock(upgrade_lock<Mutex>& m_)
           : source(&m_)
-          , exclusive(*m_.m)
+          , exclusive()
         {
             if (m_.is_locked)
             {
+                exclusive = std::unique_lock<Mutex>(*m_.m, std::adopt_lock);
                 m_.m->unlock_upgrade_and_lock();
+            }
+            else
+            {
+                exclusive = std::unique_lock<Mutex>(*m_.m, std::defer_lock);
             }
             m_.release();
         }

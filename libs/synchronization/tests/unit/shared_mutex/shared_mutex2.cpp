@@ -108,9 +108,9 @@ void test_can_lock_upgrade_if_currently_locked_shared()
         hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         pool.create_thread(
-            test::locking_thread<hpx::upgrade_lock<shared_mutex_type>>(
-                rw_mutex, unblocked_count, unblocked_count_mutex,
-                unblocked_condition, finish_mutex, simultaneous_running_count,
+            test::locking_thread<hpx::upgrade_lock<shared_mutex_type>>(rw_mutex,
+                unblocked_count, unblocked_count_mutex, unblocked_condition,
+                finish_mutex, simultaneous_running_count,
                 max_simultaneous_running));
 
         {
