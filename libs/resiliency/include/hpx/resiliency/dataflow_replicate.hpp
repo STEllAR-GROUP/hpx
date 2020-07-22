@@ -34,8 +34,7 @@ namespace hpx { namespace resiliency {
     tag_invoke(dataflow_replicate_vote_validate_t, std::size_t n, Vote&& vote,
         Pred&& pred, F&& f, Ts&&... ts)
     {
-        return hpx::dataflow(
-            hpx::resiliency::functional::async_replicate_vote_validate{}, n,
+        return hpx::dataflow(hpx::resiliency::async_replicate_vote_validate, n,
             std::forward<Vote>(vote), std::forward<Pred>(pred),
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
@@ -52,8 +51,7 @@ namespace hpx { namespace resiliency {
     tag_invoke(dataflow_replicate_vote_t, std::size_t n, Vote&& vote, F&& f,
         Ts&&... ts)
     {
-        return hpx::dataflow(
-            hpx::resiliency::functional::async_replicate_vote{}, n,
+        return hpx::dataflow(hpx::resiliency::async_replicate_vote, n,
             std::forward<Vote>(vote), std::forward<F>(f),
             std::forward<Ts>(ts)...);
     }
@@ -70,8 +68,7 @@ namespace hpx { namespace resiliency {
     tag_invoke(dataflow_replicate_validate_t, std::size_t n, Pred&& pred, F&& f,
         Ts&&... ts)
     {
-        return hpx::dataflow(
-            hpx::resiliency::functional::async_replicate_validate{}, n,
+        return hpx::dataflow(hpx::resiliency::async_replicate_validate, n,
             std::forward<Pred>(pred), std::forward<F>(f),
             std::forward<Ts>(ts)...);
     }
@@ -86,7 +83,7 @@ namespace hpx { namespace resiliency {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     tag_invoke(dataflow_replicate_t, std::size_t n, F&& f, Ts&&... ts)
     {
-        return hpx::dataflow(hpx::resiliency::functional::async_replicate{}, n,
+        return hpx::dataflow(hpx::resiliency::async_replicate, n,
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }}    // namespace hpx::resiliency

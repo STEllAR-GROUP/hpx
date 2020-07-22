@@ -201,35 +201,4 @@ namespace hpx { namespace resiliency {
 
         return helper->call(n);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Functional version of \a hpx::experimental::async_replay
-    namespace functional {
-
-        struct async_replay_validate
-        {
-            template <typename Pred, typename F, typename... Ts>
-            auto operator()(std::size_t n, Pred&& pred, F&& f, Ts&&... ts) const
-                -> decltype(hpx::resiliency::async_replay_validate(n,
-                    std::forward<Pred>(pred), std::forward<F>(f),
-                    std::forward<Ts>(ts)...))
-            {
-                return hpx::resiliency::async_replay_validate(n,
-                    std::forward<Pred>(pred), std::forward<F>(f),
-                    std::forward<Ts>(ts)...);
-            }
-        };
-
-        struct async_replay
-        {
-            template <typename F, typename... Ts>
-            auto operator()(std::size_t n, F&& f, Ts&&... ts) const
-                -> decltype(hpx::resiliency::async_replay(
-                    n, std::forward<F>(f), std::forward<Ts>(ts)...))
-            {
-                return hpx::resiliency::async_replay(
-                    n, std::forward<F>(f), std::forward<Ts>(ts)...);
-            }
-        };
-    }    // namespace functional
-}}       // namespace hpx::resiliency
+}}    // namespace hpx::resiliency

@@ -33,8 +33,7 @@ namespace hpx { namespace resiliency {
     tag_invoke(dataflow_replay_validate_t, std::size_t n, Pred&& pred, F&& f,
         Ts&&... ts)
     {
-        return hpx::dataflow(
-            hpx::resiliency::functional::async_replay_validate{}, n,
+        return hpx::dataflow(hpx::resiliency::async_replay_validate, n,
             std::forward<Pred>(pred), std::forward<F>(f),
             std::forward<Ts>(ts)...);
     }
@@ -49,7 +48,7 @@ namespace hpx { namespace resiliency {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
     tag_invoke(dataflow_replay_t, std::size_t n, F&& f, Ts&&... ts)
     {
-        return hpx::dataflow(hpx::resiliency::functional::async_replay{}, n,
+        return hpx::dataflow(hpx::resiliency::async_replay, n,
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 }}    // namespace hpx::resiliency
