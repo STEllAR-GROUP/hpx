@@ -74,8 +74,11 @@ struct locality {
             << ipaddress(ip_address()) << ":" << decnumber(port()));
     }
 
-    locality(const locality &other) : data_(other.data_) {
-        fi_address_ = other.fi_address_;
+    locality(const locality& other)
+      : data_(other.data_)
+      , fi_address_(other.fi_address_)
+    {
+        ;
         LOG_DEBUG_MSG("copy constructing locality with "
             << ipaddress(ip_address()) << ":" << decnumber(port()));
     }

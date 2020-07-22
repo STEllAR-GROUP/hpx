@@ -83,6 +83,7 @@ void hpx_test_main(
             HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));
 
             gid = id.get_gid();
+            (void) gid;
 
             // let id go out of scope
         }

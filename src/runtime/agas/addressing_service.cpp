@@ -261,16 +261,19 @@ void addressing_service::launch_bootstrap(
     gva primary_gva(here,
         hpx::components::component_agas_primary_namespace, 1U,
             primary_ns_.ptr());
+    (void) primary_gid;
 
     naming::id_type const component_gid = component_ns_->gid();
     gva component_gva(here,
          hpx::components::component_agas_component_namespace, 1U,
             component_ns_->ptr());
+    (void) component_gid;
 
     naming::id_type const symbol_gid = symbol_ns_.gid();
     gva symbol_gva(here,
         hpx::components::component_agas_symbol_namespace, 1U,
             symbol_ns_.ptr());
+    (void) symbol_gid;
 
     rtd.get_config().parse("assigned locality",
         hpx::util::format("hpx.locality!={1}",
@@ -331,16 +334,19 @@ void addressing_service::launch_bootstrap(
     gva primary_gva(here,
         hpx::components::component_agas_primary_namespace, 1U,
             primary_ns_.ptr());
+    (void) primary_gid;
 
     naming::id_type const component_gid = component_ns_->gid();
     gva component_gva(here,
          hpx::components::component_agas_component_namespace, 1U,
             component_ns_->ptr());
+    (void) component_gid;
 
     naming::id_type const symbol_gid = symbol_ns_.gid();
     gva symbol_gva(here,
         hpx::components::component_agas_symbol_namespace, 1U,
             symbol_ns_.ptr());
+    (void) symbol_gid;
 
     rtd.get_config().parse("assigned locality",
         hpx::util::format("hpx.locality!={1}",

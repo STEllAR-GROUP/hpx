@@ -15,6 +15,7 @@ void test_atomic()
     std::atomic<T> a;
     a.store(T{});
     T i = a.load();
+    (void) i;
 }
 
 int main()
@@ -35,4 +36,5 @@ int main()
     mo = std::memory_order_release;
     mo = std::memory_order_acq_rel;
     mo = std::memory_order_seq_cst;
+    (void) mo;
 }

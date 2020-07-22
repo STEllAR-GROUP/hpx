@@ -146,7 +146,8 @@ int hpx_main()
         HPX_TEST(!test_simple_server2::alive);
 
         // creating test_server2 instance
-        hpx::id_type server2 = hpx::new_<test_simple_server2>(hpx::find_here()).get();
+        hpx::id_type server2 =
+            hpx::new_<test_simple_server2>(hpx::find_here()).get();
         HPX_TEST(!test_simple_server1::alive);
         HPX_TEST(test_simple_server2::alive);
 
@@ -154,6 +155,7 @@ int hpx_main()
         hpx::id_type server1 = hpx::async(
             test_simple_server2::create_test_server1_action(), server2).get();
         server2 = hpx::invalid_id;
+        (void) server2;
         ensure_garbage_collect();
 
         HPX_TEST(test_simple_server1::alive);
@@ -161,6 +163,7 @@ int hpx_main()
 
         test_simple_server1::test_action()(server1);
         server1 = hpx::invalid_id;
+        (void) server1;
         ensure_garbage_collect();
     }
     {
@@ -168,7 +171,8 @@ int hpx_main()
         HPX_TEST(!test_managed_server2::alive);
 
         // creating test_server2 instance
-        hpx::id_type server2 = hpx::new_<test_managed_server2>(hpx::find_here()).get();
+        hpx::id_type server2 =
+            hpx::new_<test_managed_server2>(hpx::find_here()).get();
         HPX_TEST(!test_managed_server1::alive);
         HPX_TEST(test_managed_server2::alive);
 
@@ -176,6 +180,7 @@ int hpx_main()
         hpx::id_type server1 = hpx::async(
             test_managed_server2::create_test_server1_action(), server2).get();
         server2 = hpx::invalid_id;
+        (void) server2;
         ensure_garbage_collect();
 
         HPX_TEST(test_managed_server1::alive);
@@ -183,6 +188,7 @@ int hpx_main()
 
         test_managed_server1::test_action()(server1);
         server1 = hpx::invalid_id;
+        (void) server1;
         ensure_garbage_collect();
     }
 

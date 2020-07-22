@@ -43,6 +43,7 @@ int main(int argc, char ** argv)
     {
         x += 1;
     }
+    (void) x;
 
     std::size_t threads = omp_get_max_threads();
 

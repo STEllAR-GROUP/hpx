@@ -138,6 +138,7 @@ void test_binpacking_single()
     // now use bin-packing policy to create one more instance
     hpx::id_type filled_target = hpx::new_<test_server>(
         hpx::binpacked(localities)).get();
+    (void) filled_target;
 
     // now, the first locality should have one more instance
     std::uint64_t after =
@@ -149,6 +150,8 @@ void test_binpacking_single()
 int main()
 {
     std::vector<hpx::id_type> ids = test_binpacking_multiple();
+    (void) ids;
+
     test_binpacking_single();
 
     return hpx::util::report_errors();

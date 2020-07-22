@@ -7,7 +7,7 @@
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
-//  √ -- this is a test.
+//  ? -- this is a test.
 
 #include <hpx/config.hpp>
 
@@ -22,7 +22,7 @@ namespace boost
   namespace inspect
   {
 
-    static const string gPunct ( "$_{}[]#()<>%:;.?*+-/ˆ&|~!=,\\\"'@^`" );
+    static const string gPunct ( "$_{}[]#()<>%:;.?*+-/?&|~!=,\\\"'@^`" );
 
    // Legal characters for a source file are defined in section 2.2 of the standard
    // I have added '@', '^', and '`' to the "legal" chars because they are commonly
@@ -103,6 +103,7 @@ namespace boost
         ++m_files_with_errors;
         std::size_t ln = std::count( contents.begin(), bad_char, '\n' ) + 1;
         string the_line = find_line ( contents, bad_char );
+        (void) the_line;
         error( library_name, full_path, "Non-ASCII: ", ln);
       }
     }

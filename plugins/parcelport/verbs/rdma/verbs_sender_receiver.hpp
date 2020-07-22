@@ -256,6 +256,7 @@ namespace verbs
             send_sge.addr   = 0;
             send_sge.length = 0;
             send_sge.lkey   = 0;
+            (void) send_sge.lkey;
 
             // Build a send work request.
             struct ibv_send_wr send_wr;
