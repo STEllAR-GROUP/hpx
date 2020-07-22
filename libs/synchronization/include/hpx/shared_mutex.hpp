@@ -6,8 +6,11 @@
 
 #pragma once
 
+#include <hpx/synchronization/lock_types.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 
 namespace hpx {
+    using hpx::lcos::local::upgrade_lock;
+    using hpx::lcos::local::upgrade_to_unique_lock;
     using hpx::lcos::local::shared_mutex;
 }    // namespace hpx

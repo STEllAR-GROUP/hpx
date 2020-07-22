@@ -28,6 +28,7 @@ set(synchronization_headers
     hpx/synchronization/channel_mpsc.hpp
     hpx/synchronization/channel_spsc.hpp
     hpx/synchronization/latch.hpp
+    hpx/synchronization/lock_types.hpp
     hpx/synchronization/mutex.hpp
     hpx/synchronization/no_mutex.hpp
     hpx/synchronization/once.hpp

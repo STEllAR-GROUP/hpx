@@ -150,7 +150,7 @@ void test_reader_blocks_writer()
     try
     {
         pool.create_thread(
-            test::locking_thread<boost::shared_lock<shared_mutex_type>>(
+            test::locking_thread<std::shared_lock<shared_mutex_type>>(
                 rw_mutex, unblocked_count, unblocked_count_mutex,
                 unblocked_condition, finish_mutex, simultaneous_running_count,
                 max_simultaneous_running));
@@ -214,7 +214,7 @@ void test_unlocking_writer_unblocks_all_readers()
         for (unsigned i = 0; i != reader_count; ++i)
         {
             pool.create_thread(
-                test::locking_thread<boost::shared_lock<shared_mutex_type>>(
+                test::locking_thread<std::shared_lock<shared_mutex_type>>(
                     rw_mutex, unblocked_count, unblocked_count_mutex,
                     unblocked_condition, finish_mutex,
                     simultaneous_running_count, max_simultaneous_running));
@@ -279,7 +279,7 @@ void test_unlocking_last_reader_only_unblocks_one_writer()
         for (unsigned i = 0; i != reader_count; ++i)
         {
             pool.create_thread(
-                test::locking_thread<boost::shared_lock<shared_mutex_type>>(
+                test::locking_thread<std::shared_lock<shared_mutex_type>>(
                     rw_mutex, unblocked_count, unblocked_count_mutex,
                     unblocked_condition, finish_reading_mutex,
                     simultaneous_running_readers, max_simultaneous_readers));
