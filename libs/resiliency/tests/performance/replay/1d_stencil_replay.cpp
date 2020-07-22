@@ -194,7 +194,7 @@ struct stepper
         std::uint64_t nd, std::uint64_t n_value, double error,
         hpx::lcos::local::sliding_semaphore& sem)
     {
-        using hpx::resiliency::dataflow_replay;
+        using hpx::experimental::dataflow_replay;
         using hpx::util::unwrapping;
 
         // U[t][i] is the state of position i at time t.

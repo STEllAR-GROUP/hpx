@@ -93,7 +93,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         for (int i = 0; i < num_iterations; ++i)
         {
-            hpx::future<int> f = hpx::resiliency::async_replay_validate(
+            hpx::future<int> f = hpx::experimental::async_replay_validate(
                 n, &validate, &universal_ans, delay * 1000, error);
             vect.push_back(std::move(f));
         }

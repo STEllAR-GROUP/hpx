@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2020 Hartmut Kaiser
 //  Copyright (c) 2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -60,18 +60,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // successful replicate
         hpx::future<int> f =
-            hpx::resiliency::async_replicate(sr, &deep_thought);
+            hpx::experimental::async_replicate(sr, &deep_thought);
 
         std::cout << "universal answer: " << f.get() << "\n";
 
         // successful replicate_validate
-        f = hpx::resiliency::async_replicate_validate(
+        f = hpx::experimental::async_replicate_validate(
             sr, &validate, &universal_answer);
 
         std::cout << "universal answer: " << f.get() << "\n";
 
         // unsuccessful replicate
-        f = hpx::resiliency::async_replicate(usr, &deep_thought);
+        f = hpx::experimental::async_replicate(usr, &deep_thought);
         try
         {
             f.get();
@@ -82,7 +82,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
 
         // unsuccessful replicate_validate
-        f = hpx::resiliency::async_replicate_validate(
+        f = hpx::experimental::async_replicate_validate(
             usr, &validate, &universal_answer);
         try
         {
@@ -94,7 +94,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
 
         // aborted replicate
-        f = hpx::resiliency::async_replicate(a, &no_answer);
+        f = hpx::experimental::async_replicate(a, &no_answer);
         try
         {
             f.get();
@@ -105,7 +105,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
 
         // aborted replicate validate
-        f = hpx::resiliency::async_replicate_validate(a, &validate, &no_answer);
+        f = hpx::experimental::async_replicate_validate(a, &validate, &no_answer);
         try
         {
             f.get();

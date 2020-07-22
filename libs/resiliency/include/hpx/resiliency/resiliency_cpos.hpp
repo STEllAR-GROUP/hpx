@@ -1,0 +1,147 @@
+//  Copyright (c) 2018-2020 Hartmut Kaiser
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#pragma once
+
+#include <hpx/resiliency/config.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+
+namespace hpx { namespace resiliency {
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Replay customization points
+
+    /// Customization point for asynchronously launching the given function \a f.
+    /// repeatedly. Verify the result of those invocations using the given
+    /// predicate \a pred.
+    /// Repeat launching on error exactly \a n times (except if
+    /// abort_replay_exception is thrown).
+    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replay_validate_t final
+      : hpx::functional::tag<async_replay_validate_t>
+    {
+    } async_replay_validate;
+
+    /// Customization point for asynchronously launching given function \a f
+    /// repeatedly. Repeat launching on error exactly \a n times (except if
+    /// abort_replay_exception is thrown).
+    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replay_t final
+      : hpx::functional::tag<async_replay_t>
+    {
+    } async_replay;
+
+    /// Customization point for asynchronously launching the given function \a f.
+    /// repeatedly. Verify the result of those invocations using the given
+    /// predicate \a pred.
+    /// Repeat launching on error exactly \a n times.
+    ///
+    /// Delay the invocation of \a f if any of the arguments to \a f are
+    /// futures.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replay_validate_t final
+      : hpx::functional::tag<dataflow_replay_validate_t>
+    {
+    } dataflow_replay_validate;
+
+    /// Customization point for asynchronously launching the given function \a f.
+    /// repeatedly.
+    /// Repeat launching on error exactly \a n times.
+    ///
+    /// Delay the invocation of \a f if any of the arguments to \a f are
+    /// futures.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replay_t final
+      : hpx::functional::tag<dataflow_replay_t>
+    {
+    } dataflow_replay;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Replicate customization points
+
+    /// Customization point for asynchronously launching the given function \a f
+    /// exactly \a n times concurrently. Verify the result of those invocations
+    /// using the given predicate \a pred.
+    /// Run all the valid results against a user provided voting function.
+    /// Return the valid output.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_vote_validate_t final
+      : hpx::functional::tag<async_replicate_vote_validate_t>
+    {
+    } async_replicate_vote_validate;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Customization point for asynchronously launching the given function \a f
+    /// exactly \a n times concurrently. Verify the result of those invocations
+    /// using the given predicate \a pred.
+    /// Run all the valid results against a user provided voting function.
+    /// Return the valid output.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_vote_t final
+      : hpx::functional::tag<async_replicate_vote_t>
+    {
+    }    // namespace resiliency
+    async_replicate_vote;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Customization point for asynchronously launching the given function \a f
+    /// exactly \a n times concurrently. Verify the result of those invocations
+    /// using the given predicate \a pred.
+    /// Return the first valid result.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_validate_t final
+      : hpx::functional::tag<async_replicate_validate_t>
+    {
+    } async_replicate_validate;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Customization point for asynchronously launching the given function \a f
+    /// exactly \a n times concurrently. Verify the result of those invocations
+    /// by checking for exception.
+    /// Return the first valid result.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_t final
+      : hpx::functional::tag<async_replicate_t>
+    {
+    } async_replicate;
+
+    /// Customization point for asynchronously launching the given function \a f
+    /// exactly \a n times concurrently. Run all the valid results against a
+    /// user provided voting function.
+    /// Return the valid output.
+    ///
+    /// Delay the invocation of \a f if any of the arguments to \a f are
+    /// futures.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_vote_validate_t
+        final : hpx::functional::tag<dataflow_replicate_vote_validate_t>
+    {
+    } dataflow_replicate_vote_validate;
+
+    /// Customization point for asynchronously launching the given function \a f
+    /// exactly \a n times concurrently. Run all the valid results against a
+    /// user provided voting function.
+    /// Return the valid output.
+    ///
+    /// Delay the invocation of \a f if any of the arguments to \a f are
+    /// futures.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_vote_t final
+      : hpx::functional::tag<dataflow_replicate_vote_t>
+    {
+    } dataflow_replicate_vote;
+
+    /// Customization point for asynchronously launching the given function \a f
+    /// exactly \a n times concurrently. Verify the result of those invocations
+    /// using the given predicate \a pred. Return the first valid result.
+    ///
+    /// Delay the invocation of \a f if any of the arguments to \a f are
+    /// futures.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_validate_t final
+      : hpx::functional::tag<dataflow_replicate_validate_t>
+    {
+    } dataflow_replicate_validate;
+
+    /// Customization point for asynchronously launching the given function \a f
+    /// exactly \a n times concurrently. Return the first valid result.
+    ///
+    /// Delay the invocation of \a f if any of the arguments to \a f are
+    /// futures.
+    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_t final
+      : hpx::functional::tag<dataflow_replicate_t>
+    {
+    } dataflow_replicate;
+}}    // namespace hpx::resiliency

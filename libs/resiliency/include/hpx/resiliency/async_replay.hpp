@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2019 Hartmut Kaiser
+//  Copyright (c) 2018-2020 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/resiliency/config.hpp>
+#include <hpx/resiliency/resiliency_cpos.hpp>
 
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_local.hpp>
@@ -164,13 +165,14 @@ namespace hpx { namespace resiliency {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Asynchronously launch given function \a f. Verify the result of
-    /// those invocations using the given predicate \a pred. Repeat launching
-    /// on error exactly \a n times (except if abort_replay_exception is thrown).
+    // Asynchronously launch given function \a f. Verify the result of
+    // those invocations using the given predicate \a pred. Repeat launching
+    // on error exactly \a n times (except if abort_replay_exception is thrown).
     template <typename Pred, typename F, typename... Ts>
     hpx::future<
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-    async_replay_validate(std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
+    tag_invoke(
+        async_replay_validate_t, std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
@@ -183,19 +185,25 @@ namespace hpx { namespace resiliency {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Asynchronously launch given function \a f. Repeat launching
-    /// on error exactly \a n times (except if abort_replay_exception is thrown).
+    // Asynchronously launch given function \a f. Repeat launching
+    // on error exactly \a n times (except if abort_replay_exception is thrown).
     template <typename F, typename... Ts>
     hpx::future<
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-    async_replay(std::size_t n, F&& f, Ts&&... ts)
+    tag_invoke(async_replay_t, std::size_t n, F&& f, Ts&&... ts)
     {
-        return async_replay_validate(n, detail::replay_validator{},
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+        using result_type =
+            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+
+        auto helper = detail::make_async_replay_helper<result_type>(
+            detail::replay_validator{}, std::forward<F>(f),
+            std::forward<Ts>(ts)...);
+
+        return helper->call(n);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Functional version of \a hpx::resiliency::async_replay
+    /// Functional version of \a hpx::experimental::async_replay
     namespace functional {
 
         struct async_replay_validate

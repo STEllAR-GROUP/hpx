@@ -17,6 +17,7 @@ set(resiliency_headers
     hpx/resiliency/dataflow_replicate.hpp
     hpx/resiliency/version.hpp
     hpx/resiliency/resiliency.hpp
+    hpx/resiliency/resiliency_cpos.hpp
 )
 
 # Default location is $HPX_ROOT/libs/resiliency/src
@@ -28,6 +29,11 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   SOURCES ${resiliency_sources}
   HEADERS ${resiliency_headers}
-  DEPENDENCIES hpx_assertion hpx_config hpx_datastructures hpx_async_local
+  DEPENDENCIES
+    hpx_assertion
+    hpx_async_local
+    hpx_config
+    hpx_datastructures
+    hpx_functional
   CMAKE_SUBDIRS examples tests
 )

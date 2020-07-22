@@ -164,7 +164,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::vector<subdomain_future> next_input(subdomains);
             for (int j = 0; j < subdomains; ++j)
             {
-                next_input[j] = hpx::resiliency::dataflow_replay(n, update,
+                next_input[j] = hpx::experimental::dataflow_replay(n, update,
                     input[(j - 1 + subdomains) % subdomains], input[j],
                     input[(j + 1) % subdomains]);
             }
