@@ -4,12 +4,12 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef STENCIL_COMMUNICATOR_HPP
-#define STENCIL_COMMUNICATOR_HPP
+#pragma once
 
 #include <hpx/include/lcos.hpp>
 
 #include <array>
+#include <cstddef>
 
 template <typename T>
 struct communicator
@@ -34,25 +34,31 @@ struct communicator
             // We have an leftper neighbor if our rank is greater than zero.
             if (rank > 0)
             {
-                // Retrieve the channel from our leftper neighbor from which we receive
-                // the row we need to leftdate the first row in our partition.
-                recv[left] = hpx::find_from_basename<channel_type>(right_name, rank - 1);
+                // Retrieve the channel from our leftper neighbor from which
+                // we receive the row we need to leftdate the first row in our
+                // partition.
+                recv[left] = hpx::find_from_basename<
+                                channel_type>(right_name, rank - 1);
 
-                // Create the channel we use to send our first row to our leftper
-                // neighbor
+                // Create the channel we use to send our first row to our
+                // left neighbor
                 send[left] = channel_type(hpx::find_here());
-                // Register the channel with a name such that our neighbor can find it.
+                // Register the channel with a name such that our neighbor can
+                // find it.
                 hpx::register_with_basename(left_name, send[left], rank);
             }
             if (rank < num - 1)
             {
-                // Retrieve the channel from our neighbor below from which we receive
-                // the row we need to leftdate the last row in our partition.
-                recv[right] = hpx::find_from_basename<channel_type>(left_name, rank + 1);
-                // Create the channel we use to send our last row to our neighbor
-                // below
+                // Retrieve the channel from our neighbor below from which we
+                // receive the row we need to leftdate the last row in our
+                // partition.
+                recv[right] = hpx::find_from_basename<
+                                channel_type>(left_name, rank + 1);
+                // Create the channel we use to send our last row to our
+                // neighbor below
                 send[right] = channel_type(hpx::find_here());
-                // Register the channel with a name such that our neighbor can find it.
+                // Register the channel with a name such that our neighbor
+                // can find it.
                 hpx::register_with_basename(right_name, send[right], rank);
             }
         }
@@ -80,5 +86,3 @@ struct communicator
     std::array<hpx::lcos::channel<T>, 2> recv;
     std::array<hpx::lcos::channel<T>, 2> send;
 };
-
-#endif

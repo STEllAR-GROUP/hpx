@@ -26,6 +26,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <cstddef>
 
 using communication_type = double;
 
@@ -41,7 +42,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     typedef hpx::compute::host::block_allocator<double> allocator_type;
     typedef hpx::compute::host::block_executor<> executor_type;
     typedef hpx::compute::vector<double, allocator_type> data_type;
-    
+
     std::array<data_type, 2> U;
 
     auto numa_domains = hpx::compute::host::numa_domains();
@@ -68,7 +69,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     if (rank == 0)
     {
-        std::cout << "Starting benchmark with " << num_localities << 
+        std::cout << "Starting benchmark with " << num_localities <<
                      " nodes and " << num_worker_threads <<
                      " threads.\n";
     }
@@ -83,7 +84,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Send initial value to the right neighbor
         comm.set(communicator_type::right, U[0][Nx-1], 0);
     }
-    
+
     auto range = boost::irange(static_cast<std::size_t>(0), nlp);
 
     executor_type executor(numa_domains);
@@ -102,14 +103,15 @@ int hpx_main(boost::program_options::variables_map& vm)
         {
             l = comm.get(communicator_type::left, t)
                 .then(hpx::launch::sync,
-                    [&U, &next, &curr, &comm, t, local_nx](hpx::future<double>&& gg)
+                    [&next, &curr, &comm, t](hpx::future<double>&& gg)
                     {
                         double left = gg.get();
 
-                        next[0] = curr[0] + ((k*dt)/(dx*dx)) * (left - 2*curr[0] + curr[1]);
+                        next[0] = curr[0] +
+                            ((k*dt)/(dx*dx)) * (left - 2*curr[0] + curr[1]);
 
-                        // Dispatch the updated value to left neighbor for it to get
-                        // consumed in the next timestep
+                        // Dispatch the updated value to left neighbor for it
+                        // to get consumed in the next timestep
                         comm.set(communicator_type::left, next[0], t+1);
                     }
                 );
@@ -119,14 +121,15 @@ int hpx_main(boost::program_options::variables_map& vm)
         {
             r = comm.get(communicator_type::right, t)
                 .then(hpx::launch::sync,
-                    [&U, &next, &curr, &comm, t, local_nx, Nx, nlp](hpx::future<double>&& gg)
+                    [&next, &curr, &comm, t, Nx](hpx::future<double>&& gg)
                     {
                         double right = gg.get();
 
-                        next[Nx-1] = curr[Nx-1] + ((k*dt)/(dx*dx)) * (curr[Nx-2] - 2*curr[Nx-1] + right);
+                        next[Nx-1] = curr[Nx-1] + ((k*dt)/(dx*dx)) *
+                                        (curr[Nx-2] - 2*curr[Nx-1] + right);
 
-                        // Dispatch the updated value to right neighbor for it to get
-                        // consumed in the next timestep
+                        // Dispatch the updated value to right neighbor for it
+                        // to get consumed in the next timestep
                         comm.set(communicator_type::right, next[Nx-1], t+1);
                     }
                 );
@@ -135,11 +138,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::parallel::for_each(
             policy,
             std::begin(range), std::end(range),
-            [&U, local_nx, nlp, t, &comm] (std::size_t i)
+            [&U, local_nx, nlp, t] (std::size_t i)
             {
-                if (i == 0) // && !comm.has_neighbor(communicator_type::left))
+                if (i == 0)
                     stencil_update(U, 1, local_nx, t);
-                else if (i == nlp-1) // && !comm.has_neighbor(communicator_type::right))
+                else if (i == nlp-1)
                     stencil_update(U, i * local_nx, (i + 1) * local_nx - 1, t);
                 else if (i > 0 && i < nlp-1)
                     stencil_update(U, i * local_nx, (i + 1) * local_nx, t);

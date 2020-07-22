@@ -3,6 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once
+
 #include <hpx/include/compute.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/async.hpp>
@@ -13,6 +15,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 
 using allocator_type = hpx::compute::host::block_allocator<double>;
 using data_type = hpx::compute::vector<double, allocator_type>;
@@ -44,9 +47,10 @@ void stencil_update(std::array<data_type, 2>& U, const std::size_t& begin
 {
     data_type& curr = U[t % 2];
     data_type& next = U[(t + 1) % 2];
-    
+
     for (std::size_t i = begin; i < end; ++i)
     {
-        next[i] = curr[i] + ((k*dt)/(dx*dx)) * (curr[i-1] - 2*curr[i] + curr[i+1]);
+        next[i] = curr[i] + ((k*dt)/(dx*dx)) *
+                                    (curr[i-1] - 2*curr[i] + curr[i+1]);
     }
 }
