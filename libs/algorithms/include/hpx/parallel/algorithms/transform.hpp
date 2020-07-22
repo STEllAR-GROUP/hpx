@@ -174,14 +174,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         /// non_segmented version
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename F, typename Proj>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2, typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            hpx::util::tagged_pair<tag::in(FwdIter1B),
+                tag::out(FwdIter2)>>::type
+        transform_(ExPolicy&& policy, FwdIter1B first, FwdIter1E last,
             FwdIter2 dest, F&& f, Proj&& proj, std::false_type)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1B>::value),
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
@@ -189,17 +190,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
 
             return hpx::util::make_tagged_pair<tag::in, tag::out>(
-                detail::transform<std::pair<FwdIter1, FwdIter2>>().call(
+                detail::transform<std::pair<FwdIter1B, FwdIter2>>().call(
                     std::forward<ExPolicy>(policy), is_seq(), first, last, dest,
                     std::forward<F>(f), std::forward<Proj>(proj)));
         }
 
         /// forward declare the segmented version
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename F, typename Proj>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2, typename F, typename Proj>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            hpx::util::tagged_pair<tag::in(FwdIter1B),
+                tag::out(FwdIter2)>>::type
+        transform_(ExPolicy&& policy, FwdIter1B first, FwdIter1E last,
             FwdIter2 dest, F&& f, Proj&& proj, std::true_type);
         /// \endcond
     }    // namespace detail
@@ -276,24 +278,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           copied.
     ///
     //clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename F, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            traits::is_projected<Proj, FwdIter1>::value &&
-                traits::is_indirect_callable<ExPolicy, F,
-                    traits::projected<Proj, FwdIter1>>::value
-        )>
+    template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+        typename FwdIter2, typename F,
+        typename Proj = util::projection_identity,
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter1B>::value&&
+                    hpx::traits::is_iterator<FwdIter2>::value&&
+                        traits::is_projected<Proj, FwdIter1B>::value&&
+                            traits::is_indirect_callable<ExPolicy, F,
+                                traits::projected<Proj, FwdIter1B>>::value)>
     //clang-format on
-    HPX_DEPRECATED("hpx::parallel::transform is deprecated, use hpx::transform instead")
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>>::type
-    transform(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-        F&& f, Proj&& proj = Proj())
+    HPX_DEPRECATED(
+        "hpx::parallel::transform is deprecated, use hpx::transform instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_pair<tag::in(FwdIter1B), tag::out(FwdIter2)>>::
+            type transform(ExPolicy&& policy, FwdIter1B first, FwdIter1E last,
+                FwdIter2 dest, F&& f, Proj&& proj = Proj())
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter1B> is_segmented;
         return detail::transform_(std::forward<ExPolicy>(policy), first, last,
             dest, std::forward<F>(f), std::forward<Proj>(proj), is_segmented());
     }
@@ -442,16 +444,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename F, typename Proj1, typename Proj2>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2, typename FwdIter3, typename F, typename Proj1,
+            typename Proj2>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
+            hpx::util::tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2),
                 tag::out(FwdIter3)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        transform_(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
             FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2,
             std::false_type)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1B>::value),
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Requires at least forward iterator.");
@@ -459,7 +462,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 "Requires at least forward iterator.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
+            typedef hpx::util::tuple<FwdIter1B, FwdIter2, FwdIter3> result_type;
 
             return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
                 detail::transform_binary<result_type>().call(
@@ -468,12 +471,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename F, typename Proj1, typename Proj2>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2, typename FwdIter3, typename F, typename Proj1,
+            typename Proj2>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
+            hpx::util::tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2),
                 tag::out(FwdIter3)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        transform_(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
             FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2,
             std::true_type);
         /// \endcond
@@ -570,31 +574,32 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           copied.
     ///
     //clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename F,
+    template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+        typename FwdIter2, typename FwdIter3, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<
-                ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value &&
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<
+            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1B>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
             hpx::traits::is_iterator<FwdIter3>::value &&
-            traits::is_projected<Proj1, FwdIter1>::value &&
+            traits::is_projected<Proj1, FwdIter1B>::value &&
             traits::is_projected<Proj2, FwdIter2>::value &&
             traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj1, FwdIter1>, 
-                    traits::projected<Proj2, FwdIter2>>::value
-        )>
+                traits::projected<Proj1, FwdIter1B>,
+                    traits::projected<Proj2, FwdIter2>>::value)>
     //clang-format on
-    HPX_DEPRECATED("hpx::parallel::transform is deprecated, use hpx::transform instead")
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
-            tag::out(FwdIter3)>>::type
-    transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1 = Proj1(),
-        Proj2&& proj2 = Proj2())
+    HPX_DEPRECATED(
+        "hpx::parallel::transform is deprecated, use hpx::transform instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2),
+                tag::out(FwdIter3)>>::type
+        //clang-format off
+        transform(ExPolicy&& policy,
+            //clang-format on
+            FwdIter1B first1, FwdIter1E last1, FwdIter2 first2, FwdIter3 dest,
+            F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter1B> is_segmented;
 
         return detail::transform_(std::forward<ExPolicy>(policy), first1, last1,
             first2, dest, std::forward<F>(f), std::forward<Proj1>(proj1),
@@ -658,24 +663,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename F, typename Proj1, typename Proj2>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2B, typename FwdIter2E, typename FwdIter3,
+            typename F, typename Proj1, typename Proj2>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
+            hpx::util::tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2B),
                 tag::out(FwdIter3)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
+        transform_(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
+            FwdIter2B first2, FwdIter2E last2, FwdIter3 dest, F&& f,
             Proj1&& proj1, Proj2&& proj2, std::false_type)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1B>::value),
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2B>::value),
                 "Requires at least forward iterator.");
             static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
                 "Requires at least forward iterator.");
 
             typedef execution::is_sequenced_execution_policy<ExPolicy> is_seq;
-            typedef hpx::util::tuple<FwdIter1, FwdIter2, FwdIter3> result_type;
+            typedef hpx::util::tuple<FwdIter1B, FwdIter2B, FwdIter3>
+                result_type;
 
             return hpx::util::make_tagged_tuple<tag::in1, tag::in2, tag::out>(
                 detail::transform_binary2<result_type>().call(
@@ -683,13 +690,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     first2, last2, dest, std::forward<F>(f),
                     std::forward<Proj1>(proj1), std::forward<Proj2>(proj2)));
         }
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename F, typename Proj1, typename Proj2>
+        template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+            typename FwdIter2B, typename FwdIter2E, typename FwdIter3,
+            typename F, typename Proj1, typename Proj2>
         typename util::detail::algorithm_result<ExPolicy,
-            hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
+            hpx::util::tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2E),
                 tag::out(FwdIter3)>>::type
-        transform_(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
+        transform_(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
+            FwdIter2B first2, FwdIter2E last2, FwdIter3 dest, F&& f,
             Proj1&& proj1, Proj2&& proj2, std::true_type);
         /// \endcond
     }    // namespace detail
@@ -790,32 +798,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    //clang-format on
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename F,
+    //clang-format off
+    template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
+        typename FwdIter2B, typename FwdIter2E, typename FwdIter3, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            execution::is_execution_policy<
-                ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::traits::is_iterator<FwdIter3>::value &&
-            traits::is_projected<Proj1, FwdIter1>::value &&
-            traits::is_projected<Proj2, FwdIter2>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj1, FwdIter1>,
-                    traits::projected<Proj2, FwdIter2>>::value
-        )>
+        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
+                hpx::traits::is_iterator<FwdIter1B>::value&& hpx::traits::
+                    is_iterator<FwdIter2B>::value&& hpx::traits::is_iterator<
+                        FwdIter3>::value&& traits::is_projected<Proj1,
+                        FwdIter1B>::value&&
+                        traits::is_projected<Proj2, FwdIter2B>::value&&
+                            traits::is_indirect_callable<ExPolicy, F,
+                                traits::projected<Proj1, FwdIter1B>,
+                                traits::projected<Proj2, FwdIter2B>>::value)>
     //clang-format on
-    HPX_DEPRECATED("hpx::parallel::transform is deprecated, use hpx::transform instead")
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2),
-            tag::out(FwdIter3)>>::type
-    transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, F&& f,
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+    HPX_DEPRECATED(
+        "hpx::parallel::transform is deprecated, use hpx::transform instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            hpx::util::tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2B),
+                tag::out(FwdIter3)>>::type
+        transform(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
+            FwdIter2B first2, FwdIter2E last2, FwdIter3 dest, F&& f,
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
-        typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+        typedef hpx::traits::is_segmented_iterator<FwdIter1B> is_segmented;
 
         return detail::transform_(std::forward<ExPolicy>(policy), first1, last1,
             first2, last2, dest, std::forward<F>(f), std::forward<Proj1>(proj1),
