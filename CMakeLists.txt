@@ -2264,7 +2264,7 @@ endif()
 # Note: on windows systems the ':' will be converted to a ';' at runtime
 hpx_add_config_cond_define(
   HPX_DEFAULT_COMPONENT_PATH_SUFFIXES
-  "\"/${CMAKE_INSTALL_BINDIR}/hpx:/bin/hpx\""
+  "\"/${CMAKE_INSTALL_BINDIR}/hpx:/lib/hpx:/bin/hpx\""
 )
 
 # ##############################################################################
