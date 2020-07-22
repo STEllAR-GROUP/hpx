@@ -282,31 +282,33 @@ namespace hpx { namespace threads { namespace policies {
 
         void set_mpi_polling_function(polling_function_ptr mpi_func)
         {
-            polling_function_mpi_ = mpi_func;
+            polling_function_mpi_.store(mpi_func, std::memory_order_relaxed);
         }
 
         void clear_mpi_polling_function()
         {
-            polling_function_mpi_ = &null_polling_function;
+            polling_function_mpi_.store(
+                &null_polling_function, std::memory_order_relaxed);
         }
 
         void set_cuda_polling_function(polling_function_ptr cuda_func)
         {
-            polling_function_cuda_ = cuda_func;
+            polling_function_cuda_.store(cuda_func, std::memory_order_relaxed);
         }
 
         void clear_cuda_polling_function()
         {
-            polling_function_cuda_ = &null_polling_function;
+            polling_function_cuda_.store(
+                &null_polling_function, std::memory_order_relaxed);
         }
 
         inline void custom_polling_function() const
         {
 #if defined(HPX_HAVE_LIB_ASYNC_MPI)
-            (*polling_function_mpi_)();
+            (*polling_function_mpi_.load(std::memory_order_relaxed))();
 #endif
 #if defined(HPX_HAVE_LIB_ASYNC_CUDA)
-            (*polling_function_cuda_)();
+            (*polling_function_cuda_.load(std::memory_order_relaxed))();
 #endif
         }
 
@@ -342,8 +344,8 @@ namespace hpx { namespace threads { namespace policies {
 
         std::atomic<std::int64_t> background_thread_count_;
 
-        polling_function_ptr polling_function_mpi_;
-        polling_function_ptr polling_function_cuda_;
+        std::atomic<polling_function_ptr> polling_function_mpi_;
+        std::atomic<polling_function_ptr> polling_function_cuda_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:
