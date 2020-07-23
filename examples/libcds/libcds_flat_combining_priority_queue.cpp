@@ -63,17 +63,22 @@ int hpx_main(int, char**)
     // Initialize libcds
     cds::Initialize();
 
-    // Initialize Hazard Pointer singleton
-    cds::gc::HP hpGC;
+    {
+        cds::gc::HP hpGC;
+        // Initialize Hazard Pointer singleton
+        cds::threading::Manager::attachThread();
 
-    // Create flat-combining priority queue object
-    using fc_pqueue_type = cds::container::FCPriorityQueue<std::size_t,
-        std::priority_queue<std::size_t, std::deque<std::size_t>,
-            std::greater<std::size_t>>>;
+        // Create flat-combining priority queue object
+        using fc_pqueue_type = cds::container::FCPriorityQueue<std::size_t,
+            std::priority_queue<std::size_t, std::deque<std::size_t>,
+                std::greater<std::size_t>>>;
 
-    fc_pqueue_type pq;
+        fc_pqueue_type pq;
 
-    run(pq);
+        run(pq);
+
+        cds::threading::Manager::detachThread();
+    }
 
     // Terminate libcds
     cds::Terminate();
