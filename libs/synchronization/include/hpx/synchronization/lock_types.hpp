@@ -38,7 +38,7 @@ namespace hpx { namespace lcos { namespace local {
         upgrade_lock& operator=(upgrade_lock const&) = delete;
 
         upgrade_lock() noexcept
-          : m(0)
+          : m(nullptr)
           , is_locked(false)
         {
         }
@@ -71,7 +71,7 @@ namespace hpx { namespace lcos { namespace local {
           , is_locked(other.is_locked)
         {
             other.is_locked = false;
-            other.m = 0;
+            other.m = nullptr;
         }
 
         explicit upgrade_lock(std::unique_lock<Mutex>&& other)
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos { namespace local {
         Mutex* release() noexcept
         {
             Mutex* const res = m;
-            m = 0;
+            m = nullptr;
             is_locked = false;
             return res;
         }
@@ -119,7 +119,7 @@ namespace hpx { namespace lcos { namespace local {
 
         void lock()
         {
-            if (m == 0)
+            if (m == nullptr)
             {
                 HPX_THROW_EXCEPTION(
                     lock_error, "mutex::unlock", "upgrade_lock has no mutex");
@@ -134,7 +134,7 @@ namespace hpx { namespace lcos { namespace local {
         }
         bool try_lock()
         {
-            if (m == 0)
+            if (m == nullptr)
             {
                 HPX_THROW_EXCEPTION(
                     lock_error, "mutex::unlock", "upgrade_lock has no mutex");
@@ -149,7 +149,7 @@ namespace hpx { namespace lcos { namespace local {
         }
         void unlock()
         {
-            if (m == 0)
+            if (m == nullptr)
             {
                 HPX_THROW_EXCEPTION(
                     lock_error, "mutex::unlock", "upgrade_lock has no mutex");
@@ -209,7 +209,7 @@ namespace hpx { namespace lcos { namespace local {
         }
         ~upgrade_to_unique_lock()
         {
-            if (source)
+            if (source != nullptr)
             {
                 *source = upgrade_lock<Mutex>(std::move(exclusive));
             }
@@ -219,7 +219,7 @@ namespace hpx { namespace lcos { namespace local {
           : source(other.source)
           , exclusive(std::move(other.exclusive))
         {
-            other.source = 0;
+            other.source = nullptr;
         }
 
         upgrade_to_unique_lock& operator=(
