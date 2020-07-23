@@ -17,30 +17,31 @@ fi
 # Clean up directory
 rm -f jenkins-hpx*
 
+export configuration_name_with_build_type="${configuration_name}-${build_type,,}"
+
 # Start the actual build
-source .jenkins/cscs/slurm-constraint-${configuration_name}.sh
+source .jenkins/lsu/slurm-configuration-${configuration_name}.sh
 
 set +e
 sbatch \
-    --job-name="jenkins-hpx-${configuration_name}" \
-    --nodes="1" \
-    --constraint="${configuration_slurm_constraint}" \
-    --partition="cscsci" \
+    --job-name="jenkins-hpx-${configuration_name_with_build_type}" \
+    --nodes="${configuration_slurm_num_nodes}" \
+    --partition="${configuration_slurm_partition}" \
     --time="01:30:00" \
-    --output="jenkins-hpx-${configuration_name}.out" \
-    --error="jenkins-hpx-${configuration_name}.err" \
-    --wait .jenkins/cscs/batch.sh
+    --output="jenkins-hpx-${configuration_name_with_build_type}.out" \
+    --error="jenkins-hpx-${configuration_name_with_build_type}.err" \
+    --wait .jenkins/lsu/batch.sh
 set -e
 
 # Print slurm logs
 echo "= stdout =================================================="
-cat jenkins-hpx-${configuration_name}.out
+cat jenkins-hpx-${configuration_name_with_build_type}.out
 
 echo "= stderr =================================================="
-cat jenkins-hpx-${configuration_name}.err
+cat jenkins-hpx-${configuration_name_with_build_type}.err
 
 # Get build status
-if [[ "$(cat jenkins-hpx-${configuration_name}-ctest-status.txt)" -eq "0" ]]; then
+if [[ "$(cat jenkins-hpx-${configuration_name_with_build_type}-ctest-status.txt)" -eq "0" ]]; then
     github_commit_status="success"
 else
     github_commit_status="failure"
@@ -51,7 +52,7 @@ if [[ -n "${ghprbPullId:-}" ]]; then
     github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
 
     # Get the CDash dashboard build id
-    cdash_build_id="$(cat jenkins-hpx-${configuration_name}-cdash-build-id.txt)"
+    cdash_build_id="$(cat jenkins-hpx-${configuration_name_with_build_type}-cdash-build-id.txt)"
 
     # Extract actual token from GITHUB_TOKEN (in the form "username:token")
     github_token=$(echo ${GITHUB_TOKEN} | cut -f2 -d':')
@@ -62,10 +63,10 @@ if [[ -n "${ghprbPullId:-}" ]]; then
         "${github_commit_repo}" \
         "${ghprbActualCommit}" \
         "${github_commit_status}" \
-        "${configuration_name}" \
+        "${configuration_name_with_build_type}" \
         "${cdash_build_id}" \
-        "jenkins/cscs"
+        "jenkins/lsu"
 fi
 
 set -e
-exit $(cat jenkins-hpx-${configuration_name}-ctest-status.txt)
+exit $(cat jenkins-hpx-${configuration_name_with_build_type}-ctest-status.txt)

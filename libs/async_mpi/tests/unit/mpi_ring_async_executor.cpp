@@ -151,7 +151,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 {
                     auto f_send = hpx::async(
                         exec, MPI_Isend, &tokens[i], 1, MPI_INT, rank_to, i);
-                    f_send.then([=, &tokens, &counter](auto&&) {
+                    f_send.then([=, &tokens](auto&&) {
                         msg_send(rank, size, rank_to, rank_from, tokens[i], i);
                     });
                 }
