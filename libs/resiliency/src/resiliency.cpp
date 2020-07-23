@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace hpx { namespace resiliency {
+namespace hpx { namespace resiliency { namespace experimental {
 
     unsigned int major_version()
     {
@@ -39,4 +39,4 @@ namespace hpx { namespace resiliency {
             std::to_string(HPX_RESILIENCY_VERSION_MINOR) + "." +
             std::to_string(HPX_RESILIENCY_VERSION_SUBMINOR);
     }
-}}    // namespace hpx::resiliency
+}}}    // namespace hpx::resiliency::experimental

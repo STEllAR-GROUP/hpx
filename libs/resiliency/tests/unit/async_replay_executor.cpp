@@ -12,8 +12,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 
 #include <atomic>
 #include <stdexcept>
@@ -35,7 +35,7 @@ bool validate(int result)
 
 int no_answer()
 {
-    throw hpx::experimental::abort_replay_exception();
+    throw hpx::resiliency::experimental::abort_replay_exception();
 }
 
 int deep_thought()
@@ -54,17 +54,17 @@ int hpx_main()
         hpx::parallel::execution::parallel_executor exec;
 
         // successful replay
-        hpx::future<int> f =
-            hpx::experimental::async_replay(exec, 10, &deep_thought);
+        hpx::future<int> f = hpx::resiliency::experimental::async_replay(
+            exec, 10, &deep_thought);
         HPX_TEST(f.get() == 42);
 
         // successful replay validate
-        f = hpx::experimental::async_replay_validate(
+        f = hpx::resiliency::experimental::async_replay_validate(
             exec, 10, &validate, &universal_answer);
         HPX_TEST(f.get() == 42);
 
         // unsuccessful replay
-        f = hpx::experimental::async_replay(exec, 6, &deep_thought);
+        f = hpx::resiliency::experimental::async_replay(exec, 6, &deep_thought);
 
         bool exception_caught = false;
         try
@@ -83,7 +83,7 @@ int hpx_main()
         HPX_TEST(exception_caught);
 
         // unsuccessful replay validate
-        f = hpx::experimental::async_replay_validate(
+        f = hpx::resiliency::experimental::async_replay_validate(
             exec, 6, &validate, &universal_answer);
 
         exception_caught = false;
@@ -92,7 +92,7 @@ int hpx_main()
             f.get();
             HPX_TEST(false);
         }
-        catch (hpx::experimental::abort_replay_exception const&)
+        catch (hpx::resiliency::experimental::abort_replay_exception const&)
         {
             exception_caught = true;
         }
@@ -103,7 +103,7 @@ int hpx_main()
         HPX_TEST(exception_caught);
 
         // aborted replay
-        f = hpx::experimental::async_replay(exec, 1, &no_answer);
+        f = hpx::resiliency::experimental::async_replay(exec, 1, &no_answer);
 
         exception_caught = false;
         try
@@ -111,7 +111,7 @@ int hpx_main()
             f.get();
             HPX_TEST(false);
         }
-        catch (hpx::experimental::abort_replay_exception const&)
+        catch (hpx::resiliency::experimental::abort_replay_exception const&)
         {
             exception_caught = true;
         }
@@ -122,7 +122,7 @@ int hpx_main()
         HPX_TEST(exception_caught);
 
         // aborted replay validate
-        f = hpx::experimental::async_replay_validate(
+        f = hpx::resiliency::experimental::async_replay_validate(
             exec, 1, &validate, &no_answer);
 
         exception_caught = false;
@@ -130,7 +130,7 @@ int hpx_main()
         {
             f.get();
         }
-        catch (hpx::experimental::abort_replay_exception const&)
+        catch (hpx::resiliency::experimental::abort_replay_exception const&)
         {
             exception_caught = true;
         }

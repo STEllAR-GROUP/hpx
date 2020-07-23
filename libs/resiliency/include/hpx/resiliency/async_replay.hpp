@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency {
+namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_ALWAYS_EXPORT abort_replay_exception : std::exception
@@ -201,4 +201,4 @@ namespace hpx { namespace resiliency {
 
         return helper->call(n);
     }
-}}    // namespace hpx::resiliency
+}}}    // namespace hpx::resiliency::experimental

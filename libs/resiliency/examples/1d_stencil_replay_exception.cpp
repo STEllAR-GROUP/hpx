@@ -9,8 +9,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -164,9 +164,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::vector<subdomain_future> next_input(subdomains);
             for (int j = 0; j < subdomains; ++j)
             {
-                next_input[j] = hpx::experimental::dataflow_replay(n, update,
-                    input[(j - 1 + subdomains) % subdomains], input[j],
-                    input[(j + 1) % subdomains]);
+                // explicitly unwrap future returned by dataflow
+                hpx::future<chk_vector> f =
+                    hpx::resiliency::experimental::dataflow_replay(n, update,
+                        input[(j - 1 + subdomains) % subdomains], input[j],
+                        input[(j + 1) % subdomains]);
+                next_input[j] = std::move(f);
             }
             std::swap(input, next_input);
         }

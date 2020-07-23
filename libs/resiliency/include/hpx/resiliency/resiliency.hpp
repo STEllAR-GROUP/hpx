@@ -8,35 +8,4 @@
 
 #pragma once
 
-#include <hpx/resiliency/async_replay.hpp>
-#include <hpx/resiliency/async_replay_executor.hpp>
-#include <hpx/resiliency/async_replicate.hpp>
-#include <hpx/resiliency/async_replicate_executor.hpp>
-#include <hpx/resiliency/dataflow_replay.hpp>
-#include <hpx/resiliency/dataflow_replicate.hpp>
-#include <hpx/resiliency/version.hpp>
-
-namespace hpx { namespace experimental {
-
-    // Replay APIs
-    using hpx::resiliency::abort_replay_exception;
-
-    using hpx::resiliency::async_replay_validate;
-    using hpx::resiliency::async_replay;
-
-    using hpx::resiliency::dataflow_replay_validate;
-    using hpx::resiliency::dataflow_replay;
-
-    // Replicate APIs
-    using hpx::resiliency::abort_replicate_exception;
-
-    using hpx::resiliency::async_replicate_vote_validate;
-    using hpx::resiliency::async_replicate_vote;
-    using hpx::resiliency::async_replicate_validate;
-    using hpx::resiliency::async_replicate;
-
-    using hpx::resiliency::dataflow_replicate_vote_validate;
-    using hpx::resiliency::dataflow_replicate_vote;
-    using hpx::resiliency::dataflow_replicate_validate;
-    using hpx::resiliency::dataflow_replicate;
-}}    // namespace hpx::experimental
+#include <hpx/modules/resiliency.hpp>

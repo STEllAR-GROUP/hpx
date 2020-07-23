@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/future.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 
 #include <atomic>
 #include <cstdint>

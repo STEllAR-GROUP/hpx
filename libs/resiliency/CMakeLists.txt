@@ -15,8 +15,6 @@ set(resiliency_headers
     hpx/resiliency/async_replicate.hpp
     hpx/resiliency/async_replicate_executor.hpp
     hpx/resiliency/config.hpp
-    hpx/resiliency/dataflow_replay.hpp
-    hpx/resiliency/dataflow_replicate.hpp
     hpx/resiliency/version.hpp
     hpx/resiliency/resiliency.hpp
     hpx/resiliency/resiliency_cpos.hpp
@@ -28,7 +26,7 @@ set(resiliency_sources resiliency.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   resiliency
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
   SOURCES ${resiliency_sources}
   HEADERS ${resiliency_headers}
   DEPENDENCIES

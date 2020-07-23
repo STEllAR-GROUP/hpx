@@ -22,7 +22,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency {
+namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_ALWAYS_EXPORT abort_replicate_exception : std::exception
@@ -199,4 +199,4 @@ namespace hpx { namespace resiliency {
             detail::replicate_voter{}, detail::replicate_validator{},
             std::forward<F>(f), std::forward<Ts>(ts)...);
     }
-}}    // namespace hpx::resiliency
+}}}    // namespace hpx::resiliency::experimental

@@ -10,7 +10,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/testing.hpp>
@@ -52,21 +51,18 @@ int deep_thought()
 int hpx_main()
 {
     {
-        hpx::parallel::execution::parallel_executor exec;
-
         // successful replicate
-        hpx::future<int> f = hpx::resiliency::experimental::async_replicate(
-            exec, 10, &deep_thought);
+        hpx::future<int> f =
+            hpx::resiliency::experimental::async_replicate(10, &deep_thought);
         HPX_TEST(f.get() == 42);
 
         // successful replicate_validate
         f = hpx::resiliency::experimental::async_replicate_validate(
-            exec, 10, &validate, &universal_answer);
+            10, &validate, &universal_answer);
         HPX_TEST(f.get() == 42);
 
         // unsuccessful replicate
-        f = hpx::resiliency::experimental::async_replicate(
-            exec, 6, &deep_thought);
+        f = hpx::resiliency::experimental::async_replicate(6, &deep_thought);
 
         bool exception_caught = false;
         try
@@ -85,7 +81,7 @@ int hpx_main()
 
         // unsuccessful replicate_validate
         f = hpx::resiliency::experimental::async_replicate_validate(
-            exec, 6, &validate, &universal_answer);
+            6, &validate, &universal_answer);
 
         exception_caught = false;
         try
@@ -103,7 +99,7 @@ int hpx_main()
         HPX_TEST(exception_caught);
 
         // aborted replicate
-        f = hpx::resiliency::experimental::async_replicate(exec, 1, &no_answer);
+        f = hpx::resiliency::experimental::async_replicate(1, &no_answer);
 
         exception_caught = false;
         try
@@ -122,7 +118,7 @@ int hpx_main()
 
         // aborted replicate validate
         f = hpx::resiliency::experimental::async_replicate_validate(
-            exec, 1, &validate, &no_answer);
+            1, &validate, &no_answer);
 
         exception_caught = false;
         try

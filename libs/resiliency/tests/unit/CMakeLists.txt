@@ -4,8 +4,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests async_replicate_executor async_replicate_vote_executor
-          async_replay_executor)
+set(tests
+    async_replay_executor
+    async_replay_plain
+    async_replicate_executor
+    async_replicate_plain
+    async_replicate_vote_executor
+    async_replicate_vote_plain
+    dataflow_replay_executor
+    dataflow_replay_plain
+    dataflow_replicate_executor
+    dataflow_replicate_plain
+)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

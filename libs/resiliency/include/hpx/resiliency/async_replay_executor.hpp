@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency {
+namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -192,4 +192,4 @@ namespace hpx { namespace resiliency {
 
         return helper->call(std::forward<Executor>(exec), n);
     }
-}}    // namespace hpx::resiliency
+}}}    // namespace hpx::resiliency::experimental

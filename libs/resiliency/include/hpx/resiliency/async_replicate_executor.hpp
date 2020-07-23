@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency {
+namespace hpx { namespace resiliency { namespace experimental {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
@@ -192,4 +192,4 @@ namespace hpx { namespace resiliency {
             detail::replicate_validator{}, std::forward<F>(f),
             std::forward<Ts>(ts)...);
     }
-}}    // namespace hpx::resiliency
+}}}    // namespace hpx::resiliency::experimental

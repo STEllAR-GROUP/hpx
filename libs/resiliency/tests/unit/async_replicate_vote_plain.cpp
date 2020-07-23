@@ -8,7 +8,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/testing.hpp>
@@ -41,11 +40,9 @@ bool validate(int ans)
 int hpx_main()
 {
     {
-        hpx::parallel::execution::parallel_executor exec;
-
         hpx::future<int> f =
             hpx::resiliency::experimental::async_replicate_vote(
-                exec, 10, &vote, &universal_ans);
+                10, &vote, &universal_ans);
 
         auto result = f.get();
         HPX_TEST(result == 42 || result == 84);
@@ -56,7 +53,7 @@ int hpx_main()
 
         hpx::future<int> f =
             hpx::resiliency::experimental::async_replicate_vote_validate(
-                exec, 10, &vote, &validate, &universal_ans);
+                10, &vote, &validate, &universal_ans);
 
         auto result = f.get();
         HPX_TEST(result == 42 || result == 84);
