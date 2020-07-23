@@ -28,6 +28,7 @@ set(synchronization_headers
     hpx/synchronization/detail/sliding_semaphore.hpp
     hpx/synchronization/event.hpp
     hpx/synchronization/latch.hpp
+    hpx/synchronization/lock_types.hpp
     hpx/synchronization/mutex.hpp
     hpx/synchronization/no_mutex.hpp
     hpx/synchronization/once.hpp

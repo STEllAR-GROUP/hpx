@@ -50,7 +50,7 @@ void test_only_one_upgrade_lock_permitted()
         for (unsigned i = 0; i != number_of_threads; ++i)
         {
             pool.create_thread(
-                test::locking_thread<boost::upgrade_lock<shared_mutex_type>>(
+                test::locking_thread<hpx::upgrade_lock<shared_mutex_type>>(
                     rw_mutex, unblocked_count, unblocked_count_mutex,
                     unblocked_condition, finish_mutex,
                     simultaneous_running_count, max_simultaneous_running));
@@ -99,7 +99,7 @@ void test_can_lock_upgrade_if_currently_locked_shared()
         for (unsigned i = 0; i != reader_count; ++i)
         {
             pool.create_thread(
-                test::locking_thread<boost::shared_lock<shared_mutex_type>>(
+                test::locking_thread<std::shared_lock<shared_mutex_type>>(
                     rw_mutex, unblocked_count, unblocked_count_mutex,
                     unblocked_condition, finish_mutex,
                     simultaneous_running_count, max_simultaneous_running));
@@ -108,9 +108,9 @@ void test_can_lock_upgrade_if_currently_locked_shared()
         hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
         pool.create_thread(
-            test::locking_thread<boost::upgrade_lock<shared_mutex_type>>(
-                rw_mutex, unblocked_count, unblocked_count_mutex,
-                unblocked_condition, finish_mutex, simultaneous_running_count,
+            test::locking_thread<hpx::upgrade_lock<shared_mutex_type>>(rw_mutex,
+                unblocked_count, unblocked_count_mutex, unblocked_condition,
+                finish_mutex, simultaneous_running_count,
                 max_simultaneous_running));
 
         {
@@ -145,8 +145,8 @@ void test_can_lock_upgrade_to_unique_if_currently_locked_upgrade()
     typedef hpx::lcos::local::shared_mutex shared_mutex_type;
 
     shared_mutex_type mtx;
-    boost::upgrade_lock<shared_mutex_type> l(mtx);
-    boost::upgrade_to_unique_lock<shared_mutex_type> ul(l);
+    hpx::upgrade_lock<shared_mutex_type> l(mtx);
+    hpx::upgrade_to_unique_lock<shared_mutex_type> ul(l);
     HPX_TEST(ul.owns_lock());
 }
 
@@ -288,34 +288,6 @@ void test_if_other_thread_has_shared_lock_try_lock_upgrade_returns_true()
     writer.join();
 }
 
-void test_if_other_thread_has_upgrade_lock_try_lock_upgrade_returns_false()
-{
-    typedef hpx::lcos::local::shared_mutex shared_mutex_type;
-    typedef hpx::lcos::local::mutex mutex_type;
-
-    shared_mutex_type rw_mutex;
-    mutex_type finish_mutex;
-    mutex_type unblocked_mutex;
-    unsigned unblocked_count = 0;
-    std::unique_lock<mutex_type> finish_lock(finish_mutex);
-    hpx::thread writer(test::simple_upgrade_thread(
-        rw_mutex, finish_mutex, unblocked_mutex, unblocked_count));
-
-    hpx::this_thread::sleep_for(std::chrono::seconds(1));
-
-    CHECK_LOCKED_VALUE_EQUAL(unblocked_mutex, unblocked_count, 1u);
-
-    bool const try_succeeded = rw_mutex.try_lock_upgrade();
-    HPX_TEST(!try_succeeded);
-    if (try_succeeded)
-    {
-        rw_mutex.unlock_upgrade();
-    }
-
-    finish_lock.unlock();
-    writer.join();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -328,7 +300,6 @@ int hpx_main()
     test_if_no_thread_has_lock_try_lock_upgrade_returns_true();
     test_if_other_thread_has_shared_lock_try_lock_shared_returns_true();
     test_if_other_thread_has_shared_lock_try_lock_upgrade_returns_true();
-    test_if_other_thread_has_upgrade_lock_try_lock_upgrade_returns_false();
 
     return hpx::finalize();
 }

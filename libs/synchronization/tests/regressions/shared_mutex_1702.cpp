@@ -11,9 +11,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 
-#include <boost/thread/locks.hpp>
-
 #include <mutex>
+#include <shared_mutex>
 
 int main()
 {
@@ -28,7 +27,7 @@ int main()
     }
 
     {
-        boost::shared_lock<shared_mutex_type> l(mtx);
+        std::shared_lock<shared_mutex_type> l(mtx);
         int i = data;
         HPX_UNUSED(i);
     }

@@ -26,7 +26,7 @@ namespace boost
     {
       { "boost/move/move\\.hpp", "utility" },
       { "boost/atomic/atomic\\.hpp", "boost/atomic.hpp" },
-//       { "boost/thread/locks.hpp", "mutex" },
+      { "boost/thread/locks.hpp", "mutex or shared_mutex" },
       { "boost/type_traits\\.hpp", "type_traits" },
       { "boost/type_traits/([^\\s]*)\\.hpp", "type_traits" },
       { "boost/unordered_map\\.hpp", "unordered_map" },

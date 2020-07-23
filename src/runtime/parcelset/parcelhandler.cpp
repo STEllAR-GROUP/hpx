@@ -47,7 +47,6 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
 #include <boost/asio/error.hpp>
-#include <boost/assign/std/vector.hpp>
 #include <boost/predef/other/endian.h>
 
 #include <algorithm>
@@ -1582,37 +1581,47 @@ namespace hpx { namespace parcelset
         std::vector<std::string> ini_defs;
 
 #if defined(HPX_HAVE_NETWORKING)
-        using namespace boost::assign;
-        ini_defs +=
-            "[hpx.parcel]",
-            "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
-            "port = ${HPX_PARCEL_SERVER_PORT:"
-                HPX_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
-            "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
-            "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
-                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
+        ini_defs.push_back("[hpx.parcel]");
+        ini_defs.push_back(
+            "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS
+            "}");
+        ini_defs.push_back("port = ${HPX_PARCEL_SERVER_PORT:" HPX_PP_STRINGIZE(
+            HPX_INITIAL_IP_PORT) "}");
+        ini_defs.push_back(
+            "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}");
+        ini_defs.push_back(
+            "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:" HPX_PP_STRINGIZE(
+                HPX_PARCEL_MAX_CONNECTIONS) "}");
+        ini_defs.push_back(
             "max_connections_per_locality = "
-                "${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
-                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
-            "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
-            "max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:"
-                HPX_PP_STRINGIZE(HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}",
+            "${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:" HPX_PP_STRINGIZE(
+                HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}");
+        ini_defs.push_back("max_message_size = "
+                           "${HPX_PARCEL_MAX_MESSAGE_SIZE:" HPX_PP_STRINGIZE(
+                               HPX_PARCEL_MAX_MESSAGE_SIZE) "}");
+        ini_defs.push_back(
+            "max_outbound_message_size = "
+            "${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:" HPX_PP_STRINGIZE(
+                HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE) "}");
 #if BOOST_ENDIAN_BIG_BYTE
-            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
+        ini_defs.push_back("endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}");
 #else
-            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
+        ini_defs.push_back("endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}");
 #endif
-            "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
+        ini_defs.push_back(
+            "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}");
+        ini_defs.push_back(
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}",
+            "$[hpx.parcel.array_optimization]}");
+        ini_defs.push_back(
+            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}");
 #if defined(HPX_HAVE_PARCEL_COALESCING)
-            "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:1}"
+        ini_defs.push_back(
+            "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:1}");
 #else
-            "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}"
+        ini_defs.push_back(
+            "message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}");
 #endif
-            ;
 
         for (plugins::parcelport_factory_base* f :
             parcelhandler::get_parcelport_factories())
@@ -1620,7 +1629,6 @@ namespace hpx { namespace parcelset
             f->get_plugin_info(ini_defs);
         }
 #endif
-
         return ini_defs;
     }
 
