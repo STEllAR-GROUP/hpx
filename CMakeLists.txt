@@ -951,6 +951,11 @@ if(HPX_WITH_PAPI)
       "HPX_WITH_PAPI was set to ON, but PAPI cannot currently be used with HPX_WITH_DISTRIBUTED_RUNTIME=OFF"
     )
   endif()
+  if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    hpx_error(
+      "HPX_WITH_PAPI was set to ON, but PAPI can only be used on Linux (this is ${CMAKE_SYSTEM_NAME})"
+    )
+  endif()
   hpx_add_config_define(HPX_HAVE_PAPI)
 endif()
 hpx_option(
@@ -2255,6 +2260,12 @@ else()
   set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}")
   set(HPX_BUILD_PREFIX "${PROJECT_BINARY_DIR}")
 endif()
+
+# Note: on windows systems the ':' will be converted to a ';' at runtime
+hpx_add_config_cond_define(
+  HPX_DEFAULT_COMPONENT_PATH_SUFFIXES
+  "\"/${CMAKE_INSTALL_BINDIR}/hpx:/lib/hpx:/bin/hpx\""
+)
 
 # ##############################################################################
 # search path configuration

@@ -10,24 +10,25 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/synchronization/include
 set(synchronization_headers
-    hpx/barrier.hpp
     hpx/condition_variable.hpp
-    hpx/latch.hpp
+    hpx/local/barrier.hpp
+    hpx/local/latch.hpp
     hpx/mutex.hpp
     hpx/semaphore.hpp
     hpx/shared_mutex.hpp
     hpx/stop_token.hpp
     hpx/synchronization/barrier.hpp
+    hpx/synchronization/channel_mpmc.hpp
+    hpx/synchronization/channel_mpsc.hpp
+    hpx/synchronization/channel_spsc.hpp
     hpx/synchronization/condition_variable.hpp
     hpx/synchronization/counting_semaphore.hpp
     hpx/synchronization/detail/condition_variable.hpp
     hpx/synchronization/detail/counting_semaphore.hpp
     hpx/synchronization/detail/sliding_semaphore.hpp
     hpx/synchronization/event.hpp
-    hpx/synchronization/channel_mpmc.hpp
-    hpx/synchronization/channel_mpsc.hpp
-    hpx/synchronization/channel_spsc.hpp
     hpx/synchronization/latch.hpp
+    hpx/synchronization/lock_types.hpp
     hpx/synchronization/mutex.hpp
     hpx/synchronization/no_mutex.hpp
     hpx/synchronization/once.hpp

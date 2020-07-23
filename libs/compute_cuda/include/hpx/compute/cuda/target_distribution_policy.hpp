@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CUDA)
+#if defined(HPX_HAVE_CUDA) && defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 
 #include <hpx/assert.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)

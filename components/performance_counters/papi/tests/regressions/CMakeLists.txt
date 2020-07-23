@@ -9,6 +9,11 @@ set(tests papi_counters_active_interface papi_counters_basic_functions
           papi_counters_segfault_1890
 )
 
+# The papi_counters_basic_functions test depends on floating point counters
+# being available. They are not always available so we only add it as an
+# executable, not a test.
+set(papi_counters_basic_functions_NOTEST TRUE)
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
@@ -23,7 +28,9 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Components"
   )
 
-  add_hpx_regression_test(
-    "components.papi_counters" ${test} ${${test}_PARAMETERS}
-  )
+  if(NOT "${${test}_NOTEST}")
+    add_hpx_regression_test(
+      "components.papi_counters" ${test} ${${test}_PARAMETERS}
+    )
+  endif()
 endforeach()

@@ -307,19 +307,20 @@ namespace hpx { namespace mpi { namespace experimental {
     }
 
     namespace detail {
-
+        // -------------------------------------------------------------
         void register_polling(hpx::threads::thread_pool_base& pool)
         {
+            mpi_debug.debug(debug::str<>("enable polling"));
             auto* sched = pool.get_scheduler();
+            sched->set_mpi_polling_function(&hpx::mpi::experimental::poll);
+        }
 
-            mpi_debug.debug(debug::str<>("Setting mode"),
-                detail::get_mpi_info(), "enable_user_polling");
-
-            // always set polling function before enabling polling
-            sched->set_user_polling_function(&hpx::mpi::experimental::poll);
-            sched->add_remove_scheduler_mode(
-                threads::policies::enable_user_polling,
-                threads::policies::do_background_work);
+        // -------------------------------------------------------------
+        void unregister_polling(hpx::threads::thread_pool_base& pool)
+        {
+            mpi_debug.debug(debug::str<>("disable polling"));
+            auto* sched = pool.get_scheduler();
+            sched->clear_mpi_polling_function();
         }
     }    // namespace detail
 
@@ -385,15 +386,6 @@ namespace hpx { namespace mpi { namespace experimental {
     }
 
     // -----------------------------------------------------------------
-    namespace detail {
-
-        void unregister_polling(hpx::threads::thread_pool_base& pool)
-        {
-            auto* sched = pool.get_scheduler();
-            sched->remove_scheduler_mode(
-                threads::policies::enable_user_polling);
-        }
-    }    // namespace detail
 
     void finalize(std::string const& pool_name)
     {

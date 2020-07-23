@@ -22,6 +22,11 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#if defined(HPX_HAVE_PAPI) && defined(__linux__) && !defined(__ANDROID) &&     \
+    !defined(ANDROID)
+#include <sys/syscall.h>
+#endif
+
 namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -58,6 +63,12 @@ namespace hpx { namespace util {
 
             // the native_handle() of the associated thread
             std::uint64_t tid_;
+
+#if defined(HPX_HAVE_PAPI) && defined(__linux__) && !defined(__ANDROID) &&     \
+    !defined(ANDROID)
+            // the Linux thread id (required by PAPI)
+            pid_t linux_tid_;
+#endif
 
             // callback function invoked when unregistering a thread
             thread_mapper_callback_type cleanup_;
@@ -114,6 +125,11 @@ namespace hpx { namespace util {
 
         // returns low level thread id (native_handle)
         std::uint64_t get_thread_native_handle(std::uint32_t tix) const;
+
+#if defined(HPX_HAVE_PAPI) && defined(__linux__) && !defined(__ANDROID) &&     \
+    !defined(ANDROID)
+        pid_t get_linux_thread_id(std::uint32_t tix) const;
+#endif
 
         // returns the label of registered thread tix
         std::string const& get_thread_label(std::uint32_t tix) const;

@@ -158,6 +158,7 @@ namespace libfabric
           , av_(nullptr)
             //
           , immediate_(false)
+          , event_pause_(0)
         {
             FUNC_START_DEBUG_MSG;
             open_fabric(provider, domain, endpoint);

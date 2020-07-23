@@ -9,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/serialization/serialize_buffer.hpp>
 
 #include <cstddef>

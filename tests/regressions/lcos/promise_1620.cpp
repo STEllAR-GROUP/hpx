@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_start.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -39,6 +39,7 @@ void test_leak()
         }
 
         test t = f.get();
+        (void) t;
     }
 
     hpx::agas::garbage_collect();

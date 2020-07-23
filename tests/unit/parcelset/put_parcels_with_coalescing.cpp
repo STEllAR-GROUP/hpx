@@ -7,7 +7,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/include/parcel_coalescing.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/modules/testing.hpp>

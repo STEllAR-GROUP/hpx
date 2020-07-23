@@ -8,7 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/numeric.hpp>
 #include <hpx/algorithm.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 
 #include <iterator>
 #include <string>

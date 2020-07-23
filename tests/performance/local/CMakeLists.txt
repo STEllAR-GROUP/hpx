@@ -13,6 +13,7 @@ set(benchmarks
     delay_baseline
     delay_baseline_threaded
     function_object_wrapper_overhead
+    future_overhead
     hpx_tls_overhead
     native_tls_overhead
     print_heterogeneous_payloads
@@ -111,7 +112,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       ${benchmarks}
       agas_cache_timings
       foreach_scaling
-      future_overhead
       hpx_homogeneous_timed_task_spawn_executors
       hpx_heterogeneous_timed_task_spawn
       parent_vs_child_stealing
@@ -149,7 +149,7 @@ set(hpx_heterogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component
 set(parent_vs_child_stealing_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
 set(wait_all_timings_FLAGS DEPENDENCIES iostreams_component hpx_timing)
-set(future_overhead_FLAGS DEPENDENCIES iostreams_component hpx_timing)
+set(future_overhead_FLAGS DEPENDENCIES hpx_timing)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 set(foreach_scaling_FLAGS DEPENDENCIES iostreams_component hpx_timing)
 set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component hpx_timing)

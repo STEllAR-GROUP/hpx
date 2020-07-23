@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <chrono>
@@ -74,7 +74,9 @@ void hpx_test_main(
 
             // Detach the references.
             id_type id1 = monitor0.detach().get();
+            (void) id1;
             id_type id2 = monitor1.detach().get();
+            (void) id2;
 
             // Both components should still be alive.
             HPX_TEST_EQ(false, monitor0.is_ready(milliseconds(delay)));

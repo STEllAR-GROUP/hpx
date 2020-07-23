@@ -6,7 +6,7 @@
 
 //[hello_world_cpp_getting_started
 #include "hello_world_component.hpp"
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 
 #include <iostream>
 

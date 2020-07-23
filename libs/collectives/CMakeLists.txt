@@ -29,6 +29,8 @@ set(collectives_headers
     hpx/collectives/spmd_block.hpp
     hpx/collectives/detail/barrier_node.hpp
     hpx/collectives/detail/latch.hpp
+    hpx/distributed/barrier.hpp
+    hpx/distributed/latch.hpp
 )
 
 # Default location is $HPX_ROOT/libs/collectives/include_compatibility

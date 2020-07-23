@@ -145,6 +145,7 @@ struct partition : hpx::components::client_base<partition, partition_server>
 
     partition(hpx::future<hpx::id_type> && id)
       : base_type(std::move(id)),
+        partition_num_(0),
         registered_name_(false)
     {}
 

@@ -14,12 +14,11 @@
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 
-#include <boost/thread/locks.hpp>
-
 #include <algorithm>
 #include <list>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <utility>
 
 #ifdef HPX_MSVC
@@ -49,7 +48,7 @@ namespace test {
         bool is_this_thread_in()
         {
             hpx::thread::id id = hpx::this_thread::get_id();
-            boost::shared_lock<mutex_type> guard(mtx_);
+            std::shared_lock<mutex_type> guard(mtx_);
             for (hpx::thread* t : threads)
             {
                 if (t->get_id() == id)
@@ -64,7 +63,7 @@ namespace test {
                 return false;
 
             hpx::thread::id id = thrd->get_id();
-            boost::shared_lock<mutex_type> guard(mtx_);
+            std::shared_lock<mutex_type> guard(mtx_);
             for (hpx::thread* t : threads)
             {
                 if (t->get_id() == id)
@@ -122,7 +121,7 @@ namespace test {
                 return;
             }
 
-            boost::shared_lock<mutex_type> guard(mtx_);
+            std::shared_lock<mutex_type> guard(mtx_);
             for (hpx::thread* t : threads)
             {
                 if (t->joinable())
@@ -132,7 +131,7 @@ namespace test {
 
         void interrupt_all()
         {
-            boost::shared_lock<mutex_type> guard(mtx_);
+            std::shared_lock<mutex_type> guard(mtx_);
             for (hpx::thread* t : threads)
             {
                 t->interrupt();
@@ -141,7 +140,7 @@ namespace test {
 
         size_t size() const
         {
-            boost::shared_lock<mutex_type> guard(mtx_);
+            std::shared_lock<mutex_type> guard(mtx_);
             return threads.size();
         }
 

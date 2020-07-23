@@ -25,8 +25,6 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
 
-#include <boost/integer.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <iterator>

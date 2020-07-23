@@ -9,5 +9,6 @@
 int main()
 {
     auto cache_size = std::hardware_destructive_interference_size;
+    (void) cache_size;
     return 0;
 }

@@ -23,6 +23,7 @@ namespace examples { namespace server
         double volatile d = 0.;
         for (int i = 0; i < c; ++i)
             d += 1 / (2. * i + 1);
+        (void) d;
     }
 
     ///////////////////////////////////////////////////////////////////////////

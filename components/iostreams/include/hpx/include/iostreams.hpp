@@ -9,14 +9,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 
 #if defined(HPX_HAVE_DEPRECATION_WARNINGS)
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/include/iostreams.hpp is deprecated, \
-    please include hpx/distributed/iostream.hpp instead")
+    please include hpx/iostream.hpp instead")
 #else
 #warning "The header hpx/include/iostreams.hpp is deprecated, \
-    please include hpx/distributed/iostream.hpp instead"
+    please include hpx/iostream.hpp instead"
 #endif
 #endif

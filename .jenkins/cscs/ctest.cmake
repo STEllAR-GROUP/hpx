@@ -49,6 +49,6 @@ ctest_build(TARGET tests FLAGS "-k0 -j ${CTEST_BUILD_PARALLELISM}")
 ctest_submit(PARTS Build)
 ctest_test(PARALLEL_LEVEL "${CTEST_TEST_PARALLELISM}")
 ctest_submit(PARTS Test BUILD_ID CTEST_BUILD_ID)
-file(WRITE "jenkins-hpx-$ENV{configuration_name}-cdash-build-id.txt"
+file(WRITE "jenkins-hpx-${CTEST_BUILD_CONFIGURATION_NAME}-cdash-build-id.txt"
      "${CTEST_BUILD_ID}"
 )

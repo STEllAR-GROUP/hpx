@@ -99,8 +99,6 @@ void test_mru_insert_with_touch()
     // there should be 3 items in the cache, and green should be there as well
     HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
     HPX_TEST(c.holds_key("green"));
-    HPX_TEST(c.holds_key("green"));
-    HPX_TEST(c.holds_key("green"));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

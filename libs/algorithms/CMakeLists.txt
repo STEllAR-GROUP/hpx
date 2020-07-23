@@ -7,13 +7,10 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(algorithms_headers
-    hpx/algorithm.hpp
     hpx/algorithms/traits/is_value_proxy.hpp
     hpx/algorithms/traits/projected.hpp
     hpx/algorithms/traits/projected_range.hpp
     hpx/algorithms/traits/segmented_iterator_traits.hpp
-    hpx/numeric.hpp
-    hpx/memory.hpp
     hpx/parallel/algorithm.hpp
     hpx/parallel/algorithms/adjacent_difference.hpp
     hpx/parallel/algorithms/adjacent_find.hpp
@@ -143,7 +140,6 @@ set(algorithms_headers
     hpx/parallel/util/transfer.hpp
     hpx/parallel/util/transform_loop.hpp
     hpx/parallel/util/zip_iterator.hpp
-    hpx/task_block.hpp
 )
 
 # cmake-format: off
@@ -179,6 +175,7 @@ add_hpx_module(
     hpx_executors
     hpx_format
     hpx_functional
+    hpx_futures
     hpx_iterator_support
     hpx_async_local
     hpx_pack_traversal

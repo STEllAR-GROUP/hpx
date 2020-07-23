@@ -123,6 +123,9 @@ if(NOT TARGET hpx_dependencies_boost)
 
   # Boost Asio should not use Boost exceptions
   hpx_add_config_cond_define(BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION 0)
+  # Disable concepts support in Asio as a workaround to
+  # https://github.com/boostorg/asio/issues/312
+  hpx_add_config_cond_define(BOOST_ASIO_DISABLE_CONCEPTS)
 
   find_package(Threads QUIET REQUIRED)
   target_link_libraries(hpx_dependencies_boost INTERFACE Threads::Threads)
