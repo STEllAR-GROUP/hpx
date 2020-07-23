@@ -19,12 +19,10 @@ namespace hpx { namespace resiliency { namespace experimental {
     template <typename Tag, typename BaseTag>
     struct tag_deferred : hpx::functional::tag<Tag>
     {
-        static constexpr BaseTag base_tag{};
-
         template <typename... Args>
         friend HPX_FORCEINLINE decltype(auto) tag_invoke(Tag, Args&&... args)
         {
-            return hpx::dataflow(base_tag, std::forward<Args>(args)...);
+            return hpx::dataflow(BaseTag{}, std::forward<Args>(args)...);
         }
     };
 

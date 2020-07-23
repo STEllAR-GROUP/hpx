@@ -49,8 +49,6 @@ int hpx_main()
     }
 
     {
-        hpx::parallel::execution::parallel_executor exec;
-
         hpx::future<int> f =
             hpx::resiliency::experimental::async_replicate_vote_validate(
                 10, &vote, &validate, &universal_ans);

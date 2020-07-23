@@ -258,9 +258,12 @@ struct stepper
 
             for (std::size_t i = 0; i != subdomains; ++i)
             {
-                next[i] = dataflow_replay_validate(n_value, validate_result, Op,
-                    error, current[(i - 1 + subdomains) % subdomains],
-                    current[i], current[(i + 1) % subdomains]);
+                // explicitly unwrap future
+                hpx::future<partition_data> f =
+                    dataflow_replay_validate(n_value, validate_result, Op,
+                        error, current[(i - 1 + subdomains) % subdomains],
+                        current[i], current[(i + 1) % subdomains]);
+                next[i] = std::move(f);
             }
 
             // every nd time steps, attach additional continuation which will

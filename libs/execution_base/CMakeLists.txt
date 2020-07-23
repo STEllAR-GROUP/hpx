@@ -45,6 +45,6 @@ add_hpx_module(
   HEADERS ${execution_base_headers}
   COMPAT_HEADERS ${execution_base_compat_headers}
   DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_format hpx_functional
-               hpx_timing
+               hpx_iterator_support hpx_timing
   CMAKE_SUBDIRS examples tests
 )

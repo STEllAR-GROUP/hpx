@@ -64,7 +64,8 @@ int hpx_main()
         HPX_TEST(f.get() == 42);
 
         // unsuccessful replay
-        f = hpx::resiliency::experimental::dataflow_replay(exec, 6, &deep_thought);
+        f = hpx::resiliency::experimental::dataflow_replay(
+            exec, 6, &deep_thought);
 
         bool exception_caught = false;
         try

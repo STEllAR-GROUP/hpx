@@ -30,11 +30,15 @@ add_hpx_module(
   SOURCES ${resiliency_sources}
   HEADERS ${resiliency_headers}
   DEPENDENCIES
+  DEPENDENCIES
     hpx_assertion
     hpx_async_local
     hpx_config
+    hpx_concepts
     hpx_datastructures
     hpx_execution
     hpx_functional
+    hpx_futures
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
