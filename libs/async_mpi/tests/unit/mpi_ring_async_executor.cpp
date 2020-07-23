@@ -167,10 +167,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
             }
         }
 
-        // This is needed to make sure that one rank does not shut down
-        // before others have completed. MPI does not handle that well.
-        MPI_Barrier(MPI_COMM_WORLD);
-
         if (rank == 0)
         {
             std::cout << "time " << t.elapsed() << std::endl;
@@ -186,6 +182,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
 // on an hpx thread
 int main(int argc, char* argv[])
 {
+    // if this test is run with distributed runtime, we need to make sure
+    // that all ranks run their main function
+    std::vector<std::string> cfg = {"hpx.run_hpx_main!=1"};
+
     // Init MPI
     int provided = MPI_THREAD_MULTIPLE;
     MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
@@ -208,7 +208,7 @@ int main(int argc, char* argv[])
     // clang-format on
 
     // Initialize and run HPX.
-    auto result = hpx::init(cmdline, argc, argv);
+    auto result = hpx::init(cmdline, argc, argv, cfg);
 
     // Finalize MPI
     MPI_Finalize();
