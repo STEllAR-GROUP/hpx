@@ -56,7 +56,7 @@ are case-sensitive. Example:
 
 .. code-block:: bash
 
-   cmake -G "Visual Studio 9 2008" path/to/hpx
+   cmake -G "Visual Studio 16 2019" path/to/hpx
 
 For a given development platform there can be more than one adequate generator.
 If you use Visual Studio ``"NMake Makefiles"`` is a generator you can use for
@@ -85,7 +85,7 @@ Here, you will use the command-line, non-interactive CMake interface.
       mkdir mybuilddir
       cd mybuilddir
 
-#. Execute this command on the shell replacing ``path/to/hpx/`` with the path to
+#. Execute this command on the shell replacing ``path/to/hpx`` with the path to
    the root of your |hpx| source tree:
 
    .. code-block:: bash
@@ -171,7 +171,7 @@ on your target machine. |hpx| currently requires at least Boost V1.61.0 to work
 properly. It may build and run with older versions, but we do not test |hpx|
 with those versions, so please be warned.
 
-The installation of Boost is described in detail in Boost's `Getting Started <https://www.boost.org/doc/libs/1_71_0/more/getting_started/index.html>`_
+The installation of Boost is described in detail in Boost's `Getting Started <https://www.boost.org/doc/libs/1_73_0/more/getting_started/index.html>`_
 document. However, if you've never used the Boost
 libraries (or even if you have), here's a quick primer:
 :ref:`boost_installation`.
@@ -201,7 +201,6 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * **Compilers**
      *
      *
-     *
    * * |gcc|_
      * 7.0
      *
@@ -209,10 +208,9 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      * 2014
      *
    * * |clang|_
-     * 4.0
+     * 5.0
      *
    * * **Build System**
-     *
      *
      *
    * * |cmake|_
@@ -221,12 +219,11 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * **Required Libraries**
      *
      *
-     *
    * * |boost_libraries|_
-     * 1.61.0
+     * 1.64.0
      *
    * * |hwloc|_
-     * 1.2 (Xeon Phi: 1.6)
+     * 1.5 (Xeon Phi: 1.6)
      *
 
 .. note::
@@ -254,9 +251,8 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * **Required Libraries**
      *
      *
-     *
    * * |boost|_
-     * 1.61.0
+     * 1.64.0
      *
    * * |hwloc|_
      * 1.5
@@ -353,7 +349,7 @@ Documentation
 To build the |hpx| documentation, you need recent versions of the following
 packages:
 
-- ``python`` (2 or 3)
+- ``python3``
 - ``sphinx`` (Python package)
 - ``sphinx_rtd_theme`` (Python package)
 - ``breathe`` (Python package)
@@ -661,7 +657,7 @@ How to install |hpx| on Unix variants
 
   .. code-block:: bash
 
-     cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.10
+     cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.0
 
 * Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag
   to your make invocation, where N is the number of parallel processes |hpx|
@@ -752,7 +748,7 @@ remember to replace ``/usr/local/include/boost-1_53`` with whatever prefix
 you used in your installation.
 
 Build |hpx|, finally
-..................
+....................
 
 .. code-block:: bash
 
@@ -760,62 +756,44 @@ Build |hpx|, finally
    git clone https://github.com/STEllAR-GROUP/hpx.git
    mkdir build-hpx && cd build-hpx
 
-To build with Clang 3.2, execute:
+To build with Clang, execute:
 
 .. code-block:: bash
 
    cmake ../hpx \
        -DCMAKE_CXX_COMPILER=clang++ \
-       -DBOOST_INCLUDE_DIR=/usr/local/include/boost-1_53 \
-       -DBOOST_LIBRARY_DIR=/usr/local/lib \
-       -DBOOST_SUFFIX=-clang-darwin32-mt-1_53 \
-   make
-
-To build with Clang 3.3 (trunk), execute:
-
-.. code-block:: bash
-
-   cmake ../hpx \
-       -DCMAKE_CXX_COMPILER=clang++ \
-       -DBOOST_INCLUDE_DIR=/usr/local/include/boost-1_53 \
-       -DBOOST_LIBRARY_DIR=/usr/local/lib \
-       -DBOOST_SUFFIX=-clang-darwin33-mt-1_53 \
-   make
+       -DBOOST_ROOT=/path/to/boost \
+       -DHWLOC_ROOT=/path/to/hwloc
+   make -j
 
 For more detailed information about using |cmake|, please refer its documentation
 and to the section :ref:`building_hpx`.
 
 Alternative installation method of |hpx| on OS X (Mac)
-....................................................
+......................................................
 
 Alternatively, you can install a recent version of gcc as well as all
 required libraries via MacPorts:
 
 #. Install |macports|
 
-#. Install CMake, gcc 4.8, and hwloc:
+#. Install CMake, gcc, hwloc:
 
    .. code-block:: bash
 
-      sudo port install gcc48
-      sudo port install hwloc
+      sudo brew install cmake
+      sudo brew install boost
+      sudo brew install hwloc
+      sudo brew install make
 
-   You may also want:
-
-   .. code-block:: bash
-
-      sudo port install cmake
-      sudo port install git-core
-
-#. Make this version of gcc your default compiler:
+#. You may also want:
 
    .. code-block:: bash
 
-      sudo port install gcc_select
-      sudo port select gcc mp-gcc48
+      sudo brew install gperftools
 
-#. Build Boost manually (the Boost package of MacPorts is built with Clang, and
-   unfortunately doesn't work with a GCC-build version of |hpx|):
+#. If you need to build Boost manually (the Boost package of MacPorts is built
+   with Clang, and unfortunately doesn't work with a GCC-build version of |hpx|):
 
    .. code-block:: bash
 
@@ -935,10 +913,10 @@ documentation and also the section :ref:`building_hpx`.
 .. _howto_win32:
 
 How to build |hpx| under Windows 10 x64 with Visual Studio 2015
-.............................................................
+...............................................................
 
-* Download the CMake V3.4.3 installer (or latest version) from `here
-  <https://blog.kitware.com/cmake-3-4-3-available-for-download/>`__
+* Download the CMake V3.18.1 installer (or latest version) from `here
+  <https://blog.kitware.com/cmake-3-18-1-available-for-download/>`__
 * Download the hwloc V1.11.0 (or the latest version) from `here
   <http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-win64-build-1.11.0.zip>`__
   and unpack it.

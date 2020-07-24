@@ -189,7 +189,7 @@ build an executable using |cmake| and |hpx|:
 
 .. note::
 
-   ``HPX::wrap_main`` is required if you are implicitly using ``main`` as the
+   ``HPX::wrap_main`` is required if you are implicitly using ``main()`` as the
    runtime entry point. See :ref:`minimal` for more information.
 
 .. note::

@@ -85,11 +85,11 @@ index is not specified, |hpx| will assume a default of ``-1``.
 .. _example:
 
 Two counter name examples
--------------------
+-------------------------
 
 This section gives examples of both simple counter names and aggregate
 counter names. For more information on simple and aggregate counter
-names, please see :ref:`performance_counter_instances`. 
+names, please see :ref:`performance_counter_instances`.
 
 An example of a well-formed (and meaningful) simple counter name would be:
 
