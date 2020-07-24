@@ -48,8 +48,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj>
         struct transform_projected
         {
-            typename hpx::util::decay<F>::type& f_;
-            typename hpx::util::decay<Proj>::type& proj_;
+            F& f_;
+            Proj& proj_;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter curr)
@@ -57,6 +57,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr)))
             {
                 return hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr));
+            }
+        };
+
+        template <typename F>
+        struct transform_projected<F, util::projection_identity>
+        {
+            HPX_HOST_DEVICE transform_projected(F& f, util::projection_identity)
+              : f_(f)
+            {
+            }
+
+            F& f_;
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter curr)
+                -> decltype(hpx::util::invoke(f_, *curr))
+            {
+                return hpx::util::invoke(f_, *curr);
             }
         };
 
@@ -579,14 +597,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
         HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1B>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::traits::is_iterator<FwdIter3>::value &&
-            traits::is_projected<Proj1, FwdIter1B>::value &&
-            traits::is_projected<Proj2, FwdIter2>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj1, FwdIter1B>,
-                    traits::projected<Proj2, FwdIter2>>::value)>
+            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1B>::value&&
+                hpx::traits::is_iterator<FwdIter2>::value&&
+                    hpx::traits::is_iterator<FwdIter3>::value&&
+                        traits::is_projected<Proj1, FwdIter1B>::value&&
+                            traits::is_projected<Proj2, FwdIter2>::value&&
+                                traits::is_indirect_callable<ExPolicy, F,
+                                    traits::projected<Proj1, FwdIter1B>,
+                                    traits::projected<Proj2, FwdIter2>>::value)>
     //clang-format on
     HPX_DEPRECATED(
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
