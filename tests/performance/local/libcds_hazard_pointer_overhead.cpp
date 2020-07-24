@@ -115,7 +115,7 @@ std::uint64_t num_iterations = 0;
 ///////////////////////////////////////////////////////////////////////////////
 struct libcds_thread_manager_wrapper
 {
-    libcds_thread_manager_wrapper(bool uselibcds)
+    explicit libcds_thread_manager_wrapper(bool uselibcds)
       : uselibcds_(uselibcds)
     {
         if (uselibcds_)
