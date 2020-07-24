@@ -309,14 +309,7 @@ int hpx_main(variables_map& vm)
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        // Hazard pointer count per thread
-        const std::size_t nHazardPtrCount = 1;
-        // Max count of simultaneous working thread in your application
-        const std::size_t nMaxThreadCount = count;
-        // Capacity of the array of retired objects for the thread
-        const std::size_t nMaxRetiredPtrCount = 1;
-        // Initialize Hazard Pointer singleton
-        cds::gc::HP hpGC(nHazardPtrCount, nMaxThreadCount, nMaxRetiredPtrCount);
+        cds::gc::HP hpGC;
 
         hpx::parallel::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
