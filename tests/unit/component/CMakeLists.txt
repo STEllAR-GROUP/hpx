@@ -20,6 +20,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       inheritance_3_classes_1_abstract
       inheritance_3_classes_2_abstract
       inheritance_2_classes_concrete_simple
+      inheritance_3_classes_2_concrete
       inheritance_3_classes_concrete
       local_new
       migrate_component
@@ -58,6 +59,8 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(inheritance_3_classes_2_abstract_FLAGS DEPENDENCIES iostreams_component)
 
   set(inheritance_3_classes_concrete_FLAGS DEPENDENCIES iostreams_component)
+
+  set(inheritance_3_classes_2_concrete_FLAGS DEPENDENCIES iostreams_component)
 
   set(migrate_component_to_storage_FLAGS DEPENDENCIES unordered_component
                                          component_storage_component
