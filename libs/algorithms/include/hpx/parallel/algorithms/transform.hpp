@@ -233,7 +233,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam FwdIter1B   The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter1E   The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the iterator representing the
@@ -264,7 +267,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a FwdIterB can be dereferenced and then
     ///                     implicitly converted to \a Type. The type \a Ret
     ///                     must be such that an object of type \a FwdIter2 can
     ///                     be dereferenced and assigned a value of type
@@ -285,27 +288,29 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// within each thread.
     ///
     /// \returns  The \a transform algorithm returns a
-    /// \a hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
+    /// \a hpx::future<tagged_pair<tag::in(FwdIter1B), tag::out(FwdIter2)> >
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    /// \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> otherwise.
+    /// \a tagged_pair<tag::in(FwdIter1B), tag::out(FwdIter2)> otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the input sequence and
     ///           the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    //clang-format off
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
         typename FwdIter2, typename F,
         typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1B>::value&&
-                    hpx::traits::is_iterator<FwdIter2>::value&&
-                        traits::is_projected<Proj, FwdIter1B>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected<Proj, FwdIter1B>>::value)>
-    //clang-format on
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1B>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            traits::is_projected<Proj, FwdIter1B>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj, FwdIter1B>>::value
+        )>
+    // clang-format on
     HPX_DEPRECATED(
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
         typename util::detail::algorithm_result<ExPolicy,
@@ -511,7 +516,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam FwdIter1    The type of the source iterators for the first
+    /// \tparam FwdIter1B   The type of the source iterators for the first
+    ///                     range used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter1E   The type of the source iterators for the first
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -553,7 +562,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types FwdIter1 and FwdIter2 can be
+    ///                     objects of types FwdIter1B and FwdIter2 can be
     ///                     dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively. The type \a Ret
     ///                     must be such that an object of type \a FwdIter3 can
@@ -579,10 +588,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// within each thread.
     ///
     /// \returns  The \a transform algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)> >
+    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2), tag::out(FwdIter3)> >
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    /// \a tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)>
+    /// \a tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2), tag::out(FwdIter3)>
     ///           otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the first input sequence,
@@ -591,29 +600,28 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    //clang-format off
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
         typename FwdIter2, typename FwdIter3, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<
-            ExPolicy>::value&& hpx::traits::is_iterator<FwdIter1B>::value&&
-                hpx::traits::is_iterator<FwdIter2>::value&&
-                    hpx::traits::is_iterator<FwdIter3>::value&&
-                        traits::is_projected<Proj1, FwdIter1B>::value&&
-                            traits::is_projected<Proj2, FwdIter2>::value&&
-                                traits::is_indirect_callable<ExPolicy, F,
-                                    traits::projected<Proj1, FwdIter1B>,
-                                    traits::projected<Proj2, FwdIter2>>::value)>
-    //clang-format on
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value && 
+            hpx::traits::is_iterator<FwdIter1B>::value &&
+            hpx::traits::is_iterator<FwdIter2>::value &&
+            hpx::traits::is_iterator<FwdIter3>::value &&
+            traits::is_projected<Proj1, FwdIter1B>::value &&
+            traits::is_projected<Proj2, FwdIter2>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj1, FwdIter1B>,
+                traits::projected<Proj2, FwdIter2>>::value
+        )>
+    // clang-format on
     HPX_DEPRECATED(
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
         typename util::detail::algorithm_result<ExPolicy,
             hpx::util::tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2),
-                tag::out(FwdIter3)>>::type
-        //clang-format off
-        transform(ExPolicy&& policy,
-            //clang-format on
+                tag::out(FwdIter3)>>::type transform(ExPolicy&& policy,
             FwdIter1B first1, FwdIter1E last1, FwdIter2 first2, FwdIter3 dest,
             F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
@@ -731,11 +739,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam FwdIter1    The type of the source iterators for the first
+    /// \tparam FwdIter1B   The type of the source iterators for the first
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the source iterators for the second
+    /// \tparam FwdIter1E   The type of the source iterators for the first
+    ///                     range used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2B   The type of the source iterators for the second
+    ///                     range used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2E   The type of the source iterators for the second
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -775,7 +791,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types FwdIter1 and FwdIter2 can be
+    ///                     objects of types FwdIter1B and FwdIter2B can be
     ///                     dereferenced and then implicitly converted to
     ///                     \a Type1 and \a Type2 respectively. The type \a Ret
     ///                     must be such that an object of type \a FwdIter3 can
@@ -804,10 +820,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///       the end of the shorter of the two given input sequences
     ///
     /// \returns  The \a transform algorithm returns a
-    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)> >
+    /// \a hpx::future<tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2B), tag::out(FwdIter3)> >
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    /// \a tagged_tuple<tag::in1(FwdIter1), tag::in2(FwdIter2), tag::out(FwdIter3)>
+    /// \a tagged_tuple<tag::in1(FwdIter1B), tag::in2(FwdIter2B), tag::out(FwdIter3)>
     ///           otherwise.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the first input sequence,
@@ -816,21 +832,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    //clang-format off
+    // clang-format off
     template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
         typename FwdIter2B, typename FwdIter2E, typename FwdIter3, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1B>::value&& hpx::traits::
-                    is_iterator<FwdIter2B>::value&& hpx::traits::is_iterator<
-                        FwdIter3>::value&& traits::is_projected<Proj1,
-                        FwdIter1B>::value&&
-                        traits::is_projected<Proj2, FwdIter2B>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected<Proj1, FwdIter1B>,
-                                traits::projected<Proj2, FwdIter2B>>::value)>
-    //clang-format on
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value &&
+            hpx::traits::is_iterator<FwdIter1B>::value && 
+            hpx::traits::is_iterator<FwdIter2B>::value && 
+            hpx::traits::is_iterator<FwdIter3>::value && 
+            traits::is_projected<Proj1, FwdIter1B>::value &&
+            traits::is_projected<Proj2, FwdIter2B>::value &&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected<Proj1, FwdIter1B>,
+                traits::projected<Proj2, FwdIter2B>>::value
+        )>
+    // clang-format on
     HPX_DEPRECATED(
         "hpx::parallel::transform is deprecated, use hpx::transform instead")
         typename util::detail::algorithm_result<ExPolicy,
