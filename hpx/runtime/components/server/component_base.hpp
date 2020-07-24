@@ -180,13 +180,6 @@ namespace hpx { namespace components
                 static_cast<Component const&>(*this).get_base_gid());
         }
 
-#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        naming::id_type get_gid() const
-        {
-            return get_id();
-        }
-#endif
     protected:
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
