@@ -12,8 +12,9 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(lcos_distributed_headers hpx/lcos_distributed/channel.hpp
-                             hpx/lcos_distributed/server/channel.hpp
+set(lcos_distributed_headers
+    hpx/distributed/channel.hpp hpx/lcos_distributed/channel.hpp
+    hpx/lcos_distributed/server/channel.hpp
 )
 
 set(lcos_distributed_compat_headers hpx/lcos/channel.hpp

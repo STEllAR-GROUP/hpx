@@ -105,7 +105,6 @@ set(partitioned_vector_spmd_foreach_FLAGS COMPONENT_DEPENDENCIES iostreams
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(shared_mutex_FLAGS COMPONENT_DEPENDENCIES iostreams)
-set(shared_mutex_LIBRARIES hpx_dependencies_boost)
 set(simple_future_continuation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(timed_futures_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(vector_counting_dotproduct_FLAGS COMPONENT_DEPENDENCIES iostreams)

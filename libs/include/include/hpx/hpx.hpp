@@ -7,6 +7,20 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/any.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/future.hpp>
+#include <hpx/memory.hpp>
+#include <hpx/numeric.hpp>
+#include <hpx/optional.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/task_block.hpp>
+#include <hpx/tuple.hpp>
+#include <hpx/type_traits.hpp>
+
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>

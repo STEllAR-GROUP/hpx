@@ -18,6 +18,7 @@ set(lcos_local_headers
     hpx/lcos_local/promise.hpp
     hpx/lcos_local/receive_buffer.hpp
     hpx/lcos_local/trigger.hpp
+    hpx/local/channel.hpp
 )
 
 # Default location is $HPX_ROOT/libs/lcos_local/include_compatibility

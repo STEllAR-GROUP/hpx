@@ -10,9 +10,13 @@ template <class... Args>
 void foo(Args&&... args)
 {
     auto a = (... + args);
+    (void) a;
     auto b = (args + ...);
+    (void) b;
     auto c = (1 + ... + args);
+    (void) c;
     auto d = (args + ... + 1);
+    (void) c;
 }
 
 int main()

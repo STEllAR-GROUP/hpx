@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/operators.hpp>
-
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,6 +29,25 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         {
             typedef entry<Value> type;
         };
+
+        template <typename Derived>
+        struct less_than_comparable
+        {
+            friend bool operator>(Derived const& lhs, Derived const& rhs)
+            {
+                return rhs < lhs;
+            }
+
+            friend bool operator<=(Derived const& lhs, Derived const& rhs)
+            {
+                return !(rhs < lhs);
+            }
+
+            friend bool operator>=(Derived const& lhs, Derived const& rhs)
+            {
+                return !(lhs < rhs);
+            }
+        };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -44,7 +61,7 @@ namespace hpx { namespace util { namespace cache { namespace entries {
     ///
     template <typename Value, typename Derived>
     class entry
-      : boost::less_than_comparable<
+      : detail::less_than_comparable<
             typename detail::derived<Value, Derived>::type>
     {
     public:
@@ -52,7 +69,7 @@ namespace hpx { namespace util { namespace cache { namespace entries {
 
     public:
         /// \brief Any cache entry has to be default constructible
-        entry() {}
+        entry() = default;
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
@@ -116,7 +133,7 @@ namespace hpx { namespace util { namespace cache { namespace entries {
             return 1;
         }
 
-        /// \brief    Forwarding operator< allowing to compare entries in stead
+        /// \brief    Forwarding operator< allowing to compare entries instead
         ///           of the values.
         friend bool operator<(entry const& lhs, entry const& rhs)
         {

@@ -276,15 +276,40 @@ namespace hpx { namespace threads { namespace policies {
             return thread_queue_init_.small_stacksize_;
         }
 
-        void set_user_polling_function(util::function_nonser<void()> const& f)
+        using polling_function_ptr = void (*)();
+
+        static void null_polling_function() {}
+
+        void set_mpi_polling_function(polling_function_ptr mpi_func)
         {
-            user_polling_function_ = f;
+            polling_function_mpi_.store(mpi_func, std::memory_order_relaxed);
         }
 
-        void user_polling_function()
+        void clear_mpi_polling_function()
         {
-            if (user_polling_function_)
-                user_polling_function_();
+            polling_function_mpi_.store(
+                &null_polling_function, std::memory_order_relaxed);
+        }
+
+        void set_cuda_polling_function(polling_function_ptr cuda_func)
+        {
+            polling_function_cuda_.store(cuda_func, std::memory_order_relaxed);
+        }
+
+        void clear_cuda_polling_function()
+        {
+            polling_function_cuda_.store(
+                &null_polling_function, std::memory_order_relaxed);
+        }
+
+        inline void custom_polling_function() const
+        {
+#if defined(HPX_HAVE_LIB_ASYNC_MPI)
+            (*polling_function_mpi_.load(std::memory_order_relaxed))();
+#endif
+#if defined(HPX_HAVE_LIB_ASYNC_CUDA)
+            (*polling_function_cuda_.load(std::memory_order_relaxed))();
+#endif
         }
 
     protected:
@@ -319,7 +344,8 @@ namespace hpx { namespace threads { namespace policies {
 
         std::atomic<std::int64_t> background_thread_count_;
 
-        util::function_nonser<void()> user_polling_function_;
+        std::atomic<polling_function_ptr> polling_function_mpi_;
+        std::atomic<polling_function_ptr> polling_function_cuda_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:

@@ -19,6 +19,7 @@ set(example_programs
     1d_stencil_6
     1d_stencil_7
     1d_stencil_8
+    1d_stencil_channel
 )
 
 if(HPX_WITH_APEX)

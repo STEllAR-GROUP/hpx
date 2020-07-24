@@ -26,7 +26,9 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
+#ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
+#endif
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>

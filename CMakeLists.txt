@@ -930,6 +930,17 @@ if(HPX_WITH_APEX)
     CATEGORY "Profiling"
   )
 endif()
+
+# LibCDS option
+hpx_option(HPX_WITH_LIBCDS BOOL "Enable LibCDS support." OFF)
+if(HPX_WITH_LIBCDS)
+  include(HPX_SetupLibCDS)
+  if(NOT libcds_POPULATED)
+    hpx_error("HPX_WITH_LIBCDS was set to ON, but HPX failed to fetch LibCDS")
+  endif()
+  hpx_add_config_define(HPX_HAVE_LIBCDS) # tell HPX that we use LibCDS
+endif()
+
 hpx_option(
   HPX_WITH_PAPI BOOL "Enable the PAPI based performance counter." OFF
   CATEGORY "Profiling"
@@ -938,6 +949,11 @@ if(HPX_WITH_PAPI)
   if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx_error(
       "HPX_WITH_PAPI was set to ON, but PAPI cannot currently be used with HPX_WITH_DISTRIBUTED_RUNTIME=OFF"
+    )
+  endif()
+  if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    hpx_error(
+      "HPX_WITH_PAPI was set to ON, but PAPI can only be used on Linux (this is ${CMAKE_SYSTEM_NAME})"
     )
   endif()
   hpx_add_config_define(HPX_HAVE_PAPI)
@@ -1142,7 +1158,7 @@ if(HPX_WITH_NETWORKING)
 
   # we have to decide here whether we want to have MPI futures
   hpx_option(
-    HPX_MPI_WITH_FUTURES
+    HPX_WITH_ASYNC_MPI
     BOOL
     "Enable support for returning futures from MPI asynchronous calls (default: ON if networking+MPI already enabled)"
     ${HPX_WITH_PARCELPORT_MPI}
@@ -1170,7 +1186,7 @@ else(HPX_WITH_NETWORKING)
   # if networking is off,  then allow the option of using our asynchronous MPI
   # features
   hpx_option(
-    HPX_MPI_WITH_FUTURES
+    HPX_WITH_ASYNC_MPI
     BOOL
     "Enable support for returning futures from MPI asynchronous calls (default: ON if networking+MPI already enabled)"
     OFF
@@ -1178,7 +1194,7 @@ else(HPX_WITH_NETWORKING)
   )
 endif(HPX_WITH_NETWORKING)
 
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_MPI_WITH_FUTURES)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
   # mpi parcelport settings
   hpx_option(
     HPX_WITH_PARCELPORT_MPI_ENV
@@ -2244,6 +2260,12 @@ else()
   set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}")
   set(HPX_BUILD_PREFIX "${PROJECT_BINARY_DIR}")
 endif()
+
+# Note: on windows systems the ':' will be converted to a ';' at runtime
+hpx_add_config_cond_define(
+  HPX_DEFAULT_COMPONENT_PATH_SUFFIXES
+  "\"/${CMAKE_INSTALL_BINDIR}/hpx:/lib/hpx:/bin/hpx\""
+)
 
 # ##############################################################################
 # search path configuration

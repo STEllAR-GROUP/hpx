@@ -20,7 +20,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/serialization.hpp>
 
 #include <cstdint>

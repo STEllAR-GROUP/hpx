@@ -24,7 +24,7 @@
 template <typename ExPolicy, typename T>
 T test_reduce(ExPolicy&& policy, hpx::partitioned_vector<T> const& xvalues)
 {
-    return hpx::parallel::reduce(
+    return hpx::reduce(
         policy, xvalues.begin(), xvalues.end(), T(1), std::plus<T>());
 }
 
@@ -32,7 +32,7 @@ template <typename ExPolicy, typename T>
 hpx::future<T> test_reduce_async(
     ExPolicy&& policy, hpx::partitioned_vector<T> const& xvalues)
 {
-    return hpx::parallel::reduce(
+    return hpx::reduce(
         policy, xvalues.begin(), xvalues.end(), T(1), std::plus<T>());
 }
 

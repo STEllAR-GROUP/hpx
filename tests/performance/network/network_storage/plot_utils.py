@@ -6,9 +6,7 @@
 
 import optparse
 import math
-import numpy
 import itertools
-from numpy import array
 import matplotlib
 
 #----------------------------------------------------------------------------
@@ -96,9 +94,8 @@ def plot_one_collection(graph_map, labelstrings, axes, axisfunction, minmax) :
     localmarkers = itertools.cycle(markers)
     localcolours = itertools.cycle(colours)
     series_keys = sorted(graph_map.keys())
-    num_series = len(series_keys)
-    for index in range(len(series_keys)):
-        key = series_keys[index]
+    for index, value in enumerate(series_keys):
+        key = value
         series = sorted(graph_map[key])
         #print "The series is ", series
         # we can just plot the series directly, but just in case we add support
@@ -174,7 +171,6 @@ def plot_configuration(graph_map, mapnames, axesnames, titlefunction, legendfunc
     # but we need one legend per param1 regardless
     # so num_param2legend is used in places to add space for the extra legend plot
     num_param2legend = num_param2+1
-    doLegend         = True
     numrows          = num_param1
     numcols          = num_param2legend
 
@@ -193,7 +189,6 @@ def plot_configuration(graph_map, mapnames, axesnames, titlefunction, legendfunc
     # create an array of graphs for our parameter space
     # grid cells are defined by {row, col} from top left and down
     print("Creating array of graphs rows %i, cols %i" % (numrows, numcols))
-    plot_index = 0
     row = 0
     col = 0
     graph_keys = sorted(graph_map.keys())

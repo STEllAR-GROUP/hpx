@@ -6,4 +6,9 @@
 
 #pragma once
 
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/distributed/runtime.hpp>
+#endif
+#include <hpx/local/runtime.hpp>

@@ -27,8 +27,6 @@
 #include <type_traits>
 #include <vector>
 
-#include <boost/integer.hpp>
-
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////

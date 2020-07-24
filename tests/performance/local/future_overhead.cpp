@@ -6,21 +6,24 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#endif
 #include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/execution_base/this_thread.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/thread_executors/limiting_executor.hpp>
@@ -44,18 +47,12 @@ using hpx::program_options::variables_map;
 using hpx::finalize;
 using hpx::init;
 
-using hpx::find_here;
-using hpx::naming::id_type;
-
 using hpx::apply;
 using hpx::async;
 using hpx::future;
 using hpx::lcos::wait_each;
 
 using hpx::util::high_resolution_timer;
-
-using hpx::cout;
-using hpx::flush;
 
 // global vars we stick here to make printouts easy for plotting
 static std::string queuing = "default";
@@ -131,8 +128,6 @@ double null_function() noexcept
     return 0.0;
 }
 
-HPX_PLAIN_ACTION(null_function, null_action)
-
 struct scratcher
 {
     void operator()(future<double> r) const
@@ -141,10 +136,13 @@ struct scratcher
     }
 };
 
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+HPX_PLAIN_ACTION(null_function, null_action)
+
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 {
-    const id_type here = find_here();
+    const hpx::naming::id_type here = hpx::find_here();
     std::vector<future<double>> futures;
     futures.reserve(count);
 
@@ -162,7 +160,7 @@ void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_all(std::uint64_t count, bool csv)
 {
-    const id_type here = find_here();
+    const hpx::naming::id_type here = hpx::find_here();
     std::vector<future<double>> futures;
     futures.reserve(count);
 
@@ -176,6 +174,7 @@ void measure_action_futures_wait_all(std::uint64_t count, bool csv)
     const double duration = walltime.elapsed();
     print_stats("action", "WaitAll", "no-executor", count, duration, csv);
 }
+#endif
 
 // Time async execution using wait each on futures vector
 template <typename Executor>
@@ -568,8 +567,10 @@ int hpx_main(variables_map& vm)
             if (test_all)
             {
                 measure_function_futures_limiting_executor(count, csv, tpe);
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                 measure_action_futures_wait_each(count, csv);
                 measure_action_futures_wait_all(count, csv);
+#endif
                 measure_function_futures_wait_each(count, csv, par);
                 measure_function_futures_wait_each(count, csv, tpe);
                 measure_function_futures_wait_all(count, csv, par);

@@ -199,8 +199,8 @@ HPX is has been funded by:
 .. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.598202.svg
      :target: https://doi.org/10.5281/zenodo.598202
 
-.. |codacy| image:: https://api.codacy.com/project/badge/Grade/fef52e7a84d04123921152e35fbb1594
-     :target: https://www.codacy.com/app/STEllAR-GROUP/hpx
+.. |codacy| image:: https://api.codacy.com/project/badge/Grade/0b8cd5a874914edaba67ce3bb711e688
+     :target: https://www.codacy.com/gh/STEllAR-GROUP/hpx
      :alt: HPX Code Quality Assessment
 
 .. |coveralls| image:: https://coveralls.io/repos/github/STEllAR-GROUP/hpx/badge.svg

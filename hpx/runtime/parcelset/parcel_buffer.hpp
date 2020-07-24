@@ -12,8 +12,8 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/serialization/serialization_chunk.hpp>
-#include <hpx/util/integer/endian.hpp>
 
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -23,9 +23,7 @@ namespace hpx { namespace parcelset
         typename ChunkType = serialization::serialization_chunk>
     struct parcel_buffer
     {
-        typedef std::pair<
-            util::integer::ulittle32_t, util::integer::ulittle32_t
-        > count_chunks_type;
+        typedef std::pair<std::uint32_t, std::uint32_t> count_chunks_type;
 
         typedef typename BufferType::allocator_type allocator_type;
 
@@ -97,17 +95,15 @@ namespace hpx { namespace parcelset
         BufferType data_;
         std::vector<ChunkType> chunks_;
 
-        typedef std::pair<
-            util::integer::ulittle64_t, util::integer::ulittle64_t
-        > transmission_chunk_type;
+        typedef std::pair<std::uint64_t, std::uint64_t> transmission_chunk_type;
         std::vector<transmission_chunk_type> transmission_chunks_;
 
         // pair of (zero-copy, non-zero-copy) chunks
         count_chunks_type num_chunks_;
 
-        util::integer::ulittle64_t size_;
-        util::integer::ulittle64_t data_size_;
-        util::integer::ulittle64_t header_size_;
+        std::uint64_t size_;
+        std::uint64_t data_size_;
+        std::uint64_t header_size_;
 
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;

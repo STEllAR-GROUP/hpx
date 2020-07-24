@@ -332,8 +332,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     hpx/util/functional/segmented_iterator_helpers.hpp
     hpx/util/generate_unique_ids.hpp
     hpx/util/init_logging.hpp
-    hpx/util/integer/cover_operators.hpp
-    hpx/util/integer/endian.hpp
     hpx/util/one_size_heap_list.hpp
     hpx/util/pool_timer.hpp
     hpx/util/query_counters.hpp

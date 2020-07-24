@@ -26,7 +26,6 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
-#include <hpx/util/integer/endian.hpp>
 
 #if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>

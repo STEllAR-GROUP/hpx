@@ -79,6 +79,13 @@ namespace hpx { namespace plugins { namespace parcel
                     (*it).second.min_boundary, (*it).second.max_boundary,
                     (*it).second.num_buckets, result);
             }
+
+            // silence warnings
+            (void) (*it).second.num_parcels;
+            (void) (*it).second.num_messages;
+            (void) (*it).second.num_parcels_per_message;
+            (void) (*it).second.average_time_between_parcels;
+            (void) (*it).second.time_between_parcels_histogram_creator;
         }
     }
 

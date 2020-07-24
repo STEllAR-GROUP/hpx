@@ -35,6 +35,10 @@ add_hpx_module(
   CMAKE_SUBDIRS examples tests
 )
 
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+  set(MPI_DEPS hpx_mpi_base)
+endif()
+
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   target_link_libraries(
     hpx_init_runtime
@@ -43,7 +47,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
            hpx_filesystem
            hpx_format
            hpx_logging
-           hpx_mpi_base
+           ${MPI_DEPS}
            hpx_performance_counters
            hpx_program_options
            hpx_schedulers

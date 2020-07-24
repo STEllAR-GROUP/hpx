@@ -179,13 +179,18 @@ build an executable using |cmake| and |hpx|:
    project(my_hpx_project CXX)
    find_package(HPX REQUIRED)
    add_executable(my_hpx_program main.cpp)
-   target_link_libraries(my_hpx_program HPX::hpx HPX::iostreams_component)
+   target_link_libraries(my_hpx_program HPX::hpx HPX::wrap_main HPX::iostreams_component)
 
 .. note::
 
    You will most likely have more than one ``main.cpp`` file in your project.
    See the section on :ref:`using_hpx_cmake` for more details on how to use
    ``add_hpx_executable``.
+
+.. note::
+
+   ``HPX::wrap_main`` is required if you are implicitly using ``main`` as the
+   runtime entry point. See :ref:`minimal` for more information.
 
 .. note::
 

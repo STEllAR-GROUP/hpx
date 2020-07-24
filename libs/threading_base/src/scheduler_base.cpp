@@ -45,6 +45,8 @@ namespace hpx { namespace threads { namespace policies {
       , thread_queue_init_(thread_queue_init)
       , parent_pool_(nullptr)
       , background_thread_count_(0)
+      , polling_function_mpi_(&null_polling_function)
+      , polling_function_cuda_(&null_polling_function)
     {
         set_scheduler_mode(mode);
 

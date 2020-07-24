@@ -27,6 +27,12 @@
 #include <string>
 #include <vector>
 
+#if defined(__linux__) && !defined(__ANDROID) && !defined(ANDROID)
+#include <sys/syscall.h>
+#else
+#error "The PAPI performance counter component can only be used on Linux"
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace papi_ns = hpx::performance_counters::papi;
 
@@ -62,8 +68,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             "could not create PAPI event set", locstr);
         papi_call(PAPI_assign_eventset_component(evset_, 0),
             "cannot assign component index to event set", locstr);
-        unsigned long tid = tm.get_thread_native_handle(tix);
-        if (tid == tm.invalid_tid)
+        pid_t tid = tm.get_linux_thread_id(tix);
+        if (tid == -1)
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 NS_STR "thread_counters::thread_counters()",
                 "unable to retrieve correct OS thread ID for profiling "
@@ -196,7 +202,10 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // create entry for the thread associated with the counter if it doesn't exist
         ttable_type::iterator it = thread_state_.find(tix);
         if (it == thread_state_.end())
+        {
+            hpx::util::ignore_all_while_checking i;
             return thread_state_[tix] = new thread_counters(tix);
+        }
         else
             return it->second;
     }

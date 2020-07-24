@@ -12,6 +12,7 @@
 #include <rdma/rdma_cma.h>
 #include <infiniband/verbs.h>
 //
+#include <exception>
 #include <iostream>
 #include <memory>
 
@@ -47,10 +48,9 @@ namespace verbs
 
         // Default constructor.
         verbs_shared_receive_queue(verbs_protection_domain_ptr domain)
+          : domain_(domain)
+          , sqr_(nullptr)
         {
-            srq_    = nullptr;
-            domain_ = domain;
-            //
             struct ibv_srq_init_attr srq_attr;
             memset(&srq_attr, 0, sizeof(ibv_srq_init_attr));
             // @todo : need to query max before setting sge
@@ -75,8 +75,11 @@ namespace verbs
         ~verbs_shared_receive_queue()
         {
             if (ibv_destroy_srq(srq_)) {
-                rdma_error e(errno, "ibv_destroy_srq() failed");
-                throw e;
+                // can't throw exception in destructor
+                // rdma_error e(errno, "ibv_destroy_srq() failed");
+                // throw e;
+                LOG_ERROR_MSG("ibv_destroy_srq() failed");
+                std::terminate();
             }
         }
 

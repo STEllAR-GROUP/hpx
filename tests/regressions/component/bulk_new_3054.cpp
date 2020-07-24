@@ -25,9 +25,11 @@ void test_bulk_new()
 
     std::vector<hpx::id_type> ids =
         hpx::new_<test_server[]>(hpx::default_layout(locs), 10, 42).get();
+    (void) ids;
 
     hpx::future<std::vector<hpx::id_type>> ids_f =
         hpx::new_<test_server[]>(hpx::default_layout(locs), 10, 42);
+    (void) ids_f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

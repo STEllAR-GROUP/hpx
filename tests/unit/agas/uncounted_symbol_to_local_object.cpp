@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
@@ -80,6 +80,7 @@ void hpx_test_main(
         {
             // Detach the reference.
             id_type id = monitor.detach().get();
+            (void) id;
 
             // The component should still be alive.
             HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));

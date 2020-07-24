@@ -10,9 +10,9 @@ export CRAYPE_LINK_TYPE=dynamic
 
 module load daint-mc
 module switch PrgEnv-cray PrgEnv-icc
-module load CMake
 module load Boost
 module load hwloc/.2.0.3
+spack load cmake
 spack load ninja
 
 export CXX=`which CC`

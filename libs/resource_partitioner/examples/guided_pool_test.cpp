@@ -7,12 +7,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 //
-#include <hpx/distributed/iostream.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/iostream.hpp>
 //
 #include <cmath>
 #include <cstddef>

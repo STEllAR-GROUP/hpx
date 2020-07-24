@@ -12,8 +12,6 @@
 #include <plugins/parcelport/readers_writers_mutex.hpp>
 #include <plugins/parcelport/libfabric/rdma_locks.hpp>
 //
-#include <boost/thread/locks.hpp>
-//
 #include <unordered_map>
 #include <utility>
 
@@ -40,8 +38,8 @@ namespace concurrent {
 
         typedef hpx::lcos::local::readers_writer_mutex  rw_mutex_type;
         typedef std::unique_lock<rw_mutex_type>         write_lock;
-        typedef boost::shared_lock<rw_mutex_type>       read_lock;
-        typedef boost::defer_lock_t                     defer_lock;
+        typedef std::shared_lock<rw_mutex_type>         read_lock;
+        typedef std::defer_lock_t                       defer_lock;
 
     private:
         typedef std::unordered_map<Key, Value, Hash, KeyEqual, Allocator> base_map;

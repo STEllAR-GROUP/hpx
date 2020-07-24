@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/async_distributed/applier/applier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -89,7 +89,9 @@ void hpx_test_main(
 
             // Detach the references.
             id_type id1 = monitor_remote.detach().get();
+            (void) id1;
             id_type id2 = monitor_local.detach().get();
+            (void) id2;
 
             // Both components should still be alive.
             HPX_TEST_EQ(false, monitor_remote.is_ready(milliseconds(delay)));

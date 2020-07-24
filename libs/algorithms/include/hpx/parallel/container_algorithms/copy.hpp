@@ -8,23 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
-#include <hpx/parallel/util/result_types.hpp>
-
-#include <cstddef>
-#include <type_traits>
-#include <utility>
-
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
@@ -363,6 +346,23 @@ namespace hpx { namespace ranges {
 }}    // namespace hpx::ranges
 
 #else    // DOXYGEN
+
+#include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
+
+#include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
+#include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/util/result_types.hpp>
+
+#include <cstddef>
+#include <type_traits>
+#include <utility>
 
 namespace hpx { namespace ranges {
 

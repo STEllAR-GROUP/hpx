@@ -14,9 +14,10 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/memory.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/naming/id_type_impl.hpp>
+#endif
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
@@ -243,23 +244,18 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     // -------------------------------------------------------------
     void register_polling(hpx::threads::thread_pool_base& pool)
     {
+        cud_debug.debug(debug::str<>("enable polling"));
         auto* sched = pool.get_scheduler();
-
-        cud_debug.debug(debug::str<>("Setting mode"), "enable_user_polling");
-
-        // always set polling function before enabling polling
-        sched->set_user_polling_function(
+        sched->set_cuda_polling_function(
             &hpx::cuda::experimental::detail::poll);
-        sched->add_remove_scheduler_mode(threads::policies::enable_user_polling,
-            threads::policies::do_background_work);
     }
 
     // -------------------------------------------------------------
     void unregister_polling(hpx::threads::thread_pool_base& pool)
     {
-        cud_debug.debug(debug::str<>("Setting mode"), "disable_user_polling");
+        cud_debug.debug(debug::str<>("disable polling"));
         auto* sched = pool.get_scheduler();
-        sched->remove_scheduler_mode(threads::policies::enable_user_polling);
+        sched->clear_cuda_polling_function();
     }
 
 }}}}    // namespace hpx::cuda::experimental::detail

@@ -9,6 +9,11 @@
 # Make undefined variables errors, print each command
 set -eux
 
+# Set name of branch if not building a pull request
+if [[ -z "${ghprbPullId:-}" ]]; then
+    export git_local_branch=$(echo ${GIT_BRANCH} | cut -f2 -d'/')
+fi
+
 # Clean up directory
 rm -f jenkins-hpx*
 
@@ -41,10 +46,7 @@ else
     github_commit_status="failure"
 fi
 
-set +e
-if [[ -n "${ghprbPullId}" ]]; then
-    set-e
-
+if [[ -n "${ghprbPullId:-}" ]]; then
     # Extract just the organization and repo names "org/repo" from the full URL
     github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
 
@@ -55,13 +57,14 @@ if [[ -n "${ghprbPullId}" ]]; then
     github_token=$(echo ${GITHUB_TOKEN} | cut -f2 -d':')
 
     # Set GitHub status with CDash url
-    .jenkins/cscs/set_github_status.sh \
+    .jenkins/common/set_github_status.sh \
         "${github_token}" \
         "${github_commit_repo}" \
         "${ghprbActualCommit}" \
         "${github_commit_status}" \
         "${configuration_name}" \
-        "${cdash_build_id}"
+        "${cdash_build_id}" \
+        "jenkins/cscs"
 fi
 
 set -e

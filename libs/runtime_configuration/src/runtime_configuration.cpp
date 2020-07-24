@@ -73,6 +73,21 @@ namespace hpx { namespace parcelset {
 }}    // namespace hpx::parcelset
 
 namespace hpx { namespace util {
+
+    namespace detail {
+
+        // CMake does not deal with explicit semicolons well, for this reason,
+        // the paths are delimited with ':'. On Windows those need to be
+        // converted to ';'.
+        std::string convert_delimiters(std::string paths)
+        {
+#if defined(HPX_WINDOWS)
+            std::replace(paths.begin(), paths.end(), ':', ';');
+#endif
+            return paths;
+        }
+    }    // namespace detail
+
     // pre-initialize entries with compile time based values
     void runtime_configuration::pre_initialize_ini()
     {
@@ -98,9 +113,9 @@ namespace hpx { namespace util {
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_paths = ${HPX_COMPONENT_PATHS}",
             "component_base_paths = $[hpx.location]"    // NOLINT
-            HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
-            "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER
-            "/bin/hpx",
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
+            "component_path_suffixes = " +
+                detail::convert_delimiters(HPX_DEFAULT_COMPONENT_PATH_SUFFIXES),
             "master_ini_path = $[hpx.location]" HPX_INI_PATH_DELIMITER
             "$[system.executable_prefix]/",
             "master_ini_path_suffixes = /share/" HPX_BASE_DIR_NAME

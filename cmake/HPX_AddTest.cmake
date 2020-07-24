@@ -6,7 +6,7 @@
 
 function(add_hpx_test category name)
   set(options FAILURE_EXPECTED RUN_SERIAL)
-  set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY)
+  set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY RUNWRAPPER)
   set(multi_value_args ARGS PARCELPORTS)
   cmake_parse_arguments(
     ${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
@@ -87,7 +87,20 @@ function(add_hpx_test category name)
   )
   # cmake-format: on
 
-  if(HPX_WITH_NETWORKING)
+  # if runwrapper is set we don't want to use HPX parcelports
+  if(${name}_RUNWRAPPER)
+    list(
+      APPEND
+      cmd
+      "-r"
+      "${${name}_RUNWRAPPER}"
+      "-l"
+      "${${name}_LOCALITIES}"
+      "-p"
+      "none"
+    )
+    set(${name}_LOCALITIES "1")
+  elseif(HPX_WITH_NETWORKING)
     list(APPEND cmd "-l" "${${name}_LOCALITIES}")
   else()
     set(${name}_LOCALITIES "1")

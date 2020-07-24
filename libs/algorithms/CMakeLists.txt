@@ -7,13 +7,10 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 set(algorithms_headers
-    hpx/algorithm.hpp
     hpx/algorithms/traits/is_value_proxy.hpp
     hpx/algorithms/traits/projected.hpp
     hpx/algorithms/traits/projected_range.hpp
     hpx/algorithms/traits/segmented_iterator_traits.hpp
-    hpx/numeric.hpp
-    hpx/memory.hpp
     hpx/parallel/algorithm.hpp
     hpx/parallel/algorithms/adjacent_difference.hpp
     hpx/parallel/algorithms/adjacent_find.hpp
@@ -91,6 +88,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/minmax.hpp
     hpx/parallel/container_algorithms/move.hpp
     hpx/parallel/container_algorithms/partition.hpp
+    hpx/parallel/container_algorithms/reduce.hpp
     hpx/parallel/container_algorithms/remove_copy.hpp
     hpx/parallel/container_algorithms/remove.hpp
     hpx/parallel/container_algorithms/replace.hpp
@@ -101,6 +99,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/unique.hpp
+    hpx/parallel/container_numeric.hpp
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/iterator_helpers.hpp
     hpx/parallel/datapar/loop.hpp
@@ -141,7 +140,6 @@ set(algorithms_headers
     hpx/parallel/util/transfer.hpp
     hpx/parallel/util/transform_loop.hpp
     hpx/parallel/util/zip_iterator.hpp
-    hpx/task_block.hpp
 )
 
 # cmake-format: off
@@ -177,6 +175,7 @@ add_hpx_module(
     hpx_executors
     hpx_format
     hpx_functional
+    hpx_futures
     hpx_iterator_support
     hpx_async_local
     hpx_pack_traversal

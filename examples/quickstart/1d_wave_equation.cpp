@@ -23,13 +23,11 @@
 // Include statements.
 #include <hpx/hpx_init.hpp>
 #include <hpx/chrono.hpp>
-#include <hpx/distributed/iostream.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/format.hpp>
-
-#include <boost/math/constants/constants.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -196,7 +194,7 @@ double wave(std::uint64_t t, std::uint64_t x)
 int hpx_main(variables_map& vm)
 {
     here = find_here();
-    pi = boost::math::constants::pi<double>();
+    pi = 3.141592653589793238462643383279;
 
     //    dt = vm["dt-value"].as<double>();
     //    dx = vm["dx-value"].as<double>();
