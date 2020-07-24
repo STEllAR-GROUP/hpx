@@ -119,12 +119,12 @@ struct libcds_thread_manager_wrapper
       : uselibcds_(uselibcds)
     {
         if (uselibcds_)
-            cds::threading::Manager::attachThread();
+            cds::gc::hp::smr::attach_thread();
     }
     ~libcds_thread_manager_wrapper()
     {
         if (uselibcds_)
-            cds::threading::Manager::detachThread();
+            cds::gc::hp::smr::detach_thread();
     }
 
     bool uselibcds_;
@@ -287,9 +287,6 @@ int hpx_main(variables_map& vm)
     libcds_wrapper wrapper;
 
     {
-        // Initialize Hazard Pointer singleton
-        cds::gc::HP hpGC;
-
         if (vm.count("hpx:queuing"))
             queuing = vm["hpx:queuing"].as<std::string>();
 
@@ -311,6 +308,15 @@ int hpx_main(variables_map& vm)
         bool csv = vm.count("csv") != 0;
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
+
+        // Hazard pointer count per thread
+        const std::size_t nHazardPtrCount = 1;
+        // Max count of simultaneous working thread in your application
+        const std::size_t nMaxThreadCount = count;
+        // Capacity of the array of retired objects for the thread
+        const std::size_t nMaxRetiredPtrCount = 1;
+        // Initialize Hazard Pointer singleton
+        cds::gc::HP hpGC(nHazardPtrCount, nMaxThreadCount, nMaxRetiredPtrCount);
 
         hpx::parallel::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
