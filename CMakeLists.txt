@@ -932,8 +932,20 @@ if(HPX_WITH_APEX)
 endif()
 
 # LibCDS option
-hpx_option(HPX_WITH_LIBCDS BOOL "Enable LibCDS support." OFF)
+hpx_option(
+  HPX_WITH_LIBCDS BOOL "Enable LibCDS support (experimental)." OFF
+  CATEGORY "Thread Manager" ADVANCED
+)
 if(HPX_WITH_LIBCDS)
+  hpx_option(
+    HPX_WITH_LIBCDS_GIT_REPOSITORY STRING
+    "Define the LibCDS git repository to use."
+    https://github.com/STEllAR-GROUP/libcds CATEGORY "Thread Manager" ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_LIBCDS_GIT_TAG STRING "Define the LibCDS git tag to use."
+    hpx-thread CATEGORY "Thread Manager" ADVANCED
+  )
   include(HPX_SetupLibCDS)
   if(NOT libcds_POPULATED)
     hpx_error("HPX_WITH_LIBCDS was set to ON, but HPX failed to fetch LibCDS")
