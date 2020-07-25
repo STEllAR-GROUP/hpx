@@ -52,7 +52,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             Result invoke(Executor&& exec, hpx::util::index_pack<Is...>)
             {
                 return hpx::parallel::execution::async_execute(
-                    exec, f_, std::get<Is>(t_)...);
+                    std::forward<Executor>(exec), f_, std::get<Is>(t_)...);
             }
 
             template <typename Executor>
@@ -68,7 +68,9 @@ namespace hpx { namespace resiliency { namespace experimental {
                 // necessary
                 auto this_ = this->shared_from_this();
                 return f.then(hpx::launch::sync,
-                    [this_ = std::move(this_), &exec, n](Result&& f) {
+                    [this_ = std::move(this_),
+                        exec = std::forward<Executor>(exec),
+                        n](Result&& f) mutable {
                         if (f.has_exception())
                         {
                             // rethrow abort_replay_exception, if caught
@@ -78,7 +80,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             // this was not the last attempt
                             if (n != 0)
                             {
-                                return this_->call(exec, n - 1);
+                                return this_->call(std::move(exec), n - 1);
                             }
 
                             // rethrow exception if the number of replays has
@@ -94,7 +96,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             // this was not the last attempt
                             if (n != 0)
                             {
-                                return this_->call(exec, n - 1);
+                                return this_->call(std::move(exec), n - 1);
                             }
 
                             // throw aborting exception as attempts were
