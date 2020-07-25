@@ -21,8 +21,9 @@ namespace hpx { namespace resiliency { namespace experimental {
     {
         // force unwrapping of the inner future on return
         template <typename... Args>
-        friend HPX_FORCEINLINE auto tag_invoke(Tag, Args&&... args)
-            -> hpx::functional::tag_invoke_result_t<BaseTag, Args&&...>
+        friend HPX_FORCEINLINE auto tag_invoke(Tag, Args&&... args) ->
+            typename hpx::functional::tag_invoke_result<BaseTag,
+                Args&&...>::type
         {
             return hpx::dataflow(BaseTag{}, std::forward<Args>(args)...);
         }

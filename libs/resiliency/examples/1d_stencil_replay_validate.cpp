@@ -181,13 +181,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::vector<subdomain_future> next_input(subdomains);
             for (int j = 0; j < subdomains; ++j)
             {
-                // explicitly unwrap future returned by dataflow
-                hpx::future<chk_vector> f =
+                next_input[j] =
                     hpx::resiliency::experimental::dataflow_replay_validate(n,
                         &validate_result, update,
                         input[(j - 1 + subdomains) % subdomains], input[j],
                         input[(j + 1) % subdomains]);
-                next_input[j] = std::move(f);
             }
             std::swap(input, next_input);
         }
