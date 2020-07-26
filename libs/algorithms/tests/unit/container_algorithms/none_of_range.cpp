@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //                2017 Bruno Pitrus
 
 //  SPDX-License-Identifier: BSL-1.0
@@ -36,7 +36,7 @@ void test_none_of(ExPolicy policy, IteratorTag, Proj proj = Proj())
     {
         std::vector<std::size_t> c = test::fill_all_any_none(3, i);    //-V106
 
-        bool result = hpx::parallel::none_of(
+        bool result = hpx::ranges::none_of(
             policy, c, [](std::size_t v) { return v != 0; }, proj);
 
         // verify values
@@ -60,7 +60,7 @@ void test_none_of_async(ExPolicy p, IteratorTag, Proj proj = Proj())
         std::vector<std::size_t> c =
             test::fill_all_any_none(10007, i);    //-V106
 
-        hpx::future<bool> f = hpx::parallel::none_of(
+        hpx::future<bool> f = hpx::ranges::none_of(
             p, c, [](std::size_t v) { return v != 0; }, proj);
         f.wait();
 
@@ -151,7 +151,7 @@ void test_none_of_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::none_of(policy, c, [](std::size_t v) {
+            hpx::ranges::none_of(policy, c, [](std::size_t v) {
                 return throw std::runtime_error("test"), v != 0;
             });
 
@@ -187,10 +187,9 @@ void test_none_of_exception_async(ExPolicy p, IteratorTag)
         bool returned_from_algorithm = false;
         try
         {
-            hpx::future<void> f =
-                hpx::parallel::none_of(p, c, [](std::size_t v) {
-                    return throw std::runtime_error("test"), v != 0;
-                });
+            hpx::future<void> f = hpx::ranges::none_of(p, c, [](std::size_t v) {
+                return throw std::runtime_error("test"), v != 0;
+            });
             returned_from_algorithm = true;
             f.get();
 
@@ -254,7 +253,7 @@ void test_none_of_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::none_of(policy, c,
+            hpx::ranges::none_of(policy, c,
                 [](std::size_t v) { return throw std::bad_alloc(), v != 0; });
 
             HPX_TEST(false);
@@ -288,7 +287,7 @@ void test_none_of_bad_alloc_async(ExPolicy p, IteratorTag)
         bool returned_from_algorithm = false;
         try
         {
-            hpx::future<void> f = hpx::parallel::none_of(p, c,
+            hpx::future<void> f = hpx::ranges::none_of(p, c,
                 [](std::size_t v) { return throw std::bad_alloc(), v != 0; });
             returned_from_algorithm = true;
             f.get();
