@@ -72,11 +72,11 @@ void fill_algo_tests_with_policy(
     iota_vector(c, T(1234));
 
     const T v(42);
-    hpx::parallel::fill(fill_policy, c.begin(), c.end(), v);
+    hpx::fill(fill_policy, c.begin(), c.end(), v);
     verify_vector(c, v);
 
     const T v1(43);
-    hpx::parallel::fill(fill_policy, c.begin() + 1, c.end() - 1, v1);
+    hpx::fill(fill_policy, c.begin() + 1, c.end() - 1, v1);
     verify_values(c.begin() + 1, c.end() - 1, v1);
     verify_values(c.begin(), c.begin() + 1, v1, false);
     verify_values(c.end() - 1, c.end(), v1, false);
@@ -90,15 +90,14 @@ void fill_algo_tests_with_policy_async(
     iota_vector(c, T(1234));
 
     const T v(42);
-    hpx::future<void> f =
-        hpx::parallel::fill(fill_policy, c.begin(), c.end(), v);
+    hpx::future<void> f = hpx::fill(fill_policy, c.begin(), c.end(), v);
     f.wait();
 
     verify_vector(c, v);
 
     const T v1(43);
     hpx::future<void> f1 =
-        hpx::parallel::fill(fill_policy, c.begin() + 1, c.end() - 1, v1);
+        hpx::fill(fill_policy, c.begin() + 1, c.end() - 1, v1);
     f1.wait();
 
     verify_values(c.begin() + 1, c.end() - 1, v1);
