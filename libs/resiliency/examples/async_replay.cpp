@@ -12,8 +12,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/future.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 
 #include <atomic>
 #include <iostream>
@@ -36,7 +36,7 @@ bool validate(int result)
 
 int no_answer()
 {
-    throw hpx::resiliency::abort_replay_exception();
+    throw hpx::resiliency::experimental::abort_replay_exception();
 }
 
 int deep_thought()
@@ -60,18 +60,19 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::high_resolution_timer t;
 
         // successful replay
-        hpx::future<int> f = hpx::resiliency::async_replay(sr, &deep_thought);
+        hpx::future<int> f =
+            hpx::resiliency::experimental::async_replay(sr, &deep_thought);
 
         std::cout << "universal answer: " << f.get() << "\n";
 
         // successful replay validate
-        f = hpx::resiliency::async_replay_validate(
+        f = hpx::resiliency::experimental::async_replay_validate(
             sr, &validate, &universal_answer);
 
         std::cout << "universal answer: " << f.get() << "\n";
 
         // unsuccessful replay
-        f = hpx::resiliency::async_replay(usr, &deep_thought);
+        f = hpx::resiliency::experimental::async_replay(usr, &deep_thought);
         try
         {
             f.get();
@@ -82,35 +83,36 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
 
         // unsuccessful replay validate
-        f = hpx::resiliency::async_replay_validate(
+        f = hpx::resiliency::experimental::async_replay_validate(
             usr, &validate, &universal_answer);
         try
         {
             f.get();
         }
-        catch (hpx::resiliency::abort_replay_exception const&)
+        catch (hpx::resiliency::experimental::abort_replay_exception const&)
         {
             std::cout << "no universal answer!\n";
         }
 
         // aborted replay
-        f = hpx::resiliency::async_replay(a, &no_answer);
+        f = hpx::resiliency::experimental::async_replay(a, &no_answer);
         try
         {
             f.get();
         }
-        catch (hpx::resiliency::abort_replay_exception const&)
+        catch (hpx::resiliency::experimental::abort_replay_exception const&)
         {
             std::cout << "aborted universal answer calculation!\n";
         }
 
         // aborted replay validate
-        f = hpx::resiliency::async_replay_validate(a, &validate, &no_answer);
+        f = hpx::resiliency::experimental::async_replay_validate(
+            a, &validate, &no_answer);
         try
         {
             f.get();
         }
-        catch (hpx::resiliency::abort_replay_exception const&)
+        catch (hpx::resiliency::experimental::abort_replay_exception const&)
         {
             std::cout << "aborted universal answer calculation!\n";
         }

@@ -10,7 +10,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/resiliency/resiliency.hpp>
+#include <hpx/modules/resiliency.hpp>
 
 #include <atomic>
 #include <iostream>
@@ -57,8 +57,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         // Successful replicate
-        hpx::future<int> f =
-            hpx::resiliency::dataflow_replicate(sr, moody_add, 5, 5);
+        hpx::future<int> f = hpx::resiliency::experimental::dataflow_replicate(
+            sr, moody_add, 5, 5);
         try
         {
             std::cout << f.get() << std::endl;
@@ -73,7 +73,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
 
         // Unsuccessful replicate
-        f = hpx::resiliency::dataflow_replay(usr, moody_add, 0, 5);
+        f = hpx::resiliency::experimental::dataflow_replay(
+            usr, moody_add, 0, 5);
         try
         {
             std::cout << f.get() << std::endl;
@@ -88,7 +89,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
 
         // Aborted replicate
-        f = hpx::resiliency::dataflow_replay(a, bad_add, 10, 5);
+        f = hpx::resiliency::experimental::dataflow_replay(a, bad_add, 10, 5);
         try
         {
             std::cout << f.get() << std::endl;

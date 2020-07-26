@@ -9,12 +9,18 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/execution/traits/is_executor.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detected.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+
+namespace hpx { namespace lcos {
+    template <typename R>
+    class future;
+}}    // namespace hpx::lcos
 
 namespace hpx { namespace parallel { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
@@ -174,6 +180,65 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::util::detected_or_t<parallel::execution::static_chunk_size,
                 parameters_type, Executor>;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+        template <typename Executor, typename T, typename Ts,
+            typename Enable = void>
+        struct executor_future;
+
+        template <typename Executor, typename T, typename Enable = void>
+        struct exposes_future_type : std::false_type
+        {
+        };
+
+        template <typename Executor, typename T>
+        struct exposes_future_type<Executor, T,
+            typename hpx::util::always_void<
+                typename Executor::template future_type<T>>::type>
+          : std::true_type
+        {
+        };
+
+        template <typename Executor, typename T, typename... Ts>
+        struct executor_future<Executor, T, hpx::util::pack<Ts...>,
+            typename std::enable_if<
+                hpx::traits::is_two_way_executor<Executor>::value &&
+                exposes_future_type<Executor, T>::value>::type>
+        {
+            using type = typename Executor::template future_type<T>;
+        };
+
+        template <typename Executor, typename T, typename... Ts>
+        struct executor_future<Executor, T, hpx::util::pack<Ts...>,
+            typename std::enable_if<
+                hpx::traits::is_two_way_executor<Executor>::value &&
+                !exposes_future_type<Executor, T>::value>::type>
+        {
+            using type = decltype(std::declval<Executor&&>().async_execute(
+                std::declval<T (*)(Ts...)>(), std::declval<Ts>()...));
+        };
+
+        template <typename Executor, typename T, typename Ts>
+        struct executor_future<Executor, T, Ts,
+            typename std::enable_if<
+                !hpx::traits::is_two_way_executor<Executor>::value>::type>
+        {
+            using type = hpx::lcos::future<T>;
+        };
+    }    // namespace detail
+
+    template <typename Executor, typename T, typename... Ts>
+    struct executor_future
+      : detail::executor_future<typename std::decay<Executor>::type, T,
+            hpx::util::pack<typename std::decay<Ts>::type...>>
+    {
+    };
+
+    template <typename Executor, typename T, typename... Ts>
+    using executor_future_t =
+        typename executor_future<Executor, T, Ts...>::type;
+
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace traits {
@@ -265,6 +330,18 @@ namespace hpx { namespace traits {
 
     template <typename Executor>
     using executor_index_t = typename executor_index<Executor>::type;
+
+    template <typename Executor, typename T, typename... Ts>
+    struct executor_future
+      : parallel::execution::executor_future<
+            typename std::decay<Executor>::type, T,
+            typename std::decay<Ts>::type...>
+    {
+    };
+
+    template <typename Executor, typename T, typename... Ts>
+    using executor_future_t =
+        typename executor_future<Executor, T, Ts...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     // extension

@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2019 Hartmut Kaiser
+//  Copyright (c) 2018-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +8,4 @@
 
 #pragma once
 
-#include <hpx/resiliency/config.hpp>
-#include <hpx/resiliency/async_replay.hpp>
-#include <hpx/resiliency/async_replicate.hpp>
-#include <hpx/resiliency/dataflow_replay.hpp>
-#include <hpx/resiliency/dataflow_replicate.hpp>
-#include <hpx/resiliency/version.hpp>
+#include <hpx/modules/resiliency.hpp>

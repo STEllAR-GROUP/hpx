@@ -7,13 +7,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/resiliency/resiliency.hpp>
+#include <hpx/modules/resiliency.hpp>
 
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
     std::cout << "HPX Resiliency module version: "
-              << hpx::resiliency::full_version_str() << "\n";
+              << hpx::resiliency::experimental::full_version_str() << "\n";
     return 0;
 }
