@@ -12,7 +12,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting HPX V1.5
-#if HPX_VERSION_FULL >= 010500 && defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_5)
+#if (HPX_VERSION_FULL >= 010500) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_5 != 0)
 #define HPX_DEPRECATED_MSG_V1_5                                                \
     "This functionality is deprecated starting HPX V1.5 and will be removed "  \
     "in the future. Disable this warning by adding this to your cmake "        \
@@ -27,7 +27,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting HPX V1.6
-#if HPX_VERSION_FULL >= 010600 && defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_6)
+#if (HPX_VERSION_FULL >= 010600) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_6 != 0)
 #define HPX_DEPRECATED_MSG_V1_6                                                \
     "This functionality is deprecated starting HPX V1.6 and will be removed "  \
     "in the future. Disable this warning by adding this to your cmake "        \
