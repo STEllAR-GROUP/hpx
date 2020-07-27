@@ -944,7 +944,7 @@ if(HPX_WITH_LIBCDS)
   )
   hpx_option(
     HPX_WITH_LIBCDS_GIT_TAG STRING "Define the LibCDS git tag to use."
-    hpx-thread CATEGORY "Thread Manager" ADVANCED
+    hpx-1.5 CATEGORY "Thread Manager" ADVANCED
   )
   include(HPX_SetupLibCDS)
   if(NOT libcds_POPULATED)
