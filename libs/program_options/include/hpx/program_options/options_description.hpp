@@ -41,13 +41,13 @@ namespace hpx { namespace program_options {
         {
         }
 
-        HPX_DEPRECATED(PROGRAM_OPTIONS_DEPRECATED_MESSAGE)
+        HPX_DEPRECATED_V(1, 4, PROGRAM_OPTIONS_DEPRECATED_MESSAGE)
         options_description(base_type const& rhs)
           : base_type(rhs)
         {
         }
 
-        HPX_DEPRECATED(PROGRAM_OPTIONS_DEPRECATED_MESSAGE)
+        HPX_DEPRECATED_V(1, 4, PROGRAM_OPTIONS_DEPRECATED_MESSAGE)
         options_description(base_type&& rhs) noexcept
           : base_type(std::move(rhs))
         {

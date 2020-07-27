@@ -9,7 +9,27 @@
 #include <hpx/config/attributes.hpp>
 #include <hpx/config/defines.hpp>
 #include <hpx/config/version.hpp>
-#include <hpx/modules/preprocessor.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Deprecate a given functionality starting HPX V1.4
+#if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_4)
+#define HPX_HAVE_DEPRECATION_WARNINGS_V1_4 1
+#endif
+
+#if (HPX_VERSION_FULL >= 010400) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_4 != 0)
+#define HPX_DEPRECATED_MSG_V1_4                                                \
+    "This functionality is deprecated starting HPX V1.4 and will be removed "  \
+    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_4=0 to "   \
+    "acknowledge that you have received this warning."
+#define HPX_DEPRECATED_V1_4(x)                                                 \
+    HPX_DEPRECATED(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_4) ")")
+#endif
+
+#if !defined(HPX_DEPRECATED_V1_4)
+#define HPX_DEPRECATED_V1_4(x)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting HPX V1.5

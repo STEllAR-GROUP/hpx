@@ -23,8 +23,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits { namespace detail {
     template <typename T>
-    struct HPX_DEPRECATED(HPX_DEPRECATED_MSG
-        " Use is_deferred_invocable instead.") is_deferred_callable;
+    struct HPX_DEPRECATED_V(1, 5,
+        "is_deferred_callable is deprecated, use is_deferred_invocable "
+        "instead.") is_deferred_callable;
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic push
@@ -53,8 +54,9 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename T>
-        struct HPX_DEPRECATED(HPX_DEPRECATED_MSG
-            " Use invoke_deferred_result instead.") deferred_result_of;
+        struct HPX_DEPRECATED_V(1, 5,
+            "deferred_result_of is deprecated, use invoke_deferred_result "
+            "instead.") deferred_result_of;
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic push
