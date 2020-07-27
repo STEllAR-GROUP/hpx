@@ -27,7 +27,7 @@ sbatch \
     --job-name="jenkins-hpx-${configuration_name_with_build_type}" \
     --nodes="${configuration_slurm_num_nodes}" \
     --partition="${configuration_slurm_partition}" \
-    --time="01:30:00" \
+    --time="03:00:00" \
     --output="jenkins-hpx-${configuration_name_with_build_type}.out" \
     --error="jenkins-hpx-${configuration_name_with_build_type}.err" \
     --wait .jenkins/lsu/batch.sh
