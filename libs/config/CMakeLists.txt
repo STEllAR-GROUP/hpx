@@ -20,6 +20,7 @@ set(config_headers
     hpx/config/compiler_specific.hpp
     hpx/config/constexpr.hpp
     hpx/config/debug.hpp
+    hpx/config/deprecation.hpp
     hpx/config/emulate_deleted.hpp
     hpx/config/export_definitions.hpp
     hpx/config/forceinline.hpp
