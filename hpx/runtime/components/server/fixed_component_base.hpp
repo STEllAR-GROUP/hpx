@@ -142,14 +142,6 @@ public:
             naming::id_type::unmanaged);
     }
 
-#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-    HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-    naming::id_type get_gid() const
-    {
-        return get_unmanaged_id();
-    }
-#endif
-
     void set_locality_id(std::uint32_t locality_id, error_code& ec = throws)
     {
         if (gid_) {

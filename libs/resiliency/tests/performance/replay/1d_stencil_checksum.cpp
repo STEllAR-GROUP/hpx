@@ -21,8 +21,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
@@ -237,7 +237,7 @@ struct stepper
         std::uint64_t nd, std::uint64_t n_value, double error,
         hpx::lcos::local::sliding_semaphore& sem)
     {
-        using hpx::resiliency::dataflow_replay_validate;
+        using hpx::resiliency::experimental::dataflow_replay_validate;
         using hpx::util::unwrapping;
 
         // U[t][i] is the state of position i at time t.
@@ -264,9 +264,12 @@ struct stepper
 
             for (std::size_t i = 0; i != subdomains; ++i)
             {
-                next[i] = dataflow_replay_validate(n_value, validate_result, Op,
-                    sti, error, current[(i - 1 + subdomains) % subdomains],
-                    current[i], current[(i + 1) % subdomains]);
+                // explicitly unwrap future
+                hpx::future<partition_data> f =
+                    dataflow_replay_validate(n_value, validate_result, Op, sti,
+                        error, current[(i - 1 + subdomains) % subdomains],
+                        current[i], current[(i + 1) % subdomains]);
+                next[i] = std::move(f);
             }
 
             // every nd time steps, attach additional continuation which will

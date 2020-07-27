@@ -17,6 +17,7 @@
 
 if(HPX_WITH_LIBCDS AND NOT TARGET LibCDS::cds)
   include(FetchContent)
+  include(HPX_Message)
 
   set(LIBCDS_WITH_HPX
       ON
@@ -27,11 +28,14 @@ if(HPX_WITH_LIBCDS AND NOT TARGET LibCDS::cds)
       CACHE INTERNAL ""
   )
 
+  hpx_info(
+    "Fetching libCDS from repository: ${HPX_WITH_LIBCDS_GIT_REPOSITORY}, "
+    "tag: ${HPX_WITH_LIBCDS_GIT_TAG}"
+  )
   fetchcontent_declare(
     libcds
-    # GIT_REPOSITORY https://github.com/khizmax/libcds
-    GIT_REPOSITORY https://github.com/weilewei/libcds
-    GIT_TAG hpx-thread
+    GIT_REPOSITORY ${HPX_WITH_LIBCDS_GIT_REPOSITORY}
+    GIT_TAG ${HPX_WITH_LIBCDS_GIT_TAG}
     GIT_SHALLOW TRUE
   )
   fetchcontent_getproperties(libcds)
@@ -40,6 +44,9 @@ if(HPX_WITH_LIBCDS AND NOT TARGET LibCDS::cds)
     fetchcontent_populate(libcds)
     set(LIBCDS_CXX_STANDARD ${HPX_CXX_STANDARD})
     add_subdirectory(${libcds_SOURCE_DIR} ${libcds_BINARY_DIR})
+
+    set_target_properties(cds PROPERTIES FOLDER "Core")
+    set_target_properties(cds-s PROPERTIES FOLDER "Core")
   endif()
 
 endif()

@@ -805,7 +805,7 @@ system and application performance.
        where:
 
        ``<agas_service_category>`` is one of the following: ``primary``,
-           ``locality``, ``component`` or ``symbol``
+       ``locality``, ``component`` or ``symbol``
 
      * ``<agas_instance>/total``
 
@@ -868,7 +868,7 @@ system and application performance.
        where:
 
        ``<agas_service_category>`` is one of the following: ``primary``,
-       ``locality``, ``component`` or ``symbol``.
+       ``locality``, ``component`` or ``symbol``
      * ``<agas_instance>/total``
 
        where:
@@ -901,7 +901,7 @@ system and application performance.
        where:
 
        ``<cache_statistics>`` is one of the following: ``cache/evictions``,
-       ``cache/hits``, ``cache/inserts``, ``cache/misses``
+       ``cache/hits``, ``cache/insertions``, ``cache/misses``
      * ``locality#*/total``
 
        where:
@@ -1143,7 +1143,7 @@ system and application performance.
        where:
 
        ``<cache_statistics>`` is one of the following: ``cache/insertions``,
-       ``cache/evictions``, ``cache/hits``, ``cache/misses`` ``cache/misses``
+       ``cache/evictions``, ``cache/hits``, ``cache/misses``
 
        `<connection_type`` is one of the following: ``tcp``, ``mpi``
      * ``locality#*/total``

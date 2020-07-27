@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/future.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -47,7 +47,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::high_resolution_timer t;
 
         hpx::future<int> f =
-            hpx::resiliency::async_replicate_vote(n, &vote, &universal_ans);
+            hpx::resiliency::experimental::async_replicate_vote(
+                n, &vote, &universal_ans);
 
         std::cout << "Universal ans (maybe true): " << f.get() << std::endl;
 
@@ -59,8 +60,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
         // Initialize a high resolution timer
         hpx::util::high_resolution_timer t;
 
-        hpx::future<int> f = hpx::resiliency::async_replicate_vote_validate(
-            n, &vote, &validate, &universal_ans);
+        hpx::future<int> f =
+            hpx::resiliency::experimental::async_replicate_vote_validate(
+                n, &vote, &validate, &universal_ans);
 
         std::cout << "Universal ans (true ans): " << f.get() << std::endl;
 

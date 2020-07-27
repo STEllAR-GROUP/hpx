@@ -21,8 +21,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 #include <boost/range/irange.hpp>
 
 #include <cstddef>
@@ -239,7 +239,7 @@ struct stepper
         std::uint64_t n_value, double error,
         hpx::lcos::local::sliding_semaphore& sem)
     {
-        using hpx::resiliency::dataflow_replay;
+        using hpx::resiliency::experimental::dataflow_replay;
         using hpx::util::unwrapping;
 
         // U[t][i] is the state of position i at time t.

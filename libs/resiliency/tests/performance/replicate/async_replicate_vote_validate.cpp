@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/future.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -95,8 +95,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         for (int i = 0; i < num_iterations; ++i)
         {
-            hpx::future<int> f = hpx::resiliency::async_replicate_vote(
-                n, &vote, &universal_ans, delay * 1000, error);
+            hpx::future<int> f =
+                hpx::resiliency::experimental::async_replicate_vote(
+                    n, &vote, &universal_ans, delay * 1000, error);
             vect.push_back(std::move(f));
         }
 

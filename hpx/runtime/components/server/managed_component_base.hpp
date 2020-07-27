@@ -253,14 +253,6 @@ namespace hpx { namespace components
         naming::id_type get_unmanaged_id() const;
         naming::id_type get_id() const;
 
-#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        naming::id_type get_gid() const
-        {
-            return get_unmanaged_id();
-        }
-#endif
-
     protected:
         naming::gid_type get_base_gid() const;
 
@@ -452,14 +444,6 @@ namespace hpx { namespace components
         {
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
         }
-
-#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        naming::id_type get_gid() const
-        {
-            return get_unmanaged_id();
-        }
-#endif
 
     private:
 #if !defined(__NVCC__) && !defined(__CUDACC__)

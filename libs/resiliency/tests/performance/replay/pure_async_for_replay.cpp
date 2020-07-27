@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/future.hpp>
+#include <hpx/modules/resiliency.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/resiliency/resiliency.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -105,7 +105,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             std::cout << "Exceptions thrown" << std::endl;
         }
-        catch (hpx::resiliency::abort_replay_exception const&)
+        catch (hpx::resiliency::experimental::abort_replay_exception const&)
         {
             std::cout << "Exceptions thrown" << std::endl;
         }

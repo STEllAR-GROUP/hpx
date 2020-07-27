@@ -270,14 +270,6 @@ namespace lcos {
                 return get_id(false, ec);
             }
 
-#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-            HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-            naming::id_type get_gid(error_code& ec = throws) const
-            {
-                return get_id(false, ec);
-            }
-#endif
-
             naming::address resolve(error_code& ec = throws) const
             {
                 if (!addr_ || !id_)

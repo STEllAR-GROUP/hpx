@@ -10,6 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -309,12 +310,26 @@ namespace hpx { namespace parallel { namespace execution {
 
         ///////////////////////////////////////////////////////////////////////
         // bulk_async_execute customization point
+        template <typename Incrementable>
+        using counting_shape_type = hpx::util::iterator_range<
+            hpx::util::counting_iterator<Incrementable>>;
+
+        template <typename Incrementable>
+        counting_shape_type<Incrementable> make_counting_shape(Incrementable n)
+        {
+            return hpx::util::make_iterator_range(
+                hpx::util::make_counting_iterator(Incrementable(0)),
+                hpx::util::make_counting_iterator(n));
+        }
+
         template <>
         struct customization_point<bulk_async_execute_tag>
         {
         public:
             template <typename Executor, typename F, typename Shape,
-                typename... Ts>
+                typename... Ts,
+                typename Enable = typename std::enable_if<
+                    !std::is_integral<Shape>::value>::type>
             HPX_FORCEINLINE auto operator()(
                 Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
                 -> decltype(bulk_async_execute(std::forward<Executor>(exec),
@@ -322,6 +337,22 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 return bulk_async_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+            }
+
+            template <typename Executor, typename F, typename Shape,
+                typename... Ts,
+                typename Enable = typename std::enable_if<
+                    std::is_integral<Shape>::value>::type>
+            HPX_FORCEINLINE auto operator()(
+                Executor&& exec, F&& f, Shape const& n, Ts&&... ts) const
+                -> decltype(bulk_async_execute(std::forward<Executor>(exec),
+                    std::forward<F>(f),
+                    std::declval<counting_shape_type<Shape>>(),
+                    std::forward<Ts>(ts)...))
+            {
+                return bulk_async_execute(std::forward<Executor>(exec),
+                    std::forward<F>(f), make_counting_shape(n),
+                    std::forward<Ts>(ts)...);
             }
         };
 
@@ -332,7 +363,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
         public:
             template <typename Executor, typename F, typename Shape,
-                typename... Ts>
+                typename... Ts,
+                typename Enable = typename std::enable_if<
+                    !std::is_integral<Shape>::value>::type>
             HPX_FORCEINLINE auto operator()(
                 Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
                 -> decltype(bulk_sync_execute(std::forward<Executor>(exec),
@@ -340,6 +373,22 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 return bulk_sync_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), shape, std::forward<Ts>(ts)...);
+            }
+
+            template <typename Executor, typename F, typename Shape,
+                typename... Ts,
+                typename Enable = typename std::enable_if<
+                    std::is_integral<Shape>::value>::type>
+            HPX_FORCEINLINE auto operator()(
+                Executor&& exec, F&& f, Shape const& n, Ts&&... ts) const
+                -> decltype(bulk_sync_execute(std::forward<Executor>(exec),
+                    std::forward<F>(f),
+                    std::declval<counting_shape_type<Shape>>(),
+                    std::forward<Ts>(ts)...))
+            {
+                return bulk_sync_execute(std::forward<Executor>(exec),
+                    std::forward<F>(f), make_counting_shape(n),
+                    std::forward<Ts>(ts)...);
             }
         };
 
@@ -350,7 +399,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
         public:
             template <typename Executor, typename F, typename Shape,
-                typename Future, typename... Ts>
+                typename Future, typename... Ts,
+                typename Enable = typename std::enable_if<
+                    !std::is_integral<Shape>::value>::type>
             HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
                 Shape const& shape, Future&& predecessor, Ts&&... ts) const
                 -> decltype(bulk_then_execute(std::forward<Executor>(exec),
@@ -359,6 +410,22 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 return bulk_then_execute(std::forward<Executor>(exec),
                     std::forward<F>(f), shape,
+                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+            }
+
+            template <typename Executor, typename F, typename Shape,
+                typename Future, typename... Ts,
+                typename Enable = typename std::enable_if<
+                    std::is_integral<Shape>::value>::type>
+            HPX_FORCEINLINE auto operator()(Executor&& exec, F&& f,
+                Shape const& n, Future&& predecessor, Ts&&... ts) const
+                -> decltype(bulk_then_execute(std::forward<Executor>(exec),
+                    std::forward<F>(f),
+                    std::declval<counting_shape_type<Shape>>(),
+                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...))
+            {
+                return bulk_then_execute(std::forward<Executor>(exec),
+                    std::forward<F>(f), make_counting_shape(n),
                     std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
             }
         };

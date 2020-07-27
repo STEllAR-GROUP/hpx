@@ -10,15 +10,13 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
 #include <hpx/include/threads.hpp>
+#include <hpx/iostream.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
@@ -115,10 +113,27 @@ double global_scratch = 0;
 std::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
+struct libcds_thread_manager_wrapper
+{
+    explicit libcds_thread_manager_wrapper(bool uselibcds)
+      : uselibcds_(uselibcds)
+    {
+        if (uselibcds_)
+            cds::gc::hp::smr::attach_thread();
+    }
+    ~libcds_thread_manager_wrapper()
+    {
+        if (uselibcds_)
+            cds::gc::hp::smr::detach_thread();
+    }
+
+    bool uselibcds_;
+};
+
 double null_function(bool uselibcds) noexcept
 {
-    if (uselibcds)
-        cds::threading::Manager::attachThread();
+    libcds_thread_manager_wrapper wrap(uselibcds);
+
     if (num_iterations > 0)
     {
         const int array_size = 4096;
@@ -132,8 +147,6 @@ double null_function(bool uselibcds) noexcept
         }
         return dummy[0];
     }
-    if (uselibcds)
-        cds::threading::Manager::detachThread();
     return 0.0;
 }
 
@@ -210,10 +223,10 @@ void measure_function_futures_create_thread_hierarchical_placement(
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto const desc = hpx::util::thread_description();
+    auto desc = hpx::util::thread_description();
     auto prio = hpx::threads::thread_priority_normal;
-    auto const stack_size = hpx::threads::thread_stacksize_small;
-    auto const num_threads = hpx::get_num_worker_threads();
+    auto stack_size = hpx::threads::thread_stacksize_small;
+    auto num_threads = hpx::get_num_worker_threads();
     hpx::error_code ec;
 
     // start the clock
@@ -223,7 +236,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
         auto const hint =
             hpx::threads::thread_schedule_hint(static_cast<std::int16_t>(t));
         auto spawn_func = [&thread_func, sched, hint, t, count, num_threads,
-                              desc, prio]() {
+                              desc, prio, stack_size]() {
             std::uint64_t const count_start = t * count / num_threads;
             std::uint64_t const count_end = (t + 1) * count / num_threads;
             hpx::error_code ec;
@@ -253,15 +266,27 @@ void measure_function_futures_create_thread_hierarchical_placement(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+struct libcds_wrapper
+{
+    libcds_wrapper()
+    {
+        // Initialize libcds
+        cds::Initialize();
+    }
+
+    ~libcds_wrapper()
+    {
+        // Terminate libcds
+        cds::Terminate();
+    }
+};
+
 int hpx_main(variables_map& vm)
 {
     // Initialize libcds
-    cds::Initialize();
+    libcds_wrapper wrapper;
 
     {
-        // Initialize Hazard Pointer singleton
-        cds::gc::HP hpGC;
-
         if (vm.count("hpx:queuing"))
             queuing = vm["hpx:queuing"].as<std::string>();
 
@@ -284,12 +309,11 @@ int hpx_main(variables_map& vm)
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
+        cds::gc::HP hpGC;
+
         hpx::parallel::execution::parallel_executor par;
         hpx::parallel::execution::parallel_executor_aggregated par_agg;
         hpx::parallel::execution::thread_pool_executor tpe;
-        hpx::parallel::execution::thread_pool_executor tpe_nostack(
-            hpx::threads::thread_priority_default,
-            hpx::threads::thread_stacksize_nostack);
 
         for (int i = 0; i < repetitions; i++)
         {
@@ -300,13 +324,12 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_thread_count(
                     count, csv, par, bool(cds));
                 measure_function_futures_thread_count(
+                    count, csv, par_agg, bool(cds));
+                measure_function_futures_thread_count(
                     count, csv, tpe, bool(cds));
             }
         }
     }
-
-    // Terminate libcds
-    cds::Terminate();
 
     return hpx::finalize();
 }
@@ -318,20 +341,20 @@ int main(int argc, char* argv[])
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // clang-format off
-    cmdline.add_options()("futures",
-                          value<std::uint64_t>()->default_value(500000),
-                          "number of futures to invoke")
+    cmdline.add_options()
+        ("futures", value<std::uint64_t>()->default_value(500000),
+            "number of futures to invoke")
 
-            ("delay-iterations", value<std::uint64_t>()->default_value(0),
-             "number of iterations in the delay loop")
+        ("delay-iterations", value<std::uint64_t>()->default_value(0),
+            "number of iterations in the delay loop")
 
-            ("csv", "output results as csv (format: count,duration)")
-            ("test-all", "run all benchmarks")
-            ("repetitions", value<int>()->default_value(1),
-             "number of repetitions of the full benchmark")
+        ("csv", "output results as csv (format: count,duration)")
+        ("test-all", "run all benchmarks")
+        ("repetitions", value<int>()->default_value(1),
+            "number of repetitions of the full benchmark")
 
-            ("info", value<std::string>()->default_value("no-info"),
-             "extra info for plot output (e.g. branch name)");
+        ("info", value<std::string>()->default_value("no-info"),
+            "extra info for plot output (e.g. branch name)");
     // clang-format on
 
     // Initialize and run HPX.

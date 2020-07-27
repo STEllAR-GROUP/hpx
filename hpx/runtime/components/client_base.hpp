@@ -397,14 +397,6 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG)
-        id_type const& get_gid() const
-        {
-            return get_id();
-        }
-#endif
-
         id_type const& get_id() const
         {
             return get();
