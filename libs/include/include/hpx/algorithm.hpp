@@ -13,8 +13,6 @@ namespace hpx {
     using hpx::parallel::adjacent_find;
     using hpx::parallel::all_of;
     using hpx::parallel::any_of;
-    using hpx::parallel::count;
-    using hpx::parallel::count_if;
     using hpx::parallel::equal;
     using hpx::parallel::fill;
     using hpx::parallel::fill_n;
