@@ -28,6 +28,7 @@ set(executors_headers
     hpx/executors/service_executors.hpp
     hpx/executors/sync.hpp
     hpx/executors/thread_pool_attached_executors.hpp
+    hpx/executors/thread_pool_executor.hpp
 )
 
 # Default location is $HPX_ROOT/libs/executors/include_compatibility
@@ -55,6 +56,7 @@ set(executors_compat_headers
     hpx/parallel/executors/parallel_executor.hpp
     hpx/parallel/executors/sequenced_executor.hpp
     hpx/parallel/executors/thread_pool_attached_executors.hpp
+    hpx/parallel/executors/thread_pool_executor.hpp
 )
 
 set(executors_sources current_executor.cpp exception_list_callbacks.cpp)
