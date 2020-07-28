@@ -127,8 +127,8 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct HPX_DEPRECATED(
-        HPX_DEPRECATED_MSG " Use invoke_result instead.") result_of;
+    struct HPX_DEPRECATED_V(
+        1, 5, "result_of is deprecated, use invoke_result instead.") result_of;
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic push

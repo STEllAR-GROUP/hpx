@@ -362,7 +362,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter1>::value&&
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
-    HPX_DEPRECATED("hpx::parallel::copy is deprecated, use hpx::copy instead")
+    HPX_DEPRECATED_V(
+        1, 6, "hpx::parallel::copy is deprecated, use hpx::copy instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type
         copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
@@ -431,8 +432,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
-    HPX_DEPRECATED(
-        "hpx::parallel::copy_n is deprecated, use hpx::copy_n instead")
+    HPX_DEPRECATED_V(
+        1, 6, "hpx::parallel::copy_n is deprecated, use hpx::copy_n instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type
         copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
@@ -607,8 +608,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             >::value
         )>
     // clang-format on
-    HPX_DEPRECATED(
-        "hpx::parallel::copy_if is deprecated, use hpx::copy_if instead")
+    HPX_DEPRECATED_V(
+        1, 6, "hpx::parallel::copy_if is deprecated, use hpx::copy_if instead")
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type
         copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,

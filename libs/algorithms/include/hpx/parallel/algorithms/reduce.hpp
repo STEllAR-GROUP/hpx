@@ -322,9 +322,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
         )>
     // clang-format on
-    HPX_DEPRECATED(
-        "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
+    HPX_DEPRECATED_V(1, 6,
+        "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce "
+        "instead") typename util::detail::algorithm_result<ExPolicy, T>::type
         reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f)
     {
         typedef hpx::traits::is_segmented_iterator<FwdIterB> is_segmented;
@@ -341,7 +341,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
         )>
     // clang-format on
-    HPX_DEPRECATED(
+    HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce instead")
         typename util::detail::algorithm_result<ExPolicy, T>::type
         reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init)
@@ -359,7 +359,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
         )>
     // clang-format on
-    HPX_DEPRECATED(
+    HPX_DEPRECATED_V(1, 6,
         "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce instead")
         typename util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIterB>::value_type>::type

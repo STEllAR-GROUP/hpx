@@ -34,19 +34,19 @@ namespace hpx {
     "The unscoped runtime_mode names are deprecated. Please use "              \
     "runtime_mode::mode instead."
 
-    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_DEPRECATED_V(1, 5, HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr runtime_mode runtime_mode_invalid = runtime_mode::invalid;
-    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_DEPRECATED_V(1, 5, HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr runtime_mode runtime_mode_console = runtime_mode::console;
-    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_DEPRECATED_V(1, 5, HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr runtime_mode runtime_mode_worker = runtime_mode::worker;
-    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_DEPRECATED_V(1, 5, HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr runtime_mode runtime_mode_connect = runtime_mode::connect;
-    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_DEPRECATED_V(1, 5, HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr runtime_mode runtime_mode_local = runtime_mode::local;
-    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_DEPRECATED_V(1, 5, HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr runtime_mode runtime_mode_default = runtime_mode::default_;
-    HPX_DEPRECATED(HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    HPX_DEPRECATED_V(1, 5, HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG)
     static constexpr runtime_mode runtime_mode_last = runtime_mode::last;
 #undef HPX_RUNTIME_MODE_UNSCOPED_ENUM_DEPRECATION_MSG
 #endif

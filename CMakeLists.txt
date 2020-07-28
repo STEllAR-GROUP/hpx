@@ -194,8 +194,10 @@ hpx_option(
   HPX_WITH_DEPRECATION_WARNINGS BOOL
   "Enable warnings for deprecated facilities. (default: ON)" ON ADVANCED
 )
+
 if(HPX_WITH_DEPRECATION_WARNINGS)
-  hpx_add_config_define(HPX_HAVE_DEPRECATION_WARNINGS)
+  # enable deprecation warnings globally
+  hpx_add_config_cond_define(HPX_HAVE_DEPRECATION_WARNINGS 1)
 endif()
 
 # Generic build options

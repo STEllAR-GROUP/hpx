@@ -585,7 +585,7 @@ namespace hpx { namespace components
 
         // Make sure this instance does not manage the lifetime of the
         // registered object anymore (obsolete).
-        HPX_DEPRECATED(HPX_DEPRECATED_MSG) void reset_registered_name()
+        HPX_DEPRECATED_V(1, 4, HPX_DEPRECATED_MSG) void reset_registered_name()
         {
         }
 
