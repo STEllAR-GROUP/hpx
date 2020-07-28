@@ -10,7 +10,7 @@
 #include <hpx/functional/config/defines.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 
-#if defined(HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS)
+#if HPX_FUNCTIONAL_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/functional/traits/is_callable.hpp is deprecated, \

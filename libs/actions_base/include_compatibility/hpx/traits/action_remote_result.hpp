@@ -10,7 +10,7 @@
 #include <hpx/actions/config/defines.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 
-#if defined(HPX_ACTIONS_BASE_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ACTIONS_BASE_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message(                                                               \
     "The header hpx/traits/action_remote_result.hpp is deprecated, \
