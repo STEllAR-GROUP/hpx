@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -21,7 +21,7 @@ int hpx_main()
     std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), std::random_device{}());
 
-    hpx::parallel::for_each(hpx::parallel::execution::par, c.begin(), c.end(),
+    hpx::ranges::for_each(hpx::parallel::execution::par, c,
         hpx::util::annotated_function(
             [](int i) -> void {
                 hpx::util::thread_description desc(

@@ -21,7 +21,7 @@
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/topology/topology.hpp>
@@ -202,8 +202,8 @@ namespace hpx { namespace compute { namespace host {
 
                 // keep memory locality, use executor...
                 auto irange = boost::irange(std::size_t(0), count);
-                hpx::parallel::for_each(policy_, util::begin(irange),
-                    util::end(irange), [p](std::size_t i) { (p + i)->~U(); });
+                hpx::ranges::for_each(
+                    policy_, irange, [p](std::size_t i) { (p + i)->~U(); });
             }
 
             // Calls the destructor of the object pointed to by p

@@ -64,10 +64,8 @@ void test_for_each(ExPolicy&& policy, IteratorTag)
     std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    iterator result = hpx::parallel::for_each(std::forward<ExPolicy>(policy),
-        iterator(std::begin(c)), iterator(std::end(c)), set_42());
-
-    HPX_TEST(result == iterator(std::end(c)));
+    hpx::for_each(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
+        iterator(std::end(c)), set_42());
 
     // verify values
     std::size_t count = 0;
@@ -87,11 +85,9 @@ void test_for_each_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::future<iterator> f = hpx::parallel::for_each(std::forward<ExPolicy>(p),
+    hpx::future<void> f = hpx::for_each(std::forward<ExPolicy>(p),
         iterator(std::begin(c)), iterator(std::end(c)), set_42());
-    f.wait();
-
-    HPX_TEST(f.get() == iterator(std::end(c)));
+    f.get();
 
     // verify values
     std::size_t count = 0;
@@ -119,8 +115,8 @@ void test_for_each_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::for_each(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), throw_always());
+        hpx::for_each(policy, iterator(std::begin(c)), iterator(std::end(c)),
+            throw_always());
 
         HPX_TEST(false);
     }
@@ -150,7 +146,7 @@ void test_for_each_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<iterator> f = hpx::parallel::for_each(
+        hpx::future<iterator> f = hpx::for_each(
             p, iterator(std::begin(c)), iterator(std::end(c)), throw_always());
         returned_from_algorithm = true;
         f.get();
@@ -188,8 +184,8 @@ void test_for_each_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::for_each(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), throw_bad_alloc());
+        hpx::for_each(policy, iterator(std::begin(c)), iterator(std::end(c)),
+            throw_bad_alloc());
 
         HPX_TEST(false);
     }
@@ -218,8 +214,8 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<iterator> f = hpx::parallel::for_each(p,
-            iterator(std::begin(c)), iterator(std::end(c)), throw_bad_alloc());
+        hpx::future<iterator> f = hpx::for_each(p, iterator(std::begin(c)),
+            iterator(std::end(c)), throw_bad_alloc());
         returned_from_algorithm = true;
         f.get();
 
@@ -252,8 +248,8 @@ void test_for_each_n(ExPolicy policy, IteratorTag)
     std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    iterator result = hpx::parallel::for_each_n(
-        policy, iterator(std::begin(c)), c.size(), set_42());
+    iterator result =
+        hpx::for_each_n(policy, iterator(std::begin(c)), c.size(), set_42());
     iterator end = iterator(std::end(c));
     HPX_TEST(result == end);
 
@@ -275,8 +271,8 @@ void test_for_each_n_async(ExPolicy p, IteratorTag)
     std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::future<iterator> f = hpx::parallel::for_each_n(
-        p, iterator(std::begin(c)), c.size(), set_42());
+    hpx::future<iterator> f =
+        hpx::for_each_n(p, iterator(std::begin(c)), c.size(), set_42());
     HPX_TEST_EQ(f.get(), iterator(std::end(c)));
 
     // verify values

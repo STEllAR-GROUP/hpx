@@ -6,8 +6,12 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/parallel/algorithm.hpp>
 #include <hpx/parallel/container_algorithms.hpp>
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/parallel/segmented_algorithm.hpp>
+#endif
 
 namespace hpx {
     using hpx::parallel::adjacent_find;
@@ -16,8 +20,6 @@ namespace hpx {
     using hpx::parallel::find_first_of;
     using hpx::parallel::find_if;
     using hpx::parallel::find_if_not;
-    using hpx::parallel::for_each;
-    using hpx::parallel::for_each_n;
     using hpx::parallel::for_loop;
     using hpx::parallel::for_loop_n;
     using hpx::parallel::for_loop_n_strided;

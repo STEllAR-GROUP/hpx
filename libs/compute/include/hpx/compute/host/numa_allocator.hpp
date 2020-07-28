@@ -100,7 +100,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 pointer begin = p + i * part_size;
                 pointer end = begin + part_size;
-                first_touch.push_back(hpx::parallel::for_each(
+                first_touch.push_back(hpx::for_each(
                     hpx::parallel::execution::par(
                         hpx::parallel::execution::task)
                         .on(executors_[i])

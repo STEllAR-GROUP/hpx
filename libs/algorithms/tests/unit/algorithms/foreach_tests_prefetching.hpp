@@ -37,8 +37,8 @@ void test_for_each_prefetching(ExPolicy&& policy, IteratorTag)
     auto ctx = hpx::parallel::util::make_prefetcher_context(
         range.begin(), range.end(), prefetch_distance_factor, c);
 
-    hpx::parallel::for_each(std::forward<ExPolicy>(policy), ctx.begin(),
-        ctx.end(), [&](std::size_t i) { c[i] = 42.1; });
+    hpx::for_each(std::forward<ExPolicy>(policy), ctx.begin(), ctx.end(),
+        [&](std::size_t i) { c[i] = 42.1; });
 
     // verify values
     std::size_t count = 0;
@@ -65,8 +65,8 @@ void test_for_each_prefetching_async(ExPolicy&& p, IteratorTag)
     auto ctx = hpx::parallel::util::make_prefetcher_context(
         range.begin(), range.end(), prefetch_distance_factor, c);
 
-    auto f = hpx::parallel::for_each(std::forward<ExPolicy>(p), ctx.begin(),
-        ctx.end(), [&](std::size_t i) { c[i] = 42.1; });
+    auto f = hpx::for_each(std::forward<ExPolicy>(p), ctx.begin(), ctx.end(),
+        [&](std::size_t i) { c[i] = 42.1; });
     f.wait();
 
     // verify values
@@ -102,7 +102,7 @@ void test_for_each_prefetching_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::for_each(policy, ctx.begin(), ctx.end(),
+        hpx::for_each(policy, ctx.begin(), ctx.end(),
             [](std::size_t i) { throw std::runtime_error("test"); });
 
         HPX_TEST(false);
@@ -140,7 +140,7 @@ void test_for_each_prefetching_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::for_each(p, ctx.begin(), ctx.end(),
+        auto f = hpx::for_each(p, ctx.begin(), ctx.end(),
             [](std::size_t i) { throw std::runtime_error("test"); });
         returned_from_algorithm = true;
         f.get();
@@ -185,7 +185,7 @@ void test_for_each_prefetching_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::for_each(policy, ctx.begin(), ctx.end(),
+        hpx::for_each(policy, ctx.begin(), ctx.end(),
             [](std::size_t i) { throw std::bad_alloc(); });
 
         HPX_TEST(false);
@@ -223,7 +223,7 @@ void test_for_each_prefetching_bad_alloc_async(ExPolicy p, IteratorTag)
 
     try
     {
-        auto f = hpx::parallel::for_each(p, ctx.begin(), ctx.end(),
+        auto f = hpx::for_each(p, ctx.begin(), ctx.end(),
             [](std::size_t i) { throw std::bad_alloc(); });
         returned_from_algorithm = true;
         f.get();

@@ -14,9 +14,9 @@
 // computation. This example is still fully local but demonstrates nice
 // scalability on SMP machines.
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/hpx.hpp>
 #include <hpx/algorithm.hpp>
+#include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
@@ -33,10 +33,10 @@
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-bool header = true; // print csv heading
-double k = 0.5;     // heat transfer coefficient
-double dt = 1.;     // time step
-double dx = 1.;     // grid spacing
+bool header = true;    // print csv heading
+double k = 0.5;        // heat transfer coefficient
+double dt = 1.;        // time step
+double dx = 1.;        // grid spacing
 
 inline std::size_t idx(std::size_t i, std::size_t size)
 {
@@ -48,21 +48,33 @@ inline std::size_t idx(std::size_t i, std::size_t size)
 struct partition_data
 {
     explicit partition_data(std::size_t size)
-      : data_(new double [size]), size_(size)
-    {}
+      : data_(new double[size])
+      , size_(size)
+    {
+    }
 
     partition_data(std::size_t size, double initial_value)
-      : data_(new double [size]), size_(size)
+      : data_(new double[size])
+      , size_(size)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
             data_[i] = base_value + double(i);
     }
 
-    double& operator[](std::size_t idx) { return data_[idx]; }
-    double operator[](std::size_t idx) const { return data_[idx]; }
+    double& operator[](std::size_t idx)
+    {
+        return data_[idx];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[idx];
+    }
 
-    std::size_t size() const { return size_; }
+    std::size_t size() const
+    {
+        return size_;
+    }
 
 private:
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
@@ -96,7 +108,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+        return middle + (k * dt / (dx * dx)) * (left - 2 * middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all
@@ -109,16 +121,14 @@ struct stepper
 
         typedef hpx::util::counting_iterator<std::size_t> iterator;
 
-        next[0] = heat(left[size-1], middle[0], middle[1]);
+        next[0] = heat(left[size - 1], middle[0], middle[1]);
 
-        using namespace hpx::parallel;
-        for_each(execution::par, iterator(1), iterator(size-1),
-            [&next, &middle](std::size_t i)
-            {
-                next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+        hpx::for_each(hpx::execution::par, iterator(1), iterator(size - 1),
+            [&next, &middle](std::size_t i) {
+                next[i] = heat(middle[i - 1], middle[i], middle[i + 1]);
             });
 
-        next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+        next[size - 1] = heat(middle[size - 2], middle[size - 1], right[0]);
 
         return next;
     }
@@ -127,21 +137,16 @@ struct stepper
     // time steps
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt)
     {
-        using hpx::util::unwrapping;
-        using hpx::dataflow;
-        using hpx::parallel::for_each;
-        using hpx::parallel::execution::par;
-
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
-        for (space& s: U)
+        for (space& s : U)
             s.resize(np);
 
         // Initial conditions: f(0, i) = i
         for (std::size_t i = 0; i != np; ++i)
             U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
 
-        auto Op = unwrapping(&stepper::heat_part);
+        auto Op = hpx::util::unwrapping(&stepper::heat_part);
 
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)
@@ -151,13 +156,11 @@ struct stepper
 
             typedef hpx::util::counting_iterator<std::size_t> iterator;
 
-            for_each(par, iterator(0), iterator(np),
-                [&next, &current, np, &Op](std::size_t i)
-                {
-                    next[i] = dataflow(
-                            hpx::launch::async, Op,
-                            current[idx(i-1, np)], current[i], current[idx(i+1, np)]
-                        );
+            hpx::for_each(hpx::execution::par, iterator(0), iterator(np),
+                [&next, &current, np, &Op](std::size_t i) {
+                    next[i] = hpx::dataflow(hpx::launch::async, Op,
+                        current[idx(i - 1, np)], current[i],
+                        current[idx(i + 1, np)]);
                 });
         }
 
@@ -169,9 +172,10 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
-    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
+    std::uint64_t nx =
+        vm["nx"].as<std::uint64_t>();    // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
@@ -208,6 +212,7 @@ int main(int argc, char* argv[])
     using namespace hpx::program_options;
 
     options_description desc_commandline;
+    // clang-format off
     desc_commandline.add_options()
         ("results,r", "print generated results (default: false)")
         ("nx", value<std::uint64_t>()->default_value(10),
@@ -224,6 +229,7 @@ int main(int argc, char* argv[])
          "Local x dimension")
         ( "no-header", "do not print out the csv header row")
     ;
+    // clang-format on
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

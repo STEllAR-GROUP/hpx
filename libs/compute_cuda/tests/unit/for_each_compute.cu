@@ -6,17 +6,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/algorithm.hpp>
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/include/compute.hpp>
-#include <hpx/include/parallel_for_each.hpp>
-#include <hpx/include/parallel_copy.hpp>
 
 #include <hpx/modules/testing.hpp>
 
 #include <hpx/hpx_init.hpp>
 
-#include <numeric>
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -30,23 +29,17 @@ void test_for_each(executor_type& exec, target_vector& d_A)
 {
     std::vector<int> h_C(d_A.size());
     hpx::parallel::copy(
-        hpx::parallel::execution::par,
-        d_A.begin(), d_A.end(), h_C.begin());
+        hpx::parallel::execution::par, d_A.begin(), d_A.end(), h_C.begin());
 
     // FIXME : Lambda function given to for_each() is momentarily defined as
     //         HPX_HOST_DEVICE in place of HPX_DEVICE to allow the host_side
     //         result_of<> (used inside for_each()) to get the return
     //         type
 
-    hpx::parallel::for_each(
-        hpx::parallel::execution::par.on(exec),
-        d_A.begin(), d_A.end(),
-        [] HPX_HOST_DEVICE (int & i)
-        {
-             i += 5;
-        });
+    hpx::ranges::for_each(hpx::parallel::execution::par.on(exec), d_A,
+        [] HPX_HOST_DEVICE(int& i) { i += 5; });
 
-    for(std::size_t i = 0; i != h_C.size(); ++i)
+    for (std::size_t i = 0; i != h_C.size(); ++i)
     {
         HPX_TEST_EQ(h_C[i] + 5, d_A[i]);
     }
@@ -54,7 +47,7 @@ void test_for_each(executor_type& exec, target_vector& d_A)
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int)std::random_device{}();
+    unsigned int seed = (unsigned int) std::random_device{}();
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -76,8 +69,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // copy data to device
     hpx::parallel::copy(
-        hpx::parallel::execution::par,
-        h_A.begin(), h_A.end(), d_A.begin());
+        hpx::parallel::execution::par, h_A.begin(), h_A.end(), d_A.begin());
 
     // create executor
     executor_type exec(target);
@@ -95,10 +87,12 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     desc_commandline.add_options()
         ("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run")
         ;
+    // clang-format on
 
     // Initialize and run HPX
     hpx::init(desc_commandline, argc, argv);

@@ -318,7 +318,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     reduce_stencil_generate<reduce_stencil_transformer, RanIter,
                         keystate_iter_type, Compare>
                         kernel;
-                    hpx::parallel::for_each(sync_policy,
+                    hpx::for_each(sync_policy,
                         make_zip_iterator(
                             reduce_begin + 1, key_state.begin() + 1),
                         make_zip_iterator(reduce_end - 1, key_state.end() - 1),
