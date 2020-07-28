@@ -192,7 +192,8 @@ namespace hpx {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename F>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2> >::type
-    copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred);
+    copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+        Pred&& pred);
 
     // clang-format on
 }    // namespace hpx
@@ -639,8 +640,8 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                parallel::execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter1>::value&&
+                parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value
             )>
         // clang-format on

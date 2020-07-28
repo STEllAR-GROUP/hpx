@@ -78,6 +78,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/all_any_none.hpp
     hpx/parallel/container_algorithms/copy.hpp
     hpx/parallel/container_algorithms/count.hpp
+    hpx/parallel/container_algorithms/destroy.hpp
     hpx/parallel/container_algorithms/fill.hpp
     hpx/parallel/container_algorithms/find.hpp
     hpx/parallel/container_algorithms/for_each.hpp
@@ -99,6 +100,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/stable_sort.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/unique.hpp
+    hpx/parallel/container_memory.hpp
     hpx/parallel/container_numeric.hpp
     hpx/parallel/datapar.hpp
     hpx/parallel/datapar/iterator_helpers.hpp

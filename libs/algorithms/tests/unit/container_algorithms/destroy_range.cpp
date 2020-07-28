@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "destroy_tests.hpp"
+#include "destroy_range_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
