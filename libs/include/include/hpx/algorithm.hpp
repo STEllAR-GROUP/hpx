@@ -11,8 +11,6 @@
 
 namespace hpx {
     using hpx::parallel::adjacent_find;
-    using hpx::parallel::all_of;
-    using hpx::parallel::any_of;
     using hpx::parallel::count;
     using hpx::parallel::count_if;
     using hpx::parallel::equal;
@@ -45,7 +43,6 @@ namespace hpx {
     using hpx::parallel::minmax_element;
     using hpx::parallel::mismatch;
     using hpx::parallel::move;
-    using hpx::parallel::none_of;
     using hpx::parallel::partition;
     using hpx::parallel::partition_copy;
     using hpx::parallel::remove;
