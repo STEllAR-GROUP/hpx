@@ -7,8 +7,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/thread_executors/limiting_executor.hpp>
-#include <hpx/testing.hpp>
 
 #include <algorithm>
 #include <cstdlib>
@@ -31,46 +31,57 @@ void test2(int passed_through)
 
 void test_sync()
 {
-    auto exec1 = hpx::parallel::execution::parallel_executor(hpx::threads::thread_stacksize_small);
-    auto exec2 = hpx::parallel::execution::default_executor(hpx::threads::thread_stacksize_large);
+    auto exec1 = hpx::parallel::execution::parallel_executor(
+        hpx::threads::thread_stacksize_small);
+    auto exec2 = hpx::parallel::execution::default_executor(
+        hpx::threads::thread_stacksize_large);
 
-    hpx::threads::executors::limiting_executor<decltype(exec1)> lexec1(exec1, 100, 100);
-    hpx::threads::executors::limiting_executor<decltype(exec2)> lexec2(exec2, 100, 100);
+    hpx::threads::executors::limiting_executor<decltype(exec1)> lexec1(
+        exec1, 100, 100);
+    hpx::threads::executors::limiting_executor<decltype(exec2)> lexec2(
+        exec2, 100, 100);
 
     hpx::async(lexec1, &test2, 42);
     hpx::async(lexec2, &test2, 42);
 
-    auto id1 = hpx::parallel::execution::sync_execute(exec1, &thread_id_test, 42);
+    auto id1 =
+        hpx::parallel::execution::sync_execute(exec1, &thread_id_test, 42);
     auto id2 = hpx::this_thread::get_id();
-    std::cout << "hpx::parallel::execution::sync_execute Ids " << id1 << " : " << id2 << std::endl;
+    std::cout << "hpx::parallel::execution::sync_execute Ids " << id1 << " : "
+              << id2 << std::endl;
 
-    HPX_TEST(hpx::parallel::execution::sync_execute(exec1, &thread_id_test, 42) ==
-        hpx::this_thread::get_id());
-    HPX_TEST(hpx::parallel::execution::sync_execute(exec2, &thread_id_test, 42) ==
-        hpx::this_thread::get_id());
+    HPX_TEST(hpx::parallel::execution::sync_execute(
+                 exec1, &thread_id_test, 42) == hpx::this_thread::get_id());
+    HPX_TEST(hpx::parallel::execution::sync_execute(
+                 exec2, &thread_id_test, 42) == hpx::this_thread::get_id());
 
     id1 = hpx::parallel::execution::sync_execute(lexec1, &thread_id_test, 42);
     id2 = hpx::this_thread::get_id();
-    std::cout << "hpx::parallel::execution::sync_execute - limiting exec Ids " << id1 << " : " << id2 << std::endl;
+    std::cout << "hpx::parallel::execution::sync_execute - limiting exec Ids "
+              << id1 << " : " << id2 << std::endl;
 
-    HPX_TEST(hpx::parallel::execution::sync_execute(lexec1, &thread_id_test, 42) ==
-        hpx::this_thread::get_id());
-    HPX_TEST(hpx::parallel::execution::sync_execute(lexec2, &thread_id_test, 42) ==
-        hpx::this_thread::get_id());
+    HPX_TEST(hpx::parallel::execution::sync_execute(
+                 lexec1, &thread_id_test, 42) == hpx::this_thread::get_id());
+    HPX_TEST(hpx::parallel::execution::sync_execute(
+                 lexec2, &thread_id_test, 42) == hpx::this_thread::get_id());
 }
 
 void test_async()
 {
-    auto exec1 = hpx::parallel::execution::parallel_executor(hpx::threads::thread_stacksize_small);
-    auto exec2 = hpx::parallel::execution::default_executor(hpx::threads::thread_stacksize_large);
+    auto exec1 = hpx::parallel::execution::parallel_executor(
+        hpx::threads::thread_stacksize_small);
+    auto exec2 = hpx::parallel::execution::default_executor(
+        hpx::threads::thread_stacksize_large);
 
-    hpx::threads::executors::limiting_executor<decltype(exec1)> lexec1(exec1, 100, 100);
-    hpx::threads::executors::limiting_executor<decltype(exec2)> lexec2(exec2, 100, 100);
+    hpx::threads::executors::limiting_executor<decltype(exec1)> lexec1(
+        exec1, 100, 100);
+    hpx::threads::executors::limiting_executor<decltype(exec2)> lexec2(
+        exec2, 100, 100);
 
-    HPX_TEST(hpx::parallel::execution::async_execute(exec1, &thread_id_test, 42).get() !=
-        hpx::this_thread::get_id());
-    HPX_TEST(hpx::parallel::execution::async_execute(exec2, &thread_id_test, 42).get() !=
-        hpx::this_thread::get_id());
+    HPX_TEST(hpx::parallel::execution::async_execute(exec1, &thread_id_test, 42)
+                 .get() != hpx::this_thread::get_id());
+    HPX_TEST(hpx::parallel::execution::async_execute(exec2, &thread_id_test, 42)
+                 .get() != hpx::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,8 +97,10 @@ hpx::thread::id test_f(hpx::future<void> f, int passed_through)
 
 void test_then()
 {
-    auto exec1 = hpx::parallel::execution::parallel_executor(hpx::threads::thread_stacksize_small);
-    hpx::threads::executors::limiting_executor<decltype(exec1)> lexec1(exec1, 100, 100);
+    auto exec1 = hpx::parallel::execution::parallel_executor(
+        hpx::threads::thread_stacksize_small);
+    hpx::threads::executors::limiting_executor<decltype(exec1)> lexec1(
+        exec1, 100, 100);
 
     hpx::future<void> f = hpx::make_ready_future();
 
@@ -99,23 +112,25 @@ void test_then()
 void static_check_executor()
 {
     using namespace hpx::traits;
-    auto exec1 = hpx::parallel::execution::parallel_executor(hpx::threads::thread_stacksize_small);
-    hpx::threads::executors::limiting_executor<decltype(exec1)> lexec1(exec1, 100, 100);
+    auto exec1 = hpx::parallel::execution::parallel_executor(
+        hpx::threads::thread_stacksize_small);
+    hpx::threads::executors::limiting_executor<decltype(exec1)> lexec1(
+        exec1, 100, 100);
 
-//    static_assert(has_sync_execute_member<executor>::value,
-//        "has_sync_execute_member<executor>::value");
-//    static_assert(has_async_execute_member<executor>::value,
-//        "has_async_execute_member<executor>::value");
-//    static_assert(!has_then_execute_member<executor>::value,
-//        "!has_then_execute_member<executor>::value");
-//    static_assert(has_bulk_sync_execute_member<executor>::value,
-//        "has_bulk_sync_execute_member<executor>::value");
-//    static_assert(has_bulk_async_execute_member<executor>::value,
-//        "has_bulk_async_execute_member<executor>::value");
-//    static_assert(!has_bulk_then_execute_member<executor>::value,
-//        "!has_bulk_then_execute_member<executor>::value");
-//    static_assert(has_post_member<executor>::value,
-//        "check has_post_member<executor>::value");
+    //    static_assert(has_sync_execute_member<executor>::value,
+    //        "has_sync_execute_member<executor>::value");
+    //    static_assert(has_async_execute_member<executor>::value,
+    //        "has_async_execute_member<executor>::value");
+    //    static_assert(!has_then_execute_member<executor>::value,
+    //        "!has_then_execute_member<executor>::value");
+    //    static_assert(has_bulk_sync_execute_member<executor>::value,
+    //        "has_bulk_sync_execute_member<executor>::value");
+    //    static_assert(has_bulk_async_execute_member<executor>::value,
+    //        "has_bulk_async_execute_member<executor>::value");
+    //    static_assert(!has_bulk_then_execute_member<executor>::value,
+    //        "!has_bulk_then_execute_member<executor>::value");
+    //    static_assert(has_post_member<executor>::value,
+    //        "check has_post_member<executor>::value");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
