@@ -50,11 +50,19 @@ if(HPX_WITH_CUDA_COMPUTE)
   )
 endif()
 
+set(partitioned_vector_inclusive_scan_PARAMETERS RUN_SERIAL)
+set(partitioned_vector_inclusive_scan2_PARAMETERS RUN_SERIAL)
+set(partitioned_vector_exclusive_scan_PARAMETERS RUN_SERIAL)
+set(partitioned_vector_exclusive_scan2_PARAMETERS RUN_SERIAL)
+set(partitioned_vector_target_PARAMETERS RUN_SERIAL)
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
   set(${test}_FLAGS DEPENDENCIES partitioned_vector_component)
-  set(${test}_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
+  set(${test}_PARAMETERS ${${test}_PARAMETERS} LOCALITIES 2
+                         THREADS_PER_LOCALITY 4
+  )
 
   source_group("Source Files" FILES ${sources})
 
