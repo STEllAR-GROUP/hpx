@@ -26,10 +26,12 @@
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp> 
 #include <hpx/parallel/util/transform_loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
@@ -181,7 +183,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first, dest),
-                            std::distance(first, last), std::move(f1),
+                            detail::distance(first, last), std::move(f1),
                             util::projection_identity()));
                 }
 
@@ -458,7 +460,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first1, first2, dest),
-                            std::distance(first1, last1), std::move(f1),
+                            detail::distance(first1, last1), std::move(f1),
                             util::projection_identity()));
                 }
 
@@ -681,8 +683,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first1, first2, dest),
-                            (std::min)(std::distance(first1, last1),
-                                std::distance(first2, last2)),
+                            (std::min)(detail::distance(first1, last1),
+                                detail::distance(first2, last2)),
                             std::move(f1), util::projection_identity()));
                 }
 
