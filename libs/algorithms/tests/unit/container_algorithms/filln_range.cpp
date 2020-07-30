@@ -19,17 +19,13 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy, typename IteratorTag>
-void test_fill_n(ExPolicy policy, IteratorTag)
+template <typename IteratorTag>
+void test_fill_n(IteratorTag)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::parallel::fill_n(policy, c, c.size(), 10);
+    hpx::ranges::fill_n(c, 10);
 
     // verify values
     std::size_t count = 0;
@@ -42,12 +38,34 @@ void test_fill_n(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_fill_async(ExPolicy p, IteratorTag)
+void test_fill_n(ExPolicy policy, IteratorTag)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    hpx::ranges::fill_n(policy, c, 10);
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(10));
+        ++count;
+    });
+
+    HPX_TEST_EQ(count, c.size());
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_fill_n_async(ExPolicy p, IteratorTag)
 {
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    hpx::future<void> f = hpx::parallel::fill_n(p, c, c.size(), 10);
+    hpx::future<void> f = hpx::ranges::fill_n(p, c, 10);
     f.wait();
 
     std::size_t count = 0;
@@ -63,6 +81,9 @@ template <typename IteratorTag>
 void test_fill_n()
 {
     using namespace hpx::parallel;
+
+    test_fill_n(IteratorTag());
+
     test_fill_n(execution::seq, IteratorTag());
     test_fill_n(execution::par, IteratorTag());
     test_fill_n(execution::par_unseq, IteratorTag());

@@ -12,6 +12,8 @@ set(tests
     copyif_range
     count_range
     countif_range
+    fill_range
+    filln_range
     find_end_range
     find_first_of_range
     foreach_adapt

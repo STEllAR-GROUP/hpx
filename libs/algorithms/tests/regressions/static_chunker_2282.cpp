@@ -18,7 +18,7 @@ int main()
     try
     {
         // this should throw as the HPX runtime has not been initialized
-        hpx::parallel::fill(hpx::parallel::execution::par, a, a + size, 1.0f);
+        hpx::fill(hpx::parallel::execution::par, a, a + size, 1.0f);
 
         // fill should have thrown
         HPX_TEST(false);
