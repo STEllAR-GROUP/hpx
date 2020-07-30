@@ -32,6 +32,7 @@
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
+#include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
@@ -152,7 +153,10 @@ namespace hpx { namespace parallel { namespace execution {
         bool operator==(parallel_policy_executor const& rhs) const noexcept
         {
             return policy_ == rhs.policy_ && num_spread_ == rhs.num_spread_ &&
-                num_tasks_ == rhs.num_tasks_;
+                num_tasks_ == rhs.num_tasks_ && priority_ == rhs.priority_ &&
+                stacksize_ == rhs.stacksize_ &&
+                schedulehint_.mode == rhs.schedulehint_.mode &&
+                schedulehint_.hint == rhs.schedulehint_.hint;
         }
 
         bool operator!=(parallel_policy_executor const& rhs) const noexcept
@@ -365,8 +369,25 @@ namespace hpx { namespace parallel { namespace execution {
         void serialize(Archive& ar, const unsigned int version)
         {
             // clang-format off
-            ar & policy_ & num_spread_ & num_tasks_;
+            ar & policy_ & num_spread_ & num_tasks_ & priority_ & stacksize_
+            & schedulehint_.mode & schedulehint_.mode;
             // clang-format on
+        }
+        /// \endcond
+
+    public:
+        /// \cond NOINTERNAL
+        threads::thread_priority get_priority() const
+        {
+            return priority_;
+        }
+        threads::thread_stacksize get_stacksize() const
+        {
+            return stacksize_;
+        }
+        threads::thread_schedule_hint get_schedulehint() const
+        {
+            return schedulehint_;
         }
         /// \endcond
 
