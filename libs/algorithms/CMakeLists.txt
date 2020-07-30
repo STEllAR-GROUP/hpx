@@ -21,6 +21,8 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/accumulate.hpp
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp
+    hpx/parallel/algorithms/detail/fill.hpp
+    hpx/parallel/algorithms/detail/find.hpp
     hpx/parallel/algorithms/detail/insertion_sort.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
