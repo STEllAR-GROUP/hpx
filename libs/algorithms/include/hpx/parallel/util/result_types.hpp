@@ -51,6 +51,34 @@ namespace hpx { namespace parallel { namespace util {
         }
     };
 
+    template <class I1, class I2, class O>
+    struct in_in_out_result
+    {
+        HPX_NO_UNIQUE_ADDRESS I1 in1;
+        HPX_NO_UNIQUE_ADDRESS I2 in2;
+        HPX_NO_UNIQUE_ADDRESS O out;
+
+        template <class II1, class II2, class OO,
+            typename Enable = typename std::enable_if<
+                std::is_convertible<I1 const&, II1&>::value &&
+                std::is_convertible<I2 const&, II2&>::value &&
+                std::is_convertible<O const&, OO&>::value>::type>
+        constexpr operator in_in_out_result<II1, II2, OO>() const&
+        {
+            return {in1, in2, out};
+        }
+
+        template <class II1, class II2, class OO,
+            typename Enable =
+                typename std::enable_if<std::is_convertible<I1, II1>::value &&
+                    std::is_convertible<I2, II2>::value &&
+                    std::is_convertible<O, OO>::value>::type>
+        constexpr operator in_in_out_result<II1, II2, OO>() &&
+        {
+            return {std::move(in1), std::move(in2), std::move(out)};
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename ZipIter>
     in_out_result<typename hpx::util::tuple_element<0,
@@ -85,6 +113,50 @@ namespace hpx { namespace parallel { namespace util {
         return lcos::make_future<result_type>(
             std::move(zipiter), [](ZipIter zipiter) {
                 return get_in_out_result(std::move(zipiter));
+            });
+    }
+
+    template <typename ZipIter>
+    in_in_out_result<typename hpx::util::tuple_element<0,
+                         typename ZipIter::iterator_tuple_type>::type,
+        typename hpx::util::tuple_element<1,
+            typename ZipIter::iterator_tuple_type>::type,
+        typename hpx::util::tuple_element<2,
+            typename ZipIter::iterator_tuple_type>::type>
+    get_in_in_out_result(ZipIter&& zipiter)
+    {
+        using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+
+        using result_type = in_in_out_result<
+            typename hpx::util::tuple_element<0, iterator_tuple_type>::type,
+            typename hpx::util::tuple_element<1, iterator_tuple_type>::type,
+            typename hpx::util::tuple_element<2, iterator_tuple_type>::type>;
+
+        iterator_tuple_type t = zipiter.get_iterator_tuple();
+        return result_type{
+            hpx::util::get<0>(t), hpx::util::get<1>(t), hpx::util::get<2>(t)};
+    }
+
+    template <typename ZipIter>
+    hpx::future<
+        in_in_out_result<typename hpx::util::tuple_element<0,
+                             typename ZipIter::iterator_tuple_type>::type,
+            typename hpx::util::tuple_element<1,
+                typename ZipIter::iterator_tuple_type>::type,
+            typename hpx::util::tuple_element<2,
+                typename ZipIter::iterator_tuple_type>::type>>
+    get_in_in_out_result(hpx::future<ZipIter>&& zipiter)
+    {
+        using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+
+        using result_type = in_in_out_result<
+            typename hpx::util::tuple_element<0, iterator_tuple_type>::type,
+            typename hpx::util::tuple_element<1, iterator_tuple_type>::type,
+            typename hpx::util::tuple_element<2, iterator_tuple_type>::type>;
+
+        return lcos::make_future<result_type>(
+            std::move(zipiter), [](ZipIter zipiter) {
+                return get_in_in_out_result(std::move(zipiter));
             });
     }
 
