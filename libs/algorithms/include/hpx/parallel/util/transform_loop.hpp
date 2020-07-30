@@ -11,6 +11,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
+#include <hpx/parallel/util/result_types.hpp> 
 
 #include <algorithm>
 #include <cstddef>
@@ -25,20 +26,20 @@ namespace hpx { namespace parallel { namespace util {
         struct transform_loop
         {
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
             call(InIter first, InIter last, OutIter dest, F&& f)
             {
                 for (/* */; first != last; (void) ++first, ++dest)
                 {
                     *dest = hpx::util::invoke(std::forward<F>(f), first);
                 }
-                return std::make_pair(std::move(first), std::move(dest));
+                return util::in_out_result<InIter, OutIter>{std::move(first), std::move(dest)};
             }
         };
     }    // namespace detail
 
     template <typename ExPolicy, typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::pair<Iter, OutIter> transform_loop(
+    HPX_HOST_DEVICE HPX_FORCEINLINE util::in_out_result<Iter, OutIter> transform_loop(
         ExPolicy&&, Iter it, Iter end, OutIter dest, F&& f)
     {
         return detail::transform_loop<Iter>::call(
