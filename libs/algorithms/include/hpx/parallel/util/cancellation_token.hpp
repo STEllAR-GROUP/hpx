@@ -17,10 +17,6 @@ namespace hpx { namespace parallel { namespace util {
     namespace detail {
         struct no_data
         {
-            bool operator<=(no_data) const
-            {
-                return true;
-            }
         };
     }    // namespace detail
 

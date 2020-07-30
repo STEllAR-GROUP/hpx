@@ -319,9 +319,9 @@ std::vector<std::vector<double>> run_benchmark(std::size_t iterations,
     vector_type c(size, alloc);
 
     // Initialize arrays
-    hpx::parallel::fill(policy, a.begin(), a.end(), 1.0);
-    hpx::parallel::fill(policy, b.begin(), b.end(), 2.0);
-    hpx::parallel::fill(policy, c.begin(), c.end(), 0.0);
+    hpx::fill(policy, a.begin(), a.end(), 1.0);
+    hpx::fill(policy, b.begin(), b.end(), 2.0);
+    hpx::fill(policy, c.begin(), c.end(), 0.0);
 
     // Check clock ticks ...
     double t = mysecond();
