@@ -18,6 +18,9 @@ template <typename IteratorTag>
 void test_count_if()
 {
     using namespace hpx::parallel;
+
+    test_count_if(IteratorTag());
+
     test_count_if(execution::seq, IteratorTag());
     test_count_if(execution::par, IteratorTag());
     test_count_if(execution::par_unseq, IteratorTag());
@@ -37,6 +40,8 @@ template <typename IteratorTag>
 void test_count_if_exception()
 {
     using namespace hpx::parallel;
+
+    test_count_if_exception(IteratorTag());
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions

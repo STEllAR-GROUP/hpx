@@ -60,26 +60,22 @@ struct random_fill
     std::uniform_int_distribution<> dist;
 };
 
-template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_count(ExPolicy policy, IteratorTag, DataType)
+template <typename IteratorTag, typename DataType>
+void test_count(IteratorTag, DataType)
 {
-    static_assert(
-        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
-        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
-
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
 
     auto countif_lambda = [](const DataType& ele) { return ele == 10; };
 
-    auto result = hpx::parallel::count_if(policy, c, countif_lambda);
+    auto result = hpx::ranges::count_if(c, countif_lambda);
     auto expected = std::count_if(std::begin(c), std::end(c), countif_lambda);
 
     HPX_TEST_EQ(expected, result);
 }
 
 template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_count_async(ExPolicy policy, IteratorTag, DataType)
+void test_count(ExPolicy&& policy, IteratorTag, DataType)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -90,7 +86,25 @@ void test_count_async(ExPolicy policy, IteratorTag, DataType)
 
     auto countif_lambda = [](const DataType& ele) { return ele == 10; };
 
-    auto f = hpx::parallel::count_if(policy, c, countif_lambda);
+    auto result = hpx::ranges::count_if(policy, c, countif_lambda);
+    auto expected = std::count_if(std::begin(c), std::end(c), countif_lambda);
+
+    HPX_TEST_EQ(expected, result);
+}
+
+template <typename ExPolicy, typename IteratorTag, typename DataType>
+void test_count_async(ExPolicy&& policy, IteratorTag, DataType)
+{
+    static_assert(
+        hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
+        "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
+
+    std::vector<DataType> c{10007};
+    std::generate(std::begin(c), std::end(c), random_fill(0, 20));
+
+    auto countif_lambda = [](const DataType& ele) { return ele == 10; };
+
+    auto f = hpx::ranges::count_if(policy, c, countif_lambda);
     auto result = f.get();
 
     auto expected = std::count_if(std::begin(c), std::end(c), countif_lambda);
@@ -102,6 +116,8 @@ template <typename IteratorTag, typename DataType>
 void test_count()
 {
     using namespace hpx::parallel;
+
+    test_count(IteratorTag(), DataType());
 
     auto seq = execution::seq;
     auto par = execution::par;
