@@ -14,8 +14,6 @@ namespace hpx {
     using hpx::parallel::count;
     using hpx::parallel::count_if;
     using hpx::parallel::equal;
-    using hpx::parallel::fill;
-    using hpx::parallel::fill_n;
     using hpx::parallel::find;
     using hpx::parallel::find_end;
     using hpx::parallel::find_first_of;
@@ -65,6 +63,7 @@ namespace hpx {
     using hpx::parallel::set_union;
     using hpx::parallel::sort;
     using hpx::parallel::stable_partition;
+    using hpx::parallel::stable_sort;
     using hpx::parallel::swap_ranges;
     using hpx::parallel::unique;
     using hpx::parallel::unique_copy;
