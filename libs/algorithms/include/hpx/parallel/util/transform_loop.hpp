@@ -11,7 +11,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
-#include <hpx/parallel/util/result_types.hpp> 
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -26,21 +26,23 @@ namespace hpx { namespace parallel { namespace util {
         struct transform_loop
         {
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
-            call(InIter first, InIter last, OutIter dest, F&& f)
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
+                call(InIter first, InIter last, OutIter dest, F&& f)
             {
                 for (/* */; first != last; (void) ++first, ++dest)
                 {
                     *dest = hpx::util::invoke(std::forward<F>(f), first);
                 }
-                return util::in_out_result<InIter, OutIter>{std::move(first), std::move(dest)};
+                return util::in_out_result<InIter, OutIter>{
+                    std::move(first), std::move(dest)};
             }
         };
     }    // namespace detail
 
     template <typename ExPolicy, typename Iter, typename OutIter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE util::in_out_result<Iter, OutIter> transform_loop(
-        ExPolicy&&, Iter it, Iter end, OutIter dest, F&& f)
+    HPX_HOST_DEVICE HPX_FORCEINLINE util::in_out_result<Iter, OutIter>
+    transform_loop(ExPolicy&&, Iter it, Iter end, OutIter dest, F&& f)
     {
         return detail::transform_loop<Iter>::call(
             it, end, dest, std::forward<F>(f));
@@ -53,8 +55,8 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<InIter1,
-                InIter2, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
+                InIter1, InIter2, OutIter>
             call(InIter1 first1, InIter1 last1, InIter2 first2, OutIter dest,
                 F&& f)
             {
@@ -63,14 +65,14 @@ namespace hpx { namespace parallel { namespace util {
                     *dest =
                         hpx::util::invoke(std::forward<F>(f), first1, first2);
                 }
-                return util::in_in_out_result<InIter1,InIter2, OutIter>(
+                return util::in_in_out_result<InIter1, InIter2, OutIter>(
                     std::move(first1), std::move(first2), std::move(dest));
             }
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<InIter1,
-                InIter2, OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
+                InIter1, InIter2, OutIter>
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
                 OutIter dest, F&& f)
             {
@@ -80,8 +82,8 @@ namespace hpx { namespace parallel { namespace util {
                     *dest =
                         hpx::util::invoke(std::forward<F>(f), first1, first2);
                 }
-                return util::in_in_out_result<InIter1,InIter2, OutIter>
-                    (first1, first2, dest);
+                return util::in_in_out_result<InIter1, InIter2, OutIter>(
+                    first1, first2, dest);
             }
         };
     }    // namespace detail
