@@ -86,6 +86,7 @@ set(tests
     is_sorted
     is_sorted_until
     lexicographical_compare
+    make_heap
     max_element
     merge
     min_element

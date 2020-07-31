@@ -61,6 +61,7 @@ set(include_headers
     hpx/include/parallel_is_partitioned.hpp
     hpx/include/parallel_is_sorted.hpp
     hpx/include/parallel_lexicographical_compare.hpp
+    hpx/include/parallel_make_heap.hpp
     hpx/include/parallel_memory.hpp
     hpx/include/parallel_merge.hpp
     hpx/include/parallel_minmax.hpp
