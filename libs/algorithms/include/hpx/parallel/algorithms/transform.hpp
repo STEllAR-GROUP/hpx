@@ -331,9 +331,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj1, typename Proj2>
         struct transform_binary_projected
         {
-            typename hpx::util::decay<F>::type& f_;
-            typename hpx::util::decay<Proj1>::type& proj1_;
-            typename hpx::util::decay<Proj2>::type& proj2_;
+            F& f_;
+            Proj1& proj1_;
+            Proj2& proj2_;
 
             template <typename Iter1, typename Iter2>
             HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(
@@ -343,6 +343,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 return hpx::util::invoke(f_, hpx::util::invoke(proj1_, *curr1),
                     hpx::util::invoke(proj2_, *curr2));
+            }
+        };
+
+        template <typename F>
+        struct transform_binary_projected<F, util::projection_identity,
+            util::projection_identity>
+        {
+            HPX_HOST_DEVICE transform_binary_projected(
+                F& f, util::projection_identity, util::projection_identity)
+              : f_(f)
+            {
+            }
+
+            F& f_;
+
+            template <typename Iter1, typename Iter2>
+            HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter1 curr1,
+                Iter2 curr2) -> decltype(hpx::util::invoke(f_, *curr1, *curr2))
+            {
+                return hpx::util::invoke(f_, *curr1, *curr2);
             }
         };
 
