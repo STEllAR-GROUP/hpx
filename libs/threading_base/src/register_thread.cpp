@@ -17,6 +17,11 @@
 #include <string>
 #include <utility>
 
+// The following implementation has been divided for Linux and Mac OSX
+#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) && \
+    (defined(__linux) || defined(__linux__) || defined(linux) || \
+    defined(__APPLE__))
+
 namespace hpx_start {
     // Redifining weak variables defined in hpx_main.hpp to facilitate error
     // checking and make sure correct errors are thrown. It is added again
@@ -25,6 +30,8 @@ namespace hpx_start {
     HPX_SYMBOL_EXPORT bool is_linked __attribute__((weak)) = false;
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
 }   // namespace hpx_start
+
+#endif
 
 namespace hpx { namespace threads { namespace detail {
     static get_default_pool_type get_default_pool;
@@ -49,6 +56,12 @@ namespace hpx { namespace threads { namespace detail {
         }
         else
         {
+
+// The following implementation has been divided for Linux and Mac OSX
+#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) && \
+    (defined(__linux) || defined(__linux__) || defined(linux) || \
+    defined(__APPLE__))
+
             // hpx_main.hpp is included but not linked to libhpx_wrap
             if (!hpx_start::is_linked && hpx_start::include_libhpx_wrap)
                 HPX_THROW_EXCEPTION(invalid_status,
@@ -56,6 +69,8 @@ namespace hpx { namespace threads { namespace detail {
                     "Attempting to use hpx_main.hpp functionality without "
                     "linking to libhpx_wrap. Did you link to HPX::wrap_main "
                     "in your CMakeLists.txt?");
+
+#endif
 
             HPX_THROW_EXCEPTION(invalid_status,
                 "hpx::threads::detail::get_self_or_default_pool",
