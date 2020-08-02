@@ -70,7 +70,9 @@ namespace hpx { namespace threads { namespace detail {
                     "linking to libhpx_wrap. If you're using CMakeLists, make "
                     "sure to add HPX::wrap_main to target_link_libraries. "
                     "If you're using Makefile, make sure to link to "
-                    "libhpx_wrap when generating the executable.");
+                    "libhpx_wrap when generating the executable. If you're "
+                    "linking explicitly, consult the HPX docs for library "
+                    "link order and other subtle nuances.");
 
 #endif
 
