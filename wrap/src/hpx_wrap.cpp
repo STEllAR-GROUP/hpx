@@ -27,6 +27,12 @@ namespace hpx_start
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
     HPX_SYMBOL_EXPORT extern std::string app_name_libhpx_wrap;
     HPX_SYMBOL_EXPORT std::string app_name_libhpx_wrap __attribute__((weak));
+
+    // Provide a definition of is_linked variable defined weak in hpx_main.hpp
+    // header. This variable is solely to trigger a different exception when
+    // trying to register thread when not linked to libhpx_wrap and using
+    // hpx_main.hpp functionality.
+    HPX_SYMBOL_EXPORT bool is_linked = true;
 }
 
 #include <hpx/hpx_finalize.hpp>
