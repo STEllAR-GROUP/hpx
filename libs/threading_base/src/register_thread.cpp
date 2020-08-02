@@ -23,7 +23,7 @@
     defined(__APPLE__))
 
 namespace hpx_start {
-    // Redifining weak variables defined in hpx_main.hpp to facilitate error
+    // Redefining weak variables defined in hpx_main.hpp to facilitate error
     // checking and make sure correct errors are thrown. It is added again
     // to make sure that these variables are defined correctly in cases
     // where hpx_main functionalities are not used.
@@ -67,8 +67,10 @@ namespace hpx { namespace threads { namespace detail {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "hpx::threads::detail::get_self_or_default_pool",
                     "Attempting to use hpx_main.hpp functionality without "
-                    "linking to libhpx_wrap. Did you link to HPX::wrap_main "
-                    "in your CMakeLists.txt?");
+                    "linking to libhpx_wrap. If you're using CMakeLists, make "
+                    "sure to add HPX::wrap_main to target_link_libraries. "
+                    "If you're using Makefile, make sure to link to "
+                    "libhpx_wrap when generating the executable.");
 
 #endif
 
