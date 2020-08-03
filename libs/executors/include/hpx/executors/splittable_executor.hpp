@@ -88,6 +88,26 @@ namespace hpx { namespace parallel { namespace execution {
             }
         }
 
+        // Add two executor API functions that will be called before the
+        // parallel algorithm starts executing and after it has finished
+        // executing.
+        //
+        // Note that this method can cause problems if two parallel algorithms
+        // are executed concurrently.
+        template <typename Parameters>
+        static void mark_begin_execution(Parameters&&)
+        {
+            hpx::threads::remove_scheduler_mode(
+                hpx::threads::policies::enable_stealing);
+        }
+
+        template <typename Parameters>
+        static void mark_end_execution(Parameters&&)
+        {
+            hpx::threads::add_scheduler_mode(
+                hpx::threads::policies::enable_stealing);
+        }
+        
         /// \cond NOINTERNAL
         // Estimate a chunk size based on number of cores used.
         template <typename Parameters, typename F>
