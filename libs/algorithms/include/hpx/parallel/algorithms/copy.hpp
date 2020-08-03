@@ -664,7 +664,10 @@ namespace hpx {
         friend FwdIter2 tag_invoke(
             hpx::copy_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
-            return std::copy(first, last, dest);
+            return parallel::v1::detail::get_second_element(
+                parallel::v1::detail::transfer<
+                    parallel::v1::detail::copy_iter<FwdIter1, FwdIter2>>(
+                    hpx::parallel::execution::seq, first, last, dest));
         }
     } copy{};
 
@@ -721,7 +724,24 @@ namespace hpx {
         friend FwdIter2 tag_invoke(
             hpx::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
-            return std::copy_n(first, count, dest);
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Requires at least forward iterator.");
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::v1::detail::is_negative(count))
+            {
+                return hpx::parallel::util::detail::algorithm_result<
+                    hpx::parallel::execution::sequenced_policy,
+                    FwdIter2>::get(std::move(dest));
+            }
+
+            return hpx::parallel::v1::detail::get_second_element(
+                hpx::parallel::v1::detail::copy_n<
+                    hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+                    .call(hpx::parallel::execution::seq, std::true_type{},
+                        first, std::size_t(count), dest));
         }
     } copy_n{};
 
@@ -778,7 +798,17 @@ namespace hpx {
         friend FwdIter2 tag_invoke(hpx::copy_if_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred&& pred)
         {
-            return std::copy_if(first, last, dest, std::forward<Pred>(pred));
+            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+                "Required at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::v1::detail::get_second_element(
+                hpx::parallel::v1::detail::copy_if<
+                    hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+                    .call(hpx::parallel::execution::seq, std::true_type{},
+                        first, last, dest, std::forward<Pred>(pred),
+                        hpx::parallel::util::projection_identity{}));
         }
     } copy_if{};
 
