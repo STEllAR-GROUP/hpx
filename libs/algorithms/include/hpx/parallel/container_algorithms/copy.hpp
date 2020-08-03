@@ -22,7 +22,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
+    /// \tparam Iter1       The type of the begin source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
@@ -59,11 +59,11 @@ namespace hpx { namespace ranges {
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
+    template <typename ExPolicy, typename Iter1, typename Sent1,
         typename FwdIter>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_result<FwdIter1, FwdIter>>::type
-    copy(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest);
+        hpx::ranges::copy_result<Iter1, Iter>>::type
+    copy(ExPolicy&& policy, Iter1 iter, Sent1 sent, FwdIter dest);
 
     /// Copies the elements in the range \a rng to another
     /// range beginning at \a dest.

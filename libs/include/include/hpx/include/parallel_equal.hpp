@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2020 Hartmut Kaiser
 //  Copyright (c) 2014 Grant Mercer
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,3 +8,4 @@
 #pragma once
 
 #include <hpx/parallel/algorithms/equal.hpp>
+#include <hpx/parallel/container_algorithms/equal.hpp>

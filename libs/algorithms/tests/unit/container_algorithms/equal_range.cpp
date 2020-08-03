@@ -37,11 +37,11 @@ void test_equal1(IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        bool result = hpx::equal(
-            iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2));
+        bool result = hpx::ranges::equal(iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2));
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result, expected);
@@ -50,11 +50,11 @@ void test_equal1(IteratorTag)
     {
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
-        bool result = hpx::equal(
-            iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2));
+        bool result = hpx::ranges::equal(iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2));
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result, expected);
@@ -79,11 +79,11 @@ void test_equal1(ExPolicy&& policy, IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        bool result = hpx::equal(policy, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2));
+        bool result = hpx::ranges::equal(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2));
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result, expected);
@@ -92,11 +92,11 @@ void test_equal1(ExPolicy&& policy, IteratorTag)
     {
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
-        bool result = hpx::equal(policy, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2));
+        bool result = hpx::ranges::equal(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2));
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result, expected);
@@ -117,12 +117,13 @@ void test_equal1_async(ExPolicy&& p, IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        hpx::future<bool> result = hpx::equal(p, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2));
+        hpx::future<bool> result =
+            hpx::ranges::equal(p, iterator(std::begin(c1)),
+                iterator(std::end(c1)), std::begin(c2), std::end(c2));
         result.wait();
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result.get(), expected);
@@ -132,12 +133,13 @@ void test_equal1_async(ExPolicy&& p, IteratorTag)
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
 
-        hpx::future<bool> result = hpx::equal(p, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2));
+        hpx::future<bool> result =
+            hpx::ranges::equal(p, iterator(std::begin(c1)),
+                iterator(std::end(c1)), std::begin(c2), std::end(c2));
         result.wait();
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result.get(), expected);
@@ -181,11 +183,11 @@ void test_equal2(IteratorTag)
 
     {
         bool result =
-            hpx::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::equal_to<std::size_t>());
+            hpx::ranges::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result, expected);
@@ -195,11 +197,11 @@ void test_equal2(IteratorTag)
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
         bool result =
-            hpx::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::equal_to<std::size_t>());
+            hpx::ranges::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result, expected);
@@ -224,12 +226,12 @@ void test_equal2(ExPolicy&& policy, IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        bool result =
-            hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::equal_to<std::size_t>());
+        bool result = hpx::ranges::equal(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            std::equal_to<std::size_t>());
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result, expected);
@@ -238,12 +240,12 @@ void test_equal2(ExPolicy&& policy, IteratorTag)
     {
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
-        bool result =
-            hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::equal_to<std::size_t>());
+        bool result = hpx::ranges::equal(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            std::equal_to<std::size_t>());
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result, expected);
@@ -264,13 +266,13 @@ void test_equal2_async(ExPolicy&& p, IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        hpx::future<bool> result =
-            hpx::equal(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::equal_to<std::size_t>());
+        hpx::future<bool> result = hpx::ranges::equal(p,
+            iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
+            std::end(c2), std::equal_to<std::size_t>());
         result.wait();
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result.get(), expected);
@@ -280,13 +282,13 @@ void test_equal2_async(ExPolicy&& p, IteratorTag)
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
 
-        hpx::future<bool> result =
-            hpx::equal(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::equal_to<std::size_t>());
+        hpx::future<bool> result = hpx::ranges::equal(p,
+            iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
+            std::end(c2), std::equal_to<std::size_t>());
         result.wait();
 
-        bool expected =
-            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+        bool expected = std::equal(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(result.get(), expected);
@@ -331,8 +333,8 @@ void test_equal_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2), [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -372,8 +374,9 @@ void test_equal_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::equal(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -409,11 +412,11 @@ void test_equal_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<bool> f =
-            hpx::equal(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), [](std::size_t v1, std::size_t v2) {
-                    return throw std::runtime_error("test"), true;
-                });
+        hpx::future<bool> f = hpx::ranges::equal(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), true;
+            });
         returned_from_algorithm = true;
         f.get();
 
@@ -477,8 +480,9 @@ void test_equal_bad_alloc(ExPolicy&& policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::equal(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), true;
             });
 
@@ -513,11 +517,11 @@ void test_equal_bad_alloc_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<bool> f =
-            hpx::equal(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), [](std::size_t v1, std::size_t v2) {
-                    return throw std::bad_alloc(), true;
-                });
+        hpx::future<bool> f = hpx::ranges::equal(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::bad_alloc(), true;
+            });
         returned_from_algorithm = true;
         f.get();
 

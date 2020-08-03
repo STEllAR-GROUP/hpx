@@ -11,7 +11,6 @@
 
 namespace hpx {
     using hpx::parallel::adjacent_find;
-    using hpx::parallel::equal;
     using hpx::parallel::find;
     using hpx::parallel::find_end;
     using hpx::parallel::find_first_of;

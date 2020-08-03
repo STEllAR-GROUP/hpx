@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,8 +23,46 @@
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
+template <typename IteratorTag>
+void test_equal_binary1(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c1(10007);
+    std::vector<std::size_t> c2(c1.size());
+
+    std::size_t first_value = gen();    //-V101
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
+
+    {
+        bool result = hpx::equal(iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2));
+
+        bool expected =
+            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+
+        // verify values
+        HPX_TEST_EQ(result, expected);
+    }
+
+    {
+        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        c1[dis(gen)] += 1;    //-V104
+        bool result = hpx::equal(iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2));
+
+        bool expected =
+            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+
+        // verify values
+        HPX_TEST_EQ(result, expected);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_equal_binary1(ExPolicy policy, IteratorTag)
+void test_equal_binary1(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -41,7 +79,7 @@ void test_equal_binary1(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        bool result = hpx::parallel::equal(policy, iterator(std::begin(c1)),
+        bool result = hpx::equal(policy, iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::end(c2));
 
         bool expected =
@@ -54,7 +92,7 @@ void test_equal_binary1(ExPolicy policy, IteratorTag)
     {
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         c1[dis(gen)] += 1;    //-V104
-        bool result = hpx::parallel::equal(policy, iterator(std::begin(c1)),
+        bool result = hpx::equal(policy, iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::end(c2));
 
         bool expected =
@@ -66,7 +104,7 @@ void test_equal_binary1(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_equal_binary1_async(ExPolicy p, IteratorTag)
+void test_equal_binary1_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -79,9 +117,8 @@ void test_equal_binary1_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        hpx::future<bool> result =
-            hpx::parallel::equal(p, iterator(std::begin(c1)),
-                iterator(std::end(c1)), std::begin(c2), std::end(c2));
+        hpx::future<bool> result = hpx::equal(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2));
         result.wait();
 
         bool expected =
@@ -95,9 +132,8 @@ void test_equal_binary1_async(ExPolicy p, IteratorTag)
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
 
-        hpx::future<bool> result =
-            hpx::parallel::equal(p, iterator(std::begin(c1)),
-                iterator(std::end(c1)), std::begin(c2), std::end(c2));
+        hpx::future<bool> result = hpx::equal(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2));
         result.wait();
 
         bool expected =
@@ -112,6 +148,8 @@ template <typename IteratorTag>
 void test_equal_binary1()
 {
     using namespace hpx::parallel;
+
+    test_equal_binary1(IteratorTag());
 
     test_equal_binary1(execution::seq, IteratorTag());
     test_equal_binary1(execution::par, IteratorTag());
@@ -128,8 +166,48 @@ void equal_binary_test1()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_equal_binary2(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c1(10007);
+    std::vector<std::size_t> c2(c1.size());
+
+    std::size_t first_value = gen();    //-V101
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
+
+    {
+        bool result =
+            hpx::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
+
+        bool expected = std::equal(std::begin(c1), std::end(c1), std::begin(c2),
+            std::equal_to<std::size_t>());
+
+        // verify values
+        HPX_TEST_EQ(result, expected);
+    }
+
+    {
+        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        ++c1[dis(gen)];    //-V104
+        bool result =
+            hpx::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
+
+        bool expected = std::equal(std::begin(c1), std::end(c1), std::begin(c2),
+            std::equal_to<std::size_t>());
+
+        // verify values
+        HPX_TEST_EQ(result, expected);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_equal_binary2(ExPolicy policy, IteratorTag)
+void test_equal_binary2(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -146,9 +224,9 @@ void test_equal_binary2(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        bool result = hpx::parallel::equal(policy, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2), std::end(c2),
-            std::equal_to<std::size_t>());
+        bool result =
+            hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
 
         bool expected = std::equal(std::begin(c1), std::end(c1), std::begin(c2),
             std::equal_to<std::size_t>());
@@ -160,9 +238,9 @@ void test_equal_binary2(ExPolicy policy, IteratorTag)
     {
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
-        bool result = hpx::parallel::equal(policy, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2), std::end(c2),
-            std::equal_to<std::size_t>());
+        bool result =
+            hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
 
         bool expected = std::equal(std::begin(c1), std::end(c1), std::begin(c2),
             std::equal_to<std::size_t>());
@@ -173,7 +251,7 @@ void test_equal_binary2(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_equal_binary2_async(ExPolicy p, IteratorTag)
+void test_equal_binary2_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -186,9 +264,9 @@ void test_equal_binary2_async(ExPolicy p, IteratorTag)
     std::iota(std::begin(c2), std::end(c2), first_value);
 
     {
-        hpx::future<bool> result = hpx::parallel::equal(p,
-            iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
-            std::end(c2), std::equal_to<std::size_t>());
+        hpx::future<bool> result =
+            hpx::equal(p, iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
         result.wait();
 
         bool expected = std::equal(std::begin(c1), std::end(c1), std::begin(c2),
@@ -202,9 +280,9 @@ void test_equal_binary2_async(ExPolicy p, IteratorTag)
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
 
-        hpx::future<bool> result = hpx::parallel::equal(p,
-            iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2),
-            std::end(c2), std::equal_to<std::size_t>());
+        hpx::future<bool> result =
+            hpx::equal(p, iterator(std::begin(c1)), iterator(std::end(c1)),
+                std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
         result.wait();
 
         bool expected = std::equal(std::begin(c1), std::end(c1), std::begin(c2),
@@ -219,6 +297,8 @@ template <typename IteratorTag>
 void test_equal_binary2()
 {
     using namespace hpx::parallel;
+
+    test_equal_binary2(IteratorTag());
 
     test_equal_binary2(execution::seq, IteratorTag());
     test_equal_binary2(execution::par, IteratorTag());
@@ -235,8 +315,45 @@ void equal_binary_test2()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_equal_binary_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c1(10007);
+    std::vector<std::size_t> c2(c1.size());
+
+    std::size_t first_value = gen();    //-V101
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2), [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), true;
+            });
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+            IteratorTag>::call(hpx::parallel::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_equal_binary_exception(ExPolicy policy, IteratorTag)
+void test_equal_binary_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -255,9 +372,8 @@ void test_equal_binary_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::equal(policy, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2), std::end(c2),
-            [](std::size_t v1, std::size_t v2) {
+        hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2), [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -277,7 +393,7 @@ void test_equal_binary_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_equal_binary_exception_async(ExPolicy p, IteratorTag)
+void test_equal_binary_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -293,7 +409,7 @@ void test_equal_binary_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<bool> f = hpx::parallel::equal(p, iterator(std::begin(c1)),
+        hpx::future<bool> f = hpx::equal(p, iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::end(c2),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
@@ -322,6 +438,8 @@ void test_equal_binary_exception()
 {
     using namespace hpx::parallel;
 
+    test_equal_binary_exception(IteratorTag());
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -342,7 +460,7 @@ void equal_binary_exception_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_equal_binary_bad_alloc(ExPolicy policy, IteratorTag)
+void test_equal_binary_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -361,9 +479,8 @@ void test_equal_binary_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::equal(policy, iterator(std::begin(c1)),
-            iterator(std::end(c1)), std::begin(c2), std::end(c2),
-            [](std::size_t v1, std::size_t v2) {
+        hpx::equal(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2), [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), true;
             });
 
@@ -382,7 +499,7 @@ void test_equal_binary_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_equal_binary_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_equal_binary_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -398,7 +515,7 @@ void test_equal_binary_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<bool> f = hpx::parallel::equal(p, iterator(std::begin(c1)),
+        hpx::future<bool> f = hpx::equal(p, iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::end(c2),
             [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), true;
