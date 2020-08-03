@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -61,7 +61,7 @@ void test_destroy_n(IteratorTag)
 
     destruct_count.store(0);
 
-    hpx::destroy_n(iterator(p), data_size);
+    hpx::ranges::destroy_n(iterator(p), data_size);
 
     HPX_TEST_EQ(destruct_count.load(), data_size);
 
@@ -69,7 +69,7 @@ void test_destroy_n(IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_destroy_n(ExPolicy policy, IteratorTag)
+void test_destroy_n(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -88,7 +88,8 @@ void test_destroy_n(ExPolicy policy, IteratorTag)
 
     destruct_count.store(0);
 
-    hpx::destroy_n(std::forward<ExPolicy>(policy), iterator(p), data_size);
+    hpx::ranges::destroy_n(
+        std::forward<ExPolicy>(policy), iterator(p), data_size);
 
     HPX_TEST_EQ(destruct_count.load(), data_size);
 
@@ -111,8 +112,8 @@ void test_destroy_n_async(ExPolicy&& policy, IteratorTag)
 
     destruct_count.store(0);
 
-    auto f =
-        hpx::destroy_n(std::forward<ExPolicy>(policy), iterator(p), data_size);
+    auto f = hpx::ranges::destroy_n(
+        std::forward<ExPolicy>(policy), iterator(p), data_size);
     f.wait();
 
     HPX_TEST_EQ(destruct_count.load(), data_size);
@@ -169,11 +170,11 @@ void test_destroy_n_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::destroy_n(decorated_iterator(p,
-                           [&throw_after]() {
-                               if (throw_after-- == 0)
-                                   throw std::runtime_error("test");
-                           }),
+        hpx::ranges::destroy_n(decorated_iterator(p,
+                                   [&throw_after]() {
+                                       if (throw_after-- == 0)
+                                           throw std::runtime_error("test");
+                                   }),
             data_size);
         HPX_TEST(false);
     }
@@ -226,7 +227,7 @@ void test_destroy_n_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::destroy_n(policy,
+        hpx::ranges::destroy_n(policy,
             decorated_iterator(p,
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -280,7 +281,7 @@ void test_destroy_n_exception_async(ExPolicy&& policy, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::destroy_n(policy,
+        auto f = hpx::ranges::destroy_n(policy,
             decorated_iterator(p,
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -368,7 +369,7 @@ void test_destroy_n_bad_alloc(ExPolicy&& policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::destroy_n(policy,
+        hpx::ranges::destroy_n(policy,
             decorated_iterator(p,
                 [&throw_after]() {
                     if (throw_after-- == 0)
@@ -422,7 +423,7 @@ void test_destroy_n_bad_alloc_async(ExPolicy&& policy, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::destroy_n(policy,
+        auto f = hpx::ranges::destroy_n(policy,
             decorated_iterator(p,
                 [&throw_after]() {
                     if (throw_after-- == 0)
