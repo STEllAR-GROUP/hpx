@@ -92,14 +92,14 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::latch l(2);
 
             std::size_t task_size =
-                std::ceil((stop_ - start_) / (num_free_ + 1));
+                std::ceil(float(stop_ - start_) / (num_free_ + 1));
             std::size_t remainder = stop_ - start_ - task_size;
 
             hpx::util::thread_description desc(f_);
 
-            if ((num_free_ != 0 && task_size > min_task_size_) && remainder > 1)
+            if ((num_free_ != 0 && task_size > min_task_size_) && remainder > 0)
             {
-                // split the current task, create one for each idle core
+                // split the current task, create one for the first identified idle core
                 for (std::size_t i = 0, j = 0; i != 1; ++j)
                 {
                     if (hpx::threads::test(mask, j))
@@ -139,10 +139,10 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::latch l(num_free_ + 1);
 
             std::size_t task_size =
-                std::ceil((stop_ - start_) / (num_free_ + 1));
+                std::ceil(float(stop_ - start_) / (num_free_ + 1));
             std::size_t remainder = stop_ - start_ - task_size;
 
-            if ((num_free_ != 0 && task_size > min_task_size_) && remainder > 1)
+            if ((num_free_ != 0 && task_size > min_task_size_) && remainder > 0)
             {
                 hpx::util::thread_description desc(f_);
 
@@ -183,10 +183,10 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::latch l(2);
 
             std::size_t task_size =
-                std::ceil((stop_ - start_) / (num_free_ + 1));
+                std::ceil(float(stop_ - start_) / (num_free_ + 1));
             std::size_t remainder = stop_ - start_ - task_size;
 
-            if ((num_free_ != 0 && task_size > min_task_size_) && remainder > 1)
+            if ((num_free_ != 0 && task_size > min_task_size_) && remainder > 0)
             {
                 // split the current task
                 exec_.post(splittable_task(exec_, f_,
@@ -212,10 +212,10 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::latch l(num_free_ + 1);
 
             std::size_t task_size =
-                std::ceil((stop_ - start_) / (num_free_ + 1));
+                std::ceil(float(stop_ - start_) / (num_free_ + 1));
             std::size_t remainder = stop_ - start_ - task_size;
 
-            if ((num_free_ != 0 && task_size > min_task_size_) && remainder > 1)
+            if ((num_free_ != 0 && task_size > min_task_size_) && remainder > 0)
             {
                 hpx::util::thread_description desc(f_);
 
@@ -255,6 +255,7 @@ namespace hpx { namespace parallel { namespace execution {
         Executor& exec_;
         splittable_mode split_type_;
         std::size_t min_task_size_;
+        char const* desc_;
     };
 
     template <typename Executor, typename F, typename Shape>
