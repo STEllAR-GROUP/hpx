@@ -9,11 +9,12 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_count.hpp>
 #include <hpx/modules/testing.hpp>
-#include "iter_sent.hpp"
 
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+
+#include "iter_sent.hpp"
 
 struct BitCountingIterator : public Iterator<std::int64_t>
 {
@@ -85,12 +86,12 @@ void test_count()
 
     auto stdResult = std::count(Iter{0}, Iter{33}, std::int64_t{1});
 
-    auto result = hpx::parallel::count(
+    auto result = hpx::ranges::count(
         hpx::parallel::execution::seq, Iter{0}, Sent{33}, std::int64_t{1});
 
     HPX_TEST_EQ(result, stdResult);
 
-    result = hpx::parallel::count(
+    result = hpx::ranges::count(
         hpx::parallel::execution::par, Iter{0}, Sent{33}, std::int64_t{1});
 
     HPX_TEST_EQ(result, stdResult);
@@ -104,12 +105,12 @@ void test_count_if()
     auto predicate = [](std::int64_t v) { return v == 1; };
     auto stdResult = std::count_if(Iter{0}, Iter{33}, predicate);
 
-    Iter::difference_type result = hpx::parallel::count_if(
+    Iter::difference_type result = hpx::ranges::count_if(
         hpx::parallel::execution::seq, Iter{0}, Sent{33}, predicate);
 
     HPX_TEST_EQ(result, stdResult);
 
-    result = hpx::parallel::count_if(
+    result = hpx::ranges::count_if(
         hpx::parallel::execution::par, Iter{0}, Sent{33}, predicate);
 
     HPX_TEST_EQ(result, stdResult);

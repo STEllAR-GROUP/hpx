@@ -94,8 +94,8 @@ void move_algo_tests_with_policy(std::size_t size, std::size_t localities,
     compare_vectors(v1, v2);
 
     hpx::partitioned_vector<T> v3(size, policy);
-    auto p = hpx::parallel::move(move_policy, v2.begin(), v2.end(), v3.begin());
-    HPX_TEST(p.out == v3.end());
+    auto p = hpx::move(move_policy, v2.begin(), v2.end(), v3.begin());
+    HPX_TEST(p == v3.end());
     compare_vectors(v1, v3);
 }
 
@@ -112,10 +112,9 @@ void move_algo_tests_with_policy_async(std::size_t size, std::size_t localities,
     using hpx::parallel::execution::task;
 
     hpx::partitioned_vector<T> v3(size, policy);
-    auto f = hpx::parallel::move(
-        move_policy(task), v2.begin(), v2.end(), v3.begin());
+    auto f = hpx::move(move_policy(task), v2.begin(), v2.end(), v3.begin());
 
-    HPX_TEST(f.get().out == v3.end());
+    HPX_TEST(f.get() == v3.end());
     compare_vectors(v1, v3);
 }
 

@@ -9,11 +9,75 @@
 
 #pragma once
 
+#if defined(DOXYGEN)
+namespace hpx {
+    // clang-format off
+
+    /// Moves the elements in the range [first, last), to another range
+    /// beginning at \a dest. After this operation the elements in the
+    /// moved-from range will still contain valid values of the appropriate
+    /// type, but not necessarily the same values as before the move.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first move assignments.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the move assignments.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The move assignments in the parallel \a move algorithm invoked
+    /// with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in
+    /// the calling thread.
+    ///
+    /// The move assignments in the parallel \a move algorithm invoked
+    /// with an execution policy object of type
+    /// \a parallel_policy or \a parallel_task_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a move algorithm returns a
+    ///           \a  hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
+    ///           otherwise.
+    ///           The \a move algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           moved.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
+
+    // clang-format off
+}
+
+#else // DOXYGEN
+
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -105,56 +169,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    /// Moves the elements in the range [first, last), to another range
-    /// beginning at \a dest. After this operation the elements in the
-    /// moved-from range will still contain valid values of the appropriate
-    /// type, but not necessarily the same values as before the move.
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first move assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the move assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    ///
-    /// The move assignments in the parallel \a move algorithm invoked
-    /// with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in
-    /// the calling thread.
-    ///
-    /// The move assignments in the parallel \a move algorithm invoked
-    /// with an execution policy object of type
-    /// \a parallel_policy or \a parallel_task_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a move algorithm returns a
-    ///           \a  hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    ///           otherwise.
-    ///           The \a move algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           moved.
-    ///
     // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         HPX_CONCEPT_REQUIRES_(
@@ -162,11 +176,55 @@ namespace hpx { namespace parallel { inline namespace v1 {
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value)>
     // clang-format on
-    typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<FwdIter1, FwdIter2>>::type
-    move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+    HPX_DEPRECATED_V(
+        1, 6, "hpx::parallel::move is deprecated, use hpx::move instead")
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+        move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
     {
         return detail::transfer<detail::move<FwdIter1, FwdIter2>>(
             std::forward<ExPolicy>(policy), first, last, dest);
     }
 }}}    // namespace hpx::parallel::v1
+
+namespace hpx {
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::move
+    HPX_INLINE_CONSTEXPR_VARIABLE struct move_t final
+      : hpx::functional::tag<move_t>
+    {
+    private:
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value)>
+        // clang-format on
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type
+        tag_invoke(move_t, ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest)
+        {
+            return hpx::parallel::v1::detail::get_second_element(
+                hpx::parallel::v1::detail::transfer<
+                    hpx::parallel::v1::detail::move<FwdIter1, FwdIter2>>(
+                    std::forward<ExPolicy>(policy), first, last, dest));
+        }
+
+        // clang-format off
+        template <typename FwdIter1, typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::traits::is_iterator<FwdIter2>::value)>
+        // clang-format on
+        friend FwdIter2 tag_invoke(
+            move_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        {
+            return std::move(first, last, dest);
+        }
+    } move;
+}    // namespace hpx
+
+#endif    // DOXYGEN

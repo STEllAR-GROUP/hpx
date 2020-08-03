@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +19,9 @@ template <typename IteratorTag>
 void test_count()
 {
     using namespace hpx::parallel;
+
+    test_count(IteratorTag());
+
     test_count(execution::seq, IteratorTag());
     test_count(execution::par, IteratorTag());
     test_count(execution::par_unseq, IteratorTag());
@@ -37,6 +41,8 @@ template <typename IteratorTag>
 void test_count_exception()
 {
     using namespace hpx::parallel;
+
+    test_count_exception(IteratorTag());
 
     // If the execution policy object is of type parallel_unsequenced_policy,
     // std::terminate shall be called. Therefore we do not test exceptions

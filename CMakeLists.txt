@@ -945,8 +945,8 @@ if(HPX_WITH_LIBCDS)
     https://github.com/STEllAR-GROUP/libcds CATEGORY "Thread Manager" ADVANCED
   )
   hpx_option(
-    HPX_WITH_LIBCDS_GIT_TAG STRING "Define the LibCDS git tag to use."
-    hpx-thread CATEGORY "Thread Manager" ADVANCED
+    HPX_WITH_LIBCDS_GIT_TAG STRING "Define the LibCDS git tag to use." hpx-1.5
+    CATEGORY "Thread Manager" ADVANCED
   )
   include(HPX_SetupLibCDS)
   if(NOT libcds_POPULATED)
