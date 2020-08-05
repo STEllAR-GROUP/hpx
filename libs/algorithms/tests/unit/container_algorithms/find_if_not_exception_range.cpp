@@ -36,8 +36,9 @@ void test_find_if_not_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::find_if_not(decorated_iterator(std::begin(c),
-                             []() { throw std::runtime_error("test"); }),
+        hpx::ranges::find_if_not(
+            decorated_iterator(
+                std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
         HPX_TEST(false);
     }
@@ -72,7 +73,7 @@ void test_find_if_not_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::find_if_not(policy,
+        hpx::ranges::find_if_not(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
@@ -106,7 +107,7 @@ void test_find_if_not_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::find_if_not(p,
+        hpx::future<decorated_iterator> f = hpx::ranges::find_if_not(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });

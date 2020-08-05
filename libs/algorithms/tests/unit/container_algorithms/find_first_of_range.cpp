@@ -25,8 +25,28 @@ std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(0, 10006);
 std::uniform_int_distribution<> dist(0, 2);
 
+template <typename IteratorTag>
+void test_find_first_of(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+
+    int find_first_of_pos = dis(gen);
+    int random_sub_seq_pos = dist(gen);
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen() + 19);
+    std::size_t h[] = {1, 7, 18, 3};
+    c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
+
+    base_iterator index = hpx::ranges::find_first_of(c, h);
+
+    base_iterator test_index = std::begin(c) + find_first_of_pos;
+
+    HPX_TEST(index == test_index);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of(ExPolicy policy, IteratorTag)
+void test_find_first_of(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -42,14 +62,38 @@ void test_find_first_of(ExPolicy policy, IteratorTag)
     std::size_t h[] = {1, 7, 18, 3};
     c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
-    base_iterator index = hpx::parallel::find_first_of(policy, c, h);
+    base_iterator index = hpx::ranges::find_first_of(policy, c, h);
 
     base_iterator test_index = std::begin(c) + find_first_of_pos;
 
     HPX_TEST(index == test_index);
 }
+
+template <typename IteratorTag>
+void test_find_first_of_proj(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+
+    int find_first_of_pos = dis(gen);
+    int random_sub_seq_pos = dist(gen);
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), (gen() % 32768) + 19);
+    std::size_t h[] = {1 + 65536, 7 + 65536, 18 + 65536, 3 + 65536};
+    c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
+
+    base_iterator index = hpx::ranges::find_first_of(
+        c, h, std::equal_to<std::size_t>(),
+        [](std::size_t x) { return x % 65536; },
+        [](std::size_t x) { return x % 65536; });
+
+    base_iterator test_index = std::begin(c) + find_first_of_pos;
+
+    HPX_TEST(index == test_index);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of_proj(ExPolicy policy, IteratorTag)
+void test_find_first_of_proj(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -65,7 +109,7 @@ void test_find_first_of_proj(ExPolicy policy, IteratorTag)
     std::size_t h[] = {1 + 65536, 7 + 65536, 18 + 65536, 3 + 65536};
     c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
-    base_iterator index = hpx::parallel::find_first_of(
+    base_iterator index = hpx::ranges::find_first_of(
         policy, c, h, std::equal_to<std::size_t>(),
         [](std::size_t x) { return x % 65536; },
         [](std::size_t x) { return x % 65536; });
@@ -76,7 +120,7 @@ void test_find_first_of_proj(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of_async(ExPolicy p, IteratorTag)
+void test_find_first_of_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -88,7 +132,7 @@ void test_find_first_of_async(ExPolicy p, IteratorTag)
     std::size_t h[] = {1, 7, 18, 3};
     c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
-    hpx::future<base_iterator> f = hpx::parallel::find_first_of(p, c, h);
+    hpx::future<base_iterator> f = hpx::ranges::find_first_of(p, c, h);
     f.wait();
 
     // create iterator at position of value to be found
@@ -96,8 +140,9 @@ void test_find_first_of_async(ExPolicy p, IteratorTag)
 
     HPX_TEST(f.get() == test_index);
 }
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of_async_proj(ExPolicy p, IteratorTag)
+void test_find_first_of_async_proj(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
 
@@ -109,7 +154,7 @@ void test_find_first_of_async_proj(ExPolicy p, IteratorTag)
     std::size_t h[] = {1 + 65536, 7 + 65536, 18 + 65536, 3 + 65536};
     c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
-    hpx::future<base_iterator> f = hpx::parallel::find_first_of(
+    hpx::future<base_iterator> f = hpx::ranges::find_first_of(
         p, c, h, std::equal_to<std::size_t>(),
         [](std::size_t x) { return x % 65536; },
         [](std::size_t x) { return x % 65536; });
@@ -125,9 +170,13 @@ template <typename IteratorTag>
 void test_find_first_of()
 {
     using namespace hpx::parallel;
+
+    test_find_first_of(IteratorTag());
     test_find_first_of(execution::seq, IteratorTag());
     test_find_first_of(execution::par, IteratorTag());
     test_find_first_of(execution::par_unseq, IteratorTag());
+
+    test_find_first_of_proj(IteratorTag());
     test_find_first_of_proj(execution::seq, IteratorTag());
     test_find_first_of_proj(execution::par, IteratorTag());
     test_find_first_of_proj(execution::par_unseq, IteratorTag());
@@ -147,7 +196,6 @@ void find_first_of_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))

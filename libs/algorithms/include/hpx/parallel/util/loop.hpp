@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin it, End end, F&& f)
             {
                 for (/**/; it != end; ++it)
@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename Begin, typename End, typename CancelToken,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin it, End end, CancelToken& tok, F&& f)
             {
                 for (/**/; it != end; ++it)
@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename ExPolicy, typename Begin, typename End, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin loop(
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop(
         ExPolicy&&, Begin begin, End end, F&& f)
     {
         return detail::loop<Begin>::call(begin, end, std::forward<F>(f));
@@ -89,7 +89,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy, typename Begin, typename End,
         typename CancelToken, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin loop(
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop(
         ExPolicy&&, Begin begin, End end, CancelToken& tok, F&& f)
     {
         return detail::loop<Begin>::call(begin, end, tok, std::forward<F>(f));
@@ -106,8 +106,9 @@ namespace hpx { namespace parallel { namespace util {
             ///////////////////////////////////////////////////////////////////
             template <typename Begin1, typename End1, typename Begin2,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<Begin1, Begin2>
-            call(Begin1 it1, End1 end1, Begin2 it2, F&& f)
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static constexpr std::pair<Begin1, Begin2>
+                call(Begin1 it1, End1 end1, Begin2 it2, F&& f)
             {
                 for (/**/; it1 != end1; (void) ++it1, ++it2)
                     f(it1, it2);
@@ -119,7 +120,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy, typename VecOnly, typename Begin1,
         typename End1, typename Begin2, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         !execution::is_vectorpack_execution_policy<ExPolicy>::value,
         std::pair<Begin1, Begin2>>::type
     loop2(VecOnly, Begin1 begin1, End1 end1, Begin2 begin2, F&& f)
@@ -139,7 +140,7 @@ namespace hpx { namespace parallel { namespace util {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
             template <typename Iter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
                 Iter it, std::size_t num, F&& f)
             {
                 std::size_t count(num & std::size_t(-4));    // -V112
@@ -159,7 +160,7 @@ namespace hpx { namespace parallel { namespace util {
             }
 
             template <typename Iter, typename CancelToken, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
                 Iter it, std::size_t num, CancelToken& tok, F&& f)
             {
                 std::size_t count(num & std::size_t(-4));    // -V112
@@ -185,7 +186,7 @@ namespace hpx { namespace parallel { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
             !execution::is_vectorpack_execution_policy<ExPolicy>::value,
             T const&>::type
         extract_value(T const& v)
@@ -194,7 +195,7 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         template <typename ExPolicy, typename F, typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
             !execution::is_vectorpack_execution_policy<ExPolicy>::value,
             T const&>::type
         accumulate_values(F&&, T const& v)
@@ -203,7 +204,7 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         template <typename ExPolicy, typename F, typename T, typename T1>
-        HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
             !execution::is_vectorpack_execution_policy<ExPolicy>::value,
             T>::type
         accumulate_values(F&& f, T&& v, T1&& init)
@@ -214,7 +215,7 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename ExPolicy, typename Iter, typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         !execution::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
     loop_n(Iter it, std::size_t count, F&& f)
     {
@@ -223,7 +224,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename ExPolicy, typename Iter, typename CancelToken,
         typename F>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr typename std::enable_if<
         !execution::is_vectorpack_execution_policy<ExPolicy>::value, Iter>::type
     loop_n(Iter it, std::size_t count, CancelToken& tok, F&& f)
     {
@@ -313,7 +314,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename F, typename Cleanup>
-    HPX_FORCEINLINE Iter loop_with_cleanup(
+    HPX_FORCEINLINE constexpr Iter loop_with_cleanup(
         Iter it, Iter last, F&& f, Cleanup&& cleanup)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
@@ -322,7 +323,7 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     template <typename Iter, typename FwdIter, typename F, typename Cleanup>
-    HPX_FORCEINLINE FwdIter loop_with_cleanup(
+    HPX_FORCEINLINE constexpr FwdIter loop_with_cleanup(
         Iter it, Iter last, FwdIter dest, F&& f, Cleanup&& cleanup)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
@@ -432,7 +433,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename F, typename Cleanup>
-    HPX_FORCEINLINE Iter loop_with_cleanup_n(
+    HPX_FORCEINLINE constexpr Iter loop_with_cleanup_n(
         Iter it, std::size_t count, F&& f, Cleanup&& cleanup)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
@@ -441,7 +442,7 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     template <typename Iter, typename FwdIter, typename F, typename Cleanup>
-    HPX_FORCEINLINE FwdIter loop_with_cleanup_n(
+    HPX_FORCEINLINE constexpr FwdIter loop_with_cleanup_n(
         Iter it, std::size_t count, FwdIter dest, F&& f, Cleanup&& cleanup)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
@@ -450,7 +451,7 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     template <typename Iter, typename CancelToken, typename F, typename Cleanup>
-    HPX_FORCEINLINE Iter loop_with_cleanup_n_with_token(
+    HPX_FORCEINLINE constexpr Iter loop_with_cleanup_n_with_token(
         Iter it, std::size_t count, CancelToken& tok, F&& f, Cleanup&& cleanup)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
@@ -460,7 +461,7 @@ namespace hpx { namespace parallel { namespace util {
 
     template <typename Iter, typename FwdIter, typename CancelToken, typename F,
         typename Cleanup>
-    HPX_FORCEINLINE FwdIter loop_with_cleanup_n_with_token(Iter it,
+    HPX_FORCEINLINE constexpr FwdIter loop_with_cleanup_n_with_token(Iter it,
         std::size_t count, FwdIter dest, CancelToken& tok, F&& f,
         Cleanup&& cleanup)
     {
@@ -479,23 +480,26 @@ namespace hpx { namespace parallel { namespace util {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
             template <typename Iter, typename F>
-            static Iter call(
+            static constexpr Iter call(
                 std::size_t base_idx, Iter it, std::size_t count, F&& f)
             {
                 for (/**/; count != 0; (void) --count, ++it, ++base_idx)
+                {
                     f(*it, base_idx);
-
+                }
                 return it;
             }
 
             template <typename Iter, typename CancelToken, typename F>
-            static Iter call(std::size_t base_idx, Iter it, std::size_t count,
-                CancelToken& tok, F&& f)
+            static constexpr Iter call(std::size_t base_idx, Iter it,
+                std::size_t count, CancelToken& tok, F&& f)
             {
                 for (/**/; count != 0; (void) --count, ++it, ++base_idx)
                 {
                     if (tok.was_cancelled(base_idx))
+                    {
                         break;
+                    }
                     f(*it, base_idx);
                 }
                 return it;
@@ -505,7 +509,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename F>
-    HPX_FORCEINLINE Iter loop_idx_n(
+    HPX_FORCEINLINE constexpr Iter loop_idx_n(
         std::size_t base_idx, Iter it, std::size_t count, F&& f)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;
@@ -514,7 +518,7 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     template <typename Iter, typename CancelToken, typename F>
-    HPX_FORCEINLINE Iter loop_idx_n(std::size_t base_idx, Iter it,
+    HPX_FORCEINLINE constexpr Iter loop_idx_n(std::size_t base_idx, Iter it,
         std::size_t count, CancelToken& tok, F&& f)
     {
         typedef typename std::iterator_traits<Iter>::iterator_category cat;

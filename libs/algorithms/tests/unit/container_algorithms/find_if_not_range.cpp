@@ -35,7 +35,7 @@ void test_find_if_not(IteratorTag)
     c.at(c.size() / 2) = 1;
 
     iterator index =
-        hpx::find_if_not(iterator(std::begin(c)), iterator(std::end(c)),
+        hpx::ranges::find_if_not(iterator(std::begin(c)), iterator(std::end(c)),
             [](std::size_t v) { return v != std::size_t(1); });
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
@@ -58,9 +58,9 @@ void test_find_if_not(ExPolicy&& policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size() / 2) = 1;
 
-    iterator index =
-        hpx::find_if_not(policy, iterator(std::begin(c)), iterator(std::end(c)),
-            [](std::size_t v) { return v != std::size_t(1); });
+    iterator index = hpx::ranges::find_if_not(policy, iterator(std::begin(c)),
+        iterator(std::end(c)),
+        [](std::size_t v) { return v != std::size_t(1); });
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
@@ -78,9 +78,9 @@ void test_find_if_not_async(ExPolicy&& p, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size() / 2) = 1;
 
-    hpx::future<iterator> f =
-        hpx::find_if_not(p, iterator(std::begin(c)), iterator(std::end(c)),
-            [](std::size_t v) { return v != std::size_t(1); });
+    hpx::future<iterator> f = hpx::ranges::find_if_not(p,
+        iterator(std::begin(c)), iterator(std::end(c)),
+        [](std::size_t v) { return v != std::size_t(1); });
     f.wait();
 
     //create iterator at position of value to be found
