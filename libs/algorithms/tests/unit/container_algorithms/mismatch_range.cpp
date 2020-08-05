@@ -29,7 +29,9 @@ template <typename IteratorTag>
 void test_mismatch1(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -42,25 +44,26 @@ void test_mismatch1(IteratorTag)
     iterator end1 = iterator(std::end(c1));
 
     {
-        auto result = hpx::mismatch(begin1, end1, std::begin(c2));
+        auto result =
+            hpx::ranges::mismatch(begin1, end1, std::begin(c2), std::end(c2));
 
         // verify values
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.in1)), c1.size());
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
-            c2.size());
+            std::size_t(std::distance(std::begin(c2), result.in2)), c2.size());
     }
 
     {
         std::size_t changed_idx = dis(gen);    //-V104
         ++c1[changed_idx];
 
-        auto result = hpx::mismatch(begin1, end1, std::begin(c2));
+        auto result =
+            hpx::ranges::mismatch(begin1, end1, std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            std::size_t(std::distance(begin1, result.in1)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.in2)),
             changed_idx);
     }
 }
@@ -73,7 +76,9 @@ void test_mismatch1(ExPolicy&& policy, IteratorTag)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -86,25 +91,26 @@ void test_mismatch1(ExPolicy&& policy, IteratorTag)
     iterator end1 = iterator(std::end(c1));
 
     {
-        auto result = hpx::mismatch(policy, begin1, end1, std::begin(c2));
+        auto result = hpx::ranges::mismatch(
+            policy, begin1, end1, std::begin(c2), std::end(c2));
 
         // verify values
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.in1)), c1.size());
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
-            c2.size());
+            std::size_t(std::distance(std::begin(c2), result.in2)), c2.size());
     }
 
     {
         std::size_t changed_idx = dis(gen);    //-V104
         ++c1[changed_idx];
 
-        auto result = hpx::mismatch(policy, begin1, end1, std::begin(c2));
+        auto result = hpx::ranges::mismatch(
+            policy, begin1, end1, std::begin(c2), std::end(c2));
 
         // verify values
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            std::size_t(std::distance(begin1, result.in1)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.in2)),
             changed_idx);
     }
 }
@@ -113,7 +119,9 @@ template <typename ExPolicy, typename IteratorTag>
 void test_mismatch1_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -126,29 +134,30 @@ void test_mismatch1_async(ExPolicy&& p, IteratorTag)
     iterator end1 = iterator(std::end(c1));
 
     {
-        auto f = hpx::mismatch(p, begin1, end1, std::begin(c2));
+        auto f = hpx::ranges::mismatch(
+            p, begin1, end1, std::begin(c2), std::end(c2));
         f.wait();
 
         // verify values
         auto result = f.get();
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.in1)), c1.size());
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
-            c2.size());
+            std::size_t(std::distance(std::begin(c2), result.in2)), c2.size());
     }
 
     {
         std::size_t changed_idx = dis(gen);    //-V104
         ++c1[changed_idx];
 
-        auto f = hpx::mismatch(p, begin1, end1, std::begin(c2));
+        auto f = hpx::ranges::mismatch(
+            p, begin1, end1, std::begin(c2), std::end(c2));
         f.wait();
 
         // verify values
         auto result = f.get();
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            std::size_t(std::distance(begin1, result.in1)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.in2)),
             changed_idx);
     }
 }
@@ -179,7 +188,9 @@ template <typename IteratorTag>
 void test_mismatch2(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -192,27 +203,26 @@ void test_mismatch2(IteratorTag)
     iterator end1 = iterator(std::end(c1));
 
     {
-        auto result = hpx::mismatch(
-            begin1, end1, std::begin(c2), std::equal_to<std::size_t>());
+        auto result = hpx::ranges::mismatch(begin1, end1, std::begin(c2),
+            std::end(c2), std::equal_to<std::size_t>());
 
         // verify values
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.in1)), c1.size());
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
-            c2.size());
+            std::size_t(std::distance(std::begin(c2), result.in2)), c2.size());
     }
 
     {
         std::size_t changed_idx = dis(gen);    //-V104
         ++c1[changed_idx];
 
-        auto result = hpx::mismatch(
-            begin1, end1, std::begin(c2), std::equal_to<std::size_t>());
+        auto result = hpx::ranges::mismatch(begin1, end1, std::begin(c2),
+            std::end(c2), std::equal_to<std::size_t>());
 
         // verify values
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            std::size_t(std::distance(begin1, result.in1)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.in2)),
             changed_idx);
     }
 }
@@ -225,7 +235,9 @@ void test_mismatch2(ExPolicy&& policy, IteratorTag)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -238,27 +250,26 @@ void test_mismatch2(ExPolicy&& policy, IteratorTag)
     iterator end1 = iterator(std::end(c1));
 
     {
-        auto result = hpx::mismatch(
-            policy, begin1, end1, std::begin(c2), std::equal_to<std::size_t>());
+        auto result = hpx::ranges::mismatch(policy, begin1, end1,
+            std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
 
         // verify values
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.in1)), c1.size());
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
-            c2.size());
+            std::size_t(std::distance(std::begin(c2), result.in2)), c2.size());
     }
 
     {
         std::size_t changed_idx = dis(gen);    //-V104
         ++c1[changed_idx];
 
-        auto result = hpx::mismatch(
-            policy, begin1, end1, std::begin(c2), std::equal_to<std::size_t>());
+        auto result = hpx::ranges::mismatch(policy, begin1, end1,
+            std::begin(c2), std::end(c2), std::equal_to<std::size_t>());
 
         // verify values
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            std::size_t(std::distance(begin1, result.in1)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.in2)),
             changed_idx);
     }
 }
@@ -267,7 +278,9 @@ template <typename ExPolicy, typename IteratorTag>
 void test_mismatch2_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -280,31 +293,30 @@ void test_mismatch2_async(ExPolicy&& p, IteratorTag)
     iterator end1 = iterator(std::end(c1));
 
     {
-        auto f = hpx::mismatch(
-            p, begin1, end1, std::begin(c2), std::equal_to<std::size_t>());
+        auto f = hpx::ranges::mismatch(p, begin1, end1, std::begin(c2),
+            std::end(c2), std::equal_to<std::size_t>());
         f.wait();
 
         // verify values
         auto result = f.get();
+        HPX_TEST_EQ(std::size_t(std::distance(begin1, result.in1)), c1.size());
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
-            c2.size());
+            std::size_t(std::distance(std::begin(c2), result.in2)), c2.size());
     }
 
     {
         std::size_t changed_idx = dis(gen);    //-V104
         ++c1[changed_idx];
 
-        auto f = hpx::mismatch(
-            p, begin1, end1, std::begin(c2), std::equal_to<std::size_t>());
+        auto f = hpx::ranges::mismatch(p, begin1, end1, std::begin(c2),
+            std::end(c2), std::equal_to<std::size_t>());
         f.wait();
 
         // verify values
         auto result = f.get();
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            std::size_t(std::distance(begin1, result.in1)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.in2)),
             changed_idx);
     }
 }
@@ -335,7 +347,9 @@ template <typename IteratorTag>
 void test_mismatch_exception(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -347,8 +361,8 @@ void test_mismatch_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::mismatch(iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::mismatch(iterator(std::begin(c1)), iterator(std::end(c1)),
+            std::begin(c2), std::end(c2), [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -376,7 +390,9 @@ void test_mismatch_exception(ExPolicy&& policy, IteratorTag)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -388,8 +404,9 @@ void test_mismatch_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::mismatch(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::mismatch(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::runtime_error("test"), true;
             });
 
@@ -412,7 +429,9 @@ template <typename ExPolicy, typename IteratorTag>
 void test_mismatch_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -425,11 +444,11 @@ void test_mismatch_exception_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f =
-            hpx::mismatch(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), [](std::size_t v1, std::size_t v2) {
-                    return throw std::runtime_error("test"), true;
-                });
+        auto f = hpx::ranges::mismatch(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::runtime_error("test"), true;
+            });
         returned_from_algorithm = true;
         f.get();
 
@@ -481,7 +500,9 @@ void test_mismatch_bad_alloc(ExPolicy&& policy, IteratorTag)
         "hpx::parallel::execution::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -493,8 +514,9 @@ void test_mismatch_bad_alloc(ExPolicy&& policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::mismatch(policy, iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), [](std::size_t v1, std::size_t v2) {
+        hpx::ranges::mismatch(policy, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            [](std::size_t v1, std::size_t v2) {
                 return throw std::bad_alloc(), true;
             });
 
@@ -516,7 +538,9 @@ template <typename ExPolicy, typename IteratorTag>
 void test_mismatch_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef hpx::util::iterator_range<base_iterator> base_range;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef hpx::util::iterator_range<iterator> range;
 
     std::vector<std::size_t> c1(10007);
     std::vector<std::size_t> c2(c1.size());
@@ -529,11 +553,11 @@ void test_mismatch_bad_alloc_async(ExPolicy&& p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f =
-            hpx::mismatch(p, iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), [](std::size_t v1, std::size_t v2) {
-                    return throw std::bad_alloc(), true;
-                });
+        auto f = hpx::ranges::mismatch(p, iterator(std::begin(c1)),
+            iterator(std::end(c1)), std::begin(c2), std::end(c2),
+            [](std::size_t v1, std::size_t v2) {
+                return throw std::bad_alloc(), true;
+            });
         returned_from_algorithm = true;
         f.get();
 

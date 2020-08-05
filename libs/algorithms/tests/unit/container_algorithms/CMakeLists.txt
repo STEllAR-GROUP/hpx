@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2015 Hartmut Kaiser
+# Copyright (c) 2014-2020 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,6 +31,8 @@ set(tests
     merge_range
     min_element_range
     minmax_element_range
+    mismatch_binary_range
+    mismatch_range
     move_range
     none_of_range
     partition_range

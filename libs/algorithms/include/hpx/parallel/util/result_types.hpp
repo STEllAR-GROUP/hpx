@@ -18,6 +18,40 @@
 namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename I1, typename I2>
+    struct in_in_result
+    {
+        HPX_NO_UNIQUE_ADDRESS I1 in1;
+        HPX_NO_UNIQUE_ADDRESS I2 in2;
+
+        template <typename II1, typename II2,
+            typename Enable = typename std::enable_if<
+                std::is_convertible<I1 const&, II1&>::value &&
+                std::is_convertible<I2 const&, II2&>::value>::type>
+        constexpr operator in_in_result<II1, II2>() const&
+        {
+            return {in1, in2};
+        }
+
+        template <typename II1, typename II2,
+            typename Enable =
+                typename std::enable_if<std::is_convertible<I1, II1>::value &&
+                    std::is_convertible<I2, II2>::value>::type>
+        constexpr operator in_in_result<II1, II2>() &&
+        {
+            return {std::move(in1), std::move(in2)};
+        }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            // clang-format off
+            ar & in1 & in2;
+            // clang-format on
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename I, typename O>
     struct in_out_result
     {
