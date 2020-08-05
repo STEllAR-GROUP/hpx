@@ -985,10 +985,14 @@ hpx_option(
 # ##############################################################################
 # enable OpenMP emulation
 # ##############################################################################
+# Deprecated in 1.5.0
 hpx_option(
   HPX_WITH_HPXMP BOOL "Enable hpxMP OpenMP emulation." OFF CATEGORY "OpenMP"
 )
 if(HPX_WITH_HPXMP)
+  hpx_warn(
+    "HPXMP support is deprecated. This option will be removed in a future release."
+  )
   if(NOT MSVC AND (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
                    OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
   )
