@@ -352,7 +352,7 @@ packages:
 - ``python3``
 - ``sphinx`` (Python package)
 - ``sphinx_rtd_theme`` (Python package)
-- ``breathe`` (Python package)
+- ``breathe 4.16.0`` (Python package)
 - ``doxygen``
 
 If the |python|_ dependencies are not available through your system package
