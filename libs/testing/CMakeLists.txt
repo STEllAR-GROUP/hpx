@@ -20,7 +20,7 @@ set(testing_sources testing.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   testing
-  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   SOURCES ${testing_sources}

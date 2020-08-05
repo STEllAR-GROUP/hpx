@@ -17,7 +17,7 @@ set(hashing_sources)
 include(HPX_AddModule)
 add_hpx_module(
   hashing
-  COMPATIBILITY_HEADERS ON
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${hashing_sources}

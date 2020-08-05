@@ -23,7 +23,7 @@ set(assertion_sources assertion.cpp source_location.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   assertion
-  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   SOURCES ${assertion_sources}

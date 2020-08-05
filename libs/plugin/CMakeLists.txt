@@ -42,7 +42,7 @@ set(plugin_compat_headers
 include(HPX_AddModule)
 add_hpx_module(
   plugin
-  COMPATIBILITY_HEADERS ON
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   HEADERS ${plugin_headers}

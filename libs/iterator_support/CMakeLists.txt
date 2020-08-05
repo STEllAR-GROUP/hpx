@@ -35,7 +35,7 @@ set(iterator_support_sources)
 include(HPX_AddModule)
 add_hpx_module(
   iterator_support
-  COMPATIBILITY_HEADERS ON
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/iterator_support/traits/is_iterator.hpp"

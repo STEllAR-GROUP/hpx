@@ -44,7 +44,7 @@ set(cache_sources)
 include(HPX_AddModule)
 add_hpx_module(
   cache
-  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   SOURCES ${cache_sources}
   HEADERS ${cache_headers}

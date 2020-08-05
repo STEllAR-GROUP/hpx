@@ -92,7 +92,7 @@ set({lib_name}_sources)
 
 include(HPX_AddModule)
 add_hpx_module({lib_name}
-  COMPATIBILITY_HEADERS OFF
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN OFF
   SOURCES ${{{lib_name}_sources}}

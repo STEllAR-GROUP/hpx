@@ -67,7 +67,7 @@ set(synchronization_sources detail/condition_variable.cpp local_barrier.cpp
 include(HPX_AddModule)
 add_hpx_module(
   synchronization
-  COMPATIBILITY_HEADERS ON
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${synchronization_sources}
