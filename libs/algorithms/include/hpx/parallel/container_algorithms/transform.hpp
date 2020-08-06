@@ -15,6 +15,8 @@
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/tagged_pair.hpp>
 #include <hpx/parallel/util/tagged_tuple.hpp>
+#include <hpx/parallel/util/result_types.hpp>
+
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
@@ -23,6 +25,15 @@
 
 #include <type_traits>
 #include <utility>
+
+namespace hpx { namespace ranges {
+    template <typename I, typename O>
+        using unary_transform_result = parallel::util::in_out_result<I, O>;
+
+    template<class I1, class I2, class O>
+        using binary_transform_result = parallel::util::in_in_out_result<I1, I2, O>;
+
+}}
 
 namespace hpx { namespace parallel { inline namespace v1 {
     /// Applies the given function \a f to the given range \a rng and stores
@@ -96,15 +107,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///
     template <typename ExPolicy, typename Rng, typename OutIter, typename F,
         typename Proj = util::projection_identity,
+        // clang-format off
         HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
-                    OutIter>::value&& traits::is_projected_range<Proj,
-                    Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
-                    traits::projected_range<Proj, Rng>>::value)>
+                hpx::traits::is_range<Rng>::value&& 
+                hpx::traits::is_iterator<OutIter>::value&& 
+                traits::is_projected_range<Proj,Rng>::value&& 
+                traits::is_indirect_callable<ExPolicy, F,
+                    traits::projected_range<Proj, Rng>>::value
+        )>
+        // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<
-            tag::in(typename hpx::traits::range_iterator<Rng>::type),
-            tag::out(OutIter)>>::type
+        hpx::ranges::unary_transform_result<
+            typename hpx::traits::range_iterator<Rng>::type,
+            OutIter>
+        >::type
     transform(
         ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj())
     {
@@ -204,18 +220,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
         typename OutIter, typename F,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
-                    InIter2>::value&& hpx::traits::is_iterator<OutIter>::value&&
-                    traits::is_projected_range<Proj1, Rng>::value&&
-                        traits::is_projected<Proj2, InIter2>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected_range<Proj1, Rng>,
-                                traits::projected<Proj2, InIter2>>::value)>
+        // clang-format off
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_range<Rng>::value&&
+            hpx::traits::is_iterator<InIter2>::value&& 
+            hpx::traits::is_iterator<OutIter>::value&&
+            traits::is_projected_range<Proj1, Rng>::value&&
+            traits::is_projected<Proj2, InIter2>::value&&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected_range<Proj1, Rng>,
+                traits::projected<Proj2, InIter2>>::value
+        )>
+    // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<
-            tag::in1(typename hpx::traits::range_iterator<Rng>::type),
-            tag::in2(InIter2), tag::out(OutIter)>>::type
+        hpx::ranges::binary_transform_result<
+            typename hpx::traits::range_iterator<Rng>::type,
+            InIter2, 
+            OutIter>
+        >::type
     transform(ExPolicy&& policy, Rng&& rng, InIter2 first2, OutIter dest, F&& f,
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
@@ -318,19 +341,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
     template <typename ExPolicy, typename Rng1, typename Rng2, typename OutIter,
         typename F, typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(execution::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_range<Rng1>::value&& hpx::traits::is_range<
-                    Rng2>::value&& hpx::traits::is_iterator<OutIter>::value&&
-                    traits::is_projected_range<Proj1, Rng1>::value&&
-                        traits::is_projected_range<Proj2, Rng2>::value&&
-                            traits::is_indirect_callable<ExPolicy, F,
-                                traits::projected_range<Proj1, Rng1>,
-                                traits::projected_range<Proj2, Rng2>>::value)>
+        // clang-format off
+        HPX_CONCEPT_REQUIRES_(
+            execution::is_execution_policy<ExPolicy>::value&&
+            hpx::traits::is_range<Rng1>::value&& 
+            hpx::traits::is_range<Rng2>::value&& hpx::traits::is_iterator<OutIter>::value&&
+            traits::is_projected_range<Proj1, Rng1>::value&&
+            traits::is_projected_range<Proj2, Rng2>::value&&
+            traits::is_indirect_callable<ExPolicy, F,
+                traits::projected_range<Proj1, Rng1>,
+                traits::projected_range<Proj2, Rng2>>::value)>
+        // clang-format on
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<
-            tag::in1(typename hpx::traits::range_iterator<Rng1>::type),
-            tag::in2(typename hpx::traits::range_iterator<Rng2>::type),
-            tag::out(OutIter)>>::type
+        ranges::binary_transform_result<
+            typename hpx::traits::range_iterator<Rng1>::type,
+            typename hpx::traits::range_iterator<Rng2>::type,
+            OutIter>
+        >::type
     transform(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, OutIter dest, F&& f,
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
     {
@@ -340,3 +367,5 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::forward<Proj2>(proj2));
     }
 }}}    // namespace hpx::parallel::v1
+
+

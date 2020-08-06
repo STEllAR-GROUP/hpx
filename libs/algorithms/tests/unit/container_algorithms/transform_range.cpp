@@ -39,8 +39,11 @@ void test_transform(ExPolicy policy, IteratorTag)
     auto result = hpx::parallel::transform(
         policy, c, std::begin(d), [](std::size_t v) { return v + 1; });
 
-    HPX_TEST(hpx::util::get<0>(result) == std::end(c));
-    HPX_TEST(hpx::util::get<1>(result) == std::end(d));
+    // HPX_TEST(hpx::util::get<0>(result) == std::end(c));
+    // HPX_TEST(hpx::util::get<1>(result) == std::end(d));
+
+    HPX_TEST(result.in == std::end(c));
+    HPX_TEST(result.out == std::end(d));
 
     // verify values
     std::size_t count = 0;
@@ -71,8 +74,10 @@ void test_transform_async(ExPolicy p, IteratorTag)
     f.wait();
 
     auto result = f.get();
-    HPX_TEST(hpx::util::get<0>(result) == std::end(c));
-    HPX_TEST(hpx::util::get<1>(result) == std::end(d));
+    // HPX_TEST(hpx::util::get<0>(result) == std::end(c));
+    // HPX_TEST(hpx::util::get<1>(result) == std::end(d));
+    HPX_TEST(result.in == std::end(c));
+    HPX_TEST(result.out == std::end(d));
 
     // verify values
     std::size_t count = 0;

@@ -68,9 +68,9 @@ void test_transform_binary2(ExPolicy policy, IteratorTag)
         iterator(std::end(c1)), std::begin(c2), std::end(c2), std::begin(d1),
         add());
 
-    HPX_TEST(hpx::util::get<0>(result) == iterator(std::end(c1)));
-    HPX_TEST(hpx::util::get<1>(result) == std::end(c2));
-    HPX_TEST(hpx::util::get<2>(result) == std::end(d1));
+    HPX_TEST(result.in1 == iterator(std::end(c1)));
+    HPX_TEST(result.in2 == std::end(c2));
+    HPX_TEST(result.out == std::end(d1));
 
     // verify values
     std::vector<int> d2(c1.size());
@@ -106,10 +106,10 @@ void test_transform_binary2_async(ExPolicy p, IteratorTag)
         add());
     f.wait();
 
-    hpx::util::tuple<iterator, base_iterator, base_iterator> result = f.get();
-    HPX_TEST(hpx::util::get<0>(result) == iterator(std::end(c1)));
-    HPX_TEST(hpx::util::get<1>(result) == std::end(c2));
-    HPX_TEST(hpx::util::get<2>(result) == std::end(d1));
+    auto result = f.get();
+    HPX_TEST(result.in1 == iterator(std::end(c1)));
+    HPX_TEST(result.in2 == std::end(c2));
+    HPX_TEST(result.out == std::end(d1));
 
     // verify values
     std::vector<int> d2(c1.size());
