@@ -1,5 +1,6 @@
 ..
-    Copyright (C) 2013 Patricia Grubel
+    Copyright (C) 2020      ETH Zurich
+    Copyright (C) 2013      Patricia Grubel
     Copyright (C) 2007-2014 Hartmut Kaiser
 
     SPDX-License-Identifier: BSL-1.0
@@ -184,24 +185,20 @@ thread pool.
 Using the resource partitioner
 ------------------------------
 
-In order to create custom thread pools the resource partitioner needs to be set
-up before |hpx| is initialized by creating an instance of
-:cpp:class:`hpx::resource::partitioner`:
+The :cpp:class:`hpx::resource::partitioner` is now created during |hpx| runtime
+initialization without explicit action needed from the user. To specify some of
+the initialization parameters you can use the :cpp:struct:`hpx::init_params`.
 
 .. literalinclude:: ../../libs/resource_partitioner/examples/simplest_resource_partitioner_1.cpp
    :start-after: //[body
    :end-before: //body]
 
-Note that we have to pass ``argc`` and ``argv`` to the resource partitioner to
-be able to parse thread binding options passed on the command line. You should
-pass the same arguments to the :cpp:class:`hpx::resource::partitioner`
-constructor as you would to :cpp:func:`hpx::init` or :cpp:func:`hpx::start`.
-Running the above code will have the same effect as not initializing it at all,
-i.e. a default thread pool will be created with the type and number of threads
-specified on the command line.
-
-The resource partitioner class is the interface to add thread pools to the |hpx|
-runtime and to assign resources to the thread pools.
+The resource partitioner callback is the interface to add thread pools to the
+|hpx| runtime and to assign resources to the thread pools.  In order to create
+custom thread pools you can specify the resource partitioner callback
+:cpp:member:`hpx::init_params::rp_callback` which will be called once the
+resource partitioner will be created , see the example below. You can also
+specify other parameters, see :cpp:struct:`hpx::init_params`.
 
 To add a thread pool use the
 :cpp:member:`hpx::resource::partitioner::create_thread_pool` method. If you
@@ -232,6 +229,102 @@ case we leave the first processing unit for the default thread pool:
 
    The command line option :option:`--hpx:print-bind` is useful for checking
    that the thread pools have been set up the way you expect.
+
+Difference between the old and new version
+------------------------------------------
+
+In the old version, you had to create an instance of the
+:cpp:class:`resource_partitioner` with ``argc`` and ``argv``.
+
+.. code-block:: c++
+
+    int main(int argc, char** argv)
+    {
+        hpx::resource::partitioner rp(argc, argv);
+        hpx::init();
+    }
+
+From |hpx| 1.5.0 onwards, you just pass ``argc`` and ``argv`` to ``hpx::init()``
+or ``hpx::start()`` for the binding options to be parsed by the resource
+partitioner.
+
+.. code-block:: c++
+
+    int main(int argc, char** argv)
+    {
+        hpx::init_params init_args;
+        hpx::init(argc, argv, init_args);
+    }
+
+In the old version, when creating a custom thread pool, you just called the
+utilities on the resource partitioner instantiated previously.
+
+.. code-block:: c++
+
+    int main(int argc, char** argv)
+    {
+        hpx::resource::partitioner rp(argc, argv);
+
+        rp.create_thread_pool("my-thread-pool");
+
+        bool one_numa_domain = rp.numa_domains().size() == 1;
+        bool skipped_first_pu = false;
+
+        hpx::resource::numa_domain const& d = rp.numa_domains()[0];
+
+        for (const hpx::resource::core& c : d.cores())
+        {
+            for (const hpx::resource::pu& p : c.pus())
+            {
+                if (one_numa_domain && !skipped_first_pu)
+                {
+                    skipped_first_pu = true;
+                    continue;
+                }
+
+                rp.add_resource(p, "my-thread-pool");
+            }
+        }
+
+        hpx::init();
+    }
+
+You now specify the resource partitioner callback which will tie the resources
+to the resource partitioner created during runtime initialization.
+
+.. code-block:: c++
+
+    void init_resource_partitioner_handler(hpx::resource::partitioner& rp)
+    {
+        rp.create_thread_pool("my-thread-pool");
+
+        bool one_numa_domain = rp.numa_domains().size() == 1;
+        bool skipped_first_pu = false;
+
+        hpx::resource::numa_domain const& d = rp.numa_domains()[0];
+
+        for (const hpx::resource::core& c : d.cores())
+        {
+            for (const hpx::resource::pu& p : c.pus())
+            {
+                if (one_numa_domain && !skipped_first_pu)
+                {
+                    skipped_first_pu = true;
+                    continue;
+                }
+
+                rp.add_resource(p, "my-thread-pool");
+            }
+        }
+    }
+
+    int main(int argc, char* argv[])
+    {
+        hpx::init_params init_args;
+        init_args.rp_callback = &init_resource_partitioner_handler;
+
+        hpx::init(argc, argv, init_args);
+    }
 
 Advanced usage
 --------------
