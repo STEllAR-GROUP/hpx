@@ -217,6 +217,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -228,8 +229,6 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    using equal_to = hpx::parallel::v1::detail::equal_to;
-
     template <typename Iter1, typename Iter2>
     using mismatch_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 

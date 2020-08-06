@@ -215,6 +215,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/equal.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -223,8 +224,6 @@ namespace hpx { namespace ranges {
 #include <utility>
 
 namespace hpx { namespace ranges {
-
-    using equal_to = hpx::parallel::v1::detail::equal_to;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::equal

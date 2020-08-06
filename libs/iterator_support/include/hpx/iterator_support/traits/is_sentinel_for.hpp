@@ -12,13 +12,13 @@
 #include <type_traits>
 #include <utility>
 
-// The trait checks whether sentinel Sent is proper for iterator I.
-// There are two requirements for this:
-// 1. iterator I should be an input or output iterator
-// 2. I and S should oblige with the weakly-equality-comparable concept
-
 namespace hpx { namespace traits {
 
+    ///////////////////////////////////////////////////////////////////////////
+    // The trait checks whether sentinel Sent is proper for iterator I.
+    // There are two requirements for this:
+    // 1. iterator I should be an input or output iterator
+    // 2. I and S should oblige with the weakly-equality-comparable concept
     template <typename Sent, typename Iter, typename Enable = void>
     struct is_sentinel_for : std::false_type
     {
@@ -26,16 +26,13 @@ namespace hpx { namespace traits {
 
     template <typename Sent, typename Iter>
     struct is_sentinel_for<Sent, Iter,
-        typename util::always_void<
-            typename std::enable_if<is_iterator<Iter>::value>::type,
-            typename detail::equality_result<Iter, Sent>::type,
-            typename detail::equality_result<Sent, Iter>::type,
-            typename detail::inequality_result<Iter, Sent>::type,
-            typename detail::inequality_result<Sent, Iter>::type>::type>
+        typename std::enable_if<is_iterator<Iter>::value &&
+            is_weakly_equality_comparable_with<Iter, Sent>::value>::type>
       : std::true_type
     {
     };
 
+    ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR)
     template <typename Sent, typename Iter>
     inline constexpr bool disable_sized_sentinel_for =

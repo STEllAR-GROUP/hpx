@@ -11,6 +11,7 @@ set(type_support_headers
     hpx/type_support/always_void.hpp
     hpx/type_support/decay.hpp
     hpx/type_support/detected.hpp
+    hpx/type_support/equality.hpp
     hpx/type_support/identity.hpp
     hpx/type_support/lazy_conditional.hpp
     hpx/type_support/lazy_enable_if.hpp
