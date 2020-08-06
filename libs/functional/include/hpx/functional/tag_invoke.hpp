@@ -193,7 +193,7 @@ namespace hpx { namespace functional {
         template <typename... Args>
         constexpr HPX_FORCEINLINE auto operator()(Args&&... args) const
             noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
-                -> tag_invoke_result_t<Tag, decltype(args)...>
+                -> tag_invoke_result_t<Tag, Args...>
         {
             return hpx::functional::tag_invoke(
                 static_cast<Tag const&>(*this), std::forward<Args>(args)...);
