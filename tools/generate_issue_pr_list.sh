@@ -15,6 +15,11 @@ VERSION_MINOR=$(sed -n 's/set(HPX_VERSION_MINOR \(.*\))/\1/p' CMakeLists.txt)
 VERSION_SUBMINOR=$(sed -n 's/set(HPX_VERSION_SUBMINOR \(.*\))/\1/p' CMakeLists.txt)
 VERSION_FULL_NOTAG=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
 
+if ! which hub > /dev/null 2>&1; then
+    echo "Hub not installed on this system. Exiting.."
+    exit 1
+fi
+
 # hub does not have a sub-command for milestones, but we can list milestones
 # using the hub api command instead (based on
 # https://github.com/github/hub/issues/2063#issuecomment-472181266)
