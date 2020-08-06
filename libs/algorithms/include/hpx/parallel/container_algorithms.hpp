@@ -12,6 +12,7 @@
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
 #include <hpx/parallel/container_algorithms/copy.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
+#include <hpx/parallel/container_algorithms/equal.hpp>
 #include <hpx/parallel/container_algorithms/fill.hpp>
 #include <hpx/parallel/container_algorithms/find.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
