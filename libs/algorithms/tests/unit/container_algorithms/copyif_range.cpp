@@ -20,8 +20,40 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
+void test_copy_if_seq()
+{
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
+        iterator;
+
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    auto middle = std::begin(c) + c.size() / 2;
+    std::iota(std::begin(c), middle, std::rand());
+    std::fill(middle, std::end(c), -1);
+
+    hpx::ranges::copy_if(c, std::begin(d), [](int i) { return !(i < 0); });
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(
+        std::begin(c), middle, std::begin(d), [&count](int v1, int v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+
+    HPX_TEST(std::equal(middle, std::end(c), std::begin(d) + d.size() / 2,
+        [&count](int v1, int v2) -> bool {
+            HPX_TEST_NEQ(v1, v2);
+            ++count;
+            return v1 != v2;
+        }));
+
+    HPX_TEST_EQ(count, d.size());
+}
+
 template <typename ExPolicy>
-void test_copy_if(ExPolicy policy)
+void test_copy_if(ExPolicy&& policy)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -59,7 +91,7 @@ void test_copy_if(ExPolicy policy)
 }
 
 template <typename ExPolicy>
-void test_copy_if_async(ExPolicy p)
+void test_copy_if_async(ExPolicy&& p)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, std::random_access_iterator_tag>
@@ -96,6 +128,8 @@ void test_copy_if_async(ExPolicy p)
 void test_copy_if()
 {
     using namespace hpx::parallel;
+
+    test_copy_if_seq();
 
     test_copy_if(execution::seq);
     test_copy_if(execution::par);
