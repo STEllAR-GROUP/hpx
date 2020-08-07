@@ -8,9 +8,12 @@
 set(tests protect_with_nullary_pfo set_config_entry_deadlock use_all_cores_2262)
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} configuration_1572 iarchive_1237 serialize_buffer_1069)
+  set(tests ${tests} configuration_1572 iarchive_1237 serialize_buffer_1069
+            serialize_exception_4886
+  )
   set(iarchive_1237_FLAGS DEPENDENCIES iostreams_component)
   set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
+  set(serialize_exception_4886_1001_PARAMETERS LOCALITIES 2)
 endif()
 
 if(HPX_WITH_NETWORKING)
