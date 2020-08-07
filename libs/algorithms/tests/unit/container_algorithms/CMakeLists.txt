@@ -14,6 +14,8 @@ set(tests
     countif_range
     destroy_range
     destroyn_range
+    equal_range
+    equal_binary_range
     fill_range
     filln_range
     find_end_range

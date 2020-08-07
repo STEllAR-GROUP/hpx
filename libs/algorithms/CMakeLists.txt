@@ -81,6 +81,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/copy.hpp
     hpx/parallel/container_algorithms/count.hpp
     hpx/parallel/container_algorithms/destroy.hpp
+    hpx/parallel/container_algorithms/equal.hpp
     hpx/parallel/container_algorithms/fill.hpp
     hpx/parallel/container_algorithms/find.hpp
     hpx/parallel/container_algorithms/for_each.hpp

@@ -7,6 +7,7 @@
 
 set(example_programs
     composable_guard
+    disable_thread_stealing_executor
     executor_with_thread_hooks
     fibonacci_await
     fibonacci_dataflow

@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
-//  Copyright (c)      2018 Nikunj Gupta
+//  Copyright (c) 2018-2020 Nikunj Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,6 +28,14 @@ namespace hpx_start
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap = true;
     HPX_SYMBOL_EXPORT extern std::string app_name_libhpx_wrap;
     HPX_SYMBOL_EXPORT std::string app_name_libhpx_wrap = HPX_APPLICATION_STRING;
+
+    // This variable declaration is added solely for the purpose to trigger
+    // a different runtime error when a user forgets to add HPX::wrap_main in
+    // their CMakeLists.txt while using hpx_main.hpp functionality.
+    // It will enable the user to know that he is required to link to
+    // HPX::wrap_main instead of an orthogonal exception about thread not
+    // registered with the HPX runtime system.
+    HPX_SYMBOL_EXPORT bool is_linked __attribute__((weak)) = false;
 }
 
 #else
