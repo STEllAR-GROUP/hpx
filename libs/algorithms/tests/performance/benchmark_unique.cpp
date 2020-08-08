@@ -64,6 +64,11 @@ struct vector_type
         return vec_ == t.vec_;
     }
 
+    bool operator!=(vector_type const& t) const
+    {
+        return vec_ != t.vec_;
+    }
+
     std::vector<int> vec_;
     static const std::size_t vec_size_{30};
 };
@@ -80,6 +85,11 @@ struct array_type
     bool operator==(array_type const& t) const
     {
         return arr_ == t.arr_;
+    }
+
+    bool operator!=(array_type const& t) const
+    {
+        return arr_ != t.arr_;
     }
 
     static const std::size_t arr_size_{30};

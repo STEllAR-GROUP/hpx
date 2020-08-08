@@ -36,7 +36,6 @@ namespace hpx {
     using hpx::parallel::merge;
     using hpx::parallel::min_element;
     using hpx::parallel::minmax_element;
-    using hpx::parallel::mismatch;
     using hpx::parallel::partition;
     using hpx::parallel::partition_copy;
     using hpx::parallel::remove;

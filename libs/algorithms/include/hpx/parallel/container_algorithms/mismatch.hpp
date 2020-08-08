@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/equal.hpp
+/// \file parallel/container_algorithms/mismatch.hpp
 
 #pragma once
 
@@ -12,11 +12,14 @@
 namespace hpx { namespace ranges {
     // clang-format off
 
-    /// Returns true if the range [first1, last1) is equal to the range
+    /// Returns true if the range [first1, last1) is mismatch to the range
     /// [first2, last2), and false otherwise.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f.
+    ///         applications of the predicate \a f. If \a FwdIter1
+    ///         and \a FwdIter2 meet the requirements of \a RandomAccessIterator
+    ///         and (last1 - first1) != (last2 - first2) then no applications
+    ///         of the predicate \a f are made.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -36,7 +39,7 @@ namespace hpx { namespace ranges {
     ///                     the second range (deduced).
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     overload of \a mismatch requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
     /// \tparam Proj1       The type of an optional projection function applied
@@ -57,7 +60,7 @@ namespace hpx { namespace ranges {
     /// \param last2        Refers to the end of the sequence of elements of
     ///                     the second range the algorithm will be applied to.
     /// \param op           The binary predicate which returns true if the
-    ///                     elements should be treated as equal. The signature
+    ///                     elements should be treated as mismatch. The signature
     ///                     of the predicate function should be equivalent to
     ///                     the following:
     ///                     \code
@@ -80,42 +83,43 @@ namespace hpx { namespace ranges {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_policy
     /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     The two ranges are considered equal if, for every iterator
-    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
-    ///           This overload of equal uses operator== to determine if two
-    ///           elements are equal.
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
     ///
-    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
+    /// \returns  The \a mismatch algorithm returns a \a hpx::future<bool> if the
     ///           execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a bool otherwise.
-    ///           The \a equal algorithm returns true if the elements in the
-    ///           two ranges are equal, otherwise it returns false.
-    ///           If the length of the range [first1, last1) does not equal
+    ///           The \a mismatch algorithm returns true if the elements in the
+    ///           two ranges are mismatch, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not mismatch
     ///           the length of the range [first2, last2), it returns false.
     ///
     template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
         typename Sent2, typename Pred = ranges::equal_to,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
-    equal(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
-        Sent2 last2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-        Proj2&& proj2 = Proj2());
+    typename util::detail::algorithm_result<
+        ExPolicy, ranges::mismatch_result<FwdIter1, FwdIter2>>::type
+    mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+        FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred(),
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
-    /// Returns true if the range [first1, last1) is equal to the range
-    /// starting at first2, and false otherwise.
+    /// Returns std::pair with iterators to the first two non-equivalent
+    /// elements.
     ///
     /// \note   Complexity: At most \a last1 - \a first1 applications of the
     ///         predicate \a f.
@@ -132,7 +136,7 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     overload of \a mismatch requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
     /// \tparam Proj1       The type of an optional projection function applied
@@ -149,7 +153,7 @@ namespace hpx { namespace ranges {
     /// \param rng2         Refers to the second sequence of elements the
     ///                     algorithm will be applied to.
     /// \param op           The binary predicate which returns true if the
-    ///                     elements should be treated as equal. The signature
+    ///                     elements should be treated as mismatch. The signature
     ///                     of the predicate function should be equivalent to
     ///                     the following:
     ///                     \code
@@ -172,35 +176,33 @@ namespace hpx { namespace ranges {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The comparison operations in the parallel \a equal algorithm invoked
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
     /// with an execution policy object of type \a parallel_policy
     /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note     The two ranges are considered equal if, for every iterator
-    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
-    ///           This overload of equal uses operator== to determine if two
-    ///           elements are equal.
-    ///
-    /// \returns  The \a equal algorithm returns a \a hpx::future<bool> if the
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a hpx::future<std::pair<FwdIter1, FwdIter2> > if the
     ///           execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a equal algorithm returns true if the elements in the
-    ///           two ranges are equal, otherwise it returns false.
+    ///           returns \a std::pair<FwdIter1, FwdIter2> otherwise.
+    ///           The \a mismatch algorithm returns the first mismatching pair
+    ///           of elements from two ranges: one defined by [first1, last1)
+    ///           and another defined by [first2, last2).
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2,
         typename Pred = ranges::equal_to,
         typename Proj1 = util::projection_identity,
         typename Proj2 = util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
-    equal(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
+    typename util::detail::algorithm_result<
+        ExPolicy, ranges::mimatch_result<FwdIter1, FwdIter2>>::type
+    mismatch(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     // clang-format on
@@ -216,9 +218,10 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/parallel/algorithms/equal.hpp>
+#include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -226,9 +229,13 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::equal
-    HPX_INLINE_CONSTEXPR_VARIABLE struct equal_t final
-      : hpx::functional::tag<equal_t>
+    template <typename Iter1, typename Iter2>
+    using mismatch_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::ranges::mismatch
+    HPX_INLINE_CONSTEXPR_VARIABLE struct mismatch_t final
+      : hpx::functional::tag<mismatch_t>
     {
     private:
         // clang-format off
@@ -236,7 +243,7 @@ namespace hpx { namespace ranges {
             typename Iter2, typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::parallel::util::projection_identity,
             typename Proj2 = hpx::parallel::util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
+            HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
@@ -247,8 +254,8 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_invoke(equal_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
+            mismatch_result<Iter1, Iter2>>::type
+        tag_invoke(mismatch_t, ExPolicy&& policy, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -261,10 +268,11 @@ namespace hpx { namespace ranges {
                 hpx::parallel::execution::is_sequenced_execution_policy<
                     ExPolicy>;
 
-            return hpx::parallel::v1::detail::equal_binary().call(
-                std::forward<ExPolicy>(policy), is_seq{}, first1, last1, first2,
-                last2, std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+            return hpx::parallel::v1::detail::mismatch_binary<
+                mismatch_result<Iter1, Iter2>>()
+                .call(std::forward<ExPolicy>(policy), is_seq{}, first1, last1,
+                    first2, last2, std::forward<Pred>(op),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -272,7 +280,7 @@ namespace hpx { namespace ranges {
             typename Pred = equal_to,
             typename Proj1 = hpx::parallel::util::projection_identity,
             typename Proj2 = hpx::parallel::util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
+            HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::execution::is_execution_policy<ExPolicy>::value &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
@@ -285,8 +293,10 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_invoke(equal_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
+            mismatch_result<
+                typename hpx::traits::range_traits<Rng1>::iterator_type,
+                typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
+        tag_invoke(mismatch_t, ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -302,17 +312,20 @@ namespace hpx { namespace ranges {
             using is_seq =
                 hpx::parallel::execution::is_sequenced_execution_policy<
                     ExPolicy>;
+            using result_type = mismatch_result<
+                typename hpx::traits::range_traits<Rng1>::iterator_type,
+                typename hpx::traits::range_traits<Rng2>::iterator_type>;
 
-            return hpx::parallel::v1::detail::equal_binary().call(
-                std::forward<ExPolicy>(policy), is_seq{},
-                hpx::util::begin(rng1), hpx::util::end(rng1),
-                hpx::util::begin(rng2), hpx::util::end(rng2),
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+            return hpx::parallel::v1::detail::mismatch_binary<result_type>()
+                .call(std::forward<ExPolicy>(policy), is_seq{},
+                    hpx::util::begin(rng1), hpx::util::end(rng1),
+                    hpx::util::begin(rng2), hpx::util::end(rng2),
+                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2));
         }
 
         // clang-format off
-        template < typename Iter1, typename Sent1,
+        template <typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::parallel::util::projection_identity,
             typename Proj2 = hpx::parallel::util::projection_identity,
@@ -326,8 +339,9 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_invoke(equal_t, Iter1 first1, Sent1 last1, Iter2 first2,
-            Sent2 last2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        friend mismatch_result<Iter1, Iter2> tag_invoke(mismatch_t,
+            Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
+            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
@@ -335,10 +349,11 @@ namespace hpx { namespace ranges {
             static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::equal_binary().call(
-                hpx::parallel::execution::seq, std::true_type{}, first1, last1,
-                first2, last2, std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+            return hpx::parallel::v1::detail::mismatch_binary<
+                mismatch_result<Iter1, Iter2>>()
+                .call(hpx::parallel::execution::seq, std::true_type{}, first1,
+                    last1, first2, last2, std::forward<Pred>(op),
+                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
         }
 
         // clang-format off
@@ -357,9 +372,11 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_invoke(equal_t, Rng1&& rng1, Rng2&& rng2,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend mismatch_result<
+            typename hpx::traits::range_traits<Rng1>::iterator_type,
+            typename hpx::traits::range_traits<Rng2>::iterator_type>
+        tag_invoke(mismatch_t, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert(
                 (hpx::traits::is_forward_iterator<typename hpx::traits::
@@ -370,15 +387,19 @@ namespace hpx { namespace ranges {
                         range_traits<Rng2>::iterator_type>::value),
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::equal_binary().call(
-                hpx::parallel::execution::seq, std::true_type{},
-                hpx::util::begin(rng1), hpx::util::end(rng1),
-                hpx::util::begin(rng2), hpx::util::end(rng2),
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+            using result_type = mismatch_result<
+                typename hpx::traits::range_traits<Rng1>::iterator_type,
+                typename hpx::traits::range_traits<Rng2>::iterator_type>;
+
+            return hpx::parallel::v1::detail::mismatch_binary<result_type>()
+                .call(hpx::parallel::execution::seq, std::true_type{},
+                    hpx::util::begin(rng1), hpx::util::end(rng1),
+                    hpx::util::begin(rng2), hpx::util::end(rng2),
+                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
+                    std::forward<Proj2>(proj2));
         }
 
-    } equal;
+    } mismatch;
 }}    // namespace hpx::ranges
 
 #endif    // DOXYGEN
