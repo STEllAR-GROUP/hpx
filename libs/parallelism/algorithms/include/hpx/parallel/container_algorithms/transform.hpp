@@ -102,9 +102,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Rng>::value&& traits::is_indirect_callable<ExPolicy, F,
                     traits::projected_range<Proj, Rng>>::value)>
     typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<
-            tag::in(typename hpx::traits::range_iterator<Rng>::type),
-            tag::out(OutIter)>>::type
+        util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
+            OutIter>>::type
     transform(
         ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj())
     {
