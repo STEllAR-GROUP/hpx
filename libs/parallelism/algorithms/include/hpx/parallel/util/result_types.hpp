@@ -224,6 +224,21 @@ namespace hpx { namespace parallel { namespace util {
                     return get_in_out_result(std::move(zipiter));
                 });
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename I, typename O>
+        O get_second_element(util::in_out_result<I, O>&& p)
+        {
+            return p.out;
+        }
+
+        template <typename I, typename O>
+        hpx::future<O> get_second_element(
+            hpx::future<util::in_out_result<I, O>>&& f)
+        {
+            return lcos::make_future<O>(
+                std::move(f), [](util::in_out_result<I, O>&& p) { return p.out; });
+        }
     }    // namespace detail
 }}}      // namespace hpx::parallel::util
 
