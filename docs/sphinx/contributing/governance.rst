@@ -8,7 +8,7 @@
 .. _governance:
 
 ====================
-HPX Governance model
+|hpx| governance model
 ====================
 
 The HPX project is a meritocratic, consensus-based community project. Anyone
@@ -17,6 +17,5 @@ project design and participate in the decision making process.
 `This document <http://hpx.stellar-group.org/documents/governance/>`_ describes
 how that participation takes place and how to set about earning merit within
 the project community.
-
 
 
