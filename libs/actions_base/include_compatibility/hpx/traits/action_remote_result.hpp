@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions/config/defines.hpp>
+#include <hpx/actions_base/config/defines.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 
 #if HPX_ACTIONS_BASE_HAVE_DEPRECATION_WARNINGS

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/config/defines.hpp>
+#include <hpx/distributed_executors/config/defines.hpp>
 #include <hpx/modules/distributed_executors.hpp>
 
 #if HPX_EXECUTION_HAVE_DEPRECATION_WARNINGS
