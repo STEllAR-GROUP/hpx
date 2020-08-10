@@ -172,8 +172,10 @@ endif()
 set(build_systems cmake)
 set(cmake_tests
     build_dir_targets install_dir_targets build_dir_macros install_dir_macros
-    build_dir_gtest_emulation install_dir_gtest_emulation
 )
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+  list(APPEND cmake_tests build_dir_gtest_emulation install_dir_gtest_emulation)
+endif()
 if(NOT CMAKE_TOOLCHAIN_FILE
    AND PKGCONFIG_FOUND
    AND NOT MSVC
