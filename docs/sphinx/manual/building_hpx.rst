@@ -763,7 +763,8 @@ To build with Clang, execute:
    cmake ../hpx \
        -DCMAKE_CXX_COMPILER=clang++ \
        -DBOOST_ROOT=/path/to/boost \
-       -DHWLOC_ROOT=/path/to/hwloc
+       -DHWLOC_ROOT=/path/to/hwloc \
+       -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On
    make -j
 
 For more detailed information about using |cmake|, please refer its documentation
@@ -823,6 +824,7 @@ required libraries via MacPorts:
           -DBOOST_ROOT=$BOOST_ROOT \
           -DHWLOC_ROOT=/opt/local \
           -DCMAKE_INSTALL_PREFIX=$HOME/hpx \
+          -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On \
                $(pwd)/../hpx
       make -j8
       make -j8 install
@@ -832,6 +834,9 @@ required libraries via MacPorts:
 #. Note that you need to set ``BOOST_ROOT``, ``HPX_ROOT`` and
    ``DYLD_LIBRARY_PATH`` (for both ``BOOST_ROOT`` and ``HPX_ROOT``) every time
    you configure, build, or run an |hpx| application.
+
+#. Note that you need to set ``HPX_WITH_GENERIC_CONTEXT_COROUTINES=On`` for
+   MacOS.
 
 #. If you want to use |hpx| with MPI, you need to enable the MPI parcelport, and
    also specify the location of the MPI wrapper scripts. This can be done using
