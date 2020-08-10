@@ -121,12 +121,8 @@ namespace hpx {
         std::size_t set_thread_data(std::size_t);
 
 #if defined(HPX_HAVE_LIBCDS)
-        std::size_t get_libcds_data() const;
-        std::size_t set_libcds_data(std::size_t);
         std::size_t get_libcds_hazard_pointer_data() const;
         std::size_t set_libcds_hazard_pointer_data(std::size_t);
-        std::size_t get_libcds_dynamic_hazard_pointer_data() const;
-        std::size_t set_libcds_dynamic_hazard_pointer_data(std::size_t);
 #endif
 
     private:
@@ -266,13 +262,8 @@ namespace hpx {
         HPX_EXPORT std::size_t set_thread_data(std::size_t);
 
 #if defined(HPX_HAVE_LIBCDS)
-        HPX_EXPORT std::size_t get_libcds_data();
-        HPX_EXPORT std::size_t set_libcds_data(std::size_t);
         HPX_EXPORT std::size_t get_libcds_hazard_pointer_data();
         HPX_EXPORT std::size_t set_libcds_hazard_pointer_data(std::size_t);
-        HPX_EXPORT std::size_t get_libcds_dynamic_hazard_pointer_data();
-        HPX_EXPORT std::size_t set_libcds_dynamic_hazard_pointer_data(
-            std::size_t);
 #endif
 
         class HPX_EXPORT disable_interruption

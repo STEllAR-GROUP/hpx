@@ -74,17 +74,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #if defined(HPX_HAVE_LIBCDS)
-        std::size_t get_libcds_data() const override
-        {
-            HPX_ASSERT(pimpl_);
-            return pimpl_->get_libcds_data();
-        }
-        std::size_t set_libcds_data(std::size_t data) override
-        {
-            HPX_ASSERT(pimpl_);
-            return pimpl_->set_libcds_data(data);
-        }
-
         std::size_t get_libcds_hazard_pointer_data() const override
         {
             HPX_ASSERT(pimpl_);
@@ -94,18 +83,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->set_libcds_hazard_pointer_data(data);
-        }
-
-        std::size_t get_libcds_dynamic_hazard_pointer_data() const override
-        {
-            HPX_ASSERT(pimpl_);
-            return pimpl_->get_libcds_dynamic_hazard_pointer_data();
-        }
-        std::size_t set_libcds_dynamic_hazard_pointer_data(
-            std::size_t data) override
-        {
-            HPX_ASSERT(pimpl_);
-            return pimpl_->set_libcds_dynamic_hazard_pointer_data(data);
         }
 #endif
 

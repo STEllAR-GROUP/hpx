@@ -205,31 +205,6 @@ namespace hpx { namespace threads {
     }
 
 #if defined(HPX_HAVE_LIBCDS)
-    std::size_t get_libcds_data(thread_id_type const& id, error_code& ec)
-    {
-        if (HPX_UNLIKELY(!id))
-        {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_libcds_data",
-                "null thread id encountered");
-            return 0;
-        }
-
-        return get_thread_id_data(id)->get_libcds_data();
-    }
-
-    std::size_t set_libcds_data(
-        thread_id_type const& id, std::size_t data, error_code& ec)
-    {
-        if (HPX_UNLIKELY(!id))
-        {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::set_libcds_data",
-                "null thread id encountered");
-            return 0;
-        }
-
-        return get_thread_id_data(id)->set_libcds_data(data);
-    }
-
     std::size_t get_libcds_hazard_pointer_data(
         thread_id_type const& id, error_code& ec)
     {
@@ -257,36 +232,6 @@ namespace hpx { namespace threads {
 
         return get_thread_id_data(id)->set_libcds_hazard_pointer_data(data);
     }
-
-    std::size_t get_libcds_dynamic_hazard_pointer_data(
-        thread_id_type const& id, error_code& ec)
-    {
-        if (HPX_UNLIKELY(!id))
-        {
-            HPX_THROWS_IF(ec, null_thread_id,
-                "hpx::threads::get_libcds_dynamic_hazard_pointer_data",
-                "null thread id encountered");
-            return 0;
-        }
-
-        return get_thread_id_data(id)->get_libcds_dynamic_hazard_pointer_data();
-    }
-
-    std::size_t set_libcds_dynamic_hazard_pointer_data(
-        thread_id_type const& id, std::size_t data, error_code& ec)
-    {
-        if (HPX_UNLIKELY(!id))
-        {
-            HPX_THROWS_IF(ec, null_thread_id,
-                "hpx::threads::set_libcds_dynamic_hazard_pointer_data",
-                "null thread id encountered");
-            return 0;
-        }
-
-        return get_thread_id_data(id)->set_libcds_dynamic_hazard_pointer_data(
-            data);
-    }
-
 #endif
 
     ////////////////////////////////////////////////////////////////////////////
