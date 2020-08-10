@@ -10,6 +10,7 @@ set(hpx_init_HEADERS
     ""
     CACHE INTERNAL "Headers for libhpx_init." FORCE
 )
+list(APPEND hpx_init_HEADERS hpx/hpx_main_impl.hpp)
 set(hpx_init_SOURCES
     ""
     CACHE INTERNAL "Sources for libhpx_init." FORCE
@@ -22,9 +23,19 @@ list(
   hpx_main_variables_map.cpp
   hpx_user_main.cpp
   hpx_user_main_argc_argv.cpp
+  main.cpp
 )
 
 # make source groups
+set(hpx_init_HEADER_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include)
+list(TRANSFORM hpx_init_HEADERS PREPEND ${hpx_init_HEADER_ROOT}/)
+add_hpx_source_group(
+  NAME hpx_init
+  CLASS "Header Files"
+  ROOT "${hpx_init_HEADER_ROOT}"
+  TARGETS ${hpx_init_HEADERS}
+)
+
 set(hpx_init_SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src)
 list(TRANSFORM hpx_init_SOURCES PREPEND ${hpx_init_SOURCE_ROOT}/)
 add_hpx_source_group(
@@ -39,6 +50,10 @@ set_target_properties(hpx_init PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(hpx_init PRIVATE hpx_core)
 target_link_libraries(hpx_init PRIVATE hpx_private_flags)
 target_compile_definitions(hpx_init PRIVATE HPX_APPLICATION_EXPORTS)
+target_include_directories(
+  hpx_init PUBLIC $<BUILD_INTERFACE:${hpx_init_HEADER_ROOT}>
+                  $<INSTALL_INTERFACE:include>
+)
 
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
@@ -71,6 +86,12 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+)
+
+install(
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  COMPONENT runtime
 )
 
 # install PDB if needed
