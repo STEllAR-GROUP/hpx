@@ -15,9 +15,11 @@ set(resiliency_headers
     hpx/resiliency/async_replicate.hpp
     hpx/resiliency/async_replicate_executor.hpp
     hpx/resiliency/config.hpp
-    hpx/resiliency/version.hpp
+    hpx/resiliency/replay_executor.hpp
+    hpx/resiliency/replicate_executor.hpp
     hpx/resiliency/resiliency.hpp
     hpx/resiliency/resiliency_cpos.hpp
+    hpx/resiliency/version.hpp
 )
 
 # Default location is $HPX_ROOT/libs/resiliency/src
@@ -32,13 +34,17 @@ add_hpx_module(
   DEPENDENCIES
   DEPENDENCIES
     hpx_assertion
+    hpx_async_base
     hpx_async_local
     hpx_config
     hpx_concepts
     hpx_datastructures
     hpx_execution
+    hpx_executors
     hpx_functional
     hpx_futures
+    hpx_iterator_support
+    hpx_synchronization
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

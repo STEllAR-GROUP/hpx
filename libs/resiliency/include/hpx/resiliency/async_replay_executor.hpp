@@ -49,20 +49,27 @@ namespace hpx { namespace resiliency { namespace experimental {
             }
 
             template <typename Executor, std::size_t... Is>
-            Result invoke(Executor&& exec, hpx::util::index_pack<Is...>)
+            typename hpx::parallel::execution::executor_future<Executor,
+                Result>::type
+            invoke(Executor&& exec, hpx::util::index_pack<Is...>)
             {
                 return hpx::parallel::execution::async_execute(
                     std::forward<Executor>(exec), f_, std::get<Is>(t_)...);
             }
 
             template <typename Executor>
-            Result call(Executor&& exec, std::size_t n)
+            typename hpx::parallel::execution::executor_future<Executor,
+                Result>::type
+            call(Executor&& exec, std::size_t n)
             {
                 // launch given function asynchronously
                 using pack_type =
                     hpx::util::make_index_pack<std::tuple_size<Tuple>::value>;
+                using result_type =
+                    typename hpx::parallel::execution::executor_future<Executor,
+                        Result>::type;
 
-                Result f = invoke(exec, pack_type{});
+                result_type f = invoke(exec, pack_type{});
 
                 // attach a continuation that will relaunch the task, if
                 // necessary
@@ -70,7 +77,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                 return f.then(hpx::launch::sync,
                     [this_ = std::move(this_),
                         exec = std::forward<Executor>(exec),
-                        n](Result&& f) mutable {
+                        n](result_type&& f) mutable {
                         if (f.has_exception())
                         {
                             // rethrow abort_replay_exception, if caught
@@ -121,6 +128,82 @@ namespace hpx { namespace resiliency { namespace experimental {
             Tuple t_;
         };
 
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Pred, typename F, typename Tuple>
+        struct async_replay_executor_helper<void, Pred, F, Tuple>
+          : std::enable_shared_from_this<
+                async_replay_executor_helper<void, Pred, F, Tuple>>
+        {
+            template <typename Pred_, typename F_, typename Tuple_>
+            async_replay_executor_helper(Pred_&&, F_&& f, Tuple_&& tuple)
+              : f_(std::forward<F_>(f))
+              , t_(std::forward<Tuple_>(tuple))
+            {
+            }
+
+            template <typename Executor, std::size_t... Is>
+            typename hpx::parallel::execution::executor_future<Executor,
+                void>::type
+            invoke(Executor&& exec, hpx::util::index_pack<Is...>)
+            {
+                return hpx::parallel::execution::async_execute(
+                    std::forward<Executor>(exec), f_, std::get<Is>(t_)...);
+            }
+
+            template <typename Executor>
+            typename hpx::parallel::execution::executor_future<Executor,
+                void>::type
+            call(Executor&& exec, std::size_t n)
+            {
+                // launch given function asynchronously
+                using pack_type =
+                    hpx::util::make_index_pack<std::tuple_size<Tuple>::value>;
+                using result_type =
+                    typename hpx::parallel::execution::executor_future<Executor,
+                        void>::type;
+
+                result_type f = invoke(exec, pack_type{});
+
+                // attach a continuation that will relaunch the task, if
+                // necessary
+                auto this_ = this->shared_from_this();
+                return f.then(hpx::launch::sync,
+                    [this_ = std::move(this_),
+                        exec = std::forward<Executor>(exec),
+                        n](result_type&& f) mutable {
+                        if (f.has_exception())
+                        {
+                            // rethrow abort_replay_exception, if caught
+                            auto ex = rethrow_on_abort_replay(f);
+
+                            // execute the task again if an error occurred and
+                            // this was not the last attempt
+                            if (n != 0)
+                            {
+                                return this_->call(std::move(exec), n - 1);
+                            }
+
+                            // rethrow exception if the number of replays has
+                            // been exhausted
+                            std::rethrow_exception(ex);
+                        }
+
+                        if (n != 0)
+                        {
+                            // return result
+                            return hpx::make_ready_future();
+                        }
+
+                        // throw aborting exception as attempts were
+                        // exhausted
+                        throw abort_replay_exception();
+                    });
+            }
+
+            F f_;
+            Tuple t_;
+        };
+
         template <typename Result, typename Pred, typename F, typename... Ts>
         std::shared_ptr<async_replay_executor_helper<Result,
             typename std::decay<Pred>::type, typename std::decay<F>::type,
@@ -156,11 +239,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
-        using future_type =
-            typename hpx::parallel::execution::executor_future<Executor,
-                result_type>::type;
-
-        auto helper = detail::make_async_replay_executor_helper<future_type>(
+        auto helper = detail::make_async_replay_executor_helper<result_type>(
             std::forward<Pred>(pred), std::forward<F>(f),
             std::forward<Ts>(ts)...);
 
@@ -184,11 +263,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
-        using future_type =
-            typename hpx::parallel::execution::executor_future<Executor,
-                result_type>::type;
-
-        auto helper = detail::make_async_replay_executor_helper<future_type>(
+        auto helper = detail::make_async_replay_executor_helper<result_type>(
             detail::replay_validator{}, std::forward<F>(f),
             std::forward<Ts>(ts)...);
 

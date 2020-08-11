@@ -40,7 +40,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         struct replay_validator
         {
             template <typename T>
-            bool operator()(T&& result) const
+            constexpr bool operator()(T&&) const
             {
                 return true;
             }
