@@ -62,11 +62,6 @@ void test_transform(ExPolicy policy, IteratorTag)
 
     auto result = hpx::transform(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(d), add_one());
-
-    HPX_TEST(result.in == iterator(std::end(c)));
-    HPX_TEST(result.out == std::end(d));
-    // HPX_TEST(result.in == iterator(std::end(c)));
-    // HPX_TEST(result.out == std::end(d));
     HPX_TEST(result == std::end(d));
 
     // verify values
@@ -96,10 +91,6 @@ void test_transform_async(ExPolicy p, IteratorTag)
 
 
     auto result = f.get();
-    HPX_TEST(result.in == iterator(std::end(c)));
-    HPX_TEST(result.out == std::end(d));
-    // HPX_TEST(result.in == iterator(std::end(c)));
-    // HPX_TEST(result.out == std::end(d));
     HPX_TEST(result == std::end(d));
 
     // verify values

@@ -344,7 +344,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx { namespace ranges {
 
-    template <class I, class O>
+    template <typename I, typename O>
     using unary_transform_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -390,11 +390,10 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::transform_t, ExPolicy&& policy, Rng&& rng,
             FwdIter dest, F&& f, Proj&& proj = Proj())
         {
-            typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
-            //using iterator_type =
-            //    typename hpx::traits::range_traits<Rng>::iterator_type;
-            //using is_segmented =
-            //     hpx::traits::is_segmented_iterator<iterator_type>;
+            using iterator_type =
+                typename hpx::traits::range_traits<Rng>::iterator_type;
+            using is_segmented =
+                hpx::traits::is_segmented_iterator<iterator_type>;
 
             return parallel::v1::detail::transform_(
                 std::forward<ExPolicy>(policy), hpx::util::begin(rng),
@@ -415,7 +414,7 @@ namespace hpx { namespace ranges {
             hpx::ranges::transform_t, FwdIter1 first, Sent1 last, FwdIter2 dest,
             F&& f, Proj&& proj = Proj())
         {
-            typedef hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
+            hpx::traits::is_segmented_iterator<FwdIter1> is_segmented;
 
             return parallel::v1::detail::transform_(
                 hpx::parallel::execution::seq, first, last, dest,
@@ -436,11 +435,10 @@ namespace hpx { namespace ranges {
         tag_invoke(hpx::ranges::transform_t, Rng&& rng, FwdIter dest, F&& f,
             Proj&& proj = Proj())
         {
-            typedef hpx::traits::is_segmented_iterator<FwdIter> is_segmented;
-            //using iterator_type =
-            //    typename hpx::traits::range_traits<Rng>::iterator_type;
-            //using is_segmented =
-            //     hpx::traits::is_segmented_iterator<iterator_type>;
+            using iterator_type =
+                typename hpx::traits::range_traits<Rng>::iterator_type;
+            using is_segmented =
+                hpx::traits::is_segmented_iterator<iterator_type>;
 
             return parallel::v1::detail::transform_(
                 hpx::parallel::execution::seq, hpx::util::begin(rng),

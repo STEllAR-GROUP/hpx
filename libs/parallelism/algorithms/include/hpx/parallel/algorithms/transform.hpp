@@ -28,6 +28,7 @@
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
@@ -50,8 +51,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename F, typename Proj>
         struct transform_projected
         {
-            typename hpx::util::decay<F>::type& f_;
-            typename hpx::util::decay<Proj>::type& proj_;
+            F& f_;
+            Proj& proj_;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter curr)
@@ -59,6 +60,24 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr)))
             {
                 return hpx::util::invoke(f_, hpx::util::invoke(proj_, *curr));
+            }
+        };
+
+        template <typename F>
+        struct transform_projected<F, util::projection_identity>
+        {
+            HPX_HOST_DEVICE transform_projected(F& f, util::projection_identity)
+              : f_(f)
+            {
+            }
+
+            F& f_;
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE auto operator()(Iter curr)
+                -> decltype(hpx::util::invoke(f_, *curr))
+            {
+                return hpx::util::invoke(f_, *curr);
             }
         };
 
@@ -164,7 +183,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first, dest),
-                            std::distance(first, last), std::move(f1),
+                            detail::distance(first, last), std::move(f1),
                             util::projection_identity()));
                 }
 
@@ -428,7 +447,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first1, first2, dest),
-                            std::distance(first1, last1), std::move(f1),
+                            detail::distance(first1, last1), std::move(f1),
                             util::projection_identity()));
                 }
 
@@ -638,8 +657,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::foreach_partitioner<ExPolicy>::call(
                             std::forward<ExPolicy>(policy),
                             hpx::util::make_zip_iterator(first1, first2, dest),
-                            (std::min)(std::distance(first1, last1),
-                                std::distance(first2, last2)),
+                            (std::min)(detail::distance(first1, last1),
+                                detail::distance(first2, last2)),
                             std::move(f1), util::projection_identity()));
                 }
 
