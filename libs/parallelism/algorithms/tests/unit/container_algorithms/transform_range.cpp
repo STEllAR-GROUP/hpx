@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2020 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,7 +36,7 @@ void test_transform(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto result = hpx::parallel::transform(
+    auto result = hpx::ranges::transform(
         policy, c, std::begin(d), [](std::size_t v) { return v + 1; });
 
     HPX_TEST(result.in == std::end(c));
@@ -65,7 +66,7 @@ void test_transform_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto f = hpx::parallel::transform(
+    auto f = hpx::ranges::transform(
         p, c, std::begin(d), [](std::size_t& v) { return v + 1; });
     f.wait();
 
@@ -120,7 +121,7 @@ void test_transform_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::transform(policy,
+        hpx::ranges::transform(policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
@@ -155,7 +156,7 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::transform(p,
+        auto f = hpx::ranges::transform(p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
@@ -217,7 +218,7 @@ void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::transform(policy,
+        hpx::ranges::transform(policy,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
@@ -251,7 +252,7 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::transform(p,
+        auto f = hpx::ranges::transform(p,
             hpx::util::make_iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
