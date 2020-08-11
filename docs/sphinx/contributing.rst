@@ -14,6 +14,8 @@ collection of useful information related to |hpx| development.
 
 .. toctree::
 
+   contributing/contributing
+   contributing/governance
    contributing/release_procedure
    contributing/testing_hpx
    contributing/docker_image
