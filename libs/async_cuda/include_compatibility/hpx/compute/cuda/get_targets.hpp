@@ -10,7 +10,7 @@
 #include <hpx/async_cuda/config/defines.hpp>
 #include <hpx/async_cuda/get_targets.hpp>
 
-#if defined(HPX_ASYNC_CUDA_HAVE_DEPRECATION_WARNINGS)
+#if HPX_ASYNC_CUDA_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message("The header hpx/compute/cuda/get_targets.hpp is deprecated, \
     please include hpx/async_cuda/get_targets.hpp instead")

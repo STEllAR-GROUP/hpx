@@ -158,7 +158,7 @@ cat >${full_file} <<EOL
 #include <hpx/${module}/config/defines.hpp>
 #include <${new_path}/${f}>
 
-#if defined(HPX_${module_caps}_HAVE_DEPRECATION_WARNINGS)
+#if HPX_${module_caps}_HAVE_DEPRECATION_WARNINGS
 #if defined(HPX_MSVC)
 #pragma message( \\
     "The header ${old_path}/${f} is deprecated, \\
