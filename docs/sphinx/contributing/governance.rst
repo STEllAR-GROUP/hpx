@@ -7,9 +7,9 @@
 
 .. _governance:
 
-====================
+======================
 |hpx| governance model
-====================
+======================
 
 The |hpx| project is a meritocratic, consensus-based community project. Anyone
 with an interest in the project can join the community, contribute to the

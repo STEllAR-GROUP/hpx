@@ -7,9 +7,9 @@
 
 .. _contributing:
 
-===================
+=====================
 Contributing to |hpx|
-===================
+=====================
 
 The main source of information to understand the process of how to contribute
 to HPX can be found in
