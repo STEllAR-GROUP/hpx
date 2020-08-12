@@ -75,27 +75,45 @@ namespace hpx { namespace lcos { namespace local {
         private:
             void do_run_impl(/*is_void=*/std::false_type)
             {
+                std::exception_ptr p;
+
                 try
                 {
                     this->set_value(f_());
+                    return;
                 }
                 catch (...)
                 {
-                    this->set_exception(std::current_exception());
+                    p = std::current_exception();
                 }
+
+                // The exception is set outside the catch block since
+                // set_exception may yield. Ending the catch block on a
+                // different worker thread than where it was started may lead
+                // to segfaults.
+                this->set_exception(std::move(p));
             }
 
             void do_run_impl(/*is_void=*/std::true_type)
             {
+                std::exception_ptr p;
+
                 try
                 {
                     f_();
                     this->set_value(result_type());
+                    return;
                 }
                 catch (...)
                 {
-                    this->set_exception(std::current_exception());
+                    p = std::current_exception();
                 }
+
+                // The exception is set outside the catch block since
+                // set_exception may yield. Ending the catch block on a
+                // different worker thread than where it was started may lead
+                // to segfaults.
+                this->set_exception(std::move(p));
             }
 
         protected:
