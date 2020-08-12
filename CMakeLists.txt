@@ -1024,6 +1024,16 @@ if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
 endif()
 
 hpx_option(
+  HPX_WITH_BULK_STEALING BOOL "Enable bulk popping/pushing of tasks" ON
+  CATEGORY "Thread Manager"
+  ADVANCED
+)
+
+if(HPX_WITH_BULK_STEALING)
+  hpx_add_config_define(HPX_HAVE_BULK_STEALING)
+endif()
+
+hpx_option(
   HPX_WITH_SPINLOCK_POOL_NUM STRING
   "Number of elements a spinlock pool manages (default: 128)" 128
   CATEGORY "Thread Manager"
