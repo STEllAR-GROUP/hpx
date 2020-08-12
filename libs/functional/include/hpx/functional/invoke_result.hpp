@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -15,9 +16,17 @@ namespace hpx { namespace util {
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // f(t0, t1, ..., tN)
-        template <typename T>
-        struct result_of_function_object : std::result_of<T>
+        template <typename T, typename Enable = void>
+        struct result_of_function_object
         {
+        };
+
+        template <typename F, typename... Ts>
+        struct result_of_function_object<F(Ts...),
+            typename util::always_void<decltype(
+                std::declval<F>()(std::declval<Ts>()...))>::type>
+        {
+            using type = decltype(std::declval<F>()(std::declval<Ts>()...));
         };
 
         ///////////////////////////////////////////////////////////////////////
