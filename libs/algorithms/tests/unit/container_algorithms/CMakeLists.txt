@@ -18,8 +18,14 @@ set(tests
     equal_binary_range
     fill_range
     filln_range
+    find_range
+    find_if_range
+    find_if_not_range
+    find_if_not_exception_range
     find_end_range
+    find_end_range2
     find_first_of_range
+    find_first_of_range2
     foreach_adapt
     foreach_range
     foreach_range_projection

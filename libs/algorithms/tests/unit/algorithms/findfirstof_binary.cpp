@@ -26,8 +26,32 @@ std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(0, 10006);
 std::uniform_int_distribution<> dist(0, 2);
 
+template <typename IteratorTag>
+void test_find_first_of(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    int find_first_of_pos = dis(gen);
+    int random_sub_seq_pos = dist(gen);
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen() + 19);
+    std::size_t h[] = {1, 7, 18, 3};
+    c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
+
+    auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
+
+    iterator index = hpx::find_first_of(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h), op);
+
+    base_iterator test_index = std::begin(c) + find_first_of_pos;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of(ExPolicy policy, IteratorTag)
+void test_find_first_of(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -46,9 +70,8 @@ void test_find_first_of(ExPolicy policy, IteratorTag)
 
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
-    iterator index =
-        hpx::parallel::find_first_of(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h), op);
+    iterator index = hpx::find_first_of(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h), op);
 
     base_iterator test_index = std::begin(c) + find_first_of_pos;
 
@@ -56,7 +79,7 @@ void test_find_first_of(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of_async(ExPolicy p, IteratorTag)
+void test_find_first_of_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -71,9 +94,8 @@ void test_find_first_of_async(ExPolicy p, IteratorTag)
 
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
-    hpx::future<iterator> f =
-        hpx::parallel::find_first_of(p, iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h), op);
+    hpx::future<iterator> f = hpx::find_first_of(p, iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h), op);
     f.wait();
 
     // create iterator at position of value to be found
@@ -86,6 +108,9 @@ template <typename IteratorTag>
 void test_find_first_of()
 {
     using namespace hpx::parallel;
+
+    test_find_first_of(IteratorTag());
+
     test_find_first_of(execution::seq, IteratorTag());
     test_find_first_of(execution::par, IteratorTag());
     test_find_first_of(execution::par_unseq, IteratorTag());
@@ -101,8 +126,44 @@ void find_first_of_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_find_first_of_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
+    c[c.size() / 2] = 1;
+
+    std::size_t h[] = {1, 2};
+
+    auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::find_first_of(decorated_iterator(std::begin(c),
+                               []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c)), std::begin(h), std::end(h), op);
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+            IteratorTag>::call(hpx::parallel::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of_exception(ExPolicy policy, IteratorTag)
+void test_find_first_of_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -122,7 +183,7 @@ void test_find_first_of_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::find_first_of(policy,
+        hpx::find_first_of(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(h), std::end(h), op);
@@ -142,7 +203,7 @@ void test_find_first_of_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of_exception_async(ExPolicy p, IteratorTag)
+void test_find_first_of_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -160,7 +221,7 @@ void test_find_first_of_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::find_first_of(p,
+        hpx::future<decorated_iterator> f = hpx::find_first_of(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), std::begin(h), std::end(h), op);
@@ -188,6 +249,8 @@ void test_find_first_of_exception()
 {
     using namespace hpx::parallel;
 
+    test_find_first_of_exception(IteratorTag());
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -208,7 +271,7 @@ void find_first_of_exception_test()
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of_bad_alloc(ExPolicy policy, IteratorTag)
+void test_find_first_of_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -229,7 +292,7 @@ void test_find_first_of_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::find_first_of(policy,
+        hpx::find_first_of(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(h), std::end(h), op);
         HPX_TEST(false);
@@ -247,7 +310,7 @@ void test_find_first_of_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_first_of_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_find_first_of_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -265,7 +328,7 @@ void test_find_first_of_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::find_first_of(p,
+        hpx::future<decorated_iterator> f = hpx::find_first_of(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), std::begin(h), std::end(h), op);
         returned_from_algorithm = true;

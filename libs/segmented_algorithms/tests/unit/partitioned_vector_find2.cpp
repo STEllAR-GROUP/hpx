@@ -37,8 +37,7 @@ struct cond2
 template <typename ExPolicy, typename T>
 void test_find(ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
-    auto last =
-        hpx::parallel::find(policy, xvalues.begin(), xvalues.end(), val);
+    auto last = hpx::find(policy, xvalues.begin(), xvalues.end(), val);
     HPX_TEST_EQ(*last, val);
 }
 
@@ -46,16 +45,15 @@ template <typename ExPolicy, typename T>
 void test_find_async(
     ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
-    auto last =
-        hpx::parallel::find(policy, xvalues.begin(), xvalues.end(), val).get();
+    auto last = hpx::find(policy, xvalues.begin(), xvalues.end(), val).get();
     HPX_TEST_EQ(*last, val);
 }
 
 template <typename ExPolicy, typename T>
 void test_find_if(ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
-    auto last = hpx::parallel::find_if(
-        policy, xvalues.begin(), xvalues.end(), cond1<T>());
+    auto last =
+        hpx::find_if(policy, xvalues.begin(), xvalues.end(), cond1<T>());
     HPX_TEST_EQ(*last, val);
 }
 
@@ -63,9 +61,8 @@ template <typename ExPolicy, typename T>
 void test_find_if_async(
     ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
-    auto last = hpx::parallel::find_if(
-        policy, xvalues.begin(), xvalues.end(), cond1<T>())
-                    .get();
+    auto last =
+        hpx::find_if(policy, xvalues.begin(), xvalues.end(), cond1<T>()).get();
     HPX_TEST_EQ(*last, val);
 }
 
@@ -73,8 +70,8 @@ template <typename ExPolicy, typename T>
 void test_find_if_not(
     ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
-    auto last = hpx::parallel::find_if_not(
-        policy, xvalues.begin(), xvalues.end(), cond2<T>());
+    auto last =
+        hpx::find_if_not(policy, xvalues.begin(), xvalues.end(), cond2<T>());
     HPX_TEST_EQ(*last, val);
 }
 
@@ -82,9 +79,9 @@ template <typename ExPolicy, typename T>
 void test_find_if_not_async(
     ExPolicy&& policy, hpx::partitioned_vector<T>& xvalues, T val)
 {
-    auto last = hpx::parallel::find_if_not(
-        policy, xvalues.begin(), xvalues.end(), cond2<T>())
-                    .get();
+    auto last =
+        hpx::find_if_not(policy, xvalues.begin(), xvalues.end(), cond2<T>())
+            .get();
     HPX_TEST_EQ(*last, val);
 }
 

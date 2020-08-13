@@ -27,7 +27,7 @@ namespace hpx { namespace ranges {
     ///                     forward iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for FwdIter1.
+    ///                     sentinel for Iter1.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an

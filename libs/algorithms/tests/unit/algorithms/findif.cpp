@@ -24,8 +24,28 @@ unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(2, 101);
 
+template <typename IteratorTag>
+void test_find_if(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c(10007);
+    //fill vector with random values about 1
+    std::fill(std::begin(c), std::end(c), dis(gen));
+    c.at(c.size() / 2) = 1;
+
+    iterator index =
+        hpx::find_if(iterator(std::begin(c)), iterator(std::end(c)),
+            [](std::size_t v) { return v == std::size_t(1); });
+
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if(ExPolicy policy, IteratorTag)
+void test_find_if(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -39,9 +59,9 @@ void test_find_if(ExPolicy policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size() / 2) = 1;
 
-    iterator index = hpx::parallel::find_if(policy, iterator(std::begin(c)),
-        iterator(std::end(c)),
-        [](std::size_t v) { return v == std::size_t(1); });
+    iterator index =
+        hpx::find_if(policy, iterator(std::begin(c)), iterator(std::end(c)),
+            [](std::size_t v) { return v == std::size_t(1); });
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
@@ -49,7 +69,7 @@ void test_find_if(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_async(ExPolicy p, IteratorTag)
+void test_find_if_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -59,9 +79,9 @@ void test_find_if_async(ExPolicy p, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size() / 2) = 1;
 
-    hpx::future<iterator> f = hpx::parallel::find_if(p, iterator(std::begin(c)),
-        iterator(std::end(c)),
-        [](std::size_t v) { return v == std::size_t(1); });
+    hpx::future<iterator> f =
+        hpx::find_if(p, iterator(std::begin(c)), iterator(std::end(c)),
+            [](std::size_t v) { return v == std::size_t(1); });
     f.wait();
 
     //create iterator at position of value to be found
@@ -74,6 +94,9 @@ template <typename IteratorTag>
 void test_find_if()
 {
     using namespace hpx::parallel;
+
+    test_find_if(IteratorTag());
+
     test_find_if(execution::seq, IteratorTag());
     test_find_if(execution::par, IteratorTag());
     test_find_if(execution::par_unseq, IteratorTag());
@@ -89,8 +112,40 @@ void find_if_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_find_if_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), gen() + 1);
+    c[c.size() / 2] = 0;
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::find_if(decorated_iterator(std::begin(c),
+                         []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<hpx::parallel::execution::sequenced_policy,
+            IteratorTag>::call(hpx::parallel::execution::seq, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_exception(ExPolicy policy, IteratorTag)
+void test_find_if_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -106,7 +161,7 @@ void test_find_if_exception(ExPolicy policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::parallel::find_if(policy,
+        hpx::find_if(policy,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
@@ -126,7 +181,7 @@ void test_find_if_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_exception_async(ExPolicy p, IteratorTag)
+void test_find_if_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -140,7 +195,7 @@ void test_find_if_exception_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::find_if(p,
+        hpx::future<decorated_iterator> f = hpx::find_if(p,
             decorated_iterator(
                 std::begin(c), []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
@@ -168,6 +223,8 @@ void test_find_if_exception()
 {
     using namespace hpx::parallel;
 
+    test_find_if_exception(IteratorTag());
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -188,7 +245,7 @@ void find_if_exception_test()
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_bad_alloc(ExPolicy policy, IteratorTag)
+void test_find_if_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(
         hpx::parallel::execution::is_execution_policy<ExPolicy>::value,
@@ -205,7 +262,7 @@ void test_find_if_bad_alloc(ExPolicy policy, IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::parallel::find_if(policy,
+        hpx::find_if(policy,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
         HPX_TEST(false);
@@ -223,7 +280,7 @@ void test_find_if_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_find_if_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_find_if_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -237,7 +294,7 @@ void test_find_if_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        hpx::future<decorated_iterator> f = hpx::parallel::find_if(p,
+        hpx::future<decorated_iterator> f = hpx::find_if(p,
             decorated_iterator(std::begin(c), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c)), [](std::size_t v) { return 1; });
         returned_from_algorithm = true;
