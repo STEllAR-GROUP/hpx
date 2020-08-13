@@ -23,12 +23,12 @@ void myfunction(int i)
 void test_invoke_projected()
 {
     Iterator<std::int64_t> iter =
-        hpx::parallel::for_each(hpx::parallel::execution::seq,
+        hpx::ranges::for_each(hpx::parallel::execution::seq,
             Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
 
-    iter = hpx::parallel::for_each(hpx::parallel::execution::par,
+    iter = hpx::ranges::for_each(hpx::parallel::execution::par,
         Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
@@ -37,12 +37,12 @@ void test_invoke_projected()
 void test_begin_end_iterator()
 {
     Iterator<std::int64_t> iter =
-        hpx::parallel::for_each(hpx::parallel::execution::seq,
+        hpx::ranges::for_each(hpx::parallel::execution::seq,
             Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, &myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));
 
-    iter = hpx::parallel::for_each(hpx::parallel::execution::par,
+    iter = hpx::ranges::for_each(hpx::parallel::execution::par,
         Iterator<std::int64_t>{0}, Sentinel<int64_t>{100}, &myfunction);
 
     HPX_TEST_EQ(*iter, std::int64_t(100));

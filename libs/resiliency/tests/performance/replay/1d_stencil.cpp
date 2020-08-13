@@ -21,7 +21,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/include/parallel_algorithm.hpp>
+#include <hpx/algorithm.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <boost/range/irange.hpp>
 
@@ -165,8 +165,8 @@ struct stepper
         std::size_t b = 0;
         auto range = boost::irange(b, subdomains);
         using hpx::parallel::execution::par;
-        hpx::parallel::for_each(par, std::begin(range), std::end(range),
-            [&U, subdomain_width, subdomains](std::size_t i) {
+        hpx::ranges::for_each(
+            par, range, [&U, subdomain_width, subdomains](std::size_t i) {
                 U[0][i] = hpx::make_ready_future(
                     partition_data(subdomain_width, double(i), subdomains));
             });

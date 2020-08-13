@@ -20,6 +20,8 @@ void test_for_each_n()
 {
     using namespace hpx::parallel;
 
+    test_for_each_n_seq(IteratorTag());
+
     test_for_each_n(execution::seq, IteratorTag());
     test_for_each_n(execution::par, IteratorTag());
     test_for_each_n(execution::par_unseq, IteratorTag());

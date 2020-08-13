@@ -3,9 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/include/compute.hpp>
 #include <hpx/include/partitioned_vector.hpp>
-#include <hpx/include/parallel_for_each.hpp>
 
 #include <hpx/hpx_init.hpp>
 
@@ -36,17 +36,16 @@ struct pfo
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     hpx::cuda::experimental::target_distribution_policy policy =
-        hpx::cuda::experimental::target_layout(hpx::cuda::experimental::get_local_targets());
+        hpx::cuda::experimental::target_layout(
+            hpx::cuda::experimental::get_local_targets());
 
     {
         using namespace hpx::parallel;
         hpx::partitioned_vector<int, target_vector> v(1000, policy);
-        hpx::parallel::for_each(execution::seq, v.begin(), v.end(), pfo());
-        hpx::parallel::for_each(execution::par, v.begin(), v.end(), pfo());
-        hpx::parallel::for_each(execution::seq(execution::task),
-            v.begin(), v.end(), pfo()).get();
-        hpx::parallel::for_each(execution::par(execution::task),
-            v.begin(), v.end(), pfo()).get();
+        hpx::ranges::for_each(execution::seq, v, pfo());
+        hpx::ranges::for_each(execution::par, v, pfo());
+        hpx::ranges::for_each(execution::seq(execution::task), v, pfo()).get();
+        hpx::ranges::for_each(execution::par(execution::task), v, pfo()).get();
     }
 
     // TODO: add more

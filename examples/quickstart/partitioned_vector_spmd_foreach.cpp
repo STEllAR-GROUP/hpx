@@ -11,11 +11,10 @@
 // elements is done directly, with best possible performance, working directly
 // on the std::vector's the data is stored in.
 
-#include <hpx/hpx_init.hpp>
+#include <hpx/algorithm.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/partitioned_vector.hpp>
-#include <hpx/include/parallel_for_each.hpp>
-#include <hpx/include/parallel_generate.hpp>
 
 #include <hpx/modules/program_options.hpp>
 
@@ -66,7 +65,8 @@ public:
         // this view assumes that there is exactly one segment per locality
         typedef typename traits::local_segment_iterator local_segment_iterator;
         local_segment_iterator sit = segment_iterator_;
-        HPX_ASSERT(++sit == data.segment_end(hpx::get_locality_id())); // NOLINT
+        HPX_ASSERT(
+            ++sit == data.segment_end(hpx::get_locality_id()));    // NOLINT
 #endif
     }
 
@@ -129,8 +129,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     char const* const example_vector_name =
         "partitioned_vector_spmd_foreach_example";
-    char const* const example_latch_name =
-        "latch_spmd_foreach_example";
+    char const* const example_latch_name = "latch_spmd_foreach_example";
 
     {
         // create vector on one locality, connect to it from all others
@@ -141,8 +140,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-            v = hpx::partitioned_vector<int>(size,
-                    hpx::container_layout(localities));
+            v = hpx::partitioned_vector<int>(
+                size, hpx::container_layout(localities));
             v.register_as(example_vector_name);
 
             l = hpx::lcos::latch(localities.size());
@@ -160,22 +159,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // fill the vector with random numbers
         partitioned_vector_view<int> view(v);
-        hpx::parallel::generate(
-            hpx::parallel::execution::par,
-            view.begin(), view.end(),
-            [&]()
-            {
-                return dist(gen);
-            });
+        hpx::parallel::generate(hpx::parallel::execution::par, view.begin(),
+            view.end(), [&]() { return dist(gen); });
 
         // square all numbers in the array
-        hpx::parallel::for_each(
-            hpx::parallel::execution::par,
-            view.begin(), view.end(),
-            [](int& val)
-            {
-                val *= val;
-            });
+        hpx::ranges::for_each(
+            hpx::parallel::execution::par, view, [](int& val) { val *= val; });
 
         // do the same using a plain loop
         std::size_t maxnum = view.size();
@@ -196,20 +185,18 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     desc_commandline.add_options()
         ("maxelems,m", value<unsigned int>(),
             "the data array size to use (default: 10000)")
         ("seed,s", value<unsigned int>(),
             "the random number generator seed to use for this run")
         ;
+    // clang-format on
 
     // run hpx_main on all localities
-    std::vector<std::string> const cfg = {
-        "hpx.run_hpx_main!=1"
-    };
+    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv, cfg);
 }
-
-

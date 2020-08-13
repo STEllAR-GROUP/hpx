@@ -5,9 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_count.hpp>
-#include <hpx/include/parallel_for_each.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 
 #include <hpx/modules/testing.hpp>
@@ -87,7 +87,7 @@ void test_for_each(ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
     verify_values(policy, v, val);
     verify_values_count(policy, v, val);
 
-    hpx::parallel::for_each(policy, v.begin(), v.end(), pfo());
+    hpx::for_each(policy, v.begin(), v.end(), pfo());
 
     verify_values(policy, v, ++val);
     verify_values_count(policy, v, val);
@@ -99,7 +99,7 @@ void test_for_each_n(ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
     verify_values(policy, v, val);
     verify_values_count(policy, v, val);
 
-    hpx::parallel::for_each_n(policy, v.begin(), v.end() - v.begin(), pfo());
+    hpx::for_each_n(policy, v.begin(), v.end() - v.begin(), pfo());
 
     verify_values(policy, v, ++val);
     verify_values_count(policy, v, val);
@@ -124,7 +124,7 @@ void test_for_each_async(
     verify_values(policy, v, val);
     verify_values_count_async(policy, v, val);
 
-    hpx::parallel::for_each(policy, v.begin(), v.end(), pfo()).get();
+    hpx::for_each(policy, v.begin(), v.end(), pfo()).get();
 
     verify_values(policy, v, ++val);
     verify_values_count_async(policy, v, val);
@@ -137,8 +137,7 @@ void test_for_each_n_async(
     verify_values(policy, v, val);
     verify_values_count_async(policy, v, val);
 
-    hpx::parallel::for_each_n(policy, v.begin(), v.end() - v.begin(), pfo())
-        .get();
+    hpx::for_each_n(policy, v.begin(), v.end() - v.begin(), pfo()).get();
 
     verify_values(policy, v, ++val);
     verify_values_count_async(policy, v, val);
@@ -152,15 +151,13 @@ void for_each_tests(std::vector<hpx::id_type>& localities)
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::parallel::for_each(
-            hpx::parallel::execution::seq, v.begin(), v.end(), pfo());
-        hpx::parallel::for_each(
-            hpx::parallel::execution::par, v.begin(), v.end(), pfo());
-        hpx::parallel::for_each(
+        hpx::for_each(hpx::parallel::execution::seq, v.begin(), v.end(), pfo());
+        hpx::for_each(hpx::parallel::execution::par, v.begin(), v.end(), pfo());
+        hpx::for_each(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
             v.begin(), v.end(), pfo())
             .get();
-        hpx::parallel::for_each(
+        hpx::for_each(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
             v.begin(), v.end(), pfo())
             .get();
@@ -190,15 +187,13 @@ void for_each_n_tests(std::vector<hpx::id_type>& localities)
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::parallel::for_each_n(
-            hpx::parallel::execution::seq, v.begin(), 0, pfo());
-        hpx::parallel::for_each_n(
-            hpx::parallel::execution::par, v.begin(), 0, pfo());
-        hpx::parallel::for_each_n(
+        hpx::for_each_n(hpx::parallel::execution::seq, v.begin(), 0, pfo());
+        hpx::for_each_n(hpx::parallel::execution::par, v.begin(), 0, pfo());
+        hpx::for_each_n(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
             v.begin(), 0, pfo())
             .get();
-        hpx::parallel::for_each_n(
+        hpx::for_each_n(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
             v.begin(), 0, pfo())
             .get();
@@ -206,15 +201,13 @@ void for_each_n_tests(std::vector<hpx::id_type>& localities)
 
     {
         hpx::partitioned_vector<T> v;
-        hpx::parallel::for_each_n(
-            hpx::parallel::execution::seq, v.begin(), -1, pfo());
-        hpx::parallel::for_each_n(
-            hpx::parallel::execution::par, v.begin(), -1, pfo());
-        hpx::parallel::for_each_n(
+        hpx::for_each_n(hpx::parallel::execution::seq, v.begin(), -1, pfo());
+        hpx::for_each_n(hpx::parallel::execution::par, v.begin(), -1, pfo());
+        hpx::for_each_n(
             hpx::parallel::execution::seq(hpx::parallel::execution::task),
             v.begin(), -1, pfo())
             .get();
-        hpx::parallel::for_each_n(
+        hpx::for_each_n(
             hpx::parallel::execution::par(hpx::parallel::execution::task),
             v.begin(), -1, pfo())
             .get();

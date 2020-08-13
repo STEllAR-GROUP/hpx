@@ -291,7 +291,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
                     zip_iterator;
 
-                return util::get_in_out_result(
+                return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest),
@@ -400,7 +400,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
                     zip_iterator;
 
-                return util::get_in_out_result(
+                return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
                         std::forward<ExPolicy>(policy),
                         hpx::util::make_zip_iterator(first, dest), count,

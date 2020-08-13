@@ -62,8 +62,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef
                 typename std::iterator_traits<InIter>::value_type value_type;
 
-            return hpx::parallel::for_each(std::forward<ExPolicy>(policy),
-                first, last, fill_function<value_type>(value));
+            return for_each_(std::forward<ExPolicy>(policy), first, last,
+                fill_function<value_type>(value), util::projection_identity(),
+                std::true_type());
         }
 
         // forward declare the non-segmented version of this algorithm
