@@ -168,7 +168,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             std::rethrow_exception(ex);
                         }
 
-                        // throw aborting exception no correct results ere produced
+                        // throw aborting exception if no correct results were produced
                         throw abort_replicate_exception{};
                     },
                     std::move(results));
