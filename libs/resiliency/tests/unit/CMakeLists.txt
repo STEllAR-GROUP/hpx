@@ -15,6 +15,8 @@ set(tests
     dataflow_replay_plain
     dataflow_replicate_executor
     dataflow_replicate_plain
+    replay_executor
+    replicate_executor
 )
 
 foreach(test ${tests})
