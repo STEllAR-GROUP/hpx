@@ -21,39 +21,48 @@ conformant. As part of the modularization we have begun specifying the public
 API of |hpx| in terms of headers and functionality, and aligning it more closely
 to the C++ standard. All non-distributed modules are now in place, along with an
 experimental option to completely disable distributed features in |hpx|. We have
-also added an experimental asynchronous MPI executor. Lastly this release
-contains official |cmake| targets, performance improvements, and many bug fixes.
+also added experimental asynchronous MPI and CUDA executors. Lastly this release
+introduces |cmake| targets for depending projects, performance improvements,
+and many bug fixes.
 
-* We have added the C++20 features ``hpx::jthread`` and ``hpx::stop_token``. We
-  have also added ``hpx::stable_sort`` based on Francisco Tapia's
+* We have added the C++20 features ``hpx::jthread`` and ``hpx::stop_token``.
+  ``hpx::condition_variable_any`` now exposes new functions supporting
+  ``hpx::stop_token``.
+* We have added ``hpx::stable_sort`` based on Francisco Tapia's
   implementation.
 * We have adapted existing sychronization primitives to be fully conformant
-  C++20: ``barrier``, ``latch``, ``counting_semaphore``.
-* We have started using customization point objects to make the corresponding
+  C++20: ``hpx::barrier``, ``hpx::latch``, ``hpx::counting_semaphore``, and
+  ``hpx::binary_semaphore``.
+* We have started using customization point objects (CPOs) to make the corresponding
   algorithms fully conformant to C++20 as well as to make algorithm extension
   easier for the user. ``all_of``/``any_of``/``none_of``, ``copy``, ``count``,
   ``destroy``, ``equal``, ``fill``, ``mismatch``, ``move``, ``reduce`` are using
-  those CPOs.  We also have adapted their corresponding ``hpx::ranges`` versions
-  in this release.
-* We have adapted support for ``co_await`` to C++20, it now supports
-  ``shared_future`` and have added allocator support for futures returned by
-  ``co_return``. It is no longer in the ``experimental`` namespace.
+  those CPOs (all in namespace ``hpx``).  We also have adapted their
+  corresponding ``hpx::ranges`` versions to be conforming to C++20 in this
+  release.
+* We have adapted support for ``co_await`` to C++20, in addition to
+  ``hpx::future`` it now also supports ``hpx::shared_future``. We have also
+  added allocator support for futures returned by ``co_return``. It is no longer
+  in the ``experimental`` namespace.
 * We added serialization support for ``std::variant`` and ``std::tuple``.
 * ``result_of`` and ``is_callable`` are now deprecated and replaced by
   ``invoke_result`` and ``is_invocable`` to conform to C++20.
 * We continued with the modularization, making it easier for us to add the new
   experimental ``HPX_WITH_DISTRIBUTED_RUNTIME`` |cmake| option (see below) . An
-  important amount of headers have been deprecated. We adapted the namespaces
+  significant amount of headers have been deprecated. We adapted the namespaces
   and headers we could to be closer to the standard ones (:ref:`api
-  <_public_api>`).
+  <_public_api>`). Depending code should stil compile, however warnings are now
+  generated instructing to change the ``#include``s accordingly.
 * It is now possible to have a basic CUDA support including a helper function to
   get a future from a CUDA stream and target handling. They are available under
   the ``hpx::cuda::experimental`` namespace and they can be enabled with the
-  ``HPX_WITH_ASYNC_CUDA=ON`` cmake option.
+  ``-DHPX_WITH_ASYNC_CUDA=ON`` |cmake| option.
 * We added a new ``hpx::mpi::experimental`` namespace for getting futures from
-  an asynchronous MPI call and a new minimal MPI executor (add the name).
+  an asynchronous MPI call and a new minimal MPI executor
+  ``hpx::mpi::experimental::executor``. These can be enabled with the
+  ``-DHPX_WITH_ASYNC_MPI=On` |cmake| option.
 * A polymorphic executor has been implemented to reduce compile times as a
-  function accepting executor can potentially be instantiated only once instead
+  function accepting executors can potentially be instantiated only once instead
   of multiple times with different executors. It accepts the function signature
   as a template argument. It needs to be constructed from any other executor.
   Please note, that the function signatures that can be scheduled using
@@ -68,23 +77,32 @@ contains official |cmake| targets, performance improvements, and many bug fixes.
   policies in the future. This is also a first step towards simplifying our
   executor APIs in preparation for the upcoming C++23 executors
   (senders/receivers).
-* We have added performance counters type information (aggregating,
-  monotonically increasing, average count, average timer, etc.).
-* The tasks are now re-scheduled on the same worker thread they were suspended
+* We have moved all of the existing APIs related to resiliency into the
+  namespace ``hpx::resiliency::experimental``. Please note this is a breaking
+  change without backwards-compatibility option. We have converted all of those
+  APIs to be based on customization point objects. Two new executors have been
+  added to enable easy integration of the existing resiliency features with
+  other facilities (like the parallel algorithms): ``replay_executor`` and
+  ``replicate_executor``.
+* We have added performance counters type information (``aggregating``,
+  ``monotonically increasing``, ``average count``, ``average timer``, etc.).
+* HPX threads are now re-scheduled on the same worker thread they were suspended
   on to avoid cache misses from moving from one thread to the other. This
-  behavior doesn't prevent the task from being stolen.
+  behavior doesn't prevent the thread from being stolen, however.
 * We have added a new configuration option ``hpx.exception_verbosity`` to allow
-  to control the level of verbosity of the exceptions (3 levels available).
+  to control the level of verbosity of the exceptions (3 levels available). The
+  default output generated in case of exceptions is greatly reduced, please use
+  the new option to see the full output as before.
 * ``broadcast_to``, ``broadcast_from``, ``scatter_to`` and ``scatter_from`` have
   been added to the collectives, modernization of ``gather_here`` and
   ``gather_there`` with futures taken by rvalue references. See the breaking
-  change on ``all_to_all`` in the next section. All the collectives do not need
+  change on ``all_to_all`` in the next section. None of the collectives need
   supporting macros anymore (e.g. specifying the data types used for a
-  collective operation using ``HPX_REGISTER_ALLGATHER`` and similar are not
+  collective operation using ``HPX_REGISTER_ALLGATHER`` and similar is not
   needed anymore).
-* A new API function to get the number of cores which are idle
-  (``hpx::get_idle_core_count``) and another one returning a bitmask
-  representing the currently idle cores (``get_idle_core_mask``).
+* New API functions have been added: a) to get the number of cores which are idle
+  (``hpx::get_idle_core_count``) and b) returning a bitmask
+  representing the currently idle cores (``hpx::get_idle_core_mask``).
 * We have added an experimental option to only enable the local runtime, you can
   disable the distributed runtime with ``HPX_WITH_DISTRIBUTED_RUNTIME=OFF``. You
   can also enable the local runtime by using the ``--hpx:local`` runtime option.
@@ -92,9 +110,11 @@ contains official |cmake| targets, performance improvements, and many bug fixes.
 * The alias ``hpx::promise`` to ``hpx::lcos::promise`` is now deprecated. You
   can use ``hpx::lcos::promise`` directly instead. ``hpx::promise`` will refer
   to the local-only promise in the future.
-* We have added a ``prepare_checkpoint`` API function which calculates the
-  amount of necessary buffer space for a particular set of argumnets
+* We have added a ``prepare_checkpoint`` API function that calculates the
+  amount of necessary buffer space for a particular set of arguments
   checkpointed.
+* We have added ``hpx::upgrade_lock`` and ``hpx::upgrade_to_unique_lock``, which
+  make ``hpx::shared_mutex`` (and similar) usable in more flexible ways.
 * We have changed the |cmake| targets exposed to the user, it now includes
   ``HPX::hpx``, ``HPX::wrap_main`` (``int main`` as the first |hpx| thread of
   the application, see :ref:`starting HPX runtime <_starting_hpx>`),
@@ -107,6 +127,12 @@ contains official |cmake| targets, performance improvements, and many bug fixes.
 * A new example is demonstrating how to disable thread stealing during the
   execution of parallel algorithms
   (``quickstart/disable_thread_stealing_executor.cpp``)
+* We now require for our |cmake| build system configuration files to be
+  formatted using cmake-format.
+* We have removed more dependencies on various Boost libraries. If compiled
+  in C++17 mode (``-DCMAKE_CXX_STANDARD=17``), HPX now does not require linking
+  with any Boost libraries anymore. The library still depends on a number of
+  header-only Boost libraries.
 * Many bug fixes.
 
 Breaking changes
@@ -114,13 +140,16 @@ Breaking changes
 
 * |hpx| now requires a C++14 capable compiler. We have set the |hpx| C++
   standard automatically to C++14 and if it needs to be set explicitly, it
-  should be through the ``CMAKE_CXX_STANDARD``. The ``HPX_WITH_CXX*`` variables
-  are now deprecated.
+  should be specified through the ``CMAKE_CXX_STANDARD`` setting as mandated
+  by |cmake|. The ``HPX_WITH_CXX*`` variables are now deprecated and will be
+  removed in the future.
 * We have added a ``hpx::init_params`` struct to pass parameters for |hpx|
   initialization e.g. the resource partitioner callback to initialize thread
   pools (:ref:`using the resource partitioner <_using_resource_partitioner>`).
 * The ``all_to_all`` algorithm is renamed to ``all_gather``, and the new
   ``all_to_all`` algorithm is not compatible with the old one.
+* We have moved all of the existing APIs related to resiliency into the
+  namespace ``hpx::resiliency::experimental``.
 
 Closed issues
 =============
