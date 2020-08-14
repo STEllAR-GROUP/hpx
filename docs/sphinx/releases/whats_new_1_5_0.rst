@@ -145,6 +145,9 @@ Breaking changes
   should be specified through the ``CMAKE_CXX_STANDARD`` setting as mandated
   by |cmake|. The ``HPX_WITH_CXX*`` variables are now deprecated and will be
   removed in the future.
+* Building and using HPX is now supported only when using |cmake| V3.13 or later,
+  Boost V1.64 or newer, and when compiling with clang V5, gcc V7, or VS2019, or
+  later. Other compilers might still work but have not been tested thoroughly.
 * We have added a ``hpx::init_params`` struct to pass parameters for |hpx|
   initialization e.g. the resource partitioner callback to initialize thread
   pools (:ref:`using the resource partitioner <_using_resource_partitioner>`).
