@@ -133,6 +133,8 @@ and many bug fixes.
   in C++17 mode (``-DCMAKE_CXX_STANDARD=17``), HPX now does not require linking
   with any Boost libraries anymore. The library still depends on a number of
   header-only Boost libraries.
+* We have added an experimental option enabling unity builds of HPX using the
+  ``-DHPX_WITH_UNITY_BUILD=On`` |cmake| option.
 * Many bug fixes.
 
 Breaking changes
