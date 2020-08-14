@@ -310,7 +310,7 @@ namespace hpx { namespace detail {
 }}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-#if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) &&                                        \
+#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
     (defined(__linux) || defined(__linux__) || defined(linux) ||               \
         defined(__APPLE__))
 namespace hpx_start {
@@ -765,7 +765,7 @@ namespace hpx {
             // make sure the runtime system is not active yet
             if (get_runtime_ptr() != nullptr)
             {
-#if (HPX_HAVE_DYNAMIC_HPX_MAIN != 0) &&                                        \
+#if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
     (defined(__linux) || defined(__linux__) || defined(linux) ||               \
         defined(__APPLE__))
                 // make sure the runtime system is not initialized

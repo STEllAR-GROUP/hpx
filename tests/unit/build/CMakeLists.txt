@@ -15,13 +15,14 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 # Try building an external cmake based project ...
-function(create_cmake_test name hpx_dir setup_type test_dir)
+function(create_cmake_test name using_install_dir hpx_dir setup_type test_dir)
   set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
   add_custom_target(
     ${name}.make_build_dir
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${build_dir}"
     VERBATIM
   )
+  set(ADDITIONAL_CMAKE_OPTIONS -DUSING_INSTALL_DIR=${using_install_dir})
   set(ADDITIONAL_CMAKE_OPTIONS -DSETUP_TYPE=${setup_type})
   if(CMAKE_TOOLCHAIN_FILE)
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
@@ -117,25 +118,25 @@ function(create_pkgconfig_test name hpx_dir)
 endfunction()
 
 create_cmake_test(
-  cmake_build_dir_targets_test
+  cmake_build_dir_targets_test FALSE
   "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
   "examples/hello_world_component"
 )
 
 create_cmake_test(
-  cmake_build_dir_macros_test
+  cmake_build_dir_macros_test FALSE
   "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" MACROS
   "examples/hello_world_component"
 )
 
 create_cmake_test(
-  cmake_install_dir_targets_test
+  cmake_install_dir_targets_test TRUE
   "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
   "examples/hello_world_component"
 )
 
 create_cmake_test(
-  cmake_install_dir_macros_test
+  cmake_install_dir_macros_test TRUE
   "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" MACROS
   "examples/hello_world_component"
 )
@@ -143,13 +144,13 @@ create_cmake_test(
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
   # Google test emulation
   create_cmake_test(
-    cmake_build_dir_gtest_emulation_test
+    cmake_build_dir_gtest_emulation_test FALSE
     "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" TARGETS
     "examples/gtest_emulation"
   )
 
   create_cmake_test(
-    cmake_install_dir_gtest_emulation_test
+    cmake_install_dir_gtest_emulation_test TRUE
     "${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}" TARGETS
     "examples/gtest_emulation"
   )
@@ -170,10 +171,12 @@ if(NOT MSVC)
 endif()
 
 set(build_systems cmake)
-set(cmake_tests
-    build_dir_targets install_dir_targets build_dir_macros install_dir_macros
-    build_dir_gtest_emulation install_dir_gtest_emulation
+set(cmake_tests build_dir_targets install_dir_targets build_dir_macros
+                install_dir_macros
 )
+if(HPX_WITH_DYNAMIC_HPX_MAIN)
+  list(APPEND cmake_tests build_dir_gtest_emulation install_dir_gtest_emulation)
+endif()
 if(NOT CMAKE_TOOLCHAIN_FILE
    AND PKGCONFIG_FOUND
    AND NOT MSVC

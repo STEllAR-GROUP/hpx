@@ -52,7 +52,7 @@ install(
 if(NOT MSVC)
   add_library(hpx_pkgconfig_application INTERFACE)
   target_link_libraries(
-    hpx_pkgconfig_application INTERFACE hpx hpx_init hpx_wrap
+    hpx_pkgconfig_application INTERFACE hpx hpx_wrap hpx_init
   )
   target_compile_definitions(
     hpx_pkgconfig_application INTERFACE HPX_APPLICATION_EXPORTS

@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/wrap/config/defines.hpp>
 #include <hpx/hpx_init.hpp>
 
 // We support different implementation depending upon the Operating
@@ -41,7 +40,7 @@ namespace hpx_start
 #else
 
 #if defined(HPX_HAVE_STATIC_LINKING)
-#include <hpx/wrap_main_impl.hpp>
+#include <hpx/hpx_main_impl.hpp>
 #endif
 
 // We support redefining the plain C-main provided by the user to be executed
