@@ -43,7 +43,7 @@ include(HPX_AddModule)
 
 add_hpx_module(
   hardware
-  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/hardware/cpuid/linux_x86.hpp"

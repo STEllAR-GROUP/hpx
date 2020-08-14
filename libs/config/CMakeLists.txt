@@ -37,7 +37,7 @@ set(config_sources version.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   config CONFIG_FILES
-  COMPATIBILITY_HEADERS OFF
+  COMPATIBILITY_HEADERS OFF # Added in 1.4.0
   GLOBAL_HEADER_GEN OFF
   SOURCES ${config_sources}
   HEADERS ${config_headers}

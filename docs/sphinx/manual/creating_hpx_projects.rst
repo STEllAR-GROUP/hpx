@@ -255,13 +255,13 @@ This requires that you have already created the target like this:
    add_library(hello_world_component SHARED hello_world_component.cpp)
    target_include_directories(hello_world_component PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-When you link your library to the ``HPX::hpx`` |cmake| target you will be able
-use |hpx| functionality in your library. To use ``main`` as the implicit entry
+When you link your library to the ``HPX::hpx`` |cmake| target, you will be able
+use |hpx| functionality in your library. To use ``main()`` as the implicit entry
 point in your application you must additionally link your application to the
-|cmake| target ``HPX::wrap_main``. ``HPX::wrap_main`` is automatically linked to
+|cmake| target ``HPX::wrap_main``. This target is automatically linked to
 executables if you are using the macros described below
 (:ref:`using_hpx_cmake_macros`). See :ref:`minimal` for more information on
-implicitly using ``main`` as the entry point.
+implicitly using ``main()`` as the entry point.
 
 Creating a component requires setting two additional compile definitions:
 

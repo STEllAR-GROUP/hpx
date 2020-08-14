@@ -23,7 +23,7 @@ set(affinity_sources affinity_data.cpp parse_affinity_options.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   affinity
-  COMPATIBILITY_HEADERS ON
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${affinity_sources}

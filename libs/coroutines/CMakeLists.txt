@@ -51,7 +51,7 @@ set(coroutines_sources
 include(HPX_AddModule)
 add_hpx_module(
   coroutines
-  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${coroutines_sources}

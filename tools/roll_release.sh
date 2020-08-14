@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #
+# Copyright (c)      2020 ETH Zurich
 # Copyright (c)      2019 Mikael Simberg
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
@@ -20,6 +21,11 @@ VERSION_FULL_NOTAG=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
 VERSION_FULL_TAG=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR$VERSION_TAG
 VERSION_DESCRIPTION="HPX V${VERSION_FULL_NOTAG}: The C++ Standards Library for Parallelism and Concurrency"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+if ! which hub > /dev/null 2>&1; then
+    echo "Hub not installed on this system. Exiting.."
+    exit 1
+fi
 
 if [ "$CURRENT_BRANCH" != "release" ]; then
     echo "Not on release branch. Not continuing to make release."
@@ -61,7 +67,7 @@ git config user.name "STE||AR Group"
 
 echo ""
 echo "Tagging release."
-git tag -s -a "${VERSION_FULL_TAG}" -m "${VERSION_DESCRIPTION}"
+git tag --sign --annotate "${VERSION_FULL_TAG}" --message="${VERSION_DESCRIPTION}"
 git push origin "${VERSION_FULL_TAG}"
 
 echo ""
@@ -70,6 +76,11 @@ hub release create \
     ${PRERELEASE_FLAG} \
     --message "${VERSION_DESCRIPTION}" \
     "${VERSION_FULL_TAG}"
+
+# Unset the local config used for the release
+git config --unset user.signingkey
+git config --unset user.name
+git config --unset user.email
 
 echo ""
 echo "Now add the above URL to the downloads pages on stellar.cct.lsu.edu and stellar-group.org."

@@ -108,6 +108,8 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Giannis Gonidelis, for his work on the ranges adaptation during the
+  Google Summer of Code 2020.
 * Auriane Reverdell (|cscs|_), for her tireless work on refactoring our CMake
   setup and modularizing |hpx|.
 * Christopher Hinz, for his work on refactoring our CMake setup.
@@ -252,7 +254,7 @@ the project through discussions, pull requests, documentation patches, etc.
   xaguilar, Andrew Kemp, Dylan Stark, Matthew Anderson, Jeremy Wilke, Jiazheng
   Yuan, CyberDrudge, david8dixon, Maxwell Reeser, Raffaele Solca, Marco
   Ippolito, Jules Penuchot, Weile Wei, Severin Strobl, Kor de Jong, albestro,
-  Jeff Trull, and Yuri Victorovich who contributed to the general
+  Jeff Trull, Yuri Victorovich, and Gregor Daiß who contributed to the general
   improvement of |hpx|.
 
 In addition to the people who worked directly with |hpx| development we would

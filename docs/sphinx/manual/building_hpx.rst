@@ -56,7 +56,7 @@ are case-sensitive. Example:
 
 .. code-block:: bash
 
-   cmake -G "Visual Studio 9 2008" path/to/hpx
+   cmake -G "Visual Studio 16 2019" path/to/hpx
 
 For a given development platform there can be more than one adequate generator.
 If you use Visual Studio ``"NMake Makefiles"`` is a generator you can use for
@@ -85,7 +85,7 @@ Here, you will use the command-line, non-interactive CMake interface.
       mkdir mybuilddir
       cd mybuilddir
 
-#. Execute this command on the shell replacing ``path/to/hpx/`` with the path to
+#. Execute this command on the shell replacing ``path/to/hpx`` with the path to
    the root of your |hpx| source tree:
 
    .. code-block:: bash
@@ -171,7 +171,7 @@ on your target machine. |hpx| currently requires at least Boost V1.61.0 to work
 properly. It may build and run with older versions, but we do not test |hpx|
 with those versions, so please be warned.
 
-The installation of Boost is described in detail in Boost's `Getting Started <https://www.boost.org/doc/libs/1_71_0/more/getting_started/index.html>`_
+The installation of Boost is described in detail in Boost's `Getting Started <https://www.boost.org/doc/libs/1_73_0/more/getting_started/index.html>`_
 document. However, if you've never used the Boost
 libraries (or even if you have), here's a quick primer:
 :ref:`boost_installation`.
@@ -201,7 +201,6 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * **Compilers**
      *
      *
-     *
    * * |gcc|_
      * 7.0
      *
@@ -209,10 +208,9 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
      * 2014
      *
    * * |clang|_
-     * 4.0
+     * 5.0
      *
    * * **Build System**
-     *
      *
      *
    * * |cmake|_
@@ -221,12 +219,11 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * **Required Libraries**
      *
      *
-     *
    * * |boost_libraries|_
-     * 1.61.0
+     * 1.64.0
      *
    * * |hwloc|_
-     * 1.2 (Xeon Phi: 1.6)
+     * 1.5
      *
 
 .. note::
@@ -254,9 +251,8 @@ favorite compiler with |hpx| visit |hpx_buildbot|_.
    * * **Required Libraries**
      *
      *
-     *
    * * |boost|_
-     * 1.61.0
+     * 1.64.0
      *
    * * |hwloc|_
      * 1.5
@@ -353,10 +349,10 @@ Documentation
 To build the |hpx| documentation, you need recent versions of the following
 packages:
 
-- ``python`` (2 or 3)
+- ``python3``
 - ``sphinx`` (Python package)
 - ``sphinx_rtd_theme`` (Python package)
-- ``breathe`` (Python package)
+- ``breathe 4.16.0`` (Python package)
 - ``doxygen``
 
 If the |python|_ dependencies are not available through your system package
@@ -661,7 +657,7 @@ How to install |hpx| on Unix variants
 
   .. code-block:: bash
 
-     cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.10
+     cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.0
 
 * Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag
   to your make invocation, where N is the number of parallel processes |hpx|
@@ -752,7 +748,7 @@ remember to replace ``/usr/local/include/boost-1_53`` with whatever prefix
 you used in your installation.
 
 Build |hpx|, finally
-..................
+....................
 
 .. code-block:: bash
 
@@ -760,62 +756,45 @@ Build |hpx|, finally
    git clone https://github.com/STEllAR-GROUP/hpx.git
    mkdir build-hpx && cd build-hpx
 
-To build with Clang 3.2, execute:
+To build with Clang, execute:
 
 .. code-block:: bash
 
    cmake ../hpx \
        -DCMAKE_CXX_COMPILER=clang++ \
-       -DBOOST_INCLUDE_DIR=/usr/local/include/boost-1_53 \
-       -DBOOST_LIBRARY_DIR=/usr/local/lib \
-       -DBOOST_SUFFIX=-clang-darwin32-mt-1_53 \
-   make
-
-To build with Clang 3.3 (trunk), execute:
-
-.. code-block:: bash
-
-   cmake ../hpx \
-       -DCMAKE_CXX_COMPILER=clang++ \
-       -DBOOST_INCLUDE_DIR=/usr/local/include/boost-1_53 \
-       -DBOOST_LIBRARY_DIR=/usr/local/lib \
-       -DBOOST_SUFFIX=-clang-darwin33-mt-1_53 \
-   make
+       -DBOOST_ROOT=/path/to/boost \
+       -DHWLOC_ROOT=/path/to/hwloc \
+       -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On
+   make -j
 
 For more detailed information about using |cmake|, please refer its documentation
 and to the section :ref:`building_hpx`.
 
 Alternative installation method of |hpx| on OS X (Mac)
-....................................................
+......................................................
 
 Alternatively, you can install a recent version of gcc as well as all
 required libraries via MacPorts:
 
 #. Install |macports|
 
-#. Install CMake, gcc 4.8, and hwloc:
+#. Install CMake, gcc, hwloc:
 
    .. code-block:: bash
 
-      sudo port install gcc48
-      sudo port install hwloc
+      sudo brew install cmake
+      sudo brew install boost
+      sudo brew install hwloc
+      sudo brew install make
 
-   You may also want:
-
-   .. code-block:: bash
-
-      sudo port install cmake
-      sudo port install git-core
-
-#. Make this version of gcc your default compiler:
+#. You may also want:
 
    .. code-block:: bash
 
-      sudo port install gcc_select
-      sudo port select gcc mp-gcc48
+      sudo brew install gperftools
 
-#. Build Boost manually (the Boost package of MacPorts is built with Clang, and
-   unfortunately doesn't work with a GCC-build version of |hpx|):
+#. If you need to build Boost manually (the Boost package of MacPorts is built
+   with Clang, and unfortunately doesn't work with a GCC-build version of |hpx|):
 
    .. code-block:: bash
 
@@ -845,6 +824,7 @@ required libraries via MacPorts:
           -DBOOST_ROOT=$BOOST_ROOT \
           -DHWLOC_ROOT=/opt/local \
           -DCMAKE_INSTALL_PREFIX=$HOME/hpx \
+          -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On \
                $(pwd)/../hpx
       make -j8
       make -j8 install
@@ -854,6 +834,9 @@ required libraries via MacPorts:
 #. Note that you need to set ``BOOST_ROOT``, ``HPX_ROOT`` and
    ``DYLD_LIBRARY_PATH`` (for both ``BOOST_ROOT`` and ``HPX_ROOT``) every time
    you configure, build, or run an |hpx| application.
+
+#. Note that you need to set ``HPX_WITH_GENERIC_CONTEXT_COROUTINES=On`` for
+   MacOS.
 
 #. If you want to use |hpx| with MPI, you need to enable the MPI parcelport, and
    also specify the location of the MPI wrapper scripts. This can be done using
@@ -935,10 +918,10 @@ documentation and also the section :ref:`building_hpx`.
 .. _howto_win32:
 
 How to build |hpx| under Windows 10 x64 with Visual Studio 2015
-.............................................................
+...............................................................
 
-* Download the CMake V3.4.3 installer (or latest version) from `here
-  <https://blog.kitware.com/cmake-3-4-3-available-for-download/>`__
+* Download the CMake V3.18.1 installer (or latest version) from `here
+  <https://blog.kitware.com/cmake-3-18-1-available-for-download/>`__
 * Download the hwloc V1.11.0 (or the latest version) from `here
   <http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-win64-build-1.11.0.zip>`__
   and unpack it.
@@ -1043,167 +1026,6 @@ How to build |hpx| under Windows 10 x64 with Visual Studio 2015
   .. figure:: ../_static/images/vs_build_output.png
 
      Visual Studio build output.
-
-.. _bgq_installation:
-
-How to Install |hpx| on BlueGene/Q
-----------------------------------
-
-So far we only support BGClang for compiling |hpx| on the BlueGene/Q.
-
-* Check if BGClang is available on your installation. If not, obtain and install
-  a copy from the `BGClang trac page
-  <https://trac.alcf.anl.gov/projects/llvm-bgq>`_.
-
-* Build (and install) a recent version of |hwloc_downloads|_. With the following
-  commands:
-
-  .. code-block:: bash
-
-     ./configure \
-       --host=powerpc64-bgq-linux \
-       --prefix=$HOME/install/hwloc \
-       --disable-shared \
-       --enable-static \
-       CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
-     make
-     make install
-
-* Build (and install) a recent version of Boost, using BGClang. To build Boost
-  with BGClang, you'll need to set up the following in your Boost
-  ``~/user-config.jam`` file:
-
-  .. code-block:: bash
-
-     # user-config.jam (put this file into your home directory)
-     using clang
-       :
-       : bgclang++11
-       :
-       ;
-
-  You can then use this as your build command:
-
-  .. code-block:: bash
-
-     ./bootstrap.sh
-     ./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
-
-* Clone the master |hpx| git repository (or a stable tag):
-
-  .. code-block:: bash
-
-     git clone git://github.com/STEllAR-GROUP/hpx.git
-
-* Generate the |hpx| buildfiles using CMake:
-
-  .. code-block:: bash
-
-     cmake -DHPX_PLATFORM=BlueGeneQ \
-             -DCMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/BGQ.cmake \
-             -DCMAKE_CXX_COMPILER=bgclang++11 \
-             -DMPI_CXX_COMPILER=mpiclang++11 \
-             -DHWLOC_ROOT=/path/to/hwloc/installation \
-             -DBOOST_ROOT=/path/to/boost \
-             -DHPX_WITH_MALLOC=system \
-             /path/to/hpx
-
-* To complete the build and install |hpx|:
-
-  .. code-block:: bash
-
-     make -j24
-     make install
-
-  This will build and install the essential core components of |hpx| only. Use:
-
-  .. code-block:: bash
-
-     make -j24 examples
-     make -j24 install
-
-  to build and install the examples.
-
-.. _intel_mic_installation:
-
-How to Install |hpx| on the Xeon Phi
-------------------------------------
-
-Installation of the Boost Libraries
-...................................
-
-* Download |boost_downloads|_ for Linux and unpack the retrieved tarball.
-
-* Adapt your ``~/user-config.jam`` to contain the following lines:
-
-  .. code-block:: bash
-
-     ## Toolset to be used for compiling for the host
-     using intel
-         : host
-         :
-         : <cxxflags>"-std=c++0x"
-         ;
-
-     ## Toolset to be used for compiling for the Xeon Phi
-     using intel
-         : mic
-         :
-         : <cxxflags>"-std=c++0x -mmic"
-           <linkflags>"-std=c++0x -mmic"
-         ;
-
-* Change to the directory you unpacked Boost in (which will be referred to as
-  ``$BOOST_ROOT`` from now on) and execute the following commands:
-
-  .. code-block:: bash
-
-     ./bootstrap.sh
-     ./b2 toolset=intel-mic -j<N>
-
-  You should now have all the required Boost libraries.
-
-Installation of the Hwloc library
-.................................
-
-* Download |hwloc_downloads|_, unpack the retrieved tarball and change to the
-  newly created directory.
-* Run the configure-make-install procedure as follows:
-
-  .. code-block:: bash
-
-     CC=icc CFLAGS=-mmic CXX=icpc CXXFLAGS=-mmic LDFLAGS=-mmic ./configure --host=x86_64-k1om-linux --prefix=$HWLOC_ROOT
-     make
-     make install
-
-.. important::
-
-   The minimally required version of the |hwloc| library on the Intel Xeon Phi
-   is V1.6.
-
-You now have a working hwloc installation in ``$HWLOC_ROOT``.
-
-Building |hpx|
-..............
-
-After all the prerequisites have been successfully installed, we can now start
-building and installing |hpx|. The build procedure is almost the same as the one
-for :ref:`unix_installation` with the sole difference that you have to enable the
-Xeon Phi in the CMake Build system. This is achieved by invoking CMake in the
-following way:
-
-.. code-block:: bash
-
-   cmake                                             \
-       -DCMAKE_TOOLCHAIN_FILE=/path/to/hpx/cmake/toolchains/XeonPhi.cmake \
-       -DBOOST_ROOT=$BOOST_ROOT                      \
-       -DHWLOC_ROOT=$HWLOC_ROOT                      \
-       /path/to/hpx
-
-For more detailed information about using |cmake|, please refer to its
-documentation and to the section :ref:`building_hpx`. Please pay special
-attention to the section about :option:`HPX_WITH_MALLOC:STRING` as this is
-crucial for getting decent performance on the Xeon Phi.
 
 .. _fedora_installation:
 

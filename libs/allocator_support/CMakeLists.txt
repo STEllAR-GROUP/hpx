@@ -19,7 +19,7 @@ set(allocator_support_sources)
 include(HPX_AddModule)
 add_hpx_module(
   allocator_support
-  COMPATIBILITY_HEADERS ON
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${allocator_support_sources}

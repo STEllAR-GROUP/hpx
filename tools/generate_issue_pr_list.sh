@@ -9,11 +9,19 @@
 # This script generates issue and PR lists for the current release. The output
 # is meant to be used in the release notes for each release. It relie on the hub
 # command line tool (https://hub.github.com/), jq, and sed.
+# To only list the last ones in order to just update the list in the release
+# notes, specify --limit as an argument of this script, this makes the request
+# quicker.
 
 VERSION_MAJOR=$(sed -n 's/set(HPX_VERSION_MAJOR \(.*\))/\1/p' CMakeLists.txt)
 VERSION_MINOR=$(sed -n 's/set(HPX_VERSION_MINOR \(.*\))/\1/p' CMakeLists.txt)
 VERSION_SUBMINOR=$(sed -n 's/set(HPX_VERSION_SUBMINOR \(.*\))/\1/p' CMakeLists.txt)
 VERSION_FULL_NOTAG=$VERSION_MAJOR.$VERSION_MINOR.$VERSION_SUBMINOR
+
+if ! which hub > /dev/null 2>&1; then
+    echo "Hub not installed on this system. Exiting.."
+    exit 1
+fi
 
 # hub does not have a sub-command for milestones, but we can list milestones
 # using the hub api command instead (based on
@@ -44,7 +52,11 @@ VERSION_MILESTONE_ID=$(milestone_id_from_version "${VERSION_FULL_NOTAG}")
 echo "Closed issues"
 echo "============="
 
-hub issue --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
+if [[ "$1" = "--limit" ]]; then
+    hub issue --limit 15 --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
+else
+    hub issue --state=closed --milestone="${VERSION_MILESTONE_ID}" --format="* :hpx-issue:\`%I\` - %t%n"
+fi
 
 echo ""
 echo "Closed pull requests"
@@ -54,5 +66,10 @@ echo "===================="
 # However, it lets us print the milestone for each PR. So we print every PR with
 # a milestone, filter out the unwanted PRs, and remove the printed milestone
 # from every PR instead.
-hub pr list --state=closed --format="[%Mn]* :hpx-pr:\`%I\` - %t%n" |
+if [[ "$1" = "--limit" ]]; then
+    hub pr list --limit 15 --state=closed --format="[%Mn]* :hpx-pr:\`%I\` - %t%n" |
     sed -n "s/^\[${VERSION_MILESTONE_ID}\]\(.*\)/\1/p"
+else
+    hub pr list  --state=closed --format="[%Mn]* :hpx-pr:\`%I\` - %t%n" |
+    sed -n "s/^\[${VERSION_MILESTONE_ID}\]\(.*\)/\1/p"
+fi

@@ -22,7 +22,7 @@ set(topology_sources cpu_mask.cpp topology.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   topology
-  COMPATIBILITY_HEADERS ON # Added in 1.4.0
+  COMPATIBILITY_HEADERS ON # Added in 1.5.0
   DEPRECATION_WARNINGS
   GLOBAL_HEADER_GEN ON
   SOURCES ${topology_sources}
