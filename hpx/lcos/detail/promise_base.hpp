@@ -56,17 +56,26 @@ namespace lcos {
             void do_run()
             {
                 if (!f_)
-                    return;         // do nothing if no deferred task is given
+                    return;    // do nothing if no deferred task is given
+
+                std::exception_ptr p;
 
                 try
                 {
-                    f_();           // trigger action
-                    this->wait();   // wait for value to come back
+                    f_();            // trigger action
+                    this->wait();    // wait for value to come back
+                    return;
                 }
                 catch (...)
                 {
-                    this->set_exception(std::current_exception());
+                    p = std::current_exception();
                 }
+
+                // The exception is set outside the catch block since
+                // set_exception may yield. Ending the catch block on a
+                // different worker thread than where it was started may lead
+                // to segfaults.
+                this->set_exception(std::move(p));
             }
 
             util::unique_function_nonser<void()> f_;

@@ -33,29 +33,47 @@ namespace hpx { namespace lcos { namespace detail {
     HPX_FORCEINLINE void transfer_result_impl(
         std::false_type, Source&& src, Destination& dest)
     {
+        std::exception_ptr p;
+
         try
         {
             dest.set_value(src.get());
+            return;
         }
         catch (...)
         {
-            dest.set_exception(std::current_exception());
+            p = std::current_exception();
         }
+
+        // The exception is set outside the catch block since
+        // set_exception may yield. Ending the catch block on a
+        // different worker thread than where it was started may lead
+        // to segfaults.
+        dest.set_exception(std::move(p));
     }
 
     template <typename Source, typename Destination>
     HPX_FORCEINLINE void transfer_result_impl(
         std::true_type, Source&& src, Destination& dest)
     {
+        std::exception_ptr p;
+
         try
         {
             src.get();
             dest.set_value(util::unused);
+            return;
         }
         catch (...)
         {
-            dest.set_exception(std::current_exception());
+            p = std::current_exception();
         }
+
+        // The exception is set outside the catch block since
+        // set_exception may yield. Ending the catch block on a
+        // different worker thread than where it was started may lead
+        // to segfaults.
+        dest.set_exception(std::move(p));
     }
 
     template <typename Future, typename SourceState, typename DestinationState>
@@ -74,29 +92,46 @@ namespace hpx { namespace lcos { namespace detail {
     void invoke_continuation_nounwrap(
         Func& func, Future&& future, Continuation& cont, std::false_type)
     {
+        std::exception_ptr p;
+
         try
         {
             cont.set_value(func(std::forward<Future>(future)));
+            return;
         }
         catch (...)
         {
-            cont.set_exception(std::current_exception());
+            p = std::current_exception();
         }
+
+        // The exception is set outside the catch block since
+        // set_exception may yield. Ending the catch block on a
+        // different worker thread than where it was started may lead
+        // to segfaults.
+        cont.set_exception(std::move(p));
     }
 
     template <typename Func, typename Future, typename Continuation>
     void invoke_continuation_nounwrap(
         Func& func, Future&& future, Continuation& cont, std::true_type)
     {
+        std::exception_ptr p;
         try
         {
             func(std::forward<Future>(future));
             cont.set_value(util::unused);
+            return;
         }
         catch (...)
         {
-            cont.set_exception(std::current_exception());
+            p = std::current_exception();
         }
+
+        // The exception is set outside the catch block since
+        // set_exception may yield. Ending the catch block on a
+        // different worker thread than where it was started may lead
+        // to segfaults.
+        cont.set_exception(std::move(p));
     }
 
     template <typename Func, typename Future, typename Continuation>
@@ -117,6 +152,8 @@ namespace hpx { namespace lcos { namespace detail {
         typename util::invoke_result<Func, Future>::type>::value>::type
     invoke_continuation(Func& func, Future&& future, Continuation& cont)
     {
+        std::exception_ptr p;
+
         try
         {
             typedef
@@ -147,11 +184,18 @@ namespace hpx { namespace lcos { namespace detail {
                     return transfer_result<inner_future>(
                         std::move(inner_state), std::move(cont_));
                 });
+            return;
         }
         catch (...)
         {
-            cont.set_exception(std::current_exception());
+            p = std::current_exception();
         }
+
+        // The exception is set outside the catch block since
+        // set_exception may yield. Ending the catch block on a
+        // different worker thread than where it was started may lead
+        // to segfaults.
+        cont.set_exception(std::move(p));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -386,6 +430,7 @@ namespace hpx { namespace lcos { namespace detail {
         void cancel()
         {
             std::unique_lock<mutex_type> l(this->mtx_);
+            std::exception_ptr p;
             try
             {
                 if (!this->started_)
@@ -413,13 +458,20 @@ namespace hpx { namespace lcos { namespace detail {
                         "continuation<Future, ContResult>::cancel",
                         "future can't be canceled at this time");
                 }
+                return;
             }
             catch (...)
             {
                 this->started_ = true;
-                this->set_exception(std::current_exception());
-                throw;
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            this->set_exception(p);
+            std::rethrow_exception(std::move(p));
         }
 
     public:
@@ -642,14 +694,23 @@ namespace hpx { namespace lcos { namespace detail {
             typename traits::detail::shared_state_ptr_for<Inner>::type&&
                 inner_state)
         {
+            std::exception_ptr p;
+
             try
             {
                 transfer_result<Inner>(std::move(inner_state), this);
+                return;
             }
             catch (...)
             {
-                this->set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            this->set_exception(std::move(p));
         }
 
         template <typename Outer>
@@ -664,6 +725,7 @@ namespace hpx { namespace lcos { namespace detail {
             // Bind an on_completed handler to this future which will transfer
             // its result to the new future.
             hpx::intrusive_ptr<unwrap_continuation> this_(this);
+            std::exception_ptr p;
             try
             {
                 // if we get here, this future is ready
@@ -690,11 +752,18 @@ namespace hpx { namespace lcos { namespace detail {
                     return this_->template on_inner_ready<inner_future>(
                         std::move(inner_state));
                 });
+                return;
             }
             catch (...)
             {
-                this->set_exception(std::current_exception());
+                p = std::current_exception();
             }
+
+            // The exception is set outside the catch block since
+            // set_exception may yield. Ending the catch block on a
+            // different worker thread than where it was started may lead
+            // to segfaults.
+            this->set_exception(std::move(p));
         }
 
     public:

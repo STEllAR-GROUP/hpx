@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -163,14 +164,23 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
             void invoke()
             {
+                std::exception_ptr p;
+
                 try
                 {
                     invoke_helper(std::is_void<Result>());
+                    return;
                 }
                 catch (...)
                 {
-                    p_.set_exception(std::current_exception());
+                    p = std::current_exception();
                 }
+
+                // The exception is set outside the catch block since
+                // set_exception may yield. Ending the catch block on a
+                // different worker thread than where it was started may lead
+                // to segfaults.
+                p_.set_exception(std::move(p));
             }
 
             void invoke_helper(std::true_type)
